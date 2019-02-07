@@ -16,14 +16,7 @@ node {
 
     def namespace = getParameter(params.Miljo, "default")
 
-    def mvn = "${tool 'maven-3.5.0'}/bin/mvn".toString()
     def mvnSettings = "navMavenSettingsUtenProxy"
-    def MAVEN_SETTINGS
-
-    configFileProvider([configFile(fileId: "$mvnSettings", variable: "MVN_SET")]) {
-        sh "$mvn clean verify -s $MVN_SET"
-        MAVEN_SETTINGS = "$MVN_SET"
-    }
 
     // git related vars
     def branchName
@@ -57,14 +50,18 @@ node {
         }
 
         stage("Build application") {
-            sh "mvn versions:set -B -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false -s $MAVEN_SETTINGS"
-            sh "mvn clean package -Pcoverage -B -e -U -s $MAVEN_SETTINGS"
+            configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
+                sh "mvn versions:set -B -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false -s $MAVEN_SETTINGS"
+                sh "mvn clean package -Pcoverage -B -e -U -s $MAVEN_SETTINGS"
+            }
         }
 
         stage("Build & publish Docker image") {
-            sh "mvn clean package -DskipTests -B s $MAVEN_SETTINGS"
-            sh "docker build --build-arg JAR_FILE=${application}-${releaseVersion}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${releaseVersion} --rm=true ."
-            sh "docker push ${dockerRepo}/${application}:${releaseVersion}"
+            configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
+                sh "mvn clean package -DskipTests -B s $MAVEN_SETTINGS"
+                sh "docker build --build-arg JAR_FILE=${application}-${releaseVersion}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${releaseVersion} --rm=true ."
+                sh "docker push ${dockerRepo}/${application}:${releaseVersion}"
+            }
         }
 
         stage("Deploy to NAIS") {
