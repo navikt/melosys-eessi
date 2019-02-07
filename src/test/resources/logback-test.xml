@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration>
+
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+  <!-- Kveler den støyende debugloggingen når Spring initialiseres -->
+  <logger name="org.springframework" level="INFO"/>
+
+  <logger name="no.nav.melosys.eessi" level="DEBUG"/>
+</configuration>
