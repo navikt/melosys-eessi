@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
+import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -486,7 +487,7 @@ public class EuxConsumer implements RestConsumer {
       return euxRestTemplate.exchange(uri, method, entity, responseType).getBody();
     } catch (RestClientException e) {
       //throw ExceptionMapper.springExTilMelosysEx(e);
-      throw new RuntimeException(); //TODO exceptions
+      throw new IntegrationException("Error in integration with eux", e); //TODO exceptions
     }
   }
 

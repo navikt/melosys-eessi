@@ -61,9 +61,9 @@ public class RestStsService implements RestConsumer {
       return (String) responseBody.get(ACCESS_TOKEN_KEY);
 
     } catch (HttpStatusCodeException ex) {
-      throw new IntegrationException("Error when connecting to reststs");
+      throw new IntegrationException("Error when connecting to reststs", ex);
     } catch (Exception ex) {
-      throw new IntegrationException("Error when connecting to reststs");
+      throw new IntegrationException("Error when connecting to reststs", ex);
     }
   }
 
