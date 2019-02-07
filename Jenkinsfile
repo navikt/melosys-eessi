@@ -20,7 +20,7 @@ node {
     def mvnSettings = "navMavenSettingsUtenProxy"
 
     configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-        sh "$mvn $arguments -s $MAVEN_SETTINGS"
+        sh "$mvn clean verify -s $MAVEN_SETTINGS"
     }
 
     // git related vars
