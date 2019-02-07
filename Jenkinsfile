@@ -6,7 +6,7 @@
 
 node {
     def KUBECTL = "/usr/bin/kubectl"
-    def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/extras/kubeconfigs_naiserator/teammelosys.yaml"
+    def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
     def VERA_UPDATE_URL = "https://vera.adeo.no/api/v1/deploylog"
     def DEFAULT_BUILD_USER = "Jenkins"
@@ -15,6 +15,13 @@ node {
     def dockerRepo = "docker.adeo.no:5000/melosys"
 
     def namespace = getParameter(params.Miljo, "default")
+
+    def mvn = "${tool 'maven-3.5.0'}/bin/mvn".toString()
+    def mvnSettings = "navMavenSettingsUtenProxy"
+
+    configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
+        sh "$mvn $arguments -s $MAVEN_SETTINGS"
+    }
 
     // git related vars
     def branchName
