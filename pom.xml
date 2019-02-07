@@ -10,9 +10,9 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>no.nav</groupId>
-  <artifactId>melosys-lovvalg</artifactId>
+  <artifactId>melosys-eessi</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>melosys-lovvalg</name>
+  <name>melosys-eessi</name>
   <description>Melosys EESSI integrasjon</description>
 
   <properties>

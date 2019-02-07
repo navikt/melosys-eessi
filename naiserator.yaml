@@ -1,12 +1,12 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: melosys-lovvalg
+  name: melosys-eessi
   namespace: @@NAMESPACE@@
   labels:
     team: teammelosys
 spec:
-  image: docker.adeo.no:5000/melosys/melosys-lovvalg:@@RELEASE_VERSION@@
+  image: docker.adeo.no:5000/melosys/melosys-eessi:@@RELEASE_VERSION@@
   port: 8080
   replicas:
     min: 1
@@ -30,4 +30,4 @@ spec:
   vault:
     enabled: true
   ingresses:
-  - "https://melosys-lovvalg@@URL_NAMESPACE@@.nais.preprod.local"
+  - "https://melosys-eessi@@URL_NAMESPACE@@.nais.preprod.local"
