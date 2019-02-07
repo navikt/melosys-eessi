@@ -5,7 +5,7 @@
 // - Miljo: Hvilken miljø (namespace) på NAIS som applikasjonen skal deployes til.
 
 node {
-    def KUBECTL = "/usr/bin/kubectl"
+    def KUBECTL = "/usr/local/bin/kubectl"
     def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
     def VERA_UPDATE_URL = "https://vera.adeo.no/api/v1/deploylog"
@@ -75,12 +75,12 @@ node {
 
             // Oppdater Vera
             try {
-                // Brukeren som skal registreres som deployer i Vera.
-                def deployer = getBuildUser(DEFAULT_BUILD_USER)
-
-                println("[INFO] Oppdaterer Vera => application=${application}, environment=${namespace}, version=${releaseVersion}, deployedBy=${deployer}")
-
-                sh "curl -i -s --header \"Content-Type: application/json\" --request POST --data \'{\"environment\": \"${namespace}\",\"application\": \"${application}\",\"version\": \"${releaseVersion}\",\"deployedBy\": \"${deployer}\"}\' ${VERA_UPDATE_URL}"
+//                Brukeren som skal registreres som deployer i Vera.
+//                def deployer = getBuildUser(DEFAULT_BUILD_USER)
+//
+//                println("[INFO] Oppdaterer Vera => application=${application}, environment=${namespace}, version=${releaseVersion}, deployedBy=${deployer}")
+//
+//                sh "curl -i -s --header \"Content-Type: application/json\" --request POST --data \'{\"environment\": \"${namespace}\",\"application\": \"${application}\",\"version\": \"${releaseVersion}\",\"deployedBy\": \"${deployer}\"}\' ${VERA_UPDATE_URL}"
             } catch (e) {
                 println("[ERROR] Feil ved oppdatering av Vera. Exception: " + e)
             }
