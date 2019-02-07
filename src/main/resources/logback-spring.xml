@@ -25,6 +25,6 @@
   <springProfile name="local">
     <include resource="org/springframework/boot/logging/logback/base.xml" />
 
-    <logger name="no.nav.arena.dsopapi" level="DEBUG" />
+    <logger name="no.nav.melosys.eessi" level="DEBUG" />
   </springProfile>
 </configuration>
