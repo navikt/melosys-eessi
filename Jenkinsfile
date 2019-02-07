@@ -58,7 +58,7 @@ node {
 
         stage("Build & publish Docker image") {
             configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-                sh "mvn clean package -DskipTests -B s $MAVEN_SETTINGS"
+                sh "mvn clean package -DskipTests -B -s $MAVEN_SETTINGS"
                 sh "docker build --build-arg JAR_FILE=${application}-${releaseVersion}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${releaseVersion} --rm=true ."
                 sh "docker push ${dockerRepo}/${application}:${releaseVersion}"
             }
