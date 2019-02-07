@@ -11,7 +11,7 @@ node {
     def VERA_UPDATE_URL = "https://vera.adeo.no/api/v1/deploylog"
     def DEFAULT_BUILD_USER = "Jenkins"
 
-    def cluster = "preprod-fss"
+    def cluster = "dev-fss"
     def dockerRepo = "docker.adeo.no:5000/melosys"
 
     def namespace = getParameter(params.Miljo, "default")

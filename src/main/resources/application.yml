@@ -5,3 +5,15 @@ server:
 spring:
   application:
     name: melosys-eessi
+  data:
+    rest:
+      base-path: /api
+
+
+melosys:
+  systemuser:
+    username: ${SRV_USERNAME}
+    password: ${SRV_PASSWORD}
+  integrations:
+    euxapp-url: ${EUXAPP_URL}
+    reststs-url: ${RESTSTS_URL}
