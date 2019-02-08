@@ -18,7 +18,7 @@ node {
     def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
     def VERA_UPDATE_URL = "https://vera.adeo.no/api/v1/deploylog"
-    def DEFAULT_BUILD_USER = "Jenkins"
+    def DEFAULT_BUILD_USER = "eessi2-jenkins"
 
     def cluster = "dev-fss"
     def dockerRepo = "docker.adeo.no:5000/melosys"
@@ -84,12 +84,11 @@ node {
 
             // Oppdater Vera
             try {
-//                Brukeren som skal registreres som deployer i Vera.
-//                def deployer = getBuildUser(DEFAULT_BUILD_USER)
-//
-//                println("[INFO] Oppdaterer Vera => application=${application}, environment=${namespace}, version=${releaseVersion}, deployedBy=${deployer}")
-//
-//                sh "curl -i -s --header \"Content-Type: application/json\" --request POST --data \'{\"environment\": \"${namespace}\",\"application\": \"${application}\",\"version\": \"${releaseVersion}\",\"deployedBy\": \"${deployer}\"}\' ${VERA_UPDATE_URL}"
+                def deployer = getBuildUser(DEFAULT_BUILD_USER)
+
+                println("[INFO] Oppdaterer Vera => application=${application}, environment=${namespace}, version=${releaseVersion}, deployedBy=${deployer}")
+
+                sh "curl -i -s --header \"Content-Type: application/json\" --request POST --data \'{\"environment\": \"${namespace}\",\"application\": \"${application}\",\"version\": \"${releaseVersion}\",\"deployedBy\": \"${deployer}\"}\' ${VERA_UPDATE_URL}"
             } catch (e) {
                 println("[ERROR] Feil ved oppdatering av Vera. Exception: " + e)
             }
@@ -120,8 +119,8 @@ def getBuildUser(defaultUser) {
         }
     } catch (e) {
         // Dersom bygg er auto-trigget, er ikke BUILD_USER variablene satt => defaultUser benyttes
+        return buildUser
     }
-    return buildUser
 }
 
 def getParameter(paramValue, defaultValue) {
