@@ -5,6 +5,15 @@
 // - Miljo: Hvilken miljø (namespace) på NAIS som applikasjonen skal deployes til.
 
 node {
+
+    properties([
+            parameters([
+                    choice(choices: ['t8', 'default'],
+                            description: 'Hvilket miljø skal applikasjon deployes til. Default er q', name: 'NAMESPACE')
+            ])
+    ])
+
+
     def KUBECTL = "/usr/local/bin/kubectl"
     def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
@@ -14,7 +23,7 @@ node {
     def cluster = "dev-fss"
     def dockerRepo = "docker.adeo.no:5000/melosys"
 
-    def namespace = getParameter(params.Miljo, "default")
+    def namespace = "${params.NAMESPACE}".toString()
 
     def mvnSettings = "navMavenSettingsUtenProxy"
 
