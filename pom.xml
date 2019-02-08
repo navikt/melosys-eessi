@@ -23,6 +23,7 @@
     <logstash-encoder.version>4.10</logstash-encoder.version>
     <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
     <spring-kafka.version>2.2.3.RELEASE</spring-kafka.version>
+    <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
   </properties>
 
   <dependencies>
@@ -56,11 +57,20 @@
       <artifactId>guava</artifactId>
       <version>${guava.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+      <version>${springfox-swagger2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+      <version>${springfox-swagger2.version}</version>
     </dependency>
 
     <!-- TEST -->
