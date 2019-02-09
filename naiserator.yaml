@@ -13,11 +13,11 @@ spec:
     max: 2
     cpuThresholdPercentage: 50
   liveness:
-    path: /actuator/health
+    path: /api/actuator/health
     initialDelay: 60
     timeout: 10
   readiness:
-    path: /actuator/health
+    path: /api/actuator/health
     initialDelay: 60
     timeout: 10
   resources:
