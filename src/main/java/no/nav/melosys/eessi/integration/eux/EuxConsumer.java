@@ -55,10 +55,10 @@ public class EuxConsumer implements RestConsumer {
    * @param rinaSaksnummer Saksnummer til BuC
    * @return JsonNode klasse. Selve returverdien er et svært komplisert objekt,
    * derfor er ikke det spesifikke objektet spesifisert
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public JsonNode hentBuC(String rinaSaksnummer) throws Exception {
+  public JsonNode hentBuC(String rinaSaksnummer) throws IntegrationException {
 
     log.info("Henter buc: {}", rinaSaksnummer);
     String uri = String.format(BUC_PATH, rinaSaksnummer);
@@ -71,10 +71,10 @@ public class EuxConsumer implements RestConsumer {
    * Oppretter ny BuC/RINA-sak
    * @param bucType Type BuC. Eks. LA_BUC_04
    * @return saksnummer til nye sak som er opprettet
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public String opprettBuC(String bucType) throws Exception {
+  public String opprettBuC(String bucType) throws IntegrationException {
     log.info("Oppretter buc, type: {}", bucType);
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc")
         .queryParam(BUC_TYPE, bucType);
@@ -86,10 +86,10 @@ public class EuxConsumer implements RestConsumer {
   /**
    * Sletter en BuC/Rina-sak
    * @param rinaSaksnummer saksnummer til BuC'en
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void slettBuC(String rinaSaksnummer) throws Exception {
+  public void slettBuC(String rinaSaksnummer) throws IntegrationException {
     log.info("Sletter buc: {}", rinaSaksnummer);
     String uri = String.format(BUC_PATH, rinaSaksnummer);
 
@@ -101,10 +101,10 @@ public class EuxConsumer implements RestConsumer {
    * Setter mottaker på en BuC/Rina-sak
    * @param rinaSaksnummer saksnummer
    * @param mottakerId id på mottakende enhet
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void settMottaker(String rinaSaksnummer, String mottakerId) throws Exception {
+  public void settMottaker(String rinaSaksnummer, String mottakerId) throws IntegrationException {
 
     log.info("Setter mottaker {} til sak {}", mottakerId, rinaSaksnummer);
     UriComponentsBuilder builder = UriComponentsBuilder
@@ -119,10 +119,10 @@ public class EuxConsumer implements RestConsumer {
    * Henter deltagere i saken
    * @param rinaSaksnummer
    * @return liste over deltagere
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public List<String> hentDeltagere(String rinaSaksnummer) throws Exception {
+  public List<String> hentDeltagere(String rinaSaksnummer) throws IntegrationException {
 
     log.info("Henter deltakere til sak {}", rinaSaksnummer);
     String uri = String.format(BUCDELTAKERE_PATH, rinaSaksnummer);
@@ -135,10 +135,10 @@ public class EuxConsumer implements RestConsumer {
    * Henter ut en liste over mulige aksjoner
    * @param rinaSaksnummer
    * @return liste over mulige aksjoner på en rina-sak
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public JsonNode hentMuligeAksjoner(String rinaSaksnummer) throws Exception {
+  public JsonNode hentMuligeAksjoner(String rinaSaksnummer) throws IntegrationException {
     log.info("Henter mulige aksjoner for sak {}", rinaSaksnummer);
     String uri = String.format(MULIGEAKSJONER_PATH, rinaSaksnummer);
 
@@ -152,10 +152,10 @@ public class EuxConsumer implements RestConsumer {
    * @param korrelasjonsId
    * @param sed SED'en som skal legges til rina-saken
    * @return dokumentId' til SED'en
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public String opprettSed(String rinaSaksnummer, String korrelasjonsId, SED sed) throws Exception {
+  public String opprettSed(String rinaSaksnummer, String korrelasjonsId, SED sed) throws IntegrationException {
 
     log.info("Oppretter SED {} på sak {}", sed.getSed(), rinaSaksnummer);
     String uri = UriComponentsBuilder.fromPath(String.format("/buc/%s/sed", rinaSaksnummer))
@@ -172,7 +172,7 @@ public class EuxConsumer implements RestConsumer {
    * @return
    */
   
-  public SED hentSed(String rinaSaksnummer, String dokumentId) throws Exception {
+  public SED hentSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
     log.info("Henter sed med id {}, fra sak {}", dokumentId, rinaSaksnummer);
     String uri = String.format(SED_PATH, rinaSaksnummer, dokumentId);
 
@@ -186,10 +186,10 @@ public class EuxConsumer implements RestConsumer {
    * @param korrelasjonsId Optional, brukes ikke av eux per nå
    * @param dokumentId Id'en til SED'en som skal oppdateres
    * @param sed Den nye versjonen av SED'en
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void oppdaterSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId, SED sed) throws Exception {
+  public void oppdaterSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId, SED sed) throws IntegrationException {
     log.info("Oppdaterer sed {} på sak {}", dokumentId, rinaSaksnummer);
     String uri = UriComponentsBuilder.fromPath(String.format(SED_PATH, rinaSaksnummer, dokumentId))
         .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
@@ -203,10 +203,10 @@ public class EuxConsumer implements RestConsumer {
    * Sletter en eksisterende SED
    * @param rinaSaksnummer saksnummeret
    * @param dokumentId ID til SED som skal slettes
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void slettSed(String rinaSaksnummer, String dokumentId) throws Exception {
+  public void slettSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
     log.info("Sletter sed {} på sak {}", dokumentId, rinaSaksnummer);
     String uri = String.format(SED_PATH, rinaSaksnummer, dokumentId);
 
@@ -220,10 +220,10 @@ public class EuxConsumer implements RestConsumer {
    * @param rinaSaksnummer saksnummeret
    * @param dokumentId id' til SED som skal sendes
    * @param korrelasjonsId optional, ikke brukt av eux per nå
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void sendSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId) throws Exception {
+  public void sendSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId) throws IntegrationException {
     log.info("Sender sed {} fra sak {}", dokumentId, rinaSaksnummer);
     String uri = UriComponentsBuilder.fromPath(String.format(SED_PATH, rinaSaksnummer, dokumentId) + "/send")
         .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
@@ -239,10 +239,10 @@ public class EuxConsumer implements RestConsumer {
    * @param filType filtype
    * @param vedlegg Selve vedlegget som skal legges til
    * @return ukjent
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType, Object vedlegg) throws Exception {
+  public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType, Object vedlegg) throws IntegrationException {
     log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
     String uri = UriComponentsBuilder.fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
         .queryParam("Filtype", filType).toUriString();
@@ -257,10 +257,10 @@ public class EuxConsumer implements RestConsumer {
    * @param dokumentId id til SED'en
    * @param vedleggId id til vedlegget
    * @return
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public byte[] hentVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId) throws Exception {
+  public byte[] hentVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId) throws IntegrationException {
     log.info("Henter vedlegg for sak {} og dokument {}", rinaSaksnummer, dokumentId);
     String uri = String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId) + "/" + vedleggId;
 
@@ -279,10 +279,10 @@ public class EuxConsumer implements RestConsumer {
    * @param dokumentId id til sed'en
    * @param vedleggId id til vedlegget
    * @return
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void slettVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId) throws Exception {
+  public void slettVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId) throws IntegrationException {
     log.info("Sletter vedlegg {} på sak {} og dokument {}", vedleggId, rinaSaksnummer, dokumentId);
     String uri = String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId) + "/" + vedleggId;
 
@@ -294,10 +294,10 @@ public class EuxConsumer implements RestConsumer {
    * Henter liste av alle SED-typer som kan opprettes i sakens nåværende tilstand
    * @param rinaSaksnummer saksnummeret
    * @return liste av SED-typer
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public List<String> hentTilgjengeligeSedTyper(String rinaSaksnummer) throws Exception {
+  public List<String> hentTilgjengeligeSedTyper(String rinaSaksnummer) throws IntegrationException {
     log.info("Henter tilgjenglige sed-typer for sak {}", rinaSaksnummer);
     String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sedtyper";
 
@@ -308,10 +308,10 @@ public class EuxConsumer implements RestConsumer {
   /**
    * Setter en sak sensitiv
    * @param rinaSaksnummer saksnummeret
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void setSakSensitiv(String rinaSaksnummer) throws Exception {
+  public void setSakSensitiv(String rinaSaksnummer) throws IntegrationException {
     log.info("Setter sak {} sensitiv", rinaSaksnummer);
     String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sensitivsak";
 
@@ -321,10 +321,10 @@ public class EuxConsumer implements RestConsumer {
   /**
    * Fjerner 'sensitiv sak' markør på saken
    * @param rinaSaksnummer saksnummeret
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public void fjernSakSensitiv(String rinaSaksnummer) throws Exception {
+  public void fjernSakSensitiv(String rinaSaksnummer) throws IntegrationException {
     log.info("Fjerner 'sensitiv sak' på sak {}", rinaSaksnummer);
     String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sensitivsak";
 
@@ -337,10 +337,10 @@ public class EuxConsumer implements RestConsumer {
    * @param bucType Hvilken type buc som skal opprettes. Eks LA_BUC_04
    * @param mottakerId Mottaker sin Rina-id
    * @return id til rina-sak og id til dokument som ble opprettet. Nøkler: caseId og documentId
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public Map<String, String> opprettBucOgSed(String bucType, String mottakerId, SED sed) throws Exception {
+  public Map<String, String> opprettBucOgSed(String bucType, String mottakerId, SED sed) throws IntegrationException {
     log.info("Oppretter buc {}, med sed {}, med mottaker {}", bucType, sed.getSed(), mottakerId);
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed")
         .queryParam("BucType", bucType)
@@ -360,10 +360,10 @@ public class EuxConsumer implements RestConsumer {
    * @param sed sed'en som skal opprettes
    * @param vedlegg vedlegget som skal legges til saken
    * @return @return id til rina-sak, id til dokument og id til vedlegg som ble opprettet. Nøkler: caseId, documentId og attachmentId
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String fagSakNummer, String mottakerId, String filType, String korrelasjonsId, SED sed, Object vedlegg) throws Exception {
+  public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String fagSakNummer, String mottakerId, String filType, String korrelasjonsId, SED sed, Object vedlegg) throws IntegrationException {
     log.info("Oppretter buc {}, med sed {}, med mottaker {} og legger til vedlegg", bucType, sed.getSed(), mottakerId);
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed/vedlegg")
         .queryParam(BUC_TYPE, bucType)
@@ -382,8 +382,7 @@ public class EuxConsumer implements RestConsumer {
       documentBytes = new ObjectMapper().writeValueAsBytes(sed);
       attachmentBytes = new ObjectMapper().writeValueAsBytes(vedlegg);
     } catch (JsonProcessingException ex) {
-      //throw new TekniskException("Feil ved mapping fra sed til bytes"); //TODO: exceptions
-      throw new RuntimeException();
+      throw new IntegrationException("Could not send document and attachment to eux", ex);
     }
 
     ByteArrayResource document = new ByteArrayResource(documentBytes) {
@@ -410,10 +409,10 @@ public class EuxConsumer implements RestConsumer {
   /**
    * Henter en liste over mulige BuC'er den påloggede bruker kan opprette
    * @return liste av BuC'er
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public List<String> bucTypePerSektor() throws Exception {
+  public List<String> bucTypePerSektor() throws IntegrationException {
     log.info("Henter buctyper per sektor");
     return exchange("/buctypepersektor", HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
         new ParameterizedTypeReference<List<String>>() {});
@@ -424,10 +423,10 @@ public class EuxConsumer implements RestConsumer {
    * @param bucType BuC/Rina-saksnummer
    * @param landkode kode til landet det skal hente institusjoner fra
    * @return
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public List<String> hentInstitusjoner(String bucType, String landkode) throws Exception {
+  public List<String> hentInstitusjoner(String bucType, String landkode) throws IntegrationException {
     log.info("Henter institusjoner for buctype {} og landkode", bucType, landkode);
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/institusjoner")
         .queryParam(BUC_TYPE, bucType)
@@ -441,10 +440,10 @@ public class EuxConsumer implements RestConsumer {
    * Henter ut hele eller deler av kodeverket
    * @param kodeverk hvilket kodeverk som skal hentes ut. Optional
    * @return Det spesifiserte kodeverket, eller hele kodeverket om ikke spesifisert
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public JsonNode hentKodeverk(String kodeverk) throws Exception {
+  public JsonNode hentKodeverk(String kodeverk) throws IntegrationException {
     log.info("Henter kodeverk {}", kodeverk);
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/kodeverk")
         .queryParam("Kodeverk", kodeverk);
@@ -463,10 +462,10 @@ public class EuxConsumer implements RestConsumer {
    * @param bucType bucType
    * @param status status
    * @return JsonNode med rina saker
-   * @throws Exception
+   * @throws IntegrationException
    */
   
-  public JsonNode finnRinaSaker(String fnr, String fornavn, String etternavn, String fødselsdato, String rinaSaksnummer, String bucType, String status) throws Exception {
+  public JsonNode finnRinaSaker(String fnr, String fornavn, String etternavn, String fødselsdato, String rinaSaksnummer, String bucType, String status) throws IntegrationException {
     log.info("Søker etter rina-saker");
     UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/rinasaker")
         .queryParam("Fødselsnummer", fnr)
@@ -482,16 +481,15 @@ public class EuxConsumer implements RestConsumer {
         new ParameterizedTypeReference<JsonNode>() {});
   }
 
-  private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, ParameterizedTypeReference<T> responseType) throws Exception {
+  private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, ParameterizedTypeReference<T> responseType) throws IntegrationException {
     try {
       return euxRestTemplate.exchange(uri, method, entity, responseType).getBody();
     } catch (RestClientException e) {
-      //throw ExceptionMapper.springExTilMelosysEx(e);
-      throw new IntegrationException("Error in integration with eux", e); //TODO exceptions
+      throw new IntegrationException("Error in integration with eux", e);
     }
   }
 
-  private HttpHeaders getDefaultHeaders() throws Exception {
+  private HttpHeaders getDefaultHeaders() throws IntegrationException {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
@@ -499,7 +497,7 @@ public class EuxConsumer implements RestConsumer {
     return headers;
   }
 
-  private String getOidcAuth() throws Exception {
+  private String getOidcAuth() throws IntegrationException {
     return "Bearer " + restStsService.collectToken();
   }
 }

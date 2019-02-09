@@ -6,10 +6,10 @@ import lombok.Data;
 @Data
 public class SedDataDto {
   //Søknaddok.
-  private Ident utenlandskIdent;
+  private List<Ident> utenlandskIdent;
 
   //Persondok.
-  private FamilieMedlem familieMedlem;
+  private List<FamilieMedlem> familieMedlem;
   private boolean egenAnsatt;
   private Bruker bruker;
 

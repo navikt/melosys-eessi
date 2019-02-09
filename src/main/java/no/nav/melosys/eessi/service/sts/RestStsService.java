@@ -90,4 +90,3 @@ public class RestStsService implements RestConsumer {
     return new HttpEntity(headers);
   }
 }
-

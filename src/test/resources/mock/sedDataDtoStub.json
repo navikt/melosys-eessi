@@ -1,0 +1,90 @@
+{
+  "arbeidsgivendeVirksomheter": [
+    {
+      "adresse": {
+        "gateadresse": "testadresse",
+        "land": "testland",
+        "postnr": "1212",
+        "poststed": "Hønefoss"
+      },
+      "navn": "Lala AS",
+      "orgnr": "12312321",
+      "type": "type"
+    }
+  ],
+  "arbeidssteder": [
+    {
+      "adresse": {
+        "gateadresse": "testadresse",
+        "land": "testland",
+        "postnr": "1212",
+        "poststed": "Hønefoss"
+      },
+      "fysisk": true,
+      "hjemmebase": "string",
+      "navn": "string"
+    }
+  ],
+  "bostedsadresse": {
+    "gateadresse": "blulul",
+    "land": "uulululijn",
+    "postnr": "2112",
+    "poststed": "Noi"
+  },
+  "bruker": {
+    "etternavn": "string",
+    "fnr": "string",
+    "foedseldato": "2020-01-01",
+    "fornavn": "string",
+    "kjoenn": "string",
+    "statsborgerskap": "string"
+  },
+  "egenAnsatt": false,
+  "familieMedlem": [
+    {
+      "etternavn": "string",
+      "fornavn": "string",
+      "relasjon": "string"
+    }
+  ],
+  "lovvalgsperioder": [
+    {
+      "bestemmelse": "ART_12_1",
+      "fom": "2020-01-01",
+      "landkode": "string",
+      "tom": "2020-01-01"
+    }
+  ],
+  "selvstendigeVirksomheter": [
+    {
+      "adresse": {
+        "gateadresse": "testadresse",
+        "land": "testland",
+        "postnr": "1212",
+        "poststed": "Hønefoss"
+      },
+      "navn": "Vewf",
+      "orgnr": "gf",
+      "type": "frf"
+    }
+  ],
+  "utenlandskIdent": [
+    {
+      "ident": "11111111111",
+      "landkode": "BE"
+    }
+  ],
+  "utenlandskeVirksomheter": [
+    {
+      "adresse": {
+        "gateadresse": "testadresse",
+        "land": "testland",
+        "postnr": "1212",
+        "poststed": "Hønefoss"
+      },
+      "navn": "fe",
+      "orgnr": "fewfew",
+      "type": "few"
+    }
+  ]
+}

@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class FamilieMedlem {
 
-  private String relasjon; //FARA eller MORA
+  private String relasjon; //FAR ELLER MOR
   private String fornavn;
   private String etternavn;
 
