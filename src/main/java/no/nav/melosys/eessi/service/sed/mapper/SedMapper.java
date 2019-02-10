@@ -129,7 +129,7 @@ public interface SedMapper<T extends Medlemskap> {
 
     //Splitter per nå navnet etter første mellomrom
     Optional<FamilieMedlem> optionalFar = sedData.getFamilieMedlem().stream()
-        .filter(f -> f.getRelasjon().equals("FAR")).findFirst();
+        .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
 
 
     if (optionalFar.isPresent()) {
@@ -143,7 +143,7 @@ public interface SedMapper<T extends Medlemskap> {
     }
 
     Optional<FamilieMedlem> optionalMor = sedData.getFamilieMedlem().stream()
-        .filter(f -> f.getRelasjon().equals("MOR")).findFirst();
+        .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
 
     if (optionalMor.isPresent()) {
       Mor mor = new Mor();

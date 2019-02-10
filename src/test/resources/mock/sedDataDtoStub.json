@@ -3,7 +3,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "testland",
+        "land": "NO",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -16,42 +16,42 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "testland",
+        "land": "NO",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
       "fysisk": true,
-      "hjemmebase": "string",
-      "navn": "string"
+      "hjemmebase": null,
+      "navn": "MinJobb"
     }
   ],
   "bostedsadresse": {
     "gateadresse": "blulul",
-    "land": "uulululijn",
+    "land": "NO",
     "postnr": "2112",
     "poststed": "Noi"
   },
   "bruker": {
-    "etternavn": "string",
-    "fnr": "string",
+    "etternavn": "MrFornavn",
+    "fnr": "11111111111",
     "foedseldato": "2020-01-01",
-    "fornavn": "string",
-    "kjoenn": "string",
-    "statsborgerskap": "string"
+    "fornavn": "MrEtternavn",
+    "kjoenn": "M",
+    "statsborgerskap": "NO"
   },
   "egenAnsatt": false,
   "familieMedlem": [
     {
-      "etternavn": "string",
-      "fornavn": "string",
-      "relasjon": "string"
+      "etternavn": "faret",
+      "fornavn": "farfor",
+      "relasjon": "far"
     }
   ],
   "lovvalgsperioder": [
     {
       "bestemmelse": "ART_12_1",
       "fom": "2020-01-01",
-      "landkode": "string",
+      "landkode": "SE",
       "tom": "2020-01-01"
     }
   ],
@@ -64,7 +64,7 @@
         "poststed": "Hønefoss"
       },
       "navn": "Vewf",
-      "orgnr": "gf",
+      "orgnr": "12312312",
       "type": "frf"
     }
   ],
@@ -78,12 +78,12 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "testland",
+        "land": "SE",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
       "navn": "fe",
-      "orgnr": "fewfew",
+      "orgnr": "12312312",
       "type": "few"
     }
   ]
