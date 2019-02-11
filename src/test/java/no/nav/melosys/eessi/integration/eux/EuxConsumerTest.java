@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
@@ -26,9 +22,13 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -224,6 +224,26 @@ public class EuxConsumerTest {
     assertEquals("A009", resultat.getSed());
     assertNotNull(resultat.getMedlemskap());
     assertEquals(MedlemskapA009.class, resultat.getMedlemskap().getClass());
+  }
+
+  @Test
+  public void hentSedA001_forventSedA001() throws Exception, IOException {
+    String id = "123";
+    String dokumentId = "312";
+
+    URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA001.json");
+    assertNotNull(jsonUrl);
+    String sed = IOUtils.toString(jsonUrl);
+
+    server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+    SED resultat = euxConsumer.hentSed(id, dokumentId);
+    assertNotNull(resultat);
+    assertNotNull(resultat.getNav());
+    assertNotNull(resultat.getMedlemskap());
+    assertEquals("A001", resultat.getSed());
+    assertEquals(MedlemskapA001.class, resultat.getMedlemskap().getClass());
   }
 
   @Test

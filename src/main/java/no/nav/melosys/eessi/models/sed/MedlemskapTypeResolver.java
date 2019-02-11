@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 
 class MedlemskapTypeResolver implements TypeIdResolver {
@@ -35,10 +36,12 @@ class MedlemskapTypeResolver implements TypeIdResolver {
         Class<?> type;
 
         switch (SedType.valueOf(s)) {
+            case A001:
+                type = MedlemskapA001.class;
+                break;
             case A009:
                 type = MedlemskapA009.class;
                 break;
-            case A001:
             case A002:
             case A003:
             case A004:

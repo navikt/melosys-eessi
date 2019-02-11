@@ -6,8 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import java.time.LocalDate;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Data
 public class Lovvalgsperiode {
@@ -24,4 +25,6 @@ public class Lovvalgsperiode {
   @JsonSerialize(using = LocalDateSerializer.class)
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
   private LocalDate tom;
+
+  private Behandlingsresultat behandlingsresultat;
 }
