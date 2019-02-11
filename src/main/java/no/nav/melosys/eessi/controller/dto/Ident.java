@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class Ident {
-  private String ident;
-  private String landkode;
+
+    private String ident;
+    private String landkode;
 }

@@ -15,7 +15,8 @@ public class SedDataMapperRuter {
         sedMappers.put(SedType.A009, A009Mapper.class);
     }
 
-    private SedDataMapperRuter() {}
+    private SedDataMapperRuter() {
+    }
 
     public static SedMapper sedMapper(SedType sedType) throws MappingException {
         if (!sedMappers.containsKey(sedType)) {

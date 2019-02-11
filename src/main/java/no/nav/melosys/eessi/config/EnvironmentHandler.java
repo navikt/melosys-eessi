@@ -7,23 +7,24 @@ import org.springframework.stereotype.Component;
 @Component
 public class EnvironmentHandler {
 
-  private static class EnvironmentHandlerHolder {
-    private static EnvironmentHandler ENV_HANDLER = null;
-  }
+    private static class EnvironmentHandlerHolder {
 
-  private final Environment env;
+        private static EnvironmentHandler ENV_HANDLER = null;
+    }
 
-  @Autowired
-  public EnvironmentHandler(Environment environment) {
-    this.env = environment;
-    EnvironmentHandlerHolder.ENV_HANDLER = this;
-  }
+    private final Environment env;
 
-  public Environment getEnv() {
-    return env;
-  }
+    @Autowired
+    public EnvironmentHandler(Environment environment) {
+        this.env = environment;
+        EnvironmentHandlerHolder.ENV_HANDLER = this;
+    }
 
-  public static EnvironmentHandler getInstance() {
-    return EnvironmentHandlerHolder.ENV_HANDLER;
-  }
+    public Environment getEnv() {
+        return env;
+    }
+
+    public static EnvironmentHandler getInstance() {
+        return EnvironmentHandlerHolder.ENV_HANDLER;
+    }
 }

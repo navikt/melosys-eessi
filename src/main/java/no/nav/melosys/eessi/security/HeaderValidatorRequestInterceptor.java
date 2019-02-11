@@ -9,36 +9,36 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j
 public class HeaderValidatorRequestInterceptor implements HandlerInterceptor {
 
-  private final String apiHeaderName;
-  private final String apiHeaderValue;
-  private final String activeProfile;
+    private final String apiHeaderName;
+    private final String apiHeaderValue;
+    private final String activeProfile;
 
-  public HeaderValidatorRequestInterceptor(String apiHeaderName, String apiHeaderValue,
-      String activeProfile) {
-    this.apiHeaderName = apiHeaderName;
-    this.apiHeaderValue = apiHeaderValue;
-    this.activeProfile = activeProfile;
-  }
-
-  @Override
-  public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
-      Object handler) throws Exception {
-
-    log.debug("Intercepted.preHandle: " + "method: {} - servletPath: {}", request.getMethod(),
-        request.getServletPath());
-
-    if (!isValidApiRequest(request)) {
-      response.sendError(HttpStatus.UNAUTHORIZED.value());
-      return false;
+    public HeaderValidatorRequestInterceptor(String apiHeaderName, String apiHeaderValue,
+            String activeProfile) {
+        this.apiHeaderName = apiHeaderName;
+        this.apiHeaderValue = apiHeaderValue;
+        this.activeProfile = activeProfile;
     }
 
-    return true;
-  }
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
+            Object handler) throws Exception {
 
-  private boolean isValidApiRequest(HttpServletRequest request){
-    if (!activeProfile.equalsIgnoreCase("nais")) {
-      return true;
+        log.debug("Intercepted.preHandle: " + "method: {} - servletPath: {}", request.getMethod(),
+                request.getServletPath());
+
+        if (!isValidApiRequest(request)) {
+            response.sendError(HttpStatus.UNAUTHORIZED.value());
+            return false;
+        }
+
+        return true;
     }
-    return apiHeaderValue.equalsIgnoreCase(request.getHeader(apiHeaderName));
-  }
+
+    private boolean isValidApiRequest(HttpServletRequest request) {
+        if (!activeProfile.equalsIgnoreCase("nais")) {
+            return true;
+        }
+        return apiHeaderValue.equalsIgnoreCase(request.getHeader(apiHeaderName));
+    }
 }

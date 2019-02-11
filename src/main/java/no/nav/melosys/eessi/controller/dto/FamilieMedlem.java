@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class FamilieMedlem {
 
-  private String relasjon; //FAR ELLER MOR
-  private String fornavn;
-  private String etternavn;
+    private String relasjon; //FAR ELLER MOR
+    private String fornavn;
+    private String etternavn;
 
 }
