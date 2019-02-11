@@ -7,14 +7,18 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
+import lombok.Data;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 
 @SuppressWarnings("unused")
 @JsonInclude(Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class SED {
 
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "sed")
+    @JsonTypeIdResolver(MedlemskapTypeResolver.class)
     private Medlemskap medlemskap;
 
     private Nav nav;
@@ -24,47 +28,4 @@ public class SED {
     private String sedGVer;
 
     private String sedVer;
-
-    public Medlemskap getMedlemskap() {
-        return medlemskap;
-    }
-
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "sed")
-    @JsonTypeIdResolver(MedlemskapTypeResolver.class)
-    public void setMedlemskap(Medlemskap medlemskap) {
-        this.medlemskap = medlemskap;
-    }
-
-    public Nav getNav() {
-        return nav;
-    }
-
-    public void setNav(Nav nav) {
-        this.nav = nav;
-    }
-
-    public String getSed() {
-        return sed;
-    }
-
-    public void setSed(String sed) {
-        this.sed = sed;
-    }
-
-    public String getSedGVer() {
-        return sedGVer;
-    }
-
-    public void setSedGVer(String sedGVer) {
-        this.sedGVer = sedGVer;
-    }
-
-    public String getSedVer() {
-        return sedVer;
-    }
-
-    public void setSedVer(String sedVer) {
-        this.sedVer = sedVer;
-    }
-
 }
