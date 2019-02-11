@@ -1,17 +1,20 @@
 package no.nav.melosys.eessi.service.sed.helpers;
 
-import java.util.HashMap;
-import java.util.Map;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SedType;
+import no.nav.melosys.eessi.service.sed.mapper.A001Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.A009Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SedDataMapperRuter {
 
     static Map<SedType, Class<? extends SedMapper>> sedMappers = new HashMap<>();
 
     static {
+        sedMappers.put(SedType.A001, A001Mapper.class);
         sedMappers.put(SedType.A009, A009Mapper.class);
     }
 
