@@ -9,16 +9,16 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestStsConfig {
 
-  private final String uri;
+    private final String uri;
 
-  public RestStsConfig(@Value("${melosys.integrations.reststs-url}") String uri) {
-    this.uri = uri;
-  }
+    public RestStsConfig(@Value("${melosys.integrations.reststs-url}") String uri) {
+        this.uri = uri;
+    }
 
-  @Bean(name = "restStsRestTemplate")
-  public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-    return restTemplateBuilder
-        .rootUri(uri)
-        .build();
-  }
+    @Bean(name = "restStsRestTemplate")
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder
+                .rootUri(uri)
+                .build();
+    }
 }

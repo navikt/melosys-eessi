@@ -33,9 +33,11 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
     private Vedtak getVedtak(Lovvalgsperiode lovvalgsperiode) throws MappingException {
         Vedtak vedtak = new Vedtak();
 
-        vedtak.setEropprinneligvedtak("ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
+        vedtak.setEropprinneligvedtak(
+                "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
         vedtak.setLand(lovvalgsperiode.getLandkode());
-        vedtak.setGjeldervarighetyrkesaktivitet("nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
+        vedtak.setGjeldervarighetyrkesaktivitet(
+                "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
 
         if (!isKorrektLovvalgbestemmelse(lovvalgsperiode.getBestemmelse())) {
             throw new MappingException("Lovvalgsbestemmelse is not of article 12!");
@@ -58,7 +60,7 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
 
     private boolean isKorrektLovvalgbestemmelse(Bestemmelse bestemmelse) {
         return bestemmelse == Bestemmelse.ART_12_1
-            || bestemmelse == Bestemmelse.ART_12_2;
+                || bestemmelse == Bestemmelse.ART_12_2;
     }
 
     private Utsendingsland getUtsendingsland(SedDataDto sedData) throws MappingException {
@@ -72,6 +74,6 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
     }
 
     private Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
-      return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
+        return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
     }
 }

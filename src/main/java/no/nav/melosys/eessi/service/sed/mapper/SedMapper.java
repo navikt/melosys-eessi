@@ -1,11 +1,11 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
-import com.google.common.collect.Lists;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.FamilieMedlem;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.Virksomhet;
@@ -13,231 +13,226 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.models.sed.nav.Adresse;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidssted;
-import no.nav.melosys.eessi.models.sed.nav.Bruker;
-import no.nav.melosys.eessi.models.sed.nav.Far;
-import no.nav.melosys.eessi.models.sed.nav.Identifikator;
-import no.nav.melosys.eessi.models.sed.nav.Mor;
-import no.nav.melosys.eessi.models.sed.nav.Nav;
-import no.nav.melosys.eessi.models.sed.nav.Person;
-import no.nav.melosys.eessi.models.sed.nav.Pin;
-import no.nav.melosys.eessi.models.sed.nav.Selvstendig;
-import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.models.sed.nav.*;
 import org.springframework.util.StringUtils;
 
 /**
- * Felles mapper-interface for alle typer SED. Mapper NAV-objektet i NAV-SED,
- * som brukes av eux for å plukke ut nødvendig informasjon for en angitt SED.
+ * Felles mapper-interface for alle typer SED. Mapper NAV-objektet i NAV-SED, som brukes av eux for
+ * å plukke ut nødvendig informasjon for en angitt SED.
  */
 public interface SedMapper<T extends Medlemskap> {
-//TODO: Alle landkoder må sjekkes og evt mappes til iso-2 format
-  DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-  //Versjonen til SED'en. Generasjon og versjon (SED_G_VER.SED_VER = 4.1)
-  String SED_G_VER = "4";
-  String SED_VER = "1";
+    //TODO: Alle landkoder må sjekkes og evt mappes til iso-2 format
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-  // Hvis det skulle trenges noen spesifikke endringer av NAV-objektet for enkelte SED'er,
-  // bør denne metoden overrides.
-  default SED mapTilSed(SedDataDto sedData) throws MappingException {
-    SED sed = new SED();
+    //Versjonen til SED'en. Generasjon og versjon (SED_G_VER.SED_VER = 4.1)
+    String SED_G_VER = "4";
+    String SED_VER = "1";
 
-    sed.setNav(prefillNav(sedData));
-    sed.setSed(getSedType().name());
-    sed.setSedGVer(SED_G_VER);
-    sed.setSedVer(SED_VER);
-    sed.setMedlemskap(getMedlemskap(sedData));
+    // Hvis det skulle trenges noen spesifikke endringer av NAV-objektet for enkelte SED'er,
+    // bør denne metoden overrides.
+    default SED mapTilSed(SedDataDto sedData) throws MappingException {
+        SED sed = new SED();
 
-    return sed;
-  }
+        sed.setNav(prefillNav(sedData));
+        sed.setSed(getSedType().name());
+        sed.setSedGVer(SED_G_VER);
+        sed.setSedVer(SED_VER);
+        sed.setMedlemskap(getMedlemskap(sedData));
 
-  T getMedlemskap(SedDataDto sedData) throws MappingException;
-
-  SedType getSedType();
-
-  default Nav prefillNav(SedDataDto sedData) throws MappingException {
-    Nav nav = new Nav();
-
-    nav.setBruker(hentBruker(sedData));
-    nav.setArbeidssted(hentArbeidssted(sedData));
-    nav.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
-
-    if (sedData.isEgenAnsatt() && !sedData.getSelvstendigeVirksomheter().isEmpty()) {
-      nav.setSelvstendig(hentSelvstendig(sedData));
+        return sed;
     }
 
-    return nav;
-  }
+    T getMedlemskap(SedDataDto sedData) throws MappingException;
 
-  default Bruker hentBruker(SedDataDto sedDataDto) {
-    Bruker bruker = new Bruker();
+    SedType getSedType();
 
-    bruker.setPerson(hentPerson(sedDataDto));
-    bruker.setAdresse(hentAdresser(sedDataDto));
-    setFamiliemedlemmer(sedDataDto, bruker);
+    default Nav prefillNav(SedDataDto sedData) throws MappingException {
+        Nav nav = new Nav();
 
-    return bruker;
-  }
+        nav.setBruker(hentBruker(sedData));
+        nav.setArbeidssted(hentArbeidssted(sedData));
+        nav.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
 
-  default Person hentPerson(SedDataDto sedData) {
-    Person person = new Person();
+        if (sedData.isEgenAnsatt() && !sedData.getSelvstendigeVirksomheter().isEmpty()) {
+            nav.setSelvstendig(hentSelvstendig(sedData));
+        }
 
-    person.setFornavn(sedData.getBruker().getFornavn());
-    person.setEtternavn(sedData.getBruker().getEtternavn());
-    person.setFoedselsdato(formaterDato(sedData.getBruker().getFoedseldato()));
-    person.setFoedested(null); //det antas at ikke trengs når NAV fyller ut.
-    person.setKjoenn(sedData.getBruker().getKjoenn());
-
-    Statsborgerskap statsborgerskap = new Statsborgerskap();
-    statsborgerskap.setLand(sedData.getBruker().getStatsborgerskap());
-
-    person.setStatsborgerskap(Collections.singletonList(statsborgerskap));
-
-    person.setPin(hentPin(sedData));
-
-    return person;
-  }
-
-  default List<Pin> hentPin(SedDataDto sedData) {
-    List<Pin> pins = Lists.newArrayList();
-
-    pins.add(new Pin(
-        sedData.getBruker().getFnr(), "NO", null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
-
-    sedData.getUtenlandskIdent().stream()
-        .map(utenlandskIdent -> new Pin(utenlandskIdent.getIdent(), utenlandskIdent.getLandkode(), null))
-        .forEachOrdered(pins::add);
-
-    return pins;
-  }
-
-  default List<Adresse> hentAdresser(SedDataDto sedDataDto) {
-
-    Adresse adresse = new Adresse();
-    adresse.setBy(sedDataDto.getBostedsadresse().getPoststed());
-    adresse.setPostnummer(sedDataDto.getBostedsadresse().getPostnr());
-    adresse.setLand(sedDataDto.getBostedsadresse().getLand());
-    adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
-    adresse.setType("bosted");
-
-    return Collections.singletonList(adresse);
-  }
-
-  default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {
-
-    //Splitter per nå navnet etter første mellomrom
-    Optional<FamilieMedlem> optionalFar = sedData.getFamilieMedlem().stream()
-        .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
-
-
-    if (optionalFar.isPresent()) {
-      Far far = new Far();
-      Person person = new Person();
-      person.setEtternavnvedfoedsel(optionalFar.get().getEtternavn());
-      person.setFornavn(optionalFar.get().getFornavn());
-
-      far.setPerson(person);
-      bruker.setFar(far);
+        return nav;
     }
 
-    Optional<FamilieMedlem> optionalMor = sedData.getFamilieMedlem().stream()
-        .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
+    default Bruker hentBruker(SedDataDto sedDataDto) {
+        Bruker bruker = new Bruker();
 
-    if (optionalMor.isPresent()) {
-      Mor mor = new Mor();
-      Person person = new Person();
-      person.setEtternavnvedfoedsel(optionalMor.get().getEtternavn());
-      person.setFornavn(optionalMor.get().getFornavn());
+        bruker.setPerson(hentPerson(sedDataDto));
+        bruker.setAdresse(hentAdresser(sedDataDto));
+        setFamiliemedlemmer(sedDataDto, bruker);
 
-      mor.setPerson(person);
-      bruker.setMor(mor);
-    }
-  }
-
-  default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) throws MappingException {
-
-    List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
-
-    for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
-      Arbeidssted arbeidssted = new Arbeidssted();
-      arbeidssted.setNavn(arbStd.getNavn());
-      if (arbStd.isFysisk()) {
-        arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
-      } else {
-        arbeidssted.setErikkefastadresse("ja");
-        arbeidssted.setHjemmebase(""); //TODO: maritime/ikke fysisk arbeidssteder. holder med isFysisk sjekk? Trenger muligens felt hjemmebase
-      }
-      arbeidsstedList.add(arbeidssted);
+        return bruker;
     }
 
-    return arbeidsstedList;
-  }
+    default Person hentPerson(SedDataDto sedData) {
+        Person person = new Person();
 
-  default List<Arbeidsgiver> hentArbeidsGiver(List<Virksomhet> virksomhetList)
-      throws MappingException {
+        person.setFornavn(sedData.getBruker().getFornavn());
+        person.setEtternavn(sedData.getBruker().getEtternavn());
+        person.setFoedselsdato(formaterDato(sedData.getBruker().getFoedseldato()));
+        person.setFoedested(null); //det antas at ikke trengs når NAV fyller ut.
+        person.setKjoenn(sedData.getBruker().getKjoenn());
 
-    List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
+        Statsborgerskap statsborgerskap = new Statsborgerskap();
+        statsborgerskap.setLand(sedData.getBruker().getStatsborgerskap());
 
-    for (Virksomhet virksomhet : virksomhetList) {
-      Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
-      arbeidsgiver.setNavn(virksomhet.getNavn());
-      arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(virksomhet.getAdresse()));
+        person.setStatsborgerskap(Collections.singletonList(statsborgerskap));
 
-      Identifikator orgNr = new Identifikator();
-      orgNr.setId(virksomhet.getOrgnr());
-      orgNr.setType("registrering"); //organisasjonsindenttypekoder.properties i eux står typer
+        person.setPin(hentPin(sedData));
 
-      arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
-
-      arbeidsgiverList.add(arbeidsgiver);
+        return person;
     }
 
-    return arbeidsgiverList;
-  }
+    default List<Pin> hentPin(SedDataDto sedData) {
+        List<Pin> pins = Lists.newArrayList();
 
-  default Selvstendig hentSelvstendig(SedDataDto sedData) throws MappingException {
+        pins.add(new Pin(
+                sedData.getBruker().getFnr(), "NO",
+                null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
 
-    Selvstendig selvstendig = new Selvstendig();
-    List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
+        sedData.getUtenlandskIdent().stream()
+                .map(utenlandskIdent -> new Pin(utenlandskIdent.getIdent(),
+                        utenlandskIdent.getLandkode(), null))
+                .forEachOrdered(pins::add);
 
-    for (Virksomhet v : sedData.getSelvstendigeVirksomheter()) {
-      Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
-
-      Identifikator orgNr = new Identifikator();
-      orgNr.setId(v.getOrgnr());
-      orgNr.setType("registrering"); //organisasjonsindenttypekoder.properties i eux står typer
-
-      arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
-      arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(v.getAdresse()));
-      arbeidsgiver.setNavn(v.getNavn());
-
-      arbeidsgiverList.add(arbeidsgiver);
+        return pins;
     }
 
-    selvstendig.setArbeidsgiver(arbeidsgiverList);
+    default List<Adresse> hentAdresser(SedDataDto sedDataDto) {
 
-    return selvstendig;
-  }
+        Adresse adresse = new Adresse();
+        adresse.setBy(sedDataDto.getBostedsadresse().getPoststed());
+        adresse.setPostnummer(sedDataDto.getBostedsadresse().getPostnr());
+        adresse.setLand(sedDataDto.getBostedsadresse().getLand());
+        adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
+        adresse.setType("bosted");
 
-  default String formaterDato(LocalDate dato) {
-    return dateTimeFormatter.format(dato);
-  }
-
-  default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse)
-      throws MappingException {
-    Adresse adresse = new Adresse();
-    adresse.setGate(sAdresse.getGateadresse());
-    adresse.setPostnummer(sAdresse.getPostnr());
-    adresse.setBy(sAdresse.getPoststed());
-    adresse.setLand(sAdresse.getLand());
-    adresse.setBygning(null);
-
-    if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
-      throw new MappingException("Element 'poststed' and 'land' and  is required for all addresses");
+        return Collections.singletonList(adresse);
     }
 
-    return adresse;
-  }
+    default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {
+
+        //Splitter per nå navnet etter første mellomrom
+        Optional<FamilieMedlem> optionalFar = sedData.getFamilieMedlem().stream()
+                .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
+
+        if (optionalFar.isPresent()) {
+            Far far = new Far();
+            Person person = new Person();
+            person.setEtternavnvedfoedsel(optionalFar.get().getEtternavn());
+            person.setFornavn(optionalFar.get().getFornavn());
+
+            far.setPerson(person);
+            bruker.setFar(far);
+        }
+
+        Optional<FamilieMedlem> optionalMor = sedData.getFamilieMedlem().stream()
+                .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
+
+        if (optionalMor.isPresent()) {
+            Mor mor = new Mor();
+            Person person = new Person();
+            person.setEtternavnvedfoedsel(optionalMor.get().getEtternavn());
+            person.setFornavn(optionalMor.get().getFornavn());
+
+            mor.setPerson(person);
+            bruker.setMor(mor);
+        }
+    }
+
+    default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) throws MappingException {
+
+        List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
+
+        for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
+            Arbeidssted arbeidssted = new Arbeidssted();
+            arbeidssted.setNavn(arbStd.getNavn());
+            if (arbStd.isFysisk()) {
+                arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
+            } else {
+                arbeidssted.setErikkefastadresse("ja");
+                arbeidssted.setHjemmebase(
+                        ""); //TODO: maritime/ikke fysisk arbeidssteder. holder med isFysisk sjekk? Trenger muligens felt hjemmebase
+            }
+            arbeidsstedList.add(arbeidssted);
+        }
+
+        return arbeidsstedList;
+    }
+
+    default List<Arbeidsgiver> hentArbeidsGiver(List<Virksomhet> virksomhetList)
+            throws MappingException {
+
+        List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
+
+        for (Virksomhet virksomhet : virksomhetList) {
+            Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
+            arbeidsgiver.setNavn(virksomhet.getNavn());
+            arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(virksomhet.getAdresse()));
+
+            Identifikator orgNr = new Identifikator();
+            orgNr.setId(virksomhet.getOrgnr());
+            orgNr.setType(
+                    "registrering"); //organisasjonsindenttypekoder.properties i eux står typer
+
+            arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
+
+            arbeidsgiverList.add(arbeidsgiver);
+        }
+
+        return arbeidsgiverList;
+    }
+
+    default Selvstendig hentSelvstendig(SedDataDto sedData) throws MappingException {
+
+        Selvstendig selvstendig = new Selvstendig();
+        List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
+
+        for (Virksomhet v : sedData.getSelvstendigeVirksomheter()) {
+            Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
+
+            Identifikator orgNr = new Identifikator();
+            orgNr.setId(v.getOrgnr());
+            orgNr.setType(
+                    "registrering"); //organisasjonsindenttypekoder.properties i eux står typer
+
+            arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
+            arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(v.getAdresse()));
+            arbeidsgiver.setNavn(v.getNavn());
+
+            arbeidsgiverList.add(arbeidsgiver);
+        }
+
+        selvstendig.setArbeidsgiver(arbeidsgiverList);
+
+        return selvstendig;
+    }
+
+    default String formaterDato(LocalDate dato) {
+        return dateTimeFormatter.format(dato);
+    }
+
+    default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse)
+            throws MappingException {
+        Adresse adresse = new Adresse();
+        adresse.setGate(sAdresse.getGateadresse());
+        adresse.setPostnummer(sAdresse.getPostnr());
+        adresse.setBy(sAdresse.getPoststed());
+        adresse.setLand(sAdresse.getLand());
+        adresse.setBygning(null);
+
+        if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
+            throw new MappingException(
+                    "Element 'poststed' and 'land' and  is required for all addresses");
+        }
+
+        return adresse;
+    }
 }

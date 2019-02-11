@@ -7,16 +7,17 @@ import org.springframework.core.env.Environment;
 
 public interface RestConsumer {
 
-  String SYSTEM_USERNAME = "melosys.systemuser.username";
-  String SYSTEM_PASSWORD = "melosys.systemuser.password";
+    String SYSTEM_USERNAME = "melosys.systemuser.username";
+    String SYSTEM_PASSWORD = "melosys.systemuser.password";
 
-  default String basicAuth() {
-    return "Basic " + Base64.getEncoder().encodeToString(
-        String.format("%s:%s", getEnv().getRequiredProperty(SYSTEM_USERNAME), getEnv().getRequiredProperty(SYSTEM_PASSWORD))
-            .getBytes(StandardCharsets.UTF_8));
-  }
+    default String basicAuth() {
+        return "Basic " + Base64.getEncoder().encodeToString(
+                String.format("%s:%s", getEnv().getRequiredProperty(SYSTEM_USERNAME),
+                        getEnv().getRequiredProperty(SYSTEM_PASSWORD))
+                        .getBytes(StandardCharsets.UTF_8));
+    }
 
-  default Environment getEnv() {
-    return EnvironmentHandler.getInstance().getEnv();
-  }
+    default Environment getEnv() {
+        return EnvironmentHandler.getInstance().getEnv();
+    }
 }

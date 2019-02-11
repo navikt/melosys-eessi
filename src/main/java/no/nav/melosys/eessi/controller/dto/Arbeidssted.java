@@ -5,8 +5,8 @@ import lombok.Data;
 @Data
 public class Arbeidssted {
 
-  private String navn;
-  private Adresse adresse;
-  private boolean fysisk;
-  private String hjemmebase;
+    private String navn;
+    private Adresse adresse;
+    private boolean fysisk;
+    private String hjemmebase;
 }

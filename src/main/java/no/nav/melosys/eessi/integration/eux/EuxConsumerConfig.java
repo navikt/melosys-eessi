@@ -9,16 +9,16 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class EuxConsumerConfig {
 
-  private final String uri;
+    private final String uri;
 
-  public EuxConsumerConfig(@Value("${melosys.integrations.euxapp-url}") String uri) {
-    this.uri = uri;
-  }
+    public EuxConsumerConfig(@Value("${melosys.integrations.euxapp-url}") String uri) {
+        this.uri = uri;
+    }
 
-  @Bean(name = "euxRestTemplate")
-  public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
-    return restTemplateBuilder
-        .rootUri(uri)
-        .build();
-  }
+    @Bean(name = "euxRestTemplate")
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+        return restTemplateBuilder
+                .rootUri(uri)
+                .build();
+    }
 }

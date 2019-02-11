@@ -10,29 +10,29 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class ApiConfig implements WebMvcConfigurer {
 
-  private final Environment environment;
+    private final Environment environment;
 
-  public ApiConfig(Environment environment) {
-    this.environment = environment;
-  }
+    public ApiConfig(Environment environment) {
+        this.environment = environment;
+    }
 
-  @Bean
-  public HeaderValidatorRequestInterceptor requestInterceptor() {
-    return new HeaderValidatorRequestInterceptor(
-        environment.getProperty("melosys.api.security.header-name"),
-        environment.getProperty("melosys.api.security.header-value"),
-        environment.getProperty("spring.profiles.active")
-    );
-  }
-
-  @Override
-  public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(requestInterceptor())
-        .addPathPatterns(
-            "/**"
-        )
-        .excludePathPatterns(
-            "/actuator/**"
+    @Bean
+    public HeaderValidatorRequestInterceptor requestInterceptor() {
+        return new HeaderValidatorRequestInterceptor(
+                environment.getProperty("melosys.api.security.header-name"),
+                environment.getProperty("melosys.api.security.header-value"),
+                environment.getProperty("spring.profiles.active")
         );
-  }
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(requestInterceptor())
+                .addPathPatterns(
+                        "/**"
+                )
+                .excludePathPatterns(
+                        "/actuator/**"
+                );
+    }
 }
