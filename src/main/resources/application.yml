@@ -14,6 +14,12 @@ melosys:
   integrations:
     euxapp-url: ${EUXAPP_URL}
     reststs-url: ${RESTSTS_URL}
+    sts-url: ${STS_URL}
+    dokkat:
+      typeid-url: ${DOKKATTYPEID_URL}
+      typeinfo-url: ${DOKKATTYPEINFO_URL}
+    gsak:
+      sak-url: ${SAK_URL}
   api:
     security:
       header-name: ${API_KEY_HEADER}
