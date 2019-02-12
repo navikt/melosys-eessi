@@ -42,7 +42,7 @@ public class A009MapperTest {
     }
 
     @Test
-    public void hentMedlemskapIkkeSelvstendigOg12_1_forventGyldigMedlemskap() throws MappingException, NotFoundException {
+    public void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() throws MappingException, NotFoundException {
         SED sed = a009Mapper.mapTilSed(sedData);
 
         assertEquals(MedlemskapA009.class, sed.getMedlemskap().getClass());
@@ -61,7 +61,7 @@ public class A009MapperTest {
     }
 
     @Test
-    public void hentMedlemskapErSelvstendigOg12_2_forventGyldigMedlemskap() throws MappingException, NotFoundException {
+    public void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() throws MappingException, NotFoundException {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
         sedData.setEgenAnsatt(true);
         SED sed = a009Mapper.mapTilSed(sedData);
@@ -80,14 +80,14 @@ public class A009MapperTest {
     }
 
     @Test(expected = MappingException.class)
-    public void hentMedlemkapFeilLovvalgsBestemmelse_forventFunksjonellException() throws MappingException, NotFoundException {
+    public void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() throws MappingException, NotFoundException {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
         a009Mapper.mapTilSed(sedData);
     }
 
     @Test(expected = NullPointerException.class)
     @SuppressWarnings("unchecked")
-    public void ingenLovvalgsperioder_forventTekniskException() throws MappingException, NotFoundException {
+    public void ingenLovvalgsperioder_expectNullPointerException() throws MappingException, NotFoundException {
         sedData.setLovvalgsperioder(null);
         a009Mapper.mapTilSed(sedData);
     }
