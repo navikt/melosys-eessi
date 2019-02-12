@@ -6,16 +6,16 @@ import org.junit.Test;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class PostnummerCheckerTest {
+public class PostnummerMapperTest {
 
     @Test
     public void getPoststed_expectValidPoststed() throws NotFoundException {
-        assertThat(PostnummerChecker.getPoststed("0001"), is("OSLO"));
-        assertThat(PostnummerChecker.getPoststed("1337"), is("SANDVIKA"));
+        assertThat(PostnummerMapper.getPoststed("0001"), is("OSLO"));
+        assertThat(PostnummerMapper.getPoststed("1337"), is("SANDVIKA"));
     }
 
     @Test(expected = NotFoundException.class)
     public void getPoststed_expectNotFoundException() throws NotFoundException {
-        PostnummerChecker.getPoststed("0000");
+        PostnummerMapper.getPoststed("0000");
     }
 }

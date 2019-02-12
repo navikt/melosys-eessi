@@ -13,14 +13,14 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class PostnummerChecker {
+public class PostnummerMapper {
 
     private static TreeMap<String, String> postnummerOgPoststed;
 
     static {
         String filename = "/kodeverk/postnummer.json";
 
-        URL jsonUrl = PostnummerChecker.class.getResource(filename);
+        URL jsonUrl = PostnummerMapper.class.getResource(filename);
 
         try {
             postnummerOgPoststed = getTreeMapFromUrl(jsonUrl);
