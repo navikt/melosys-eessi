@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.util.Map;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
@@ -12,6 +12,8 @@ import no.nav.melosys.eessi.service.sed.helpers.SedDataMapperRuter;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class SedService {
@@ -23,7 +25,7 @@ public class SedService {
         this.euxConsumer = euxConsumer;
     }
 
-    public String createAndSend(SedDataDto sedDataDto) throws MappingException, IntegrationException {
+    public String createAndSend(SedDataDto sedDataDto) throws MappingException, IntegrationException, NotFoundException {
 
         BucType bucType = SedUtils.getBucTypeFromBestemmelse(
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());

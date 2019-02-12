@@ -3,7 +3,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "NO",
+        "land": "NOR",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -16,7 +16,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "NO",
+        "land": "NOR",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -27,7 +27,7 @@
   ],
   "bostedsadresse": {
     "gateadresse": "blulul",
-    "land": "NO",
+    "land": "NOR",
     "postnr": "2112",
     "poststed": "Noi"
   },
@@ -37,7 +37,7 @@
     "foedseldato": "2020-01-01",
     "fornavn": "MrEtternavn",
     "kjoenn": "M",
-    "statsborgerskap": "NO"
+    "statsborgerskap": "NOR"
   },
   "egenAnsatt": false,
   "familieMedlem": [
@@ -51,7 +51,7 @@
     {
       "bestemmelse": "ART_12_1",
       "fom": "2020-01-01",
-      "landkode": "SE",
+      "landkode": "SWE",
       "tom": "2020-01-01"
     }
   ],
@@ -59,7 +59,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "testland",
+        "land": "NOR",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -71,14 +71,14 @@
   "utenlandskIdent": [
     {
       "ident": "11111111111",
-      "landkode": "BE"
+      "landkode": "BEL"
     }
   ],
   "utenlandskeVirksomheter": [
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "SE",
+        "land": "SWE",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
