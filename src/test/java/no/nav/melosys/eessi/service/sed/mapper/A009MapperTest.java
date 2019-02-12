@@ -1,13 +1,10 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.Collections;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
@@ -15,6 +12,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.Collections;
+
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -32,14 +35,14 @@ public class A009MapperTest {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_12_1);
         lovvalgsperiode.setFom(LocalDate.now());
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLandkode("NO");
+        lovvalgsperiode.setLandkode("NOR");
         sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
 
         sedData.setEgenAnsatt(false);
     }
 
     @Test
-    public void hentMedlemskapIkkeSelvstendigOg12_1_forventGyldigMedlemskap() throws MappingException {
+    public void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() throws MappingException, NotFoundException {
         SED sed = a009Mapper.mapTilSed(sedData);
 
         assertEquals(MedlemskapA009.class, sed.getMedlemskap().getClass());
@@ -58,7 +61,7 @@ public class A009MapperTest {
     }
 
     @Test
-    public void hentMedlemskapErSelvstendigOg12_2_forventGyldigMedlemskap() throws MappingException {
+    public void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() throws MappingException, NotFoundException {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
         sedData.setEgenAnsatt(true);
         SED sed = a009Mapper.mapTilSed(sedData);
@@ -77,14 +80,14 @@ public class A009MapperTest {
     }
 
     @Test(expected = MappingException.class)
-    public void hentMedlemkapFeilLovvalgsBestemmelse_forventFunksjonellException() throws MappingException {
+    public void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() throws MappingException, NotFoundException {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
         a009Mapper.mapTilSed(sedData);
     }
 
     @Test(expected = NullPointerException.class)
     @SuppressWarnings("unchecked")
-    public void ingenLovvalgsperioder_forventTekniskException() throws MappingException {
+    public void ingenLovvalgsperioder_expectNullPointerException() throws MappingException, NotFoundException {
         sedData.setLovvalgsperioder(null);
         a009Mapper.mapTilSed(sedData);
     }
