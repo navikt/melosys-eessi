@@ -1,16 +1,15 @@
 package no.nav.melosys.eessi.service.sed.helpers;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 
 @Slf4j
 public class PostnummerMapper {
@@ -47,7 +46,7 @@ public class PostnummerMapper {
         String poststed = postnummerOgPoststed.get(postnummer);
 
         if (poststed == null) {
-            throw new NotFoundException("Postnummer " + poststed + " ble ikke funnet.");
+            throw new NotFoundException("Postnummer " + postnummer + " ble ikke funnet.");
         }
 
         return poststed;

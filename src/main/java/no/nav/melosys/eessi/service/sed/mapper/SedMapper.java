@@ -1,5 +1,10 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.FamilieMedlem;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -11,13 +16,8 @@ import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Felles mapper-interface for alle typer SED. Mapper NAV-objektet i NAV-SED, som brukes av eux for
@@ -233,7 +233,7 @@ public interface SedMapper<T extends Medlemskap> {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(sAdresse.getPoststed());
+        adresse.setBy(PostnummerMapper.getPoststed(sAdresse.getPostnr()));
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
 
