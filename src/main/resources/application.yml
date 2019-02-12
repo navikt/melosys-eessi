@@ -15,6 +15,7 @@ melosys:
     euxapp-url: ${EUXAPP_URL}
     reststs-url: ${RESTSTS_URL}
     sts-url: ${STS_URL}
+    dokarkivsed-url: ${DOKARKIVSED_URL}
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}
       typeinfo-url: ${DOKKATTYPEINFO_URL}
