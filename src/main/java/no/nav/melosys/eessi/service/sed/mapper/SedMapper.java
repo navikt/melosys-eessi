@@ -188,8 +188,7 @@ public interface SedMapper<T extends Medlemskap> {
 
             Identifikator orgNr = new Identifikator();
             orgNr.setId(virksomhet.getOrgnr());
-            orgNr.setType(
-                    "registrering"); //organisasjonsindenttypekoder.properties i eux står typer
+            orgNr.setType("registrering"); //organisasjonsindenttypekoder.properties i eux står typer
 
             arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
 
@@ -233,7 +232,8 @@ public interface SedMapper<T extends Medlemskap> {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(PostnummerMapper.getPoststed(sAdresse.getPostnr()));
+        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) ?
+                PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
 
