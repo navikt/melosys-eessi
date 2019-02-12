@@ -25,7 +25,7 @@ public class LandkodeMapper {
         try {
             landkoderIso3OgIso2 = getTreeMapFromUrl(jsonUrl);
         } catch (IOException e) {
-            log.error("Klarte ikke å lese landkoder fra fil " + filename + ". Error: " + e.getMessage());
+            log.error("Klarte ikke å lese landkoder fra fil {}. Error {}", filename, e.getMessage());
         }
     }
 
