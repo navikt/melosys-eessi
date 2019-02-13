@@ -13,5 +13,7 @@ public class MedlemskapA009 extends Medlemskap {
 
     private Utsendingsland utsendingsland;
 
+    private Utsendingsland andreland;
+
     private Vedtak vedtak;
 }

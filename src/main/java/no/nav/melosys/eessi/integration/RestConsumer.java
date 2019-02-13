@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 import no.nav.melosys.eessi.config.EnvironmentHandler;
 import org.springframework.core.env.Environment;
 
@@ -19,5 +20,9 @@ public interface RestConsumer {
 
     default Environment getEnv() {
         return EnvironmentHandler.getInstance().getEnv();
+    }
+
+    default String generateUUID() {
+        return UUID.randomUUID().toString();
     }
 }
