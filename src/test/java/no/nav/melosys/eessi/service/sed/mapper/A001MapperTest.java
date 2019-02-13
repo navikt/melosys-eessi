@@ -13,11 +13,13 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class A001MapperTest {
@@ -34,7 +36,8 @@ public class A001MapperTest {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_16_1);
         lovvalgsperiode.setFom(LocalDate.now());
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLandkode("NO");
+        lovvalgsperiode.setLandkode("NOR");
+        lovvalgsperiode.setUnntakFraBestemmelse(Bestemmelse.ART_16_1);
         sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
 
         sedData.setEgenAnsatt(false);
@@ -44,7 +47,14 @@ public class A001MapperTest {
     public void mapTilSed() throws MappingException, NotFoundException {
         SED sed = a001Mapper.mapTilSed(sedData);
 
-        Assert.assertEquals(MedlemskapA001.class, sed.getMedlemskap().getClass());
+        assertEquals(MedlemskapA001.class, sed.getMedlemskap().getClass());
+
+        MedlemskapA001 medlemskap = (MedlemskapA001) sed.getMedlemskap();
+
+        assertNotNull(medlemskap);
+        assertNotNull(medlemskap.getAnmodning().getErendring());
+        assertNotNull(medlemskap.getUnntak().getA1grunnlag());
+        assertNotNull(medlemskap.getSøknadsperiode());
     }
 }
 
