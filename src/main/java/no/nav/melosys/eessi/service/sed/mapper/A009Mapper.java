@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
+import java.util.Collections;
+import java.util.Comparator;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -13,9 +15,6 @@ import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.Vedtak;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
-import java.util.Collections;
-import java.util.Comparator;
-
 public class A009Mapper implements SedMapper<MedlemskapA009> {
 
     @Override
@@ -25,6 +24,7 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
 
         medlemskapA009.setVedtak(getVedtak(lovvalgsperiode));
+        medlemskapA009.setAndreland(getAndreland(sedData));
 
         if (!sedData.isEgenAnsatt()) {
             medlemskapA009.setUtsendingsland(getUtsendingsland(sedData));
@@ -69,6 +69,16 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
     private Utsendingsland getUtsendingsland(SedDataDto sedData) throws MappingException, NotFoundException {
         Utsendingsland utsendingsland = new Utsendingsland();
         utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
+        return utsendingsland;
+    }
+
+    private Utsendingsland getAndreland(SedDataDto sedData) throws MappingException, NotFoundException {
+        if (sedData.getUtenlandskeVirksomheter() == null) {
+            return null; //Ikke påkrevd
+        }
+
+        Utsendingsland utsendingsland = new Utsendingsland();
+        utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getUtenlandskeVirksomheter()));
         return utsendingsland;
     }
 
