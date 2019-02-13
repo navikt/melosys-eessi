@@ -8,7 +8,7 @@ import lombok.Data;
 @SuppressWarnings("unused")
 @JsonInclude(Include.NON_NULL)
 @Data
-public class Land { // TODO fjerne?
+public class Land {
 
     @JsonProperty("land")
     private String landkode;

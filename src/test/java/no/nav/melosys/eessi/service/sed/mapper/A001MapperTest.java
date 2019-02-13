@@ -1,9 +1,15 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.Collections;
+
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
@@ -12,11 +18,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class A001MapperTest {
@@ -40,7 +41,7 @@ public class A001MapperTest {
     }
 
     @Test
-    public void mapTilSed() throws MappingException {
+    public void mapTilSed() throws MappingException, NotFoundException {
         SED sed = a001Mapper.mapTilSed(sedData);
 
         Assert.assertEquals(MedlemskapA001.class, sed.getMedlemskap().getClass());

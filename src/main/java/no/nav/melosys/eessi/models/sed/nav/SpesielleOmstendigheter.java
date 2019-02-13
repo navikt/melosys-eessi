@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class SpesielleOmstendigheter {
 
-    private String type; // TODO: enum?
+    private String type;
 
     private String beskrivelseannensituasjon;
 }

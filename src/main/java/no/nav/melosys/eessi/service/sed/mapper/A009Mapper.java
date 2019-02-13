@@ -13,9 +13,6 @@ import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.Vedtak;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
-import java.util.Collections;
-import java.util.Comparator;
-
 public class A009Mapper implements SedMapper<MedlemskapA009> {
 
     @Override
@@ -74,9 +71,5 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
 
     public SedType getSedType() {
         return SedType.A009;
-    }
-
-    private Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
-        return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
     }
 }

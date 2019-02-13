@@ -9,15 +9,15 @@ import lombok.Data;
 @Data
 public class Unntak {
 
-    private String startdatoansattforsikret; // TODO: Date?
+    private String startdatoansattforsikret;
 
     private Grunnlag grunnlag;
 
     private SpesielleOmstendigheter spesielleomstendigheter;
 
-    private String startdatokontraktansettelse; // TODO: Date?
+    private String startdatokontraktansettelse;
 
     private String begrunnelse;
 
-    private String a1grunnlag; // TODO: enum?
+    private String a1grunnlag;
 }
