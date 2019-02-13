@@ -1,0 +1,162 @@
+[
+  {
+    "iso2": "LV",
+    "iso3": "LVA",
+    "navn": "Latvia"
+  },
+  {
+    "iso2": "LI",
+    "iso3": "LIE",
+    "navn": "Liechtenstein"
+  },
+  {
+    "iso2": "LT",
+    "iso3": "LTU",
+    "navn": "Litauen"
+  },
+  {
+    "iso2": "NL",
+    "iso3": "NLD",
+    "navn": "Nederland"
+  },
+  {
+    "iso2": "DK",
+    "iso3": "DNK",
+    "navn": "Danmark"
+  },
+  {
+    "iso2": "SE",
+    "iso3": "SWE",
+    "navn": "Sverige"
+  },
+  {
+    "iso2": "NO",
+    "iso3": "NOR",
+    "navn": "Norge"
+  },
+  {
+    "iso2": "IS",
+    "iso3": "ISL",
+    "navn": "Island"
+  },
+  {
+    "iso2": "PL",
+    "iso3": "POL",
+    "navn": "Polen"
+  },
+  {
+    "iso2": "IT",
+    "iso3": "ITA",
+    "navn": "Italia"
+  },
+  {
+    "iso2": "ES",
+    "iso3": "ESP",
+    "navn": "Spania"
+  },
+  {
+    "iso2": "LU",
+    "iso3": "LUX",
+    "navn": "Luxembourg"
+  },
+  {
+    "iso2": "DE",
+    "iso3": "DEU",
+    "navn": "Tyskland"
+  },
+  {
+    "iso2": "GB",
+    "iso3": "GBR",
+    "navn": "Storbritannia"
+  },
+  {
+    "iso2": "FR",
+    "iso3": "FRA",
+    "navn": "Frankrike"
+  },
+  {
+    "iso2": "EE",
+    "iso3": "EST",
+    "navn": "Estland"
+  },
+  {
+    "iso2": "FI",
+    "iso3": "FIN",
+    "navn": "Finland"
+  },
+  {
+    "iso2": "IE",
+    "iso3": "IRL",
+    "navn": "Irland"
+  },
+  {
+    "iso2": "PT",
+    "iso3": "PRT",
+    "navn": "Portugal"
+  },
+  {
+    "iso2": "SK",
+    "iso3": "SVK",
+    "navn": "Slovakia"
+  },
+  {
+    "iso2": "GR",
+    "iso3": "GRC",
+    "navn": "Hellas"
+  },
+  {
+    "iso2": "MT",
+    "iso3": "MLT",
+    "navn": "Malta"
+  },
+  {
+    "iso2": "RO",
+    "iso3": "ROU",
+    "navn": "Romania"
+  },
+  {
+    "iso2": "SI",
+    "iso3": "SVN",
+    "navn": "Slovenia"
+  },
+  {
+    "iso2": "HU",
+    "iso3": "HUN",
+    "navn": "Ungarn"
+  },
+  {
+    "iso2": "AT",
+    "iso3": "AUT",
+    "navn": "Østerrike"
+  },
+  {
+    "iso2": "HR",
+    "iso3": "HRV",
+    "navn": "Kroatia"
+  },
+  {
+    "iso2": "CY",
+    "iso3": "CYP",
+    "navn": "Kypros"
+  },
+  {
+    "iso2": "BE",
+    "iso3": "BEL",
+    "navn": "Belgia"
+  },
+  {
+    "iso2": "BG",
+    "iso3": "BGR",
+    "navn": "Bulgaria"
+  },
+  {
+    "iso2": "CZ",
+    "iso3": "CZE",
+    "navn": "Tsjekkia"
+  },
+  {
+    "iso2": "CH",
+    "iso3": "CHE",
+    "navn": "Sveits"
+  }
+]

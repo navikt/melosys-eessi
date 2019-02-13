@@ -10,10 +10,13 @@ import no.nav.melosys.eessi.controller.dto.FamilieMedlem;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.Virksomhet;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
 
 /**
@@ -22,7 +25,6 @@ import org.springframework.util.StringUtils;
  */
 public interface SedMapper<T extends Medlemskap> {
 
-    //TODO: Alle landkoder må sjekkes og evt mappes til iso-2 format
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     //Versjonen til SED'en. Generasjon og versjon (SED_G_VER.SED_VER = 4.1)
@@ -31,7 +33,7 @@ public interface SedMapper<T extends Medlemskap> {
 
     // Hvis det skulle trenges noen spesifikke endringer av NAV-objektet for enkelte SED'er,
     // bør denne metoden overrides.
-    default SED mapTilSed(SedDataDto sedData) throws MappingException {
+    default SED mapTilSed(SedDataDto sedData) throws MappingException, NotFoundException {
         SED sed = new SED();
 
         sed.setNav(prefillNav(sedData));
@@ -43,11 +45,11 @@ public interface SedMapper<T extends Medlemskap> {
         return sed;
     }
 
-    T getMedlemskap(SedDataDto sedData) throws MappingException;
+    T getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException;
 
     SedType getSedType();
 
-    default Nav prefillNav(SedDataDto sedData) throws MappingException {
+    default Nav prefillNav(SedDataDto sedData) throws MappingException, NotFoundException {
         Nav nav = new Nav();
 
         nav.setBruker(hentBruker(sedData));
@@ -61,7 +63,7 @@ public interface SedMapper<T extends Medlemskap> {
         return nav;
     }
 
-    default Bruker hentBruker(SedDataDto sedDataDto) {
+    default Bruker hentBruker(SedDataDto sedDataDto) throws NotFoundException {
         Bruker bruker = new Bruker();
 
         bruker.setPerson(hentPerson(sedDataDto));
@@ -71,7 +73,7 @@ public interface SedMapper<T extends Medlemskap> {
         return bruker;
     }
 
-    default Person hentPerson(SedDataDto sedData) {
+    default Person hentPerson(SedDataDto sedData) throws NotFoundException {
         Person person = new Person();
 
         person.setFornavn(sedData.getBruker().getFornavn());
@@ -81,7 +83,7 @@ public interface SedMapper<T extends Medlemskap> {
         person.setKjoenn(sedData.getBruker().getKjoenn());
 
         Statsborgerskap statsborgerskap = new Statsborgerskap();
-        statsborgerskap.setLand(sedData.getBruker().getStatsborgerskap());
+        statsborgerskap.setLand(LandkodeMapper.getLandkodeIso2(sedData.getBruker().getStatsborgerskap()));
 
         person.setStatsborgerskap(Collections.singletonList(statsborgerskap));
 
@@ -98,19 +100,26 @@ public interface SedMapper<T extends Medlemskap> {
                 null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
 
         sedData.getUtenlandskIdent().stream()
-                .map(utenlandskIdent -> new Pin(utenlandskIdent.getIdent(),
-                        utenlandskIdent.getLandkode(), null))
+                .map(utenlandskIdent -> {
+                    try {
+                        return new Pin(utenlandskIdent.getIdent(),
+                                LandkodeMapper.getLandkodeIso2(utenlandskIdent.getLandkode()), null);
+                    } catch (NotFoundException e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                })
                 .forEachOrdered(pins::add);
 
         return pins;
     }
 
-    default List<Adresse> hentAdresser(SedDataDto sedDataDto) {
+    default List<Adresse> hentAdresser(SedDataDto sedDataDto) throws NotFoundException {
 
         Adresse adresse = new Adresse();
         adresse.setBy(sedDataDto.getBostedsadresse().getPoststed());
         adresse.setPostnummer(sedDataDto.getBostedsadresse().getPostnr());
-        adresse.setLand(sedDataDto.getBostedsadresse().getLand());
+        adresse.setLand(LandkodeMapper.getLandkodeIso2(sedDataDto.getBostedsadresse().getLand()));
         adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
         adresse.setType("bosted");
 
@@ -147,7 +156,7 @@ public interface SedMapper<T extends Medlemskap> {
         }
     }
 
-    default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) throws MappingException {
+    default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) throws MappingException, NotFoundException {
 
         List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
 
@@ -168,7 +177,7 @@ public interface SedMapper<T extends Medlemskap> {
     }
 
     default List<Arbeidsgiver> hentArbeidsGiver(List<Virksomhet> virksomhetList)
-            throws MappingException {
+            throws MappingException, NotFoundException {
 
         List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
 
@@ -179,8 +188,7 @@ public interface SedMapper<T extends Medlemskap> {
 
             Identifikator orgNr = new Identifikator();
             orgNr.setId(virksomhet.getOrgnr());
-            orgNr.setType(
-                    "registrering"); //organisasjonsindenttypekoder.properties i eux står typer
+            orgNr.setType("registrering"); //organisasjonsindenttypekoder.properties i eux står typer
 
             arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
 
@@ -190,7 +198,7 @@ public interface SedMapper<T extends Medlemskap> {
         return arbeidsgiverList;
     }
 
-    default Selvstendig hentSelvstendig(SedDataDto sedData) throws MappingException {
+    default Selvstendig hentSelvstendig(SedDataDto sedData) throws MappingException, NotFoundException {
 
         Selvstendig selvstendig = new Selvstendig();
         List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
@@ -220,12 +228,13 @@ public interface SedMapper<T extends Medlemskap> {
     }
 
     default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse)
-            throws MappingException {
+            throws MappingException, NotFoundException {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(sAdresse.getPoststed());
-        adresse.setLand(sAdresse.getLand());
+        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) ?
+                PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
+        adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
 
         if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {

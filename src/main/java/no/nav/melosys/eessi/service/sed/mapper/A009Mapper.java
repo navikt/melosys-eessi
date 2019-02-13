@@ -1,22 +1,25 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
-import java.util.Collections;
-import java.util.Comparator;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.GjelderPeriode;
 import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.Vedtak;
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+
+import java.util.Collections;
+import java.util.Comparator;
 
 public class A009Mapper implements SedMapper<MedlemskapA009> {
 
     @Override
-    public MedlemskapA009 getMedlemskap(SedDataDto sedData) throws MappingException {
+    public MedlemskapA009 getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException {
 
         final MedlemskapA009 medlemskapA009 = new MedlemskapA009();
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
@@ -30,12 +33,12 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
         return medlemskapA009;
     }
 
-    private Vedtak getVedtak(Lovvalgsperiode lovvalgsperiode) throws MappingException {
+    private Vedtak getVedtak(Lovvalgsperiode lovvalgsperiode) throws MappingException, NotFoundException {
         Vedtak vedtak = new Vedtak();
 
         vedtak.setEropprinneligvedtak(
                 "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
-        vedtak.setLand(lovvalgsperiode.getLandkode());
+        vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLandkode()));
         vedtak.setGjeldervarighetyrkesaktivitet(
                 "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
 
@@ -63,7 +66,7 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
                 || bestemmelse == Bestemmelse.ART_12_2;
     }
 
-    private Utsendingsland getUtsendingsland(SedDataDto sedData) throws MappingException {
+    private Utsendingsland getUtsendingsland(SedDataDto sedData) throws MappingException, NotFoundException {
         Utsendingsland utsendingsland = new Utsendingsland();
         utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
         return utsendingsland;
