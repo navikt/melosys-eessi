@@ -46,15 +46,21 @@ public class OpprettUtgaaendeJournalpostService {
 
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()
                 .forsendelsesinformasjon(opprettUtgaaendeJournalpostMapper.createForsendelse(null, sedSendt, sak, receiver))
-//                .dokumentInfoVedleggListe() TODO: vedlegg
+//                .dokumentInfoVedleggListe(dokumentInfoVedleggListe(sedSendt)) //TODO: vedlegg
                 .dokumentInfoHoveddokument(hoveddokument(sedSendt.getSedType(), pdf))
                 .build();
 
         OpprettUtgaaendeJournalpostResponse repsonse = dokarkivSedConsumer.create(arkiverUtgaaendeSed);
-//        DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedSendt.getSedType()); //TODO: trengs dette?
 
         return repsonse.getJournalpostId();
     }
+
+//    private List<DokumentInfoVedlegg> dokumentInfoVedleggListe(SedSendt sedSendt) {
+//
+//        DokumentInfoVedlegg.builder()
+//
+//        return Collections.emptyList();
+//    }
 
     private ReceiverInfo extractReceiverInformation(JsonNode receiverResponse) {
         if (receiverResponse.isArray()) {
