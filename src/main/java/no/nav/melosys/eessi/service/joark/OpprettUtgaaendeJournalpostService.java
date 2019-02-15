@@ -1,16 +1,13 @@
 package no.nav.melosys.eessi.service.joark;
 
-import java.util.Collections;
 import com.fasterxml.jackson.databind.JsonNode;
-import no.nav.dokarkivsed.api.v1.*;
+import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
 import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.ValidationException;
-import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,36 +15,33 @@ import org.springframework.stereotype.Service;
 @Service
 public class OpprettUtgaaendeJournalpostService {
 
-    private final OpprettUtgaaendeJournalpostMapper opprettUtgaaendeJournalpostMapper;
-    private final DokkatService dokkatService;
+    private final ForsendelseInformasjonMapper forsendelseInformasjonMapper;
     private final GsakService gsakService;
     private final DokarkivSedConsumer dokarkivSedConsumer;
     private final EuxConsumer euxConsumer;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
-            DokkatService dokkatService, GsakService gsakService,
+            GsakService gsakService,
             DokarkivSedConsumer dokarkivSedConsumer, EuxConsumer euxConsumer) {
         this.dokarkivSedConsumer = dokarkivSedConsumer;
         this.euxConsumer = euxConsumer;
-        this.opprettUtgaaendeJournalpostMapper = new OpprettUtgaaendeJournalpostMapper();
-        this.dokkatService = dokkatService;
+        this.forsendelseInformasjonMapper = new ForsendelseInformasjonMapper();
         this.gsakService = gsakService;
     }
 
     //Returnerer journalpostId. Trengs returverdi?
-    public String arkiverUtgaaendeSed(SedSendt sedSendt) throws ValidationException, IntegrationException {
+    public String arkiverUtgaaendeSed(SedSendt sedSendt) throws IntegrationException {
 
         byte[] pdf = SedDocumentStub.getPdfStub();
-        Long sakId = 1L; //TODO: kall mot melosys med bucId for å hent gsak-sak knyttet til rina-sak sedSendt.getRinaSakId()
+        Long sakId = 1L; //TODO: hente gsakId fra database
         Sak sak = gsakService.getSak(sakId);
         ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
 
-
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()
-                .forsendelsesinformasjon(opprettUtgaaendeJournalpostMapper.createForsendelse(null, sedSendt, sak, receiver))
-//                .dokumentInfoVedleggListe(dokumentInfoVedleggListe(sedSendt)) //TODO: vedlegg
-                .dokumentInfoHoveddokument(hoveddokument(sedSendt.getSedType(), pdf))
+                .forsendelsesinformasjon(forsendelseInformasjonMapper.createForsendelse(sak.getAktoerId(), sedSendt, sak, receiver))
+//                .dokumentInfoVedleggListe(dokumentInfoVedleggListe(sedSendt))
+                .dokumentInfoHoveddokument(forsendelseInformasjonMapper.hoveddokument(sedSendt.getSedType(), pdf))
                 .build();
 
         OpprettUtgaaendeJournalpostResponse repsonse = dokarkivSedConsumer.create(arkiverUtgaaendeSed);
@@ -55,12 +49,8 @@ public class OpprettUtgaaendeJournalpostService {
         return repsonse.getJournalpostId();
     }
 
-//    private List<DokumentInfoVedlegg> dokumentInfoVedleggListe(SedSendt sedSendt) {
-//
-//        DokumentInfoVedlegg.builder()
-//
-//        return Collections.emptyList();
-//    }
+//  TODO: venter på avklaring rundt potensielle endringer ved vedlegg til journalpost
+//  private List<DokumentInfoVedlegg> dokumentInfoVedleggListe(SedSendt sedSendt) {}
 
     private ReceiverInfo extractReceiverInformation(JsonNode receiverResponse) {
         if (receiverResponse.isArray()) {
@@ -77,16 +67,4 @@ public class OpprettUtgaaendeJournalpostService {
         }
         return null;
     }
-
-    private static DokumentInfoHoveddokument hoveddokument(String sedType, byte[] pdf) {
-        return DokumentInfoHoveddokument.builder()
-                .sedType(sedType)
-                .filinfoListe(Collections.singletonList(Filinfo.builder()
-                        .dokument(pdf)
-                        .variantFormat(VariantFormat.ARKIV)
-                        .arkivFilType(ArkivFilType.PDFA)
-                        .build()))
-                .build();
-    }
-
 }

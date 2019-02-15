@@ -16,6 +16,7 @@ melosys:
     reststs-url: ${RESTSTS_URL}
     sts-url: ${STS_URL}
     dokarkivsed-url: ${DOKARKIVSED_URL}
+    aktoer-url: ${AKTOER_URL}
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}
       typeinfo-url: ${DOKKATTYPEINFO_URL}
