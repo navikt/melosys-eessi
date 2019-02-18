@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Collections;
-
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -17,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -54,7 +52,7 @@ public class A001MapperTest {
         assertNotNull(medlemskap);
         assertNotNull(medlemskap.getAnmodning().getErendring());
         assertNotNull(medlemskap.getUnntak().getA1grunnlag());
-        assertNotNull(medlemskap.getSøknadsperiode());
+        assertNotNull(medlemskap.getSoeknadsperiode());
     }
 }
 

@@ -9,7 +9,7 @@ import lombok.Data;
 @SuppressWarnings("unused")
 @JsonInclude(Include.NON_NULL)
 @Data
-public class GjelderPeriode {
+public class Periode {
 
     private AapenPeriode aapenperiode;
 

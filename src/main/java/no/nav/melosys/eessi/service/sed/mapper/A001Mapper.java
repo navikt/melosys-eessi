@@ -1,8 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
-import java.util.Collection;
 import java.util.Collections;
-
+import java.util.List;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -23,22 +22,19 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
 
         medlemskap.setUnntak(getUnntak(lovvalgsperiode));
         medlemskap.setVertsland(getVertsland(sedData));
-        medlemskap.setNåværendemedlemskap(getNåværendeMedlemskap(sedData));
+        medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(sedData));
         medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
-        medlemskap.setSøknadsperiode(getSøknadsperiode(lovvalgsperiode));
+        medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
         medlemskap.setTidligereperiode(getTidligerePeriode());
         medlemskap.setAnmodning(getAnmodning());
 
         return medlemskap;
     }
 
-    // Unntak inneholder for det meste felt i 10.x
-    // Feltene i 10.x blir ikke tatt med, bortsett fra a1Grunnlag og begrunnelse
     private Unntak getUnntak(Lovvalgsperiode lovvalgsperiode) throws MappingException {
         Unntak unntak = new Unntak();
 
         // Hent fast tekst (samme som i brev), denne kan overskrives av saksbehandler (særlig grunn)
-        // Verdien blir satt inn i en tekstboks i RINA. Viser fritekst dersom den har en verdi, og eventuelle begrunnelser.
         unntak.setBegrunnelse(lovvalgsperiode.getBegrunnelse());
 
         // Mapper verdi fra getUnntakFraBestemmelse() til format som eux vil motta.
@@ -54,7 +50,7 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         return vertsland;
     }
 
-    private Collection<Land> getNåværendeMedlemskap(SedDataDto sedDataDto) throws NotFoundException {
+    private List<Land> getNaavaerendeMedlemskap(SedDataDto sedDataDto) throws NotFoundException {
         // Person sitt statsborgerskap
         Land land = new Land();
         if (sedDataDto.getBruker() != null) {
@@ -64,14 +60,14 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         return Collections.singletonList(land);
     }
 
-    private Collection<Land> getForespurtMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
+    private List<Land> getForespurtMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
         Land land = new Land();
         land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLandkode()));
 
         return Collections.singletonList(land);
     }
 
-    private Fastperiode getSøknadsperiode(Lovvalgsperiode lovvalgsperiode) {
+    private Fastperiode getSoeknadsperiode(Lovvalgsperiode lovvalgsperiode) {
         Fastperiode periode = new Fastperiode();
 
         periode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
@@ -81,7 +77,7 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
     }
 
     // Blir ikke implementert i denne versjonen av Melosys.
-    private Collection<Tidligereperiode> getTidligerePeriode() {
+    private List<Periode> getTidligerePeriode() {
         return null;
     }
 

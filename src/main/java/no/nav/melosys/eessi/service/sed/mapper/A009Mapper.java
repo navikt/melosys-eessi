@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
-import java.util.Collections;
-import java.util.Comparator;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -10,7 +8,7 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.GjelderPeriode;
+import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.Vedtak;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -48,7 +46,7 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
 
         vedtak.setArtikkelforordning(lovvalgsperiode.getBestemmelse().getValue());
 
-        GjelderPeriode gjelderperiode = new GjelderPeriode();
+        Periode gjelderperiode = new Periode();
 
         //Vil alltid være fast periode
         Fastperiode fastperiode = new Fastperiode();
