@@ -8,6 +8,8 @@ spring:
     name: melosys-eessi
   datasource:
     url: jdbc:postgresql://${PG_HOST}:5432/${DATABASE_NAME}
+  flyway:
+    clean-on-validation-error: true
 
 melosys:
   systemuser:

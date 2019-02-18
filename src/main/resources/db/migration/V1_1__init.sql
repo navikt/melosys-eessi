@@ -1,4 +1,5 @@
 CREATE TABLE CASE_RELATION (
+  id          SERIAL    NOT NULL,
   rina_sakid  VARCHAR   NOT NULL,
   gsak_id     VARCHAR   NOT NULL
 );
