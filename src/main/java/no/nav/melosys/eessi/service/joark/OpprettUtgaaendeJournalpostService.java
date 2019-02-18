@@ -11,11 +11,12 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.createForsendelse;
+import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.hoveddokument;
 
 @Service
 public class OpprettUtgaaendeJournalpostService {
 
-    private final ForsendelseInformasjonMapper forsendelseInformasjonMapper;
     private final GsakService gsakService;
     private final DokarkivSedConsumer dokarkivSedConsumer;
     private final EuxConsumer euxConsumer;
@@ -26,7 +27,6 @@ public class OpprettUtgaaendeJournalpostService {
             DokarkivSedConsumer dokarkivSedConsumer, EuxConsumer euxConsumer) {
         this.dokarkivSedConsumer = dokarkivSedConsumer;
         this.euxConsumer = euxConsumer;
-        this.forsendelseInformasjonMapper = new ForsendelseInformasjonMapper();
         this.gsakService = gsakService;
     }
 
@@ -39,9 +39,9 @@ public class OpprettUtgaaendeJournalpostService {
         ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
 
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()
-                .forsendelsesinformasjon(forsendelseInformasjonMapper.createForsendelse(sak.getAktoerId(), sedSendt, sak, receiver))
+                .forsendelsesinformasjon(createForsendelse(sak.getAktoerId(), sedSendt, sak, receiver))
 //                .dokumentInfoVedleggListe(dokumentInfoVedleggListe(sedSendt))
-                .dokumentInfoHoveddokument(forsendelseInformasjonMapper.hoveddokument(sedSendt.getSedType(), pdf))
+                .dokumentInfoHoveddokument(hoveddokument(sedSendt.getSedType(), pdf))
                 .build();
 
         OpprettUtgaaendeJournalpostResponse repsonse = dokarkivSedConsumer.create(arkiverUtgaaendeSed);

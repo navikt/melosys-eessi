@@ -11,7 +11,7 @@ class ForsendelseInformasjonMapper {
 
     private static final String GOSYS_ARKIVSAKSYSTEM = "FS22";
 
-    ForsendelsesInformasjon createForsendelse(String aktoerId, SedSendt sedSendt, Sak sak,
+    static ForsendelsesInformasjon createForsendelse(String aktoerId, SedSendt sedSendt, Sak sak,
             ReceiverInfo mottaker) {
 
         return ForsendelsesInformasjon.builder()
@@ -37,7 +37,7 @@ class ForsendelseInformasjonMapper {
                 .build();
     }
 
-    DokumentInfoHoveddokument hoveddokument(String sedType, byte[] pdf) {
+    static DokumentInfoHoveddokument hoveddokument(String sedType, byte[] pdf) {
         return DokumentInfoHoveddokument.builder()
                 .sedType(sedType)
                 .filinfoListe(Collections.singletonList(Filinfo.builder()

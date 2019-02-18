@@ -13,11 +13,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class OidcTokenClientrequestInterceptor implements ClientHttpRequestInterceptor {
+public class OidcTokenClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsService restStsService;
 
-    public OidcTokenClientrequestInterceptor(RestStsService restStsService) {
+    public OidcTokenClientRequestInterceptor(RestStsService restStsService) {
         this.restStsService = restStsService;
     }
 

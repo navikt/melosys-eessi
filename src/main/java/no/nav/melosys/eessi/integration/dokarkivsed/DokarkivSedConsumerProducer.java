@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.integration.dokarkivsed;
 
-import no.nav.melosys.eessi.security.OidcTokenClientrequestInterceptor;
+import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ public class DokarkivSedConsumerProducer {
     }
 
     @Bean
-    public DokarkivSedConsumer dokarkivSedConsumer(OidcTokenClientrequestInterceptor oidcTokenClientrequestInterceptor) {
+    public DokarkivSedConsumer dokarkivSedConsumer(OidcTokenClientRequestInterceptor oidcTokenClientrequestInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
                 .interceptors(oidcTokenClientrequestInterceptor)
