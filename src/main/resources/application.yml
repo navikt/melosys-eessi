@@ -6,6 +6,8 @@ server:
 spring:
   application:
     name: melosys-eessi
+  datasource:
+    url: jdbc:postgresql://${PG_HOST}:5432/${DATABASE_NAME}
 
 melosys:
   systemuser:
