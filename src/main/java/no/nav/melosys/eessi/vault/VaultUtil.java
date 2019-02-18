@@ -60,7 +60,7 @@ public class VaultUtil {
         VaultConfig vaultConfig = null;
         try {
             vaultConfig = new VaultConfig()
-                    .address(System.getenv().getOrDefault("VAULT_ADDR", "https://no.nav.melosys.eessi.vault.adeo.no"))
+                    .address(System.getenv().getOrDefault("VAULT_ADDR", "https://vault.adeo.no"))
                     .token(getVaultToken())
                     .openTimeout(5)
                     .readTimeout(30)
@@ -78,9 +78,9 @@ public class VaultUtil {
             lookupSelf = vault.auth().lookupSelf();
         } catch (VaultException e) {
             if (e.getHttpStatusCode() == 403) {
-                throw new VaultError("The application's no.nav.melosys.eessi.vault token seems to be invalid", e);
+                throw new VaultError("The application's vault token seems to be invalid", e);
             } else {
-                throw new VaultError("Could not validate the application's no.nav.melosys.eessi.vault token", e);
+                throw new VaultError("Could not validate the application's vault token", e);
             }
         }
 
@@ -98,7 +98,7 @@ public class VaultUtil {
                     }
                 }
             }
-            log.info("Starting a refresh timer on the no.nav.melosys.eessi.vault token (TTL = " + lookupSelf.getTTL() + " seconds");
+            log.info("Starting a refresh timer on the vault token (TTL = " + lookupSelf.getTTL() + " seconds");
             timer.schedule(new RefreshTokenTask(), suggestedRefreshInterval(lookupSelf.getTTL() * 1000));
         }
         else {
@@ -119,14 +119,14 @@ public class VaultUtil {
             } else if (env.containsKey("VAULT_TOKEN_PATH")) {
                 byte[] encoded = Files.readAllBytes(Paths.get(env.get("VAULT_TOKEN_PATH")));
                 return new String(encoded, StandardCharsets.UTF_8).trim();
-            } else if (Files.exists(Paths.get("/var/run/secrets/nais.io/no.nav.melosys.eessi.vault/vault_token"))) {
-                byte[] encoded = Files.readAllBytes(Paths.get("/var/run/secrets/nais.io/no.nav.melosys.eessi.vault/vault_token"));
+            } else if (Files.exists(Paths.get("/var/run/secrets/nais.io/vault/vault_token"))) {
+                byte[] encoded = Files.readAllBytes(Paths.get("/var/run/secrets/nais.io/vault/vault_token"));
                 return new String(encoded, StandardCharsets.UTF_8).trim();
             } else {
                 throw new RuntimeException("Neither VAULT_TOKEN or VAULT_TOKEN_PATH is set");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Could not get a no.nav.melosys.eessi.vault token for authentication", e);
+            throw new RuntimeException("Could not get a vault token for authentication", e);
         }
     }
 }
