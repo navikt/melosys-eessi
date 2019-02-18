@@ -127,13 +127,13 @@ public class EuxConsumer implements RestConsumer {
      * @return liste over deltagere
      */
 
-    public List<String> hentDeltagere(String rinaSaksnummer) throws IntegrationException {
+    public JsonNode hentDeltagere(String rinaSaksnummer) throws IntegrationException {
 
         log.info("Henter deltakere til sak {}", rinaSaksnummer);
         String uri = String.format(BUCDELTAKERE_PATH, rinaSaksnummer);
 
         return exchange(uri, HttpMethod.PUT, new HttpEntity<>(getDefaultHeaders()),
-                new ParameterizedTypeReference<List<String>>() {
+                new ParameterizedTypeReference<JsonNode>() {
                 });
     }
 
@@ -284,7 +284,6 @@ public class EuxConsumer implements RestConsumer {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
-        headers.add(HttpHeaders.AUTHORIZATION, getOidcAuth());
 
         return exchange(uri, HttpMethod.GET, new HttpEntity<>(headers),
                 new ParameterizedTypeReference<byte[]>() {
@@ -407,7 +406,6 @@ public class EuxConsumer implements RestConsumer {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add(HttpHeaders.AUTHORIZATION, getOidcAuth());
 
         byte[] documentBytes, attachmentBytes;
         try {
@@ -535,11 +533,6 @@ public class EuxConsumer implements RestConsumer {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add(HttpHeaders.AUTHORIZATION, getOidcAuth());
         return headers;
-    }
-
-    private String getOidcAuth() throws IntegrationException {
-        return "Bearer " + restStsService.collectToken();
     }
 }
