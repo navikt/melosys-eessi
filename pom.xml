@@ -118,7 +118,7 @@
     <dependency>
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
-      <scope>${flyway.version}</scope>
+      <version>${flyway.version}</version>
     </dependency>
 
     <!-- TEST -->
