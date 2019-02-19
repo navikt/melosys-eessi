@@ -10,16 +10,23 @@ og utgående SED'er.
 
 Klon repositoriet og sett det opp som et standard Maven-prosjekt i foretrukket IDE. 
 
-Eneste konfigurasjon som trengs er å sette miljøvariabler:
+Sett først miljøvariabler:
 
 ```
-EUXAPP_URL=
-RESTSTS_URL=
 SRV_USERNAME=
 SRV_PASSWORD=
 ```
  
-Disse kan fås enten på Vault eller ved å spørre på slack-kanal #melosys-utvikling
+Disse kan fås enten på Vault eller ved å spørre på slack-kanal #melosys-utvikling.
+
+Du må også kjøre opp en postgers-instans. Det kan gjøres gjennom følgende docker-kommando:
+```
+docker run -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=su -d --rm postgres
+```
+
+For å aksessere postgres-databasen i preprod må man først koble seg mot og logge inn i vault gjennom kommandolinjen.
+Dokumentasjon hvordan det gjøres finnes her: https://github.com/navikt/utvikling/blob/master/Vault.md
+
 
 # Henvendelser
 

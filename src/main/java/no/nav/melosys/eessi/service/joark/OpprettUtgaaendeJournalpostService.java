@@ -7,7 +7,10 @@ import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.repository.CaseRelationRepository;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,22 +23,28 @@ public class OpprettUtgaaendeJournalpostService {
     private final GsakService gsakService;
     private final DokarkivSedConsumer dokarkivSedConsumer;
     private final EuxConsumer euxConsumer;
+    private final CaseRelationRepository caseRelationRepository;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
             GsakService gsakService,
-            DokarkivSedConsumer dokarkivSedConsumer, EuxConsumer euxConsumer) {
+            DokarkivSedConsumer dokarkivSedConsumer, EuxConsumer euxConsumer,
+            CaseRelationRepository caseRelationRepository) {
         this.dokarkivSedConsumer = dokarkivSedConsumer;
         this.euxConsumer = euxConsumer;
         this.gsakService = gsakService;
+        this.caseRelationRepository = caseRelationRepository;
     }
 
     //Returnerer journalpostId. Trengs returverdi?
-    public String arkiverUtgaaendeSed(SedSendt sedSendt) throws IntegrationException {
+    public String arkiverUtgaaendeSed(SedSendt sedSendt) throws IntegrationException, NotFoundException {
 
         byte[] pdf = SedDocumentStub.getPdfStub();
-        Long sakId = 1L; //TODO: hente gsakId fra database
-        Sak sak = gsakService.getSak(sakId);
+
+        Long gsakId = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
+                .map(CaseRelation::getGsakId).orElseThrow(() -> new NotFoundException("CaseRelation not found with rinaSakId" + sedSendt.getRinaSakId()));
+
+        Sak sak = gsakService.getSak(gsakId);
         ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
 
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()
