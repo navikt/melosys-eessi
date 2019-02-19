@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.config;
 
+import java.net.URISyntaxException;
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -11,6 +13,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Profile("nais")
 @Configuration
@@ -60,5 +65,20 @@ public class DatabaseConfig {
             return String.join("-", APPLICATION_NAME, role);
         }
         return String.join("-", APPLICATION_NAME, namespace, role);
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws URISyntaxException {
+        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
+        entityManagerFactoryBean.setDataSource(userDataSource());
+        entityManagerFactoryBean.setPackagesToScan("no.nav.melosys.eessi");
+        return entityManagerFactoryBean;
+    }
+
+    @Bean(name = "transactionManager")
+    public PlatformTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) throws URISyntaxException {
+        JpaTransactionManager transactionManager = new JpaTransactionManager();
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
+        return transactionManager;
     }
 }
