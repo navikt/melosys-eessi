@@ -1,7 +1,7 @@
 CREATE TABLE CASE_RELATION (
-  id          SERIAL    NOT NULL,
+  id          SERIAL PRIMARY KEY,
   rina_sakid  VARCHAR   NOT NULL,
-  gsak_id     VARCHAR   NOT NULL
+  gsak_id     INTEGER   NOT NULL
 );
 
 CREATE UNIQUE INDEX rina_sakid_idx ON CASE_RELATION(rina_sakid);

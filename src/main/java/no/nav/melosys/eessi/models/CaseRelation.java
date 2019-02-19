@@ -16,5 +16,5 @@ public class CaseRelation {
     private String rinaId;
 
     @Column(name = "gsak_id")
-    private String gsakId;
+    private Long gsakId;
 }

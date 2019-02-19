@@ -8,9 +8,12 @@ spring:
     name: melosys-eessi
   datasource:
     url: jdbc:postgresql://${PG_HOST}:5432/${DATABASE_NAME}
-  flyway:
-    clean-on-validation-error: true
-
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true #fix for jdbc bug i postgres-driver som krasjer app
 melosys:
   systemuser:
     username: ${SRV_USERNAME}

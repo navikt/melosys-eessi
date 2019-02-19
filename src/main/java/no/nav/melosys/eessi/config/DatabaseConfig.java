@@ -10,11 +10,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
-import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 @Profile("nais")
 @Configuration
-@EnableJdbcRepositories
 public class DatabaseConfig {
 
     private static final String APPLICATION_NAME = "melosys-eessi";
@@ -39,8 +37,9 @@ public class DatabaseConfig {
     public FlywayConfigurationCustomizer flywayConfig() {
         return config ->
                 config
-                .initSql(String.format("SET ROLE \"%s-admin\"", environment.getRequiredProperty("DATABASE_NAME")))
-                .dataSource(adminDataSource());
+                        .initSql(String.format("SET ROLE \"%s-admin\"",
+                                environment.getRequiredProperty("DATABASE_NAME")))
+                        .dataSource(adminDataSource());
     }
 
     @SneakyThrows
