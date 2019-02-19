@@ -42,7 +42,7 @@ public class OpprettUtgaaendeJournalpostService {
         byte[] pdf = SedDocumentStub.getPdfStub();
 
         Long gsakId = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
-                .map(CaseRelation::getGsakId).orElseThrow(() -> new NotFoundException("not found"));
+                .map(CaseRelation::getGsakId).orElseThrow(() -> new NotFoundException("CaseRelation not found with rinaSakId" + sedSendt.getRinaSakId()));
 
         Sak sak = gsakService.getSak(gsakId);
         ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
