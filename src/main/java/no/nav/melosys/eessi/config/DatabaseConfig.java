@@ -10,9 +10,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Profile("nais")
 @Configuration
+@EnableJpaRepositories(basePackages = "no.nav.melosys.eessi")
 public class DatabaseConfig {
 
     private static final String APPLICATION_NAME = "melosys-eessi";
