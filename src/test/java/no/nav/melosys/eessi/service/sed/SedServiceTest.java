@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.repository.CaseRelationRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,6 +23,8 @@ public class SedServiceTest {
 
     @Mock
     private EuxConsumer euxConsumer;
+    @Mock
+    private CaseRelationRepository caseRelationRepository;
 
     @InjectMocks
     private SedService sedService;
@@ -30,7 +33,6 @@ public class SedServiceTest {
 
     @Before
     public void setup() throws Exception {
-
         Map<String, String> bucAndSedId = Maps.newHashMap();
         bucAndSedId.put("caseId", RINAID);
         bucAndSedId.put("documentId", "123123123");

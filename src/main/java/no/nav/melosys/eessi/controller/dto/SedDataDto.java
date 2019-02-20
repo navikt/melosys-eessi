@@ -1,9 +1,11 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class SedDataDto {
 
     //Søknaddok.
@@ -24,4 +26,5 @@ public class SedDataDto {
     //Lovvalg
     private List<Lovvalgsperiode> lovvalgsperioder;
 
+    private Long gsakSaksnummer;
 }
