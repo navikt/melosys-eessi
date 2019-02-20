@@ -3,10 +3,13 @@ package no.nav.melosys.eessi.service.sed.mapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.FamilieMedlem;
+import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.Virksomhet;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -243,5 +246,9 @@ public interface SedMapper<T extends Medlemskap> {
         }
 
         return adresse;
+    }
+
+    default Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
+        return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
     }
 }

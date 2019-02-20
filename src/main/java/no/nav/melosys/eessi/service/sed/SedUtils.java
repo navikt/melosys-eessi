@@ -33,7 +33,7 @@ public class SedUtils {
                 break;
             case ART_16_1:
             case ART_16_2:
-                break;
+                return SedType.A001;
         }
 
         throw new RuntimeException("Lovvalgsbestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
@@ -66,7 +66,7 @@ public class SedUtils {
                 break;
             case ART_16_1:
             case ART_16_2:
-                break;
+                return BucType.LA_BUC_01;
         }
         throw new RuntimeException("Bestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
     }

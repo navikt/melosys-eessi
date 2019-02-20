@@ -17,7 +17,7 @@ public class Vedtak {
 
     private String erendringsvedtak;
 
-    private GjelderPeriode gjelderperiode;
+    private Periode gjelderperiode;
 
     private String gjeldervarighetyrkesaktivitet;
 

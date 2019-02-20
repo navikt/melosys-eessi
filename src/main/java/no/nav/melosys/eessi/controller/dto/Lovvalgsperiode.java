@@ -24,4 +24,8 @@ public class Lovvalgsperiode {
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate tom;
+
+    private String unntaksBegrunnelse;
+
+    private Bestemmelse unntakFraBestemmelse;
 }
