@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.eux;
 
+import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +17,12 @@ public class EuxConsumerConfig {
     }
 
     @Bean(name = "euxRestTemplate")
-    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder,
+            OidcTokenClientRequestInterceptor oidcTokenClientrequestInterceptor) {
+
         return restTemplateBuilder
                 .rootUri(uri)
+                .interceptors(oidcTokenClientrequestInterceptor)
                 .build();
     }
 }

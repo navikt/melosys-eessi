@@ -1,0 +1,42 @@
+[
+  {
+    "role": "CaseOwner",
+    "organisation": {
+      "id": "NO:NAVT002",
+      "address": {
+        "street": null,
+        "town": null,
+        "postalCode": null,
+        "region": null,
+        "country": "NO"
+      },
+      "contactMethods": null,
+      "registryNumber": null,
+      "name": "NAVT002",
+      "acronym": "12347",
+      "countryCode": "NO",
+      "activeSince": 1508450400000,
+      "accessPoint": null,
+      "location": null,
+      "assignedBUCs": null
+    },
+    "selected": false
+  },
+  {
+    "role": "CounterParty",
+    "organisation": {
+      "id": "NO:NAVT003",
+      "address": null,
+      "contactMethods": null,
+      "registryNumber": null,
+      "name": "NAVT003",
+      "acronym": "12348",
+      "countryCode": "NO",
+      "activeSince": 1518476400000,
+      "accessPoint": null,
+      "location": null,
+      "assignedBUCs": null
+    },
+    "selected": false
+  }
+]
