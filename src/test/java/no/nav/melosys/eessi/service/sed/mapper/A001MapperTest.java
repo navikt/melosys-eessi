@@ -51,7 +51,7 @@ public class A001MapperTest {
 
         assertNotNull(medlemskap);
         assertNotNull(medlemskap.getAnmodning().getErendring());
-        assertNotNull(medlemskap.getUnntak().getA1grunnlag());
+        assertNotNull(medlemskap.getUnntak().getGrunnlag());
         assertNotNull(medlemskap.getSoeknadsperiode());
     }
 }

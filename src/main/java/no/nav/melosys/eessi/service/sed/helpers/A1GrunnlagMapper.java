@@ -3,16 +3,9 @@ package no.nav.melosys.eessi.service.sed.helpers;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.models.exception.MappingException;
 
-/**
- * Mapper fra Bestemmelse til A1 Grunnlag som EUX vil motta.
- * A1 Grunnlag kan ha en av følgende verdier:
- * - 12_R
- * - 16_R
- * - ANNET
- */
+// Verdiene er hentet fra 'a1grunnlagskoder.properties' i eux-prosjektet.
 public class A1GrunnlagMapper {
 
-    // Verdiene er hentet fra 'a1grunnlagskoder.properties' i eux-prosjektet.
     private static final String BESTEMMELSE_12_R  = "12_r";
     private static final String BESTEMMELSE_16_R  = "16_R";
     private static final String BESTEMMELSE_OTHER = "annet";

@@ -9,8 +9,8 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.sed.helpers.A1GrunnlagMapper;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper;
 
 public class A001Mapper implements SedMapper<MedlemskapA001> {
 
@@ -35,10 +35,18 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         Unntak unntak = new Unntak();
 
         // Hent fast tekst (samme som i brev), denne kan overskrives av saksbehandler (særlig grunn)
-        unntak.setBegrunnelse(lovvalgsperiode.getBegrunnelse());
+        unntak.setBegrunnelse(lovvalgsperiode.getUnntaksBegrunnelse());
 
-        // Mapper verdi fra getUnntakFraBestemmelse() til format som eux vil motta.
-        unntak.setA1grunnlag(A1GrunnlagMapper.mapFromBestemmelse(lovvalgsperiode.getUnntakFraBestemmelse()));
+        Grunnlag grunnlag = new Grunnlag();
+        grunnlag.setArtikkel(UnntakArtikkelMapper.mapFromBestemmelse(lovvalgsperiode.getUnntakFraBestemmelse()));
+
+        if (UnntakArtikkelMapper.BESTEMMELSE_OTHER.equals(grunnlag.getAnnet())) {
+            // Støttes ikke i denne versjonen av melosys
+            grunnlag.setAnnet(""); // maks 255 tegn
+        }
+        unntak.setGrunnlag(grunnlag);
+
+        //unntak.setA1grunnlag(A1GrunnlagMapper.mapFromBestemmelse(tidligereLovvalgsperiode.getUnntakFraBestemmelse()));
 
         return unntak;
     }

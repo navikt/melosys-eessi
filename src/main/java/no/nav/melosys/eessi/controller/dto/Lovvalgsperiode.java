@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.time.LocalDate;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -26,7 +25,7 @@ public class Lovvalgsperiode {
     @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate tom;
 
-    private String begrunnelse;
+    private String unntaksBegrunnelse;
 
     private Bestemmelse unntakFraBestemmelse;
 }
