@@ -13,8 +13,9 @@ Klon repositoriet og sett det opp som et standard Maven-prosjekt i foretrukket I
 Sett først miljøvariabler:
 
 ```
-SRV_USERNAME=
-SRV_PASSWORD=
+SRV_USERNAME
+SRV_PASSWORD
+KAFKA_BOOTSTRAP_SERVERS
 ```
  
 Disse kan fås enten på Vault eller ved å spørre på slack-kanal #melosys-utvikling.

@@ -29,5 +29,4 @@ public class MelosysEessiController {
 
         return result;
     }
-
 }

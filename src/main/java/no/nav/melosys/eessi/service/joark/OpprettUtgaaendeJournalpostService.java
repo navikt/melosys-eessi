@@ -42,7 +42,7 @@ public class OpprettUtgaaendeJournalpostService {
         byte[] pdf = SedDocumentStub.getPdfStub();
 
         Long gsakId = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
-                .map(CaseRelation::getGsakId).orElseThrow(() -> new NotFoundException("CaseRelation not found with rinaSakId" + sedSendt.getRinaSakId()));
+                .map(CaseRelation::getGsakSaksnummer).orElseThrow(() -> new NotFoundException("CaseRelation not found with rinaSakId " + sedSendt.getRinaSakId()));
 
         Sak sak = gsakService.getSak(gsakId);
         ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
@@ -64,6 +64,7 @@ public class OpprettUtgaaendeJournalpostService {
     private ReceiverInfo extractReceiverInformation(JsonNode receiverResponse) {
         if (receiverResponse.isArray()) {
             for (JsonNode receiver : receiverResponse) {
+                //Get first counterparty
                 if ("CounterParty".equalsIgnoreCase(receiver.get("role").asText())) {
                     JsonNode organization = receiver.get("organisation");
 

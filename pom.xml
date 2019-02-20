@@ -24,6 +24,7 @@
     <guava.version>21.0</guava.version>
     <hikaricp.version>3.2.0</hikaricp.version>
     <java.version>1.8</java.version>
+    <kafka-avro-serializer.version>5.1.0</kafka-avro-serializer.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <logstash-encoder.version>4.10</logstash-encoder.version>
     <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
@@ -118,6 +119,11 @@
       <groupId>org.flywaydb</groupId>
       <artifactId>flyway-core</artifactId>
       <version>${flyway.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.confluent</groupId>
+      <artifactId>kafka-avro-serializer</artifactId>
+      <version>${kafka-avro-serializer.version}</version>
     </dependency>
 
     <!-- TEST -->
