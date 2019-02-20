@@ -8,5 +8,5 @@ public interface CaseRelationRepository extends JpaRepository<CaseRelation, Long
 
     Optional<CaseRelation> findByRinaId(String rinaId);
 
-    Optional<CaseRelation> findByGsakId(Long gsakId);
+    Optional<CaseRelation> findByGsakSaksnummer(Long gsakSaksnummer);
 }
