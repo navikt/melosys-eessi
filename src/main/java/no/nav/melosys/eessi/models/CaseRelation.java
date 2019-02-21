@@ -1,8 +1,6 @@
 package no.nav.melosys.eessi.models;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import lombok.Data;
 
 @Data
@@ -10,6 +8,7 @@ import lombok.Data;
 public class CaseRelation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "rina_sakid")
