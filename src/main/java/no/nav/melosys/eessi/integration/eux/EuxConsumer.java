@@ -132,7 +132,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter deltakere til sak {}", rinaSaksnummer);
         String uri = String.format(BUCDELTAKERE_PATH, rinaSaksnummer);
 
-        return exchange(uri, HttpMethod.PUT, new HttpEntity<>(getDefaultHeaders()),
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
                 new ParameterizedTypeReference<JsonNode>() {
                 });
     }
