@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.sed;
 
 import java.util.Map;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.CaseRelation;
@@ -17,7 +17,7 @@ import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Log4j2
+@Slf4j
 @Service
 public class SedService {
 

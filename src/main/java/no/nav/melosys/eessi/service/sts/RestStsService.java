@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.service.sts;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-@Log4j2
+@Slf4j
 @Service
 public class RestStsService implements RestConsumer {
 

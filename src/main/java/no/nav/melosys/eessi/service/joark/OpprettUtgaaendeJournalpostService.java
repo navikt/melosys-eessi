@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.joark;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
 import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.createForsendelse;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.hoveddokument;
 
-@Log4j2
+@Slf4j
 @Service
 public class OpprettUtgaaendeJournalpostService {
 
