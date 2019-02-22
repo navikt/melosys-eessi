@@ -53,13 +53,14 @@ public class SedService {
         String documentId = map.get("documentId");
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaCaseId, documentId);
 
-        euxConsumer.sendSed(rinaCaseId, "!23", documentId);
-        log.info("Sed {} sendt", documentId);
-
         CaseRelation caseRelation = new CaseRelation();
         caseRelation.setRinaId(rinaCaseId);
         caseRelation.setGsakSaksnummer(sedDataDto.getGsakSaksnummer());
         caseRelationRepository.save(caseRelation);
+
+        euxConsumer.sendSed(rinaCaseId, "!23", documentId);
+        log.info("Sed {} sendt", documentId);
+
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaCaseId);
 
         return rinaCaseId;
