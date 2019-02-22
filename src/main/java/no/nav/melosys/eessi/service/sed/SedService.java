@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed;
 
 import java.util.Map;
+import lombok.extern.log4j.Log4j2;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.CaseRelation;
@@ -16,6 +17,7 @@ import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 public class SedService {
 
@@ -31,11 +33,13 @@ public class SedService {
 
     public String createAndSend(SedDataDto sedDataDto) throws MappingException, IntegrationException, NotFoundException {
 
-        Long sakId = sedDataDto.getGsakSaksnummer();
-        if (sakId == null) {
-            throw new MappingException("GsakId is required!");
+        Long gsakSaksnummer = sedDataDto.getGsakSaksnummer();
+        if (gsakSaksnummer == null) {
+            log.error("sakId er null, kan ikke opprette buc og sed");
+            throw new MappingException("GsakId er påkrevd!");
         }
 
+        log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
         BucType bucType = SedUtils.getBucTypeFromBestemmelse(
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
         SedType sedType = SedUtils.getSedTypeFromBestemmelse(
@@ -47,13 +51,16 @@ public class SedService {
         Map<String, String> map = euxConsumer.opprettBucOgSed(bucType.name(), "NAVT003", sed); //NAVT003 vil være default i test-fase
         String rinaCaseId = map.get("caseId");
         String documentId = map.get("documentId");
+        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaCaseId, documentId);
 
         euxConsumer.sendSed(rinaCaseId, "!23", documentId);
+        log.info("Sed {} sendt", documentId);
 
         CaseRelation caseRelation = new CaseRelation();
         caseRelation.setRinaId(rinaCaseId);
         caseRelation.setGsakSaksnummer(sedDataDto.getGsakSaksnummer());
         caseRelationRepository.save(caseRelation);
+        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaCaseId);
 
         return rinaCaseId;
     }

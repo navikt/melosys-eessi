@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.joark;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.extern.log4j.Log4j2;
 import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
 import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.createForsendelse;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.hoveddokument;
 
+@Log4j2
 @Service
 public class OpprettUtgaaendeJournalpostService {
 
@@ -41,12 +43,14 @@ public class OpprettUtgaaendeJournalpostService {
 
         byte[] pdf = SedDocumentStub.getPdfStub();
 
-        Long gsakId = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
-                .map(CaseRelation::getGsakSaksnummer).orElseThrow(() -> new NotFoundException("CaseRelation not found with rinaSakId " + sedSendt.getRinaSakId()));
+        Long gsakSaksnummer = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
+                .map(CaseRelation::getGsakSaksnummer).orElseThrow(() -> new NotFoundException("Saksrelasjon ikke funnet med rinaSakId " + sedSendt.getRinaSakId()));
 
-        Sak sak = gsakService.getSak(gsakId);
+        log.info("Henter gsak med id: {}", gsakSaksnummer);
+        Sak sak = gsakService.getSak(gsakSaksnummer);
         ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
 
+        log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()
                 .forsendelsesinformasjon(createForsendelse(sak.getAktoerId(), sedSendt, sak, receiver))
 //                .dokumentInfoVedleggListe(dokumentInfoVedleggListe(sedSendt))

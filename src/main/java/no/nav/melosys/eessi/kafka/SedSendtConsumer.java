@@ -30,10 +30,10 @@ public class SedSendtConsumer {
 
         try {
             String journalpostId = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
-            log.info("Journalpost created with id: {}", journalpostId);
+            log.info("Journalpost opprettet med id: {}", journalpostId);
         } catch (NotFoundException|IntegrationException e) {
             //Settes pga testing for nå, da gsakSaksnummer ikke alltid vil eksistere, ved feks testing direkte fra rina eller lokalt
-            log.error("Sed ikke journalført: {}", sedSendt, e);
+            log.error("Sed ikke journalført: {}, melding: {}", sedSendt, e.getMessage(), e);
         }
 
     }
