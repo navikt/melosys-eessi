@@ -1,5 +1,10 @@
 package no.nav.melosys.eessi.integration.eux;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,25 +14,16 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import static org.junit.Assert.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -39,9 +35,6 @@ public class EuxConsumerTest {
     @Spy
     private RestTemplate restTemplate;
 
-    @Mock
-    private RestStsService restStsService;
-
     private EuxConsumer euxConsumer;
 
     private MockRestServiceServer server;
@@ -50,7 +43,7 @@ public class EuxConsumerTest {
 
     @Before
     public void setup() {
-        euxConsumer = new EuxConsumer(restTemplate, restStsService);
+        euxConsumer = new EuxConsumer(restTemplate);
         server = MockRestServiceServer.createServer(restTemplate);
     }
 

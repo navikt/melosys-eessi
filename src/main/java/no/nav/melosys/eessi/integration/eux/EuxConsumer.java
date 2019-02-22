@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,7 +30,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class EuxConsumer implements RestConsumer {
 
     private final RestTemplate euxRestTemplate;
-    private final RestStsService restStsService;
 
     private final String RINA_SAKSNUMMER = "RINASaksnummer";
     private final String KORRELASJONS_ID = "KorrelasjonsId";
@@ -45,10 +43,8 @@ public class EuxConsumer implements RestConsumer {
     private final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
 
     @Autowired
-    public EuxConsumer(@Qualifier("euxRestTemplate") RestTemplate restTemplate,
-            RestStsService restStsService) {
+    public EuxConsumer(@Qualifier("euxRestTemplate") RestTemplate restTemplate) {
         this.euxRestTemplate = restTemplate;
-        this.restStsService = restStsService;
     }
 
     /**

@@ -22,7 +22,7 @@ public class DokarkivSedConsumer {
             log.info("Oppretter utgående journalpost for arkivsakid {}",
                     arkiverUtgaaendeSed.getForsendelsesinformasjon().getArkivSak().getArkivSakId());
 
-            return restTemplate.postForObject("", arkiverUtgaaendeSed, OpprettUtgaaendeJournalpostResponse.class);
+            return restTemplate.postForObject("/dokarkivsed", arkiverUtgaaendeSed, OpprettUtgaaendeJournalpostResponse.class);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new IntegrationException("Feil ved oppretting av journalpost", e);
         }
