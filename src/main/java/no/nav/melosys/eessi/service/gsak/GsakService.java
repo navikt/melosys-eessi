@@ -19,4 +19,8 @@ public class GsakService {
     public Sak getSak(Long id) throws IntegrationException {
         return sakConsumer.getSak(id);
     }
+
+    public Sak createSak(String aktoerId) throws IntegrationException {
+        return sakConsumer.createSak(aktoerId);
+    }
 }

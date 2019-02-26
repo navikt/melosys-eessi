@@ -12,7 +12,7 @@ class ForsendelseInformasjonMapper {
     private static final String GOSYS_ARKIVSAKSYSTEM = "FS22";
 
     static ForsendelsesInformasjon createForsendelse(String aktoerId, SedSendt sedSendt, Sak sak,
-            ReceiverInfo mottaker) {
+            ParticipantInfo mottaker) {
 
         return ForsendelsesInformasjon.builder()
                 .arkivSak(sak != null ?

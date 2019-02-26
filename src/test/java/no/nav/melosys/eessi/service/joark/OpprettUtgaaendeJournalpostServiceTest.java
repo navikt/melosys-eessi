@@ -58,7 +58,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
         response.setKanalreferanseId("123");
 
 
-        URL jsonUrl = getClass().getClassLoader().getResource("buc_receivers.json");
+        URL jsonUrl = getClass().getClassLoader().getResource("buc_participants.json");
         assertThat(jsonUrl, not(nullValue()));
         JsonNode receiverInfo = new ObjectMapper().readValue(IOUtils.toString(jsonUrl), JsonNode.class);
         when(euxConsumer.hentDeltagere(anyString())).thenReturn(receiverInfo);

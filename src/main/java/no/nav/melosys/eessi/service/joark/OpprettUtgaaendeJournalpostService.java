@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.joark;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
 import no.nav.eessi.basis.SedSendt;
@@ -17,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.createForsendelse;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.hoveddokument;
+import static no.nav.melosys.eessi.service.joark.JournalpostUtils.extractReceiverInformation;
 
 @Slf4j
 @Service
@@ -48,7 +48,7 @@ public class OpprettUtgaaendeJournalpostService {
 
         log.info("Henter gsak med id: {}", gsakSaksnummer);
         Sak sak = gsakService.getSak(gsakSaksnummer);
-        ReceiverInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
+        ParticipantInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
 
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()
@@ -64,21 +64,4 @@ public class OpprettUtgaaendeJournalpostService {
 
 //  TODO: venter på avklaring rundt potensielle endringer ved vedlegg til journalpost
 //  private List<DokumentInfoVedlegg> dokumentInfoVedleggListe(SedSendt sedSendt) {}
-
-    private ReceiverInfo extractReceiverInformation(JsonNode receiverResponse) {
-        if (receiverResponse.isArray()) {
-            for (JsonNode receiver : receiverResponse) {
-                //Get first counterparty
-                if ("CounterParty".equalsIgnoreCase(receiver.get("role").asText())) {
-                    JsonNode organization = receiver.get("organisation");
-
-                    ReceiverInfo receiverInfo = new ReceiverInfo();
-                    receiverInfo.setId(organization.get("id").textValue());
-                    receiverInfo.setName(organization.get("name").textValue());
-                    return receiverInfo;
-                }
-            }
-        }
-        return null;
-    }
 }
