@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.kafka;
+package no.nav.melosys.eessi.kafka.consumers;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.eessi.basis.SedMottatt;

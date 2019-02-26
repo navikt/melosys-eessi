@@ -19,7 +19,7 @@ import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
 @Configuration
 @EnableKafka
-public class KafkaConfig {
+public class KafkaConsumerConfig {
 
     private static final String LEGISLATION_APPLICABLE_CODE = "LA";
 
@@ -55,8 +55,7 @@ public class KafkaConfig {
         KafkaProperties properties) {
         Map<String, Object> props = properties.buildConsumerProperties();
         props.putAll(sedEventConsumerConfig());
-        DefaultKafkaConsumerFactory<String, SedSendt> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-            props);
+        DefaultKafkaConsumerFactory<String, SedSendt> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props);
         ConcurrentKafkaListenerContainerFactory<String, SedSendt> factory;
         factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setRecordFilterStrategy(recordFilterStrategySedSendt());
@@ -69,8 +68,7 @@ public class KafkaConfig {
             KafkaProperties properties) {
         Map<String, Object> props = properties.buildConsumerProperties();
         props.putAll(sedEventConsumerConfig());
-        DefaultKafkaConsumerFactory<String, SedMottatt> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-                props);
+        DefaultKafkaConsumerFactory<String, SedMottatt> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props);
         ConcurrentKafkaListenerContainerFactory<String, SedMottatt> factory;
         factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setRecordFilterStrategy(recordFilterStrategySedMottatt());
