@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.dokkat;
 
+import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -20,19 +21,25 @@ public class DokkatConsumerProducer {
     }
 
     @Bean
-    public DokumenttypeIdConsumer dokumenttypeIdRestClient() {
+    public DokumenttypeIdConsumer dokumenttypeIdRestClient(
+            BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
+
         RestTemplate restTemplate = new RestTemplateBuilder()
-            .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeIdUrl))
-            .build();
+                .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeIdUrl))
+                .interceptors(basicAuthClientRequestInterceptor)
+                .build();
 
         return new DokumenttypeIdConsumer(restTemplate);
     }
 
     @Bean
-    public DokumenttypeInfoConsumer dokumenttypeInfoRestClient() {
+    public DokumenttypeInfoConsumer dokumenttypeInfoRestClient(
+            BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
+
         RestTemplate restTemplate = new RestTemplateBuilder()
-            .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeInfoUrl))
-            .build();
+                .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeInfoUrl))
+                .interceptors(basicAuthClientRequestInterceptor)
+                .build();
 
         return new DokumenttypeInfoConsumer(restTemplate);
     }

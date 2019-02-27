@@ -5,20 +5,18 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseRequest;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseResponse;
 import no.nav.eessi.basis.SedMottatt;
-import no.nav.melosys.eessi.integration.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.repository.CaseRelationRepository;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
+import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import static no.nav.melosys.eessi.service.joark.InngaaendeForsendelseMapper.createMottaInngaaendeForsendelseRequest;
-import static no.nav.melosys.eessi.service.joark.JournalpostUtils.extractSenderInformation;
 
 @Slf4j
 @Service
@@ -26,32 +24,28 @@ public class OpprettInngaaendeJournalpostService {
 
     private final DokmotInngaaendeConsumer dokmotInngaaendeConsumer;
     private final CaseRelationRepository caseRelationRepository;
-    private final AktoerConsumer aktoerConsumer;
     private final DokkatService dokkatService;
     private final GsakService gsakService;
-    private final EuxConsumer euxConsumer;
+    private final EuxService euxService;
 
     @Autowired
     public OpprettInngaaendeJournalpostService(DokmotInngaaendeConsumer dokmotInngaaendeConsumer,
                                                CaseRelationRepository caseRelationRepository,
-                                               AktoerConsumer aktoerConsumer,
                                                DokkatService dokkatService,
                                                GsakService gsakService,
-                                               EuxConsumer euxConsumer) {
+                                               EuxService euxService) {
         this.dokmotInngaaendeConsumer = dokmotInngaaendeConsumer;
         this.caseRelationRepository = caseRelationRepository;
-        this.aktoerConsumer = aktoerConsumer;
         this.dokkatService = dokkatService;
         this.gsakService = gsakService;
-        this.euxConsumer = euxConsumer;
+        this.euxService = euxService;
     }
 
-    public String arkiverInngaaendeSed(SedMottatt sedMottatt) throws IntegrationException {
+    public String arkiverInngaaendeSed(SedMottatt sedMottatt, String aktoerId) throws IntegrationException {
 
-        String aktoerId = aktoerConsumer.getAktoerId(sedMottatt.getNavBruker());
         Sak sak = getOrCreateSak(sedMottatt.getRinaSakId(), aktoerId);
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedMottatt.getSedType());
-        ParticipantInfo sender = extractSenderInformation(euxConsumer.hentDeltagere(sedMottatt.getRinaSakId()));
+        ParticipantInfo sender = euxService.hentUtsender(sedMottatt.getRinaSakId());
 
         byte[] pdf = SedDocumentStub.getPdfStub();
         MottaInngaaendeForsendelseRequest request = createMottaInngaaendeForsendelseRequest(

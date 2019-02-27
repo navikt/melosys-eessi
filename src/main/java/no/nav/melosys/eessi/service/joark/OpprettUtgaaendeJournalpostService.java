@@ -5,18 +5,17 @@ import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
 import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.repository.CaseRelationRepository;
+import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.createForsendelse;
 import static no.nav.melosys.eessi.service.joark.ForsendelseInformasjonMapper.hoveddokument;
-import static no.nav.melosys.eessi.service.joark.JournalpostUtils.extractReceiverInformation;
 
 @Slf4j
 @Service
@@ -24,16 +23,16 @@ public class OpprettUtgaaendeJournalpostService {
 
     private final GsakService gsakService;
     private final DokarkivSedConsumer dokarkivSedConsumer;
-    private final EuxConsumer euxConsumer;
+    private final EuxService euxService;
     private final CaseRelationRepository caseRelationRepository;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
             GsakService gsakService,
-            DokarkivSedConsumer dokarkivSedConsumer, EuxConsumer euxConsumer,
+            DokarkivSedConsumer dokarkivSedConsumer, EuxService euxService,
             CaseRelationRepository caseRelationRepository) {
         this.dokarkivSedConsumer = dokarkivSedConsumer;
-        this.euxConsumer = euxConsumer;
+        this.euxService = euxService;
         this.gsakService = gsakService;
         this.caseRelationRepository = caseRelationRepository;
     }
@@ -48,7 +47,7 @@ public class OpprettUtgaaendeJournalpostService {
 
         log.info("Henter gsak med id: {}", gsakSaksnummer);
         Sak sak = gsakService.getSak(gsakSaksnummer);
-        ParticipantInfo receiver = extractReceiverInformation(euxConsumer.hentDeltagere(sedSendt.getRinaSakId()));
+        ParticipantInfo receiver = euxService.hentMottaker(sedSendt.getRinaSakId());
 
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         ArkiverUtgaaendeSed arkiverUtgaaendeSed = ArkiverUtgaaendeSed.builder()

@@ -24,34 +24,24 @@ public class SakConsumer implements RestConsumer {
     }
 
     public Sak getSak(Long sakId) throws IntegrationException {
-        String correlationId = generateUUID();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add(HttpHeaders.AUTHORIZATION, basicAuth());
-        headers.add("X-Correlation-ID", correlationId);
-
-        log.info("getSak: correlationId: {}, sakId: {}", correlationId, sakId);
+        HttpHeaders headers = headers();
+        log.info("getSak: correlationId: {}, sakId: {}", headers.get("X-Correlation-ID"), sakId);
 
         return exchange("/" + Long.toString(sakId), HttpMethod.GET, new HttpEntity<>(headers), Sak.class);
     }
 
     public Sak createSak(String aktoerId) throws IntegrationException {
-        String correlationId = generateUUID();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.add(HttpHeaders.AUTHORIZATION, basicAuth());
-        headers.add("X-Correlation-ID", correlationId);
 
         SakDto sakDto = new SakDto();
         sakDto.setAktoerId(aktoerId);
         sakDto.setApplikasjon(MELOSYS_APPLIKASJON);
         sakDto.setTema(TEMA_MEDLEM);
 
-        HttpEntity httpEntity = new HttpEntity<>(sakDto, headers);
+        HttpHeaders headers = headers();
+        log.info("createSak: correlationId: {}", headers.get("X-Correlation-ID"));
 
-        return exchange("/", HttpMethod.POST, httpEntity, Sak.class);
+        return exchange("/", HttpMethod.POST, new HttpEntity<>(sakDto, headers), Sak.class);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
@@ -61,5 +51,15 @@ public class SakConsumer implements RestConsumer {
         } catch (RestClientException e) {
             throw new IntegrationException("Feil i integrasjon mot gsak", e);
         }
+    }
+
+    private HttpHeaders headers() {
+        String correlationId = generateUUID();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.add("X-Correlation-ID", correlationId);
+
+        return headers;
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.gsak;
 
+import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,10 @@ public class SakConsumerProducer {
     }
 
     @Bean
-    public SakConsumer sakRestClient() {
+    public SakConsumer sakRestClient(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
+                .interceptors(basicAuthClientRequestInterceptor)
                 .build();
         return new SakConsumer(restTemplate);
     }

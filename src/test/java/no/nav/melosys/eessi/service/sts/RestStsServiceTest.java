@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sts;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.config.EnvironmentHandler;
+import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,9 +29,12 @@ public class RestStsServiceTest {
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor;
+
     @Before
     public void setUp() {
-        restStsService = spy(new RestStsService(restTemplate));
+        restStsService = spy(new RestStsService(restTemplate, basicAuthClientRequestInterceptor));
 
         // Setter environment som "singleton"
         MockEnvironment environment = spy(new MockEnvironment());
@@ -55,7 +59,8 @@ public class RestStsServiceTest {
                 .thenReturn(responseEntity);
 
         String token = restStsService.collectToken();
-        verify(restStsService, times(1)).basicAuth();
+        verify(restTemplate, times(1))
+                .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
         assertNotNull(token);
         assertFalse(token.isEmpty());
 
@@ -63,13 +68,15 @@ public class RestStsServiceTest {
         body.put("expires_in", 3600L);
 
         String secondToken = restStsService.collectToken();
-        verify(restStsService, times(2)).basicAuth();
+        verify(restTemplate, times(2))
+                .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
         assertNotEquals(token, secondToken);
 
         body.put("access_token", "abccba");
 
         String thirdToken = restStsService.collectToken();
-        verify(restStsService, times(2)).basicAuth();
+        verify(restTemplate, times(2))
+                .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
         assertEquals(secondToken, thirdToken);
     }
 }

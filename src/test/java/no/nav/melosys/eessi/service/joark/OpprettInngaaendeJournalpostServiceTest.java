@@ -1,22 +1,18 @@
 package no.nav.melosys.eessi.service.joark;
 
-import java.util.Objects;
 import java.util.Optional;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseResponse;
 import no.nav.eessi.basis.SedMottatt;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.integration.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.repository.CaseRelationRepository;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
+import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,16 +37,13 @@ public class OpprettInngaaendeJournalpostServiceTest {
     private CaseRelationRepository caseRelationRepository;
 
     @Mock
-    private AktoerConsumer aktoerConsumer;
-
-    @Mock
     private DokkatService dokkatService;
 
     @Mock
     private GsakService gsakService;
 
     @Mock
-    private EuxConsumer euxConsumer;
+    private EuxService euxService;
 
     @InjectMocks
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
@@ -72,9 +65,6 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(caseRelationRepository.findByRinaId(anyString()))
                 .thenReturn(Optional.ofNullable(caseRelation));
 
-        when(aktoerConsumer.getAktoerId(anyString()))
-                .thenReturn("123456789");
-
         DokkatSedInfo dokkatSedInfo = enhancedRandom.nextObject(DokkatSedInfo.class);
         when(dokkatService.hentMetadataFraDokkat(anyString()))
                 .thenReturn(dokkatSedInfo);
@@ -87,25 +77,27 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(gsakService.createSak(anyString()))
                 .thenReturn(sak);
 
-        JsonNode deltagereJson = new ObjectMapper().readTree(Objects.requireNonNull(getClass().getClassLoader().getResource("buc_participants.json")));
-        when(euxConsumer.hentDeltagere(anyString()))
-                .thenReturn(deltagereJson);
+        ParticipantInfo sender = ParticipantInfo.builder()
+                .name("NAVT002")
+                .id("NO:NAVT002")
+                .build();
+        when(euxService.hentUtsender(anyString()))
+                .thenReturn(sender);
     }
 
     @Test
     public void arkiverInngaaendeSed_expectId() throws Exception {
-        String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt);
+        String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
 
         assertThat(journalpostId, not(nullValue()));
         assertThat(journalpostId, is("11223344"));
 
         verify(dokmotInngaaendeConsumer, times(1)).create(any());
         verify(caseRelationRepository, times(1)).findByRinaId(anyString());
-        verify(aktoerConsumer, times(1)).getAktoerId(anyString());
         verify(dokkatService, times(1)).hentMetadataFraDokkat(anyString());
         verify(gsakService, times(1)).getSak(anyLong());
         verify(gsakService, times(0)).createSak(any());
-        verify(euxConsumer, times(1)).hentDeltagere(anyString());
+        verify(euxService, times(1)).hentUtsender(anyString());
     }
 
     @Test
@@ -113,7 +105,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(caseRelationRepository.findByRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
-        String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt);
+        String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
 
         assertThat(journalpostId, not(nullValue()));
         assertThat(journalpostId, is("11223344"));
@@ -130,6 +122,6 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(gsakService.createSak(any()))
                 .thenReturn(null);
 
-        opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt);
+        opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
     }
 }

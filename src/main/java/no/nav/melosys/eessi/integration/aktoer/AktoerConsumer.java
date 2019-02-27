@@ -49,7 +49,6 @@ public class AktoerConsumer implements RestConsumer {
     private HttpEntity<?> headers(String ident) {
         return new HttpEntity<>(new HttpHeaders() {{
             set("Nav-Personidenter", ident);
-            set(AUTHORIZATION, basicAuth());
             set(ACCEPT, APPLICATION_JSON_VALUE);
             set(CONTENT_TYPE, APPLICATION_JSON_VALUE);
             set("Nav-Call-Id","srvmelosys");

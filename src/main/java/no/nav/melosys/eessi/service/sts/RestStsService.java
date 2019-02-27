@@ -6,6 +6,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
@@ -31,8 +32,10 @@ public class RestStsService implements RestConsumer {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public RestStsService(@Qualifier("restStsRestTemplate") RestTemplate restTemplate) {
+    public RestStsService(@Qualifier("restStsRestTemplate") RestTemplate restTemplate,
+                          BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
         this.restTemplate = restTemplate;
+        restTemplate.getInterceptors().add(basicAuthClientRequestInterceptor);
     }
 
     public synchronized String collectToken() throws IntegrationException {
@@ -81,7 +84,6 @@ public class RestStsService implements RestConsumer {
     private HttpEntity<?> createHttpEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.add(HttpHeaders.AUTHORIZATION, basicAuth());
 
         return new HttpEntity(headers);
     }

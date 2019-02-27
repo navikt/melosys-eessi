@@ -1,46 +1,67 @@
 package no.nav.melosys.eessi.service.joark;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.AbstractMap;
 import java.util.HashMap;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.Aktoer;
-import org.junit.Before;
+import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseRequest;
+import no.nav.eessi.basis.SedMottatt;
+import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import org.junit.Test;
-import static no.nav.melosys.eessi.service.joark.JournalpostUtils.*;
+import static no.nav.dok.tjenester.mottainngaaendeforsendelse.DokumentVariant.ArkivFilType.PDFA;
+import static no.nav.dok.tjenester.mottainngaaendeforsendelse.DokumentVariant.VariantFormat.ARKIV;
+import static no.nav.melosys.eessi.service.joark.InngaaendeForsendelseMapper.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class JournalpostUtilsTest {
-
-    private JsonNode participants;
-
-    @Before
-    public void setup() throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        URL jsonUrl = getClass().getClassLoader().getResource("buc_participants.json");
-
-        participants = objectMapper.readTree(jsonUrl);
-    }
+public class InngaaendeForsendelseMapperTest {
 
     @Test
-    public void extractReceiverInformation_expectParticipantInfo() {
-        ParticipantInfo receiver = extractReceiverInformation(participants);
+    public void createMottaInngaaendeForsendelseRequest_expectCorrectlyFormattedRequest() {
+        String aktoerId = "123123123";
 
-        assertThat(receiver, not(nullValue()));
-        assertThat(receiver.getId(), is("NO:NAVT003"));
-        assertThat(receiver.getName(), is("NAVT003"));
-    }
+        SedMottatt sedMottatt = new SedMottatt();
+        sedMottatt.setSedId("123456");
 
-    @Test
-    public void extractSenderInformation_expectParticipantInfo() {
-        ParticipantInfo sender = extractSenderInformation(participants);
+        Sak sak = new Sak();
+        sak.setTema("MED");
 
-        assertThat(sender, not(nullValue()));
-        assertThat(sender.getId(), is("NO:NAVT002"));
-        assertThat(sender.getName(), is("NAVT002"));
+        DokkatSedInfo dokkatSedInfo = new DokkatSedInfo();
+        dokkatSedInfo.setDokumentTittel("Dokumenttittel");
+        dokkatSedInfo.setDokumenttypeId("DokumenttypeId");
+
+        ParticipantInfo senderInfo = ParticipantInfo.builder()
+                .name("NAVT002")
+                .id("NO:NAVT002")
+                .build();
+
+        byte[] pdf = SedDocumentStub.getPdfStub();
+
+        MottaInngaaendeForsendelseRequest mottaInngaaendeForsendelseRequest =
+                createMottaInngaaendeForsendelseRequest(aktoerId, sedMottatt, sak, dokkatSedInfo, senderInfo, pdf);
+
+        assertThat(mottaInngaaendeForsendelseRequest
+                .getForsokEndeligJF(), is(false));
+        assertThat(mottaInngaaendeForsendelseRequest.getForsendelseInformasjon()
+                .getBruker(), not(nullValue()));
+        assertThat(mottaInngaaendeForsendelseRequest.getForsendelseInformasjon()
+                .getAvsender(), not(nullValue()));
+        assertThat(mottaInngaaendeForsendelseRequest.getForsendelseInformasjon()
+                .getTema(), is("MED"));
+        assertThat(mottaInngaaendeForsendelseRequest.getForsendelseInformasjon()
+                .getKanalReferanseId(), is("123456"));
+        assertThat(mottaInngaaendeForsendelseRequest.getForsendelseInformasjon()
+                .getMottaksKanal(), is("EESSI"));
+        assertThat(mottaInngaaendeForsendelseRequest.getForsendelseInformasjon()
+                .getTittel(), is("Dokumenttittel"));
+        assertThat(mottaInngaaendeForsendelseRequest.getDokumentInfoHoveddokument()
+                .getDokumentTypeId(), is("DokumenttypeId"));
+        assertThat(mottaInngaaendeForsendelseRequest.getDokumentInfoHoveddokument().getDokumentVariant().get(0)
+                .getArkivFilType(), is(PDFA));
+        assertThat(mottaInngaaendeForsendelseRequest.getDokumentInfoHoveddokument().getDokumentVariant().get(0)
+                .getVariantFormat(), is(ARKIV));
+        assertThat(mottaInngaaendeForsendelseRequest.getDokumentInfoHoveddokument().getDokumentVariant().get(0)
+                .getDokument(), is(pdf));
     }
 
     @Test
