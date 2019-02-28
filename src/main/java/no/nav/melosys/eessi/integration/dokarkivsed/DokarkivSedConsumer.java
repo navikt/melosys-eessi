@@ -24,6 +24,7 @@ public class DokarkivSedConsumer {
 
             return restTemplate.postForObject("/dokarkivsed", arkiverUtgaaendeSed, OpprettUtgaaendeJournalpostResponse.class);
         } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.error("Kunne ikke journalføre. Status: {}, ArkiverUtgaaendeSed: {}", e.getStatusCode(), arkiverUtgaaendeSed);
             throw new IntegrationException("Feil ved oppretting av journalpost", e);
         }
     }
