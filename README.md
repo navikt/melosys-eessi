@@ -33,7 +33,7 @@ Dokumentasjon hvordan det gjøres finnes her: https://github.com/navikt/utviklin
 
 Spørsmål knyttet til koden eller prosjektet kan rettes mot:
 
-* [Team Melosys](https://github.com/orgs/navikt/teams/Melosys)  
+* [Team Melosys](https://github.com/orgs/navikt/teams/melosys)  
 
 ## For NAV-ansatte
 
