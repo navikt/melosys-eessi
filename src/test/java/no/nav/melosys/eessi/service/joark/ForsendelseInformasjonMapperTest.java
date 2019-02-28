@@ -69,8 +69,8 @@ public class ForsendelseInformasjonMapperTest {
 
     }
 
-    private ReceiverInfo getReceiverInfoStub() {
-        return ReceiverInfo.builder()
+    private ParticipantInfo getReceiverInfoStub() {
+        return ParticipantInfo.builder()
                 .id("123id")
                 .name("123name")
                 .build();

@@ -26,7 +26,6 @@ public class DokumenttypeIdConsumer implements RestConsumer {
             throws IntegrationException {
         try {
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.AUTHORIZATION, basicAuth());
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
             return restTemplate.exchange(String.format("/%s/%s", eksternDokumenttypeId, eksternIdType),

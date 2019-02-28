@@ -26,7 +26,6 @@ public class DokumenttypeInfoConsumer implements RestConsumer {
         try {
 
             HttpHeaders headers = new HttpHeaders();
-            headers.add(HttpHeaders.AUTHORIZATION, basicAuth());
             headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
             return restTemplate

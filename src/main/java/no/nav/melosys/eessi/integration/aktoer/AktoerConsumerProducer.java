@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.aktoer;
 
+import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -17,9 +18,10 @@ public class AktoerConsumerProducer {
     }
 
     @Bean
-    public AktoerConsumer aktoerConsumer() {
+    public AktoerConsumer aktoerConsumer(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
+                .interceptors(basicAuthClientRequestInterceptor)
                 .build();
         return new AktoerConsumer(restTemplate);
     }

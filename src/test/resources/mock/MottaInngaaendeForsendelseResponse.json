@@ -1,0 +1,9 @@
+{
+  "journalpostId": "123456789",
+  "journalTilstand": "MIDLERTIDIG_JOURNALFOERT",
+  "dokumentIdListe": [
+    "123",
+    "456",
+    "789"
+  ]
+}
