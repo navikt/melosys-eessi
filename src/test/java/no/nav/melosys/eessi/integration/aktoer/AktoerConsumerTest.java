@@ -11,8 +11,9 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -52,13 +53,13 @@ public class AktoerConsumerTest {
     @Test
     public void getAktoerIdOk() {
         server.expect(requestTo("/identer?identgruppe=AktoerId")).andRespond(withSuccess(OK_RESPONSE, MediaType.APPLICATION_JSON));
-        assertEquals("1000004898116", aktoerConsumer.getAktoerId("06038029973"));
+        assertThat(aktoerConsumer.getAktoerId("06038029973"), is("1000004898116"));
     }
 
     @Test
     public void getAktoerIdIdentFinnesIkke() {
         server.expect(requestTo("/identer?identgruppe=AktoerId"))
                 .andRespond(withSuccess(FUNCTIONAL_ERROR_RESPONSE, MediaType.APPLICATION_JSON));
-        assertNull(aktoerConsumer.getAktoerId("12345678910"));
+        assertThat(aktoerConsumer.getAktoerId("12345678910"), is(nullValue()));
     }
 }
