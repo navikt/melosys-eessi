@@ -10,22 +10,22 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
 @Service
-public class MelosysBehandlingProducer {
+public class MelosysEessiProducer {
 
     private final KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate;
     private static final String TOPIC_NAME = "privat-melosys-eessi-v1";
 
-    public MelosysBehandlingProducer(KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate) {
+    public MelosysEessiProducer(KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void publiserBehandling(MelosysEessiMelding behandling) {
-        ListenableFuture<SendResult<String, MelosysEessiMelding>> future = kafkaTemplate.send(TOPIC_NAME, behandling);
+    public void publiserMelding(MelosysEessiMelding melding) {
+        ListenableFuture<SendResult<String, MelosysEessiMelding>> future = kafkaTemplate.send(TOPIC_NAME, melding);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, MelosysEessiMelding>>() {
             @Override
             public void onFailure(Throwable throwable) {
-                log.error("Kunne ikke sende melding om ny behandling: {}", behandling, throwable); //TODO: store and retry
+                log.error("Kunne ikke sende melding om ny behandling: {}", melding, throwable); //TODO: store and retry
             }
 
             @Override
