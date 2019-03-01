@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.config;
 
 import java.util.Map;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
-import no.nav.melosys.eessi.avro.MelosysEessiBehandling;
+import no.nav.melosys.eessi.avro.MelosysEessiMelding;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
@@ -15,15 +15,15 @@ import org.springframework.kafka.core.ProducerFactory;
 public class KafkaProducerConfig {
 
     @Bean
-    public ProducerFactory<String, MelosysEessiBehandling> melosysEessiProducerFactory(KafkaProperties kafkaProperties) {
+    public ProducerFactory<String, MelosysEessiMelding> melosysEessiProducerFactory(KafkaProperties kafkaProperties) {
         Map<String, Object> props = kafkaProperties.buildProducerProperties();
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
         return new DefaultKafkaProducerFactory<>(props);
     }
 
     @Bean
-    public KafkaTemplate<String, MelosysEessiBehandling> kafkaTemplate(
-            ProducerFactory<String, MelosysEessiBehandling> melosysEessiProducerFactory) {
+    public KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate(
+            ProducerFactory<String, MelosysEessiMelding> melosysEessiProducerFactory) {
         return new KafkaTemplate<>(melosysEessiProducerFactory);
     }
 }
