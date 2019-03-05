@@ -1,10 +1,23 @@
 package no.nav.melosys.eessi.service.behandling;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.stream.Stream;
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.eessi.basis.SedMottatt;
-import no.nav.melosys.eessi.integration.aktoer.AktoerConsumer;
+import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
+import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import no.nav.melosys.eessi.service.tps.TpsService;
+import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
+import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,24 +26,97 @@ import org.springframework.stereotype.Service;
 public class BehandleSedMottattService {
 
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-    private final AktoerConsumer aktoerConsumer;
+    private final EuxConsumer euxConsumer;
+    private final TpsService tpsService;
 
     @Autowired
     public BehandleSedMottattService(OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService,
-                                     AktoerConsumer aktoerConsumer) {
+                                     EuxConsumer euxConsumer,
+                                     TpsService tpsService) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
-        this.aktoerConsumer = aktoerConsumer;
+        this.euxConsumer = euxConsumer;
+        this.tpsService = tpsService;
     }
 
     public void behandleSed(SedMottatt sedMottatt) {
 
-        String aktoerId = aktoerConsumer.getAktoerId(sedMottatt.getNavBruker());
-
         try {
+            SED sed = euxConsumer.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
+            vurderPerson(sedMottatt, sed);
+            log.info("Person i rinaSak {} er verifisert mot TPS", sedMottatt.getRinaSakId());
+
+            String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());
             String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, aktoerId);
             log.info("Midlertidig journalpost opprettet med id {}", journalpostId);
-        } catch (IntegrationException e) {
-            log.error("Sed ikke journalført: {}, melding: {}", sedMottatt, e.getMessage(), e);
+        } catch (IntegrationException | NotFoundException | ValidationException e) {
+            log.error("Behandling av sed {} ble ikke fullført. Melding: {}", sedMottatt.getRinaDokumentId(), e.getMessage(), e);
         }
+
+        log.info("Behandling av innkommende sed {} fullført.", sedMottatt.getRinaDokumentId());
+    }
+
+    /**
+     * Vurderer om personen er kjent fra før (i TPS) ut fra følgende opplysninger:
+     * - Fødselsdato
+     * - Statsborgerskap
+     *
+     * @param sedMottatt Objekt som blir mottatt fra kafka-køen
+     * @param sed        SED-dokument hentet fra eux
+     * @throws NotFoundException   Dersom det ikke er oppgitt en norsk ident i sedMottatt eller dersom
+     *                             person ikke blir funnet i TPS
+     * @throws ValidationException Dersom opplysninger om person hentet fra TPS ikke stemmer overens med opplysninger
+     *                             i SED eller dersom tpsService ikke klarer å hente person fra TPS
+     */
+    private void vurderPerson(SedMottatt sedMottatt, SED sed) throws NotFoundException, ValidationException {
+
+        if (StringUtils.isEmpty(sedMottatt.getNavBruker())) {
+            throw new NotFoundException("Ingen norsk ident funnet i sed");
+        }
+
+        try {
+            Person person = tpsService.hentPerson(sedMottatt.getNavBruker());
+
+            if (!harSammeStatsborgerskap(person, sed) || !harSammeFoedselsdato(person, sed)) {
+                throw new ValidationException("Kunne ikke vurdere person");
+            }
+        } catch (HentPersonPersonIkkeFunnet hentPersonPersonIkkeFunnet) {
+            throw new NotFoundException("Person ble ikke funnet i TPS: " + hentPersonPersonIkkeFunnet.getMessage());
+        } catch (HentPersonSikkerhetsbegrensning hentPersonSikkerhetsbegrensning) {
+            throw new ValidationException("Kunne ikke hente person fra TPS: " + hentPersonSikkerhetsbegrensning.getMessage());
+        }
+    }
+
+    /**
+     * Sjekker om person mottatt fra TPS har samme statsborgerskap som person i SED.
+     *
+     * @param person Person mottatt fra TPS
+     * @param sed    SED mottatt fra kafka-kø
+     * @return true dersom person og sed har samme statsborgerskap
+     */
+    private boolean harSammeStatsborgerskap(Person person, SED sed) throws NotFoundException {
+        String tpsStatsborgerskap = LandkodeMapper.getLandkodeIso2(person.getStatsborgerskap().getLand().getValue());
+        Stream<String> sedStatsborgerskap = sed.getNav().getBruker().getPerson().getStatsborgerskap()
+                .stream().map(Statsborgerskap::getLand);
+
+        return sedStatsborgerskap.anyMatch(tpsStatsborgerskap::equalsIgnoreCase);
+    }
+
+    /**
+     * Sjekker om person mottatt fra TPS har samme fødselsdato som person i SED.
+     *
+     * @param person Person mottatt fra TPS
+     * @param sed    SED mottatt fra kafka-kø
+     * @return true dersom person og sed har samme fødselsdato
+     */
+    private boolean harSammeFoedselsdato(Person person, SED sed) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+        Calendar tpsFoedselsdatoCalendar = person.getFoedselsdato().getFoedselsdato().toGregorianCalendar();
+        dateFormatter.setTimeZone(tpsFoedselsdatoCalendar.getTimeZone());
+
+        String tpsFoedselsdato = dateFormatter.format(tpsFoedselsdatoCalendar.getTime());
+        String sedFoedselsdato = sed.getNav().getBruker().getPerson().getFoedselsdato();
+
+        return tpsFoedselsdato.equalsIgnoreCase(sedFoedselsdato);
     }
 }

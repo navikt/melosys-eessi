@@ -10,11 +10,9 @@ import static org.hamcrest.Matchers.*;
 
 public class ForsendelseInformasjonMapperTest {
 
-    private ForsendelseInformasjonMapper mapper = new ForsendelseInformasjonMapper();
-
     @Test
     public void createForsendelse_expectValidForsendelsesInformasjon() {
-        ForsendelsesInformasjon res = mapper.createForsendelse("aktoerid", getSedSendtStub(), getSakStub(),getReceiverInfoStub());
+        ForsendelsesInformasjon res = ForsendelseInformasjonMapper.createForsendelse("aktoerid", getSedSendtStub(), getSakStub(),getReceiverInfoStub());
         assertThat(res, not(nullValue()));
         assertThat(res.getBruker(), not(nullValue()));
         assertThat(res.getBruker(), instanceOf(Person.class));
@@ -25,7 +23,7 @@ public class ForsendelseInformasjonMapperTest {
 
     @Test
     public void createForsendelse_expectIkkeTilgjengligMottakerAndNoArkivsakAndNoBruker() {
-        ForsendelsesInformasjon res = mapper.createForsendelse("", getSedSendtStub(), null, null);
+        ForsendelsesInformasjon res = ForsendelseInformasjonMapper.createForsendelse("", getSedSendtStub(), null, null);
         assertThat(res.getMottaker(), not(nullValue()));
         assertThat(((Organisasjon) res.getMottaker()).getNavn(), is("Ikke tilgjengelig"));
         assertThat(((Organisasjon) res.getMottaker()).getOrgnummer(), is("Ikke tilgjengelig"));
@@ -35,7 +33,7 @@ public class ForsendelseInformasjonMapperTest {
 
     @Test
     public void createHoveddokument_expectValidInformation() {
-        DokumentInfoHoveddokument hoveddokument = mapper.hoveddokument("LA_BUC_04", new byte[0]);
+        DokumentInfoHoveddokument hoveddokument = ForsendelseInformasjonMapper.hoveddokument("LA_BUC_04", new byte[0]);
         assertThat(hoveddokument.getSedType(), is("LA_BUC_04"));
         assertThat(hoveddokument.getFilinfoListe(), not(empty()));
         assertThat(hoveddokument.getFilinfoListe().get(0).getArkivFilType(), is(ArkivFilType.PDFA));
@@ -52,6 +50,10 @@ public class ForsendelseInformasjonMapperTest {
                 .setSedId("1")
                 .setSedType("A009")
                 .setSektorKode("MED")
+                .setAvsenderId("NO:NAVT002")
+                .setAvsenderNavn("NAVT002")
+                .setMottakerId("NO:NAVT003")
+                .setMottakerNavn("NAVT003")
                 .build();
     }
 
