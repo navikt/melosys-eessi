@@ -52,6 +52,10 @@ public class ForsendelseInformasjonMapperTest {
                 .setSedId("1")
                 .setSedType("A009")
                 .setSektorKode("MED")
+                .setAvsenderId("123")
+                .setAvsenderNavn("123Navn")
+                .setMottakerId("321")
+                .setMottakerNavn("321Navn")
                 .build();
     }
 
