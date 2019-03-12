@@ -3,12 +3,9 @@ package no.nav.melosys.eessi.config;
 import no.nav.melosys.eessi.security.StsConfigUtil;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -22,16 +19,6 @@ public abstract class SoapConsumerConfig {
     public SoapConsumerConfig(AppCredentials appCredentials, String stsUrl) {
         this.appCredentials = appCredentials;
         this.stsUrl = stsUrl;
-    }
-
-    @Bean
-    public LoggingOutInterceptor loggingOutInterceptor() {
-        return new LoggingOutInterceptor();
-    }
-
-    @Bean
-    public LoggingInInterceptor loggingInInterceptor() {
-        return new LoggingInInterceptor();
     }
 
     public <T> T wrapWithSts(T port) {
