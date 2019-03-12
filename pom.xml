@@ -157,11 +157,6 @@
       <artifactId>cxf-services-sts-core</artifactId>
       <version>${cxf.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.pac4j</groupId>
-      <artifactId>spring-security-pac4j</artifactId>
-      <version>${spring-security-pac4j.version}</version>
-    </dependency>
 
     <!-- TEST -->
     <dependency>
