@@ -38,7 +38,6 @@
     <postgresql.version>42.2.5</postgresql.version>
     <vault-java-driver.version>3.1.0</vault-java-driver.version>
     <cxf.version>3.1.11</cxf.version>
-    <spring-security-pac4j.version>4.1.0</spring-security-pac4j.version>
   </properties>
 
   <dependencies>
