@@ -60,14 +60,12 @@ node {
 
         stage("Build application") {
             configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-                sh "mvn versions:set -B -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false -s $MAVEN_SETTINGS"
                 sh "mvn clean package -Pcoverage -B -e -U -s $MAVEN_SETTINGS"
             }
         }
 
         stage("Build & publish Docker image") {
             configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-                sh "mvn clean package -DskipTests -B -s $MAVEN_SETTINGS"
                 sh "docker build --build-arg JAR_FILE=${application}-${releaseVersion}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${releaseVersion} --rm=true ."
                 sh "docker push ${dockerRepo}/${application}:${releaseVersion}"
             }
@@ -78,7 +76,8 @@ node {
 
             // set namespace to context
             sh "${KUBECTL} config --kubeconfig=${KUBECONFIG_NAISERATOR} set-context ${cluster} --namespace=${namespace}"
-            sh "${KUBECTL} apply --kubeconfig=${KUBECONFIG_NAISERATOR} -f ${NAISERATOR_CONFIG}"
+            sh "${KUBECTL} config --kubeconfig=${KUBECONFIG_NAISERATOR} use-context ${cluster}"
+            sh "${KUBECTL} apply --kubeconfig=${KUBECONFIG_NAISERATOR} -f ${NAISERATOR_CONFIG} --wait=true"
 
             // Oppdater Vera
             try {
