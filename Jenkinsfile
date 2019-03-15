@@ -60,6 +60,7 @@ node {
 
         stage("Build application") {
             configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
+                sh "mvn versions:set -B -DnewVersion=${releaseVersion} -DgenerateBackupPoms=false -s $MAVEN_SETTINGS"
                 sh "mvn clean package -Pcoverage -B -e -U -s $MAVEN_SETTINGS"
             }
         }
