@@ -44,6 +44,7 @@ public class ForsendelseInformasjonMapperTest {
 
     private SedSendt getSedSendtStub() {
         return SedSendt.newBuilder()
+                .setId(1L)
                 .setBucType("LA_BUC_04")
                 .setNavBruker("05059905050")
                 .setRinaDokumentId("123123123")
