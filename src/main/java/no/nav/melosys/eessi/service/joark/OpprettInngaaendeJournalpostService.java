@@ -47,7 +47,7 @@ public class OpprettInngaaendeJournalpostService {
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedMottatt.getSedType());
         ParticipantInfo sender = euxService.hentUtsender(sedMottatt.getRinaSakId());
 
-        byte[] pdf = SedDocumentStub.getPdfStub();
+        byte[] pdf = euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
         MottaInngaaendeForsendelseRequest request = createMottaInngaaendeForsendelseRequest(
                 aktoerId, sedMottatt, sak, dokkatSedInfo, sender, pdf);
 

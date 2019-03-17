@@ -221,6 +221,18 @@ public class EuxConsumer implements RestConsumer {
                 });
     }
 
+    public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        log.info("Henter pdf for sed {} på sak {}", dokumentId, rinaSaksnummer);
+        String uri = String.format(SED_PATH + "/pdf", rinaSaksnummer, dokumentId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
+
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(headers),
+                new ParameterizedTypeReference<byte[]>() {}
+                );
+    }
+
 
     /**
      * Sender en SED til mottakkere. Mottakere må være satt før den kan sendes.

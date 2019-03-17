@@ -244,6 +244,19 @@ public class EuxConsumerTest {
     }
 
     @Test
+    public void hentSedPdf_forventPdf() throws Exception {
+        String id = "123", dokumentId = "123321";
+
+        byte[] forventetRetur = "teststring".getBytes();
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/pdf"))
+                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
+
+        byte[] resultat = euxConsumer.hentSedPdf(id, dokumentId);
+        assertTrue(Arrays.equals(forventetRetur, resultat));
+    }
+
+    @Test
     public void opprettSed_forventId() throws Exception {
         String id = "123";
         String korrelasjonId = "312";
