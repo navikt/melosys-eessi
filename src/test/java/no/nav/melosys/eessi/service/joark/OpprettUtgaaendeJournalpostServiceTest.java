@@ -54,6 +54,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
 
         ParticipantInfo mottakerInfo = ParticipantInfo.builder().id("NO:NAVT003").name("NAVT003").build();
         when(euxService.hentMottaker(anyString())).thenReturn(mottakerInfo);
+        when(euxService.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
 
         CaseRelation caseRelation = enhancedRandom.nextObject(CaseRelation.class);
         when(caseRelationRepository.findByRinaId(anyString())).thenReturn(Optional.of(caseRelation));

@@ -5,12 +5,12 @@ import java.util.List;
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import lombok.val;
 import no.nav.eessi.basis.SedMottatt;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -34,7 +34,7 @@ public class BehandleSedMottattServiceTest {
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
 
     @Mock
-    private EuxConsumer euxConsumer;
+    private EuxService euxService;
 
     @Mock
     private TpsService tpsService;
@@ -50,7 +50,7 @@ public class BehandleSedMottattServiceTest {
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSed(any(), anyString()))
                 .thenReturn("9988776655");
 
-        when(euxConsumer.hentSed(anyString(), anyString()))
+        when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
 
         when(tpsService.hentPerson(anyString()))
@@ -66,7 +66,7 @@ public class BehandleSedMottattServiceTest {
 
         behandleSedMottattService.behandleSed(sedMottatt);
 
-        verify(euxConsumer, times(1)).hentSed(anyString(), anyString());
+        verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
         verify(tpsService, times(1)).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, times(1)).arkiverInngaaendeSed(any(), anyString());
@@ -80,7 +80,7 @@ public class BehandleSedMottattServiceTest {
 
         behandleSedMottattService.behandleSed(sedMottatt);
 
-        verify(euxConsumer, times(1)).hentSed(anyString(), anyString());
+        verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(0)).hentPerson(anyString());
         verify(tpsService, times(0)).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSed(any(), anyString());
@@ -102,7 +102,7 @@ public class BehandleSedMottattServiceTest {
 
         behandleSedMottattService.behandleSed(sedMottatt);
 
-        verify(euxConsumer, times(1)).hentSed(anyString(), anyString());
+        verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
         verify(tpsService, times(0)).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSed(any(), anyString());
@@ -120,7 +120,7 @@ public class BehandleSedMottattServiceTest {
 
         behandleSedMottattService.behandleSed(sedMottatt);
 
-        verify(euxConsumer, times(1)).hentSed(anyString(), anyString());
+        verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
         verify(tpsService, times(0)).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSed(any(), anyString());
