@@ -6,12 +6,12 @@ import java.util.stream.Stream;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.eessi.basis.SedMottatt;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.TpsService;
@@ -26,22 +26,22 @@ import org.springframework.stereotype.Service;
 public class BehandleSedMottattService {
 
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-    private final EuxConsumer euxConsumer;
+    private final EuxService euxService;
     private final TpsService tpsService;
 
     @Autowired
     public BehandleSedMottattService(OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService,
-                                     EuxConsumer euxConsumer,
+                                     EuxService euxService,
                                      TpsService tpsService) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
-        this.euxConsumer = euxConsumer;
+        this.euxService = euxService;
         this.tpsService = tpsService;
     }
 
     public void behandleSed(SedMottatt sedMottatt) {
 
         try {
-            SED sed = euxConsumer.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
+            SED sed = euxService.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
             vurderPerson(sedMottatt, sed);
             log.info("Person i rinaSak {} er verifisert mot TPS", sedMottatt.getRinaSakId());
 
@@ -70,6 +70,7 @@ public class BehandleSedMottattService {
     private void vurderPerson(SedMottatt sedMottatt, SED sed) throws NotFoundException, ValidationException {
 
         if (StringUtils.isEmpty(sedMottatt.getNavBruker())) {
+            // TODO: Venter på avklaringer som beskriver hva som skal gjøres når ingen norsk ident er oppgitt i SED.
             throw new NotFoundException("Ingen norsk ident funnet i sed");
         }
 
@@ -77,9 +78,11 @@ public class BehandleSedMottattService {
             Person person = tpsService.hentPerson(sedMottatt.getNavBruker());
 
             if (!harSammeStatsborgerskap(person, sed) || !harSammeFoedselsdato(person, sed)) {
+                // TODO: Person i SED hadde ikke samme opplysninger i TPS. Venter på avklaringer.
                 throw new ValidationException("Kunne ikke vurdere person");
             }
         } catch (HentPersonPersonIkkeFunnet hentPersonPersonIkkeFunnet) {
+            // TODO: Person ble ikke funnet i TPS. Venter på avklaringer.
             throw new NotFoundException("Person ble ikke funnet i TPS: " + hentPersonPersonIkkeFunnet.getMessage());
         } catch (HentPersonSikkerhetsbegrensning hentPersonSikkerhetsbegrensning) {
             throw new ValidationException("Kunne ikke hente person fra TPS: " + hentPersonSikkerhetsbegrensning.getMessage());
