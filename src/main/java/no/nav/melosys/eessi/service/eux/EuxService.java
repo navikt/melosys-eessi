@@ -101,6 +101,10 @@ public class EuxService {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
     }
 
+    public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
+    }
+
     public void oppdaterSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId, SED sed) throws IntegrationException {
         euxConsumer.opprettSed(rinaSaksnummer, korrelasjonsId, sed);
     }

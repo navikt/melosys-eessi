@@ -40,7 +40,7 @@ public class OpprettUtgaaendeJournalpostService {
     //Returnerer journalpostId. Trengs returverdi?
     public String arkiverUtgaaendeSed(SedSendt sedSendt) throws IntegrationException, NotFoundException {
 
-        byte[] pdf = SedDocumentStub.getPdfStub();
+        byte[] pdf = euxService.hentSedPdf(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId());
 
         Long gsakSaksnummer = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
                 .map(CaseRelation::getGsakSaksnummer).orElseThrow(() -> new NotFoundException("Saksrelasjon ikke funnet med rinaSakId " + sedSendt.getRinaSakId()));
