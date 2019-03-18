@@ -34,6 +34,7 @@ melosys:
     dokarkivsed-url: ${DOKARKIVSED_URL}
     dokmotinngaaende-url: ${DOKMOTINNGAAENDE_URL}
     aktoer-url: ${AKTOER_URL}
+    person-url: ${PERSON_URL}
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}
       typeinfo-url: ${DOKKATTYPEINFO_URL}
