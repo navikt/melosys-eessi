@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
@@ -21,10 +20,10 @@ public class SedSendtConsumer {
         this.opprettUtgaaendeJournalpostService = opprettUtgaaendeJournalpostService;
     }
 
-    @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt", topics = "privat-eessi-basis-sedSendt-v1",
+    @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt", topics = "eessi-basis-sedSendt-v1",
             containerFactory = "sedSendtListenerContainerFactory")
-    public void sedSendt(ConsumerRecord<String, SedSendt> consumerRecord) {
-        SedSendt sedSendt = consumerRecord.value();
+    public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
+        SedHendelse sedSendt = consumerRecord.value();
         log.info("Sed sendt: {}", sedSendt);
 
         try {

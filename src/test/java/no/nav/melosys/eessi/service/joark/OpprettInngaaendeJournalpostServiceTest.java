@@ -3,10 +3,10 @@ package no.nav.melosys.eessi.service.joark;
 import java.util.Optional;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseResponse;
-import no.nav.eessi.basis.SedMottatt;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.repository.CaseRelationRepository;
@@ -50,11 +50,11 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
-    private SedMottatt sedMottatt;
+    private SedHendelse sedMottatt;
 
     @Before
     public void setup() throws Exception {
-        sedMottatt = enhancedRandom.nextObject(SedMottatt.class);
+        sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
 
         MottaInngaaendeForsendelseResponse response = enhancedRandom.nextObject(MottaInngaaendeForsendelseResponse.class);
         response.setJournalpostId("11223344");

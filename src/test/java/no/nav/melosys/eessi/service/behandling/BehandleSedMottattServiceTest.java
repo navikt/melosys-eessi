@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
 import lombok.val;
-import no.nav.eessi.basis.SedMottatt;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
@@ -59,12 +59,12 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_expectServiceCalls() throws Exception {
-        SedMottatt sedMottatt = new SedMottatt();
-        sedMottatt.setNavBruker("11223344");
-        sedMottatt.setRinaSakId("123");
-        sedMottatt.setRinaDokumentId("456");
+        SedHendelse sedHendelse = new SedHendelse();
+        sedHendelse.setNavBruker("11223344");
+        sedHendelse.setRinaSakId("123");
+        sedHendelse.setRinaDokumentId("456");
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
@@ -74,11 +74,11 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_expectIngenNorskIdent() throws Exception {
-        SedMottatt sedMottatt = new SedMottatt();
-        sedMottatt.setRinaSakId("123");
-        sedMottatt.setRinaDokumentId("456");
+        SedHendelse sedHendelse = new SedHendelse();
+        sedHendelse.setRinaSakId("123");
+        sedHendelse.setRinaDokumentId("456");
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(0)).hentPerson(anyString());
@@ -88,10 +88,10 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_expectIkkeValiderbarPerson() throws Exception {
-        SedMottatt sedMottatt = new SedMottatt();
-        sedMottatt.setNavBruker("11223344");
-        sedMottatt.setRinaSakId("123");
-        sedMottatt.setRinaDokumentId("456");
+        SedHendelse sedHendelse = new SedHendelse();
+        sedHendelse.setNavBruker("11223344");
+        sedHendelse.setRinaSakId("123");
+        sedHendelse.setRinaDokumentId("456");
 
         val person = opprettPerson();
         person.setStatsborgerskap(new no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap()
@@ -100,7 +100,7 @@ public class BehandleSedMottattServiceTest {
 
         when(tpsService.hentPerson(anyString())).thenReturn(person);
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
@@ -110,15 +110,15 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_expectIngenPersonFunnet() throws Exception {
-        SedMottatt sedMottatt = new SedMottatt();
-        sedMottatt.setNavBruker("11223344");
-        sedMottatt.setRinaSakId("123");
-        sedMottatt.setRinaDokumentId("456");
+        SedHendelse sedHendelse = new SedHendelse();
+        sedHendelse.setNavBruker("11223344");
+        sedHendelse.setRinaSakId("123");
+        sedHendelse.setRinaDokumentId("456");
 
         when(tpsService.hentPerson(anyString()))
                 .thenThrow(new HentPersonPersonIkkeFunnet("Person ikke funnet" , new PersonIkkeFunnet()));
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());

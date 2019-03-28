@@ -2,9 +2,7 @@ package no.nav.melosys.eessi.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import io.confluent.kafka.serializers.KafkaAvroDeserializer;
-import no.nav.eessi.basis.SedMottatt;
-import no.nav.eessi.basis.SedSendt;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -16,6 +14,8 @@ import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer2;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
 @EnableKafka
@@ -34,45 +34,51 @@ public class KafkaConsumerConfig {
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 100);
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 15000);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, KafkaAvroDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         return props;
     }
 
     @Bean
-    public RecordFilterStrategy<String, SedSendt> recordFilterStrategySedSendt() {
+    public RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedSendt() {
         // Return false to be dismissed
         return record -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(record.value().getSektorKode());
     }
 
     @Bean
-    public RecordFilterStrategy<String, SedMottatt> recordFilterStrategySedMottatt() {
+    public RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedMottatt() {
         // Return false to be dismissed
         return record -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(record.value().getSektorKode());
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedSendt>> sedSendtListenerContainerFactory(
-        KafkaProperties properties) {
-        Map<String, Object> props = properties.buildConsumerProperties();
-        props.putAll(sedEventConsumerConfig());
-        DefaultKafkaConsumerFactory<String, SedSendt> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props);
-        ConcurrentKafkaListenerContainerFactory<String, SedSendt> factory;
-        factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setRecordFilterStrategy(recordFilterStrategySedSendt());
-        factory.setConsumerFactory(defaultKafkaConsumerFactory);
-        return factory;
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedMottattListenerContainerFactory(
+            KafkaProperties properties) {
+        return sedListenerContainerFactory(properties);
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedMottatt>> sedMottattListenerContainerFactory(
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedSendtListenerContainerFactory(
+            KafkaProperties properties) {
+        return sedListenerContainerFactory(properties);
+    }
+
+    private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedListenerContainerFactory(
             KafkaProperties properties) {
         Map<String, Object> props = properties.buildConsumerProperties();
         props.putAll(sedEventConsumerConfig());
-        DefaultKafkaConsumerFactory<String, SedMottatt> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props);
-        ConcurrentKafkaListenerContainerFactory<String, SedMottatt> factory;
-        factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setRecordFilterStrategy(recordFilterStrategySedMottatt());
+        ErrorHandlingDeserializer2<SedHendelse> deserializer = valueDeserializer(SedHendelse.class);
+        DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+                props, new StringDeserializer(), deserializer);
+        ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        //For replay of messages
+        //factory.getContainerProperties().setAckOnError(false);
+        //factory.getContainerProperties().setAckMode(AckMode.RECORD);
         return factory;
+    }
+
+    //ErrorHandlingDeserializer2 added to prevent never ending loop if parsing fails.
+    private <T> ErrorHandlingDeserializer2<T> valueDeserializer(Class<T> targetType) {
+        return new ErrorHandlingDeserializer2<>(new JsonDeserializer<>(targetType,false ));
     }
 }

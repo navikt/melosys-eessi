@@ -2,10 +2,10 @@ package no.nav.melosys.eessi.service.joark;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
-import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -38,7 +38,7 @@ public class OpprettUtgaaendeJournalpostService {
     }
 
     //Returnerer journalpostId. Trengs returverdi?
-    public String arkiverUtgaaendeSed(SedSendt sedSendt) throws IntegrationException, NotFoundException {
+    public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
 
         byte[] pdf = euxService.hentSedPdf(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId());
 

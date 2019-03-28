@@ -3,15 +3,15 @@ package no.nav.melosys.eessi.service.joark;
 import java.util.Collections;
 import java.util.Optional;
 import no.nav.dokarkivsed.api.v1.*;
-import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.springframework.util.StringUtils;
 
 class ForsendelseInformasjonMapper {
 
     private static final String GOSYS_ARKIVSAKSYSTEM = "FS22";
 
-    static ForsendelsesInformasjon createForsendelse(String aktoerId, SedSendt sedSendt, Sak sak,
+    static ForsendelsesInformasjon createForsendelse(String aktoerId, SedHendelse sedHendelse, Sak sak,
             ParticipantInfo mottaker) {
 
         return ForsendelsesInformasjon.builder()
@@ -30,8 +30,8 @@ class ForsendelseInformasjonMapper {
                         .build())
                 .bruker(StringUtils.isEmpty(aktoerId) ?
                         null : Person.builder().aktoerId(aktoerId).build())
-                .bucId(sedSendt.getRinaSakId())
-                .kanalreferanseId(sedSendt.getSedId())
+                .bucId(sedHendelse.getRinaSakId())
+                .kanalreferanseId(sedHendelse.getSedId())
                 .tema(Optional.ofNullable(sak).map(Sak::getTema)
                         .orElse("MED"))
                 .build();

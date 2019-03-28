@@ -19,7 +19,6 @@
     <commons-io.version>2.6</commons-io.version>
     <dokarkiv-api-v1.version>0.0.4</dokarkiv-api-v1.version>
     <dokkat-api.version>10.1.1</dokkat-api.version>
-    <eux-hendelser-avro.version>0.1-SNAPSHOT</eux-hendelser-avro.version>
     <no-nav-dok-tjenester-mottainngaaendeforsendelse.version>1.0.13</no-nav-dok-tjenester-mottainngaaendeforsendelse.version>
     <tps.person.version>3.4.1</tps.person.version>
     <flyway.version>5.2.4</flyway.version>
@@ -98,11 +97,6 @@
       <groupId>no.nav.dokkat</groupId>
       <artifactId>dokkat-api</artifactId>
       <version>${dokkat-api.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>no.nav.eux.avro</groupId>
-      <artifactId>eux-hendelser-avro</artifactId>
-      <version>${eux-hendelser-avro.version}</version>
     </dependency>
     <dependency>
       <groupId>no.nav.tjenester.fim</groupId>
