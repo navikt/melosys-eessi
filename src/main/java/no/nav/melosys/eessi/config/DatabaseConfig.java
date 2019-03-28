@@ -6,7 +6,7 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
-import no.nav.melosys.eessi.vault.HikariCPVaultUtil;
+import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,19 +43,18 @@ public class DatabaseConfig {
     }
 
     @Bean
-    public FlywayConfigurationCustomizer flywayConfig() {
+    public FlywayConfigurationCustomizer flywayConfig(DataSource adminDataSource) {
         return config ->
-                config
-                        .initSql(String.format("SET ROLE \"%s-admin\"",
+                config.initSql(String.format("SET ROLE \"%s-admin\"",
                                 environment.getRequiredProperty("DATABASE_NAME")))
-                        .dataSource(adminDataSource());
+                        .dataSource(adminDataSource);
     }
 
     @SneakyThrows
     private HikariDataSource dataSource(String user) {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
-        config.setMaximumPoolSize(4);
+        config.setMaximumPoolSize(3);
         config.setMinimumIdle(1);
         String mountPath = "postgresql/preprod-fss";
         return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
@@ -70,7 +69,7 @@ public class DatabaseConfig {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws URISyntaxException {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(userDataSource());
         entityManagerFactoryBean.setPackagesToScan("no.nav.melosys.eessi");
