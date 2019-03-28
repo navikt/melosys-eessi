@@ -2,8 +2,8 @@ package no.nav.melosys.eessi.service.joark;
 
 import java.time.ZonedDateTime;
 import no.nav.dokarkivsed.api.v1.*;
-import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -14,7 +14,7 @@ public class ForsendelseInformasjonMapperTest {
 
     @Test
     public void createForsendelse_expectValidForsendelsesInformasjon() {
-        ForsendelsesInformasjon res = mapper.createForsendelse("aktoerid", getSedSendtStub(), getSakStub(),getReceiverInfoStub());
+        ForsendelsesInformasjon res = mapper.createForsendelse("aktoerid", getSedHendelseStub(), getSakStub(),getReceiverInfoStub());
         assertThat(res, not(nullValue()));
         assertThat(res.getBruker(), not(nullValue()));
         assertThat(res.getBruker(), instanceOf(Person.class));
@@ -25,7 +25,7 @@ public class ForsendelseInformasjonMapperTest {
 
     @Test
     public void createForsendelse_expectIkkeTilgjengligMottakerAndNoArkivsakAndNoBruker() {
-        ForsendelsesInformasjon res = mapper.createForsendelse("", getSedSendtStub(), null, null);
+        ForsendelsesInformasjon res = mapper.createForsendelse("", getSedHendelseStub(), null, null);
         assertThat(res.getMottaker(), not(nullValue()));
         assertThat(((Organisasjon) res.getMottaker()).getNavn(), is("Ikke tilgjengelig"));
         assertThat(((Organisasjon) res.getMottaker()).getOrgnummer(), is("Ikke tilgjengelig"));
@@ -42,21 +42,21 @@ public class ForsendelseInformasjonMapperTest {
         assertThat(hoveddokument.getFilinfoListe().get(0).getVariantFormat(), is(VariantFormat.ARKIV));
     }
 
-    private SedSendt getSedSendtStub() {
-        return SedSendt.newBuilder()
-                .setId(1L)
-                .setBucType("LA_BUC_04")
-                .setNavBruker("05059905050")
-                .setRinaDokumentId("123123123")
-                .setRinaDokumentVersjon("4.1")
-                .setRinaSakId("11111")
-                .setSedId("1")
-                .setSedType("A009")
-                .setSektorKode("MED")
-                .setAvsenderId("123")
-                .setAvsenderNavn("123Navn")
-                .setMottakerId("321")
-                .setMottakerNavn("321Navn")
+    private SedHendelse getSedHendelseStub() {
+        return SedHendelse.builder()
+                .id(1L)
+                .bucType("LA_BUC_04")
+                .navBruker("05059905050")
+                .rinaDokumentId("123123123")
+                .rinaDokumentVersjon("4.1")
+                .rinaSakId("11111")
+                .sedId("1")
+                .sedType("A009")
+                .sektorKode("MED")
+                .avsenderId("123")
+                .avsenderNavn("123Navn")
+                .mottakerId("321")
+                .mottakerNavn("321Navn")
                 .build();
     }
 

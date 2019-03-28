@@ -4,9 +4,9 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseRequest;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseResponse;
-import no.nav.eessi.basis.SedMottatt;
 import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.repository.CaseRelationRepository;
@@ -41,7 +41,7 @@ public class OpprettInngaaendeJournalpostService {
         this.euxService = euxService;
     }
 
-    public String arkiverInngaaendeSed(SedMottatt sedMottatt, String aktoerId) throws IntegrationException {
+    public String arkiverInngaaendeSed(SedHendelse sedMottatt, String aktoerId) throws IntegrationException {
 
         Sak sak = getOrCreateSak(sedMottatt.getRinaSakId(), aktoerId);
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedMottatt.getSedType());

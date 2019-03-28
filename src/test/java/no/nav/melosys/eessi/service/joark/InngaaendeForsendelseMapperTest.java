@@ -4,8 +4,8 @@ import java.util.AbstractMap;
 import java.util.HashMap;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.Aktoer;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseRequest;
-import no.nav.eessi.basis.SedMottatt;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import org.junit.Test;
 import static no.nav.dok.tjenester.mottainngaaendeforsendelse.DokumentVariant.ArkivFilType.PDFA;
@@ -20,7 +20,7 @@ public class InngaaendeForsendelseMapperTest {
     public void createMottaInngaaendeForsendelseRequest_expectCorrectlyFormattedRequest() {
         String aktoerId = "123123123";
 
-        SedMottatt sedMottatt = new SedMottatt();
+        SedHendelse sedMottatt = new SedHendelse();
         sedMottatt.setSedId("123456");
 
         Sak sak = new Sak();

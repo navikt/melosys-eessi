@@ -3,11 +3,11 @@ package no.nav.melosys.eessi.service.joark;
 import java.util.Optional;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
-import no.nav.eessi.basis.SedSendt;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.repository.CaseRelationRepository;
@@ -41,7 +41,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @InjectMocks
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
-    private SedSendt sedSendt;
+    private SedHendelse sedSendt;
     private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
     @Before
@@ -62,7 +62,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
         when(dokarkivSedConsumer.create(any(ArkiverUtgaaendeSed.class))).thenReturn(response);
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
-        sedSendt = enhancedRandom.nextObject(SedSendt.class);
+        sedSendt = enhancedRandom.nextObject(SedHendelse.class);
 
         when(gsakService.getSak(anyLong())).thenReturn(sak);
 

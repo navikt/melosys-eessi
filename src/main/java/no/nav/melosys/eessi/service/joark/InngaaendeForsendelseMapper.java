@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import no.nav.dok.tjenester.mottainngaaendeforsendelse.*;
-import no.nav.eessi.basis.SedMottatt;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 
 class InngaaendeForsendelseMapper {
@@ -18,7 +18,7 @@ class InngaaendeForsendelseMapper {
     private static final String AVSENDER_IKKE_TILGJENGELIG = "avsender ikke tilgjengelig";
 
     static MottaInngaaendeForsendelseRequest createMottaInngaaendeForsendelseRequest(
-            String aktoerId, SedMottatt sedMottatt, Sak sak, DokkatSedInfo dokkatSedInfo, ParticipantInfo senderInfo, byte[] pdf) {
+            String aktoerId, SedHendelse sedMottatt, Sak sak, DokkatSedInfo dokkatSedInfo, ParticipantInfo senderInfo, byte[] pdf) {
 
         return new MottaInngaaendeForsendelseRequest()
                 .withForsokEndeligJF(Boolean.FALSE)
@@ -27,7 +27,7 @@ class InngaaendeForsendelseMapper {
     }
 
     private static ForsendelseInformasjon forsendelseInformasjon(
-            String aktoerId, SedMottatt sedMottatt, Sak sak, DokkatSedInfo dokkatSedInfo, ParticipantInfo senderInfo) {
+            String aktoerId, SedHendelse sedMottatt, Sak sak, DokkatSedInfo dokkatSedInfo, ParticipantInfo senderInfo) {
 
         return new ForsendelseInformasjon()
                 .withBruker(person(aktoerId))

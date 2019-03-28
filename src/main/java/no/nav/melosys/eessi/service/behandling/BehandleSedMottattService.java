@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.stream.Stream;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.eessi.basis.SedMottatt;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
@@ -38,7 +38,7 @@ public class BehandleSedMottattService {
         this.tpsService = tpsService;
     }
 
-    public void behandleSed(SedMottatt sedMottatt) {
+    public void behandleSed(SedHendelse sedMottatt) {
 
         try {
             SED sed = euxService.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
@@ -67,7 +67,7 @@ public class BehandleSedMottattService {
      * @throws ValidationException Dersom opplysninger om person hentet fra TPS ikke stemmer overens med opplysninger
      *                             i SED eller dersom tpsService ikke klarer å hente person fra TPS
      */
-    private void vurderPerson(SedMottatt sedMottatt, SED sed) throws NotFoundException, ValidationException {
+    private void vurderPerson(SedHendelse sedMottatt, SED sed) throws NotFoundException, ValidationException {
 
         if (StringUtils.isEmpty(sedMottatt.getNavBruker())) {
             // TODO: Venter på avklaringer som beskriver hva som skal gjøres når ingen norsk ident er oppgitt i SED.
