@@ -5,10 +5,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
-import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.repository.CaseRelationRepository;
+import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,13 +17,13 @@ import org.springframework.stereotype.Service;
 public class EuxService {
 
     private final EuxConsumer euxConsumer;
-    private final CaseRelationRepository caseRelationRepository;
+    private final CaseRelationService caseRelationService;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      CaseRelationRepository caseRelationRepository) {
+                      CaseRelationService caseRelationService) {
         this.euxConsumer = euxConsumer;
-        this.caseRelationRepository = caseRelationRepository;
+        this.caseRelationService = caseRelationService;
     }
 
     public JsonNode hentBuC(String rinaSaksnummer) throws IntegrationException {
@@ -59,10 +58,7 @@ public class EuxService {
         String documentId = map.get("documentId");
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaCaseId, documentId);
 
-        CaseRelation caseRelation = new CaseRelation();
-        caseRelation.setRinaId(rinaCaseId);
-        caseRelation.setGsakSaksnummer(gsakSaksnummer);
-        caseRelationRepository.save(caseRelation);
+        caseRelationService.save(gsakSaksnummer, rinaCaseId);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaCaseId);
 
         euxConsumer.sendSed(rinaCaseId, "!23", documentId);

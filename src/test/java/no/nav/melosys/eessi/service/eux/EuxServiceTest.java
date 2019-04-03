@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.repository.CaseRelationRepository;
+import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class EuxServiceTest {
     private EuxConsumer euxConsumer;
 
     @Mock
-    private CaseRelationRepository caseRelationRepository;
+    private CaseRelationService caseRelationService;
 
     @InjectMocks
     private EuxService euxService;
@@ -85,7 +85,7 @@ public class EuxServiceTest {
         verify(euxConsumer, times(1))
                 .sendSed(anyString(), anyString(), anyString());
 
-        verify(caseRelationRepository, times(1))
-                .save(any());
+        verify(caseRelationService, times(1))
+                .save(anyLong(), anyString());
     }
 }

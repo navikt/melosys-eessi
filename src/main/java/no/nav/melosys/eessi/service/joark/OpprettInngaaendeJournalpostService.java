@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.repository.CaseRelationRepository;
+import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -23,19 +23,19 @@ import static no.nav.melosys.eessi.service.joark.InngaaendeForsendelseMapper.cre
 public class OpprettInngaaendeJournalpostService {
 
     private final DokmotInngaaendeConsumer dokmotInngaaendeConsumer;
-    private final CaseRelationRepository caseRelationRepository;
+    private final CaseRelationService caseRelationService;
     private final DokkatService dokkatService;
     private final GsakService gsakService;
     private final EuxService euxService;
 
     @Autowired
     public OpprettInngaaendeJournalpostService(DokmotInngaaendeConsumer dokmotInngaaendeConsumer,
-                                               CaseRelationRepository caseRelationRepository,
+                                               CaseRelationService caseRelationService,
                                                DokkatService dokkatService,
                                                GsakService gsakService,
                                                EuxService euxService) {
         this.dokmotInngaaendeConsumer = dokmotInngaaendeConsumer;
-        this.caseRelationRepository = caseRelationRepository;
+        this.caseRelationService = caseRelationService;
         this.dokkatService = dokkatService;
         this.gsakService = gsakService;
         this.euxService = euxService;
@@ -57,7 +57,7 @@ public class OpprettInngaaendeJournalpostService {
     }
 
     private Sak getOrCreateSak(String rinaId, String aktoerId) throws IntegrationException {
-        Optional<Long> gsakId = caseRelationRepository.findByRinaId(rinaId)
+        Optional<Long> gsakId = caseRelationService.findByRinaId(rinaId)
                 .map(CaseRelation::getGsakSaksnummer);
 
         if (gsakId.isPresent()) {
@@ -79,7 +79,7 @@ public class OpprettInngaaendeJournalpostService {
         CaseRelation caseRelation = new CaseRelation();
         caseRelation.setRinaId(rinaId);
         caseRelation.setGsakSaksnummer(Long.parseLong(sak.getId()));
-        caseRelationRepository.save(caseRelation);
+        caseRelationService.save(caseRelation);
 
         log.info("Sak i gsak med id {} ble opprettet for rinaSak {}", sak.getId(), rinaId);
         return sak;
