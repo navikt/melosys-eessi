@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.repository.CaseRelationRepository;
+import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -23,8 +23,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -34,7 +33,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
     private DokmotInngaaendeConsumer dokmotInngaaendeConsumer;
 
     @Mock
-    private CaseRelationRepository caseRelationRepository;
+    private CaseRelationService caseRelationService;
 
     @Mock
     private DokkatService dokkatService;
@@ -62,7 +61,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
                 .thenReturn(response);
 
         CaseRelation caseRelation = enhancedRandom.nextObject(CaseRelation.class);
-        when(caseRelationRepository.findByRinaId(anyString()))
+        when(caseRelationService.findByRinaId(anyString()))
                 .thenReturn(Optional.ofNullable(caseRelation));
 
         DokkatSedInfo dokkatSedInfo = enhancedRandom.nextObject(DokkatSedInfo.class);
@@ -93,7 +92,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(journalpostId, is("11223344"));
 
         verify(dokmotInngaaendeConsumer, times(1)).create(any());
-        verify(caseRelationRepository, times(1)).findByRinaId(anyString());
+        verify(caseRelationService, times(1)).findByRinaId(anyString());
         verify(dokkatService, times(1)).hentMetadataFraDokkat(anyString());
         verify(gsakService, times(1)).getSak(anyLong());
         verify(gsakService, times(0)).createSak(any());
@@ -102,7 +101,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSed_expectCreateSak() throws Exception {
-        when(caseRelationRepository.findByRinaId(anyString()))
+        when(caseRelationService.findByRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
         String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
@@ -116,7 +115,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test(expected = IntegrationException.class)
     public void arkiverInngaaendeSed_expectIntegrationException() throws Exception {
-        when(caseRelationRepository.findByRinaId(anyString()))
+        when(caseRelationService.findByRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
         when(gsakService.createSak(any()))

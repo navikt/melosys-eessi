@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.repository.CaseRelationRepository;
+import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +24,17 @@ public class OpprettUtgaaendeJournalpostService {
     private final GsakService gsakService;
     private final DokarkivSedConsumer dokarkivSedConsumer;
     private final EuxService euxService;
-    private final CaseRelationRepository caseRelationRepository;
+    private final CaseRelationService caseRelationService;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
             GsakService gsakService,
             DokarkivSedConsumer dokarkivSedConsumer, EuxService euxService,
-            CaseRelationRepository caseRelationRepository) {
+            CaseRelationService caseRelationService) {
         this.dokarkivSedConsumer = dokarkivSedConsumer;
         this.euxService = euxService;
         this.gsakService = gsakService;
-        this.caseRelationRepository = caseRelationRepository;
+        this.caseRelationService = caseRelationService;
     }
 
     //Returnerer journalpostId. Trengs returverdi?
@@ -42,7 +42,7 @@ public class OpprettUtgaaendeJournalpostService {
 
         byte[] pdf = euxService.hentSedPdf(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId());
 
-        Long gsakSaksnummer = caseRelationRepository.findByRinaId(sedSendt.getRinaSakId())
+        Long gsakSaksnummer = caseRelationService.findByRinaId(sedSendt.getRinaSakId())
                 .map(CaseRelation::getGsakSaksnummer).orElseThrow(() -> new NotFoundException("Saksrelasjon ikke funnet med rinaSakId " + sedSendt.getRinaSakId()));
 
         log.info("Henter gsak med id: {}", gsakSaksnummer);
