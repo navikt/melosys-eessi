@@ -42,7 +42,7 @@ public class SedService {
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        //NAVT003 vil være default i test-fase
-        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), "NAVT003", sed);
+        //NAVT002 vil være default i test-fase
+        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), "NAVT002", sed);
     }
 }
