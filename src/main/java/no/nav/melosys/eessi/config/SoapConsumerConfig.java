@@ -1,10 +1,13 @@
 package no.nav.melosys.eessi.config;
 
+import javax.xml.namespace.QName;
 import no.nav.melosys.eessi.security.StsConfigUtil;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,5 +46,22 @@ public abstract class SoapConsumerConfig {
         httpClientPolicy.setConnectionTimeout(timeout);
         httpClientPolicy.setReceiveTimeout(timeout);
         conduit.setClient(httpClientPolicy);
+    }
+
+    protected <T> T createPort(Class<T> portClass,
+                            String wsdlURL,
+                            QName serviceName,
+                            QName endpointName,
+                            String endpointUrl) {
+
+        JaxWsProxyFactoryBean factoryBean = new JaxWsProxyFactoryBean();
+        factoryBean.setWsdlURL(wsdlURL);
+        factoryBean.setServiceName(serviceName);
+        factoryBean.setEndpointName(endpointName);
+        factoryBean.setServiceClass(portClass);
+        factoryBean.setAddress(endpointUrl);
+        factoryBean.getFeatures().add(new WSAddressingFeature());
+
+        return factoryBean.create(portClass);
     }
 }

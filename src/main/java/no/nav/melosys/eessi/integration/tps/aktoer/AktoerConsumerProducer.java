@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.aktoer;
+package no.nav.melosys.eessi.integration.tps.aktoer;
 
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;

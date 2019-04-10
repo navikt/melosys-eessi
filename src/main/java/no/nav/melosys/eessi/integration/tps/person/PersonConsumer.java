@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.tps;
+package no.nav.melosys.eessi.integration.tps.person;
 
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;

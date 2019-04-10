@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.tps;
 
-import no.nav.melosys.eessi.integration.aktoer.AktoerConsumer;
-import no.nav.melosys.eessi.integration.tps.PersonConsumer;
+import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
+import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bostedsadresse;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Gateadresse;
