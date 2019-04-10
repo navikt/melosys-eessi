@@ -30,6 +30,9 @@ class InngaaendeForsendelseMapper {
             String aktoerId, SedHendelse sedMottatt, Sak sak, DokkatSedInfo dokkatSedInfo, ParticipantInfo senderInfo) {
 
         return new ForsendelseInformasjon()
+                .withArkivSak(new ArkivSak()
+                        .withArkivSakId(sak.getId())
+                        .withArkivSakSystem(ArkivSak.ArkivSakSystem.FS_22))
                 .withBruker(person(aktoerId))
                 .withAvsender(organisasjon(senderInfo.getId(), senderInfo.getName()))
                 .withTema(sak.getTema())
