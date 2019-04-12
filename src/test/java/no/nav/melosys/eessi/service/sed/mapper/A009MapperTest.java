@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.Collections;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -12,12 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.Collections;
-
 import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,8 +35,6 @@ public class A009MapperTest {
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
         lovvalgsperiode.setLandkode("NOR");
         sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
-
-        sedData.setEgenAnsatt(false);
     }
 
     @Test
@@ -63,7 +59,6 @@ public class A009MapperTest {
     @Test
     public void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() throws MappingException, NotFoundException {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
-        sedData.setEgenAnsatt(true);
         SED sed = a009Mapper.mapTilSed(sedData);
 
         assertEquals(MedlemskapA009.class, sed.getMedlemskap().getClass());
@@ -71,7 +66,6 @@ public class A009MapperTest {
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
         assertNotNull(medlemskapA009);
-        assertNull(medlemskapA009.getUtsendingsland());
 
         assertNotNull(medlemskapA009.getVedtak());
         assertEquals("12_2", medlemskapA009.getVedtak().getArtikkelforordning());
@@ -86,7 +80,6 @@ public class A009MapperTest {
     }
 
     @Test(expected = NullPointerException.class)
-    @SuppressWarnings("unchecked")
     public void ingenLovvalgsperioder_expectNullPointerException() throws MappingException, NotFoundException {
         sedData.setLovvalgsperioder(null);
         a009Mapper.mapTilSed(sedData);
