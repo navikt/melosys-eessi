@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.kafka.producers.MelosysEessiMeldingMapper;
+import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
@@ -13,6 +15,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -28,14 +31,16 @@ public class BehandleSedMottattService {
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final EuxService euxService;
     private final TpsService tpsService;
+    private final MelosysEessiProducer melosysEessiProducer;
 
     @Autowired
     public BehandleSedMottattService(OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService,
-                                     EuxService euxService,
-                                     TpsService tpsService) {
+            EuxService euxService,
+            TpsService tpsService, MelosysEessiProducer melosysEessiProducer) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.tpsService = tpsService;
+        this.melosysEessiProducer = melosysEessiProducer;
     }
 
     public void behandleSed(SedHendelse sedMottatt) {
@@ -46,8 +51,13 @@ public class BehandleSedMottattService {
             log.info("Person i rinaSak {} er verifisert mot TPS", sedMottatt.getRinaSakId());
 
             String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());
-            String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, aktoerId);
-            log.info("Midlertidig journalpost opprettet med id {}", journalpostId);
+            SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, aktoerId);
+            log.info("Midlertidig journalpost opprettet med id {}", sakInformasjon.getJournalpostId());
+
+            if (MelosysEessiMeldingMapper.isSupportedSed(sed)) {
+                melosysEessiProducer.publiserMelding(MelosysEessiMeldingMapper.map(aktoerId,sed, sedMottatt, sakInformasjon));
+            }
+
         } catch (IntegrationException | NotFoundException | ValidationException e) {
             log.error("Behandling av sed {} ble ikke fullført. Melding: {}", sedMottatt.getRinaDokumentId(), e.getMessage(), e);
         }
