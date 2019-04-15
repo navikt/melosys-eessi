@@ -8,14 +8,12 @@ import java.util.stream.Stream;
 import io.micrometer.core.instrument.util.StringUtils;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.exception.ValidationException;
+import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
-import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,67 +39,68 @@ public class Personvurdering {
      *
      * @param sedMottatt Objekt som blir mottatt fra kafka-køen
      * @param sed        SED-dokument hentet fra eux
-     * @throws NotFoundException   Dersom person ikke blir funnet i TPS ved enten søk eller oppslag på fnr
-     * @throws ValidationException Dersom opplysninger om person hentet fra TPS ikke stemmer overens med opplysninger
-     *                             i SED eller dersom tpsService ikke klarer å hente person fra TPS
+     * @return Norsk ident til person eller null dersom den ikke finnes.
+     * @throws NotFoundException Dersom landkode oppgitt er ugyldig
      */
-    public void vurderPerson(SedHendelse sedMottatt, SED sed) throws NotFoundException, ValidationException {
+    public String hentNorskIdent(SedHendelse sedMottatt, SED sed) throws NotFoundException {
 
         String ident = sedMottatt.getNavBruker();
         if (StringUtils.isEmpty(ident)) { // Ingen norsk ident oppgitt
-            soekOgVurderPerson(sedMottatt, sed);
+            ident = soekOgVurderPerson(sed);
         } else {
-            try {
-                hentOgVurderPerson(ident, sed);
-            } catch (NotFoundException e) { // Person ble ikke funnet med ident angitt i Sed. Prøver å søke etter person
-                soekOgVurderPerson(sedMottatt, sed);
+            ident = hentOgVurderPerson(ident, sed);
+            if (StringUtils.isEmpty(ident)) { // Person ble ikke funnet med ident angitt i Sed. Prøver å søke etter person
+                ident = soekOgVurderPerson(sed);
             }
         }
+
+        return ident;
     }
 
     /**
-     * Søker etter en person basert på navn og fødselsdato i sed. Dersom den finnes og blir validert
-     * så oppdateres sedHendelse.navBruker til den nye (rette) identen.
+     * Søker etter en person basert på navn og fødselsdato i sed.
      */
-    private void soekOgVurderPerson(SedHendelse sedMottatt, SED sed) throws NotFoundException, ValidationException {
+    private String soekOgVurderPerson(SED sed) {
         String ident = soekEtterPerson(sed);
-        hentOgVurderPerson(ident, sed);
-        sedMottatt.setNavBruker(ident);
+        if (!StringUtils.isEmpty(ident)) {
+            ident = hentOgVurderPerson(ident, sed);
+        }
+
+        return ident;
     }
 
-    private void hentOgVurderPerson(String ident, SED sed) throws NotFoundException, ValidationException {
+    private String hentOgVurderPerson(String ident, SED sed) {
         try {
             Person person = tpsService.hentPerson(ident);
             if (!harSammeStatsborgerskap(person, sed) || !harSammeFoedselsdato(person, sed)) {
-                throw new ValidationException("Person kunne ikke vurderes, person har ikke samme statsborgerskap eller fødselsdato i TPS");
+                return null;
             }
-        } catch (HentPersonPersonIkkeFunnet hentPersonPersonIkkeFunnet) {
-            throw new NotFoundException("Person ble ikke funnet i TPS: " + hentPersonPersonIkkeFunnet.getMessage());
-        } catch (HentPersonSikkerhetsbegrensning hentPersonSikkerhetsbegrensning) {
-            throw new ValidationException("Kunne ikke hente person fra TPS: " + hentPersonSikkerhetsbegrensning.getMessage());
+        } catch (SecurityException | NotFoundException e) {
+            return null;
         }
+
+        return ident;
     }
 
     /**
      * Søker etter person i TPS basert på fornavn, etternavn og fødselsdato.
      *
      * @param sed SED som inneholder person med navn og fødselsdato
-     * @return fødselsnummer/d-nummer for person
-     * @throws NotFoundException Kastes dersom det mottas ugyldige søkedata
-     *                           eller dersom antall treff på person er ulik 1
+     * @return fødselsnummer/d-nummer for person, null hvis ikke funnet
      */
-    private String soekEtterPerson(SED sed) throws NotFoundException {
+    private String soekEtterPerson(SED sed) {
         no.nav.melosys.eessi.models.sed.nav.Person sedPerson = sed.getNav().getBruker().getPerson();
         LocalDate foedselsdato = LocalDate.parse(sedPerson.getFoedselsdato(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        String ident = tpsService.soekEtterPerson(PersonsoekKriterier.builder()
-                .fornavn(sedPerson.getFornavn())
-                .etternavn(sedPerson.getEtternavn())
-                .foedselsdato(foedselsdato)
-                .build());
-
-        if (StringUtils.isEmpty(ident)) {
-            throw new NotFoundException("Søk etter person gav ingen treff");
+        String ident;
+        try {
+            ident = tpsService.soekEtterPerson(PersonsoekKriterier.builder()
+                    .fornavn(sedPerson.getFornavn())
+                    .etternavn(sedPerson.getEtternavn())
+                    .foedselsdato(foedselsdato)
+                    .build());
+        } catch (NotFoundException e) {
+            return null;
         }
 
         return ident;
@@ -113,6 +112,7 @@ public class Personvurdering {
      * @param person Person mottatt fra TPS
      * @param sed    SED mottatt fra kafka-kø
      * @return true dersom person og sed har samme statsborgerskap
+     * @throws NotFoundException Kastes ved ukjent landkode.
      */
     private boolean harSammeStatsborgerskap(Person person, SED sed) throws NotFoundException {
         String tpsStatsborgerskap = LandkodeMapper.getLandkodeIso2(person.getStatsborgerskap().getLand().getValue());

@@ -20,7 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BehandleSedMottattServiceTest {
@@ -51,7 +52,7 @@ public class BehandleSedMottattServiceTest {
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
 
-        doNothing().when(personvurdering).vurderPerson(any(), any());
+        when(personvurdering.hentNorskIdent(any(), any())).thenReturn("12312312312");
     }
 
     @Test
@@ -65,7 +66,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personvurdering).vurderPerson(any(), any());
+        verify(personvurdering).hentNorskIdent(any(), any());
         verify(tpsService).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }

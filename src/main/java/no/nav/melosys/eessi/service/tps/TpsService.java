@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
@@ -45,23 +46,37 @@ public class TpsService {
         this.personsokConsumer = personsokConsumer;
     }
 
-    public Person hentPerson(String ident) throws HentPersonPersonIkkeFunnet, HentPersonSikkerhetsbegrensning {
+    public Person hentPerson(String ident) throws SecurityException, NotFoundException {
         HentPersonRequest request = new HentPersonRequest()
                 .withAktoer(new AktoerId()
                         .withAktoerId(ident));
 
-        HentPersonResponse response = personConsumer.hentPerson(request);
+        HentPersonResponse response;
+        try {
+            response = personConsumer.hentPerson(request);
+        } catch (HentPersonSikkerhetsbegrensning hentPersonSikkerhetsbegrensning) {
+            throw new SecurityException("Ikke tilstrekkelig autentisering mot TPS", hentPersonSikkerhetsbegrensning);
+        } catch (HentPersonPersonIkkeFunnet hentPersonPersonIkkeFunnet) {
+            throw new NotFoundException("Person ikke funnet", hentPersonPersonIkkeFunnet);
+        }
 
         return response.getPerson();
     }
 
-    public Person hentPersonMedAdresse(String ident) throws HentPersonPersonIkkeFunnet, HentPersonSikkerhetsbegrensning {
+    public Person hentPersonMedAdresse(String ident) throws SecurityException, NotFoundException {
         HentPersonRequest request = new HentPersonRequest()
                 .withInformasjonsbehov(Informasjonsbehov.ADRESSE)
                 .withAktoer(new AktoerId()
                         .withAktoerId(ident));
 
-        HentPersonResponse response = personConsumer.hentPerson(request);
+        HentPersonResponse response;
+        try {
+            response = personConsumer.hentPerson(request);
+        } catch (HentPersonSikkerhetsbegrensning hentPersonSikkerhetsbegrensning) {
+            throw new SecurityException("Ikke tilstrekkelig autentisering mot TPS", hentPersonSikkerhetsbegrensning);
+        } catch (HentPersonPersonIkkeFunnet hentPersonPersonIkkeFunnet) {
+            throw new NotFoundException("Person ikke funnet", hentPersonPersonIkkeFunnet);
+        }
 
         return response.getPerson();
     }
