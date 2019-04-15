@@ -41,7 +41,7 @@ public class OpprettInngaaendeJournalpostService {
         this.euxService = euxService;
     }
 
-    public String arkiverInngaaendeSed(SedHendelse sedMottatt, String aktoerId) throws IntegrationException {
+    public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId) throws IntegrationException {
 
         Sak sak = getOrCreateSak(sedMottatt.getRinaSakId(), aktoerId);
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedMottatt.getSedType());
@@ -53,7 +53,11 @@ public class OpprettInngaaendeJournalpostService {
 
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         MottaInngaaendeForsendelseResponse response = dokmotInngaaendeConsumer.create(request);
-        return response.getJournalpostId();
+
+        return SakInformasjon.builder().journalpostId(response.getJournalpostId())
+                .dokumentId(response.getDokumentIdListe().get(0))
+                .gsakSaksnummer(sak.getId())
+                .build();
     }
 
     private Sak getOrCreateSak(String rinaId, String aktoerId) throws IntegrationException {

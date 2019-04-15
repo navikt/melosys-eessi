@@ -37,8 +37,6 @@ public class A001MapperTest {
         lovvalgsperiode.setLandkode("NOR");
         lovvalgsperiode.setUnntakFraBestemmelse(Bestemmelse.ART_16_1);
         sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
-
-        sedData.setEgenAnsatt(false);
     }
 
     @Test

@@ -13,7 +13,6 @@ public class SedDataDto {
 
     //Persondok.
     private List<FamilieMedlem> familieMedlem;
-    private boolean egenAnsatt;
     private Bruker bruker;
 
     //Andre medlemsvariabler

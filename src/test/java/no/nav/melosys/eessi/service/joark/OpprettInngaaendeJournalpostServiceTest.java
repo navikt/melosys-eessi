@@ -86,10 +86,10 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSed_expectId() throws Exception {
-        String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
 
-        assertThat(journalpostId, not(nullValue()));
-        assertThat(journalpostId, is("11223344"));
+        assertThat(sakInformasjon, not(nullValue()));
+        assertThat(sakInformasjon.getJournalpostId(), is("11223344"));
 
         verify(dokmotInngaaendeConsumer, times(1)).create(any());
         verify(caseRelationService, times(1)).findByRinaId(anyString());
@@ -104,10 +104,10 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(caseRelationService.findByRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
-        String journalpostId = opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
 
-        assertThat(journalpostId, not(nullValue()));
-        assertThat(journalpostId, is("11223344"));
+        assertThat(sakInformasjon, not(nullValue()));
+        assertThat(sakInformasjon.getJournalpostId(), is("11223344"));
 
         verify(gsakService, times(0)).getSak(anyLong());
         verify(gsakService, times(1)).createSak(any());
@@ -121,6 +121,6 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(gsakService.createSak(any()))
                 .thenReturn(null);
 
-        opprettInngaaendeJournalpostService.arkiverInngaaendeSed(sedMottatt, "123123");
+        opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
     }
 }

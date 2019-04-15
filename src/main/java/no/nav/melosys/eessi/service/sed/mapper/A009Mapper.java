@@ -23,10 +23,7 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
 
         medlemskapA009.setVedtak(getVedtak(lovvalgsperiode));
         medlemskapA009.setAndreland(getAndreland(sedData));
-
-        if (!sedData.isEgenAnsatt()) {
-            medlemskapA009.setUtsendingsland(getUtsendingsland(sedData));
-        }
+        medlemskapA009.setUtsendingsland(getUtsendingsland(sedData));
 
         return medlemskapA009;
     }

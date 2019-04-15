@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.FamilieMedlem;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
@@ -59,7 +58,7 @@ public interface SedMapper<T extends Medlemskap> {
         nav.setArbeidssted(hentArbeidssted(sedData));
         nav.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
 
-        if (sedData.isEgenAnsatt() && !sedData.getSelvstendigeVirksomheter().isEmpty()) {
+        if (!sedData.getSelvstendigeVirksomheter().isEmpty()) {
             nav.setSelvstendig(hentSelvstendig(sedData));
         }
 

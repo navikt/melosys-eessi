@@ -28,7 +28,7 @@
     <kafka-avro-serializer.version>5.1.0</kafka-avro-serializer.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <logstash-encoder.version>4.10</logstash-encoder.version>
-    <melosys-eessi-avro.version>0.1-SNAPSHOT</melosys-eessi-avro.version>
+    <melosys-eessi-avro.version>0.2-SNAPSHOT</melosys-eessi-avro.version>
     <random-benas.version>3.7.0</random-benas.version>
     <spring-boot.version>2.1.2.RELEASE</spring-boot.version>
     <spring-kafka.version>2.2.3.RELEASE</spring-kafka.version>

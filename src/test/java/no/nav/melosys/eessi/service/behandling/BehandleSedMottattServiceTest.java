@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,8 +45,8 @@ public class BehandleSedMottattServiceTest {
         when(tpsService.hentAktoerId(anyString()))
                 .thenReturn("44332211");
 
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSed(any(), anyString()))
-                .thenReturn("9988776655");
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), anyString()))
+                .thenReturn(SakInformasjon.builder().journalpostId("9988776655").build());
 
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
@@ -59,27 +60,14 @@ public class BehandleSedMottattServiceTest {
         sedHendelse.setNavBruker("11223344");
         sedHendelse.setRinaSakId("123");
         sedHendelse.setRinaDokumentId("456");
+        sedHendelse.setSedType("A005");
 
         behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personvurdering).vurderPerson(any(), any());
         verify(tpsService).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSed(any(), anyString());
-    }
-
-    @Test
-    public void behandleSed_expectIngenNorskIdent() throws Exception {
-        SedHendelse sedHendelse = new SedHendelse();
-        sedHendelse.setRinaSakId("123");
-        sedHendelse.setRinaDokumentId("456");
-
-        behandleSedMottattService.behandleSed(sedHendelse);
-
-        verify(euxService).hentSed(anyString(), anyString());
-        verify(personvurdering).vurderPerson(any(), any());
-        verify(tpsService, never()).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSed(any(), anyString());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }
 
     private SED opprettSED() {
@@ -103,6 +91,7 @@ public class BehandleSedMottattServiceTest {
 
         SED sed = new SED();
         sed.setNav(nav);
+        sed.setSed("A005");
 
         return sed;
     }
