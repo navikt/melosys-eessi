@@ -12,6 +12,7 @@ import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.feil.PersonIkkeFunnet;
@@ -47,8 +48,8 @@ public class BehandleSedMottattServiceTest {
         when(tpsService.hentAktoerId(anyString()))
                 .thenReturn("44332211");
 
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSed(any(), anyString()))
-                .thenReturn("9988776655");
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), anyString()))
+                .thenReturn(SakInformasjon.builder().journalpostId("9988776655").build());
 
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
@@ -63,13 +64,14 @@ public class BehandleSedMottattServiceTest {
         sedHendelse.setNavBruker("11223344");
         sedHendelse.setRinaSakId("123");
         sedHendelse.setRinaDokumentId("456");
+        sedHendelse.setSedType("A005");
 
         behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
         verify(tpsService, times(1)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(1)).arkiverInngaaendeSed(any(), anyString());
+        verify(opprettInngaaendeJournalpostService, times(1)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }
 
     @Test
@@ -83,7 +85,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(0)).hentPerson(anyString());
         verify(tpsService, times(0)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSed(any(), anyString());
+        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }
 
     @Test
@@ -105,7 +107,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
         verify(tpsService, times(0)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSed(any(), anyString());
+        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }
 
     @Test
@@ -123,7 +125,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService, times(1)).hentSed(anyString(), anyString());
         verify(tpsService, times(1)).hentPerson(anyString());
         verify(tpsService, times(0)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSed(any(), anyString());
+        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }
 
     private SED opprettSED() {
@@ -147,6 +149,7 @@ public class BehandleSedMottattServiceTest {
 
         SED sed = new SED();
         sed.setNav(nav);
+        sed.setSed("A005");
 
         return sed;
     }
