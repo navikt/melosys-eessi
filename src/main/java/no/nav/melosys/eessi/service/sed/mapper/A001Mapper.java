@@ -2,6 +2,8 @@ package no.nav.melosys.eessi.service.sed.mapper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -25,7 +27,7 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(sedData));
         medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
         medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
-        medlemskap.setTidligereperiode(getTidligerePeriode());
+        medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
         medlemskap.setAnmodning(getAnmodning());
 
         return medlemskap;
@@ -84,9 +86,32 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         return periode;
     }
 
-    // Blir ikke implementert i denne versjonen av Melosys.
-    private List<Periode> getTidligerePeriode() {
-        return null;
+    private List<Periode> getTidligerePeriode(List<Lovvalgsperiode> tidligereLovvalgsperioder) {
+        return tidligereLovvalgsperioder.stream()
+                .map(this::mapTilPeriodeDto)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private Periode mapTilPeriodeDto(Lovvalgsperiode tidligereLovvalgsperiode) {
+        Periode periode = new Periode();
+
+        if (tidligereLovvalgsperiode.getFom() != null) {
+            if (tidligereLovvalgsperiode.getTom() != null) {
+                Fastperiode fastperiode = new Fastperiode();
+                fastperiode.setStartdato(formaterDato(tidligereLovvalgsperiode.getFom()));
+                fastperiode.setSluttdato(formaterDato(tidligereLovvalgsperiode.getTom()));
+                periode.setFastperiode(fastperiode);
+            } else {
+                AapenPeriode aapenPeriode = new AapenPeriode();
+                aapenPeriode.setStartdato(formaterDato(tidligereLovvalgsperiode.getFom()));
+                periode.setAapenperiode(aapenPeriode);
+            }
+        } else {
+            return null;
+        }
+
+        return periode;
     }
 
     // Blir ikke implementert i denne versjonen av Melosys.

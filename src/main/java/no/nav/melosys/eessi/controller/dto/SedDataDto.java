@@ -24,6 +24,7 @@ public class SedDataDto {
 
     //Lovvalg
     private List<Lovvalgsperiode> lovvalgsperioder;
+    private List<Lovvalgsperiode> tidligereLovvalgsperioder;
 
     private Long gsakSaksnummer;
 }
