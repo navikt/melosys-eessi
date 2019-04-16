@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration.aktoer;
 
 import no.nav.melosys.eessi.config.EnvironmentHandler;
+import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

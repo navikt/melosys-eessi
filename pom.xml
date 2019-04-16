@@ -35,6 +35,7 @@
     <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
     <vault-jdbc.version>1.2.1</vault-jdbc.version>
     <cxf.version>3.1.11</cxf.version>
+    <personsok.version>1.0.1</personsok.version>
   </properties>
 
   <dependencies>
@@ -141,6 +142,12 @@
       <groupId>no.nav</groupId>
       <artifactId>vault-jdbc</artifactId>
       <version>${vault-jdbc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>no.nav.tjenester.fim</groupId>
+      <artifactId>nav-fim-personsok-v1-tjenestespesifikasjon</artifactId>
+      <version>${personsok.version}</version>
+      <classifier>jaxws</classifier>
     </dependency>
 
     <!-- TEST -->

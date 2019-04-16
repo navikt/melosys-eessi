@@ -2,8 +2,6 @@ package no.nav.melosys.eessi.service.behandling;
 
 import java.util.Arrays;
 import java.util.List;
-import com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl;
-import lombok.val;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Bruker;
@@ -14,10 +12,6 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.tps.TpsService;
-import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.person.v3.feil.PersonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Foedselsdato;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Landkoder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,7 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BehandleSedMottattServiceTest {
@@ -39,6 +34,9 @@ public class BehandleSedMottattServiceTest {
 
     @Mock
     private TpsService tpsService;
+
+    @Mock
+    private Personvurdering personvurdering;
 
     @InjectMocks
     private BehandleSedMottattService behandleSedMottattService;
@@ -54,8 +52,7 @@ public class BehandleSedMottattServiceTest {
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
 
-        when(tpsService.hentPerson(anyString()))
-                .thenReturn(opprettPerson());
+        when(personvurdering.hentNorskIdent(any(), any())).thenReturn("12312312312");
     }
 
     @Test
@@ -68,64 +65,10 @@ public class BehandleSedMottattServiceTest {
 
         behandleSedMottattService.behandleSed(sedHendelse);
 
-        verify(euxService, times(1)).hentSed(anyString(), anyString());
-        verify(tpsService, times(1)).hentPerson(anyString());
-        verify(tpsService, times(1)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(1)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
-    }
-
-    @Test
-    public void behandleSed_expectIngenNorskIdent() throws Exception {
-        SedHendelse sedHendelse = new SedHendelse();
-        sedHendelse.setRinaSakId("123");
-        sedHendelse.setRinaDokumentId("456");
-
-        behandleSedMottattService.behandleSed(sedHendelse);
-
-        verify(euxService, times(1)).hentSed(anyString(), anyString());
-        verify(tpsService, times(0)).hentPerson(anyString());
-        verify(tpsService, times(0)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
-    }
-
-    @Test
-    public void behandleSed_expectIkkeValiderbarPerson() throws Exception {
-        SedHendelse sedHendelse = new SedHendelse();
-        sedHendelse.setNavBruker("11223344");
-        sedHendelse.setRinaSakId("123");
-        sedHendelse.setRinaDokumentId("456");
-
-        val person = opprettPerson();
-        person.setStatsborgerskap(new no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap()
-                .withLand(new Landkoder()
-                        .withValue("DNK")));
-
-        when(tpsService.hentPerson(anyString())).thenReturn(person);
-
-        behandleSedMottattService.behandleSed(sedHendelse);
-
-        verify(euxService, times(1)).hentSed(anyString(), anyString());
-        verify(tpsService, times(1)).hentPerson(anyString());
-        verify(tpsService, times(0)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
-    }
-
-    @Test
-    public void behandleSed_expectIngenPersonFunnet() throws Exception {
-        SedHendelse sedHendelse = new SedHendelse();
-        sedHendelse.setNavBruker("11223344");
-        sedHendelse.setRinaSakId("123");
-        sedHendelse.setRinaDokumentId("456");
-
-        when(tpsService.hentPerson(anyString()))
-                .thenThrow(new HentPersonPersonIkkeFunnet("Person ikke funnet" , new PersonIkkeFunnet()));
-
-        behandleSedMottattService.behandleSed(sedHendelse);
-
-        verify(euxService, times(1)).hentSed(anyString(), anyString());
-        verify(tpsService, times(1)).hentPerson(anyString());
-        verify(tpsService, times(0)).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, times(0)).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
+        verify(euxService).hentSed(anyString(), anyString());
+        verify(personvurdering).hentNorskIdent(any(), any());
+        verify(tpsService).hentAktoerId(anyString());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
     }
 
     private SED opprettSED() {
@@ -152,19 +95,5 @@ public class BehandleSedMottattServiceTest {
         sed.setSed("A005");
 
         return sed;
-    }
-
-    private no.nav.tjeneste.virksomhet.person.v3.informasjon.Person opprettPerson() {
-        val person = new no.nav.tjeneste.virksomhet.person.v3.informasjon.Person();
-
-        person.setFoedselsdato(new Foedselsdato()
-                .withFoedselsdato(XMLGregorianCalendarImpl
-                        .createDateTime(1990, 1, 1, 17, 50, 0)));
-
-        person.setStatsborgerskap(new no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap()
-                .withLand(new Landkoder()
-                        .withValue("NOR")));
-
-        return person;
     }
 }

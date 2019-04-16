@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.tps;
 
+import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.tjeneste.virksomhet.person.v3.binding.PersonV3;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
