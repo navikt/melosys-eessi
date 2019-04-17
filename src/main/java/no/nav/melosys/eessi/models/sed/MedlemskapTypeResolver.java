@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 
 class MedlemskapTypeResolver implements TypeIdResolver {
 
@@ -42,6 +43,9 @@ class MedlemskapTypeResolver implements TypeIdResolver {
             case A009:
                 type = MedlemskapA009.class;
                 break;
+            case A010:
+                type = MedlemskapA010.class;
+                break;
             case A002:
             case A003:
             case A004:
@@ -49,11 +53,10 @@ class MedlemskapTypeResolver implements TypeIdResolver {
             case A006:
             case A007:
             case A008:
-            case A010:
             case A011:
             case A012:
             default:
-                throw new RuntimeException("Støtte for sed " + s + " er ikke implementert enda");
+                throw new IllegalArgumentException("Støtte for sed " + s + " er ikke implementert enda");
         }
 
         return databindContext.constructSpecializedType(sedType, type);

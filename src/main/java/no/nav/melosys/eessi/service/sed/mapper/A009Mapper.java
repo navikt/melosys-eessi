@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
-import no.nav.melosys.eessi.models.sed.nav.Vedtak;
+import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
 public class A009Mapper implements SedMapper<MedlemskapA009> {
@@ -28,8 +28,8 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
         return medlemskapA009;
     }
 
-    private Vedtak getVedtak(Lovvalgsperiode lovvalgsperiode) throws MappingException, NotFoundException {
-        Vedtak vedtak = new Vedtak();
+    private VedtakA009 getVedtak(Lovvalgsperiode lovvalgsperiode) throws MappingException, NotFoundException {
+        VedtakA009 vedtak = new VedtakA009();
 
         vedtak.setEropprinneligvedtak(
                 "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak

@@ -9,7 +9,7 @@ import lombok.Data;
 @SuppressWarnings("unused")
 @JsonInclude(Include.NON_NULL)
 @Data
-public class Vedtak {
+public class VedtakA009 {
 
     private String artikkelforordning;
 

@@ -2,11 +2,13 @@ package no.nav.melosys.eessi.service.behandling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMeldingMapper;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
+import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapper;
+import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
@@ -24,6 +26,7 @@ public class BehandleSedMottattService {
     private final TpsService tpsService;
     private final MelosysEessiProducer melosysEessiProducer;
     private final Personvurdering personvurdering;
+    private final MelosysEessiMeldingMapperFactory meldingMapperFactory;
 
     @Autowired
     public BehandleSedMottattService(
@@ -31,12 +34,14 @@ public class BehandleSedMottattService {
             EuxService euxService,
             TpsService tpsService,
             MelosysEessiProducer melosysEessiProducer,
-            Personvurdering personvurdering) {
+            Personvurdering personvurdering,
+            MelosysEessiMeldingMapperFactory meldingMapperFactory) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.tpsService = tpsService;
         this.melosysEessiProducer = melosysEessiProducer;
         this.personvurdering = personvurdering;
+        this.meldingMapperFactory = meldingMapperFactory;
     }
 
     public void behandleSed(SedHendelse sedMottatt) {
@@ -55,13 +60,22 @@ public class BehandleSedMottattService {
             SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, aktoerId);
             log.info("Midlertidig journalpost opprettet med id {}", sakInformasjon.getJournalpostId());
 
-            if (MelosysEessiMeldingMapper.isSupportedSed(sed)) {
-                melosysEessiProducer.publiserMelding(MelosysEessiMeldingMapper.map(aktoerId, sed, sedMottatt, sakInformasjon));
-            }
+            publiserMelosysEessiMelding(aktoerId, sed, sedMottatt, sakInformasjon);
 
             log.info("Behandling av innkommende sed {} fullført.", sedMottatt.getRinaDokumentId());
         } catch (IntegrationException | NotFoundException e) {
             log.error("Behandling av sed {} ble ikke fullført. Melding: {}", sedMottatt.getRinaDokumentId(), e.getMessage(), e);
         }
     }
+
+    private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) {
+        SedType sedType = SedType.valueOf(sed.getSed());
+        MelosysEessiMeldingMapper mapper = meldingMapperFactory.getMapper(sedType);
+        if (mapper != null) {
+            melosysEessiProducer.publiserMelding(
+                    mapper.map(aktoerId, sed, sedHendelse, sakInformasjon)
+            );
+        }
+    }
+
 }
