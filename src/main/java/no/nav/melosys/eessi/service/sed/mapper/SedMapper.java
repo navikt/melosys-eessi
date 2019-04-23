@@ -258,4 +258,25 @@ public interface SedMapper<T extends Medlemskap> {
     default Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
         return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
     }
+
+    default Periode mapTilPeriodeDto(Lovvalgsperiode lovvalgsperiode) {
+        Periode periode = new Periode();
+
+        if (lovvalgsperiode.getFom() != null) {
+            if (lovvalgsperiode.getTom() != null) {
+                Fastperiode fastperiode = new Fastperiode();
+                fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
+                fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
+                periode.setFastperiode(fastperiode);
+            } else {
+                AapenPeriode aapenPeriode = new AapenPeriode();
+                aapenPeriode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
+                periode.setAapenperiode(aapenPeriode);
+            }
+        } else {
+            return null;
+        }
+
+        return periode;
+    }
 }

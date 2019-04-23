@@ -75,12 +75,7 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
     }
 
     private Fastperiode getSoeknadsperiode(Lovvalgsperiode lovvalgsperiode) {
-        Fastperiode periode = new Fastperiode();
-
-        periode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
-        periode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
-
-        return periode;
+        return mapTilPeriodeDto(lovvalgsperiode).getFastperiode();
     }
 
     private List<Periode> getTidligerePeriode(List<Lovvalgsperiode> tidligereLovvalgsperioder) {
@@ -92,27 +87,6 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
                 .map(this::mapTilPeriodeDto)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-    }
-
-    private Periode mapTilPeriodeDto(Lovvalgsperiode tidligereLovvalgsperiode) {
-        Periode periode = new Periode();
-
-        if (tidligereLovvalgsperiode.getFom() != null) {
-            if (tidligereLovvalgsperiode.getTom() != null) {
-                Fastperiode fastperiode = new Fastperiode();
-                fastperiode.setStartdato(formaterDato(tidligereLovvalgsperiode.getFom()));
-                fastperiode.setSluttdato(formaterDato(tidligereLovvalgsperiode.getTom()));
-                periode.setFastperiode(fastperiode);
-            } else {
-                AapenPeriode aapenPeriode = new AapenPeriode();
-                aapenPeriode.setStartdato(formaterDato(tidligereLovvalgsperiode.getFom()));
-                periode.setAapenperiode(aapenPeriode);
-            }
-        } else {
-            return null;
-        }
-
-        return periode;
     }
 
     // Blir ikke implementert i denne versjonen av Melosys.
