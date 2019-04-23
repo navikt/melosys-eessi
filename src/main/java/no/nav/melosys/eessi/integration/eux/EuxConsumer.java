@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
+import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,16 +32,15 @@ public class EuxConsumer implements RestConsumer {
 
     private final RestTemplate euxRestTemplate;
 
-    private final String RINA_SAKSNUMMER = "RINASaksnummer";
-    private final String KORRELASJONS_ID = "KorrelasjonsId";
-    private final String BUC_TYPE = "BuCType";
+    private static final String RINA_SAKSNUMMER = "RINASaksnummer";
+    private static final String KORRELASJONS_ID = "KorrelasjonsId";
+    private static final String BUC_TYPE = "BuCType";
 
-    private final String BUC_PATH = "/buc/%s";
-    private final String SED_PATH = "/buc/%s/sed/%s";
-    private final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
-    private final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
-    private final String DOKUMENTMAL_PATH = "/buc/%s/dokumentmal";
-    private final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
+    private static final String BUC_PATH = "/buc/%s";
+    private static final String SED_PATH = "/buc/%s/sed/%s";
+    private static final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
+    private static final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
+    private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
 
     @Autowired
     public EuxConsumer(@Qualifier("euxRestTemplate") RestTemplate restTemplate) {
@@ -415,7 +415,9 @@ public class EuxConsumer implements RestConsumer {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        byte[] documentBytes, attachmentBytes;
+        byte[] documentBytes;
+        byte[] attachmentBytes;
+
         try {
             documentBytes = new ObjectMapper().writeValueAsBytes(sed);
             attachmentBytes = new ObjectMapper().writeValueAsBytes(vedlegg);
@@ -424,13 +426,13 @@ public class EuxConsumer implements RestConsumer {
         }
 
         ByteArrayResource document = new ByteArrayResource(documentBytes) {
-
+            @Override
             public String getFilename() {
                 return "document";
             }
         };
         ByteArrayResource attachment = new ByteArrayResource(attachmentBytes) {
-
+            @Override
             public String getFilename() {
                 return "attachment";
             }
@@ -465,7 +467,7 @@ public class EuxConsumer implements RestConsumer {
      * @param landkode kode til landet det skal hente institusjoner fra
      */
 
-    public List<String> hentInstitusjoner(String bucType, String landkode)
+    public List<Institusjon> hentInstitusjoner(String bucType, String landkode)
             throws IntegrationException {
         log.info("Henter institusjoner for buctype {} og landkode", bucType, landkode);
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/institusjoner")
@@ -474,7 +476,7 @@ public class EuxConsumer implements RestConsumer {
 
         return exchange(builder.toUriString(), HttpMethod.GET,
                 new HttpEntity<>(getDefaultHeaders()),
-                new ParameterizedTypeReference<List<String>>() {
+                new ParameterizedTypeReference<List<Institusjon>>() {
                 });
     }
 
@@ -502,23 +504,23 @@ public class EuxConsumer implements RestConsumer {
      * @param fnr fødselsnummer
      * @param fornavn fornavn
      * @param etternavn etternavn
-     * @param fødselsdato fødselsdato
+     * @param foedselsdato fødselsdato
      * @param rinaSaksnummer rinaSaksnummer
      * @param bucType bucType
      * @param status status
      * @return JsonNode med rina saker
      */
 
-    public JsonNode finnRinaSaker(String fnr, String fornavn, String etternavn, String fødselsdato,
+    public JsonNode finnRinaSaker(String fnr, String fornavn, String etternavn, String foedselsdato,
             String rinaSaksnummer, String bucType, String status) throws IntegrationException {
         log.info("Søker etter rina-saker");
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/rinasaker")
                 .queryParam("Fødselsnummer", fnr)
                 .queryParam("Fornavn", fornavn)
                 .queryParam("Etternavn", etternavn)
-                .queryParam("Fødselsdato", fødselsdato)
+                .queryParam("Fødselsdato", foedselsdato)
                 .queryParam(RINA_SAKSNUMMER, rinaSaksnummer)
-                .queryParam("BuCType", bucType)
+                .queryParam(BUC_TYPE, bucType)
                 .queryParam("Status", status);
 
         //Må vurdere å endre returverdi til en POJO om denne integrasjonen faktisk tas i bruk
@@ -537,7 +539,7 @@ public class EuxConsumer implements RestConsumer {
         }
     }
 
-    private HttpHeaders getDefaultHeaders() throws IntegrationException {
+    private HttpHeaders getDefaultHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

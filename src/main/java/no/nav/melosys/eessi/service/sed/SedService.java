@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -41,8 +42,10 @@ public class SedService {
         SedMapper sedMapper = SedDataMapperRuter.sedMapper(sedType);
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
+        String mottakerLand = sedDataDto.getLovvalgsperioder().stream().map(Lovvalgsperiode::getLandkode)
+                .findFirst().orElseThrow(() -> new NotFoundException("Landkode for lovvalg ikke satt"));
 
         //NAVT002 vil være default i test-fase
-        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), "NAVT002", sed);
+        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), mottakerLand, sed);
     }
 }

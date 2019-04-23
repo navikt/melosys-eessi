@@ -2,10 +2,12 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
 import avro.shaded.com.google.common.collect.ImmutableMap;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -48,10 +50,15 @@ public class EuxServiceTest {
                         "caseId", "1122334455",
                         "documentId", "9988776655"
                 ));
+
+        Institusjon institusjon = new Institusjon();
+        institusjon.setId("NO:321");
+        when(euxConsumer.hentInstitusjoner(anyString(), anyString()))
+                .thenReturn(Collections.singletonList(institusjon));
     }
 
     @Test
-    public void hentMottaker_expectParticipantInfo() throws IntegrationException {
+    public void hentMottaker_expectParticipantInfo() throws Exception {
         ParticipantInfo receiver = euxService.hentMottaker("123123123");
 
         assertThat(receiver, not(nullValue()));
@@ -60,7 +67,7 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentUtsender_expectParticipantInfo() throws IntegrationException {
+    public void hentUtsender_expectParticipantInfo() throws Exception {
         ParticipantInfo sender = euxService.hentUtsender("123123123");
 
         assertThat(sender, not(nullValue()));
@@ -69,23 +76,19 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void opprettOgSendBucOgSed_expectRinaCaseId() throws IntegrationException {
+    public void opprettOgSendBucOgSed_expectRinaCaseId() throws Exception {
         Long gsakSaksnummer = 12345L;
         String bucType = BucType.LA_BUC_01.name();
-        String mottakerId = "NAVT003";
+        String mottakerLand = "SE";
         SED sed = new SED();
 
-        String rinaCaseId = euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerId, sed);
+        String rinaCaseId = euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
 
         assertThat(rinaCaseId, is("1122334455"));
 
-        verify(euxConsumer, times(1))
-                .opprettBucOgSed(anyString(), anyString(), any());
-
-        verify(euxConsumer, times(1))
-                .sendSed(anyString(), anyString(), anyString());
-
-        verify(caseRelationService, times(1))
-                .save(anyLong(), anyString());
+        verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
+        verify(euxConsumer).sendSed(anyString(), anyString(), anyString());
+        verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
+        verify(caseRelationService).save(anyLong(), anyString());
     }
 }

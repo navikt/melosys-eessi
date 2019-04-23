@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.eux;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -9,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
@@ -102,15 +105,23 @@ public class EuxConsumerTest {
 
     @Test
     public void hentInstitusjoner_forventListe() throws Exception {
-        List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/institusjon_liste.json");
+        assertNotNull(jsonUrl);
+        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+
         String buctype = "LA_BUC_04";
         String landkode = "NO";
 
         server.expect(requestTo("/institusjoner?BuCType=" + buctype + "&LandKode=" + landkode))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
-        List<String> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
-        assertEquals(resultat, forventetRetur);
+        List<Institusjon> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
+        assertNotNull(resultat);
+
+        Institusjon institusjon = resultat.get(0);
+        assertNotNull(institusjon);
+        assertEquals("LT:123123", institusjon.getId());
+        assertEquals(2, institusjon.getTilegnetBucs().size());
     }
 
     @Test
