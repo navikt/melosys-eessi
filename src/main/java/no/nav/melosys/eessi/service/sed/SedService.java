@@ -42,7 +42,7 @@ public class SedService {
         SedMapper sedMapper = SedDataMapperRuter.sedMapper(sedType);
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
-        String mottakerLand = sedDataDto.getLovvalgsperioder().stream().map(Lovvalgsperiode::getLandkode)
+        String mottakerLand = sedDataDto.getLovvalgsperioder().stream().map(Lovvalgsperiode::getLovvalgsland)
                 .findFirst().orElseThrow(() -> new NotFoundException("Landkode for lovvalg ikke satt"));
 
         return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), mottakerLand, sed);
