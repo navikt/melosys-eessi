@@ -12,7 +12,8 @@ import lombok.Data;
 @Data
 public class Lovvalgsperiode {
 
-    private String landkode;
+    private String lovvalgsland;
+    private String unntakFraLovvalgsland;
     private Bestemmelse bestemmelse;
 
     @JsonDeserialize(using = LocalDateDeserializer.class)

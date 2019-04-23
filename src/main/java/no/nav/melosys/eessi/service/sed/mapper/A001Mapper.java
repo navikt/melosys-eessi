@@ -24,7 +24,7 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
 
         medlemskap.setUnntak(getUnntak(lovvalgsperiode));
         medlemskap.setVertsland(getVertsland(sedData));
-        medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(sedData));
+        medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(lovvalgsperiode));
         medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
         medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
         medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
@@ -60,19 +60,16 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         return vertsland;
     }
 
-    private List<Land> getNaavaerendeMedlemskap(SedDataDto sedDataDto) throws NotFoundException {
-        // Person sitt statsborgerskap
+    private List<Land> getNaavaerendeMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
         Land land = new Land();
-        if (sedDataDto.getBruker() != null) {
-            land.setLandkode(LandkodeMapper.getLandkodeIso2(sedDataDto.getBruker().getStatsborgerskap()));
-        }
+        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getUnntakFraLovvalgsland()));
 
         return Collections.singletonList(land);
     }
 
     private List<Land> getForespurtMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
         Land land = new Land();
-        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLandkode()));
+        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
 
         return Collections.singletonList(land);
     }
@@ -87,6 +84,10 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
     }
 
     private List<Periode> getTidligerePeriode(List<Lovvalgsperiode> tidligereLovvalgsperioder) {
+        if (tidligereLovvalgsperioder == null) {
+            return Collections.emptyList();
+        }
+
         return tidligereLovvalgsperioder.stream()
                 .map(this::mapTilPeriodeDto)
                 .filter(Objects::nonNull)

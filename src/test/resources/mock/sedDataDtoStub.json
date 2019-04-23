@@ -51,7 +51,8 @@
     {
       "bestemmelse": "ART_12_1",
       "fom": "2020-01-01",
-      "landkode": "SWE",
+      "lovvalgsland": "SWE",
+      "unntakFraLovvalgsland": "NOR",
       "tom": "2020-01-01"
     }
   ],
