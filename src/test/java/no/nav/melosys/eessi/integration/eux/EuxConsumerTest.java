@@ -107,13 +107,13 @@ public class EuxConsumerTest {
     public void hentInstitusjoner_forventListe() throws Exception {
         URL jsonUrl = getClass().getClassLoader().getResource("mock/institusjon_liste.json");
         assertNotNull(jsonUrl);
-        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+        String institusjonerString = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         String buctype = "LA_BUC_04";
         String landkode = "NO";
 
         server.expect(requestTo("/institusjoner?BuCType=" + buctype + "&LandKode=" + landkode))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(institusjonerString, MediaType.APPLICATION_JSON));
 
         List<Institusjon> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
         assertNotNull(resultat);
