@@ -3,7 +3,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "NOR",
+        "land": "NO",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -16,7 +16,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "NOR",
+        "land": "NO",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -27,7 +27,7 @@
   ],
   "bostedsadresse": {
     "gateadresse": "blulul",
-    "land": "NOR",
+    "land": "NO",
     "postnr": "2112",
     "poststed": "Noi"
   },
@@ -37,7 +37,7 @@
     "foedseldato": "2020-01-01",
     "fornavn": "MrEtternavn",
     "kjoenn": "M",
-    "statsborgerskap": "NOR"
+    "statsborgerskap": "NO"
   },
   "egenAnsatt": false,
   "familieMedlem": [
@@ -51,8 +51,8 @@
     {
       "bestemmelse": "ART_12_1",
       "fom": "2020-01-01",
-      "lovvalgsland": "SWE",
-      "unntakFraLovvalgsland": "NOR",
+      "lovvalgsland": "SE",
+      "unntakFraLovvalgsland": "NO",
       "tom": "2020-01-01"
     }
   ],
@@ -60,7 +60,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "NOR",
+        "land": "NO",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },
@@ -79,7 +79,7 @@
     {
       "adresse": {
         "gateadresse": "testadresse",
-        "land": "SWE",
+        "land": "SE",
         "postnr": "1212",
         "poststed": "Hønefoss"
       },

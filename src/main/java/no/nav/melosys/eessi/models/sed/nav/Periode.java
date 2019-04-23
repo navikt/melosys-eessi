@@ -14,4 +14,8 @@ public class Periode {
     private AapenPeriode aapenperiode;
 
     private Fastperiode fastperiode;
+
+    public boolean erAapenPeriode() {
+        return aapenperiode != null && aapenperiode.getStartdato() != null;
+    }
 }

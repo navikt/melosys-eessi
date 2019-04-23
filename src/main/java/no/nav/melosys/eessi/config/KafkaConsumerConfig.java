@@ -28,7 +28,7 @@ public class KafkaConsumerConfig {
         Map<String, Object> props = new HashMap<>();
         //Without this, the consumer will receive GenericData records.
         props.put("specific.avro.reader", true);
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "melosys-eessi-sedHendelser");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, "melosys-eessi-sedHendelser-asdasdf");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 100);

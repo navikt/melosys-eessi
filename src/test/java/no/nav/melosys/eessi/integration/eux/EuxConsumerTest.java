@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration.eux;
 
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -10,10 +11,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -88,7 +92,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentBucTypePerSektor_returnerListe() throws Exception, JsonProcessingException {
+    public void hentBucTypePerSektor_returnerListe() throws Exception {
 
         List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
 
@@ -100,20 +104,28 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentInstitusjoner_forventListe() throws Exception, JsonProcessingException {
-        List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
+    public void hentInstitusjoner_forventListe() throws Exception {
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/institusjon_liste.json");
+        assertNotNull(jsonUrl);
+        String institusjonerString = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+
         String buctype = "LA_BUC_04";
         String landkode = "NO";
 
         server.expect(requestTo("/institusjoner?BuCType=" + buctype + "&LandKode=" + landkode))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(institusjonerString, MediaType.APPLICATION_JSON));
 
-        List<String> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
-        assertEquals(resultat, forventetRetur);
+        List<Institusjon> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
+        assertNotNull(resultat);
+
+        Institusjon institusjon = resultat.get(0);
+        assertNotNull(institusjon);
+        assertEquals("LT:123123", institusjon.getId());
+        assertEquals(2, institusjon.getTilegnetBucs().size());
     }
 
     @Test
-    public void hentKodeverk_forventJson() throws Exception, JsonProcessingException {
+    public void hentKodeverk_forventJson() throws Exception {
         Map<String, Object> forventetRetur = Maps.newHashMap();
         forventetRetur.put("string", "value");
         forventetRetur.put("int", 1L);
@@ -129,7 +141,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentMuligeAksjoner_forventJson() throws Exception, JsonProcessingException {
+    public void hentMuligeAksjoner_forventJson() throws Exception {
         Map<String, Object> forventetRetur = Maps.newHashMap();
         forventetRetur.put("string", "value");
         forventetRetur.put("int", 1L);
@@ -144,7 +156,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBucOgSed_forventString() throws Exception, JsonProcessingException {
+    public void opprettBucOgSed_forventString() throws Exception {
         String buc = "buc", mottaker = "NAV";
         SED sed = new SED();
 
@@ -161,7 +173,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBucOgSedMedVedlegg_forventString() throws Exception, JsonProcessingException {
+    public void opprettBucOgSedMedVedlegg_forventString() throws Exception {
         String buc = "buc", fagsak = "123", mottaker = "NAV", filtype = "virus.exe", korrelasjon = "111", vedlegg = "vedlegg";
         SED sed = new SED();
 
@@ -180,7 +192,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void finnRinaSaker_forventJson() throws Exception, JsonProcessingException {
+    public void finnRinaSaker_forventJson() throws Exception {
         Map<String, Object> forventetRetur = Maps.newHashMap();
         forventetRetur.put("string", "value");
         forventetRetur.put("int", 1L);
@@ -204,27 +216,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSed_forventSed() throws Exception, IOException {
-        String id = "123";
-        String dokumentId = "312";
-
-        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA009.json");
-        assertNotNull(jsonUrl);
-        String sed = IOUtils.toString(jsonUrl);
-
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
-
-        SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertEquals("A009", resultat.getSed());
-        assertNotNull(resultat.getMedlemskap());
-        assertEquals(MedlemskapA009.class, resultat.getMedlemskap().getClass());
-    }
-
-    @Test
-    public void hentSedA001_forventSedA001() throws Exception, IOException {
+    public void hentSedA001_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -239,8 +231,48 @@ public class EuxConsumerTest {
         assertNotNull(resultat);
         assertNotNull(resultat.getNav());
         assertNotNull(resultat.getMedlemskap());
-        assertEquals("A001", resultat.getSed());
+        assertEquals(SedType.A001.name(), resultat.getSed());
         assertEquals(MedlemskapA001.class, resultat.getMedlemskap().getClass());
+    }
+
+    @Test
+    public void hentSedA009_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA009.json");
+        assertNotNull(jsonUrl);
+        String sed = IOUtils.toString(jsonUrl);
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertNotNull(resultat);
+        assertNotNull(resultat.getNav());
+        assertEquals(SedType.A009.name(), resultat.getSed());
+        assertNotNull(resultat.getMedlemskap());
+        assertEquals(MedlemskapA009.class, resultat.getMedlemskap().getClass());
+    }
+
+    @Test
+    public void hentSedA010_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA010.json");
+        assertNotNull(jsonUrl);
+        String sed = IOUtils.toString(jsonUrl);
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertNotNull(resultat);
+        assertNotNull(resultat.getNav());
+        assertEquals(SedType.A010.name(), resultat.getSed());
+        assertNotNull(resultat.getMedlemskap());
+        assertEquals(MedlemskapA010.class, resultat.getMedlemskap().getClass());
     }
 
     @Test
