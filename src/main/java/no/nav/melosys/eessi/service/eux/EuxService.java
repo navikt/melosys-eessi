@@ -5,7 +5,9 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
@@ -45,15 +47,16 @@ public class EuxService {
     /**
      * Oppretter buc og sed i EUX, lagrer relasjon mellom gsakSaksnummer og rinaCaseId,
      * og sender sed til EUX.
-     * @param gsakSaksnummer gsakSak knyttet til Sed
+     * @param gsakSaksnummer gsakSak knyttet til SED
      * @param bucType Hvilken type buc som skal opprettes
-     * @param mottakerId Id til mottaker (Counter Party)
-     * @param sed Sed som skal opprettes
+     * @param mottakerLand Land som skal motta SED
+     * @param sed SED som skal opprettes
      * @return rinaCaseId - id for rina-saken
      */
-    public String opprettOgSendBucOgSed(Long gsakSaksnummer, String bucType, String mottakerId, SED sed) throws IntegrationException {
+    public String opprettOgSendBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
+            throws IntegrationException, NotFoundException {
 
-        Map<String, String> map = euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);
+        Map<String, String> map = euxConsumer.opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
         String rinaCaseId = map.get("caseId");
         String documentId = map.get("documentId");
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaCaseId, documentId);
@@ -65,6 +68,13 @@ public class EuxService {
         log.info("Sed {} sendt", documentId);
 
         return rinaCaseId;
+    }
+
+    private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
+        List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
+
+        return institusjoner.stream().map(i -> i.getId().split(":")[1]).findFirst()
+                .orElseThrow(() -> new NotFoundException("Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
     /**
@@ -102,7 +112,7 @@ public class EuxService {
     }
 
     public void oppdaterSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId, SED sed) throws IntegrationException {
-        euxConsumer.opprettSed(rinaSaksnummer, korrelasjonsId, sed);
+        euxConsumer.oppdaterSed(rinaSaksnummer, korrelasjonsId, dokumentId, sed);
     }
 
     public void slettSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
@@ -147,10 +157,6 @@ public class EuxService {
 
     public List<String> bucTypePerSektor() throws IntegrationException {
         return euxConsumer.bucTypePerSektor();
-    }
-
-    public List<String> hentInstitusjoner(String bucType, String landkode) throws IntegrationException {
-        return euxConsumer.hentInstitusjoner(bucType, landkode);
     }
 
     public JsonNode hentKodeverk(String kodeverk) throws IntegrationException {

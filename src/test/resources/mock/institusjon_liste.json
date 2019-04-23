@@ -1,0 +1,22 @@
+[
+  {
+    "id": "LT:123123",
+    "navn": "Foreign benefits office",
+    "akronym": "Akronym",
+    "landkode": "LT",
+    "tilegnetBucs": [
+      {
+        "bucType": "LA_BUC_04",
+        "institusjonsrolle": "CounterParty",
+        "gyldigStartDato": "2017-12-31T23:00:00.000+0000",
+        "eessiklar": false
+      },
+      {
+        "bucType": "LA_BUC_04",
+        "institusjonsrolle": "CaseOwner",
+        "gyldigStartDato": "2017-12-31T23:00:00.000+0000",
+        "eessiklar": true
+      }
+    ]
+  }
+]
