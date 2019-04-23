@@ -74,7 +74,7 @@ public class EuxService {
         List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
 
         return institusjoner.stream().map(i -> i.getId().split(":")[1]).findFirst()
-                .orElseThrow(() -> new NotFoundException("gfd"));
+                .orElseThrow(() -> new NotFoundException("Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
     /**

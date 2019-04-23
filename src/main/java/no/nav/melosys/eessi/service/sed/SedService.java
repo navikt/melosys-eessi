@@ -45,7 +45,6 @@ public class SedService {
         String mottakerLand = sedDataDto.getLovvalgsperioder().stream().map(Lovvalgsperiode::getLandkode)
                 .findFirst().orElseThrow(() -> new NotFoundException("Landkode for lovvalg ikke satt"));
 
-        //NAVT002 vil være default i test-fase
         return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), mottakerLand, sed);
     }
 }
