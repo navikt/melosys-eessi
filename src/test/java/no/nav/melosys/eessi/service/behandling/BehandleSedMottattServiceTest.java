@@ -3,6 +3,9 @@ package no.nav.melosys.eessi.service.behandling;
 import java.util.Arrays;
 import java.util.List;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
+import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapper;
+import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
@@ -17,6 +20,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,6 +42,12 @@ public class BehandleSedMottattServiceTest {
     @Mock
     private Personvurdering personvurdering;
 
+    @Mock
+    private MelosysEessiProducer melosysEessiProducer;
+
+    @Mock
+    private MelosysEessiMeldingMapperFactory meldingMapperFactory;
+
     @InjectMocks
     private BehandleSedMottattService behandleSedMottattService;
 
@@ -53,6 +63,7 @@ public class BehandleSedMottattServiceTest {
                 .thenReturn(opprettSED());
 
         when(personvurdering.hentNorskIdent(any(), any())).thenReturn("12312312312");
+        when(meldingMapperFactory.getMapper(any())).thenReturn(Mockito.mock(MelosysEessiMeldingMapper.class));
     }
 
     @Test
@@ -69,6 +80,7 @@ public class BehandleSedMottattServiceTest {
         verify(personvurdering).hentNorskIdent(any(), any());
         verify(tpsService).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), anyString());
+        verify(melosysEessiProducer).publiserMelding(any());
     }
 
     private SED opprettSED() {
