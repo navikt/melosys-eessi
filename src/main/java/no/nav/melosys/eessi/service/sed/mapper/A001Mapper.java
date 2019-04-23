@@ -2,6 +2,8 @@ package no.nav.melosys.eessi.service.sed.mapper;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -22,10 +24,10 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
 
         medlemskap.setUnntak(getUnntak(lovvalgsperiode));
         medlemskap.setVertsland(getVertsland(sedData));
-        medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(sedData));
+        medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(lovvalgsperiode));
         medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
         medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
-        medlemskap.setTidligereperiode(getTidligerePeriode());
+        medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
         medlemskap.setAnmodning(getAnmodning());
 
         return medlemskap;
@@ -58,35 +60,33 @@ public class A001Mapper implements SedMapper<MedlemskapA001> {
         return vertsland;
     }
 
-    private List<Land> getNaavaerendeMedlemskap(SedDataDto sedDataDto) throws NotFoundException {
-        // Person sitt statsborgerskap
+    private List<Land> getNaavaerendeMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
         Land land = new Land();
-        if (sedDataDto.getBruker() != null) {
-            land.setLandkode(LandkodeMapper.getLandkodeIso2(sedDataDto.getBruker().getStatsborgerskap()));
-        }
+        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getUnntakFraLovvalgsland()));
 
         return Collections.singletonList(land);
     }
 
     private List<Land> getForespurtMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
         Land land = new Land();
-        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLandkode()));
+        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
 
         return Collections.singletonList(land);
     }
 
     private Fastperiode getSoeknadsperiode(Lovvalgsperiode lovvalgsperiode) {
-        Fastperiode periode = new Fastperiode();
-
-        periode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
-        periode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
-
-        return periode;
+        return mapTilPeriodeDto(lovvalgsperiode).getFastperiode();
     }
 
-    // Blir ikke implementert i denne versjonen av Melosys.
-    private List<Periode> getTidligerePeriode() {
-        return null;
+    private List<Periode> getTidligerePeriode(List<Lovvalgsperiode> tidligereLovvalgsperioder) {
+        if (tidligereLovvalgsperioder == null) {
+            return Collections.emptyList();
+        }
+
+        return tidligereLovvalgsperioder.stream()
+                .map(this::mapTilPeriodeDto)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     // Blir ikke implementert i denne versjonen av Melosys.

@@ -123,7 +123,14 @@ public interface SedMapper<T extends Medlemskap> {
         adresse.setPostnummer(sedDataDto.getBostedsadresse().getPostnr());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sedDataDto.getBostedsadresse().getLand()));
         adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
-        adresse.setType("bosted");
+        adresse.setRegion(sedDataDto.getBostedsadresse().getRegion());
+
+        // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
+        if ("NO".equalsIgnoreCase(adresse.getLand())) {
+            adresse.setType("bosted");
+        } else {
+            adresse.setType("opphold");
+        }
 
         return Collections.singletonList(adresse);
     }
@@ -238,6 +245,7 @@ public interface SedMapper<T extends Medlemskap> {
                 PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
+        adresse.setRegion(sAdresse.getRegion());
 
         if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
             throw new MappingException(
@@ -249,5 +257,26 @@ public interface SedMapper<T extends Medlemskap> {
 
     default Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
         return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
+    }
+
+    default Periode mapTilPeriodeDto(Lovvalgsperiode lovvalgsperiode) {
+        Periode periode = new Periode();
+
+        if (lovvalgsperiode.getFom() != null) {
+            if (lovvalgsperiode.getTom() != null) {
+                Fastperiode fastperiode = new Fastperiode();
+                fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
+                fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
+                periode.setFastperiode(fastperiode);
+            } else {
+                AapenPeriode aapenPeriode = new AapenPeriode();
+                aapenPeriode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
+                periode.setAapenperiode(aapenPeriode);
+            }
+        } else {
+            return null;
+        }
+
+        return periode;
     }
 }

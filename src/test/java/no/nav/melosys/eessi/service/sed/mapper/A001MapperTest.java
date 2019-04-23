@@ -34,7 +34,8 @@ public class A001MapperTest {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_16_1);
         lovvalgsperiode.setFom(LocalDate.now());
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLandkode("NOR");
+        lovvalgsperiode.setLovvalgsland("NOR");
+        lovvalgsperiode.setUnntakFraLovvalgsland("NOR");
         lovvalgsperiode.setUnntakFraBestemmelse(Bestemmelse.ART_16_1);
         sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
     }

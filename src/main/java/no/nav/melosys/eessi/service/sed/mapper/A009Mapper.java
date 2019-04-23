@@ -33,7 +33,7 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
 
         vedtak.setEropprinneligvedtak(
                 "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
-        vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLandkode()));
+        vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
         vedtak.setGjeldervarighetyrkesaktivitet(
                 "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
 
@@ -47,8 +47,8 @@ public class A009Mapper implements SedMapper<MedlemskapA009> {
 
         //Vil alltid være fast periode
         Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setStartdato(dateTimeFormatter.format(lovvalgsperiode.getFom()));
-        fastperiode.setSluttdato(dateTimeFormatter.format(lovvalgsperiode.getTom()));
+        fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
+        fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
         gjelderperiode.setFastperiode(fastperiode);
 
         vedtak.setGjelderperiode(gjelderperiode);
