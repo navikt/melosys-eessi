@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.integration.eux;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -90,7 +89,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentBucTypePerSektor_returnerListe() throws Exception, JsonProcessingException {
+    public void hentBucTypePerSektor_returnerListe() throws Exception {
 
         List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
 
@@ -102,7 +101,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentInstitusjoner_forventListe() throws Exception, JsonProcessingException {
+    public void hentInstitusjoner_forventListe() throws Exception {
         List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
         String buctype = "LA_BUC_04";
         String landkode = "NO";
@@ -115,7 +114,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentKodeverk_forventJson() throws Exception, JsonProcessingException {
+    public void hentKodeverk_forventJson() throws Exception {
         Map<String, Object> forventetRetur = Maps.newHashMap();
         forventetRetur.put("string", "value");
         forventetRetur.put("int", 1L);
@@ -131,7 +130,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentMuligeAksjoner_forventJson() throws Exception, JsonProcessingException {
+    public void hentMuligeAksjoner_forventJson() throws Exception {
         Map<String, Object> forventetRetur = Maps.newHashMap();
         forventetRetur.put("string", "value");
         forventetRetur.put("int", 1L);
@@ -146,7 +145,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBucOgSed_forventString() throws Exception, JsonProcessingException {
+    public void opprettBucOgSed_forventString() throws Exception {
         String buc = "buc", mottaker = "NAV";
         SED sed = new SED();
 
@@ -163,7 +162,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBucOgSedMedVedlegg_forventString() throws Exception, JsonProcessingException {
+    public void opprettBucOgSedMedVedlegg_forventString() throws Exception {
         String buc = "buc", fagsak = "123", mottaker = "NAV", filtype = "virus.exe", korrelasjon = "111", vedlegg = "vedlegg";
         SED sed = new SED();
 
@@ -182,7 +181,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void finnRinaSaker_forventJson() throws Exception, JsonProcessingException {
+    public void finnRinaSaker_forventJson() throws Exception {
         Map<String, Object> forventetRetur = Maps.newHashMap();
         forventetRetur.put("string", "value");
         forventetRetur.put("int", 1L);
@@ -206,7 +205,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA001_forventSedA001() throws Exception, IOException {
+    public void hentSedA001_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -226,7 +225,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA009_forventSed() throws Exception, IOException {
+    public void hentSedA009_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -246,7 +245,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA010_forventSed() throws Exception, IOException {
+    public void hentSedA010_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 

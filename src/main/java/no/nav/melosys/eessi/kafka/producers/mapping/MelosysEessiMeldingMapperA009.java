@@ -35,7 +35,7 @@ class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper {
 
         MedlemskapA009 medlemskapA009 = hentMedlemskap(sed);
         Periode periode = medlemskapA009.getVedtak().getGjelderperiode();
-        if (periode.getAapenperiode() != null && periode.getAapenperiode().getStartdato() != null) {
+        if (periode.erAapenPeriode()) {
             AapenPeriode aapenPeriode = periode.getAapenperiode();
             fom = aapenPeriode.getStartdato();
             tom = null;
