@@ -188,6 +188,14 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <mainClass>no.nav.melosys.eessi.MelosysEessiApplication</mainClass>
+          <finalName>melosys-eessi</finalName>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

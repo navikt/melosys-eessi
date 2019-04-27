@@ -36,19 +36,19 @@ node {
     stage("Checkout") {
         scmInfo = checkout scm
         commitId = scmInfo.GIT_COMMIT.substring(0, 10)
-        imageVersion += new Date().format("YYYYMMddHHmmss") + "-" + commitId
+        imageVersion = new Date().format("YYYYMMddHHmmss") + "-" + commitId
         println("[INFO] imageVersion: ${imageVersion}")
     }
 
     stage("Build application") {
         configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-            sh "mvn clean package -Pcoverage -B -e -U -s $MAVEN_SETTINGS"
+            sh "mvn clean package -B -e -U -s $MAVEN_SETTINGS"
         }
     }
 
     stage("Build & publish Docker image") {
         configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-            sh "docker build --build-arg JAR_FILE=${application}-${imageVersion}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${imageVersion} --rm=true ."
+            sh "docker build --build-arg JAR_FILE=${application}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${imageVersion} --rm=true ."
             sh "docker push ${dockerRepo}/${application}:${imageVersion}"
         }
     }
