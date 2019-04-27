@@ -14,7 +14,9 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -36,6 +38,9 @@ public class EuxServiceTest {
 
     @InjectMocks
     private EuxService euxService;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() throws IOException, IntegrationException {
@@ -90,5 +95,21 @@ public class EuxServiceTest {
         verify(euxConsumer).sendSed(anyString(), anyString(), anyString());
         verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
         verify(caseRelationService).save(anyLong(), anyString());
+    }
+
+    @Test
+    public void opprettOgSendBucOgSed_expectExceptionDeleteCaseAndBuc() throws Exception {
+        Long gsakSaksnummer = 12345L;
+        String bucType = BucType.LA_BUC_01.name();
+        String mottakerLand = "SE";
+        SED sed = new SED();
+
+        doThrow(IntegrationException.class).when(euxConsumer).sendSed(anyString(), anyString(), anyString());
+
+        expectedException.expect(IntegrationException.class);
+        euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+
+        verify(euxConsumer).slettBuC(anyString());
+        verify(caseRelationService).deleteByRinaId(anyString());
     }
 }

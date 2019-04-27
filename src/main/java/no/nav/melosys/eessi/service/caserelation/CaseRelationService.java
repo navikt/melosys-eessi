@@ -17,6 +17,7 @@ public class CaseRelationService {
         this.caseRelationRepository = caseRelationRepository;
     }
 
+    @Transactional
     public CaseRelation save(Long gsakSaksnummer, String rinaCaseId) {
         CaseRelation caseRelation = new CaseRelation();
         caseRelation.setRinaId(rinaCaseId);
@@ -25,13 +26,16 @@ public class CaseRelationService {
         return save(caseRelation);
     }
 
-    @Transactional
-    public CaseRelation save(CaseRelation caseRelation) {
+    private CaseRelation save(CaseRelation caseRelation) {
         return caseRelationRepository.save(caseRelation);
     }
 
     public Optional<CaseRelation> findByRinaId(String rinaId) {
         return caseRelationRepository.findByRinaId(rinaId);
+    }
+
+    public void deleteByRinaId(String rinaId) {
+        caseRelationRepository.deleteByRinaId(rinaId);
     }
 
     public Optional<CaseRelation> findByGsakSaksnummer(Long gsakSaksnummer) {

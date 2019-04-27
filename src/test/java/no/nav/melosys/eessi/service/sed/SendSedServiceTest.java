@@ -15,13 +15,13 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SedServiceTest {
+public class SendSedServiceTest {
 
     @Mock
     private EuxService euxService;
 
     @InjectMocks
-    private SedService sedService;
+    private SendSedService sendSedService;
 
     private final String RINAID = "aabbcc";
 
@@ -34,7 +34,7 @@ public class SedServiceTest {
     @Test
     public void createAndSend_expectRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        String rinaId = sedService.createAndSend(sedData);
+        String rinaId = sendSedService.createAndSend(sedData);
         assertThat(rinaId, is(RINAID));
     }
 
@@ -42,6 +42,6 @@ public class SedServiceTest {
     public void createAndSend_withNoGsakSaksnummer_expectMappingException() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.setGsakSaksnummer(null);
-        String rinaId = sedService.createAndSend(sedData);
+        String rinaId = sendSedService.createAndSend(sedData);
     }
 }
