@@ -22,11 +22,6 @@ public class CaseRelationService {
         CaseRelation caseRelation = new CaseRelation();
         caseRelation.setRinaId(rinaCaseId);
         caseRelation.setGsakSaksnummer(gsakSaksnummer);
-        caseRelationRepository.save(caseRelation);
-        return save(caseRelation);
-    }
-
-    private CaseRelation save(CaseRelation caseRelation) {
         return caseRelationRepository.save(caseRelation);
     }
 
