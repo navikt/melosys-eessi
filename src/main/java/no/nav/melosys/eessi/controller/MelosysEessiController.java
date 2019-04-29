@@ -4,8 +4,7 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
-import no.nav.melosys.eessi.service.sed.SedService;
+import no.nav.melosys.eessi.service.sed.SendSedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/sed")
 public class MelosysEessiController {
 
-    private final SedService sedService;
+    private final SendSedService sendSedService;
 
     @Autowired
-    public MelosysEessiController(SedService sedService,
-            OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService) {
-        this.sedService = sedService;
+    public MelosysEessiController(SendSedService sendSedService) {
+        this.sendSedService = sendSedService;
     }
 
     @PostMapping("/createAndSend")
@@ -30,7 +28,7 @@ public class MelosysEessiController {
         log.info("/api/createAndSend: Oppretter ny buc og sed");
 
         try {
-            String rinaCaseId = sedService.createAndSend(sedDataDto);
+            String rinaCaseId = sendSedService.createAndSend(sedDataDto);
             Map<String, String> result = Maps.newHashMap();
             result.put("rinaCaseId", rinaCaseId);
             return result;

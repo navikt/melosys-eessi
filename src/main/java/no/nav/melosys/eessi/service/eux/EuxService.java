@@ -28,20 +28,8 @@ public class EuxService {
         this.caseRelationService = caseRelationService;
     }
 
-    public JsonNode hentBuC(String rinaSaksnummer) throws IntegrationException {
-        return euxConsumer.hentBuC(rinaSaksnummer);
-    }
-
-    public String opprettBuC(String bucType) throws IntegrationException {
-        return euxConsumer.opprettBuC(bucType);
-    }
-
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
         euxConsumer.slettBuC(rinaSaksnummer);
-    }
-
-    public void settMottaker(String rinaSaksnummer, String mottakerId) throws IntegrationException {
-        euxConsumer.settMottaker(rinaSaksnummer, mottakerId);
     }
 
     /**
@@ -56,18 +44,31 @@ public class EuxService {
     public String opprettOgSendBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
             throws IntegrationException, NotFoundException {
 
-        Map<String, String> map = euxConsumer.opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
-        String rinaCaseId = map.get("caseId");
-        String documentId = map.get("documentId");
-        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaCaseId, documentId);
+        String rinaId = null;
+        String documentId;
 
-        caseRelationService.save(gsakSaksnummer, rinaCaseId);
-        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaCaseId);
+        try {
+            Map<String, String> map = euxConsumer
+                    .opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
+            rinaId = map.get("caseId");
+            documentId = map.get("documentId");
+            log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaId, documentId);
 
-        euxConsumer.sendSed(rinaCaseId, "!23", documentId);
-        log.info("Sed {} sendt", documentId);
+            caseRelationService.save(gsakSaksnummer, rinaId);
+            log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaId);
 
-        return rinaCaseId;
+            euxConsumer.sendSed(rinaId, "!23", documentId);
+            log.info("Sed {} sendt", documentId);
+
+        } catch (IntegrationException|NotFoundException ex) {
+            log.error("Feil ved oppretting og sending av buc og sed", ex);
+            if (rinaId != null) {
+                caseRelationService.deleteByRinaId(rinaId);
+                slettBuC(rinaId);
+            }
+            throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
+        }
+        return rinaId;
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
@@ -95,76 +96,12 @@ public class EuxService {
         return extractSenderInformation(euxConsumer.hentDeltagere(rinaSaksnummer));
     }
 
-    public JsonNode hentMuligeAksjoner(String rinaSaksnummer) throws IntegrationException {
-        return euxConsumer.hentMuligeAksjoner(rinaSaksnummer);
-    }
-
-    public String opprettSed(String rinaSaksnummer, String korrelasjonsId, SED sed) throws IntegrationException {
-        return euxConsumer.opprettSed(rinaSaksnummer, korrelasjonsId, sed);
-    }
-
     public SED hentSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
     }
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
-    }
-
-    public void oppdaterSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId, SED sed) throws IntegrationException {
-        euxConsumer.oppdaterSed(rinaSaksnummer, korrelasjonsId, dokumentId, sed);
-    }
-
-    public void slettSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
-        euxConsumer.slettSed(rinaSaksnummer, dokumentId);
-    }
-
-    public void sendSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId) throws IntegrationException {
-        euxConsumer.sendSed(rinaSaksnummer, korrelasjonsId, dokumentId);
-    }
-
-    public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType, Object vedlegg) throws IntegrationException {
-        return euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentId, filType, vedlegg);
-    }
-
-    public byte[] hentVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId) throws IntegrationException {
-        return euxConsumer.hentVedlegg(rinaSaksnummer, dokumentId, vedleggId);
-    }
-
-    public void slettVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId) throws IntegrationException {
-        euxConsumer.slettVedlegg(rinaSaksnummer, dokumentId, vedleggId);
-    }
-
-    public List<String> hentTilgjengeligeSedTyper(String rinaSaksnummer) throws IntegrationException {
-        return euxConsumer.hentTilgjengeligeSedTyper(rinaSaksnummer);
-    }
-
-    public void setSakSensitiv(String rinaSaksnummer) throws IntegrationException {
-        euxConsumer.setSakSensitiv(rinaSaksnummer);
-    }
-
-    public void fjernSakSensitiv(String rinaSaksnummer) throws IntegrationException {
-        euxConsumer.fjernSakSensitiv(rinaSaksnummer);
-    }
-
-    public Map<String, String> opprettBucOgSed(String bucType, String mottakerId, SED sed) throws IntegrationException {
-        return euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);
-    }
-
-    public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String fagSakNummer, String mottakerId, String filType, String korrelasjonsId, SED sed, Object vedlegg) throws IntegrationException {
-        return euxConsumer.opprettBucOgSedMedVedlegg(bucType, fagSakNummer, mottakerId, filType, korrelasjonsId, sed, vedlegg);
-    }
-
-    public List<String> bucTypePerSektor() throws IntegrationException {
-        return euxConsumer.bucTypePerSektor();
-    }
-
-    public JsonNode hentKodeverk(String kodeverk) throws IntegrationException {
-        return euxConsumer.hentKodeverk(kodeverk);
-    }
-
-    public JsonNode finnRinaSaker(String fnr, String fornavn, String etternavn, String foedselsdato, String rinaSaksnummer, String bucType, String status) throws IntegrationException {
-        return euxConsumer.finnRinaSaker(fnr, fornavn, etternavn, foedselsdato, rinaSaksnummer, bucType, status);
     }
 
     private static ParticipantInfo extractReceiverInformation(JsonNode participants) {

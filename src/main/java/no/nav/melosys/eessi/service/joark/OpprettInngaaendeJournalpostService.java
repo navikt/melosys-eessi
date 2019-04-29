@@ -80,11 +80,7 @@ public class OpprettInngaaendeJournalpostService {
             throw new IntegrationException("Sak ble ikke opprettet");
         }
 
-        CaseRelation caseRelation = new CaseRelation();
-        caseRelation.setRinaId(rinaId);
-        caseRelation.setGsakSaksnummer(Long.parseLong(sak.getId()));
-        caseRelationService.save(caseRelation);
-
+        caseRelationService.save(Long.parseLong(sak.getId()), rinaId);
         log.info("Sak i gsak med id {} ble opprettet for rinaSak {}", sak.getId(), rinaId);
         return sak;
     }

@@ -17,12 +17,12 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class SedService {
+public class SendSedService {
 
     private final EuxService euxService;
 
     @Autowired
-    public SedService(EuxService euxService) {
+    public SendSedService(EuxService euxService) {
         this.euxService = euxService;
     }
 
