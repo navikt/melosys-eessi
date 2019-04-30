@@ -180,6 +180,16 @@
       <version>${random-benas.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>net.javacrumbs.shedlock</groupId>
+      <artifactId>shedlock-spring</artifactId>
+      <version>2.4.0</version>
+    </dependency>
+    <dependency>
+      <groupId>net.javacrumbs.shedlock</groupId>
+      <artifactId>shedlock-provider-jdbc-template</artifactId>
+      <version>2.4.0</version>
+    </dependency>
   </dependencies>
 
   <build>
