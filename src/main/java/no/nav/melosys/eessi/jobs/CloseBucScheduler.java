@@ -16,7 +16,7 @@ public class CloseBucScheduler {
         this.euxService = euxService;
     }
 
-    @Scheduled(fixedRateString = "0 0 0 * * *") // Midnight every day
+    @Scheduled(cron = "0 0 0 * * *") // Midnight every day
     @SchedulerLock(name = "closeBuc", lockAtLeastForString = "PT10M", lockAtMostForString = "PT120M")
     public void closeBuc() {
         log.info("SCHEDULER STARTED");
