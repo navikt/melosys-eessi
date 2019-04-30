@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -45,7 +46,7 @@ public class DatabaseConfig {
     }
 
     @Bean
-    public FlywayConfigurationCustomizer flywayConfig(DataSource adminDataSource) {
+    public FlywayConfigurationCustomizer flywayConfig(@Qualifier("adminDataSource") DataSource adminDataSource) {
         return config ->
                 config.initSql(String.format("SET ROLE \"%s-admin\"",
                                 environment.getRequiredProperty("DATABASE_NAME")))
