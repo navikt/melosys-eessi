@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.models.sed;
 
 public enum SedType {
+    X001,
     A001,
     A002,
     A003,

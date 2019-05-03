@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "sak": {
+      "anmodning": {
+        "avslutning": {
+          "dato": "2018-09-08",
+          "aarsak": {
+            "annet": "dasd asdasdasda",
+            "type": "annet"
+          },
+          "type": "manuell"
+        }
+      },
+      "kontekst": {
+        "bruker": {
+          "person": {
+            "kjoenn": "M",
+            "fornavn": "asdsdjoiuo",
+            "etternavn": "asd asdsd",
+            "foedselsdato": "asd iojoijioo"
+          }
+        }
+      }
+    }
+  },
+  "sed": "X001",
+  "sedGVer": "4",
+  "sedVer": "1"
+}

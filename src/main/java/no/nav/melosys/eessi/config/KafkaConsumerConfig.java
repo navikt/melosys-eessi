@@ -27,7 +27,6 @@ public class KafkaConsumerConfig {
     public Map<String, Object> sedEventConsumerConfig() {
         Map<String, Object> props = new HashMap<>();
         //Without this, the consumer will receive GenericData records.
-        props.put("specific.avro.reader", true);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "melosys-eessi-sedHendelser");
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");

@@ -1,14 +1,37 @@
 package no.nav.melosys.eessi.models.sed;
 
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 
 class MedlemskapTypeResolver implements TypeIdResolver {
+
+    private static final Class<? extends Medlemskap> DEFAULT_CLASS = NoType.class;
+    private static final List<String> SED_TYPES_STRING = Arrays.stream(SedType.values()).map(SedType::name).collect(Collectors.toList());
+
+    private static final EnumMap<SedType, Class<? extends Medlemskap>> medlemskapMapper = new EnumMap<>(SedType.class);
+
+    static {
+        medlemskapMapper.put(SedType.A001, MedlemskapA001.class);
+        medlemskapMapper.put(SedType.A002, MedlemskapA002.class);
+        medlemskapMapper.put(SedType.A003, MedlemskapA003.class);
+        medlemskapMapper.put(SedType.A004, MedlemskapA004.class);
+        medlemskapMapper.put(SedType.A005, MedlemskapA005.class);
+        medlemskapMapper.put(SedType.A006, MedlemskapA006.class);
+        medlemskapMapper.put(SedType.A007, MedlemskapA007.class);
+        //A008
+        medlemskapMapper.put(SedType.A009, MedlemskapA009.class);
+        medlemskapMapper.put(SedType.A010, MedlemskapA010.class);
+        medlemskapMapper.put(SedType.A011, MedlemskapA011.class);
+        medlemskapMapper.put(SedType.A012, MedlemskapA012.class);
+    }
 
     private JavaType sedType;
 
@@ -35,28 +58,10 @@ class MedlemskapTypeResolver implements TypeIdResolver {
     @Override
     public JavaType typeFromId(DatabindContext databindContext, String s) {
         Class<?> type;
-
-        switch (SedType.valueOf(s)) {
-            case A001:
-                type = MedlemskapA001.class;
-                break;
-            case A009:
-                type = MedlemskapA009.class;
-                break;
-            case A010:
-                type = MedlemskapA010.class;
-                break;
-            case A002:
-            case A003:
-            case A004:
-            case A005:
-            case A006:
-            case A007:
-            case A008:
-            case A011:
-            case A012:
-            default:
-                throw new IllegalArgumentException("Støtte for sed " + s + " er ikke implementert enda");
+        if (SED_TYPES_STRING.contains(s)) {
+            type = medlemskapMapper.get(SedType.valueOf(s));
+        } else {
+            type = DEFAULT_CLASS;
         }
 
         return databindContext.constructSpecializedType(sedType, type);

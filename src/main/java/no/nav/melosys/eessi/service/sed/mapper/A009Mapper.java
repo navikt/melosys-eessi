@@ -13,7 +13,7 @@ import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
-public class A009Mapper implements SedMapper<MedlemskapA009> {
+public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     @Override
     public MedlemskapA009 getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException {
