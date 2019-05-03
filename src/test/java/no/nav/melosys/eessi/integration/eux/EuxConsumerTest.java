@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import org.apache.commons.io.IOUtils;
@@ -233,6 +234,26 @@ public class EuxConsumerTest {
         assertNotNull(resultat.getMedlemskap());
         assertEquals(SedType.A001.name(), resultat.getSed());
         assertEquals(MedlemskapA001.class, resultat.getMedlemskap().getClass());
+    }
+
+    @Test
+    public void hentSedA008_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA008.json");
+        assertNotNull(jsonUrl);
+        String sed = IOUtils.toString(jsonUrl);
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertNotNull(resultat);
+        assertNotNull(resultat.getNav());
+        assertEquals(SedType.A008.name(), resultat.getSed());
+        assertNotNull(resultat.getMedlemskap());
+        assertEquals(MedlemskapA008.class, resultat.getMedlemskap().getClass());
     }
 
     @Test

@@ -19,9 +19,21 @@ public class Pin {
         this.sektor = sektor;
     }
 
+    public Pin(String identifikator, String land, String sektor, String institusjonsid, String institusjonsnavn) {
+        this.identifikator = identifikator;
+        this.land = land;
+        this.sektor = sektor;
+        this.institusjonsid = institusjonsid;
+        this.institusjonsnavn = institusjonsnavn;
+    }
+
     private String identifikator;
 
     private String land;
 
     private String sektor;
+
+    private String institusjonsid;
+
+    private String institusjonsnavn;
 }
