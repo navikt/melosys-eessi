@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -78,6 +80,12 @@ public class EuxService {
                 .orElseThrow(() -> new NotFoundException("Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
+    public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
+        String sedId = euxConsumer.opprettSed(rinaSaksnummer, null, sed);
+        euxConsumer.sendSed(rinaSaksnummer, null, sedId);
+        log.info("SED {} sendt i sak {}", sed.getSed(), rinaSaksnummer);
+    }
+
     /**
      * Henter mottaker (Counter Party) for en rina-sak
      * @param rinaSaksnummer id for rina-saken
@@ -98,6 +106,15 @@ public class EuxService {
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
+    }
+
+    public List<BucInfo> hentBucer(BucSearch bucSearch) throws IntegrationException {
+        return euxConsumer.finnRinaSaker(bucSearch.getFnr(), bucSearch.getFornavn(), bucSearch.getEtternavn(),
+                bucSearch.getFoedselsdato(), bucSearch.getRinaSaksnummer(), bucSearch.getBucType(), bucSearch.getStatus());
+    }
+
+    public BUC hentBuc(String rinaSakid) throws IntegrationException {
+        return euxConsumer.hentBuC(rinaSakid);
     }
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
