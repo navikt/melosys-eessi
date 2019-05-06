@@ -81,7 +81,7 @@ public class TpsService {
         return response.getPerson();
     }
 
-    public String hentAktoerId(String ident) {
+    public String hentAktoerId(String ident) throws NotFoundException {
         return aktoerConsumer.getAktoerId(ident);
     }
 

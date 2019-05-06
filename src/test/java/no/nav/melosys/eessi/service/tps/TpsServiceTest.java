@@ -79,7 +79,7 @@ public class TpsServiceTest {
     }
 
     @Test
-    public void hentAktoerId_expectAktoerId() {
+    public void hentAktoerId_expectAktoerId() throws Exception {
         String aktoerId = tpsService.hentAktoerId("11223344556");
         assertThat(aktoerId).isNotNull();
         assertThat(aktoerId).isEqualTo("998877665544");

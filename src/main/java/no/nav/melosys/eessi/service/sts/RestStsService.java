@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -59,8 +58,6 @@ public class RestStsService implements RestConsumer {
 
             return (String) responseBody.get(ACCESS_TOKEN_KEY);
 
-        } catch (HttpStatusCodeException ex) {
-            throw new IntegrationException("Error when connecting to reststs", ex);
         } catch (Exception ex) {
             throw new IntegrationException("Error when connecting to reststs", ex);
         }

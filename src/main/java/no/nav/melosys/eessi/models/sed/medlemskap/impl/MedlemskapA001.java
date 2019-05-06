@@ -6,7 +6,6 @@ import lombok.Data;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
 
-@SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class MedlemskapA001 extends Medlemskap {
