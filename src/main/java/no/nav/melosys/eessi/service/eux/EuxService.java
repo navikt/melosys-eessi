@@ -12,6 +12,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -20,6 +21,9 @@ public class EuxService {
 
     private final EuxConsumer euxConsumer;
     private final CaseRelationService caseRelationService;
+
+    @Value("${melosys.integrations.rina-host-url}")
+    private String rinaHostUrl;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
@@ -127,5 +131,14 @@ public class EuxService {
         }
 
         return null;
+    }
+
+    public String hentRinaUrl(String rinaCaseId, String sedId) {
+        return "https://" + rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId +
+                "?openMode=Update&docId=" + sedId;
+    }
+
+    public String hentRinaUrl(String rinaCaseId) {
+        return "https://" + rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
     }
 }
