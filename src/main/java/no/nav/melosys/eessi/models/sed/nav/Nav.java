@@ -21,4 +21,6 @@ public class Nav {
     private String ytterligereinformasjon;
 
     private List<Arbeidsgiver> arbeidsgiver;
+
+    private EessiSak eessisak;
 }
