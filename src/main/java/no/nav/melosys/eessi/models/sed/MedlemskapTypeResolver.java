@@ -28,7 +28,7 @@ class MedlemskapTypeResolver implements TypeIdResolver {
         mapping.put(SedType.A005, MedlemskapA005.class);
         mapping.put(SedType.A006, MedlemskapA006.class);
         mapping.put(SedType.A007, MedlemskapA007.class);
-        //A008
+        mapping.put(SedType.A008, MedlemskapA008.class);
         mapping.put(SedType.A009, MedlemskapA009.class);
         mapping.put(SedType.A010, MedlemskapA010.class);
         mapping.put(SedType.A011, MedlemskapA011.class);

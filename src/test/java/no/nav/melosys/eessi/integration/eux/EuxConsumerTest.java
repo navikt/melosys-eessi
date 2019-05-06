@@ -262,7 +262,7 @@ public class EuxConsumerTest {
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA008.json");
         assertNotNull(jsonUrl);
-        String sed = IOUtils.toString(jsonUrl);
+        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
