@@ -57,7 +57,6 @@ public interface SedMapper<T extends Medlemskap> {
         nav.setBruker(hentBruker(sedData));
         nav.setArbeidssted(hentArbeidssted(sedData));
         nav.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
-        nav.setEessisak(hentEessiSak(sedData));
 
         if (!sedData.getSelvstendigeVirksomheter().isEmpty()) {
             nav.setSelvstendig(hentSelvstendig(sedData));
@@ -279,9 +278,5 @@ public interface SedMapper<T extends Medlemskap> {
         }
 
         return periode;
-    }
-
-    default EessiSak hentEessiSak(SedDataDto sedData) {
-        return null;
     }
 }
