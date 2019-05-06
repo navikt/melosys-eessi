@@ -6,19 +6,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import com.google.common.collect.Lists;
-import no.nav.melosys.eessi.controller.dto.FamilieMedlem;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.Virksomhet;
+import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.sed.Constants;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
+import no.nav.melosys.eessi.models.sed.nav.Adresse;
+import no.nav.melosys.eessi.models.sed.nav.Arbeidssted;
+import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
+import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
+import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
 
 /**
  * Felles mapper-interface for alle typer av lovvalgs-SED'er. Mapper NAV-objektet i NAV-SED, som brukes av eux for
@@ -87,24 +90,19 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
         return person;
     }
 
-    default List<Pin> hentPin(SedDataDto sedData) {
+    default List<Pin> hentPin(SedDataDto sedData) throws NotFoundException {
         List<Pin> pins = Lists.newArrayList();
 
         pins.add(new Pin(
                 sedData.getBruker().getFnr(), "NO",
                 null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
 
-        sedData.getUtenlandskIdent().stream()
-                .map(utenlandskIdent -> {
-                    try {
-                        return new Pin(utenlandskIdent.getIdent(),
-                                LandkodeMapper.getLandkodeIso2(utenlandskIdent.getLandkode()), null);
-                    } catch (NotFoundException e) {
-                        e.printStackTrace();
-                        return null;
-                    }
-                })
-                .forEachOrdered(pins::add);
+        for (Ident utenlandskIdent : sedData.getUtenlandskIdent()) {
+            pins.add(
+                new Pin(utenlandskIdent.getIdent(),
+                    LandkodeMapper.getLandkodeIso2(utenlandskIdent.getLandkode()), null)
+            );
+        }
 
         return pins;
     }
@@ -226,7 +224,7 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
     }
 
     default String formaterDato(LocalDate dato) {
-        return dateTimeFormatter.format(dato);
+        return Constants.dateTimeFormatter.format(dato);
     }
 
     default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse)

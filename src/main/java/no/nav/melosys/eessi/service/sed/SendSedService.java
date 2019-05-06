@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.sed.helpers.SedDataTilLovvalgSedMapperFactory;
+import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class SendSedService {
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
         SedType sedType = SedUtils.getSedTypeFromBestemmelse(
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
-        LovvalgSedMapper sedMapper = SedDataTilLovvalgSedMapperFactory.sedMapper(sedType);
+        LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
         String mottakerLand = sedDataDto.getLovvalgsperioder().stream().map(Lovvalgsperiode::getUnntakFraLovvalgsland)

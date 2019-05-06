@@ -11,7 +11,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 
-public class SedDataTilLovvalgSedMapperFactoryTest {
+public class LovvalgSedMapperFactoryTest {
 
     public class IkkeInstansierbarSedMapper implements LovvalgSedMapper {
 
@@ -31,14 +31,14 @@ public class SedDataTilLovvalgSedMapperFactoryTest {
 
     @Test
     public void oppslagavSedGirKorrektMapper() throws Exception {
-        SedMapper sedMapper = SedDataTilLovvalgSedMapperFactory.sedMapper(SedType.A009);
+        SedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(SedType.A009);
         assertThat(sedMapper).isInstanceOf(A009Mapper.class);
     }
 
     @Test
     public void oppslagAvIkkeInstansierbarSedMapperKasterUnntak() {
-        SedDataTilLovvalgSedMapperFactory.sedMappers.put(SedType.A012, IkkeInstansierbarSedMapper.class);
-        Throwable unntak = catchThrowable(() -> SedDataTilLovvalgSedMapperFactory.sedMapper(SedType.A012));
+        LovvalgSedMapperFactory.sedMappers.put(SedType.A012, IkkeInstansierbarSedMapper.class);
+        Throwable unntak = catchThrowable(() -> LovvalgSedMapperFactory.sedMapper(SedType.A012));
         assertThat(unntak).isInstanceOf(MappingException.class).hasCauseInstanceOf(InstantiationException.class);
     }
 }

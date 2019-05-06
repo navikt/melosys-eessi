@@ -1,8 +1,11 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
 import java.time.LocalDate;
+import no.nav.melosys.eessi.models.sed.Constants;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.*;
+import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
+import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
 
 
 public class X001Mapper implements SedMapper {
@@ -43,7 +46,7 @@ public class X001Mapper implements SedMapper {
         aarsak.setType(aarsakType);
 
         Avslutning avslutning = new Avslutning();
-        avslutning.setDato(LocalDate.now().format(SedMapper.dateTimeFormatter));
+        avslutning.setDato(LocalDate.now().format(Constants.dateTimeFormatter));
         avslutning.setAarsak(aarsak);
         avslutning.setType("automatisk");
 

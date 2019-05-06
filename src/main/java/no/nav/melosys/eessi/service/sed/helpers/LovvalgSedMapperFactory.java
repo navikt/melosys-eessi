@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.service.sed.mapper.A001Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.A009Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 
-public class SedDataTilLovvalgSedMapperFactory {
+public class LovvalgSedMapperFactory {
 
     static Map<SedType, Class<? extends LovvalgSedMapper>> sedMappers = new EnumMap<>(SedType.class);
 
@@ -17,7 +17,7 @@ public class SedDataTilLovvalgSedMapperFactory {
         sedMappers.put(SedType.A009, A009Mapper.class);
     }
 
-    private SedDataTilLovvalgSedMapperFactory() {
+    private LovvalgSedMapperFactory() {
     }
 
     public static LovvalgSedMapper sedMapper(SedType sedType) throws MappingException {
