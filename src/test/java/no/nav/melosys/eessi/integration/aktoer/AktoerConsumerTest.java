@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.integration.aktoer;
 
-import no.nav.melosys.eessi.config.EnvironmentHandler;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import org.junit.Before;
@@ -10,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import static org.hamcrest.CoreMatchers.is;
@@ -45,10 +43,6 @@ public class AktoerConsumerTest {
     @Before
     public void setUp() {
         server = MockRestServiceServer.createServer(restTemplate);
-        MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("melosys.systemuser.username", "123");
-        environment.setProperty("melosys.systemuser.password", "123");
-        new EnvironmentHandler(environment);
     }
 
     @Test

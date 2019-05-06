@@ -1,19 +1,20 @@
 package no.nav.melosys.eessi.service.sed.helpers;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
-
 @Slf4j
 public class LandkodeMapper {
+
+    private LandkodeMapper() {}
 
     private static TreeMap<String, String> landkoderIso3OgIso2; // Key: iso3, Value: iso2
 

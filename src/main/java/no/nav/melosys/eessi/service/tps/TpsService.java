@@ -66,6 +66,7 @@ public class TpsService {
     private Person hentPerson(HentPersonRequest request) throws SecurityException, NotFoundException {
         HentPersonResponse response;
         try {
+            log.info("Henter person fra tps");
             response = personConsumer.hentPerson(request);
         } catch (HentPersonSikkerhetsbegrensning hentPersonSikkerhetsbegrensning) {
             throw new SecurityException("Ikke tilstrekkelig autentisering mot TPS", hentPersonSikkerhetsbegrensning);

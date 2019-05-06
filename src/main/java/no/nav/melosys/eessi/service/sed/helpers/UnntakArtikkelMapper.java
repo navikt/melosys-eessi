@@ -5,6 +5,8 @@ import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 // Mappes til verdier som finnes i 'medlemskapsunntakartikkelkoder.properties' i eux-prosjektet.
 public class UnntakArtikkelMapper {
 
+    private UnntakArtikkelMapper() {}
+
     private static final String BESTEMMELSE_11_4= "11_4";
     public static final String BESTEMMELSE_OTHER = "annet";
 

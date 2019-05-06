@@ -4,9 +4,11 @@ import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SedType;
 
-public class SedUtils {
+class SedUtils {
 
-    public static SedType getSedTypeFromBestemmelse(Bestemmelse bestemmelse) {
+    private SedUtils() {}
+
+    static SedType getSedTypeFromBestemmelse(Bestemmelse bestemmelse) {
 
         switch (bestemmelse) {
 
@@ -30,16 +32,17 @@ public class SedUtils {
             case ART_13_2_b:
             case ART_13_3:
             case ART_13_4:
+            case ART_14_11:
                 break;
             case ART_16_1:
             case ART_16_2:
                 return SedType.A001;
         }
 
-        throw new RuntimeException("Lovvalgsbestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
+        throw new IllegalArgumentException("Lovvalgsbestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
     }
 
-    public static BucType getBucTypeFromBestemmelse(Bestemmelse bestemmelse) {
+    static BucType getBucTypeFromBestemmelse(Bestemmelse bestemmelse) {
 
         switch (bestemmelse) {
 
@@ -63,12 +66,14 @@ public class SedUtils {
             case ART_13_2_b:
             case ART_13_3:
             case ART_13_4:
+            case ART_14_11:
                 break;
             case ART_16_1:
             case ART_16_2:
                 return BucType.LA_BUC_01;
+                
         }
-        throw new RuntimeException("Bestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
+        throw new IllegalArgumentException("Bestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
     }
 }
 

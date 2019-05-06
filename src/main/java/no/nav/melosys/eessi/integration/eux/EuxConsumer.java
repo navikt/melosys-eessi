@@ -40,6 +40,7 @@ public class EuxConsumer implements RestConsumer {
 
     private static final String BUC_PATH = "/buc/%s";
     private static final String SED_PATH = "/buc/%s/sed/%s";
+    private static final String SED_PATH_PDF = "/buc/%s/sed/%s/pdf";
     private static final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
     private static final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
     private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
@@ -225,7 +226,7 @@ public class EuxConsumer implements RestConsumer {
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Henter pdf for sed {} på sak {}", dokumentId, rinaSaksnummer);
-        String uri = String.format(SED_PATH + "/pdf", rinaSaksnummer, dokumentId);
+        String uri = String.format(SED_PATH_PDF, rinaSaksnummer, dokumentId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
