@@ -24,4 +24,6 @@ public class Nav {
     private List<Arbeidsgiver> arbeidsgiver;
 
     private Sak sak;
+
+    private EessiSak eessisak;
 }

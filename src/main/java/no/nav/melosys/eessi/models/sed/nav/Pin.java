@@ -15,9 +15,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Pin {
 
+    public Pin(String identifikator, String land, String sektor) {
+        this.identifikator = identifikator;
+        this.land = land;
+        this.sektor = sektor;
+    }
+
     private String identifikator;
 
     private String land;
 
     private String sektor;
+
+    private String institusjonsid;
+
+    private String institusjonsnavn;
 }
