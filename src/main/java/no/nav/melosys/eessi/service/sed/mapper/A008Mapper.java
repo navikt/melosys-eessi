@@ -4,7 +4,7 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
 
-public class A008Mapper implements SedMapper<MedlemskapA008> {
+public class A008Mapper implements LovvalgSedMapper<MedlemskapA008> {
 
     @Override
     public MedlemskapA008 getMedlemskap(SedDataDto sedData) {

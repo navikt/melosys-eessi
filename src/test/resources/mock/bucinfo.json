@@ -1,0 +1,40 @@
+[
+  {
+    "id": "100485",
+    "traits": {
+      "birthday": null,
+      "localPin": null,
+      "surname": null,
+      "caseId": "100485",
+      "name": null,
+      "flowType": "LA_BUC_01",
+      "status": "open"
+    },
+    "properties": {
+      "importance": "1",
+      "criticality": "1"
+    },
+    "processDefinitionId": "LA_BUC_01",
+    "applicationRoleId": "PO",
+    "status": "open"
+  },
+  {
+    "id": "113797",
+    "traits": {
+      "birthday": null,
+      "localPin": null,
+      "surname": null,
+      "caseId": "113797",
+      "name": null,
+      "flowType": "LA_BUC_01",
+      "status": "open"
+    },
+    "properties": {
+      "importance": "1",
+      "criticality": "1"
+    },
+    "processDefinitionId": "LA_BUC_01",
+    "applicationRoleId": "PO",
+    "status": "open"
+  }
+]

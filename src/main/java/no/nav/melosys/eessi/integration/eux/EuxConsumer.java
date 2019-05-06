@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +57,13 @@ public class EuxConsumer implements RestConsumer {
      * spesifikke objektet spesifisert
      */
 
-    public JsonNode hentBuC(String rinaSaksnummer) throws IntegrationException {
+    public BUC hentBuC(String rinaSaksnummer) throws IntegrationException {
 
         log.info("Henter buc: {}", rinaSaksnummer);
         String uri = String.format(BUC_PATH, rinaSaksnummer);
 
         return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
-                new ParameterizedTypeReference<JsonNode>() {
+                new ParameterizedTypeReference<BUC>() {
                 });
     }
 
@@ -511,7 +513,7 @@ public class EuxConsumer implements RestConsumer {
      * @return JsonNode med rina saker
      */
 
-    public JsonNode finnRinaSaker(String fnr, String fornavn, String etternavn, String foedselsdato,
+    public List<BucInfo> finnRinaSaker(String fnr, String fornavn, String etternavn, String foedselsdato,
             String rinaSaksnummer, String bucType, String status) throws IntegrationException {
         log.info("Søker etter rina-saker");
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/rinasaker")
@@ -526,7 +528,7 @@ public class EuxConsumer implements RestConsumer {
         //Må vurdere å endre returverdi til en POJO om denne integrasjonen faktisk tas i bruk
         return exchange(builder.build(false).toUriString(), HttpMethod.GET,
                 new HttpEntity<>(getDefaultHeaders()),
-                new ParameterizedTypeReference<JsonNode>() {
+                new ParameterizedTypeReference<List<BucInfo>>() {
                 });
     }
 

@@ -8,11 +8,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
-@SuppressWarnings("unused")
-@AllArgsConstructor
-@NoArgsConstructor
+
 @JsonInclude(Include.NON_NULL)
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Pin {
 
     public Pin(String identifikator, String land, String sektor) {

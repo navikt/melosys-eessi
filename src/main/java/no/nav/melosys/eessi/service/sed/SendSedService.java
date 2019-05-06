@@ -15,9 +15,9 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.sed.helpers.SedDataMapperRuter;
+import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.A008Mapper;
-import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -45,7 +45,7 @@ public class SendSedService {
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
         SedType sedType = SedUtils.getSedTypeFromBestemmelse(
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
-        SedMapper sedMapper = SedDataMapperRuter.sedMapper(sedType);
+        LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
@@ -60,7 +60,7 @@ public class SendSedService {
     public Map<String, String> createAndSendA008(SedDataDto sedDataDto, String rinaCaseId) throws MappingException, NotFoundException, IntegrationException {
 
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
-        SedMapper sedMapper = new A008Mapper();
+        LovvalgSedMapper sedMapper = new A008Mapper();
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         if (!StringUtils.isEmpty(rinaCaseId)) {
