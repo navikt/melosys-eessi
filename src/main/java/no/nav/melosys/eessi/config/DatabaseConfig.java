@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.config;
 
-import java.net.URISyntaxException;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
@@ -85,7 +84,7 @@ public class DatabaseConfig {
     }
 
     @Bean(name = "transactionManager")
-    public PlatformTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) throws URISyntaxException {
+    public PlatformTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory);
         return transactionManager;
