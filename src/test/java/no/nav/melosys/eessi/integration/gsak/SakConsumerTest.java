@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.integration.gsak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.config.EnvironmentHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +8,6 @@ import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import static org.hamcrest.CoreMatchers.is;
@@ -33,11 +31,6 @@ public class SakConsumerTest {
     public void setup() {
         sakConsumer = new SakConsumer(restTemplate);
         server = MockRestServiceServer.createServer(restTemplate);
-
-        MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("melosys.systemuser.username", "123");
-        environment.setProperty("melosys.systemuser.password", "123");
-        new EnvironmentHandler(environment);
     }
 
     @Test

@@ -14,6 +14,8 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 @Slf4j
 public class PostnummerMapper {
 
+    private PostnummerMapper() {}
+
     private static TreeMap<String, String> postnummerOgPoststed;
 
     static {

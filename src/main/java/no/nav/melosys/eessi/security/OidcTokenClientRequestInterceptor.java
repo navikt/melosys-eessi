@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.security;
 
 import java.io.IOException;
-import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +10,6 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class OidcTokenClientRequestInterceptor implements ClientHttpRequestInterceptor {
 

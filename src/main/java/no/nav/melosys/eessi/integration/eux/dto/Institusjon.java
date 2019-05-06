@@ -5,7 +5,6 @@ import java.util.List;
 import lombok.Data;
 
 @Data
-@SuppressWarnings("unused")
 public class Institusjon {
 
     private String akronym;

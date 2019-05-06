@@ -14,8 +14,11 @@ import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 
 class InngaaendeForsendelseMapper {
 
+    private InngaaendeForsendelseMapper() {}
+
     private static final String MOTTAKS_KANAL = "EESSI";
     private static final String AVSENDER_IKKE_TILGJENGELIG = "avsender ikke tilgjengelig";
+    private static final String AKTOER = "aktoer";
 
     static MottaInngaaendeForsendelseRequest createMottaInngaaendeForsendelseRequest(
             String aktoerId, SedHendelse sedMottatt, Sak sak, DokkatSedInfo dokkatSedInfo, ParticipantInfo senderInfo, byte[] pdf) {
@@ -54,7 +57,7 @@ class InngaaendeForsendelseMapper {
 
     static Aktoer person(String ident) {
         return ident != null ?
-                new Aktoer().withAdditionalProperty("aktoer",
+                new Aktoer().withAdditionalProperty(AKTOER,
                         KeyValue.of("person",
                                 KeyValue.of("ident", ident)))
                 : null;
@@ -62,13 +65,13 @@ class InngaaendeForsendelseMapper {
 
     static Aktoer organisasjon(String orgnr, String navn) {
         return orgnr != null ?
-                new Aktoer().withAdditionalProperty("aktoer",
+                new Aktoer().withAdditionalProperty(AKTOER,
                         KeyValue.of("organisasjon",
                                 collect(KeyValue.of("orgnr", orgnr),
                                         KeyValue.of("navn", navn))))
 
                 //dokmotinngående støtter ikke null i avsender så returner default verdier
-                : new Aktoer().withAdditionalProperty("aktoer",
+                : new Aktoer().withAdditionalProperty(AKTOER,
                 KeyValue.of("organisasjon",
                         collect(KeyValue.of("orgnr", AVSENDER_IKKE_TILGJENGELIG),
                                 KeyValue.of("navn", AVSENDER_IKKE_TILGJENGELIG))));

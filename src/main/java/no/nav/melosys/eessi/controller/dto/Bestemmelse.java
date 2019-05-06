@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.controller.dto;
 
 import lombok.Getter;
 
+@SuppressWarnings("squid:S00115")
 public enum Bestemmelse {
 
     ART_11_1("11_1"),
