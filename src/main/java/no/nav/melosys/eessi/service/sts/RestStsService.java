@@ -10,7 +10,9 @@ import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -49,7 +51,7 @@ public class RestStsService implements RestConsumer {
         log.info("Henter oidc-token fra security-token-service");
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate
-                    .exchange(createUriString(), HttpMethod.GET, createHttpEntity(),
+                    .exchange(createUriString(), HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                             new ParameterizedTypeReference<Map<String, Object>>() {
                             });
 
@@ -76,12 +78,5 @@ public class RestStsService implements RestConsumer {
         return UriComponentsBuilder.fromPath("/")
                 .queryParam("grant_type", "client_credentials")
                 .queryParam("scope", "openid").toUriString();
-    }
-
-    private HttpEntity<?> createHttpEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-
-        return new HttpEntity(headers);
     }
 }

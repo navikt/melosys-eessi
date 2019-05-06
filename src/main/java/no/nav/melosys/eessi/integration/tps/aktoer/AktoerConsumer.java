@@ -9,9 +9,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import static org.springframework.http.HttpHeaders.ACCEPT;
-import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
-import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Slf4j
 public class AktoerConsumer implements RestConsumer {
@@ -49,10 +46,8 @@ public class AktoerConsumer implements RestConsumer {
     }
 
     private HttpEntity<?> headers(String ident) {
-        HttpHeaders httpHeaders = new HttpHeaders();
+        HttpHeaders httpHeaders = defaultHeaders();
         httpHeaders.add("Nav-Personidenter", ident);
-        httpHeaders.add(ACCEPT, APPLICATION_JSON_VALUE);
-        httpHeaders.add(CONTENT_TYPE, APPLICATION_JSON_VALUE);
         httpHeaders.add("Nav-Call-Id","srvmelosys");
         return new HttpEntity<>(httpHeaders);
     }
