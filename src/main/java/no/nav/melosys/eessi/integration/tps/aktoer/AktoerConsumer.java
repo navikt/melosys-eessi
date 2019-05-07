@@ -49,6 +49,7 @@ public class AktoerConsumer implements RestConsumer {
         HttpHeaders httpHeaders = defaultHeaders();
         httpHeaders.add("Nav-Personidenter", ident);
         httpHeaders.add("Nav-Call-Id","srvmelosys");
+        httpHeaders.add("Nav-Consumer-Id","srvmelosys");
         return new HttpEntity<>(httpHeaders);
     }
 }
