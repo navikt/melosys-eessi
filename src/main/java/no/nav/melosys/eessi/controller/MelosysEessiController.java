@@ -4,11 +4,12 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.sed.SendSedService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -16,13 +17,10 @@ import org.springframework.web.bind.annotation.*;
 public class MelosysEessiController {
 
     private final SendSedService sendSedService;
-    private final AktoerConsumer aktoerConsumer;
 
     @Autowired
-    public MelosysEessiController(SendSedService sendSedService,
-            AktoerConsumer aktoerConsumer) {
+    public MelosysEessiController(SendSedService sendSedService) {
         this.sendSedService = sendSedService;
-        this.aktoerConsumer = aktoerConsumer;
     }
 
     @PostMapping("/createAndSend")
@@ -39,10 +37,5 @@ public class MelosysEessiController {
             throw e;
         }
 
-    }
-
-    @GetMapping("/yy")
-    public Object test() throws NotFoundException {
-        return aktoerConsumer.getAktoerId("05089417165");
     }
 }
