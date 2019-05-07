@@ -4,13 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
-import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapper;
-import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.Bruker;
-import no.nav.melosys.eessi.models.sed.nav.Nav;
-import no.nav.melosys.eessi.models.sed.nav.Person;
-import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
+import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
@@ -20,7 +16,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -45,9 +40,6 @@ public class BehandleSedMottattServiceTest {
     @Mock
     private MelosysEessiProducer melosysEessiProducer;
 
-    @Mock
-    private MelosysEessiMeldingMapperFactory meldingMapperFactory;
-
     @InjectMocks
     private BehandleSedMottattService behandleSedMottattService;
 
@@ -57,13 +49,12 @@ public class BehandleSedMottattServiceTest {
                 .thenReturn("44332211");
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), anyString()))
-                .thenReturn(SakInformasjon.builder().journalpostId("9988776655").build());
+                .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
 
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
 
         when(personvurdering.hentNorskIdent(any(), any())).thenReturn("12312312312");
-        when(meldingMapperFactory.getMapper(any())).thenReturn(Mockito.mock(MelosysEessiMeldingMapper.class));
     }
 
     @Test
@@ -72,7 +63,7 @@ public class BehandleSedMottattServiceTest {
         sedHendelse.setNavBruker("11223344");
         sedHendelse.setRinaSakId("123");
         sedHendelse.setRinaDokumentId("456");
-        sedHendelse.setSedType("A005");
+        sedHendelse.setSedType("A009");
 
         behandleSedMottattService.behandleSed(sedHendelse);
 
@@ -104,7 +95,13 @@ public class BehandleSedMottattServiceTest {
 
         SED sed = new SED();
         sed.setNav(nav);
-        sed.setSed("A005");
+        sed.setSed("A009");
+
+        MedlemskapA009 medlemskap = new MedlemskapA009();
+        medlemskap.setVedtak(new VedtakA009());
+        medlemskap.getVedtak().setGjelderperiode(new Periode());
+        medlemskap.getVedtak().getGjelderperiode().setFastperiode(new Fastperiode());
+        sed.setMedlemskap(medlemskap);
 
         return sed;
     }

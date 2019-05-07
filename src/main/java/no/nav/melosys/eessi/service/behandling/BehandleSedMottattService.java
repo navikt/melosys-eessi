@@ -26,7 +26,6 @@ public class BehandleSedMottattService {
     private final TpsService tpsService;
     private final MelosysEessiProducer melosysEessiProducer;
     private final Personvurdering personvurdering;
-    private final MelosysEessiMeldingMapperFactory meldingMapperFactory;
 
     @Autowired
     public BehandleSedMottattService(
@@ -34,14 +33,12 @@ public class BehandleSedMottattService {
             EuxService euxService,
             TpsService tpsService,
             MelosysEessiProducer melosysEessiProducer,
-            Personvurdering personvurdering,
-            MelosysEessiMeldingMapperFactory meldingMapperFactory) {
+            Personvurdering personvurdering) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.tpsService = tpsService;
         this.melosysEessiProducer = melosysEessiProducer;
         this.personvurdering = personvurdering;
-        this.meldingMapperFactory = meldingMapperFactory;
     }
 
     public void behandleSed(SedHendelse sedMottatt) {
@@ -70,7 +67,7 @@ public class BehandleSedMottattService {
 
     private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) {
         SedType sedType = SedType.valueOf(sed.getSed());
-        MelosysEessiMeldingMapper mapper = meldingMapperFactory.getMapper(sedType);
+        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(sedType);
         if (mapper != null) {
             melosysEessiProducer.publiserMelding(
                     mapper.map(aktoerId, sed, sedHendelse, sakInformasjon)
