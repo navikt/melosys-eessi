@@ -35,10 +35,10 @@ public class InngaaendeForsendelseMapperTest {
                 .id("NO:NAVT002")
                 .build();
 
-        byte[] pdf = SedDocumentStub.getPdfStub();
+        byte[] pdfMock = "pdf".getBytes();
 
         MottaInngaaendeForsendelseRequest mottaInngaaendeForsendelseRequest =
-                createMottaInngaaendeForsendelseRequest(aktoerId, sedMottatt, sak, dokkatSedInfo, senderInfo, pdf);
+                createMottaInngaaendeForsendelseRequest(aktoerId, sedMottatt, sak, dokkatSedInfo, senderInfo, pdfMock);
 
         assertThat(mottaInngaaendeForsendelseRequest
                 .getForsokEndeligJF(), is(false));
@@ -61,7 +61,7 @@ public class InngaaendeForsendelseMapperTest {
         assertThat(mottaInngaaendeForsendelseRequest.getDokumentInfoHoveddokument().getDokumentVariant().get(0)
                 .getVariantFormat(), is(ARKIV));
         assertThat(mottaInngaaendeForsendelseRequest.getDokumentInfoHoveddokument().getDokumentVariant().get(0)
-                .getDokument(), is(pdf));
+                .getDokument(), is(pdfMock));
     }
 
     @Test

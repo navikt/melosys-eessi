@@ -17,6 +17,8 @@ import org.apache.neethi.Policy;
 
 public class StsConfigUtil {
 
+    private StsConfigUtil() {}
+
     private static final String STS_REQUEST_SAML_POLICY = "classpath:soap/policy/stsPolicy.xml";
     private static final String STS_CLIENT_AUTHENTICATION_POLICY = "classpath:soap/policy/untPolicy.xml";
 
@@ -28,10 +30,10 @@ public class StsConfigUtil {
         client.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
         client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true);
 
-        setClientEndpointPolicy(client, resolvePolicyReference(client, STS_REQUEST_SAML_POLICY));
+        setClientEndpointPolicy(client, resolvePolicyReference(client));
     }
 
-    protected static STSClient configureSTSClient(STSClient stsClient, String location, String username, String password) {
+    private static void configureSTSClient(STSClient stsClient, String location, String username, String password) {
 
         stsClient.setEnableAppliesTo(false);
         stsClient.setAllowRenewing(false);
@@ -44,14 +46,12 @@ public class StsConfigUtil {
         stsClient.setProperties(properties);
 
         stsClient.setPolicy(STS_CLIENT_AUTHENTICATION_POLICY);
-
-        return stsClient;
     }
 
-    private static Policy resolvePolicyReference(Client client, String uri) {
+    private static Policy resolvePolicyReference(Client client) {
         PolicyBuilder policyBuilder = client.getBus().getExtension(PolicyBuilder.class);
         ReferenceResolver resolver = new RemoteReferenceResolver("", policyBuilder);
-        return resolver.resolveReference(uri);
+        return resolver.resolveReference(STS_REQUEST_SAML_POLICY);
     }
 
     private static void setClientEndpointPolicy(Client client, Policy policy) {

@@ -40,6 +40,7 @@ public class EuxConsumer implements RestConsumer {
 
     private static final String BUC_PATH = "/buc/%s";
     private static final String SED_PATH = "/buc/%s/sed/%s";
+    private static final String SED_PATH_PDF = "/buc/%s/sed/%s/pdf";
     private static final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
     private static final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
     private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
@@ -62,7 +63,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter buc: {}", rinaSaksnummer);
         String uri = String.format(BUC_PATH, rinaSaksnummer);
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<BUC>() {
                 });
     }
@@ -80,7 +81,7 @@ public class EuxConsumer implements RestConsumer {
                 .queryParam(BUC_TYPE, bucType);
 
         return exchange(builder.toUriString(), HttpMethod.POST,
-                new HttpEntity<>(getDefaultHeaders()),
+                new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<String>() {
                 });
     }
@@ -95,7 +96,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Sletter buc: {}", rinaSaksnummer);
         String uri = String.format(BUC_PATH, rinaSaksnummer);
 
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(getDefaultHeaders()),
+        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -114,7 +115,7 @@ public class EuxConsumer implements RestConsumer {
                 .fromPath(String.format(BUCDELTAKERE_PATH, rinaSaksnummer))
                 .queryParam("MottakerId", mottakerId);
 
-        exchange(builder.toUriString(), HttpMethod.PUT, new HttpEntity<>(getDefaultHeaders()),
+        exchange(builder.toUriString(), HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -130,7 +131,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter deltakere til sak {}", rinaSaksnummer);
         String uri = String.format(BUCDELTAKERE_PATH, rinaSaksnummer);
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<JsonNode>() {
                 });
     }
@@ -145,7 +146,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter mulige aksjoner for sak {}", rinaSaksnummer);
         String uri = String.format(MULIGEAKSJONER_PATH, rinaSaksnummer);
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<JsonNode>() {
                 });
     }
@@ -165,7 +166,7 @@ public class EuxConsumer implements RestConsumer {
         String uri = UriComponentsBuilder.fromPath(String.format("/buc/%s/sed", rinaSaksnummer))
                 .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
-        return exchange(uri, HttpMethod.POST, new HttpEntity<>(sed, getDefaultHeaders()),
+        return exchange(uri, HttpMethod.POST, new HttpEntity<>(sed, defaultHeaders()),
                 new ParameterizedTypeReference<String>() {
                 });
     }
@@ -181,7 +182,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter sed med id {}, fra sak {}", dokumentId, rinaSaksnummer);
         String uri = String.format(SED_PATH, rinaSaksnummer, dokumentId);
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<SED>() {
                 });
     }
@@ -202,7 +203,7 @@ public class EuxConsumer implements RestConsumer {
                 .fromPath(String.format(SED_PATH, rinaSaksnummer, dokumentId))
                 .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
-        exchange(uri, HttpMethod.PUT, new HttpEntity<>(sed, getDefaultHeaders()),
+        exchange(uri, HttpMethod.PUT, new HttpEntity<>(sed, defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -218,14 +219,14 @@ public class EuxConsumer implements RestConsumer {
         log.info("Sletter sed {} på sak {}", dokumentId, rinaSaksnummer);
         String uri = String.format(SED_PATH, rinaSaksnummer, dokumentId);
 
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(getDefaultHeaders()),
+        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Henter pdf for sed {} på sak {}", dokumentId, rinaSaksnummer);
-        String uri = String.format(SED_PATH + "/pdf", rinaSaksnummer, dokumentId);
+        String uri = String.format(SED_PATH_PDF, rinaSaksnummer, dokumentId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
@@ -251,7 +252,7 @@ public class EuxConsumer implements RestConsumer {
                 .fromPath(String.format(SED_PATH, rinaSaksnummer, dokumentId) + "/send")
                 .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
-        exchange(uri, HttpMethod.POST, new HttpEntity<>(getDefaultHeaders()),
+        exchange(uri, HttpMethod.POST, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -273,7 +274,7 @@ public class EuxConsumer implements RestConsumer {
                 .fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
                 .queryParam("Filtype", filType).toUriString();
 
-        return exchange(uri, HttpMethod.POST, new HttpEntity<>(vedlegg, getDefaultHeaders()),
+        return exchange(uri, HttpMethod.POST, new HttpEntity<>(vedlegg, defaultHeaders()),
                 new ParameterizedTypeReference<String>() {
                 });
     }
@@ -314,7 +315,7 @@ public class EuxConsumer implements RestConsumer {
                 dokumentId);
         String uri = String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId) + "/" + vedleggId;
 
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(getDefaultHeaders()),
+        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -331,7 +332,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter tilgjenglige sed-typer for sak {}", rinaSaksnummer);
         String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sedtyper";
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<List<String>>() {
                 });
     }
@@ -346,7 +347,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Setter sak {} sensitiv", rinaSaksnummer);
         String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sensitivsak";
 
-        exchange(uri, HttpMethod.PUT, new HttpEntity<>(getDefaultHeaders()),
+        exchange(uri, HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -361,7 +362,7 @@ public class EuxConsumer implements RestConsumer {
         log.info("Fjerner 'sensitiv sak' på sak {}", rinaSaksnummer);
         String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sensitivsak";
 
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(getDefaultHeaders()),
+        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -383,7 +384,7 @@ public class EuxConsumer implements RestConsumer {
                 .queryParam("MottakerId", mottakerId);
 
         return exchange(builder.toUriString(), HttpMethod.POST,
-                new HttpEntity<>(sed, getDefaultHeaders()),
+                new HttpEntity<>(sed, defaultHeaders()),
                 new ParameterizedTypeReference<Map<String, String>>() {
                 });
     }
@@ -457,7 +458,7 @@ public class EuxConsumer implements RestConsumer {
 
     public List<String> bucTypePerSektor() throws IntegrationException {
         log.info("Henter buctyper per sektor");
-        return exchange("/buctypepersektor", HttpMethod.GET, new HttpEntity<>(getDefaultHeaders()),
+        return exchange("/buctypepersektor", HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<List<String>>() {
                 });
     }
@@ -477,7 +478,7 @@ public class EuxConsumer implements RestConsumer {
                 .queryParam("LandKode", landkode);
 
         return exchange(builder.toUriString(), HttpMethod.GET,
-                new HttpEntity<>(getDefaultHeaders()),
+                new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<List<Institusjon>>() {
                 });
     }
@@ -495,7 +496,7 @@ public class EuxConsumer implements RestConsumer {
                 .queryParam("Kodeverk", kodeverk);
 
         return exchange(builder.toUriString(), HttpMethod.GET,
-                new HttpEntity<>(getDefaultHeaders()),
+                new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<JsonNode>() {
                 });
     }
@@ -527,7 +528,7 @@ public class EuxConsumer implements RestConsumer {
 
         //Må vurdere å endre returverdi til en POJO om denne integrasjonen faktisk tas i bruk
         return exchange(builder.build(false).toUriString(), HttpMethod.GET,
-                new HttpEntity<>(getDefaultHeaders()),
+                new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<List<BucInfo>>() {
                 });
     }
@@ -539,12 +540,5 @@ public class EuxConsumer implements RestConsumer {
         } catch (RestClientException e) {
             throw new IntegrationException("Error in integration with eux", e);
         }
-    }
-
-    private HttpHeaders getDefaultHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        return headers;
     }
 }

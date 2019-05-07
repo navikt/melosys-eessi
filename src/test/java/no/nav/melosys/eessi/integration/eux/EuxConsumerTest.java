@@ -465,5 +465,38 @@ public class EuxConsumerTest {
         euxConsumer.slettVedlegg(id, dokumentId, vedleggId);
     }
 
+    @Test
+    public void setSakSensitiv_ingenResponseEllerException() throws Exception {
+
+        String id ="123";
+        server.expect(requestTo("/buc/" + id + "/sensitivsak"))
+                .andRespond(withSuccess());
+
+        euxConsumer.setSakSensitiv(id);
+    }
+
+    @Test
+    public void fjernSakSensitiv_ingenResponseEllerException() throws Exception {
+
+        String id ="123";
+        server.expect(requestTo("/buc/" + id + "/sensitivsak"))
+                .andRespond(withSuccess());
+
+        euxConsumer.fjernSakSensitiv(id);
+    }
+
+    @Test
+    public void hentDeltakere_jsonResponse() throws Exception {
+        String id ="123";
+        server.expect(requestTo("/buc/" + id + "/bucdeltakere"))
+                .andRespond(withSuccess("{\"hei\":\"ho\"}", MediaType.APPLICATION_JSON));
+
+        JsonNode jsonNode = euxConsumer.hentDeltagere(id);
+
+        assertEquals("ho", jsonNode.get("hei").textValue());
+    }
+
+
+
 
 }

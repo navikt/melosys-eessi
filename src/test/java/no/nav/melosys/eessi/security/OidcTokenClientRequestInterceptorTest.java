@@ -15,7 +15,8 @@ import org.springframework.mock.http.client.MockClientHttpRequest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasEntry;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OidcTokenClientRequestInterceptorTest {
@@ -39,8 +40,8 @@ public class OidcTokenClientRequestInterceptorTest {
         MockClientHttpRequest httpRequest = new MockClientHttpRequest();
         oidcTokenClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
 
-        verify(httpRequestExecution, times(1)).execute(any(HttpRequest.class), any(byte[].class));
-        verify(restStsService, times(1)).collectToken();
+        verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
+        verify(restStsService).collectToken();
 
         assertThat(httpRequest.getHeaders(), hasEntry(HttpHeaders.AUTHORIZATION, Collections.singletonList("Bearer " + oidcKey)));
     }

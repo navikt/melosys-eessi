@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.service.sts;
 
 import java.util.Map;
 import com.google.common.collect.Maps;
-import no.nav.melosys.eessi.config.EnvironmentHandler;
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,7 +13,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mock.env.MockEnvironment;
 import org.springframework.web.client.RestTemplate;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,12 +33,6 @@ public class RestStsServiceTest {
     @Before
     public void setUp() {
         restStsService = spy(new RestStsService(restTemplate, basicAuthClientRequestInterceptor));
-
-        // Setter environment som "singleton"
-        MockEnvironment environment = spy(new MockEnvironment());
-        environment.setProperty("melosys.systemuser.username", "test");
-        environment.setProperty("melosys.systemuser.password", "test");
-        new EnvironmentHandler(environment);
     }
 
     //Tester at token blir hentet på nytt ved kort expires_in, og ikke ved lengre expires_in

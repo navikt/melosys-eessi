@@ -8,7 +8,6 @@ import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
 
 @EqualsAndHashCode(callSuper = false)
-@SuppressWarnings("unused")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class MedlemskapA009 extends Medlemskap {
