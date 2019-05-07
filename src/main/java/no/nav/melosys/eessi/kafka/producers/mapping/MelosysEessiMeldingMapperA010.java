@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import no.nav.melosys.eessi.avro.Periode;
+import no.nav.melosys.eessi.kafka.producers.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
