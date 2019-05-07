@@ -136,7 +136,7 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentBucer() throws IntegrationException {
+    public void hentBucer_expectConsumerCalls() throws IntegrationException {
         BucSearch bucSearch = BucSearch.builder()
                 .bucType(BucType.LA_BUC_01.name())
                 .fnr("12345678910")
@@ -156,14 +156,14 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentBuc() throws IntegrationException {
+    public void hentBuc_expectConsumerCalls() throws IntegrationException {
         euxService.hentBuc("123123123");
 
         verify(euxConsumer).hentBuC(eq("123123123"));
     }
 
     @Test
-    public void hentSedPdf() throws IntegrationException {
+    public void hentSedPdf_expectConsumerCalls() throws IntegrationException {
         euxService.hentSedPdf("123123123", "12345");
 
         verify(euxConsumer).hentSedPdf(eq("123123123"), eq("12345"));
