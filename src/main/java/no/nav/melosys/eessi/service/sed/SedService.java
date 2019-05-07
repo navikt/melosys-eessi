@@ -24,14 +24,14 @@ import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
-public class SendSedService {
+public class SedService {
 
     private final EuxService euxService;
 
     private final CaseRelationService caseRelationService;
 
     @Autowired
-    public SendSedService(EuxService euxService, CaseRelationService caseRelationService) {
+    public SedService(EuxService euxService, CaseRelationService caseRelationService) {
         this.euxService = euxService;
         this.caseRelationService = caseRelationService;
     }
@@ -53,34 +53,39 @@ public class SendSedService {
     }
 
     /**
+     * Oppretter en Sed A008 og returnerer rinaSakId og link til sak i rina.
+     * Sed-en blir opprettet på en eksisterende Buc dersom den er oppgitt eller dersom
+     * den finnes i CaseRelationRepository.
+     *
      * @param sedDataDto data for sed
-     * @param rinaCaseId  oppretter A008 på denne Buc-en, dersom den er oppgitt
+     * @param rinaCaseId oppretter A008 på denne Buc-en, dersom den er oppgitt
      * @return map med rinaSakId og url til SED i Rina
      */
-    public Map<String, String> createAndSendA008(SedDataDto sedDataDto, String rinaCaseId) throws MappingException, NotFoundException, IntegrationException {
+    public Map<String, String> createA008(SedDataDto sedDataDto, String rinaCaseId) throws MappingException, NotFoundException, IntegrationException {
 
+        String sedId = null;
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
         LovvalgSedMapper sedMapper = new A008Mapper();
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         if (!StringUtils.isEmpty(rinaCaseId)) {
             log.info("Oppretter sed på eksisterende buc {}, gsakSaksnummer: {}", rinaCaseId, gsakSaksnummer);
-            // euxService.opprettOgSendSedForEksisterendeBuc(gsakSaksnummer, rinaCaseId, getMottakerLand(sedDataDto), sed);
+            sedId = euxService.opprettSed(sed, rinaCaseId);
         } else {
             Optional<CaseRelation> caseRelation = caseRelationService.findByGsakSaksnummer(gsakSaksnummer);
             if (caseRelation.isPresent()) { // Finnes allerede en buc på sak
                 rinaCaseId = caseRelation.get().getRinaId();
                 log.info("Oppretter sed på eksisterende buc {}, gsakSaksnummer: {}", rinaCaseId, gsakSaksnummer);
-                // euxService.opprettOgSendSedForEksisterendeBuc(gsakSaksnummer, rinaCaseId, getMottakerLand(sedDataDto), sed);
+                sedId = euxService.opprettSed(sed, rinaCaseId);
             } else { // Oppretter ny buc og sed
                 log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-                rinaCaseId = euxService.opprettOgSendBucOgSed(gsakSaksnummer, "LA_BUC_03", getMottakerLand(sedDataDto), sed);
+                rinaCaseId = euxService.opprettBucOgSed(gsakSaksnummer, BucType.LA_BUC_03.name(), getMottakerLand(sedDataDto), sed);
             }
         }
 
         Map<String, String> result = Maps.newHashMap();
         result.put("rinaCaseId", rinaCaseId);
-        result.put("rinaUrl", euxService.hentRinaUrl(rinaCaseId));
+        result.put("rinaUrl", euxService.hentRinaUrl(rinaCaseId, sedId));
         return result;
     }
 

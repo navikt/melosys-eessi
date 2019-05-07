@@ -16,10 +16,14 @@ import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
 public class EuxService {
+
+    private static final String CASE_ID = "caseId";
+    private static final String DOCUMENT_ID = "documentId";
 
     private final EuxConsumer euxConsumer;
     private final CaseRelationService caseRelationService;
@@ -39,12 +43,34 @@ public class EuxService {
     }
 
     /**
+     * Oppretter buc og sed i EUX, og lagrer relasjon mellom gsakSaksnummer og rinaCaseId
+     *
+     * @param gsakSaksnummer gsakSak knyttet til SED
+     * @param bucType        Hvilken type buc som skal opprettes
+     * @param mottakerLand   Land som skal motta SED
+     * @param sed            SED som skal opprettes
+     * @return rinaCaseId - id for rina-saken
+     */
+    public String opprettBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
+            throws IntegrationException, NotFoundException {
+
+        try {
+            Map<String, String> map = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+            return map.get(CASE_ID);
+        } catch (IntegrationException | NotFoundException ex) {
+            log.error("Feil ved oppretting av buc og sed", ex);
+            throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
+        }
+    }
+
+    /**
      * Oppretter buc og sed i EUX, lagrer relasjon mellom gsakSaksnummer og rinaCaseId,
      * og sender sed til EUX.
+     *
      * @param gsakSaksnummer gsakSak knyttet til SED
-     * @param bucType Hvilken type buc som skal opprettes
-     * @param mottakerLand Land som skal motta SED
-     * @param sed SED som skal opprettes
+     * @param bucType        Hvilken type buc som skal opprettes
+     * @param mottakerLand   Land som skal motta SED
+     * @param sed            SED som skal opprettes
      * @return rinaCaseId - id for rina-saken
      */
     public String opprettOgSendBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
@@ -54,19 +80,14 @@ public class EuxService {
         String documentId;
 
         try {
-            Map<String, String> map = euxConsumer
-                    .opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
-            rinaId = map.get("caseId");
-            documentId = map.get("documentId");
-            log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaId, documentId);
-
-            caseRelationService.save(gsakSaksnummer, rinaId);
-            log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaId);
+            Map<String, String> map = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+            rinaId = map.get(CASE_ID);
+            documentId = map.get(DOCUMENT_ID);
 
             euxConsumer.sendSed(rinaId, "!23", documentId);
             log.info("Sed {} sendt", documentId);
 
-        } catch (IntegrationException|NotFoundException ex) {
+        } catch (IntegrationException | NotFoundException ex) {
             log.error("Feil ved oppretting og sending av buc og sed", ex);
             if (rinaId != null) {
                 caseRelationService.deleteByRinaId(rinaId);
@@ -75,6 +96,20 @@ public class EuxService {
             throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
         }
         return rinaId;
+    }
+
+    private Map<String, String> opprettOgLagreBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
+            throws NotFoundException, IntegrationException {
+
+        Map<String, String> map = euxConsumer.opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
+        String rinaId = map.get(CASE_ID);
+        String documentId = map.get(DOCUMENT_ID);
+        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaId, documentId);
+
+        caseRelationService.save(gsakSaksnummer, rinaId);
+        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaId);
+
+        return map;
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
@@ -91,7 +126,22 @@ public class EuxService {
     }
 
     /**
+     * Oppretter en SED på en BUC
+     *
+     * @param sed            SED som skal opprettes
+     * @param rinaSaksnummer id til BUC som sed skal opprettes på
+     * @return id til SED som ble opprettet
+     */
+    public String opprettSed(SED sed, String rinaSaksnummer) throws IntegrationException {
+        String sedId = euxConsumer.opprettSed(rinaSaksnummer, null, sed);
+        log.info("SED {} opprettet i sak {}", sed.getSed(), rinaSaksnummer);
+
+        return sedId;
+    }
+
+    /**
      * Henter mottaker (Counter Party) for en rina-sak
+     *
      * @param rinaSaksnummer id for rina-saken
      * @return ParticipantInfo - inneholder id og navn for mottaker
      */
@@ -101,6 +151,7 @@ public class EuxService {
 
     /**
      * Henter utsender (Case Owner) for en rina-sak
+     *
      * @param rinaSaksnummer id for rina-saken
      * @return ParticipantInfo - inneholder id og navn for utsender
      */
@@ -151,11 +202,19 @@ public class EuxService {
     }
 
     public String hentRinaUrl(String rinaCaseId, String sedId) {
-        return "https://" + rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId +
-                "?openMode=Update&docId=" + sedId;
+
+        if (StringUtils.isEmpty(rinaCaseId)) {
+            return "";
+        }
+
+        if (StringUtils.isEmpty(sedId)) {
+            return hentRinaUrl(rinaCaseId);
+        }
+
+        return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId + "?openMode=Update&docId=" + sedId;
     }
 
-    public String hentRinaUrl(String rinaCaseId) {
-        return "https://" + rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
+    private String hentRinaUrl(String rinaCaseId) {
+        return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
     }
 }

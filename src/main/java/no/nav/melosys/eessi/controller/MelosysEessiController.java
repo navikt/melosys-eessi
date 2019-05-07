@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.service.sed.SendSedService;
+import no.nav.melosys.eessi.service.sed.SedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,10 +16,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/sed")
 public class MelosysEessiController {
 
-    private final SendSedService sendSedService;
+    private final SedService sendSedService;
 
     @Autowired
-    public MelosysEessiController(SendSedService sendSedService) {
+    public MelosysEessiController(SedService sendSedService) {
         this.sendSedService = sendSedService;
     }
 
@@ -39,15 +39,15 @@ public class MelosysEessiController {
 
     }
 
-    @PostMapping("/createAndSendA008")
-    public Map<String, String> createAndSendA008(@RequestBody SedDataDto sedDataDto,
-                                                 @PathVariable(required = false) String rinaSakId) throws MappingException, NotFoundException, IntegrationException {
-        log.info("/api/sed/createAndSendA008: Oppretter og sender sed A008");
+    @PostMapping("/createA008")
+    public Map<String, String> createA008(@RequestBody SedDataDto sedDataDto,
+                                          @RequestParam(required = false) String rinaSakId) throws MappingException, NotFoundException, IntegrationException {
+        log.info("/api/sed/createA008: Oppretter og sender sed A008");
 
         try {
-            return sendSedService.createAndSendA008(sedDataDto, rinaSakId);
+            return sendSedService.createA008(sedDataDto, rinaSakId);
         } catch (Exception e) {
-            log.error("Error in /sed/createAndSendA008", e);
+            log.error("Error in /sed/createA008", e);
             throw e;
         }
     }
