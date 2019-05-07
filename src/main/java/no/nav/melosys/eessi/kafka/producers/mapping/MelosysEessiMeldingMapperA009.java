@@ -28,7 +28,7 @@ class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper {
     }
 
     @Override
-    no.nav.melosys.eessi.avro.Periode mapPeriode(SED sed) {
+    no.nav.melosys.eessi.kafka.producers.Periode mapPeriode(SED sed) {
 
         String fom;
         String tom;
@@ -45,7 +45,7 @@ class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper {
             tom = fastperiode.getSluttdato();
         }
 
-        return new no.nav.melosys.eessi.avro.Periode(fom, tom);
+        return new no.nav.melosys.eessi.kafka.producers.Periode(fom, tom);
     }
 
     private MedlemskapA009 hentMedlemskap(SED sed) {

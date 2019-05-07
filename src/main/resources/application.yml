@@ -17,7 +17,6 @@ spring:
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
-      schema.registry.url: ${KAFKA_SCHEMA_REGISTRY_URL}
       security.protocol: SASL_SSL
       sasl.mechanism: PLAIN
       sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${melosys.systemuser.username}" password="${melosys.systemuser.password}";
