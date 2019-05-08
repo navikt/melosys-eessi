@@ -35,6 +35,7 @@ melosys:
     aktoer-url: ${AKTOER_URL}
     person-url: ${PERSON_URL}
     personsok-url: ${PERSONSOK_URL}
+    rina-host-url: ${RINA_HOST_URL}
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}
       typeinfo-url: ${DOKKATTYPEINFO_URL}
