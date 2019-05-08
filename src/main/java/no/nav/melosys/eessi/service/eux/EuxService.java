@@ -76,7 +76,7 @@ public class EuxService {
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
         List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
 
-        return institusjoner.stream().map(i -> i.getId().split(":")[1]).findFirst()
+        return institusjoner.stream().map(Institusjon::getId).findFirst()
                 .orElseThrow(() -> new NotFoundException("Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
