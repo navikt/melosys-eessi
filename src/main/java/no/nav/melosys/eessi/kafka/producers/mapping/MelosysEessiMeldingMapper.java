@@ -2,10 +2,10 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import no.nav.melosys.eessi.avro.MelosysEessiMelding;
-import no.nav.melosys.eessi.avro.Periode;
-import no.nav.melosys.eessi.avro.Statsborgerskap;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
+import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.kafka.producers.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
@@ -33,11 +33,11 @@ public abstract class MelosysEessiMeldingMapper {
         return melosysEessiMelding;
     }
 
-    private List<Statsborgerskap> mapStatsborgerskap(List<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskap) {
-        return statsborgerskap.stream().map(s -> {
-            Statsborgerskap avroStatsborgerskap = new Statsborgerskap();
-            avroStatsborgerskap.setLandkode(s.getLand());
-            return avroStatsborgerskap;
+    private List<Statsborgerskap> mapStatsborgerskap(List<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {
+        return statsborgerskapListe.stream().map(s -> {
+            Statsborgerskap statsborgerskap = new Statsborgerskap();
+            statsborgerskap.setLandkode(s.getLand());
+            return statsborgerskap;
         }).collect(Collectors.toList());
     }
 

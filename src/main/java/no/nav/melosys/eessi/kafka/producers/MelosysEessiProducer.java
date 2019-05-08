@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.avro.MelosysEessiMelding;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,8 @@ public class MelosysEessiProducer {
 
             @Override
             public void onSuccess(SendResult<String, MelosysEessiMelding> res) {
-                log.info("Melding sendt på topic {}: {}", TOPIC_NAME, res.getProducerRecord().value());
+                log.info("Melding sendt på topic {}. Record.key: {}, record: {}",
+                        TOPIC_NAME, res.getProducerRecord().key(), res.getProducerRecord().value());
             }
         });
     }
