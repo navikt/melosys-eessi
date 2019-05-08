@@ -67,26 +67,22 @@ public class EuxService {
     public String opprettOgSendBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
             throws IntegrationException, NotFoundException {
 
-        String rinaId = null;
-        String documentId;
-
+        BucAndSed bucAndSed = null;
         try {
-            BucAndSed bucAndSed = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-            rinaId = bucAndSed.getBucId();
-            documentId = bucAndSed.getSedId();
+            bucAndSed = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
 
-            euxConsumer.sendSed(rinaId, "!23", documentId);
-            log.info("Sed {} sendt", documentId);
+            euxConsumer.sendSed(bucAndSed.getBucId(), "!23", bucAndSed.getSedId());
+            log.info("Sed {} sendt", bucAndSed.getSedId());
 
         } catch (IntegrationException | NotFoundException ex) {
             log.error("Feil ved oppretting og sending av buc og sed", ex);
-            if (rinaId != null) {
-                caseRelationService.deleteByRinaId(rinaId);
-                slettBuC(rinaId);
+            if (bucAndSed != null && bucAndSed.getBucId() != null) {
+                caseRelationService.deleteByRinaId(bucAndSed.getBucId());
+                slettBuC(bucAndSed.getBucId());
             }
             throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
         }
-        return rinaId;
+        return bucAndSed.getBucId();
     }
 
     private BucAndSed opprettOgLagreBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
@@ -197,7 +193,7 @@ public class EuxService {
     public String hentRinaUrl(String rinaCaseId, String sedId) {
 
         if (StringUtils.isEmpty(rinaCaseId)) {
-            return "";
+            throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
 
         if (StringUtils.isEmpty(sedId)) {

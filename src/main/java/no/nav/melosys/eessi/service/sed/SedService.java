@@ -90,12 +90,7 @@ public class SedService {
     }
 
     private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
-        Long gsakSaksnummer = sedDataDto.getGsakSaksnummer();
-        if (gsakSaksnummer == null) {
-            log.error("sakId er null, kan ikke opprette buc og sed");
-            throw new MappingException("GsakId er påkrevd!");
-        }
-        return gsakSaksnummer;
+        return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
     }
 
     private String getMottakerLand(SedDataDto sedDataDto) throws NotFoundException {

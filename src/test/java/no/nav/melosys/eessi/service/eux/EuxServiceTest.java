@@ -239,12 +239,9 @@ public class EuxServiceTest {
         assertThat(resultUrl).isEqualTo(expectedUrl);
     }
 
-    @Test
-    public void hentRinaUrl_withNoRinaCaseId_expectEmptyString() {
-        String expectedUrl = "";
-        String resultUrl = euxService.hentRinaUrl(null, "998877");
-
-        assertThat(resultUrl).isEqualTo(expectedUrl);
+    @Test(expected = IllegalArgumentException.class)
+    public void hentRinaUrl_withNoRinaCaseId_expectException() {
+        euxService.hentRinaUrl(null, "998877");
     }
 
     @Test

@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.controller;
 
-import java.util.Arrays;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
@@ -46,27 +45,19 @@ public class MelosysEessiController {
 
     @PostMapping("/create/{bucType}/{sedType}")
     public CreateSedDto create(@RequestBody SedDataDto sedDataDto,
-                               @PathVariable String bucType,
-                               @PathVariable String sedType)
+                               @PathVariable BucType bucType,
+                               @PathVariable SedType sedType)
             throws MappingException, IntegrationException, NotFoundException, ValidationException {
         log.info("/api/sed/create/{}/{}: Oppretter sed", bucType, sedType);
 
         try {
-            if (!validBucType(bucType) || !validSedType(sedType)) {
+            if (bucType == null || sedType == null) {
                 throw new ValidationException("Kan ikke opprette sed med bucType " + bucType + " og sedType " + sedType);
             }
-            return sedService.createSed(sedDataDto, BucType.valueOf(bucType), SedType.valueOf(sedType));
+            return sedService.createSed(sedDataDto, bucType, sedType);
         } catch (MappingException | NotFoundException | IntegrationException | ValidationException e) {
             log.error("Error in /sed/createAndSend", e);
             throw e;
         }
-    }
-
-    private static boolean validSedType(String sedType) {
-        return Arrays.stream(SedType.values()).map(SedType::name).anyMatch(type -> type.equals(sedType));
-    }
-
-    private static boolean validBucType(String bucType) {
-        return Arrays.stream(BucType.values()).map(BucType::name).anyMatch(type -> type.equals(bucType));
     }
 }
