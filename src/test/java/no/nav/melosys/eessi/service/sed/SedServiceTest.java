@@ -1,11 +1,12 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.util.Map;
 import java.util.Optional;
+import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.CaseRelation;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.BucType;
+import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import org.junit.Before;
@@ -45,6 +46,8 @@ public class SedServiceTest {
         when(euxService.opprettSed(any(), anyString())).thenReturn(SED_ID);
 
         when(euxService.hentRinaUrl(anyString(), any())).thenReturn("URL");
+
+        when(euxService.sedKanOpprettesPaaBuc(anyString(), any())).thenReturn(true);
     }
 
     @Test
@@ -58,48 +61,36 @@ public class SedServiceTest {
     public void createAndSend_withNoGsakSaksnummer_expectMappingException() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.setGsakSaksnummer(null);
-        String rinaId = sendSedService.createAndSend(sedData);
+        sendSedService.createAndSend(sedData);
     }
 
     @Test
-    public void createA008_withRinaId_expectRinaIdAndUrl() throws Exception {
+    public void createSed_withNoExistingBuc_expectCreateNewBucAndSed() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        Map<String, String> map = sendSedService.createA008(sedData, RINA_ID);
+        CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03, SedType.A008);
 
-        verify(euxService).opprettSed(any(), eq(RINA_ID));
-        verify(euxService).hentRinaUrl(eq(RINA_ID), eq(SED_ID));
-        assertThat(map.get("rinaCaseId")).isEqualTo(RINA_ID);
-        assertThat(map.get("rinaUrl")).isEqualTo("URL");
+        verify(euxService).opprettBucOgSed(anyLong(), anyString(), anyString(), any());
+        verify(euxService).hentRinaUrl(eq(RINA_ID), eq(null));
+        assertThat(response.getBucId()).isEqualTo(RINA_ID);
+        assertThat(response.getRinaUrl()).isEqualTo("URL");
+        assertThat(response.getSedId()).isNull();
     }
 
     @Test
-    public void createA008_withNoRinaId_expectRinaIdAndUrl() throws Exception {
+    public void createSed_withExistingBuc_expectCreateNewSed() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         CaseRelation caseRelation = new CaseRelation();
         caseRelation.setGsakSaksnummer(123L);
         caseRelation.setRinaId(RINA_ID);
         when(caseRelationService.findByGsakSaksnummer(anyLong())).thenReturn(Optional.of(caseRelation));
 
-        Map<String, String> map = sendSedService.createA008(sedData, null);
+        CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03, SedType.A008);
 
         verify(caseRelationService).findByGsakSaksnummer(eq(123L));
         verify(euxService).opprettSed(any(), eq(RINA_ID));
         verify(euxService).hentRinaUrl(eq(RINA_ID), eq(SED_ID));
-        assertThat(map.get("rinaCaseId")).isEqualTo(RINA_ID);
-        assertThat(map.get("rinaUrl")).isEqualTo("URL");
-    }
-
-    @Test
-    public void createA008_withNoRinaId_expectCreateNewBucAndSed() throws Exception {
-        SedDataDto sedData = SedDataStub.getStub();
-        when(caseRelationService.findByGsakSaksnummer(anyLong())).thenReturn(Optional.empty());
-
-        Map<String, String> map = sendSedService.createA008(sedData, null);
-
-        verify(caseRelationService).findByGsakSaksnummer(eq(123L));
-        verify(euxService).opprettBucOgSed(eq(123L), eq(BucType.LA_BUC_03.name()), any(), any());
-        verify(euxService).hentRinaUrl(eq(RINA_ID), eq(null));
-        assertThat(map.get("rinaCaseId")).isEqualTo(RINA_ID);
-        assertThat(map.get("rinaUrl")).isEqualTo("URL");
+        assertThat(response.getBucId()).isEqualTo(RINA_ID);
+        assertThat(response.getRinaUrl()).isEqualTo("URL");
+        assertThat(response.getSedId()).isEqualTo(SED_ID);
     }
 }

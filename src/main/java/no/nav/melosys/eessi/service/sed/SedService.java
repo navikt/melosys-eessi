@@ -1,9 +1,8 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.util.Map;
 import java.util.Optional;
-import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.CaseRelation;
@@ -16,11 +15,9 @@ import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
-import no.nav.melosys.eessi.service.sed.mapper.A008Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -53,40 +50,43 @@ public class SedService {
     }
 
     /**
-     * Oppretter en Sed A008 og returnerer rinaSakId og link til sak i rina.
-     * Sed-en blir opprettet på en eksisterende Buc dersom den er oppgitt eller dersom
-     * den finnes i CaseRelationRepository.
+     * Oppretter en Sed.
+     * Sed-en blir opprettet på en eksisterende Buc dersom den finnes i CaseRelationRepository,
+     * hvis ikke blir det opprettet en ny Buc av type bucType.
      *
-     * @param sedDataDto data for sed
-     * @param rinaCaseId oppretter A008 på denne Buc-en, dersom den er oppgitt
-     * @return map med rinaSakId og url til SED i Rina
+     * @param sedDataDto sed som skal opprettes
+     * @param bucType    hvilken type buc som skal opprettes (dersom det ikke er en eksisterende buc på saken)
+     * @param sedType    hvilken type sed som skal opprettes
+     * @return Dto-objekt som inneholder bucId, sedId og link til sak i rina
      */
-    public Map<String, String> createA008(SedDataDto sedDataDto, String rinaCaseId) throws MappingException, NotFoundException, IntegrationException {
+    public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType, SedType sedType)
+            throws MappingException, NotFoundException, IntegrationException {
 
         String sedId = null;
+        String rinaSaksnummer;
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
-        LovvalgSedMapper sedMapper = new A008Mapper();
+        LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        if (!StringUtils.isEmpty(rinaCaseId)) {
-            log.info("Oppretter sed på eksisterende buc {}, gsakSaksnummer: {}", rinaCaseId, gsakSaksnummer);
-            sedId = euxService.opprettSed(sed, rinaCaseId);
-        } else {
-            Optional<CaseRelation> caseRelation = caseRelationService.findByGsakSaksnummer(gsakSaksnummer);
-            if (caseRelation.isPresent()) { // Finnes allerede en buc på sak
-                rinaCaseId = caseRelation.get().getRinaId();
-                log.info("Oppretter sed på eksisterende buc {}, gsakSaksnummer: {}", rinaCaseId, gsakSaksnummer);
-                sedId = euxService.opprettSed(sed, rinaCaseId);
-            } else { // Oppretter ny buc og sed
-                log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-                rinaCaseId = euxService.opprettBucOgSed(gsakSaksnummer, BucType.LA_BUC_03.name(), getMottakerLand(sedDataDto), sed);
+        Optional<CaseRelation> caseRelation = caseRelationService.findByGsakSaksnummer(gsakSaksnummer);
+        if (caseRelation.isPresent()) { // Finnes allerede en buc på sak
+            rinaSaksnummer = caseRelation.get().getRinaId();
+            if (euxService.sedKanOpprettesPaaBuc(rinaSaksnummer, sedType)) {
+                log.info("Oppretter sed på eksisterende buc {}, gsakSaksnummer: {}", rinaSaksnummer, gsakSaksnummer);
+                sedId = euxService.opprettSed(sed, rinaSaksnummer);
+            } else {
+                throw new IntegrationException("Kunne ikke opprette SED av type " + sedType + " på BUC " + rinaSaksnummer);
             }
+        } else { // Oppretter ny buc og sed
+            log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
+            rinaSaksnummer = euxService.opprettBucOgSed(gsakSaksnummer, bucType.name(), getMottakerLand(sedDataDto), sed);
         }
 
-        Map<String, String> result = Maps.newHashMap();
-        result.put("rinaCaseId", rinaCaseId);
-        result.put("rinaUrl", euxService.hentRinaUrl(rinaCaseId, sedId));
-        return result;
+        return CreateSedDto.builder()
+                .bucId(rinaSaksnummer)
+                .sedId(sedId)
+                .rinaUrl(euxService.hentRinaUrl(rinaSaksnummer, sedId))
+                .build();
     }
 
     private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {

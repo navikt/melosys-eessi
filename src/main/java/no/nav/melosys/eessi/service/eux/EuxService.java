@@ -3,6 +3,8 @@ package no.nav.melosys.eessi.service.eux;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
@@ -11,6 +13,7 @@ import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +24,6 @@ import org.springframework.util.StringUtils;
 @Slf4j
 @Service
 public class EuxService {
-
-    private static final String CASE_ID = "caseId";
-    private static final String DOCUMENT_ID = "documentId";
 
     private final EuxConsumer euxConsumer;
     private final CaseRelationService caseRelationService;
@@ -42,21 +42,12 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    /**
-     * Oppretter buc og sed i EUX, og lagrer relasjon mellom gsakSaksnummer og rinaCaseId
-     *
-     * @param gsakSaksnummer gsakSak knyttet til SED
-     * @param bucType        Hvilken type buc som skal opprettes
-     * @param mottakerLand   Land som skal motta SED
-     * @param sed            SED som skal opprettes
-     * @return rinaCaseId - id for rina-saken
-     */
     public String opprettBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
             throws IntegrationException, NotFoundException {
 
         try {
-            Map<String, String> map = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-            return map.get(CASE_ID);
+            BucAndSed bucAndSed = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+            return bucAndSed.getBucId();
         } catch (IntegrationException | NotFoundException ex) {
             log.error("Feil ved oppretting av buc og sed", ex);
             throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
@@ -80,9 +71,9 @@ public class EuxService {
         String documentId;
 
         try {
-            Map<String, String> map = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-            rinaId = map.get(CASE_ID);
-            documentId = map.get(DOCUMENT_ID);
+            BucAndSed bucAndSed = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+            rinaId = bucAndSed.getBucId();
+            documentId = bucAndSed.getSedId();
 
             euxConsumer.sendSed(rinaId, "!23", documentId);
             log.info("Sed {} sendt", documentId);
@@ -98,18 +89,17 @@ public class EuxService {
         return rinaId;
     }
 
-    private Map<String, String> opprettOgLagreBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
+    private BucAndSed opprettOgLagreBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
             throws NotFoundException, IntegrationException {
 
-        Map<String, String> map = euxConsumer.opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
-        String rinaId = map.get(CASE_ID);
-        String documentId = map.get(DOCUMENT_ID);
-        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaId, documentId);
+        Map<String, String> response = euxConsumer.opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
+        BucAndSed bucAndSed = new BucAndSed(response.get("caseId"), response.get("documentId"));
+        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", bucAndSed.getBucId(), bucAndSed.getSedId());
 
-        caseRelationService.save(gsakSaksnummer, rinaId);
-        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, rinaId);
+        caseRelationService.save(gsakSaksnummer, bucAndSed.getBucId());
+        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, bucAndSed.getBucId());
 
-        return map;
+        return bucAndSed;
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
@@ -125,13 +115,6 @@ public class EuxService {
         log.info("SED {} sendt i sak {}", sed.getSed(), rinaSaksnummer);
     }
 
-    /**
-     * Oppretter en SED på en BUC
-     *
-     * @param sed            SED som skal opprettes
-     * @param rinaSaksnummer id til BUC som sed skal opprettes på
-     * @return id til SED som ble opprettet
-     */
     public String opprettSed(SED sed, String rinaSaksnummer) throws IntegrationException {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, null, sed);
         log.info("SED {} opprettet i sak {}", sed.getSed(), rinaSaksnummer);
@@ -176,6 +159,16 @@ public class EuxService {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
     }
 
+    public boolean sedKanOpprettesPaaBuc(String rinaSaksnummer, SedType sedType) {
+        try {
+            return euxConsumer.hentTilgjengeligeSedTyper(rinaSaksnummer).stream()
+                    .anyMatch(type -> type.equalsIgnoreCase(sedType.name()));
+        } catch (IntegrationException e) {
+            log.error("Kunne ikke hente tilgjengelige sed-typer for buc {}", rinaSaksnummer, e);
+            return false;
+        }
+    }
+
     private static ParticipantInfo extractReceiverInformation(JsonNode participants) {
         return extractParticipantInformation(participants, "CounterParty");
     }
@@ -216,5 +209,12 @@ public class EuxService {
 
     private String hentRinaUrl(String rinaCaseId) {
         return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
+    }
+
+    @Data
+    @AllArgsConstructor
+    private static class BucAndSed {
+        private String bucId;
+        private String sedId;
     }
 }

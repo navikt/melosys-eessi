@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import avro.shaded.com.google.common.collect.ImmutableMap;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -13,6 +14,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.junit.Before;
@@ -243,5 +245,23 @@ public class EuxServiceTest {
         String resultUrl = euxService.hentRinaUrl(null, "998877");
 
         assertThat(resultUrl).isEqualTo(expectedUrl);
+    }
+
+    @Test
+    public void sedKanOpprettesPaaBuc_withRinaCaseId_expectTrue() throws IntegrationException {
+        when(euxConsumer.hentTilgjengeligeSedTyper(anyString())).thenReturn(Arrays.asList("X001", "H001", "A008"));
+        boolean result = euxService.sedKanOpprettesPaaBuc("123123123", SedType.A008);
+
+        verify(euxConsumer).hentTilgjengeligeSedTyper(anyString());
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void sedKanOpprettesPaaBuc_withRinaCaseId_expectFalse() throws IntegrationException {
+        when(euxConsumer.hentTilgjengeligeSedTyper(anyString())).thenReturn(Arrays.asList("X001", "H001", "A001"));
+        boolean result = euxService.sedKanOpprettesPaaBuc("123123123", SedType.A008);
+
+        verify(euxConsumer).hentTilgjengeligeSedTyper(anyString());
+        assertThat(result).isFalse();
     }
 }
