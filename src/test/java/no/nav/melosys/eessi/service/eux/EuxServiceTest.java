@@ -127,7 +127,7 @@ public class EuxServiceTest {
         euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
 
         verify(euxConsumer).slettBuC(anyString());
-        verify(saksrelasjonService).slettRinaId(anyString());
+        verify(saksrelasjonService).slettVedRinaId(anyString());
     }
 
     @Test

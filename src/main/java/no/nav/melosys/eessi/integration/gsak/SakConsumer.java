@@ -39,7 +39,7 @@ public class SakConsumer implements RestConsumer, UUIDGenerator {
         sakDto.setTema(TEMA_MEDLEM);
 
         HttpHeaders headers = headers();
-        log.info("createSak: correlationId: {}", headers.get(X_CORRELATION_ID));
+        log.info("opprettSak: correlationId: {}", headers.get(X_CORRELATION_ID));
 
         return exchange("/", HttpMethod.POST, new HttpEntity<>(sakDto, headers), Sak.class);
     }

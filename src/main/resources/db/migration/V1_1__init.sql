@@ -1,16 +1,8 @@
-CREATE TABLE FAGSAK_KOBLING
+CREATE TABLE FAGSAK_RINASAK_KOBLING
 (
-    id      SERIAL PRIMARY KEY,
-    gsak_saksnummer INTEGER NOT NULL
+    rina_saksnummer VARCHAR(20) PRIMARY KEY,
+    gsak_saksnummer INTEGER NOT NULL,
+    buc_type        VARCHAR(10) NOT NULL
 );
 
-CREATE TABLE RINASAK_KOBLING
-(
-    id        SERIAL PRIMARY KEY,
-    rina_id   VARCHAR NOT NULL,
-    buc_type  VARCHAR NOT NULL,
-    fagsak_id INTEGER REFERENCES FAGSAK_KOBLING (id)
-);
-
-CREATE UNIQUE INDEX rina_sakid_idx ON RINASAK_KOBLING (rina_id);
-CREATE UNIQUE INDEX gsak_id_idx ON FAGSAK_KOBLING (gsak_saksnummer);
+CREATE INDEX gsak_saksnummer_idx ON FAGSAK_RINASAK_KOBLING(gsak_saksnummer);

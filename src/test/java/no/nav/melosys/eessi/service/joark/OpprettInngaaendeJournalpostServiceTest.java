@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsume
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.RinasakKobling;
+import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
@@ -62,9 +62,9 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(dokmotInngaaendeConsumer.create(any()))
                 .thenReturn(response);
 
-        RinasakKobling caseRelation = enhancedRandom.nextObject(RinasakKobling.class);
+        FagsakRinasakKobling fagsakRinasakKobling = enhancedRandom.nextObject(FagsakRinasakKobling.class);
         when(saksrelasjonService.finnVedRinaId(anyString()))
-                .thenReturn(Optional.ofNullable(caseRelation));
+                .thenReturn(Optional.ofNullable(fagsakRinasakKobling));
 
         DokkatSedInfo dokkatSedInfo = enhancedRandom.nextObject(DokkatSedInfo.class);
         when(dokkatService.hentMetadataFraDokkat(anyString()))
@@ -75,7 +75,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(gsakService.getSak(anyLong()))
                 .thenReturn(sak);
 
-        when(gsakService.createSak(anyString()))
+        when(gsakService.opprettSak(anyString()))
                 .thenReturn(sak);
 
         ParticipantInfo sender = ParticipantInfo.builder()
@@ -97,7 +97,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         verify(saksrelasjonService, times(1)).finnVedRinaId(anyString());
         verify(dokkatService, times(1)).hentMetadataFraDokkat(anyString());
         verify(gsakService, times(1)).getSak(anyLong());
-        verify(gsakService, times(0)).createSak(any());
+        verify(gsakService, times(0)).opprettSak(any());
         verify(euxService, times(1)).hentUtsender(anyString());
     }
 
@@ -112,7 +112,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getJournalpostId(), is("11223344"));
 
         verify(gsakService, times(0)).getSak(anyLong());
-        verify(gsakService, times(1)).createSak(any());
+        verify(gsakService, times(1)).opprettSak(any());
     }
 
     @Test(expected = IntegrationException.class)
@@ -120,7 +120,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(saksrelasjonService.finnVedRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
-        when(gsakService.createSak(any()))
+        when(gsakService.opprettSak(any()))
                 .thenReturn(null);
 
         opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");

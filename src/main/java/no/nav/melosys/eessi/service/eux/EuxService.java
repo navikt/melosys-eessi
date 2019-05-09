@@ -79,7 +79,7 @@ public class EuxService {
         } catch (IntegrationException | NotFoundException ex) {
             log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
             if (bucAndSed != null && bucAndSed.getBucId() != null) {
-                saksrelasjonService.slettRinaId(bucAndSed.getBucId());
+                saksrelasjonService.slettVedRinaId(bucAndSed.getBucId());
                 slettBuC(bucAndSed.getBucId());
             }
             throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
