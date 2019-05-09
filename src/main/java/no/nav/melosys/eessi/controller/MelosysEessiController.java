@@ -5,12 +5,12 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
-import no.nav.melosys.eessi.models.sed.BucType;
-import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.sed.SedService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +46,7 @@ public class MelosysEessiController {
     @PostMapping("/create/{bucType}/{sedType}")
     public CreateSedDto create(@RequestBody SedDataDto sedDataDto,
                                @PathVariable BucType bucType,
-                               @PathVariable SedType sedType)
+                               @PathVariable(required = false) SedType sedType)
             throws MappingException, IntegrationException, NotFoundException, ValidationException {
         log.info("/api/sed/create/{}/{}: Oppretter sed", bucType, sedType);
 
