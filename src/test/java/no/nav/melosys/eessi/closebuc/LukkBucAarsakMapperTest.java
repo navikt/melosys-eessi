@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.closebuc;
 
 import java.util.Collections;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.sed.BucType;
-import no.nav.melosys.eessi.models.sed.SedType;
 import org.junit.Before;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;

@@ -23,6 +23,9 @@ spring:
       reconnect.backoff.ms: 1000
 
 melosys:
+  kafka:
+    consumer:
+      groupid: ${kafka.groupid:melosys-eessi-sedHendelser}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}

@@ -7,9 +7,10 @@ import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.CaseRelation;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.RinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -33,7 +34,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
     private DokmotInngaaendeConsumer dokmotInngaaendeConsumer;
 
     @Mock
-    private CaseRelationService caseRelationService;
+    private SaksrelasjonService saksrelasjonService;
 
     @Mock
     private DokkatService dokkatService;
@@ -54,14 +55,15 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
+        sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
         MottaInngaaendeForsendelseResponse response = enhancedRandom.nextObject(MottaInngaaendeForsendelseResponse.class);
         response.setJournalpostId("11223344");
         when(dokmotInngaaendeConsumer.create(any()))
                 .thenReturn(response);
 
-        CaseRelation caseRelation = enhancedRandom.nextObject(CaseRelation.class);
-        when(caseRelationService.findByRinaId(anyString()))
+        RinasakKobling caseRelation = enhancedRandom.nextObject(RinasakKobling.class);
+        when(saksrelasjonService.finnVedRinaId(anyString()))
                 .thenReturn(Optional.ofNullable(caseRelation));
 
         DokkatSedInfo dokkatSedInfo = enhancedRandom.nextObject(DokkatSedInfo.class);
@@ -92,7 +94,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getJournalpostId(), is("11223344"));
 
         verify(dokmotInngaaendeConsumer, times(1)).create(any());
-        verify(caseRelationService, times(1)).findByRinaId(anyString());
+        verify(saksrelasjonService, times(1)).finnVedRinaId(anyString());
         verify(dokkatService, times(1)).hentMetadataFraDokkat(anyString());
         verify(gsakService, times(1)).getSak(anyLong());
         verify(gsakService, times(0)).createSak(any());
@@ -101,7 +103,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSed_expectCreateSak() throws Exception {
-        when(caseRelationService.findByRinaId(anyString()))
+        when(saksrelasjonService.finnVedRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
         SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
@@ -115,7 +117,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test(expected = IntegrationException.class)
     public void arkiverInngaaendeSed_expectIntegrationException() throws Exception {
-        when(caseRelationService.findByRinaId(anyString()))
+        when(saksrelasjonService.finnVedRinaId(anyString()))
                 .thenReturn(Optional.empty());
 
         when(gsakService.createSak(any()))

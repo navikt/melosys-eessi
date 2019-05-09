@@ -7,9 +7,11 @@ import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendels
 import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.CaseRelation;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.FagsakKobling;
+import no.nav.melosys.eessi.models.RinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -23,19 +25,20 @@ import static no.nav.melosys.eessi.service.joark.InngaaendeForsendelseMapper.cre
 public class OpprettInngaaendeJournalpostService {
 
     private final DokmotInngaaendeConsumer dokmotInngaaendeConsumer;
-    private final CaseRelationService caseRelationService;
+    private final SaksrelasjonService saksrelasjonService;
     private final DokkatService dokkatService;
     private final GsakService gsakService;
     private final EuxService euxService;
 
     @Autowired
-    public OpprettInngaaendeJournalpostService(DokmotInngaaendeConsumer dokmotInngaaendeConsumer,
-                                               CaseRelationService caseRelationService,
-                                               DokkatService dokkatService,
-                                               GsakService gsakService,
-                                               EuxService euxService) {
+    public OpprettInngaaendeJournalpostService(
+            DokmotInngaaendeConsumer dokmotInngaaendeConsumer,
+            SaksrelasjonService saksrelasjonService,
+            DokkatService dokkatService,
+            GsakService gsakService,
+            EuxService euxService) {
         this.dokmotInngaaendeConsumer = dokmotInngaaendeConsumer;
-        this.caseRelationService = caseRelationService;
+        this.saksrelasjonService = saksrelasjonService;
         this.dokkatService = dokkatService;
         this.gsakService = gsakService;
         this.euxService = euxService;
@@ -43,7 +46,7 @@ public class OpprettInngaaendeJournalpostService {
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId) throws IntegrationException {
 
-        Sak sak = getOrCreateSak(sedMottatt.getRinaSakId(), aktoerId);
+        Sak sak = getOrCreateSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedMottatt.getSedType());
         ParticipantInfo sender = euxService.hentUtsender(sedMottatt.getRinaSakId());
 
@@ -60,27 +63,28 @@ public class OpprettInngaaendeJournalpostService {
                 .build();
     }
 
-    private Sak getOrCreateSak(String rinaId, String aktoerId) throws IntegrationException {
-        Optional<Long> gsakId = caseRelationService.findByRinaId(rinaId)
-                .map(CaseRelation::getGsakSaksnummer);
+    private Sak getOrCreateSak(String rinaId, String aktoerId, BucType bucType) throws IntegrationException {
+        Optional<Long> gsakId = saksrelasjonService.finnVedRinaId(rinaId)
+                .map(RinasakKobling::getFagsakKobling)
+                .map(FagsakKobling::getGsakSaksnummer);
 
         if (gsakId.isPresent()) {
             log.info("Henter gsak med id: {}", gsakId.get());
             return gsakService.getSak(gsakId.get());
         } else {
             log.info("Oppretter ny sak i gsak for rinaSak {}", rinaId);
-            return createSak(rinaId, aktoerId);
+            return createSak(rinaId, aktoerId, bucType);
         }
     }
 
-    private Sak createSak(String rinaId, String aktoerId) throws IntegrationException {
+    private Sak createSak(String rinaId, String aktoerId, BucType bucType) throws IntegrationException {
         Sak sak = gsakService.createSak(aktoerId);
 
         if (sak == null) {
             throw new IntegrationException("Sak ble ikke opprettet");
         }
 
-        caseRelationService.save(Long.parseLong(sak.getId()), rinaId);
+        saksrelasjonService.lagreKobling(Long.parseLong(sak.getId()), rinaId, bucType);
         log.info("Sak i gsak med id {} ble opprettet for rinaSak {}", sak.getId(), rinaId);
         return sak;
     }

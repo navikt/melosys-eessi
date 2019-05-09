@@ -5,6 +5,7 @@ import java.util.Map;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,11 +24,17 @@ public class KafkaConsumerConfig {
 
     private static final String LEGISLATION_APPLICABLE_CODE = "LA";
 
+    private final String groupId;
+
+    public KafkaConsumerConfig(@Value("${melosys.kafka.consumer.groupid}") String groupId) {
+        this.groupId = groupId;
+    }
+
     @Bean
     public Map<String, Object> sedEventConsumerConfig() {
         Map<String, Object> props = new HashMap<>();
         //Without this, the consumer will receive GenericData records.
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, "melosys-eessi-sedHendelser");
+        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "latest");
         props.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 100);

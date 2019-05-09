@@ -1,12 +1,32 @@
 package no.nav.melosys.eessi.service.sed;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.models.sed.BucType;
-import no.nav.melosys.eessi.models.sed.SedType;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 
 class SedUtils {
 
     private SedUtils() {}
+
+    //Henter første lovlige SED på en ny BUC
+    static SedType hentFoersteLovligeSedPaaBuc(BucType bucType) {
+        switch (bucType) {
+
+            case LA_BUC_01:
+                return SedType.A001;
+            case LA_BUC_02:
+                return SedType.A003;
+            case LA_BUC_03:
+                return SedType.A008;
+            case LA_BUC_04:
+                return SedType.A009;
+            case LA_BUC_05:
+                return SedType.A010;
+            case LA_BUC_06:
+                return SedType.A005;
+        }
+        throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + bucType);
+    }
 
     static SedType getSedTypeFromBestemmelse(Bestemmelse bestemmelse) {
 

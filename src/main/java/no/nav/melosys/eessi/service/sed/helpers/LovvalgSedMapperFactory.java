@@ -2,8 +2,8 @@ package no.nav.melosys.eessi.service.sed.helpers;
 
 import java.util.EnumMap;
 import java.util.Map;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.SedType;
 import no.nav.melosys.eessi.service.sed.mapper.A001Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.A008Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.A009Mapper;

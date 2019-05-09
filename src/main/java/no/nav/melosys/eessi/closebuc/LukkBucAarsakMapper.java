@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.closebuc;
 
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.sed.BucType;
-import no.nav.melosys.eessi.models.sed.SedType;
 
 final class LukkBucAarsakMapper {
 

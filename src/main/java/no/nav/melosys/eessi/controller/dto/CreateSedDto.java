@@ -7,6 +7,5 @@ import lombok.Data;
 @Builder
 public class CreateSedDto {
     private String bucId;
-    private String sedId;
     private String rinaUrl;
 }

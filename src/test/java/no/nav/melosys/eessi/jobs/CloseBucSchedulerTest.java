@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.jobs;
 
 import no.nav.melosys.eessi.closebuc.BucCloser;
-import no.nav.melosys.eessi.models.sed.BucType;
+import no.nav.melosys.eessi.models.BucType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

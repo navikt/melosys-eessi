@@ -4,7 +4,7 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.SchedulerLock;
 import no.nav.melosys.eessi.closebuc.BucCloser;
-import no.nav.melosys.eessi.models.sed.BucType;
+import no.nav.melosys.eessi.models.BucType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
