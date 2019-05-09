@@ -27,4 +27,6 @@ public class SedDataDto {
     private List<Lovvalgsperiode> tidligereLovvalgsperioder;
 
     private Long gsakSaksnummer;
+
+    private String mottakerLand;
 }
