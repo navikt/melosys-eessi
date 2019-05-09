@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.service.sed;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.models.sed.BucType;
-import no.nav.melosys.eessi.models.sed.SedType;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 
 class SedUtils {
 

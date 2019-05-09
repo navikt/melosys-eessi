@@ -5,14 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.CaseRelation;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.SedType;
-import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
@@ -25,12 +23,9 @@ public class SedService {
 
     private final EuxService euxService;
 
-    private final CaseRelationService caseRelationService;
-
     @Autowired
-    public SedService(EuxService euxService, CaseRelationService caseRelationService) {
+    public SedService(EuxService euxService) {
         this.euxService = euxService;
-        this.caseRelationService = caseRelationService;
     }
 
     public String createAndSend(SedDataDto sedDataDto) throws MappingException, IntegrationException, NotFoundException {
@@ -50,9 +45,7 @@ public class SedService {
     }
 
     /**
-     * Oppretter en Sed.
-     * Sed-en blir opprettet på en eksisterende Buc dersom den finnes i CaseRelationRepository,
-     * hvis ikke blir det opprettet en ny Buc av type bucType.
+     * Oppretter en SED på en ny BUC.
      *
      * @param sedDataDto sed som skal opprettes
      * @param bucType    hvilken type buc som skal opprettes (dersom det ikke er en eksisterende buc på saken)
@@ -62,30 +55,17 @@ public class SedService {
     public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType, SedType sedType)
             throws MappingException, NotFoundException, IntegrationException {
 
-        String sedId = null;
         String rinaSaksnummer;
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
         LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        Optional<CaseRelation> caseRelation = caseRelationService.findByGsakSaksnummer(gsakSaksnummer);
-        if (caseRelation.isPresent()) { // Finnes allerede en buc på sak
-            rinaSaksnummer = caseRelation.get().getRinaId();
-            if (euxService.sedKanOpprettesPaaBuc(rinaSaksnummer, sedType)) {
-                log.info("Oppretter sed på eksisterende buc {}, gsakSaksnummer: {}", rinaSaksnummer, gsakSaksnummer);
-                sedId = euxService.opprettSed(sed, rinaSaksnummer);
-            } else {
-                throw new IntegrationException("Kunne ikke opprette SED av type " + sedType + " på BUC " + rinaSaksnummer);
-            }
-        } else { // Oppretter ny buc og sed
-            log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-            rinaSaksnummer = euxService.opprettBucOgSed(gsakSaksnummer, bucType.name(), getMottakerLand(sedDataDto), sed);
-        }
+        log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
+        rinaSaksnummer = euxService.opprettBucOgSed(gsakSaksnummer, bucType.name(), getMottakerLand(sedDataDto), sed);
 
         return CreateSedDto.builder()
                 .bucId(rinaSaksnummer)
-                .sedId(sedId)
-                .rinaUrl(euxService.hentRinaUrl(rinaSaksnummer, sedId))
+                .rinaUrl(euxService.hentRinaUrl(rinaSaksnummer))
                 .build();
     }
 

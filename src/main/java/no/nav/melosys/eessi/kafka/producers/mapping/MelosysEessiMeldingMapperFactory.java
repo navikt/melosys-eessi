@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.util.EnumMap;
 import java.util.Map;
-import no.nav.melosys.eessi.models.sed.SedType;
+import no.nav.melosys.eessi.models.SedType;
 
 public class MelosysEessiMeldingMapperFactory {
 

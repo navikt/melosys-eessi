@@ -8,13 +8,14 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.SedType;
-import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,16 +27,17 @@ import org.springframework.util.StringUtils;
 public class EuxService {
 
     private final EuxConsumer euxConsumer;
-    private final CaseRelationService caseRelationService;
+    private final SaksrelasjonService saksrelasjonService;
 
-    @Value("${melosys.integrations.rina-host-url}")
-    private String rinaHostUrl;
+    private final String rinaHostUrl;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      CaseRelationService caseRelationService) {
+            SaksrelasjonService saksrelasjonService,
+            @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
         this.euxConsumer = euxConsumer;
-        this.caseRelationService = caseRelationService;
+        this.saksrelasjonService = saksrelasjonService;
+        this.rinaHostUrl = rinaHostUrl;
     }
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
@@ -75,9 +77,9 @@ public class EuxService {
             log.info("Sed {} sendt", bucAndSed.getSedId());
 
         } catch (IntegrationException | NotFoundException ex) {
-            log.error("Feil ved oppretting og sending av buc og sed", ex);
+            log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
             if (bucAndSed != null && bucAndSed.getBucId() != null) {
-                caseRelationService.deleteByRinaId(bucAndSed.getBucId());
+                saksrelasjonService.slettRinaId(bucAndSed.getBucId());
                 slettBuC(bucAndSed.getBucId());
             }
             throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
@@ -92,7 +94,7 @@ public class EuxService {
         BucAndSed bucAndSed = new BucAndSed(response.get("caseId"), response.get("documentId"));
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", bucAndSed.getBucId(), bucAndSed.getSedId());
 
-        caseRelationService.save(gsakSaksnummer, bucAndSed.getBucId());
+        saksrelasjonService.lagreKobling(gsakSaksnummer, bucAndSed.getBucId(), BucType.valueOf(bucType));
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, bucAndSed.getBucId());
 
         return bucAndSed;
@@ -190,20 +192,10 @@ public class EuxService {
         return null;
     }
 
-    public String hentRinaUrl(String rinaCaseId, String sedId) {
-
+    public String hentRinaUrl(String rinaCaseId) {
         if (StringUtils.isEmpty(rinaCaseId)) {
             throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
-
-        if (StringUtils.isEmpty(sedId)) {
-            return hentRinaUrl(rinaCaseId);
-        }
-
-        return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId + "?openMode=Update&docId=" + sedId;
-    }
-
-    private String hentRinaUrl(String rinaCaseId) {
         return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
     }
 

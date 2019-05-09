@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 

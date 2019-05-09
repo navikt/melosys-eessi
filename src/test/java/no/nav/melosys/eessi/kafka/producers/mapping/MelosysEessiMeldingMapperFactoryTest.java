@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import no.nav.melosys.eessi.models.sed.SedType;
+import no.nav.melosys.eessi.models.SedType;
 import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 

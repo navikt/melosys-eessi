@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.models.sed;
+package no.nav.melosys.eessi.models;
 
 public enum BucType {
     LA_BUC_01,

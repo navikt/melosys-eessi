@@ -1,8 +1,16 @@
-CREATE TABLE CASE_RELATION (
-  id          SERIAL PRIMARY KEY,
-  rina_sakid  VARCHAR   NOT NULL,
-  gsak_id     INTEGER   NOT NULL
+CREATE TABLE FAGSAK_KOBLING
+(
+    id      SERIAL PRIMARY KEY,
+    gsak_saksnummer INTEGER NOT NULL
 );
 
-CREATE UNIQUE INDEX rina_sakid_idx ON CASE_RELATION(rina_sakid);
-CREATE UNIQUE INDEX gsak_id_idx ON CASE_RELATION(gsak_id);
+CREATE TABLE RINASAK_KOBLING
+(
+    id        SERIAL PRIMARY KEY,
+    rina_id   VARCHAR NOT NULL,
+    buc_type  VARCHAR NOT NULL,
+    fagsak_id INTEGER REFERENCES FAGSAK_KOBLING (id)
+);
+
+CREATE UNIQUE INDEX rina_sakid_idx ON RINASAK_KOBLING (rina_id);
+CREATE UNIQUE INDEX gsak_id_idx ON FAGSAK_KOBLING (gsak_saksnummer);

@@ -10,12 +10,12 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableMap;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.BucType;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.SedType;
-import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +39,7 @@ public class EuxServiceTest {
     private EuxConsumer euxConsumer;
 
     @Mock
-    private CaseRelationService caseRelationService;
+    private SaksrelasjonService saksrelasjonService;
 
     @InjectMocks
     private EuxService euxService;
@@ -111,7 +111,7 @@ public class EuxServiceTest {
         verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
         verify(euxConsumer).sendSed(anyString(), anyString(), anyString());
         verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
-        verify(caseRelationService).save(anyLong(), anyString());
+        verify(saksrelasjonService).lagreKobling(anyLong(), anyString(), eq(BucType.LA_BUC_01));
     }
 
     @Test
@@ -127,7 +127,7 @@ public class EuxServiceTest {
         euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
 
         verify(euxConsumer).slettBuC(anyString());
-        verify(caseRelationService).deleteByRinaId(anyString());
+        verify(saksrelasjonService).slettRinaId(anyString());
     }
 
     @Test
@@ -184,7 +184,7 @@ public class EuxServiceTest {
 
         verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
         verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
-        verify(caseRelationService).save(anyLong(), anyString());
+        verify(saksrelasjonService).lagreKobling(eq(gsakSaksnummer), anyString(), eq(BucType.LA_BUC_01));
     }
 
     @Test
@@ -200,7 +200,7 @@ public class EuxServiceTest {
         euxService.opprettBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
 
         verify(euxConsumer).opprettBucOgSed(anyString(), any(), any());
-        verify(caseRelationService, never()).save(anyLong(), anyString());
+        verify(saksrelasjonService, never()).lagreKobling(eq(gsakSaksnummer), anyString(), eq(BucType.LA_BUC_01));
     }
 
     @Test
@@ -224,24 +224,16 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentRinaUrl_withRinaCaseIdAndSedId_expectUrl() {
-        String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/12345?openMode=Update&docId=998877";
-        String resultUrl = euxService.hentRinaUrl("12345", "998877");
-
-        assertThat(resultUrl).isEqualTo(expectedUrl);
-    }
-
-    @Test
     public void hentRinaUrl_withRinaCaseId_expectUrl() {
         String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/12345";
-        String resultUrl = euxService.hentRinaUrl("12345", null);
+        String resultUrl = euxService.hentRinaUrl("12345");
 
         assertThat(resultUrl).isEqualTo(expectedUrl);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void hentRinaUrl_withNoRinaCaseId_expectException() {
-        euxService.hentRinaUrl(null, "998877");
+        euxService.hentRinaUrl(null);
     }
 
     @Test

@@ -8,9 +8,9 @@ import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.CaseRelation;
+import no.nav.melosys.eessi.models.RinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.service.caserelation.CaseRelationService;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.junit.Before;
@@ -36,7 +36,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Mock
     private EuxService euxService;
     @Mock
-    private CaseRelationService caseRelationService;
+    private SaksrelasjonService saksrelasjonService;
 
     @InjectMocks
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
@@ -56,8 +56,9 @@ public class OpprettUtgaaendeJournalpostServiceTest {
         when(euxService.hentMottaker(anyString())).thenReturn(mottakerInfo);
         when(euxService.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
 
-        CaseRelation caseRelation = enhancedRandom.nextObject(CaseRelation.class);
-        when(caseRelationService.findByRinaId(anyString())).thenReturn(Optional.of(caseRelation));
+
+        RinasakKobling rinasakKobling = enhancedRandom.nextObject(RinasakKobling.class);
+        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(rinasakKobling));
 
         when(dokarkivSedConsumer.create(any(ArkiverUtgaaendeSed.class))).thenReturn(response);
 
@@ -76,7 +77,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void journalfoer_noCaseRelation_expectNotFoundException() throws Exception {
-        when(caseRelationService.findByRinaId(anyString())).thenReturn(Optional.empty());
+        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.empty());
         opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
     }
 }
