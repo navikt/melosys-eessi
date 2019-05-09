@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.sed;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class SedServiceTest {
     @Test
     public void createSed_withNoExistingBuc_expectCreateNewBucAndSed() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03, SedType.A008);
+        CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
 
         verify(euxService).opprettBucOgSed(anyLong(), anyString(), anyString(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));

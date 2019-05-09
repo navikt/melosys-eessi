@@ -52,8 +52,10 @@ public class SedService {
      * @param sedType    hvilken type sed som skal opprettes
      * @return Dto-objekt som inneholder bucId, sedId og link til sak i rina
      */
-    public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType, SedType sedType)
+    public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType)
             throws MappingException, NotFoundException, IntegrationException {
+
+        SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
 
         String rinaSaksnummer;
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
