@@ -1,11 +1,15 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -39,13 +43,12 @@ public class SedService {
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
         BucType bucType = SedUtils.getBucTypeFromBestemmelse(
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
-        SedType sedType = SedUtils.getSedTypeFromBestemmelse(
-                sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
+        SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
         LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand());
+        OpprettBucOgSedResponse opprettBucOgSedResponse = opprettEllerOppdaterBucOgSed(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand());
 
         try {
             euxService.sendSed(opprettBucOgSedResponse.getRinaSaksnummer(), opprettBucOgSedResponse.getDokumentId());
@@ -83,6 +86,49 @@ public class SedService {
                 .bucId(opprettBucOgSedResponse.getRinaSaksnummer())
                 .rinaUrl(euxService.hentRinaUrl(opprettBucOgSedResponse.getRinaSaksnummer()))
                 .build();
+    }
+
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand) throws NotFoundException, IntegrationException {
+        SedType sedType = SedType.valueOf(sed.getSed());
+
+        if (sedType == SedType.A009) {
+            Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
+                    saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType)
+            );
+
+            if (eksisterendeSak.isPresent()) {
+                BUC buc = eksisterendeSak.get();
+                Optional<Document> document = finnDokumentVedSedType(buc.getDocuments(), sed.getSed());
+
+                if (document.isPresent() && sedKanOppdateres(buc, document.get().getId())) {
+                    String rinaSaksnummer = buc.getId();
+                    String dokumentId = document.get().getId();
+                    log.info("SED {} på rinasak {} oppdateres", dokumentId, rinaSaksnummer);
+                    euxService.oppdaterSed(rinaSaksnummer, dokumentId, sed);
+                    return new OpprettBucOgSedResponse(rinaSaksnummer, dokumentId);
+                }
+            }
+        }
+
+        return opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, mottakerLand);
+    }
+
+    private boolean sedKanOppdateres(BUC buc, String id) {
+        return buc.getActions().stream().filter(action -> id.equals(action.getDocumentId()))
+                .anyMatch(action -> "Update".equalsIgnoreCase(action.getOperation()));
+    }
+
+    private Optional<Document> finnDokumentVedSedType(List<Document> documents, String sedType) {
+        return documents.stream().filter(d -> sedType.equals(d.getType())).findFirst();
+    }
+
+    private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) throws IntegrationException {
+        for (FagsakRinasakKobling fagsakRinasakKobling : eksisterendeSaker) {
+            BUC buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
+            if ("open".equals(buc.getStatus())) return Optional.of(buc);
+        }
+
+        return Optional.empty();
     }
 
     private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand)

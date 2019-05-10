@@ -54,6 +54,10 @@ public class EuxService {
         euxConsumer.sendSed(rinaSaksnummer, null, dokumentId);
     }
 
+    public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) throws IntegrationException {
+        euxConsumer.oppdaterSed(rinaSaksnummer, null, dokumentId, sed);
+    }
+
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
         List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
 
