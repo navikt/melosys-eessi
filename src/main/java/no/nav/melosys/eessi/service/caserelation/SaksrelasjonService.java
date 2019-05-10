@@ -40,4 +40,8 @@ public class SaksrelasjonService {
         return fagsakRinasakKoblingRepository.findAllByGsakSaksnummer(gsakSaksnummer);
     }
 
+    public List<FagsakRinasakKobling> finnVedGsakSaksnummerOgBucType(Long gsakSaksnummer, BucType bucType) {
+        return fagsakRinasakKoblingRepository.findAllByGsakSaksnummerAndBucType(gsakSaksnummer, bucType);
+    }
+
 }

@@ -41,7 +41,7 @@ public class MelosysEessiController {
 
     }
 
-    @PostMapping("/create/{bucType}/{sedType}")
+    @PostMapping("/create/{bucType}")
     public CreateSedDto create(@RequestBody SedDataDto sedDataDto, @PathVariable BucType bucType)
             throws MappingException, IntegrationException, NotFoundException {
 

@@ -8,4 +8,6 @@ import lombok.Data;
 public class Action {
     private String name;
     private String documentType;
+    private String documentId;
+    private String operation;
 }
