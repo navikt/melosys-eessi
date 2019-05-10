@@ -3,19 +3,15 @@ package no.nav.melosys.eessi.service.eux;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
-import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,16 +23,13 @@ import org.springframework.util.StringUtils;
 public class EuxService {
 
     private final EuxConsumer euxConsumer;
-    private final SaksrelasjonService saksrelasjonService;
 
     private final String rinaHostUrl;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-            SaksrelasjonService saksrelasjonService,
             @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
         this.euxConsumer = euxConsumer;
-        this.saksrelasjonService = saksrelasjonService;
         this.rinaHostUrl = rinaHostUrl;
     }
 
@@ -44,67 +37,29 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public String opprettBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
+    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerLand, SED sed)
             throws IntegrationException, NotFoundException {
 
-        try {
-            BucAndSed bucAndSed = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-            return bucAndSed.getBucId();
-        } catch (IntegrationException | NotFoundException ex) {
-            log.error("Feil ved oppretting av buc og sed", ex);
-            throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
-        }
+        Map<String, String> response = euxConsumer
+                .opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(response.get("caseId"),
+                response.get("documentId"));
+        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
+                opprettBucOgSedResponse.getDokumentId());
+
+        return opprettBucOgSedResponse;
     }
 
-    /**
-     * Oppretter buc og sed i EUX, lagrer relasjon mellom gsakSaksnummer og rinaCaseId,
-     * og sender sed til EUX.
-     *
-     * @param gsakSaksnummer gsakSak knyttet til SED
-     * @param bucType        Hvilken type buc som skal opprettes
-     * @param mottakerLand   Land som skal motta SED
-     * @param sed            SED som skal opprettes
-     * @return rinaCaseId - id for rina-saken
-     */
-    public String opprettOgSendBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
-            throws IntegrationException, NotFoundException {
-
-        BucAndSed bucAndSed = null;
-        try {
-            bucAndSed = opprettOgLagreBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-
-            euxConsumer.sendSed(bucAndSed.getBucId(), "!23", bucAndSed.getSedId());
-            log.info("Sed {} sendt", bucAndSed.getSedId());
-
-        } catch (IntegrationException | NotFoundException ex) {
-            log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
-            if (bucAndSed != null && bucAndSed.getBucId() != null) {
-                saksrelasjonService.slettVedRinaId(bucAndSed.getBucId());
-                slettBuC(bucAndSed.getBucId());
-            }
-            throw ex; //Exception må kastes igjen for å gi tilbakemelding til Melosys om at det har feilet
-        }
-        return bucAndSed.getBucId();
-    }
-
-    private BucAndSed opprettOgLagreBucOgSed(Long gsakSaksnummer, String bucType, String mottakerLand, SED sed)
-            throws NotFoundException, IntegrationException {
-
-        Map<String, String> response = euxConsumer.opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
-        BucAndSed bucAndSed = new BucAndSed(response.get("caseId"), response.get("documentId"));
-        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", bucAndSed.getBucId(), bucAndSed.getSedId());
-
-        saksrelasjonService.lagreKobling(gsakSaksnummer, bucAndSed.getBucId(), BucType.valueOf(bucType));
-        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, bucAndSed.getBucId());
-
-        return bucAndSed;
+    public void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        euxConsumer.sendSed(rinaSaksnummer, null, dokumentId);
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
         List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
 
         return institusjoner.stream().map(Institusjon::getId).findFirst()
-                .orElseThrow(() -> new NotFoundException("Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
+                .orElseThrow(() -> new NotFoundException(
+                        "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
@@ -197,12 +152,5 @@ public class EuxService {
             throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
         return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static class BucAndSed {
-        private String bucId;
-        private String sedId;
     }
 }

@@ -4,7 +4,10 @@ import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +24,8 @@ public class SedServiceTest {
 
     @Mock
     private EuxService euxService;
+    @Mock
+    private SaksrelasjonService saksrelasjonService;
 
     @InjectMocks
     private SedService sendSedService;
@@ -29,11 +34,11 @@ public class SedServiceTest {
 
     @Before
     public void setup() throws Exception {
-        when(euxService.opprettOgSendBucOgSed(anyLong(), anyString(), anyString(), any()))
-                .thenReturn(RINA_ID);
 
-        when(euxService.opprettBucOgSed(anyLong(), anyString(), anyString(), any()))
-                .thenReturn(RINA_ID);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
+
+        when(euxService.opprettBucOgSed(anyString(), anyString(), any(SED.class)))
+                .thenReturn(opprettBucOgSedResponse);
 
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
     }
@@ -57,7 +62,7 @@ public class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
 
-        verify(euxService).opprettBucOgSed(anyLong(), anyString(), anyString(), any());
+        verify(euxService).opprettBucOgSed(anyString(), anyString(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
         assertThat(response.getBucId()).isEqualTo(RINA_ID);
         assertThat(response.getRinaUrl()).isEqualTo("URL");

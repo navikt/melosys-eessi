@@ -10,7 +10,9 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +23,13 @@ import org.springframework.stereotype.Service;
 public class SedService {
 
     private final EuxService euxService;
+    private final SaksrelasjonService saksrelasjonService;
 
     @Autowired
-    public SedService(EuxService euxService) {
+    public SedService(EuxService euxService,
+            SaksrelasjonService saksrelasjonService) {
         this.euxService = euxService;
+        this.saksrelasjonService = saksrelasjonService;
     }
 
     public String createAndSend(SedDataDto sedDataDto) throws MappingException, IntegrationException, NotFoundException {
@@ -40,7 +45,18 @@ public class SedService {
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), sedDataDto.getMottakerLand(), sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand());
+
+        try {
+            euxService.sendSed(opprettBucOgSedResponse.getRinaSaksnummer(), opprettBucOgSedResponse.getDokumentId());
+        } catch (IntegrationException e) {
+            log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
+            euxService.slettBuC(opprettBucOgSedResponse.getRinaSaksnummer());
+            saksrelasjonService.slettVedRinaId(opprettBucOgSedResponse.getRinaSaksnummer());
+            throw e;
+        }
+
+        return opprettBucOgSedResponse.getRinaSaksnummer();
     }
 
     /**
@@ -49,25 +65,32 @@ public class SedService {
      * @param sedDataDto sed som skal opprettes
      * @param bucType    hvilken type buc som skal opprettes (dersom det ikke er en eksisterende buc på saken)
      * @param sedType    hvilken type sed som skal opprettes
-     * @return Dto-objekt som inneholder bucId, sedId og link til sak i rina
+     * @return Dto-objekt som inneholder rinaSaksnummer, dokumentId og link til sak i rina
      */
     public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType)
             throws MappingException, NotFoundException, IntegrationException {
 
         SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
 
-        String rinaSaksnummer;
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
         LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-        rinaSaksnummer = euxService.opprettBucOgSed(gsakSaksnummer, bucType.name(), sedDataDto.getMottakerLand(), sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand());
 
         return CreateSedDto.builder()
-                .bucId(rinaSaksnummer)
-                .rinaUrl(euxService.hentRinaUrl(rinaSaksnummer))
+                .bucId(opprettBucOgSedResponse.getRinaSaksnummer())
+                .rinaUrl(euxService.hentRinaUrl(opprettBucOgSedResponse.getRinaSaksnummer()))
                 .build();
+    }
+
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand)
+            throws NotFoundException, IntegrationException {
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, sed);
+        saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
+        log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
+        return opprettBucOgSedResponse;
     }
 
     private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {

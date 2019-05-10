@@ -15,7 +15,6 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,9 +36,6 @@ public class EuxServiceTest {
 
     @Mock
     private EuxConsumer euxConsumer;
-
-    @Mock
-    private SaksrelasjonService saksrelasjonService;
 
     @InjectMocks
     private EuxService euxService;
@@ -98,39 +94,6 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void opprettOgSendBucOgSed_expectRinaCaseId() throws Exception {
-        Long gsakSaksnummer = 12345L;
-        String bucType = BucType.LA_BUC_01.name();
-        String mottakerLand = "SE";
-        SED sed = new SED();
-
-        String rinaCaseId = euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-
-        assertThat(rinaCaseId).isEqualTo("1122334455");
-
-        verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
-        verify(euxConsumer).sendSed(anyString(), anyString(), anyString());
-        verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
-        verify(saksrelasjonService).lagreKobling(anyLong(), anyString(), eq(BucType.LA_BUC_01));
-    }
-
-    @Test
-    public void opprettOgSendBucOgSed_expectExceptionDeleteCaseAndBuc() throws Exception {
-        Long gsakSaksnummer = 12345L;
-        String bucType = BucType.LA_BUC_01.name();
-        String mottakerLand = "SE";
-        SED sed = new SED();
-
-        doThrow(IntegrationException.class).when(euxConsumer).sendSed(anyString(), anyString(), anyString());
-
-        expectedException.expect(IntegrationException.class);
-        euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
-
-        verify(euxConsumer).slettBuC(anyString());
-        verify(saksrelasjonService).slettVedRinaId(anyString());
-    }
-
-    @Test
     public void hentSed_expectConsumerCalls() throws IntegrationException {
         SED sed = euxService.hentSed("123123123", "12345");
 
@@ -173,23 +136,20 @@ public class EuxServiceTest {
 
     @Test
     public void opprettBucOgSed_expectRinaCaseId() throws NotFoundException, IntegrationException {
-        Long gsakSaksnummer = 12345L;
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
         SED sed = new SED();
 
-        String rinaCaseId = euxService.opprettBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse= euxService.opprettBucOgSed(bucType, mottakerLand, sed);
 
-        assertThat(rinaCaseId).isEqualTo("1122334455");
+        assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
 
         verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
         verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
-        verify(saksrelasjonService).lagreKobling(eq(gsakSaksnummer), anyString(), eq(BucType.LA_BUC_01));
     }
 
     @Test
     public void opprettBucOgSed_expectException() throws Exception {
-        Long gsakSaksnummer = 12345L;
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
         SED sed = new SED();
@@ -197,10 +157,9 @@ public class EuxServiceTest {
         doThrow(IntegrationException.class).when(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
 
         expectedException.expect(IntegrationException.class);
-        euxService.opprettBucOgSed(gsakSaksnummer, bucType, mottakerLand, sed);
+        euxService.opprettBucOgSed(bucType, mottakerLand, sed);
 
         verify(euxConsumer).opprettBucOgSed(anyString(), any(), any());
-        verify(saksrelasjonService, never()).lagreKobling(eq(gsakSaksnummer), anyString(), eq(BucType.LA_BUC_01));
     }
 
     @Test
@@ -252,5 +211,11 @@ public class EuxServiceTest {
 
         verify(euxConsumer).hentTilgjengeligeSedTyper(anyString());
         assertThat(result).isFalse();
+    }
+
+    @Test
+    public void sendSed_verifiserConsumerKall() throws IntegrationException {
+        euxService.sendSed("123", "123");
+        verify(euxConsumer).sendSed(anyString(), any(), anyString());
     }
 }
