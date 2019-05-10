@@ -20,7 +20,7 @@ public class GsakService {
         return sakConsumer.getSak(id);
     }
 
-    public Sak createSak(String aktoerId) throws IntegrationException {
+    public Sak opprettSak(String aktoerId) throws IntegrationException {
         return sakConsumer.createSak(aktoerId);
     }
 }

@@ -6,8 +6,7 @@ import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.FagsakKobling;
-import no.nav.melosys.eessi.models.RinasakKobling;
+import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
@@ -44,8 +43,7 @@ public class OpprettUtgaaendeJournalpostService {
 
         byte[] pdf = euxService.hentSedPdf(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId());
 
-        Long gsakSaksnummer = saksrelasjonService.finnVedRinaId(sedSendt.getRinaSakId())
-                .map(RinasakKobling::getFagsakKobling).map(FagsakKobling::getGsakSaksnummer)
+        Long gsakSaksnummer = saksrelasjonService.finnVedRinaId(sedSendt.getRinaSakId()).map(FagsakRinasakKobling::getGsakSaksnummer)
                 .orElseThrow(() -> new NotFoundException("Saksrelasjon ikke funnet med rinaSakId " + sedSendt.getRinaSakId()));
 
         log.info("Henter gsak med id: {}", gsakSaksnummer);

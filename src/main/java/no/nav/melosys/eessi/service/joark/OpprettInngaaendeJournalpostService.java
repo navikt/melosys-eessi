@@ -8,8 +8,7 @@ import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsume
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.FagsakKobling;
-import no.nav.melosys.eessi.models.RinasakKobling;
+import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
@@ -46,7 +45,7 @@ public class OpprettInngaaendeJournalpostService {
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId) throws IntegrationException {
 
-        Sak sak = getOrCreateSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
+        Sak sak = hentEllerOpprettSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedMottatt.getSedType());
         ParticipantInfo sender = euxService.hentUtsender(sedMottatt.getRinaSakId());
 
@@ -63,22 +62,21 @@ public class OpprettInngaaendeJournalpostService {
                 .build();
     }
 
-    private Sak getOrCreateSak(String rinaId, String aktoerId, BucType bucType) throws IntegrationException {
+    private Sak hentEllerOpprettSak(String rinaId, String aktoerId, BucType bucType) throws IntegrationException {
         Optional<Long> gsakId = saksrelasjonService.finnVedRinaId(rinaId)
-                .map(RinasakKobling::getFagsakKobling)
-                .map(FagsakKobling::getGsakSaksnummer);
+                .map(FagsakRinasakKobling::getGsakSaksnummer);
 
         if (gsakId.isPresent()) {
             log.info("Henter gsak med id: {}", gsakId.get());
             return gsakService.getSak(gsakId.get());
         } else {
             log.info("Oppretter ny sak i gsak for rinaSak {}", rinaId);
-            return createSak(rinaId, aktoerId, bucType);
+            return opprettSak(rinaId, aktoerId, bucType);
         }
     }
 
-    private Sak createSak(String rinaId, String aktoerId, BucType bucType) throws IntegrationException {
-        Sak sak = gsakService.createSak(aktoerId);
+    private Sak opprettSak(String rinaId, String aktoerId, BucType bucType) throws IntegrationException {
+        Sak sak = gsakService.opprettSak(aktoerId);
 
         if (sak == null) {
             throw new IntegrationException("Sak ble ikke opprettet");

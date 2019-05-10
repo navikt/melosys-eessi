@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
 import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.RinasakKobling;
+import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -57,8 +57,8 @@ public class OpprettUtgaaendeJournalpostServiceTest {
         when(euxService.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
 
 
-        RinasakKobling rinasakKobling = enhancedRandom.nextObject(RinasakKobling.class);
-        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(rinasakKobling));
+        FagsakRinasakKobling fagsakRinasakKobling = enhancedRandom.nextObject(FagsakRinasakKobling.class);
+        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
         when(dokarkivSedConsumer.create(any(ArkiverUtgaaendeSed.class))).thenReturn(response);
 
