@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.sed;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
@@ -41,7 +40,7 @@ public class SedService {
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), getMottakerLand(sedDataDto), sed);
+        return euxService.opprettOgSendBucOgSed(gsakSaksnummer, bucType.name(), sedDataDto.getMottakerLand(), sed);
     }
 
     /**
@@ -63,7 +62,7 @@ public class SedService {
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-        rinaSaksnummer = euxService.opprettBucOgSed(gsakSaksnummer, bucType.name(), getMottakerLand(sedDataDto), sed);
+        rinaSaksnummer = euxService.opprettBucOgSed(gsakSaksnummer, bucType.name(), sedDataDto.getMottakerLand(), sed);
 
         return CreateSedDto.builder()
                 .bucId(rinaSaksnummer)
@@ -73,10 +72,5 @@ public class SedService {
 
     private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
-    }
-
-    private String getMottakerLand(SedDataDto sedDataDto) throws NotFoundException {
-        return sedDataDto.getLovvalgsperioder().stream().map(Lovvalgsperiode::getUnntakFraLovvalgsland)
-                .findFirst().orElseThrow(() -> new NotFoundException("Landkode for lovvalg ikke satt"));
     }
 }

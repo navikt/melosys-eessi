@@ -88,7 +88,7 @@
   "utenlandskIdent": [
     {
       "ident": "11111111111",
-      "landkode": "BEL"
+      "landkode": "SE"
     }
   ],
   "utenlandskeVirksomheter": [
@@ -104,5 +104,6 @@
       "type": "few"
     }
   ],
-  "gsakSaksnummer": 123
+  "gsakSaksnummer": 123,
+  "mottakerLand": "SE"
 }
