@@ -23,7 +23,7 @@ public class SedMottattConsumer {
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedMottatt = consumerRecord.value();
 
-        log.info("Sed mottatt med rinaSakId: {}", sedMottatt.getRinaSakId());
+        log.info("Sed mottatt: {}", sedMottatt);
         behandleSedMottattService.behandleSed(sedMottatt);
     }
 }
