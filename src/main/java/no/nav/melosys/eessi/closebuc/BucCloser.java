@@ -32,7 +32,7 @@ public class BucCloser {
     public void closeBucsByType(BucType bucType) {
         try {
             euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).status("open").build())
-                    .parallelStream()
+                    .stream()
                     .map(this::hentBuc)
                     .filter(Objects::nonNull)
                     .filter(this::norgeErCaseOwner)
