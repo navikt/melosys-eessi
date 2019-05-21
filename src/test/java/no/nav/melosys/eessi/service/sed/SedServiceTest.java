@@ -48,7 +48,7 @@ public class SedServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
-        when(euxService.opprettBucOgSed(anyString(), anyString(), any(SED.class)))
+        when(euxService.opprettBucOgSed(anyString(), anyString(), anyString(), any(SED.class)))
                 .thenReturn(opprettBucOgSedResponse);
 
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
@@ -113,7 +113,7 @@ public class SedServiceTest {
         sendSedService.createAndSend(sedDataDto);
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(documentId), any(SED.class));
-        verify(euxService, never()).opprettBucOgSed(any(), any(), any());
+        verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
     }
 
     @Test(expected = MappingException.class)
@@ -128,7 +128,7 @@ public class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
 
-        verify(euxService).opprettBucOgSed(anyString(), anyString(), any());
+        verify(euxService).opprettBucOgSed(anyString(), anyString(), anyString(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
         assertThat(response.getBucId()).isEqualTo(RINA_ID);
         assertThat(response.getRinaUrl()).isEqualTo("URL");

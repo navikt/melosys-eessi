@@ -138,9 +138,10 @@ public class EuxServiceTest {
     public void opprettBucOgSed_expectRinaCaseId() throws NotFoundException, IntegrationException {
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
+        String mottakerId = "";
         SED sed = new SED();
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse= euxService.opprettBucOgSed(bucType, mottakerLand, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse= euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
 
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
 
@@ -152,12 +153,13 @@ public class EuxServiceTest {
     public void opprettBucOgSed_expectException() throws Exception {
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
+        String mottakerId = "";
         SED sed = new SED();
 
         doThrow(IntegrationException.class).when(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
 
         expectedException.expect(IntegrationException.class);
-        euxService.opprettBucOgSed(bucType, mottakerLand, sed);
+        euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
 
         verify(euxConsumer).opprettBucOgSed(anyString(), any(), any());
     }

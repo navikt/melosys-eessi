@@ -1,10 +1,12 @@
 package no.nav.melosys.eessi.controller;
 
+import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SedinfoDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -53,5 +55,10 @@ public class MelosysEessiController {
             log.error("Error in /sed/createAndSend", e);
             throw e;
         }
+    }
+
+    @GetMapping("/hentTilknyttedeSedUtkast/{gsakSaksnummer}")
+    public List<SedinfoDto> hentTilknyttedeSedUtkast(@PathVariable Long gsakSaksnummer) {
+        return sedService.hentTilknyttedeSedUtkast(gsakSaksnummer);
     }
 }

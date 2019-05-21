@@ -8,6 +8,7 @@ import lombok.Data;
 public class Document {
 
     private String id;
+    private String subProcessId;
     private long creationDate;
     private long lastUpdate;
     private Creator creator;

@@ -37,11 +37,14 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerLand, SED sed)
+    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerLand, String mottakerId, SED sed)
             throws IntegrationException, NotFoundException {
 
-        Map<String, String> response = euxConsumer
-                .opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
+        if (StringUtils.isEmpty(mottakerId)) {
+            mottakerId = avklarMottakerId(bucType, mottakerLand);
+        }
+
+        Map<String, String> response = euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(response.get("caseId"),
                 response.get("documentId"));
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
@@ -64,6 +67,11 @@ public class EuxService {
         return institusjoner.stream().map(Institusjon::getId).findFirst()
                 .orElseThrow(() -> new NotFoundException(
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
+    }
+
+    // TODO: Denne henter veldig mye data. Det må caches, filtreres + evt. settes opp en jobb.
+    private List<Institusjon> hentAlleMuligeMottakere(String bucType) throws IntegrationException {
+        return euxConsumer.hentInstitusjoner(bucType, null);
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
