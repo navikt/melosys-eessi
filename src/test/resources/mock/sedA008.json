@@ -85,7 +85,9 @@
     },
     "bruker" : {
       "arbeidiflereland" : {
-        "bostedsland" : "SE",
+        "bosted" : {
+          "land" : "SE"
+        },
         "yrkesaktivitet" : {
           "startdato" : "2019-10-09"
         }

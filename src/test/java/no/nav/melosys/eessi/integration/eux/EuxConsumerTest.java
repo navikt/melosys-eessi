@@ -253,6 +253,9 @@ public class EuxConsumerTest {
         assertNotNull(resultat.getMedlemskap());
         assertEquals(SedType.A001.name(), resultat.getSed());
         assertEquals(MedlemskapA001.class, resultat.getMedlemskap().getClass());
+
+        MedlemskapA001 medlemskapA001 = (MedlemskapA001) resultat.getMedlemskap();
+        assertEquals("2017-12-01", medlemskapA001.getForrigesoeknad().get(0).getDato());
     }
 
     @Test
@@ -273,6 +276,9 @@ public class EuxConsumerTest {
         assertEquals(SedType.A008.name(), resultat.getSed());
         assertNotNull(resultat.getMedlemskap());
         assertEquals(MedlemskapA008.class, resultat.getMedlemskap().getClass());
+
+        MedlemskapA008 medlemskapA008 = (MedlemskapA008) resultat.getMedlemskap();
+        assertEquals("SE", medlemskapA008.getBruker().getArbeidiflereland().getBosted().getLand());
     }
 
     @Test
