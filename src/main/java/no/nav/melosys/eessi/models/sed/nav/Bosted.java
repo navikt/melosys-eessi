@@ -5,9 +5,7 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class ArbeidIFlereLand {
+public class Bosted {
 
-    private Bosted bosted;
-
-    private Yrkesaktivitet yrkesaktivitet;
+    private String land;
 }

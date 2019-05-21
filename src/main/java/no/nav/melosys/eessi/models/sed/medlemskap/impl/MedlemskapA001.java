@@ -24,5 +24,5 @@ public class MedlemskapA001 extends Medlemskap {
 
     private Anmodning anmodning;
 
-    private String datoforrigesoeknad;
+    private List<ForrigeSoeknad> forrigesoeknad;
 }

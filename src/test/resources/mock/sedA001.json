@@ -212,7 +212,11 @@
     "anmodning": {
       "erendring": "ja"
     },
-    "datoforrigesoeknad": "2017-12-01"
+    "forrigesoeknad": [
+      {
+        "dato": "2017-12-01"
+      }
+    ]
   },
   "sedVer": "1",
   "sedGVer": "4",
