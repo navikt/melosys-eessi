@@ -3,10 +3,9 @@ package no.nav.melosys.eessi.service.sed;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.LongFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
@@ -28,6 +27,7 @@ import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -151,7 +151,7 @@ public class SedService {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
     }
 
-    public List<SedinfoDto> hentTilknyttedeSedUtkast(Long gsakSaksnummer) {
+    public List<SedinfoDto> hentSed(Long gsakSaksnummer, String status) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                 .map(kobling -> {
                     try {
@@ -162,10 +162,24 @@ public class SedService {
                     }
                 })
                 .filter(Objects::nonNull)
-                .flatMap(buc -> buc.getDocuments().stream())
-                .filter(document -> "new".equals(document.getStatus()))
+                .map(BUC::getDocuments)
+                .flatMap(Collection::stream)
+                .filter(filtrerMedStatus(status))
                 .map(this::lagSedinfoDto)
                 .collect(Collectors.toList());
+    }
+
+    private static Predicate<Document> filtrerMedStatus(String status) {
+        if (!StringUtils.isEmpty(status)) {
+            if ("utkast".equalsIgnoreCase(status)) {
+                return document -> "new".equals(document.getStatus());
+            } else if ("sendt".equalsIgnoreCase(status)) {
+                return document -> "sent".equals(document.getStatus());
+            }
+        }
+
+        // Ingen gyldig status, alle går igjennom filteret.
+        return d -> true;
     }
 
     private SedinfoDto lagSedinfoDto(Document document) {
@@ -173,13 +187,13 @@ public class SedService {
                 Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
 
         return SedinfoDto.builder()
-                .bucId(document.getSubProcessId())
+                .bucId(document.getBucId())
                 .sedId(document.getId())
                 .opprettetDato(tilLocalDate.apply(document.getCreationDate()))
                 .sedType(document.getType())
                 .sistOppdatert(tilLocalDate.apply(document.getLastUpdate()))
                 .status(document.getStatus())
-                .rinaUrl(euxService.hentRinaUrl(document.getSubProcessId()))
+                .rinaUrl(euxService.hentRinaUrl(document.getBucId()))
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.models.buc;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 @Data
@@ -8,7 +9,8 @@ import lombok.Data;
 public class Document {
 
     private String id;
-    private String subProcessId;
+    @JsonProperty("subProcessId")
+    private String bucId;
     private long creationDate;
     private long lastUpdate;
     private Creator creator;

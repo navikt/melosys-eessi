@@ -15,6 +15,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -69,8 +70,8 @@ public class EuxService {
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
-    // TODO: Denne henter veldig mye data. Det må caches, filtreres + evt. settes opp en jobb.
-    private List<Institusjon> hentAlleMuligeMottakere(String bucType) throws IntegrationException {
+    @Cacheable("institusjoner")
+    public List<Institusjon> hentAlleMottakerinstitusjoner(String bucType) throws IntegrationException {
         return euxConsumer.hentInstitusjoner(bucType, null);
     }
 
