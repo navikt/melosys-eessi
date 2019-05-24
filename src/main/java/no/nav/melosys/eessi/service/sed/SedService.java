@@ -3,7 +3,10 @@ package no.nav.melosys.eessi.service.sed;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -162,10 +165,10 @@ public class SedService {
                     }
                 })
                 .filter(Objects::nonNull)
-                .map(BUC::getDocuments)
-                .flatMap(Collection::stream)
-                .filter(filtrerMedStatus(status))
-                .map(this::lagSedinfoDto)
+                .map(buc -> buc.getDocuments().stream()
+                        .filter(filtrerMedStatus(status))
+                        .map(doc -> lagSedinfoDto(doc, buc.getId())))
+                .flatMap(Function.identity())
                 .collect(Collectors.toList());
     }
 
@@ -182,18 +185,18 @@ public class SedService {
         return d -> true;
     }
 
-    private SedinfoDto lagSedinfoDto(Document document) {
+    private SedinfoDto lagSedinfoDto(Document document, String bucId) {
         LongFunction<LocalDate> tilLocalDate = timestamp ->
                 Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
 
         return SedinfoDto.builder()
-                .bucId(document.getBucId())
+                .bucId(bucId)
                 .sedId(document.getId())
                 .opprettetDato(tilLocalDate.apply(document.getCreationDate()))
                 .sedType(document.getType())
                 .sistOppdatert(tilLocalDate.apply(document.getLastUpdate()))
                 .status(document.getStatus())
-                .rinaUrl(euxService.hentRinaUrl(document.getBucId()))
+                .rinaUrl(euxService.hentRinaUrl(bucId))
                 .build();
     }
 }
