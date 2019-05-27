@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
@@ -12,14 +13,15 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 public class MelosysEessiProducer {
 
     private final KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate;
-    private static final String TOPIC_NAME = "privat-melosys-eessi-v1";
+    private final String topicName;
 
-    public MelosysEessiProducer(KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate) {
+    public MelosysEessiProducer(KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate, @Value("${melosys.kafka.producer.topic-name}") String topicName) {
         this.kafkaTemplate = kafkaTemplate;
+        this.topicName = topicName;
     }
 
     public void publiserMelding(MelosysEessiMelding melding) {
-        ListenableFuture<SendResult<String, MelosysEessiMelding>> future = kafkaTemplate.send(TOPIC_NAME, melding);
+        ListenableFuture<SendResult<String, MelosysEessiMelding>> future = kafkaTemplate.send(topicName, melding);
 
         future.addCallback(new ListenableFutureCallback<SendResult<String, MelosysEessiMelding>>() {
             @Override
@@ -30,7 +32,7 @@ public class MelosysEessiProducer {
             @Override
             public void onSuccess(SendResult<String, MelosysEessiMelding> res) {
                 log.info("Melding sendt på topic {}. Record.key: {}, record: {}",
-                        TOPIC_NAME, res.getProducerRecord().key(), res.getProducerRecord().value());
+                        topicName, res.getProducerRecord().key(), res.getProducerRecord().value());
             }
         });
     }

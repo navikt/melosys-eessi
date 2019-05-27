@@ -25,7 +25,9 @@ spring:
 melosys:
   kafka:
     consumer:
-      groupid: ${kafka.groupid:melosys-eessi-sedHendelser}
+      groupid: ${KAFKA.SEDHENDELSER.GROUPID:melosys-eessi-sedHendelser}
+    producer:
+      topic-name: ${KAFKA.EESSIMELDING.TOPIC}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}
