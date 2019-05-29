@@ -26,12 +26,12 @@ public class SakConsumer implements RestConsumer, UUIDGenerator {
     public Sak getSak(Long sakId) throws IntegrationException {
 
         HttpHeaders headers = headers();
-        log.info("getSak: correlationId: {}, sakId: {}", headers.get(X_CORRELATION_ID), sakId);
+        log.info("hentsak: correlationId: {}, sakId: {}", headers.get(X_CORRELATION_ID), sakId);
 
         return exchange("/" + sakId, HttpMethod.GET, new HttpEntity<>(headers), Sak.class);
     }
 
-    public Sak createSak(String aktoerId) throws IntegrationException {
+    public Sak opprettSak(String aktoerId) throws IntegrationException {
 
         SakDto sakDto = new SakDto();
         sakDto.setAktoerId(aktoerId);

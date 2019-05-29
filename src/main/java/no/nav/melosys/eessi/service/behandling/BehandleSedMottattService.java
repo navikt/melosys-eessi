@@ -54,7 +54,8 @@ public class BehandleSedMottattService {
             log.info("Person i rinaSak {} er verifisert mot TPS", sedMottatt.getRinaSakId());
 
             String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());
-            SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, aktoerId);
+            SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(
+                    sedMottatt, aktoerId, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId()));
             log.info("Midlertidig journalpost opprettet med id {}", sakInformasjon.getJournalpostId());
 
             publiserMelosysEessiMelding(aktoerId, sed, sedMottatt, sakInformasjon);
@@ -74,5 +75,4 @@ public class BehandleSedMottattService {
             );
         }
     }
-
 }

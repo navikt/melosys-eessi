@@ -66,7 +66,7 @@ public class SakConsumerTest {
                 .andExpect(content().json(expectedSakDtoJson, true))
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
-        Sak response = sakConsumer.createSak("123");
+        Sak response = sakConsumer.opprettSak("123");
         assertThat(response, not(nullValue()));
         assertThat(response.getId(), is(Long.toString(sakId)));
     }
