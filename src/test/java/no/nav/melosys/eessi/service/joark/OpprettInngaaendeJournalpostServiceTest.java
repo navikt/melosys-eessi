@@ -1,19 +1,12 @@
 package no.nav.melosys.eessi.service.joark;
 
-import java.util.Optional;
+import com.google.common.collect.Lists;
 import io.github.benas.randombeans.api.EnhancedRandom;
-import no.nav.dok.tjenester.mottainngaaendeforsendelse.MottaInngaaendeForsendelseResponse;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.integration.dokmotinngaaende.DokmotInngaaendeConsumer;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
-import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
-import no.nav.melosys.eessi.service.dokkat.DokkatService;
-import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,26 +17,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OpprettInngaaendeJournalpostServiceTest {
 
     @Mock
-    private DokmotInngaaendeConsumer dokmotInngaaendeConsumer;
-
-    @Mock
-    private SaksrelasjonService saksrelasjonService;
-
-    @Mock
-    private DokkatService dokkatService;
-
+    private JournalpostService journalpostService;
     @Mock
     private GsakService gsakService;
-
-    @Mock
-    private EuxService euxService;
 
     @InjectMocks
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
@@ -57,72 +40,23 @@ public class OpprettInngaaendeJournalpostServiceTest {
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
         sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
-        MottaInngaaendeForsendelseResponse response = enhancedRandom.nextObject(MottaInngaaendeForsendelseResponse.class);
-        response.setJournalpostId("11223344");
-        when(dokmotInngaaendeConsumer.create(any()))
-                .thenReturn(response);
-
-        FagsakRinasakKobling fagsakRinasakKobling = enhancedRandom.nextObject(FagsakRinasakKobling.class);
-        when(saksrelasjonService.finnVedRinaId(anyString()))
-                .thenReturn(Optional.ofNullable(fagsakRinasakKobling));
-
-        DokkatSedInfo dokkatSedInfo = enhancedRandom.nextObject(DokkatSedInfo.class);
-        when(dokkatService.hentMetadataFraDokkat(anyString()))
-                .thenReturn(dokkatSedInfo);
+        OpprettJournalpostResponse response = new OpprettJournalpostResponse("11223344", Lists.newArrayList("123"), null, null);
+        when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any())).thenReturn(response);
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sak.setId("1234"); // Må kunne bli parset til Long
-        when(gsakService.getSak(anyLong()))
+        when(gsakService.hentEllerOpprettSak(anyString(), anyString(), any()))
                 .thenReturn(sak);
-
-        when(gsakService.opprettSak(anyString()))
-                .thenReturn(sak);
-
-        ParticipantInfo sender = ParticipantInfo.builder()
-                .name("NAVT002")
-                .id("NO:NAVT002")
-                .build();
-        when(euxService.hentUtsender(anyString()))
-                .thenReturn(sender);
     }
 
     @Test
     public void arkiverInngaaendeSed_expectId() throws Exception {
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123", new byte[0]);
 
         assertThat(sakInformasjon, not(nullValue()));
         assertThat(sakInformasjon.getJournalpostId(), is("11223344"));
 
-        verify(dokmotInngaaendeConsumer, times(1)).create(any());
-        verify(saksrelasjonService, times(1)).finnVedRinaId(anyString());
-        verify(dokkatService, times(1)).hentMetadataFraDokkat(anyString());
-        verify(gsakService, times(1)).getSak(anyLong());
-        verify(gsakService, times(0)).opprettSak(any());
-        verify(euxService, times(1)).hentUtsender(anyString());
-    }
-
-    @Test
-    public void arkiverInngaaendeSed_expectCreateSak() throws Exception {
-        when(saksrelasjonService.finnVedRinaId(anyString()))
-                .thenReturn(Optional.empty());
-
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
-
-        assertThat(sakInformasjon, not(nullValue()));
-        assertThat(sakInformasjon.getJournalpostId(), is("11223344"));
-
-        verify(gsakService, times(0)).getSak(anyLong());
-        verify(gsakService, times(1)).opprettSak(any());
-    }
-
-    @Test(expected = IntegrationException.class)
-    public void arkiverInngaaendeSed_expectIntegrationException() throws Exception {
-        when(saksrelasjonService.finnVedRinaId(anyString()))
-                .thenReturn(Optional.empty());
-
-        when(gsakService.opprettSak(any()))
-                .thenReturn(null);
-
-        opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123");
+        verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any());
+        verify(gsakService, times(1)).hentEllerOpprettSak(any(), any(), any());
     }
 }

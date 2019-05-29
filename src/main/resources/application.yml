@@ -35,12 +35,11 @@ melosys:
     euxapp-url: ${EUXAPP_URL}
     reststs-url: ${RESTSTS_URL}
     sts-url: ${STS_URL}
-    dokarkivsed-url: ${DOKARKIVSED_URL}
-    dokmotinngaaende-url: ${DOKMOTINNGAAENDE_URL}
     aktoer-url: ${AKTOER_URL}
     person-url: ${PERSON_URL}
     personsok-url: ${PERSONSOK_URL}
     rina-host-url: ${RINA_HOST_URL}
+    journalpostapi-url: ${JOURNALPOSTAPI_URL}
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}
       typeinfo-url: ${DOKKATTYPEINFO_URL}

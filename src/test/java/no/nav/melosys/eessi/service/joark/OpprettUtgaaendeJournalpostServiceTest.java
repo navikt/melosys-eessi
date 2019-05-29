@@ -1,12 +1,11 @@
 package no.nav.melosys.eessi.service.joark;
 
+import java.util.ArrayList;
 import java.util.Optional;
 import io.github.benas.randombeans.api.EnhancedRandom;
-import no.nav.dokarkivsed.api.v1.ArkiverUtgaaendeSed;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.integration.dokarkivsed.DokarkivSedConsumer;
-import no.nav.melosys.eessi.integration.dokarkivsed.OpprettUtgaaendeJournalpostResponse;
 import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -30,13 +29,13 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     private static final String JOURNALPOST_ID = "123";
 
     @Mock
-    private DokarkivSedConsumer dokarkivSedConsumer;
-    @Mock
     private GsakService gsakService;
     @Mock
     private EuxService euxService;
     @Mock
     private SaksrelasjonService saksrelasjonService;
+    @Mock
+    private JournalpostService journalpostService;
 
     @InjectMocks
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
@@ -47,26 +46,19 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
 
-        OpprettUtgaaendeJournalpostResponse response = new OpprettUtgaaendeJournalpostResponse();
-        response.setJournalpostId(JOURNALPOST_ID);
-        response.setJournalfoeringStatus(OpprettUtgaaendeJournalpostResponse.JournalTilstand.ENDELIG_JOURNALFOERT);
-        response.setKanalreferanseId("123");
+        OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);
 
-        ParticipantInfo mottakerInfo = ParticipantInfo.builder().id("NO:NAVT003").name("NAVT003").build();
-        when(euxService.hentMottaker(anyString())).thenReturn(mottakerInfo);
         when(euxService.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
-
 
         FagsakRinasakKobling fagsakRinasakKobling = enhancedRandom.nextObject(FagsakRinasakKobling.class);
         when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
-        when(dokarkivSedConsumer.create(any(ArkiverUtgaaendeSed.class))).thenReturn(response);
+        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any())).thenReturn(response);
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sedSendt = enhancedRandom.nextObject(SedHendelse.class);
 
-        when(gsakService.getSak(anyLong())).thenReturn(sak);
-
+        when(gsakService.hentsak(anyLong())).thenReturn(sak);
     }
 
     @Test

@@ -24,7 +24,7 @@ public class GsakServiceTest {
     @Test
     public void getSak_expectSak() throws Exception{
         when(sakConsumer.getSak(anyLong())).thenReturn(new Sak());
-        Sak sak = gsakService.getSak(1L);
+        Sak sak = gsakService.hentsak(1L);
         assertThat(sak, not(nullValue()));
     }
 }
