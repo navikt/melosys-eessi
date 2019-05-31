@@ -1,21 +1,16 @@
 package no.nav.melosys.eessi.controller;
 
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
-import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -24,12 +19,10 @@ import org.springframework.web.bind.annotation.*;
 public class MelosysEessiController {
 
     private final SedService sedService;
-    private final EuxService euxService;
 
     @Autowired
-    public MelosysEessiController(SedService sedService, EuxService euxService) {
+    public MelosysEessiController(SedService sedService) {
         this.sedService = sedService;
-        this.euxService = euxService;
     }
 
     @PostMapping("/createAndSend")
@@ -60,18 +53,5 @@ public class MelosysEessiController {
             log.error("Error in /sed/createAndSend", e);
             throw e;
         }
-    }
-
-    @GetMapping("/mottakerinstitusjoner/{bucType}")
-    public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
-                                                          @RequestParam(required = false) String land) throws IntegrationException {
-        return euxService.hentAlleMottakerinstitusjoner(bucType.name()).stream()
-                .filter(institusjon -> StringUtils.isEmpty(land) || land.equalsIgnoreCase(institusjon.getLandkode()))
-                .map(institusjon -> InstitusjonDto.builder()
-                        .id(institusjon.getId())
-                        .navn(institusjon.getNavn())
-                        .landkode(institusjon.getLandkode())
-                        .build())
-                .collect(Collectors.toList());
     }
 }
