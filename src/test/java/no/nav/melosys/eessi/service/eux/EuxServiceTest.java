@@ -141,7 +141,7 @@ public class EuxServiceTest {
         String mottakerId = "";
         SED sed = new SED();
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse= euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
 
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
 
@@ -219,5 +219,11 @@ public class EuxServiceTest {
     public void sendSed_verifiserConsumerKall() throws IntegrationException {
         euxService.sendSed("123", "123");
         verify(euxConsumer).sendSed(anyString(), any(), anyString());
+    }
+
+    @Test
+    public void hentAlleMottakerinstitusjoner_verifiserConsumerKall() throws IntegrationException {
+        euxService.hentAlleMottakerinstitusjoner(BucType.LA_BUC_01.name());
+        verify(euxConsumer).hentInstitusjoner(eq(BucType.LA_BUC_01.name()), eq(null));
     }
 }

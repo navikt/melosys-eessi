@@ -1,8 +1,13 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Collections;
+import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SedinfoDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -24,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -48,7 +54,7 @@ public class SedServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
-        when(euxService.opprettBucOgSed(anyString(), anyString(), anyString(), any(SED.class)))
+        when(euxService.opprettBucOgSed(anyString(), anyString(), any(), any(SED.class)))
                 .thenReturn(opprettBucOgSedResponse);
 
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
@@ -128,9 +134,53 @@ public class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
 
-        verify(euxService).opprettBucOgSed(anyString(), anyString(), anyString(), any());
+        verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
         assertThat(response.getBucId()).isEqualTo(RINA_ID);
         assertThat(response.getRinaUrl()).isEqualTo("URL");
+    }
+
+    @Test
+    public void hentSed_forventSedMedTypeOgId() throws IntegrationException, IOException {
+        when(saksrelasjonService.finnVedGsakSaksnummer(1L)).thenReturn(lagFagsakRinasakKobling());
+        when(euxService.hentBuc(anyString())).thenReturn(lagBuc());
+
+        List<SedinfoDto> sedinfoDtoList = sendSedService.hentSed(1L, "");
+
+        verify(saksrelasjonService).finnVedGsakSaksnummer(anyLong());
+        verify(euxService).hentBuc(anyString());
+
+        assertThat(sedinfoDtoList)
+                .extracting(SedinfoDto::getSedType, SedinfoDto::getSedId, SedinfoDto::getBucId)
+                .contains(tuple("A001", "93f022ea50e54c08bbdb85290a5fb23d", "100485"));
+    }
+
+    @Test
+    public void hentSed_medIntegrastionError_forventIngenSed() throws IntegrationException, IOException {
+        when(saksrelasjonService.finnVedGsakSaksnummer(1L)).thenReturn(lagFagsakRinasakKobling());
+        when(euxService.hentBuc(anyString())).thenAnswer(invocation -> {
+            throw new IntegrationException("");
+        });
+
+        List<SedinfoDto> sedinfoDtoList = sendSedService.hentSed(1L, "");
+
+        verify(saksrelasjonService).finnVedGsakSaksnummer(anyLong());
+        verify(euxService).hentBuc(anyString());
+
+        assertThat(sedinfoDtoList).isEmpty();
+    }
+
+    private List<FagsakRinasakKobling> lagFagsakRinasakKobling() {
+        FagsakRinasakKobling kobling = new FagsakRinasakKobling();
+        kobling.setBucType(BucType.LA_BUC_03);
+        kobling.setGsakSaksnummer(1L);
+        kobling.setRinaSaksnummer("123");
+
+        return Collections.singletonList(kobling);
+    }
+
+    private BUC lagBuc() throws IOException {
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/buc.json");
+        return new ObjectMapper().readValue(jsonUrl, BUC.class);
     }
 }
