@@ -9,7 +9,6 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.BucService;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -26,11 +25,10 @@ public class BucController {
         this.bucService = bucService;
     }
 
-    @GetMapping("/mottakerinstitusjoner/{bucType}")
+    @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
                                                           @RequestParam(required = false) String land) throws IntegrationException {
-        return euxService.hentAlleMottakerinstitusjoner(bucType.name()).stream()
-                .filter(institusjon -> StringUtils.isEmpty(land) || land.equalsIgnoreCase(institusjon.getLandkode()))
+        return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> InstitusjonDto.builder()
                         .id(institusjon.getId())
                         .navn(institusjon.getNavn())
@@ -39,7 +37,7 @@ public class BucController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/bucSedRelasjoner")
+    @GetMapping("/relasjoner")
     public List<BucSedRelasjonDto> hentBucSedRelasjoner() {
         return bucService.hentBucSedRelasjoner();
     }

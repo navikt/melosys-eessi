@@ -18,8 +18,8 @@ public class SakController {
     }
 
     @GetMapping("/{gsakSaksnummer}/sed")
-    public List<SedinfoDto> hentTilknyttedeSed(@PathVariable Long gsakSaksnummer,
-                                               @RequestParam(required = false) String status) {
-        return sedService.hentSed(gsakSaksnummer, status);
+    public List<SedinfoDto> hentTilknyttedeSeder(@PathVariable Long gsakSaksnummer,
+                                                 @RequestParam(required = false) String status) {
+        return sedService.hentSeder(gsakSaksnummer, status);
     }
 }

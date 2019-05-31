@@ -59,7 +59,8 @@ public class EuxServiceTest {
 
         Institusjon institusjon = new Institusjon();
         institusjon.setId("NO:321");
-        when(euxConsumer.hentInstitusjoner(anyString(), anyString()))
+        institusjon.setLandkode("SE");
+        when(euxConsumer.hentInstitusjoner(anyString(), any()))
                 .thenReturn(Collections.singletonList(institusjon));
 
         when(euxConsumer.opprettSed(anyString(), any(), any())).thenReturn("12345");
@@ -138,7 +139,7 @@ public class EuxServiceTest {
     public void opprettBucOgSed_expectRinaCaseId() throws NotFoundException, IntegrationException {
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
-        String mottakerId = "";
+        String mottakerId = null;
         SED sed = new SED();
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
@@ -146,14 +147,14 @@ public class EuxServiceTest {
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
 
         verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
-        verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(mottakerLand));
+        verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(null));
     }
 
     @Test
     public void opprettBucOgSed_expectException() throws Exception {
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
-        String mottakerId = "";
+        String mottakerId = null;
         SED sed = new SED();
 
         doThrow(IntegrationException.class).when(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
@@ -222,8 +223,8 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentAlleMottakerinstitusjoner_verifiserConsumerKall() throws IntegrationException {
-        euxService.hentAlleMottakerinstitusjoner(BucType.LA_BUC_01.name());
+    public void hentMottakerinstitusjoner_verifiserConsumerKall() throws IntegrationException {
+        euxService.hentMottakerinstitusjoner(BucType.LA_BUC_01.name(), null);
         verify(euxConsumer).hentInstitusjoner(eq(BucType.LA_BUC_01.name()), eq(null));
     }
 }

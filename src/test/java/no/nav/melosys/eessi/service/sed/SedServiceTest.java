@@ -145,7 +145,7 @@ public class SedServiceTest {
         when(saksrelasjonService.finnVedGsakSaksnummer(1L)).thenReturn(lagFagsakRinasakKobling());
         when(euxService.hentBuc(anyString())).thenReturn(lagBuc());
 
-        List<SedinfoDto> sedinfoDtoList = sendSedService.hentSed(1L, "");
+        List<SedinfoDto> sedinfoDtoList = sendSedService.hentSeder(1L, "");
 
         verify(saksrelasjonService).finnVedGsakSaksnummer(anyLong());
         verify(euxService).hentBuc(anyString());
@@ -162,7 +162,7 @@ public class SedServiceTest {
             throw new IntegrationException("");
         });
 
-        List<SedinfoDto> sedinfoDtoList = sendSedService.hentSed(1L, "");
+        List<SedinfoDto> sedinfoDtoList = sendSedService.hentSeder(1L, "");
 
         verify(saksrelasjonService).finnVedGsakSaksnummer(anyLong());
         verify(euxService).hentBuc(anyString());

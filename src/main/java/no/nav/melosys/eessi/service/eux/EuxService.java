@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
@@ -15,7 +16,6 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.joark.ParticipantInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -63,16 +63,23 @@ public class EuxService {
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
-        List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
+        List<Institusjon> institusjoner = hentMottakerinstitusjoner(bucType, landkode);
 
         return institusjoner.stream().map(Institusjon::getId).findFirst()
                 .orElseThrow(() -> new NotFoundException(
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
-    @Cacheable("institusjoner")
-    public List<Institusjon> hentAlleMottakerinstitusjoner(String bucType) throws IntegrationException {
-        return euxConsumer.hentInstitusjoner(bucType, null);
+    public List<Institusjon> hentMottakerinstitusjoner(String bucType, String landkode) throws IntegrationException {
+        List<Institusjon> institusjoner =  euxConsumer.hentInstitusjoner(bucType, null);
+
+        if (!StringUtils.isEmpty(landkode)) {
+            return institusjoner.stream()
+                    .filter(institusjon -> landkode.equalsIgnoreCase(institusjon.getLandkode()))
+                    .collect(Collectors.toList());
+        }
+
+        return institusjoner;
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {

@@ -6,10 +6,10 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.LongFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -30,7 +30,6 @@ import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -154,7 +153,7 @@ public class SedService {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
     }
 
-    public List<SedinfoDto> hentSed(Long gsakSaksnummer, String status) {
+    public List<SedinfoDto> hentSeder(Long gsakSaksnummer, String status) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                 .map(kobling -> {
                     try {
@@ -165,27 +164,27 @@ public class SedService {
                     }
                 })
                 .filter(Objects::nonNull)
-                .map(buc -> buc.getDocuments().stream()
-                        .filter(filtrerMedStatus(status))
-                        .map(doc -> lagSedinfoDto(doc, buc.getId())))
-                .flatMap(Function.identity())
+                .flatMap(buc -> tilSedInfoDto(buc, status))
                 .collect(Collectors.toList());
     }
 
+    private Stream<SedinfoDto> tilSedInfoDto(BUC buc, String status) {
+        return buc.getDocuments().stream()
+                .filter(filtrerMedStatus(status))
+                .map(doc -> byggSedinfoDto(doc, buc.getId()));
+    }
+
     private static Predicate<Document> filtrerMedStatus(String status) {
-        if (!StringUtils.isEmpty(status)) {
-            if ("utkast".equalsIgnoreCase(status)) {
-                return document -> "new".equals(document.getStatus());
-            } else if ("sendt".equalsIgnoreCase(status)) {
-                return document -> "sent".equals(document.getStatus());
-            }
+        if ("utkast".equalsIgnoreCase(status)) {
+            return document -> "new".equals(document.getStatus());
+        } else if ("sendt".equalsIgnoreCase(status)) {
+            return document -> "sent".equals(document.getStatus());
         }
 
-        // Ingen gyldig status, alle går igjennom filteret.
         return d -> true;
     }
 
-    private SedinfoDto lagSedinfoDto(Document document, String bucId) {
+    private SedinfoDto byggSedinfoDto(Document document, String bucId) {
         LongFunction<LocalDate> tilLocalDate = timestamp ->
                 Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
 
