@@ -17,10 +17,7 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
@@ -256,6 +253,29 @@ public class EuxConsumerTest {
 
         MedlemskapA001 medlemskapA001 = (MedlemskapA001) resultat.getMedlemskap();
         assertEquals("2017-12-01", medlemskapA001.getForrigesoeknad().get(0).getDato());
+    }
+
+    @Test
+    public void hentSedA003_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA003.json");
+        assertNotNull(jsonUrl);
+        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertNotNull(resultat);
+        assertNotNull(resultat.getNav());
+        assertNotNull(resultat.getMedlemskap());
+        assertEquals(SedType.A003.name(), resultat.getSed());
+        assertEquals(MedlemskapA003.class, resultat.getMedlemskap().getClass());
+
+        MedlemskapA003 medlemskap = (MedlemskapA003) resultat.getMedlemskap();
+        assertEquals("2017-12-01", medlemskap.getVedtak().getGjelderperiode().getSluttdato());
     }
 
     @Test

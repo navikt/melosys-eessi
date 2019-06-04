@@ -6,35 +6,35 @@ import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 
-class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper {
+class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper<MedlemskapA009> {
 
     @Override
-    Boolean sedErEndring(SED sed) {
-
-        MedlemskapA009 medlemskapA009 = hentMedlemskap(sed);
-        return "ja".equalsIgnoreCase(medlemskapA009.getVedtak().getErendringsvedtak());
+    Boolean sedErEndring(MedlemskapA009 medlemskap) {
+        return "ja".equalsIgnoreCase(medlemskap.getVedtak().getErendringsvedtak());
     }
 
     @Override
-    String hentLovvalgsbestemmelse(SED sed) {
-        MedlemskapA009 medlemskapA009 = hentMedlemskap(sed);
-        return medlemskapA009.getVedtak().getArtikkelforordning();
+    MedlemskapA009 hentMedlemskap(SED sed) {
+        return (MedlemskapA009) sed.getMedlemskap();
     }
 
     @Override
-    String hentLovvalgsland(SED sed) {
-        MedlemskapA009 medlemskapA009 = hentMedlemskap(sed);
-        return medlemskapA009.getVedtak().getLand();
+    String hentLovvalgsbestemmelse(MedlemskapA009 medlemskap) {
+        return medlemskap.getVedtak().getArtikkelforordning();
     }
 
     @Override
-    no.nav.melosys.eessi.kafka.producers.Periode mapPeriode(SED sed) {
+    String hentLovvalgsland(MedlemskapA009 medlemskap) {
+        return medlemskap.getVedtak().getLand();
+    }
+
+    @Override
+    no.nav.melosys.eessi.kafka.producers.Periode mapPeriode(MedlemskapA009 medlemskap) {
 
         String fom;
         String tom;
 
-        MedlemskapA009 medlemskapA009 = hentMedlemskap(sed);
-        Periode periode = medlemskapA009.getVedtak().getGjelderperiode();
+        Periode periode = medlemskap.getVedtak().getGjelderperiode();
         if (periode.erAapenPeriode()) {
             AapenPeriode aapenPeriode = periode.getAapenperiode();
             fom = aapenPeriode.getStartdato();
@@ -46,9 +46,5 @@ class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper {
         }
 
         return new no.nav.melosys.eessi.kafka.producers.Periode(fom, tom);
-    }
-
-    private MedlemskapA009 hentMedlemskap(SED sed) {
-        return (MedlemskapA009) sed.getMedlemskap();
     }
 }

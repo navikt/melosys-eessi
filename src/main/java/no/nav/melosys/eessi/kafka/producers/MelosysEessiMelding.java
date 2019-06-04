@@ -17,5 +17,7 @@ public class MelosysEessiMelding {
     private String lovvalgsland;
     private String artikkel;
     private boolean erEndring;
-
+    private boolean midlertidigBestemmelse;
+    private String bucType;
+    private String sedType;
 }
