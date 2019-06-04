@@ -3,12 +3,10 @@ package no.nav.melosys.eessi.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.controller.dto.BucSedRelasjonDto;
 import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.sed.BucService;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -18,11 +16,8 @@ public class BucController {
 
     private final EuxService euxService;
 
-    private final BucService bucService;
-
-    public BucController(EuxService euxService, BucService bucService) {
+    public BucController(EuxService euxService) {
         this.euxService = euxService;
-        this.bucService = bucService;
     }
 
     @GetMapping("/{bucType}/institusjoner")
@@ -35,10 +30,5 @@ public class BucController {
                         .landkode(institusjon.getLandkode())
                         .build())
                 .collect(Collectors.toList());
-    }
-
-    @GetMapping("/relasjoner")
-    public List<BucSedRelasjonDto> hentBucSedRelasjoner() {
-        return bucService.hentBucSedRelasjoner();
     }
 }
