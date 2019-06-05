@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
@@ -37,11 +38,14 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerLand, SED sed)
+    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerLand, String mottakerId, SED sed)
             throws IntegrationException, NotFoundException {
 
-        Map<String, String> response = euxConsumer
-                .opprettBucOgSed(bucType, avklarMottakerId(bucType, mottakerLand), sed);
+        if (StringUtils.isEmpty(mottakerId)) {
+            mottakerId = avklarMottakerId(bucType, mottakerLand);
+        }
+
+        Map<String, String> response = euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(response.get("caseId"),
                 response.get("documentId"));
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
@@ -59,11 +63,23 @@ public class EuxService {
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
-        List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, landkode);
+        List<Institusjon> institusjoner = hentMottakerinstitusjoner(bucType, landkode);
 
         return institusjoner.stream().map(Institusjon::getId).findFirst()
                 .orElseThrow(() -> new NotFoundException(
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
+    }
+
+    public List<Institusjon> hentMottakerinstitusjoner(String bucType, String landkode) throws IntegrationException {
+        List<Institusjon> institusjoner =  euxConsumer.hentInstitusjoner(bucType, null);
+
+        if (!StringUtils.isEmpty(landkode)) {
+            return institusjoner.stream()
+                    .filter(institusjon -> landkode.equalsIgnoreCase(institusjon.getLandkode()))
+                    .collect(Collectors.toList());
+        }
+
+        return institusjoner;
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {

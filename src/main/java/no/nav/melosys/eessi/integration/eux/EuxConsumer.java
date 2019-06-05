@@ -15,6 +15,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -470,6 +471,7 @@ public class EuxConsumer implements RestConsumer {
      * @param landkode kode til landet det skal hente institusjoner fra
      */
 
+    @Cacheable("institusjoner")
     public List<Institusjon> hentInstitusjoner(String bucType, String landkode)
             throws IntegrationException {
         log.info("Henter institusjoner for buctype {} og landkode", bucType, landkode);

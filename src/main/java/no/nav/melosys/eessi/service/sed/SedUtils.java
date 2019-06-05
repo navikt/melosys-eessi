@@ -2,11 +2,13 @@ package no.nav.melosys.eessi.service.sed;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.Fagomraade;
 import no.nav.melosys.eessi.models.SedType;
 
 class SedUtils {
 
-    private SedUtils() {}
+    private SedUtils() {
+    }
 
     //Henter første lovlige SED på en ny BUC
     static SedType hentFoersteLovligeSedPaaBuc(BucType bucType) {
@@ -25,6 +27,20 @@ class SedUtils {
             case LA_BUC_06:
                 return SedType.A005;
         }
+        throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + bucType);
+    }
+
+    static Fagomraade hentFagomraadeForBuc(BucType bucType) {
+        switch (bucType) {
+            case LA_BUC_01:
+            case LA_BUC_02:
+            case LA_BUC_03:
+            case LA_BUC_04:
+            case LA_BUC_05:
+            case LA_BUC_06:
+                return Fagomraade.LOVVALG;
+        }
+
         throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + bucType);
     }
 
@@ -91,7 +107,7 @@ class SedUtils {
             case ART_16_1:
             case ART_16_2:
                 return BucType.LA_BUC_01;
-                
+
         }
         throw new IllegalArgumentException("Bestemmelse " + bestemmelse.name() + " er ikke støttet enda!");
     }

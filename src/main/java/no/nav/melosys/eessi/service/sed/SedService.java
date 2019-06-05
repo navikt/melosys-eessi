@@ -1,10 +1,19 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.LongFunction;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SedinfoDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -31,7 +40,7 @@ public class SedService {
 
     @Autowired
     public SedService(EuxService euxService,
-            SaksrelasjonService saksrelasjonService) {
+                      SaksrelasjonService saksrelasjonService) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
     }
@@ -48,7 +57,8 @@ public class SedService {
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = opprettEllerOppdaterBucOgSed(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand());
+        OpprettBucOgSedResponse opprettBucOgSedResponse =
+                opprettEllerOppdaterBucOgSed(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId());
 
         try {
             euxService.sendSed(opprettBucOgSedResponse.getRinaSaksnummer(), opprettBucOgSedResponse.getDokumentId());
@@ -67,7 +77,6 @@ public class SedService {
      *
      * @param sedDataDto sed som skal opprettes
      * @param bucType    hvilken type buc som skal opprettes (dersom det ikke er en eksisterende buc på saken)
-     * @param sedType    hvilken type sed som skal opprettes
      * @return Dto-objekt som inneholder rinaSaksnummer, dokumentId og link til sak i rina
      */
     public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType)
@@ -80,7 +89,8 @@ public class SedService {
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-        OpprettBucOgSedResponse opprettBucOgSedResponse = opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand());
+        OpprettBucOgSedResponse opprettBucOgSedResponse =
+                opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId());
 
         return CreateSedDto.builder()
                 .bucId(opprettBucOgSedResponse.getRinaSaksnummer())
@@ -88,7 +98,7 @@ public class SedService {
                 .build();
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand) throws NotFoundException, IntegrationException {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
         SedType sedType = SedType.valueOf(sed.getSed());
 
         if (sedType == SedType.A009) {
@@ -110,7 +120,7 @@ public class SedService {
             }
         }
 
-        return opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, mottakerLand);
+        return opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, mottakerLand, mottakerId);
     }
 
     private boolean sedKanOppdateres(BUC buc, String id) {
@@ -131,9 +141,9 @@ public class SedService {
         return Optional.empty();
     }
 
-    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand)
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId)
             throws NotFoundException, IntegrationException {
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, mottakerId, sed);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
         return opprettBucOgSedResponse;
@@ -141,5 +151,51 @@ public class SedService {
 
     private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
+    }
+
+    public List<SedinfoDto> hentSeder(Long gsakSaksnummer, String status) {
+        return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
+                .map(kobling -> {
+                    try {
+                        return euxService.hentBuc(kobling.getRinaSaksnummer());
+                    } catch (IntegrationException e) {
+                        log.error(e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .flatMap(buc -> tilSedInfoDto(buc, status))
+                .collect(Collectors.toList());
+    }
+
+    private Stream<SedinfoDto> tilSedInfoDto(BUC buc, String status) {
+        return buc.getDocuments().stream()
+                .filter(filtrerMedStatus(status))
+                .map(doc -> byggSedinfoDto(doc, buc.getId()));
+    }
+
+    private static Predicate<Document> filtrerMedStatus(String status) {
+        if ("utkast".equalsIgnoreCase(status)) {
+            return document -> "new".equals(document.getStatus());
+        } else if ("sendt".equalsIgnoreCase(status)) {
+            return document -> "sent".equals(document.getStatus());
+        }
+
+        return d -> true;
+    }
+
+    private SedinfoDto byggSedinfoDto(Document document, String bucId) {
+        LongFunction<LocalDate> tilLocalDate = timestamp ->
+                Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
+
+        return SedinfoDto.builder()
+                .bucId(bucId)
+                .sedId(document.getId())
+                .opprettetDato(tilLocalDate.apply(document.getCreationDate()))
+                .sedType(document.getType())
+                .sistOppdatert(tilLocalDate.apply(document.getLastUpdate()))
+                .status(document.getStatus())
+                .rinaUrl(euxService.hentRinaUrl(bucId))
+                .build();
     }
 }
