@@ -6,7 +6,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.val;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -129,7 +128,7 @@ public class PersonvurderingTest {
         ObjectMapper mapper = new ObjectMapper();
         SED sed = mapper.readValue(jsonUrl, SED.class);
 
-        val statsborgerskap = new no.nav.melosys.eessi.models.sed.nav.Statsborgerskap();
+        no.nav.melosys.eessi.models.sed.Statsborgerskap statsborgerskap = new no.nav.melosys.eessi.models.sed.Statsborgerskap();
         statsborgerskap.setLand("NO");
         sed.getNav().getBruker().getPerson().getStatsborgerskap().add(statsborgerskap);
 

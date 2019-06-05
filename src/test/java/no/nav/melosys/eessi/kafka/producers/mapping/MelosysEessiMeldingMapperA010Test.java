@@ -2,12 +2,7 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
-import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
-import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg;
-import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
+import no.nav.melosys.eessi.models.sed.*;
 import org.junit.Test;
 import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,7 +57,7 @@ public class MelosysEessiMeldingMapperA010Test {
         VedtakA010 vedtak = new VedtakA010();
         medlemskapA010.setVedtak(vedtak);
 
-        PeriodeA010 periode = new PeriodeA010();
+        PeriodeA003 periode = new PeriodeA003();
         if (fastperiode) {
             periode.setSluttdato("slutt");
             periode.setStartdato("start");

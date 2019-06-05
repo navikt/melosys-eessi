@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.service.sed.mapper;
 
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
+import no.nav.melosys.eessi.models.sed.MedlemskapA008;
 
 public class A008Mapper implements LovvalgSedMapper<MedlemskapA008> {
 

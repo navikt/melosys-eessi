@@ -1,9 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
 import java.time.LocalDate;
-import no.nav.melosys.eessi.models.sed.Constants;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.sed.*;
 import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
 import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
 

@@ -2,12 +2,7 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.util.Collections;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.models.sed.nav.Bruker;
-import no.nav.melosys.eessi.models.sed.nav.Nav;
-import no.nav.melosys.eessi.models.sed.nav.Person;
-import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.models.sed.*;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
 class MelosysEessiMeldingMapperStubs {

@@ -6,9 +6,9 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.Periode;
 import no.nav.melosys.eessi.kafka.producers.Statsborgerskap;
+import no.nav.melosys.eessi.models.sed.Medlemskap;
+import no.nav.melosys.eessi.models.sed.PeriodeA003;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
 public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
@@ -41,7 +41,7 @@ public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
         return melosysEessiMelding;
     }
 
-    private List<Statsborgerskap> mapStatsborgerskap(List<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {
+    private List<Statsborgerskap> mapStatsborgerskap(List<no.nav.melosys.eessi.models.sed.Statsborgerskap> statsborgerskapListe) {
         return statsborgerskapListe.stream().map(s -> {
             Statsborgerskap statsborgerskap = new Statsborgerskap();
             statsborgerskap.setLandkode(s.getLand());
@@ -59,11 +59,11 @@ public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
         return false;
     }
 
-    Periode hentPeriodeA010(PeriodeA010 periode) {
+    Periode hentPeriodeA010(PeriodeA003 periode) {
         String fom;
         String tom;
 
-        if (periode.erAapenPeriode()) {
+        if (periode.getAapenperiode() != null && periode.getAapenperiode().getStartdato() != null) {
             fom = periode.getAapenperiode().getStartdato();
             tom = null;
         } else {

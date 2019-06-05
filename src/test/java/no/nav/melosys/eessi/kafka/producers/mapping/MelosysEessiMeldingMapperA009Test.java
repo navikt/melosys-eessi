@@ -1,12 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
+import no.nav.melosys.eessi.models.sed.*;
 import org.junit.Test;
 import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;

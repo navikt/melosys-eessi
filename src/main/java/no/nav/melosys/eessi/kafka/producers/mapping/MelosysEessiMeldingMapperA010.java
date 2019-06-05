@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.models.sed.MedlemskapA010;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 
 class MelosysEessiMeldingMapperA010 extends MelosysEessiMeldingMapper<MedlemskapA010> {
 

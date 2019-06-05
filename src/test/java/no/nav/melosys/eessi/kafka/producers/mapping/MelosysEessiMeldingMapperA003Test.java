@@ -2,10 +2,10 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.models.sed.MedlemskapA003;
+import no.nav.melosys.eessi.models.sed.PeriodeA003;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
-import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
+import no.nav.melosys.eessi.models.sed.VedtakA003;
 import org.junit.Test;
 import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,7 +30,7 @@ public class MelosysEessiMeldingMapperA003Test {
         medlemskap.setVedtak(new VedtakA003());
         medlemskap.getVedtak().setErendringsvedtak("ja");
 
-        PeriodeA010 periodeA010 = new PeriodeA010();
+        PeriodeA003 periodeA010 = new PeriodeA003();
         periodeA010.setStartdato("12-12-2000");
         periodeA010.setSluttdato("12-12-2000");
         medlemskap.getVedtak().setGjelderperiode(periodeA010);

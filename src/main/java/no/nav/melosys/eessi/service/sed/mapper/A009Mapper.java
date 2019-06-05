@@ -6,11 +6,7 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
+import no.nav.melosys.eessi.models.sed.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
 public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {

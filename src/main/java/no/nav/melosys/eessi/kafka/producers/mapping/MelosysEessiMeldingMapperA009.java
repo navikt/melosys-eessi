@@ -1,10 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.models.sed.*;
 
 class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper<MedlemskapA009> {
 
@@ -35,7 +31,7 @@ class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper<Medlemskap
         String tom;
 
         Periode periode = medlemskap.getVedtak().getGjelderperiode();
-        if (periode.erAapenPeriode()) {
+        if (periode.getAapenperiode() != null && periode.getAapenperiode().getStartdato() != null) {
             AapenPeriode aapenPeriode = periode.getAapenperiode();
             fom = aapenPeriode.getStartdato();
             tom = null;

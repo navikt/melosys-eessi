@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.models.sed.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 
 class MelosysEessiMeldingMapperA003 extends MelosysEessiMeldingMapper<MedlemskapA003>  {
 
@@ -33,6 +33,6 @@ class MelosysEessiMeldingMapperA003 extends MelosysEessiMeldingMapper<Medlemskap
 
     @Override
     boolean erMidlertidigBestemmelse(MedlemskapA003 medlemskap) {
-        return "ja".equals(medlemskap.getIsDeterminationProvisional());
+        return "ja".equals(medlemskap.getMidlertidigVedtak());
     }
 }

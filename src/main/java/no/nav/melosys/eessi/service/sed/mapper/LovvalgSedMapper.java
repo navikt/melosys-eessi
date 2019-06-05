@@ -10,13 +10,10 @@ import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.Constants;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.models.sed.nav.Adresse;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidssted;
-import no.nav.melosys.eessi.models.sed.nav.Bruker;
-import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.sed.Adresse;
+import no.nav.melosys.eessi.models.sed.Arbeidssted;
+import no.nav.melosys.eessi.models.sed.Bruker;
+import no.nav.melosys.eessi.models.sed.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
@@ -133,7 +130,7 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
                 .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
 
         if (optionalFar.isPresent()) {
-            Far far = new Far();
+            Forelder far = new Forelder();
             Person person = new Person();
             person.setEtternavnvedfoedsel(optionalFar.get().getEtternavn());
             person.setFornavn(optionalFar.get().getFornavn());
@@ -146,7 +143,7 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
                 .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
 
         if (optionalMor.isPresent()) {
-            Mor mor = new Mor();
+            Forelder mor = new Forelder();
             Person person = new Person();
             person.setEtternavnvedfoedsel(optionalMor.get().getEtternavn());
             person.setFornavn(optionalMor.get().getFornavn());

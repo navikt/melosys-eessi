@@ -9,8 +9,7 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.sed.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper;
 

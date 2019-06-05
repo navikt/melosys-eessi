@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.service.sed.helpers;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
+import no.nav.melosys.eessi.models.sed.Medlemskap;
 import no.nav.melosys.eessi.service.sed.mapper.A009Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;

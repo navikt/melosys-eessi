@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.models.sed.Statsborgerskap;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
@@ -89,7 +89,7 @@ public class Personvurdering {
      * @return fødselsnummer/d-nummer for person, null hvis ikke funnet
      */
     private String soekEtterPerson(SED sed) {
-        no.nav.melosys.eessi.models.sed.nav.Person sedPerson = sed.getNav().getBruker().getPerson();
+        no.nav.melosys.eessi.models.sed.Person sedPerson = sed.getNav().getBruker().getPerson();
         LocalDate foedselsdato = LocalDate.parse(sedPerson.getFoedselsdato(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         String ident;
