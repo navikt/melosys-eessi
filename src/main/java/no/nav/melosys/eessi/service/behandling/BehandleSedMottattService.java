@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.behandling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapper;
 import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
@@ -66,13 +67,25 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) {
+    private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon)
+            throws NotFoundException, IntegrationException {
+
         SedType sedType = SedType.valueOf(sed.getSed());
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(sedType);
         if (mapper != null) {
-            melosysEessiProducer.publiserMelding(
-                    mapper.map(aktoerId, sed, sedHendelse, sakInformasjon)
-            );
+            MelosysEessiMelding melosysEessiMelding = mapper.map(aktoerId, sed, sedHendelse, sakInformasjon);
+            melosysEessiMelding.setErEndring(sedErEndring(sedHendelse, melosysEessiMelding));
+            melosysEessiProducer.publiserMelding(melosysEessiMelding);
         }
+    }
+
+    private boolean sedErEndring(SedHendelse sedHendelse, MelosysEessiMelding melosysEessiMelding)
+            throws IntegrationException, NotFoundException {
+
+        if (melosysEessiMelding.isErEndring()) {
+            return true;
+        }
+
+        return euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
     }
 }

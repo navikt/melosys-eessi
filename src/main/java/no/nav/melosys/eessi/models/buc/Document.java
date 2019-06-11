@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.models.buc;
 
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class Document {
     private Creator creator;
     private String type;
     private String status;
+    private List<Conversation> conversations;
 }
