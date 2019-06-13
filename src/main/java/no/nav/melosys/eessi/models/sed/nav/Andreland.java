@@ -12,4 +12,7 @@ import lombok.Data;
 public class Andreland {
 
     private List<Arbeidsgiver> arbeidsgiver;
+
+    //A003
+    private ArbeidsgiverAktivitet arbeidsgiveraktivitet;
 }

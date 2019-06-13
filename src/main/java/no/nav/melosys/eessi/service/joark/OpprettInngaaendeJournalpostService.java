@@ -30,8 +30,11 @@ public class OpprettInngaaendeJournalpostService {
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
 
+        //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
+        String dokumentId = response.getDokumenter() == null ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
+
         return SakInformasjon.builder().journalpostId(response.getJournalpostId())
-                .dokumentId(response.getDokumenter().get(0))
+                .dokumentId(dokumentId)
                 .gsakSaksnummer(sak.getId())
                 .build();
     }

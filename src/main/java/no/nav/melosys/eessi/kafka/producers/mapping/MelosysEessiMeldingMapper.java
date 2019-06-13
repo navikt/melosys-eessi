@@ -7,9 +7,11 @@ import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.Periode;
 import no.nav.melosys.eessi.kafka.producers.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
+import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
-public abstract class MelosysEessiMeldingMapper {
+public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
 
     public MelosysEessiMelding map(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
@@ -24,11 +26,14 @@ public abstract class MelosysEessiMeldingMapper {
                 mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
         );
 
-        melosysEessiMelding.setPeriode(mapPeriode(sed));
+        T medlemskap = hentMedlemskap(sed);
 
-        melosysEessiMelding.setLovvalgsland(hentLovvalgsland(sed));
-        melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(sed));
-        melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(sed));
+        melosysEessiMelding.setPeriode(mapPeriode(medlemskap));
+
+        melosysEessiMelding.setLovvalgsland(hentLovvalgsland(medlemskap));
+        melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(medlemskap));
+        melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(medlemskap));
+        melosysEessiMelding.setMidlertidigBestemmelse(erMidlertidigBestemmelse(medlemskap));
 
         return melosysEessiMelding;
     }
@@ -41,9 +46,27 @@ public abstract class MelosysEessiMeldingMapper {
         }).collect(Collectors.toList());
     }
 
-    abstract Periode mapPeriode(SED sed);
-    abstract String hentLovvalgsland(SED sed);
-    abstract String hentLovvalgsbestemmelse(SED sed);
-    abstract Boolean sedErEndring(SED sed);
+    abstract Periode mapPeriode(T medlemskap);
+    abstract String hentLovvalgsland(T medlemskap);
+    abstract String hentLovvalgsbestemmelse(T medlemskap);
+    abstract Boolean sedErEndring(T medlemskap);
+    abstract T hentMedlemskap(SED sed);
 
+    boolean erMidlertidigBestemmelse(T medlemskap) {
+        return false;
+    }
+
+    Periode hentPeriode(PeriodeA010 periode) {
+        String fom;
+        String tom;
+
+        if (periode.erAapenPeriode()) {
+            fom = periode.getAapenperiode().getStartdato();
+            tom = null;
+        } else {
+            fom = periode.getStartdato();
+            tom = periode.getSluttdato();
+        }
+        return new Periode(fom, tom);
+    }
 }
