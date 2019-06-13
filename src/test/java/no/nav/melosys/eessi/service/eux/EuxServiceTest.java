@@ -257,14 +257,14 @@ public class EuxServiceTest {
         assertThat(erEndring).isFalse();
     }
 
-    @Test(expected = NotFoundException.class)
-    public void sedErEndring_utenSederForBuc_forventException() throws IntegrationException, NotFoundException {
+    @Test
+    public void sedErEndring_utenSederForBuc_forventFalse() throws IntegrationException, NotFoundException {
         when(euxConsumer.hentBuC(anyString())).thenReturn(enhancedRandom.nextObject(BUC.class));
 
         boolean erEndring = euxService.sedErEndring("1", "123");
 
         verify(euxConsumer).hentBuC(eq("123"));
-        assertThat(erEndring).isTrue();
+        assertThat(erEndring).isFalse();
     }
 
     private BUC lagBuc() {

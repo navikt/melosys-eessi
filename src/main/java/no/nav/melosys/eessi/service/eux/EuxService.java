@@ -9,7 +9,6 @@ import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -96,13 +95,12 @@ public class EuxService {
         return sedId;
     }
 
-    public boolean sedErEndring(String sedId, String rinaSaksnummer) throws IntegrationException, NotFoundException {
+    public boolean sedErEndring(String sedId, String rinaSaksnummer) throws IntegrationException {
         BUC buc = euxConsumer.hentBuC(rinaSaksnummer);
 
-        Document sed = buc.getDocuments().stream().filter(document -> document.getId().equals(sedId)).findFirst()
-                .orElseThrow(() -> new NotFoundException("Kunne ikke finne sed " + sedId + " for buc " + rinaSaksnummer));
-
-        return sed.getConversations().size() > 1;
+        return buc.getDocuments().stream()
+                .filter(document -> document.getId().equals(sedId)).findFirst()
+                .filter(document -> document.getConversations().size() > 1).isPresent();
     }
 
     /**

@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
 public abstract class MelosysEessiMeldingMapper {
 
-    public MelosysEessiMelding map(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) {
+    public MelosysEessiMelding map(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setSedId(sedHendelse.getRinaDokumentId());
         melosysEessiMelding.setRinaSaksnummer(sedHendelse.getRinaSakId());
@@ -28,7 +28,7 @@ public abstract class MelosysEessiMeldingMapper {
 
         melosysEessiMelding.setLovvalgsland(hentLovvalgsland(sed));
         melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(sed));
-        melosysEessiMelding.setErEndring(sedErEndring(sed));
+        melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(sed));
 
         return melosysEessiMelding;
     }
