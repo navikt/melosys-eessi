@@ -59,7 +59,7 @@ public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
         return false;
     }
 
-    Periode hentPeriodeA010(PeriodeA010 periode) {
+    Periode hentPeriode(PeriodeA010 periode) {
         String fom;
         String tom;
 

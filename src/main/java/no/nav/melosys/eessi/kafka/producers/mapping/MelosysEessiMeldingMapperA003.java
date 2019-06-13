@@ -8,7 +8,7 @@ class MelosysEessiMeldingMapperA003 extends MelosysEessiMeldingMapper<Medlemskap
 
     @Override
     Periode mapPeriode(MedlemskapA003 medlemskap) {
-        return hentPeriodeA010(medlemskap.getVedtak().getGjelderperiode());
+        return hentPeriode(medlemskap.getVedtak().getGjelderperiode());
     }
 
     @Override
