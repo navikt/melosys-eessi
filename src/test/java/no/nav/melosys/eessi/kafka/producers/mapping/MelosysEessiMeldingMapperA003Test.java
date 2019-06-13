@@ -17,7 +17,7 @@ public class MelosysEessiMeldingMapperA003Test {
     public void mapA003_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap());
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory
-                .getMapper(SedType.A003).map("123", sed, creteSedHendelse(), createSakInformasjon());
+                .getMapper(SedType.A003).map("123", sed, createSedHendelse(), createSakInformasjon(), false);
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getPeriode().getFom()).isEqualTo("12-12-2000");
