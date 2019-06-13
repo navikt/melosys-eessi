@@ -7,7 +7,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MelosysEessiMeldingMapperFactoryTest {
 
     @Test
-    public void mapA009_fastPeriode_verifiserPeriode() {
+    public void hentA003Mapper() {
+        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.A003);
+        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA003.class);
+    }
+
+    @Test
+    public void hentA009Mapper() {
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.A009);
         assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA009.class);
     }
