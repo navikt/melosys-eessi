@@ -40,7 +40,8 @@ public class OpprettInngaaendeJournalpostServiceTest {
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
         sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
-        OpprettJournalpostResponse response = new OpprettJournalpostResponse("11223344", Lists.newArrayList("123"), null, null);
+        OpprettJournalpostResponse response = new OpprettJournalpostResponse("11223344", Lists.newArrayList(
+                new OpprettJournalpostResponse.Dokument("123")), null, null);
         when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any())).thenReturn(response);
 
         Sak sak = enhancedRandom.nextObject(Sak.class);

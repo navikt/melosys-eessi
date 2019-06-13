@@ -10,7 +10,14 @@ import lombok.*;
 @ToString
 public class OpprettJournalpostResponse {
   private String journalpostId;
-  private List<String> dokumenter;
+  private List<Dokument> dokumenter;
   private String journalstatus;
   private String melding;
+
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class Dokument {
+    private String dokumentInfoId;
+  }
 }
