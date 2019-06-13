@@ -8,10 +8,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.google.common.collect.ImmutableMap;
+import io.github.benas.randombeans.EnhancedRandomBuilder;
+import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -42,6 +46,9 @@ public class EuxServiceTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+    private EnhancedRandom enhancedRandom = EnhancedRandomBuilder.aNewEnhancedRandomBuilder()
+            .collectionSizeRange(3, 10).build();
 
     @Before
     public void setup() throws IOException, IntegrationException {
@@ -226,5 +233,46 @@ public class EuxServiceTest {
     public void hentMottakerinstitusjoner_verifiserConsumerKall() throws IntegrationException {
         euxService.hentMottakerinstitusjoner(BucType.LA_BUC_01.name(), null);
         verify(euxConsumer).hentInstitusjoner(eq(BucType.LA_BUC_01.name()), eq(null));
+    }
+
+    @Test
+    public void sedErEndring_medFlereConversations_forventTrue() throws IntegrationException, NotFoundException {
+        when(euxConsumer.hentBuC(anyString())).thenReturn(lagBuc());
+
+        boolean erEndring = euxService.sedErEndring("1", "123");
+
+        verify(euxConsumer).hentBuC(eq("123"));
+        assertThat(erEndring).isTrue();
+    }
+
+    @Test
+    public void sedErEndring_utenNoenConversations_forventFalse() throws IntegrationException, NotFoundException {
+        BUC buc = lagBuc();
+        buc.getDocuments().get(0).setConversations(Collections.singletonList(new Conversation()));
+        when(euxConsumer.hentBuC(anyString())).thenReturn(buc);
+
+        boolean erEndring = euxService.sedErEndring("1", "123");
+
+        verify(euxConsumer).hentBuC(eq("123"));
+        assertThat(erEndring).isFalse();
+    }
+
+    @Test
+    public void sedErEndring_utenSederForBuc_forventFalse() throws IntegrationException, NotFoundException {
+        when(euxConsumer.hentBuC(anyString())).thenReturn(enhancedRandom.nextObject(BUC.class));
+
+        boolean erEndring = euxService.sedErEndring("1", "123");
+
+        verify(euxConsumer).hentBuC(eq("123"));
+        assertThat(erEndring).isFalse();
+    }
+
+    private BUC lagBuc() {
+        BUC buc = enhancedRandom.nextObject(BUC.class);
+
+        buc.getDocuments().get(0).setId("1");
+        buc.setId("123");
+
+        return buc;
     }
 }

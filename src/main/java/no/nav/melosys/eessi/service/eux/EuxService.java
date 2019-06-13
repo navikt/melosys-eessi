@@ -29,7 +29,7 @@ public class EuxService {
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-            @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
+                      @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
         this.euxConsumer = euxConsumer;
         this.rinaHostUrl = rinaHostUrl;
     }
@@ -71,7 +71,7 @@ public class EuxService {
     }
 
     public List<Institusjon> hentMottakerinstitusjoner(String bucType, String landkode) throws IntegrationException {
-        List<Institusjon> institusjoner =  euxConsumer.hentInstitusjoner(bucType, null);
+        List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, null);
 
         if (!StringUtils.isEmpty(landkode)) {
             return institusjoner.stream()
@@ -93,6 +93,14 @@ public class EuxService {
         log.info("SED {} opprettet i sak {}", sed.getSed(), rinaSaksnummer);
 
         return sedId;
+    }
+
+    public boolean sedErEndring(String sedId, String rinaSaksnummer) throws IntegrationException {
+        BUC buc = euxConsumer.hentBuC(rinaSaksnummer);
+
+        return buc.getDocuments().stream()
+                .filter(document -> document.getId().equals(sedId)).findFirst()
+                .filter(document -> document.getConversations().size() > 1).isPresent();
     }
 
     /**

@@ -66,12 +66,14 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) {
+    private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) throws IntegrationException {
+
         SedType sedType = SedType.valueOf(sed.getSed());
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(sedType);
         if (mapper != null) {
+            boolean sedErEndring = euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
             melosysEessiProducer.publiserMelding(
-                    mapper.map(aktoerId, sed, sedHendelse, sakInformasjon)
+                    mapper.map(aktoerId, sed, sedHendelse, sakInformasjon, sedErEndring)
             );
         }
     }

@@ -19,7 +19,7 @@ public class MelosysEessiMeldingMapperA009Test {
 
         SED sed = createSed(hentMedlemskap(true));
         sed.setSed("A009");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, creteSedHendelse(),createSakInformasjon());
+        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), false);
 
         assertThat(melding).isNotNull();
         assertThat(melding.getGsakSaksnummer()).isNotNull();
@@ -32,6 +32,7 @@ public class MelosysEessiMeldingMapperA009Test {
         assertThat(melding.getDokumentId()).isEqualTo("dokument");
         assertThat(melding.getLovvalgsland()).isEqualTo("SE");
         assertThat(melding.getGsakSaksnummer()).isEqualTo(123L);
+        assertThat(melding.isErEndring()).isFalse();
     }
 
     @Test
@@ -40,7 +41,7 @@ public class MelosysEessiMeldingMapperA009Test {
 
         SED sed = createSed(hentMedlemskap(false));
         sed.setSed("A009");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, creteSedHendelse(),createSakInformasjon());
+        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), false);
 
         assertThat(melding).isNotNull();
         assertThat(melding.getGsakSaksnummer()).isNotNull();
@@ -53,6 +54,32 @@ public class MelosysEessiMeldingMapperA009Test {
         assertThat(melding.getDokumentId()).isEqualTo("dokument");
         assertThat(melding.getLovvalgsland()).isEqualTo("SE");
         assertThat(melding.getGsakSaksnummer()).isEqualTo(123L);
+        assertThat(melding.isErEndring()).isFalse();
+    }
+
+    @Test
+    public void mapA009_medErendringsvedtak_forventAtSpesifikkRegelOverskriver() {
+        MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA009();
+
+        SED sed = createSed(hentMedlemskap(false));
+        sed.setSed("A009");
+        ((MedlemskapA009) sed.getMedlemskap()).getVedtak().setErendringsvedtak("ja");
+        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), false);
+
+        assertThat(melding).isNotNull();
+        assertThat(melding.isErEndring()).isTrue();
+    }
+
+    @Test
+    public void mapA009_utenErendringsvedtak_forventAtResultatFraEuxOverskriver() {
+        MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA009();
+
+        SED sed = createSed(hentMedlemskap(false));
+        sed.setSed("A009");
+        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), true);
+
+        assertThat(melding).isNotNull();
+        assertThat(melding.isErEndring()).isTrue();
     }
 
     private MedlemskapA009 hentMedlemskap(boolean fastperiode) {

@@ -26,7 +26,7 @@ class MelosysEessiMeldingMapperStubs {
         return sed;
     }
 
-    static SedHendelse creteSedHendelse() {
+    static SedHendelse createSedHendelse() {
         return SedHendelse.builder().navBruker("navbruker").rinaDokumentId("rinadok").rinaSakId("rinasak").avsenderId("avsenderid").avsenderNavn("avsendernavn")
                 .bucType("buc").sedType("sed").id(1L).build();
     }
