@@ -1,19 +1,10 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.function.LongFunction;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SedinfoDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -151,51 +142,5 @@ public class SedService {
 
     private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
-    }
-
-    public List<SedinfoDto> hentSeder(Long gsakSaksnummer, String status) {
-        return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
-                .map(kobling -> {
-                    try {
-                        return euxService.hentBuc(kobling.getRinaSaksnummer());
-                    } catch (IntegrationException e) {
-                        log.error(e.getMessage());
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .flatMap(buc -> tilSedInfoDto(buc, status))
-                .collect(Collectors.toList());
-    }
-
-    private Stream<SedinfoDto> tilSedInfoDto(BUC buc, String status) {
-        return buc.getDocuments().stream()
-                .filter(filtrerMedStatus(status))
-                .map(doc -> byggSedinfoDto(doc, buc.getId()));
-    }
-
-    private static Predicate<Document> filtrerMedStatus(String status) {
-        if ("utkast".equalsIgnoreCase(status)) {
-            return document -> "new".equals(document.getStatus());
-        } else if ("sendt".equalsIgnoreCase(status)) {
-            return document -> "sent".equals(document.getStatus());
-        }
-
-        return d -> true;
-    }
-
-    private SedinfoDto byggSedinfoDto(Document document, String bucId) {
-        LongFunction<LocalDate> tilLocalDate = timestamp ->
-                Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
-
-        return SedinfoDto.builder()
-                .bucId(bucId)
-                .sedId(document.getId())
-                .opprettetDato(tilLocalDate.apply(document.getCreationDate()))
-                .sedType(document.getType())
-                .sistOppdatert(tilLocalDate.apply(document.getLastUpdate()))
-                .status(document.getStatus())
-                .rinaUrl(euxService.hentRinaUrl(bucId))
-                .build();
     }
 }
