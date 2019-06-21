@@ -34,6 +34,8 @@ public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
         melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(medlemskap));
         melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(medlemskap));
         melosysEessiMelding.setMidlertidigBestemmelse(erMidlertidigBestemmelse(medlemskap));
+        melosysEessiMelding.setSedType(sedHendelse.getSedType());
+        melosysEessiMelding.setBucType(sedHendelse.getBucType());
 
         return melosysEessiMelding;
     }
