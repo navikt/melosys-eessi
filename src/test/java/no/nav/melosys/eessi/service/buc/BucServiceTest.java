@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.service.buc;
 
 import java.io.IOException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BucServiceTest {
+    private static Long EXPECTED_TIMESTAMP = 1554400129480L;
 
     @Mock
     private EuxService euxService;
@@ -55,7 +55,7 @@ public class BucServiceTest {
 
         assertThat(bucinfoDtoList)
                 .extracting(BucinfoDto::getId, BucinfoDto::getBucType, BucinfoDto::getOpprettetDato)
-                .contains(tuple("100485", "LA_BUC_01", LocalDate.of(2019, 4, 4)));
+                .contains(tuple("100485", "LA_BUC_01", EXPECTED_TIMESTAMP));
 
        assertThat(bucinfoDtoList.get(0).getSeder())
                 .extracting(SedinfoDto::getSedType, SedinfoDto::getSedId, SedinfoDto::getBucId)
@@ -74,7 +74,7 @@ public class BucServiceTest {
 
         assertThat(bucinfoDtoList)
                 .extracting(BucinfoDto::getId, BucinfoDto::getBucType, BucinfoDto::getOpprettetDato)
-                .contains(tuple("100485", "LA_BUC_01", LocalDate.of(2019, 4, 4)));
+                .contains(tuple("100485", "LA_BUC_01", EXPECTED_TIMESTAMP));
 
         assertThat(bucinfoDtoList.get(0).getSeder())
                 .extracting(SedinfoDto::getSedType, SedinfoDto::getSedId, SedinfoDto::getBucId)

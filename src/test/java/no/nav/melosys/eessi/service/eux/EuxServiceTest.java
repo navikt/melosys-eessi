@@ -267,6 +267,12 @@ public class EuxServiceTest {
         assertThat(erEndring).isFalse();
     }
 
+    @Test
+    public void hentRinaUrlPrefix_forventRettString() {
+        String rinaUrlPrefix = euxService.hentRinaUrlPrefix();
+        assertThat(rinaUrlPrefix).isEqualTo(RINA_MOCK_URL + "/portal/#/caseManagement/");
+    }
+
     private BUC lagBuc() {
         BUC buc = enhancedRandom.nextObject(BUC.class);
 
