@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.controller.dto;
 
-import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import no.nav.melosys.eessi.models.buc.Document;
 
 @Data
 @Builder
@@ -14,9 +14,30 @@ public class SedinfoDto {
 
     private String bucId;
     private String sedId;
-    private LocalDate opprettetDato;
-    private LocalDate sistOppdatert;
+    private Long opprettetDato;
+    private Long sistOppdatert;
     private String sedType;
     private String status;
     private String rinaUrl;
+
+    public static SedinfoDto av(Document document, String bucId, String rinaUrlPrefix) {
+        return SedinfoDto.builder()
+                .bucId(bucId)
+                .sedId(document.getId())
+                .sedType(document.getType())
+                .opprettetDato(document.getCreationDate())
+                .sistOppdatert(document.getLastUpdate())
+                .status(tilNorskStatusEllerTomString(document.getStatus()))
+                .rinaUrl(rinaUrlPrefix + bucId)
+                .build();
+    }
+
+    private static String tilNorskStatusEllerTomString(String status) {
+        SedStatus sedStatus = SedStatus.fraEngelskStatus(status);
+        if (sedStatus == null) {
+            return "";
+        }
+
+        return sedStatus.getNorskStatus();
+    }
 }

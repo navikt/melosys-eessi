@@ -23,6 +23,8 @@ import org.springframework.util.StringUtils;
 @Service
 public class EuxService {
 
+    private static final String RINA_URL_TEMPLATE = "/portal/#/caseManagement/";
+
     private final EuxConsumer euxConsumer;
 
     private final String rinaHostUrl;
@@ -179,6 +181,10 @@ public class EuxService {
         if (StringUtils.isEmpty(rinaCaseId)) {
             throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
-        return rinaHostUrl + "/portal/#/caseManagement/" + rinaCaseId;
+        return rinaHostUrl + RINA_URL_TEMPLATE + rinaCaseId;
+    }
+
+    public String hentRinaUrlPrefix() {
+        return rinaHostUrl + RINA_URL_TEMPLATE;
     }
 }
