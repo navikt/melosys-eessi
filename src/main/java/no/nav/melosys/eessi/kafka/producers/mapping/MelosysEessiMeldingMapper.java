@@ -21,6 +21,7 @@ public abstract class MelosysEessiMeldingMapper<T extends Medlemskap> {
         melosysEessiMelding.setDokumentId(sakInformasjon.getDokumentId());
         melosysEessiMelding.setGsakSaksnummer(Long.parseLong(sakInformasjon.getGsakSaksnummer()));
         melosysEessiMelding.setAktoerId(aktoerId);
+        melosysEessiMelding.setYtterligereInformasjon(sed.getNav().getYtterligereinformasjon());
 
         melosysEessiMelding.setStatsborgerskap(
                 mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())

@@ -14,6 +14,7 @@ public class MelosysEessiMeldingMapperFactory {
         mappers.put(SedType.A003, new MelosysEessiMeldingMapperA003());
         mappers.put(SedType.A009, new MelosysEessiMeldingMapperA009());
         mappers.put(SedType.A010, new MelosysEessiMeldingMapperA010());
+        mappers.put(SedType.A011, new MelosysEessiMeldingMapperA011());
     }
 
     public static MelosysEessiMeldingMapper getMapper(SedType sedType) {
