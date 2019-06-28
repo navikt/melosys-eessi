@@ -48,6 +48,11 @@ public class OpprettJournalpostRequest {
     private String id;
     private String navn;
     private String land;
+    private IdType idType;
+
+    public enum IdType {
+      FNR, ORGNR, HPRNR, UTL_ORG
+    }
   }
 
   @Builder

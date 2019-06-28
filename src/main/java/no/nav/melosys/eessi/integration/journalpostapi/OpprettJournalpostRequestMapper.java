@@ -66,6 +66,7 @@ public class OpprettJournalpostRequestMapper {
         return AvsenderMottaker.builder()
                 .id(type == JournalpostType.UTGAAENDE ? sedHendelse.getMottakerId() : sedHendelse.getAvsenderId())
                 .navn(type == JournalpostType.UTGAAENDE ? sedHendelse.getMottakerNavn() : sedHendelse.getAvsenderNavn())
+                .idType(AvsenderMottaker.IdType.UTL_ORG)
                 .build();
     }
 
