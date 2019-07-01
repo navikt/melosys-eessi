@@ -7,6 +7,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MelosysEessiMeldingMapperFactoryTest {
 
     @Test
+    public void hentA002Mapper() {
+        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002);
+        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA002.class);
+    }
+
+    @Test
     public void hentA003Mapper() {
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.A003);
         assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA003.class);
@@ -22,5 +28,11 @@ public class MelosysEessiMeldingMapperFactoryTest {
     public void hentA010Mapper() {
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.A010);
         assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA010.class);
+    }
+
+    @Test
+    public void hentA011Mapper() {
+        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.A011);
+        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA011.class);
     }
 }

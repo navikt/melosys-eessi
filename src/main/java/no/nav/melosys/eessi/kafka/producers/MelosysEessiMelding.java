@@ -21,4 +21,17 @@ public class MelosysEessiMelding {
     private String ytterligereInformasjon;
     private String bucType;
     private String sedType;
+
+    private SvarAnmodningUnntak svarAnmodningUnntak;
+
+    @Data
+    public static class SvarAnmodningUnntak {
+        Beslutning beslutning;
+        String begrunnelse;
+        Periode delvisInnvilgetPeriode;
+    }
+
+    public enum Beslutning {
+        INNVILGELSE, DELVIS_INNVILGELSE, AVSLAG;
+    }
 }

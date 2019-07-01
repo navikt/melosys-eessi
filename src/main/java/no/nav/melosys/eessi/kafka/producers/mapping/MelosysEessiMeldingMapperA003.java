@@ -4,7 +4,7 @@ import no.nav.melosys.eessi.kafka.producers.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 
-class MelosysEessiMeldingMapperA003 extends MelosysEessiMeldingMapper<MedlemskapA003>  {
+class MelosysEessiMeldingMapperA003 extends NyttLovvalgEessiMeldingMapper<MedlemskapA003> {
 
     @Override
     Periode mapPeriode(MedlemskapA003 medlemskap) {
