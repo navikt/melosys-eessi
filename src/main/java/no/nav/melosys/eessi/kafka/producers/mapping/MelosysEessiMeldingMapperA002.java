@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 
@@ -13,13 +13,13 @@ public class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldi
     }
 
     @Override
-    MelosysEessiMelding.Beslutning hentBeslutning(MedlemskapA002 medlemskap) {
+    SvarAnmodningUnntak.Beslutning hentBeslutning(MedlemskapA002 medlemskap) {
         String resultat = medlemskap.getUnntak().getVedtak().getResultat();
 
         if ("ikke_godkjent".equals(resultat)) {
-            return MelosysEessiMelding.Beslutning.AVSLAG;
+            return SvarAnmodningUnntak.Beslutning.AVSLAG;
         } else if ("godkjent_for_annen_periode".equals(resultat)) {
-            return MelosysEessiMelding.Beslutning.DELVIS_INNVILGELSE;
+            return SvarAnmodningUnntak.Beslutning.DELVIS_INNVILGELSE;
         }
 
         throw new IllegalArgumentException("Feil ved mapping til beslutning for A002. "

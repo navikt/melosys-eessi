@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
@@ -16,7 +17,7 @@ public abstract class SvarAnmodningUnntakEessiMeldingMapper<T extends Medlemskap
 
         T medlemskap = hentMedlemskap(sed);
 
-        MelosysEessiMelding.SvarAnmodningUnntak svarAnmodningUnntak = new MelosysEessiMelding.SvarAnmodningUnntak();
+        SvarAnmodningUnntak svarAnmodningUnntak = new SvarAnmodningUnntak();
         svarAnmodningUnntak.setBeslutning(hentBeslutning(medlemskap));
         svarAnmodningUnntak.setBegrunnelse(hentBegrunnelse(medlemskap));
         svarAnmodningUnntak.setDelvisInnvilgetPeriode(hentDelvisInnvilgetPeriode(medlemskap));
@@ -27,7 +28,7 @@ public abstract class SvarAnmodningUnntakEessiMeldingMapper<T extends Medlemskap
 
     abstract T hentMedlemskap(SED sed);
 
-    abstract MelosysEessiMelding.Beslutning hentBeslutning(T medlemskap);
+    abstract SvarAnmodningUnntak.Beslutning hentBeslutning(T medlemskap);
 
     abstract String hentBegrunnelse(T medlemskap);
 

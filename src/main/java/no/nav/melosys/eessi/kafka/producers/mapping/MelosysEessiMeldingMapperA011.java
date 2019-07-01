@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011;
 
@@ -13,8 +13,8 @@ public class MelosysEessiMeldingMapperA011 extends SvarAnmodningUnntakEessiMeldi
     }
 
     @Override
-    MelosysEessiMelding.Beslutning hentBeslutning(MedlemskapA011 medlemskap) {
-        return MelosysEessiMelding.Beslutning.INNVILGELSE;
+    SvarAnmodningUnntak.Beslutning hentBeslutning(MedlemskapA011 medlemskap) {
+        return SvarAnmodningUnntak.Beslutning.INNVILGELSE;
     }
 
     @Override

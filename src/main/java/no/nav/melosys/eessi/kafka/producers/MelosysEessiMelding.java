@@ -23,15 +23,4 @@ public class MelosysEessiMelding {
     private String sedType;
 
     private SvarAnmodningUnntak svarAnmodningUnntak;
-
-    @Data
-    public static class SvarAnmodningUnntak {
-        Beslutning beslutning;
-        String begrunnelse;
-        Periode delvisInnvilgetPeriode;
-    }
-
-    public enum Beslutning {
-        INNVILGELSE, DELVIS_INNVILGELSE, AVSLAG;
-    }
 }
