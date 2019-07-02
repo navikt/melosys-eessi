@@ -5,7 +5,7 @@ import no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 
-public class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA002> {
+class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA002> {
 
     @Override
     MedlemskapA002 hentMedlemskap(SED sed) {
@@ -25,8 +25,6 @@ public class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldi
         throw new IllegalArgumentException("Feil ved mapping til beslutning for A002. "
                 + "medlemskap.unntak.vedtak.resultat har ukjent verdi: " + resultat);
     }
-
-
 
     @Override
     String hentBegrunnelse(MedlemskapA002 medlemskap) {

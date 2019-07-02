@@ -5,7 +5,7 @@ import no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011;
 
-public class MelosysEessiMeldingMapperA011 extends SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA011> {
+class MelosysEessiMeldingMapperA011 extends SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA011> {
 
     @Override
     MedlemskapA011 hentMedlemskap(SED sed) {
