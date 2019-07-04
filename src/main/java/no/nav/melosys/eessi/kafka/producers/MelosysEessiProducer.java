@@ -26,7 +26,7 @@ public class MelosysEessiProducer {
         future.addCallback(new ListenableFutureCallback<SendResult<String, MelosysEessiMelding>>() {
             @Override
             public void onFailure(Throwable throwable) {
-                log.error("Kunne ikke sende melding om ny behandling: {}", melding, throwable); //TODO: store and retry
+                log.error("Kunne ikke sende melding om mottat SED: {}", melding, throwable); //TODO: store and retry
             }
 
             @Override

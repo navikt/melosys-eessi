@@ -6,7 +6,7 @@ import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 
-class MelosysEessiMeldingMapperA009 extends MelosysEessiMeldingMapper<MedlemskapA009> {
+class MelosysEessiMeldingMapperA009 extends NyttLovvalgEessiMeldingMapper<MedlemskapA009> {
 
     @Override
     Boolean sedErEndring(MedlemskapA009 medlemskap) {

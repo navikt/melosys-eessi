@@ -21,4 +21,6 @@ public class MelosysEessiMelding {
     private String ytterligereInformasjon;
     private String bucType;
     private String sedType;
+
+    private SvarAnmodningUnntak svarAnmodningUnntak;
 }
