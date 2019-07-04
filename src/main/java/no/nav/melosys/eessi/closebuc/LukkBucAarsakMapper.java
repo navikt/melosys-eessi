@@ -19,7 +19,7 @@ final class LukkBucAarsakMapper {
         BucType bucType = BucType.valueOf(buc.getBucType());
         switch (bucType) {
             case LA_BUC_02:
-                if (inneholderSed(buc, SedType.A012)) {
+                if (a012SendtFraBuc(buc)) {
                     return LOVVALG_BEKREFTET;
                 }
                 return INGEN_SVAR_2_MND;
@@ -35,7 +35,8 @@ final class LukkBucAarsakMapper {
         }
     }
 
-    private static boolean inneholderSed(BUC buc, SedType sedType) {
-        return buc.getDocuments().stream().anyMatch(d -> sedType.name().equals(d.getType()));
+    private static boolean a012SendtFraBuc(BUC buc) {
+        return buc.getDocuments().stream().anyMatch(d ->
+                SedType.A012.name().equals(d.getType()) && !"empty".equals(d.getStatus()));
     }
 }
