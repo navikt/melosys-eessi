@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -16,6 +15,7 @@ import no.nav.melosys.eessi.service.eux.BucSearch;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.mapper.X001Mapper;
 import org.springframework.stereotype.Service;
+import static no.nav.melosys.eessi.models.buc.BucUtils.*;
 
 @Service
 @Slf4j
@@ -35,8 +35,8 @@ public class BucCloser {
                     .stream()
                     .map(this::hentBuc)
                     .filter(Objects::nonNull)
-                    .filter(this::norgeErCaseOwner)
-                    .filter(this::kanLukkes)
+                    .filter(norgeErCaseOwnerPredicate)
+                    .filter(bucKanLukkesPredicate)
                     .forEach(this::lukkBuc);
 
         } catch (IntegrationException e) {
@@ -44,31 +44,41 @@ public class BucCloser {
         }
     }
 
-    private boolean norgeErCaseOwner(BUC buc) {
-        return "NO".equalsIgnoreCase(buc.getCreator().getOrganisation().getCountryCode());
-    }
-
-    private boolean kanLukkes(BUC buc) {
-        return buc.getActions().stream().anyMatch(action -> SedType.X001.name().equals(action.getDocumentType()));
-    }
-
     private void lukkBuc(BUC buc) {
         try {
             SED x001 = opprettX001(buc, LukkBucAarsakMapper.hentAarsakForLukking(buc));
-            euxService.opprettOgSendSed(x001, buc.getId());
+
+            Document eksisterendeX001 = hentEksisterendeX001Utkast(buc);
+
+            if (eksisterendeX001 == null) {
+                euxService.opprettOgSendSed(x001, buc.getId());
+            } else {
+                euxService.oppdaterSed(buc.getId(), eksisterendeX001.getId(), x001);
+                euxService.sendSed(buc.getId(), eksisterendeX001.getId());
+            }
+
             log.info("BUC {} lukket med årsak {}", buc.getId(), x001.getNav().getSak().getAnmodning().getAvslutning().getAarsak().getType());
         } catch (IntegrationException e) {
             log.error("Kunne ikke lukke buc {}", buc.getId(), e);
         }
     }
 
-    private SED opprettX001(BUC buc, String aarsak) throws IntegrationException {
-        return x001Mapper.mapFraSed(hentSisteSed(buc), aarsak);
+    private Document hentEksisterendeX001Utkast(BUC buc) {
+        return buc.getDocuments().stream()
+                .filter(dokumentErX001Predicate)
+                .min(documentComparator).orElse(null);
     }
 
-    private SED hentSisteSed(BUC buc) throws IntegrationException {
-        String sedId = buc.getDocuments().stream().filter(d -> "sent".equals(d.getStatus())).min(documentComparator)
-                .orElseThrow(IllegalArgumentException::new).getId();
+    private SED opprettX001(BUC buc, String aarsak) throws IntegrationException {
+        return x001Mapper.mapFraSed(hentSisteLovvalgSed(buc), aarsak);
+    }
+
+    private SED hentSisteLovvalgSed(BUC buc) throws IntegrationException {
+        String sedId = buc.getDocuments().stream()
+                .filter(sisteSendtLovvalgsSedPredicate)
+                .min(documentComparator)
+                .orElseThrow(() -> new IllegalStateException("Finner ingen lovvalgs-SED på buc" + buc.getId()))
+                .getId();
 
         return euxService.hentSed(buc.getId(), sedId);
     }
@@ -83,7 +93,6 @@ public class BucCloser {
         return null;
     }
 
-    private Comparator<Document> documentComparator = Comparator.comparing(d ->
-            Instant.ofEpochMilli(d.getCreationDate()).atZone(ZoneId.systemDefault()).toLocalDate()
-    );
+    private static final Comparator<Document> documentComparator = Comparator.comparing(d ->
+            Instant.ofEpochMilli(d.getCreationDate()).atZone(ZoneId.systemDefault()).toLocalDate());
 }

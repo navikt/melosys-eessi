@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.closebuc;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
@@ -59,6 +60,39 @@ public class BucCloserTest {
         verify(euxService).hentBuc(bucInfo.getId());
         verify(euxService).hentSed(eq(buc.getId()), eq(buc.getDocuments().get(0).getId()));
         verify(euxService).opprettOgSendSed(any(SED.class), eq(buc.getId()));
+    }
+
+    @Test
+    public void closeBucsByType_enBucKanLukkesInneholderUtkastX001_verifiserOppdaterSåSend() throws Exception {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setId("123jfpw");
+
+        List<BucInfo> bucInfos = new ArrayList<>();
+        bucInfos.add(bucInfo);
+
+        BUC buc = lagBuc();
+
+        Document x001Doc = new Document();
+        x001Doc.setType(SedType.X001.name());
+        x001Doc.setCreationDate(123);
+        x001Doc.setConversations(Collections.emptyList());
+        buc.getDocuments().add(x001Doc);
+
+        when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
+        when(euxService.hentBuc(eq(bucInfo.getId()))).thenReturn(buc);
+
+        SED sed = new SED();
+        sed.setNav(enhancedRandom.nextObject(Nav.class));
+        sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
+        when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
+
+        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+
+        verify(euxService).hentBucer(any(BucSearch.class));
+        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).hentSed(eq(buc.getId()), eq(buc.getDocuments().get(0).getId()));
+        verify(euxService).oppdaterSed(eq(buc.getId()), eq(x001Doc.getId()), any(SED.class));
+        verify(euxService).sendSed(eq(buc.getId()), eq(x001Doc.getId()));
     }
 
     @Test
@@ -128,8 +162,8 @@ public class BucCloserTest {
         document.setCreationDate(LocalDateTime.now().minusDays(1L).toEpochSecond(ZoneOffset.UTC));
         document.setStatus("sent");
         document.setId("rrrr");
+        document.setConversations(Collections.emptyList());
         buc.getDocuments().add(document);
-
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
         when(euxService.hentBuc(eq(bucInfo.getId()))).thenReturn(buc);
@@ -150,7 +184,7 @@ public class BucCloserTest {
     private BUC lagBuc() {
         BUC buc = new BUC();
         buc.setId("ffff");
-        buc.setBucType("LA_BUC_04");
+        buc.setBucType(BucType.LA_BUC_04.name());
 
         Creator creator = new Creator();
         creator.setOrganisation(new Organisation());
@@ -163,11 +197,15 @@ public class BucCloserTest {
         actions.add(action);
         buc.setActions(actions);
 
+        Conversation conversation = new Conversation();
+        conversation.setVersionId("1");
+
         List<Document> documents = new ArrayList<>();
         Document document = new Document();
         document.setType(SedType.A009.name());
         document.setCreationDate(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
         document.setStatus("sent");
+        document.setConversations(Collections.singletonList(conversation));
         document.setId("gjrieogroei");
         documents.add(document);
 
