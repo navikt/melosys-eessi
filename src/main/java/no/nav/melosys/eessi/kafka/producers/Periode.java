@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Periode {
 
-    private String fom;
-    private String tom;
+    private LocalDate fom;
+    private LocalDate tom;
 
 }

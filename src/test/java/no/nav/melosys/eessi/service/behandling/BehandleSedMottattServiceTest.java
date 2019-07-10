@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.behandling;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -100,7 +102,10 @@ public class BehandleSedMottattServiceTest {
         MedlemskapA009 medlemskap = new MedlemskapA009();
         medlemskap.setVedtak(new VedtakA009());
         medlemskap.getVedtak().setGjelderperiode(new Periode());
-        medlemskap.getVedtak().getGjelderperiode().setFastperiode(new Fastperiode());
+        Fastperiode fastperiode = new Fastperiode();
+        fastperiode.setStartdato("2019-05-01");
+        fastperiode.setSluttdato("2019-12-01");
+        medlemskap.getVedtak().getGjelderperiode().setFastperiode(fastperiode);
         sed.setMedlemskap(medlemskap);
 
         return sed;

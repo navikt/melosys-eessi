@@ -20,7 +20,7 @@ public class MelosysEessiMeldingMapperA003Test {
                 .getMapper(SedType.A003).map("123", sed, createSedHendelse(), createSakInformasjon(), false);
 
         assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.getPeriode().getFom()).isEqualTo("12-12-2000");
+        assertThat(melosysEessiMelding.getPeriode().getFom()).isEqualTo("2000-12-12");
         assertThat(melosysEessiMelding.isErEndring()).isTrue();
         assertThat(melosysEessiMelding.getArtikkel()).isEqualTo("13_1_b_i");
     }
@@ -31,8 +31,8 @@ public class MelosysEessiMeldingMapperA003Test {
         medlemskap.getVedtak().setErendringsvedtak("ja");
 
         PeriodeA010 periodeA010 = new PeriodeA010();
-        periodeA010.setStartdato("12-12-2000");
-        periodeA010.setSluttdato("12-12-2000");
+        periodeA010.setStartdato("2000-12-12");
+        periodeA010.setSluttdato("2000-12-12");
         medlemskap.getVedtak().setGjelderperiode(periodeA010);
         medlemskap.setRelevantartikkelfor8832004eller9872009("13_1_b_i");
 

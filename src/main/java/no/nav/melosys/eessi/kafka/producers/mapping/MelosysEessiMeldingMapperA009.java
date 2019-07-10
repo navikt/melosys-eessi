@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
+import java.time.LocalDate;
+
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
@@ -31,18 +33,18 @@ class MelosysEessiMeldingMapperA009 extends NyttLovvalgEessiMeldingMapper<Medlem
     @Override
     no.nav.melosys.eessi.kafka.producers.Periode mapPeriode(MedlemskapA009 medlemskap) {
 
-        String fom;
-        String tom;
+        LocalDate fom;
+        LocalDate tom;
 
         Periode periode = medlemskap.getVedtak().getGjelderperiode();
         if (periode.erAapenPeriode()) {
             AapenPeriode aapenPeriode = periode.getAapenperiode();
-            fom = aapenPeriode.getStartdato();
+            fom = aapenPeriode.getStartdato() == null ? null : LocalDate.parse(aapenPeriode.getStartdato());
             tom = null;
         } else {
             Fastperiode fastperiode = periode.getFastperiode();
-            fom = fastperiode.getStartdato();
-            tom = fastperiode.getSluttdato();
+            fom = fastperiode.getStartdato() == null ? null : LocalDate.parse(fastperiode.getStartdato());
+            tom = fastperiode.getSluttdato() == null ? null : LocalDate.parse(fastperiode.getSluttdato());
         }
 
         return new no.nav.melosys.eessi.kafka.producers.Periode(fom, tom);

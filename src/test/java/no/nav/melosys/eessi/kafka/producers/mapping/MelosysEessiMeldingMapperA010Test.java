@@ -91,11 +91,11 @@ public class MelosysEessiMeldingMapperA010Test {
 
         PeriodeA010 periode = new PeriodeA010();
         if (fastperiode) {
-            periode.setSluttdato("slutt");
-            periode.setStartdato("start");
+            periode.setSluttdato("2019-12-01");
+            periode.setStartdato("2019-05-01");
         } else {
             periode.setAapenperiode(new AapenPeriode());
-            periode.getAapenperiode().setStartdato("aapen");
+            periode.getAapenperiode().setStartdato("2019-05-01");
         }
         vedtak.setGjelderperiode(periode);
 
