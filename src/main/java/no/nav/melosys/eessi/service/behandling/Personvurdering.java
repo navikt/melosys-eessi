@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.behandling;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.stream.Stream;
 import io.micrometer.core.instrument.util.StringUtils;
@@ -20,6 +21,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class Personvurdering {
+
+    private static final String UTGAATT_PERSON = "UTPE";
+    private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
 
     private final TpsService tpsService;
 
@@ -72,7 +76,7 @@ public class Personvurdering {
     private String hentOgVurderPerson(String ident, SED sed) {
         try {
             Person person = tpsService.hentPerson(ident);
-            if (!harSammeStatsborgerskap(person, sed) || !harSammeFoedselsdato(person, sed)) {
+            if (erOpphoert(person) || !harSammeStatsborgerskap(person, sed) || !harSammeFoedselsdato(person, sed)) {
                 return null;
             }
         } catch (SecurityException | NotFoundException e) {
@@ -106,6 +110,11 @@ public class Personvurdering {
         return ident;
     }
 
+    public static boolean erOpphoert(Person person) {
+        return Arrays.asList(UTGAATT_PERSON_ANNULLERT_TILGANG, UTGAATT_PERSON)
+                .contains(person.getPersonstatus().getPersonstatus().getValue());
+    }
+
     /**
      * Sjekker om person mottatt fra TPS har samme statsborgerskap som person i SED.
      *
@@ -114,7 +123,7 @@ public class Personvurdering {
      * @return true dersom person og sed har samme statsborgerskap
      * @throws NotFoundException Kastes ved ukjent landkode.
      */
-    private boolean harSammeStatsborgerskap(Person person, SED sed) throws NotFoundException {
+    private static boolean harSammeStatsborgerskap(Person person, SED sed) throws NotFoundException {
         String tpsStatsborgerskap = LandkodeMapper.getLandkodeIso2(person.getStatsborgerskap().getLand().getValue());
         Stream<String> sedStatsborgerskap = sed.getNav().getBruker().getPerson().getStatsborgerskap()
                 .stream().map(Statsborgerskap::getLand);
@@ -129,7 +138,7 @@ public class Personvurdering {
      * @param sed    SED mottatt fra kafka-kø
      * @return true dersom person og sed har samme fødselsdato
      */
-    private boolean harSammeFoedselsdato(Person person, SED sed) {
+    private static boolean harSammeFoedselsdato(Person person, SED sed) {
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
         Calendar tpsFoedselsdatoCalendar = person.getFoedselsdato().getFoedselsdato().toGregorianCalendar();
