@@ -28,6 +28,7 @@ node {
 
     // pom related vars
     def application = "melosys-eessi"
+    def applicationJar = application + "-exec"
     def imageVersion
 
     // Set Spring profiles to activate
@@ -48,7 +49,7 @@ node {
 
     stage("Build & publish Docker image") {
         configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-            sh "docker build --build-arg JAR_FILE=${application}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${imageVersion} --rm=true ."
+            sh "docker build --build-arg JAR_FILE=${applicationJar}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${imageVersion} --rm=true ."
             sh "docker push ${dockerRepo}/${application}:${imageVersion}"
         }
     }
