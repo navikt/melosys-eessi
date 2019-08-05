@@ -23,17 +23,6 @@
       "fysisk": true,
       "hjemmebase": null,
       "navn": "MinJobb"
-    },
-    {
-      "adresse": {
-        "gateadresse": "testadresse",
-        "land": "NO",
-        "postnr": "1212",
-        "poststed": "Hønefoss"
-      },
-      "fysisk": false,
-      "hjemmebase": null,
-      "navn": "MinJobb"
     }
   ],
   "bostedsadresse": {

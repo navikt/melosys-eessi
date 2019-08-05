@@ -69,7 +69,7 @@ class SedUtils {
             case ART_13_3:
             case ART_13_4:
             case ART_14_11:
-                break;
+                return SedType.A003;
             case ART_16_1:
             case ART_16_2:
                 return SedType.A001;
@@ -103,7 +103,7 @@ class SedUtils {
             case ART_13_3:
             case ART_13_4:
             case ART_14_11:
-                break;
+                return BucType.LA_BUC_02;
             case ART_16_1:
             case ART_16_2:
                 return BucType.LA_BUC_01;
