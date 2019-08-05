@@ -12,11 +12,15 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 @Configuration
 public class KafkaProducerConfig {
     
-    @Autowired
-    private ProducerFactory<Object, Object> producerFactory;
+    private final ProducerFactory<Object, Object> producerFactory;
+
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    public KafkaProducerConfig(final ProducerFactory<Object, Object> producerFactory, final ObjectMapper objectMapper) {
+        this.producerFactory = producerFactory;
+        this.objectMapper = objectMapper;
+    }
 
     @PostConstruct
     public void melosysEessiProducerFactory() {

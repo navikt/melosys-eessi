@@ -14,11 +14,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaAopListener implements Ordered {
 
-    @Autowired
-    private KafkaListenerLatchService latchService;
+    private final KafkaListenerLatchService latchService;
 
     @Getter
     private Optional<Throwable> exception;
+
+    @Autowired
+    public KafkaAopListener(final KafkaListenerLatchService latchService) {
+        this.latchService = latchService;
+    }
 
     @Around("@annotation(org.springframework.kafka.annotation.KafkaListener)")
     public Object onInvoke(ProceedingJoinPoint joinPoint) throws Throwable {

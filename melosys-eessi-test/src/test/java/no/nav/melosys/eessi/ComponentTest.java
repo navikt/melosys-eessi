@@ -13,7 +13,8 @@ public class ComponentTest extends ComponentTestBase {
 
     @Test
     public void testHappyCase() throws Exception {
-        kafkaTestConsumer.reset(2);
+        // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output 
+        kafkaTestConsumer.reset(2); 
         kafkaTemplate.send(createProducerRecord()).get();
         kafkaTestConsumer.doWait(10_000L);
 
