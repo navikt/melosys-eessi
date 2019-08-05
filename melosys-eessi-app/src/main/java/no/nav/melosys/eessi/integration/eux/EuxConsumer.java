@@ -474,7 +474,7 @@ public class EuxConsumer implements RestConsumer {
     @Cacheable("institusjoner")
     public List<Institusjon> hentInstitusjoner(String bucType, String landkode)
             throws IntegrationException {
-        log.info("Henter institusjoner for buctype {} og landkode", bucType, landkode);
+        log.info("Henter institusjoner for buctype {} og landkode {}", bucType, landkode);
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/institusjoner")
                 .queryParam(BUC_TYPE, bucType)
                 .queryParam("LandKode", landkode);
