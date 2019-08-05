@@ -3,7 +3,7 @@ LABEL maintainer="Team Melosys"
 
 ARG JAR_FILE
 RUN echo $JAR_FILE
-COPY target/$JAR_FILE /app/app.jar
+COPY melosys-eessi-app/target/$JAR_FILE /app/app.jar
 
 ARG SPRING_PROFILES
 RUN echo $SPRING_PROFILES

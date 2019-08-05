@@ -1,0 +1,54 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: melosys-eessi
+  datasource:
+    url: jdbc:postgresql://${PG_HOST}:5432/${DATABASE_NAME}
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true #fix for jdbc bug i postgres-driver som krasjer app
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
+    properties:
+      security.protocol: SASL_SSL
+      sasl.mechanism: PLAIN
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${melosys.systemuser.username}" password="${melosys.systemuser.password}";
+      reconnect.backoff.ms: 1000
+
+melosys:
+  kafka:
+    consumer:
+      groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
+    producer:
+      topic-name: ${KAFKA_EESSIMELDING_TOPIC}
+  systemuser:
+    username: ${SRV_USERNAME}
+    password: ${SRV_PASSWORD}
+  integrations:
+    euxapp-url: ${EUXAPP_URL}
+    reststs-url: ${RESTSTS_URL}
+    sts-url: ${STS_URL}
+    aktoer-url: ${AKTOER_URL}
+    person-url: ${PERSON_URL}
+    personsok-url: ${PERSONSOK_URL}
+    rina-host-url: ${RINA_HOST_URL}
+    journalpostapi-url: ${JOURNALPOSTAPI_URL}
+    dokkat:
+      typeid-url: ${DOKKATTYPEID_URL}
+      typeinfo-url: ${DOKKATTYPEINFO_URL}
+    gsak:
+      sak-url: ${SAK_URL}
+  api:
+    security:
+      header-name: ${API_KEY_HEADER}
+      header-value: ${API_KEY_VALUE}
