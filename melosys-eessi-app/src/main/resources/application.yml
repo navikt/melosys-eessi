@@ -15,6 +15,9 @@ spring:
           lob:
             non_contextual_creation: true #fix for jdbc bug i postgres-driver som krasjer app
   kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
