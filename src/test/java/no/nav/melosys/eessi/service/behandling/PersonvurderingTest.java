@@ -115,6 +115,17 @@ public class PersonvurderingTest {
         assertThat(ident).isNull();
     }
 
+    @Test
+    public void hentNorskIdent_medOpphoertPerson_forventIdentLikNull() throws Exception {
+        Person person = lagTpsPerson().withPersonstatus(new Personstatus()
+                .withPersonstatus(new Personstatuser().withValue("UTAN")));
+
+        when(tpsService.hentPerson(anyString())).thenReturn(person);
+        String ident = personvurdering.hentNorskIdent(lagSedHendelse(), lagSed());
+
+        assertThat(ident).isNull();
+    }
+
     private SedHendelse lagSedHendelse() {
         return SedHendelse.builder()
                 .rinaDokumentId("abcd1234")
@@ -143,7 +154,9 @@ public class PersonvurderingTest {
                 .withStatsborgerskap(new Statsborgerskap()
                         .withLand(new Landkoder().withValue("NOR")))
                 .withFoedselsdato(new Foedselsdato()
-                        .withFoedselsdato(lagXmlDato("1983-05-01")));
+                        .withFoedselsdato(lagXmlDato("1983-05-01")))
+                .withPersonstatus(new Personstatus()
+                        .withPersonstatus(new Personstatuser().withValue("BOSA")));
     }
 
     /**
