@@ -20,6 +20,9 @@ public interface MelosysEessiMeldingMapper {
         melosysEessiMelding.setAktoerId(aktoerId);
         melosysEessiMelding.setYtterligereInformasjon(sed.getNav().getYtterligereinformasjon());
 
+        melosysEessiMelding.setSedType(sedHendelse.getSedType());
+        melosysEessiMelding.setBucType(sedHendelse.getBucType());
+
         melosysEessiMelding.setStatsborgerskap(
                 mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
         );

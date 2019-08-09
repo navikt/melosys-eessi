@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.time.LocalDate;
-
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.Periode;
@@ -25,8 +24,6 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
         melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(medlemskap));
         melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(medlemskap));
         melosysEessiMelding.setMidlertidigBestemmelse(erMidlertidigBestemmelse(medlemskap));
-        melosysEessiMelding.setSedType(sedHendelse.getSedType());
-        melosysEessiMelding.setBucType(sedHendelse.getBucType());
 
         return melosysEessiMelding;
     }

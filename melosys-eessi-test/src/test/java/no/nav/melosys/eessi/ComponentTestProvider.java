@@ -5,7 +5,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-
 import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
@@ -17,12 +16,13 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
+import no.nav.melosys.eessi.models.sed.nav.Bruker;
+import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.models.sed.nav.Person;
+import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Foedselsdato;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Landkoder;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
-
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
 import static no.nav.melosys.eessi.models.SedType.A002;
 
@@ -94,6 +94,7 @@ public class ComponentTestProvider {
         no.nav.tjeneste.virksomhet.person.v3.informasjon.Person person = new no.nav.tjeneste.virksomhet.person.v3.informasjon.Person();
         AktoerId aktoerIdObject = new AktoerId().withAktoerId(aktoerId1);
         person.setAktoer(aktoerIdObject);
+        person.setPersonstatus(new Personstatus().withPersonstatus(new Personstatuser().withValue("ADNR")));
         Foedselsdato foedselsdato = new Foedselsdato();
         foedselsdato.setFoedselsdato(DatatypeFactory.newInstance().newXMLGregorianCalendar(fødselsdato.toString()));
         person.setFoedselsdato(foedselsdato);
