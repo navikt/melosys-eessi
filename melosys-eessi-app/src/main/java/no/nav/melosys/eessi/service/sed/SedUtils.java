@@ -12,22 +12,33 @@ class SedUtils {
 
     //Henter første lovlige SED på en ny BUC
     static SedType hentFoersteLovligeSedPaaBuc(BucType bucType) {
+        SedType sedType = null;
         switch (bucType) {
-
             case LA_BUC_01:
-                return SedType.A001;
+                sedType = SedType.A001;
+                break;
             case LA_BUC_02:
-                return SedType.A003;
+                sedType = SedType.A003;
+                break;
             case LA_BUC_03:
-                return SedType.A008;
+                sedType = SedType.A008;
+                break;
             case LA_BUC_04:
-                return SedType.A009;
+                sedType = SedType.A009;
+                break;
             case LA_BUC_05:
-                return SedType.A010;
+                sedType = SedType.A010;
+                break;
             case LA_BUC_06:
-                return SedType.A005;
+                sedType = SedType.A005;
+                break;
+            case H_BUC_02a:
+                sedType = SedType.H005;
+                break;
+            default:
+                throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + bucType);
         }
-        throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + bucType);
+        return sedType;
     }
 
     static Fagomraade hentFagomraadeForBuc(BucType bucType) {
@@ -39,6 +50,16 @@ class SedUtils {
             case LA_BUC_05:
             case LA_BUC_06:
                 return Fagomraade.LOVVALG;
+            case H_BUC_01:
+            case H_BUC_02a:
+            case H_BUC_02b:
+            case H_BUC_02c:
+            case H_BUC_03a:
+            case H_BUC_03b:
+            case H_BUC_05:
+            case H_BUC_06:
+            case H_BUC_07:
+                return Fagomraade.HORISONTAL;
         }
 
         throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + bucType);

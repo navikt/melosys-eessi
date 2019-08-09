@@ -11,6 +11,11 @@ public class UnntakArtikkelMapper {
     public static final String BESTEMMELSE_OTHER = "annet";
 
     public static String mapFromBestemmelse(Bestemmelse bestemmelse) {
+
+        if (bestemmelse == null) {
+            return null;
+        }
+
         switch (bestemmelse) {
             case ART_11_4_2:
                 return BESTEMMELSE_11_4;

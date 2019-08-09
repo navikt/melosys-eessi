@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.mapper;
+package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
 
 import java.util.Collections;
 import java.util.List;
