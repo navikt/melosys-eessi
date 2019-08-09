@@ -30,4 +30,6 @@ public class SedDataDto {
 
     private String mottakerLand;
     private String mottakerId;
+
+    private boolean erUtkast;
 }
