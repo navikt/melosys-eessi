@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.mapper;
+package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -49,6 +49,4 @@ public class A010MapperTest {
         assertThat(medlemskap.getVedtak().getGjelderperiode().getStartdato()).isNotNull();
         assertThat(medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isNotNull();
     }
-
-
 }

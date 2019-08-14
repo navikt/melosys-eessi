@@ -5,7 +5,6 @@ import java.util.Map;
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.service.sed.mapper.A010Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import no.nav.melosys.eessi.service.sed.mapper.horisontal.H005Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.lovvalg.*;
