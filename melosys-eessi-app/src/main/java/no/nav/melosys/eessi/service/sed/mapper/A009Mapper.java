@@ -21,7 +21,10 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         final MedlemskapA009 medlemskapA009 = new MedlemskapA009();
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
 
-        medlemskapA009.setVedtak(getVedtak(lovvalgsperiode));
+        if (!sedData.getLovvalgsperioder().isEmpty()) {
+            medlemskapA009.setVedtak(getVedtak(lovvalgsperiode));
+        }
+
         medlemskapA009.setAndreland(getAndreland(sedData));
         medlemskapA009.setUtsendingsland(getUtsendingsland(sedData));
 

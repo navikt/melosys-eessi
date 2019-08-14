@@ -22,12 +22,15 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
         final MedlemskapA001 medlemskap = new MedlemskapA001();
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
 
-        medlemskap.setUnntak(getUnntak(lovvalgsperiode));
+        if (!sedData.getLovvalgsperioder().isEmpty()) {
+            medlemskap.setUnntak(getUnntak(lovvalgsperiode));
+            medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(lovvalgsperiode));
+            medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
+            medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
+            medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
+        }
+
         medlemskap.setVertsland(getVertsland(sedData));
-        medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(lovvalgsperiode));
-        medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
-        medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
-        medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
         medlemskap.setAnmodning(getAnmodning());
 
         return medlemskap;
