@@ -16,6 +16,7 @@ public class LovvalgSedMapperFactory {
         sedMappers.put(SedType.A005, A005Mapper.class);
         sedMappers.put(SedType.A008, A008Mapper.class);
         sedMappers.put(SedType.A009, A009Mapper.class);
+        sedMappers.put(SedType.A010, A010Mapper.class);
     }
 
     private LovvalgSedMapperFactory() {

@@ -247,7 +247,7 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
     }
 
     default Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
-        if (sedData.isErUtkast() && sedData.getLovvalgsperioder().isEmpty()) {
+        if (sedData.getLovvalgsperioder().isEmpty()) {
             return null;
         }
 

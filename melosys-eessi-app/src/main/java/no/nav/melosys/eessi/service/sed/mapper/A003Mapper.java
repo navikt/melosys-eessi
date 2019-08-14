@@ -16,7 +16,7 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
         MedlemskapA003 medlemskap = new MedlemskapA003();
 
-        if (!(sedData.isErUtkast() && sedData.getLovvalgsperioder().isEmpty())) {
+        if (!sedData.getLovvalgsperioder().isEmpty()) {
             medlemskap.setVedtak(getVedtak(sedData));
             medlemskap.setRelevantartikkelfor8832004eller9872009(sedData.getLovvalgsperioder().get(0).getBestemmelse().getValue());
         }
