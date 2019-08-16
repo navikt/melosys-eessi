@@ -44,6 +44,10 @@ public class LandkodeMapper {
     }
 
     public static String getLandkodeIso2(String landkodeIso3) throws NotFoundException {
+        if (landkodeIso3 == null) {
+            return null;
+        }
+
         if (landkodeIso3.length() == 2) {
             return landkodeIso3;
         }
