@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.integration.gsak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

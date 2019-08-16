@@ -9,9 +9,9 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

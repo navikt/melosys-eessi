@@ -6,6 +6,7 @@ import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class DokkatService {
         this.dokumenttypeInfoConsumer = dokumenttypeInfoConsumer;
     }
 
+    @Cacheable("metadataDokkat")
     public DokkatSedInfo hentMetadataFraDokkat(String sedType) throws IntegrationException {
         DokumenttypeIdTo dokumenttypeIdTo = dokumenttypeIdConsumer
             .hentDokumenttypeId(sedType, EKSTERN_ID_TYPE_SED);
