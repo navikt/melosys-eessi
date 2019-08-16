@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
-
 import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
@@ -24,7 +23,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +30,7 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class })
 @TestPropertySource(locations = "/kafka-test.properties")
-public class ComponentTestBase {
+public abstract class ComponentTestBase {
     
     private static final String AKTOER_ID = "1234567890123";
     private static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);

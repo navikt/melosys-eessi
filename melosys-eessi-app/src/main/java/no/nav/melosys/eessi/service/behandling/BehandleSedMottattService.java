@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.behandling;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
@@ -15,7 +16,6 @@ import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
@@ -46,11 +46,11 @@ public class BehandleSedMottattService {
         try {
             SED sed = euxService.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
 
-            String ident = personvurdering.hentNorskIdent(sedMottatt, sed);
-            if (StringUtils.isEmpty(ident)) {
+            Optional<String> ident = personvurdering.hentNorskIdent(sedMottatt, sed);
+            if (!ident.isPresent()) {
                 throw new NotFoundException("Ingen norsk ident ble funnet for rinaSak " + sedMottatt.getRinaSakId());
             }
-            sedMottatt.setNavBruker(ident);
+            sedMottatt.setNavBruker(ident.get());
             log.info("Person i rinaSak {} er verifisert mot TPS", sedMottatt.getRinaSakId());
 
             String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());

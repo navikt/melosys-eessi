@@ -1,9 +1,8 @@
 package no.nav.melosys.eessi.service.behandling;
 
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -56,7 +55,7 @@ public class BehandleSedMottattServiceTest {
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
 
-        when(personvurdering.hentNorskIdent(any(), any())).thenReturn("12312312312");
+        when(personvurdering.hentNorskIdent(any(), any())).thenReturn(Optional.of("12312312312"));
     }
 
     @Test
