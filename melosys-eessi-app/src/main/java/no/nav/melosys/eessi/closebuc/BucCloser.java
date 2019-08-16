@@ -13,7 +13,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.BucSearch;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.sed.mapper.X001Mapper;
+import no.nav.melosys.eessi.service.sed.mapper.administrativ.X001Mapper;
 import org.springframework.stereotype.Service;
 import static no.nav.melosys.eessi.models.buc.BucUtils.*;
 

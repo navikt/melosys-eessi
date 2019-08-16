@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.mapper;
+package no.nav.melosys.eessi.service.sed.mapper.administrativ;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;

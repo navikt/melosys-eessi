@@ -2,13 +2,17 @@ package no.nav.melosys.eessi.service.sed.helpers;
 
 import java.util.EnumMap;
 import java.util.Map;
+import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.service.sed.mapper.*;
+import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.horisontal.H005Mapper;
+import no.nav.melosys.eessi.service.sed.mapper.lovvalg.*;
 
-public class LovvalgSedMapperFactory {
+@UtilityClass
+public class SedMapperFactory {
 
-    static Map<SedType, Class<? extends LovvalgSedMapper>> sedMappers = new EnumMap<>(SedType.class);
+    static Map<SedType, Class<? extends SedMapper>> sedMappers = new EnumMap<>(SedType.class);
 
     static {
         sedMappers.put(SedType.A001, A001Mapper.class);
@@ -17,12 +21,10 @@ public class LovvalgSedMapperFactory {
         sedMappers.put(SedType.A008, A008Mapper.class);
         sedMappers.put(SedType.A009, A009Mapper.class);
         sedMappers.put(SedType.A010, A010Mapper.class);
+        sedMappers.put(SedType.H005, H005Mapper.class);
     }
 
-    private LovvalgSedMapperFactory() {
-    }
-
-    public static LovvalgSedMapper sedMapper(SedType sedType) throws MappingException {
+    public static SedMapper sedMapper(SedType sedType) throws MappingException {
         if (!sedMappers.containsKey(sedType)) {
             throw new MappingException("Sed-type " + sedType.name() + " not supported");
         }

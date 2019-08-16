@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.mapper;
+package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

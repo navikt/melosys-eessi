@@ -17,8 +17,8 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
-import no.nav.melosys.eessi.service.sed.helpers.LovvalgSedMapperFactory;
-import no.nav.melosys.eessi.service.sed.mapper.LovvalgSedMapper;
+import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
+import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,7 @@ public class SedService {
         BucType bucType = SedUtils.getBucTypeFromBestemmelse(
                 sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
         SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
-        LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
+        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
 
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
@@ -76,7 +76,7 @@ public class SedService {
         SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
 
         Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
-        LovvalgSedMapper sedMapper = LovvalgSedMapperFactory.sedMapper(sedType);
+        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
