@@ -1,11 +1,12 @@
 package no.nav.melosys.eessi.service.tps;
 
 import java.time.LocalDate;
+import java.util.List;
 import lombok.val;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bostedsadresse;
@@ -87,17 +88,9 @@ public class TpsServiceTest {
 
     @Test
     public void soekEtterPerson_forventIdent() throws Exception {
-        String ident = tpsService.soekEtterPerson(lagPersonsoekKriterier());
-        assertThat(ident).isEqualTo("04127811111");
-    }
-
-    @Test(expected = NotFoundException.class)
-    public void soekEtterPerson_medFlereTreff_forventException() throws Exception {
-        FinnPersonResponse response = lagFinnPersonResponseMedEnPerson();
-        response.setTotaltAntallTreff(2);
-        when(personsokConsumer.finnPerson(any())).thenReturn(response);
-
-        tpsService.soekEtterPerson(lagPersonsoekKriterier());
+        List<PersonSoekResponse> response = tpsService.soekEtterPerson(lagPersonsoekKriterier());
+        assertThat(response).isNotEmpty();
+        assertThat(response.get(0).getIdent()).isEqualTo("04127811111");
     }
 
     private PersonsoekKriterier lagPersonsoekKriterier() {
