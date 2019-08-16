@@ -41,25 +41,6 @@ public class BehandleSedMottattService {
         this.personvurdering = personvurdering;
     }
 
-    /*
-    - Hent SED
-    - Sjekk om person finnes
-
-    PERSON FINNES
-    - hent aktørID
-    - opprett/hent saksrelasjon
-    - midlertidig journalfør
-    - publiser melding
-
-
-    PERSON FINNES IKKE
-    - opprett journalpost
-    - opprett oppgave
-    - ingen opprettelse av sak
-    - ingen publisering på kafka topic
-
-     */
-
     public void behandleSed(SedHendelse sedMottatt) {
 
         try {
