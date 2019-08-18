@@ -25,8 +25,6 @@ public class HeaderValidatorRequestInterceptor implements HandlerInterceptor {
             Object handler) throws Exception {
 
         log.info("{} -> {}", request.getMethod(), request.getServletPath());
-        log.debug("Intercepted.preHandle: " + "method: {} - servletPath: {}", request.getMethod(),
-                request.getServletPath());
 
         if (!isValidApiRequest(request)) {
             response.sendError(HttpStatus.UNAUTHORIZED.value());

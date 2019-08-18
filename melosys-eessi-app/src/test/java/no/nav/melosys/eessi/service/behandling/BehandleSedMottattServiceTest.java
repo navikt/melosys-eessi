@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.tps.TpsService;
@@ -20,8 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BehandleSedMottattServiceTest {
@@ -36,7 +36,7 @@ public class BehandleSedMottattServiceTest {
     private TpsService tpsService;
 
     @Mock
-    private Personvurdering personvurdering;
+    private PersonIdentifiseringService personIdentifiseringService;
 
     @Mock
     private MelosysEessiProducer melosysEessiProducer;
@@ -44,10 +44,10 @@ public class BehandleSedMottattServiceTest {
     @InjectMocks
     private BehandleSedMottattService behandleSedMottattService;
 
+    private static final String IDENT = "1122334455";
+
     @Before
     public void setup() throws Exception {
-        when(tpsService.hentAktoerId(anyString()))
-                .thenReturn("44332211");
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), anyString(), any()))
                 .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
@@ -55,13 +55,16 @@ public class BehandleSedMottattServiceTest {
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
 
-        when(personvurdering.hentNorskIdent(any(), any())).thenReturn(Optional.of("12312312312"));
     }
 
     @Test
-    public void behandleSed_expectServiceCalls() throws Exception {
+    public void behandleSed_FinnerPerson_forventPubliserKafkaMelding() throws Exception {
+        final String aktoerID = "12312312312";
+        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+        when(tpsService.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
+
         SedHendelse sedHendelse = new SedHendelse();
-        sedHendelse.setNavBruker("11223344");
+        sedHendelse.setNavBruker(IDENT);
         sedHendelse.setRinaSakId("123");
         sedHendelse.setRinaDokumentId("456");
         sedHendelse.setSedType("A009");
@@ -69,10 +72,29 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedHendelse);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personvurdering).hentNorskIdent(any(), any());
+        verify(personIdentifiseringService).identifiserPerson(any(), any());
         verify(tpsService).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), anyString(), any());
         verify(melosysEessiProducer).publiserMelding(any());
+    }
+
+    @Test
+    public void behandleSed_finnerIkkePerson_forventJournalpostOgOppgaveOpprettes() throws Exception {
+        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
+
+        SedHendelse sedHendelse = new SedHendelse();
+        sedHendelse.setNavBruker("ukjent");
+        sedHendelse.setRinaSakId("123");
+        sedHendelse.setRinaDokumentId("456");
+        sedHendelse.setSedType("A009");
+
+        behandleSedMottattService.behandleSed(sedHendelse);
+
+        verify(euxService).hentSed(anyString(), anyString());
+        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any());
+
+        verify(melosysEessiProducer, never()).publiserMelding(any());
     }
 
     private SED opprettSED() {
