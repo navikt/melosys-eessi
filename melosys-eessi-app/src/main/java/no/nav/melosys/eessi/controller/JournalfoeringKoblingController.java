@@ -34,7 +34,7 @@ public class JournalfoeringKoblingController {
             throws NotFoundException, IntegrationException {
 
         JournalpostSedKobling journalpostSedKobling = journalpostSedKoblingService.finnVedJournalpostID(journalpostID)
-                .orElseThrow(() -> new NotFoundException("Finner ikke eessimelding fra journalpsot " + journalpostID));
+                .orElseThrow(() -> new NotFoundException("Finner ikke eessimelding fra journalpost " + journalpostID));
 
         SED sed = euxService.hentSed(journalpostSedKobling.getRinaSaksnummer(), journalpostSedKobling.getSedId());
 
