@@ -18,8 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -64,7 +63,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Test
     public void journalfoer_expectId() throws Exception {
         String result = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
-        assertThat(result, is(JOURNALPOST_ID));
+        assertThat(result).isEqualTo(JOURNALPOST_ID);
     }
 
     @Test(expected = NotFoundException.class)

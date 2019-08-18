@@ -11,8 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -56,13 +55,13 @@ public class AktoerConsumerTest {
     @Test
     public void hentAktoerIdOk() throws Exception {
         server.expect(requestTo("/identer?identgruppe=AktoerId")).andRespond(withSuccess(OK_RESPONSE_AKTOER, MediaType.APPLICATION_JSON));
-        assertThat(aktoerConsumer.hentAktoerId("06038029973"), is("1000004898116"));
+        assertThat(aktoerConsumer.hentAktoerId("06038029973")).isEqualTo("1000004898116");
     }
 
     @Test
     public void hentNorskIdent() throws Exception {
         server.expect(requestTo("/identer?identgruppe=NorskIdent")).andRespond(withSuccess(OK_RESPONSE_NORSK_IDENT, MediaType.APPLICATION_JSON));
-        assertThat(aktoerConsumer.hentNorskIdent("06038029973"), is("1000004898117"));
+        assertThat(aktoerConsumer.hentNorskIdent("06038029973")).isEqualTo("1000004898117");
     }
 
     @Test(expected = NotFoundException.class)

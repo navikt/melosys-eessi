@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.security;
 
-import java.util.Collections;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,8 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.mock.http.client.MockClientHttpRequest;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,6 +41,7 @@ public class OidcTokenClientRequestInterceptorTest {
         verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
         verify(restStsService).collectToken();
 
-        assertThat(httpRequest.getHeaders(), hasEntry(HttpHeaders.AUTHORIZATION, Collections.singletonList("Bearer " + oidcKey)));
+        assertThat(httpRequest.getHeaders()).containsKey(HttpHeaders.AUTHORIZATION);
+        assertThat(httpRequest.getHeaders().get(HttpHeaders.AUTHORIZATION)).contains("Bearer " + oidcKey);
     }
 }

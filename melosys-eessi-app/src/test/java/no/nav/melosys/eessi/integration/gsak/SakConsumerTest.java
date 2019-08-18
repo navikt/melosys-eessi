@@ -10,10 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNot.not;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -43,8 +40,8 @@ public class SakConsumerTest {
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
         Sak response = sakConsumer.getSak(sakId);
-        assertThat(response, not(nullValue()));
-        assertThat(response.getId(), is(Long.toString(sakId)));
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(Long.toString(sakId));
 
     }
 
@@ -67,7 +64,7 @@ public class SakConsumerTest {
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
         Sak response = sakConsumer.opprettSak("123");
-        assertThat(response, not(nullValue()));
-        assertThat(response.getId(), is(Long.toString(sakId)));
+        assertThat(response).isNotNull();
+        assertThat(response.getId()).isEqualTo(Long.toString(sakId));
     }
 }
