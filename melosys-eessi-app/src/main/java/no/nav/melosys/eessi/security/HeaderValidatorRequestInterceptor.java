@@ -24,6 +24,7 @@ public class HeaderValidatorRequestInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
             Object handler) throws Exception {
 
+        log.info("{} -> {}", request.getMethod(), request.getServletPath());
         log.debug("Intercepted.preHandle: " + "method: {} - servletPath: {}", request.getMethod(),
                 request.getServletPath());
 
