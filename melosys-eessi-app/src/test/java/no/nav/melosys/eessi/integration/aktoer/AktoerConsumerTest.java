@@ -19,11 +19,19 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RunWith(MockitoJUnitRunner.class)
 public class AktoerConsumerTest {
 
-    private static final String OK_RESPONSE =
+    private static final String OK_RESPONSE_AKTOER =
             "{\"06038029973\":"
                     + "{\"identer\":"
                     + "[{\"ident\":\"1000004898116\","
                     + "\"identgruppe\":\"AktoerId\","
+                    + "\"gjeldende\":true}],"
+                    + "\"feilmelding\":null}}";
+
+    private static final String OK_RESPONSE_NORSK_IDENT =
+            "{\"06038029973\":"
+                    + "{\"identer\":"
+                    + "[{\"ident\":\"1000004898117\","
+                    + "\"identgruppe\":\"NorskIdent\","
                     + "\"gjeldende\":true}],"
                     + "\"feilmelding\":null}}";
 
@@ -46,9 +54,15 @@ public class AktoerConsumerTest {
     }
 
     @Test
-    public void getAktoerIdOk() throws Exception {
-        server.expect(requestTo("/identer?identgruppe=AktoerId")).andRespond(withSuccess(OK_RESPONSE, MediaType.APPLICATION_JSON));
-        assertThat(aktoerConsumer.getAktoerId("06038029973"), is("1000004898116"));
+    public void hentAktoerIdOk() throws Exception {
+        server.expect(requestTo("/identer?identgruppe=AktoerId")).andRespond(withSuccess(OK_RESPONSE_AKTOER, MediaType.APPLICATION_JSON));
+        assertThat(aktoerConsumer.hentAktoerId("06038029973"), is("1000004898116"));
+    }
+
+    @Test
+    public void hentNorskIdent() throws Exception {
+        server.expect(requestTo("/identer?identgruppe=NorskIdent")).andRespond(withSuccess(OK_RESPONSE_NORSK_IDENT, MediaType.APPLICATION_JSON));
+        assertThat(aktoerConsumer.hentNorskIdent("06038029973"), is("1000004898117"));
     }
 
     @Test(expected = NotFoundException.class)
@@ -56,6 +70,6 @@ public class AktoerConsumerTest {
         server.expect(requestTo("/identer?identgruppe=AktoerId"))
                 .andRespond(withSuccess(FUNCTIONAL_ERROR_RESPONSE, MediaType.APPLICATION_JSON));
 
-        aktoerConsumer.getAktoerId("12345678910");
+        aktoerConsumer.hentAktoerId("12345678910");
     }
 }

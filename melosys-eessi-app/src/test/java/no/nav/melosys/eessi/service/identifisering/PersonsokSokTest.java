@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.behandling;
+package no.nav.melosys.eessi.service.identifisering;
 
 import java.io.IOException;
 import java.net.URL;
@@ -27,7 +27,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class PersonvurderingTest {
+public class PersonsokSokTest {
 
     private final String PERSON = "01058312345";
 
@@ -35,7 +35,7 @@ public class PersonvurderingTest {
     private TpsService tpsService;
 
     @InjectMocks
-    private Personvurdering personvurdering;
+    private PersonsokSok personsokSok;
 
     @Before
     public void setup() throws Exception {
@@ -47,8 +47,8 @@ public class PersonvurderingTest {
     }
 
     @Test
-    public void hentNorskIdent_medGyldigIdent_forventGyldigIdent() throws Exception {
-        Optional<String> ident = personvurdering.hentNorskIdent(lagSedHendelse(), lagSed());
+    public void finnNorskIdent_medGyldigIdent_forventGyldigIdent() throws Exception {
+        Optional<String> ident = personsokSok.finnNorskIdent(lagSedHendelse(), lagSed());
 
         verify(tpsService).hentPerson(anyString());
         assertThat(ident).isPresent();
@@ -56,11 +56,11 @@ public class PersonvurderingTest {
     }
 
     @Test
-    public void hentNorskIdent_medTomIdent_forventGyldigIdent() throws Exception {
+    public void finnNorskIdent_medTomIdent_forventGyldigIdent() throws Exception {
         SedHendelse sedHendelse = lagSedHendelse();
         sedHendelse.setNavBruker(null);
 
-        Optional<String> ident = personvurdering.hentNorskIdent(sedHendelse, lagSed());
+        Optional<String> ident = personsokSok.finnNorskIdent(sedHendelse, lagSed());
 
         verify(tpsService).hentPerson(anyString());
         verify(tpsService).soekEtterPerson(any());
@@ -70,11 +70,11 @@ public class PersonvurderingTest {
     }
 
     @Test
-    public void hentNorskIdent_medIdentSomIkkeBlirFunnetITPS_forventGyldigIdent() throws Exception {
+    public void finnNorskIdent_medIdentSomIkkeBlirFunnetITPS_forventGyldigIdent() throws Exception {
         SedHendelse sedHendelse = lagSedHendelse();
         sedHendelse.setNavBruker("1234");
 
-        Optional<String> ident = personvurdering.hentNorskIdent(sedHendelse, lagSed());
+        Optional<String> ident = personsokSok.finnNorskIdent(sedHendelse, lagSed());
 
         verify(tpsService, times(2)).hentPerson(anyString());
         verify(tpsService).soekEtterPerson(any());
@@ -84,52 +84,52 @@ public class PersonvurderingTest {
     }
 
     @Test
-    public void hentNorskIdent_medFeilFoedselsdato_forventIdentLikNull() throws Exception {
+    public void finnNorskIdent_medFeilFoedselsdato_forventIdentLikNull() throws Exception {
         SED sed = lagSed();
         sed.getNav().getBruker().getPerson().setFoedselsdato("1999-01-01");
 
-        Optional<String> ident = personvurdering.hentNorskIdent(lagSedHendelse(), sed);
+        Optional<String> ident = personsokSok.finnNorskIdent(lagSedHendelse(), sed);
 
         assertThat(ident).isNotPresent();
     }
 
     @Test
-    public void hentNorskIdent_medFeilStatsborgerskap_forventIdentLikNull() throws Exception {
+    public void finnNorskIdent_medFeilStatsborgerskap_forventIdentLikNull() throws Exception {
         SED sed = lagSed();
         sed.getNav().getBruker().getPerson().getStatsborgerskap().clear();
 
-        Optional<String> ident = personvurdering.hentNorskIdent(lagSedHendelse(), sed);
+        Optional<String> ident = personsokSok.finnNorskIdent(lagSedHendelse(), sed);
 
         assertThat(ident).isNotPresent();
     }
 
     @Test
-    public void hentNorskIdent_medIngenIdentOgIngenTreffPaaSoek_forventIdentLikNull() throws Exception {
+    public void finnNorskIdent_medIngenIdentOgIngenTreffPaaSoek_forventIdentLikNull() throws Exception {
         when(tpsService.soekEtterPerson(any())).thenReturn(Collections.emptyList());
         SedHendelse sedHendelse = lagSedHendelse();
         sedHendelse.setNavBruker(null);
 
-        Optional<String> ident = personvurdering.hentNorskIdent(sedHendelse, lagSed());
+        Optional<String> ident = personsokSok.finnNorskIdent(sedHendelse, lagSed());
 
         assertThat(ident).isNotPresent();
     }
 
     @Test
-    public void hentNorskIdent_medIngenTreffITPS_forventIdentLikNull() throws Exception {
+    public void finnNorskIdent_medIngenTreffITPS_forventIdentLikNull() throws Exception {
         when(tpsService.hentPerson(anyString())).thenThrow(NotFoundException.class);
 
-        Optional<String> ident = personvurdering.hentNorskIdent(lagSedHendelse(), lagSed());
+        Optional<String> ident = personsokSok.finnNorskIdent(lagSedHendelse(), lagSed());
 
         assertThat(ident).isNotPresent();
     }
 
     @Test
-    public void hentNorskIdent_medOpphoertPerson_forventIdentLikNull() throws Exception {
+    public void finnNorskIdent_medOpphoertPerson_forventIdentLikNull() throws Exception {
         Person person = lagTpsPerson().withPersonstatus(new Personstatus()
                 .withPersonstatus(new Personstatuser().withValue("UTAN")));
 
         when(tpsService.hentPerson(anyString())).thenReturn(person);
-        Optional<String> ident = personvurdering.hentNorskIdent(lagSedHendelse(), lagSed());
+        Optional<String> ident = personsokSok.finnNorskIdent(lagSedHendelse(), lagSed());
 
         assertThat(ident).isNotPresent();
     }

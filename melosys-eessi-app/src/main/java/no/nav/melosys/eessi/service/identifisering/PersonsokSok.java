@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.behandling;
+package no.nav.melosys.eessi.service.identifisering;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class Personvurdering {
+class PersonsokSok {
 
     private static final String UTGAATT_PERSON = "UTPE";
     private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
@@ -27,7 +27,7 @@ public class Personvurdering {
     private final TpsService tpsService;
 
     @Autowired
-    public Personvurdering(TpsService tpsService) {
+    public PersonsokSok(TpsService tpsService) {
         this.tpsService = tpsService;
     }
 
@@ -44,7 +44,7 @@ public class Personvurdering {
      * @param sed        SED-dokument hentet fra eux
      * @return Norsk ident til person eller null dersom den ikke finnes.
      */
-    Optional<String> hentNorskIdent(SedHendelse sedMottatt, SED sed) {
+    Optional<String> finnNorskIdent(SedHendelse sedMottatt, SED sed) {
 
         Optional<String> ident = Optional.ofNullable(sedMottatt.getNavBruker());
         if (!ident.isPresent()) { // Ingen norsk ident oppgitt

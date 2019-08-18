@@ -19,7 +19,7 @@ public class AktoerConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public String getAktoerId(String ident) throws NotFoundException {
+    public String hentAktoerId(String ident) throws NotFoundException {
 
         String url = UriComponentsBuilder.fromPath("/identer")
                 .queryParam("identgruppe", "AktoerId")
@@ -35,11 +35,36 @@ public class AktoerConsumer implements RestConsumer {
         }
     }
 
+    public String hentNorskIdent(String aktoerID) throws NotFoundException {
+        String url = UriComponentsBuilder.fromPath("/identer")
+                .queryParam("identgruppe", "NorskIdent")
+                .toUriString();
+        log.info("Henter ident for aktørID: {}", aktoerID);
+        JsonNode rootNode = restTemplate.exchange(url, HttpMethod.GET, headers(aktoerID), JsonNode.class)
+                .getBody();
+
+        if (rootNode != null) {
+            return hentNorskIdentFraResponse(rootNode, aktoerID);
+        } else {
+            throw new NotFoundException("Finner ikke ident for aktørID" + aktoerID);
+        }
+    }
+
     private String hentAktoerIdFraResponse(JsonNode rootNode, String ident) throws NotFoundException {
         JsonNode identNode = rootNode.path(ident).path("identer").path(0);
 
         if (identNode.isMissingNode()) {
             throw new NotFoundException("Finner ikke aktørId for ident " + ident);
+        }
+
+        return identNode.get("ident").textValue();
+    }
+
+    private String hentNorskIdentFraResponse(JsonNode rootNode, String aktoerID) throws NotFoundException {
+        JsonNode identNode = rootNode.path(aktoerID).path("identer").path(0);
+
+        if (identNode.isMissingNode()) {
+            throw new NotFoundException("Finner ikke norsk ident for aktørId " + aktoerID);
         }
 
         return identNode.get("ident").textValue();
