@@ -25,4 +25,10 @@ public class JournalpostSedKobling {
 
     @Column(name = "sed_versjon")
     private String sedVersjon;
+
+    @Column(name = "buc_type")
+    private String bucType;
+
+    @Column(name = "sed_type")
+    private String sedType;
 }

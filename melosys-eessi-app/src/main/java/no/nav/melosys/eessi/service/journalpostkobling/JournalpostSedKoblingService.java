@@ -19,9 +19,10 @@ public class JournalpostSedKoblingService {
         return journalpostSedKoblingRepository.findByJournalpostID(journalpostID);
     }
 
-    public JournalpostSedKobling lagre(String journalpostID, String rinaSaksnummer, String sedID, String sedVersjon) {
+    public JournalpostSedKobling lagre(String journalpostID, String rinaSaksnummer, String sedID,
+            String sedVersjon, String bucType, String sedType) {
         return journalpostSedKoblingRepository.save(
-          new JournalpostSedKobling(journalpostID,rinaSaksnummer, sedID, sedVersjon)
+          new JournalpostSedKobling(journalpostID,rinaSaksnummer, sedID, sedVersjon, bucType, sedType)
         );
     }
 

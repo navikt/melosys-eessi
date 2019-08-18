@@ -48,7 +48,8 @@ public class OpprettInngaaendeJournalpostService {
     public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, byte[] sedPdf) throws IntegrationException {
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedHendelse, null, sedPdf);
         journalpostSedKoblingService.lagre(
-                response.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(), sedHendelse.getRinaDokumentVersjon()
+                response.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(),
+                sedHendelse.getRinaDokumentVersjon(), sedHendelse.getBucType(), sedHendelse.getSedType()
         );
 
         return response.getJournalpostId();
