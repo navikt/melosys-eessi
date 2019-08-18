@@ -57,7 +57,7 @@ public class TpsServiceTest {
 
         when(personConsumer.hentPerson(any())).thenReturn(response);
 
-        when(aktoerConsumer.getAktoerId(anyString())).thenReturn("998877665544");
+        when(aktoerConsumer.hentAktoerId(anyString())).thenReturn("998877665544");
 
         when(personsokConsumer.finnPerson(any())).thenReturn(lagFinnPersonResponseMedEnPerson());
     }

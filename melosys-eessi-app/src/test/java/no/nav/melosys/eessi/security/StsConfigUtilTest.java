@@ -8,9 +8,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.junit.Test;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +27,6 @@ public class StsConfigUtilTest {
 
         StsConfigUtil.configureStsRequestSamlToken(client, stsUrl, username, password);
 
-        assertThat(client.getRequestContext().get(SecurityConstants.STS_CLIENT), not(nullValue()));
+        assertThat(client.getRequestContext().get(SecurityConstants.STS_CLIENT)).isNotNull();
     }
 }

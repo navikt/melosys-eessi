@@ -83,7 +83,11 @@ public class TpsService {
     }
 
     public String hentAktoerId(String ident) throws NotFoundException {
-        return aktoerConsumer.getAktoerId(ident);
+        return aktoerConsumer.hentAktoerId(ident);
+    }
+
+    public String hentNorskIdent(String aktoerID) throws NotFoundException {
+        return aktoerConsumer.hentNorskIdent(aktoerID);
     }
 
     public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) throws NotFoundException {

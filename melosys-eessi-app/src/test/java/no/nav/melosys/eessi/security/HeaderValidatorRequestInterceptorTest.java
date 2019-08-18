@@ -1,14 +1,11 @@
 package no.nav.melosys.eessi.security;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.isEmptyString;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class HeaderValidatorRequestInterceptorTest {
@@ -17,32 +14,32 @@ public class HeaderValidatorRequestInterceptorTest {
     private final String HEADER_VALUE = "val123";
 
     @Test
-    public void preHandle_naisProfile_expectValidationSuccessful() throws Exception {
+    public void preHandle_naisProfilUtenToken_forventFeiletValidering() throws Exception {
         HeaderValidatorRequestInterceptor requestInterceptor = new HeaderValidatorRequestInterceptor(HEADER_NAME,
                 HEADER_VALUE, "nais");
-        Boolean result;
-
-        HttpServletRequest request = new MockHttpServletRequest();
-        HttpServletResponse response = new MockHttpServletResponse();
-
-        result = requestInterceptor.preHandle(request, response, null);
-
-        assertThat(result, is(Boolean.FALSE));
-
-    }
-
-    @Test
-    public void preHandle_lovalProfile_expectValidationUnauthorized() throws Exception {
-        HeaderValidatorRequestInterceptor requestInterceptor = new HeaderValidatorRequestInterceptor(HEADER_NAME,
-                HEADER_VALUE, "local");
-        Boolean result;
+        boolean result;
 
         HttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         result = requestInterceptor.preHandle(request, response, null);
 
-        assertThat(result, is(Boolean.TRUE));
-        assertThat(response.getErrorMessage(), not(isEmptyString()));
+        assertThat(result).isFalse();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.UNAUTHORIZED.value());
+    }
+
+    @Test
+    public void preHandle_localProfil_forventSuksessfullValidering() throws Exception {
+        HeaderValidatorRequestInterceptor requestInterceptor = new HeaderValidatorRequestInterceptor(HEADER_NAME,
+                HEADER_VALUE, "local");
+        boolean result;
+
+        HttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        result = requestInterceptor.preHandle(request, response, null);
+
+        assertThat(result).isTrue();
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     }
 }

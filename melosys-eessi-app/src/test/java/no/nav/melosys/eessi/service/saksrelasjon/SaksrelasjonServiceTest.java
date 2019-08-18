@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.caserelation;
+package no.nav.melosys.eessi.service.saksrelasjon;
 
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;

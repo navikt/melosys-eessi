@@ -7,6 +7,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.gsak.GsakService;
+import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +17,15 @@ public class OpprettInngaaendeJournalpostService {
 
     private final GsakService gsakService;
     private final JournalpostService journalpostService;
+    private final JournalpostSedKoblingService journalpostSedKoblingService;
 
     @Autowired
     public OpprettInngaaendeJournalpostService(GsakService gsakService,
-            JournalpostService journalpostService) {
+            JournalpostService journalpostService,
+            JournalpostSedKoblingService journalpostSedKoblingService) {
         this.gsakService = gsakService;
         this.journalpostService = journalpostService;
+        this.journalpostSedKoblingService = journalpostSedKoblingService;
     }
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId, byte[] sedPdf) throws IntegrationException {
@@ -29,6 +33,8 @@ public class OpprettInngaaendeJournalpostService {
         Sak sak = gsakService.hentEllerOpprettSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+        log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
+
 
         //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
         String dokumentId = response.getDokumenter() == null ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
@@ -37,5 +43,15 @@ public class OpprettInngaaendeJournalpostService {
                 .dokumentId(dokumentId)
                 .gsakSaksnummer(sak.getId())
                 .build();
+    }
+
+    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, byte[] sedPdf) throws IntegrationException {
+        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedHendelse, null, sedPdf);
+        journalpostSedKoblingService.lagre(
+                response.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(),
+                sedHendelse.getRinaDokumentVersjon(), sedHendelse.getBucType(), sedHendelse.getSedType()
+        );
+
+        return response.getJournalpostId();
     }
 }

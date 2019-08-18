@@ -10,8 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -54,9 +53,9 @@ public class DokkatServiceTest {
     public void hentMetaDataFraDokkat_expectDokkatSedInfo() throws Exception {
         DokkatSedInfo dokkatSedInfo = dokkatService.hentMetadataFraDokkat(sedType);
 
-        assertThat(dokkatSedInfo, not(nullValue()));
-        assertThat(dokkatSedInfo.getBehandlingstema(), is("behandlingstema"));
-        assertThat(dokkatSedInfo.getDokumenttypeId(), is(dokumentTypeId));
+        assertThat(dokkatSedInfo).isNotNull();
+        assertThat(dokkatSedInfo.getBehandlingstema()).isEqualTo("behandlingstema");
+        assertThat(dokkatSedInfo.getDokumenttypeId()).isEqualTo(dokumentTypeId);
     }
 
 }

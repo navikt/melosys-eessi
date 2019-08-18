@@ -28,7 +28,6 @@
     <tps.person.version>3.4.1</tps.person.version>
     <flyway.version>5.2.4</flyway.version>
     <guava.version>21.0</guava.version>
-    <hamcrest.version>1.3</hamcrest.version>
     <java.version>1.8</java.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <logstash-encoder.version>5.3</logstash-encoder.version>
