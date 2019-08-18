@@ -43,8 +43,8 @@ public class OpprettJournalpostRequestMapper {
                 .journalfoerendeEnhet("4530")
                 .journalpostType(journalpostType)
                 .kanal("EESSI")
-                .sak(OpprettJournalpostRequest.Sak.builder().arkivsaksnummer(sak.getId()).build())
-                .tema(sak.getTema())
+                .sak(sak != null ? OpprettJournalpostRequest.Sak.builder().arkivsaksnummer(sak.getId()).build() : null)
+                .tema(sak != null ? sak.getTema() : "MED") //fixme: MED eller null?
                 .tittel(dokkatSedInfo.getDokumentTittel())
                 .tilleggsopplysninger(Collections.singletonList(Tilleggsopplysning.builder()
                         .nokkel("rinaSakId")
