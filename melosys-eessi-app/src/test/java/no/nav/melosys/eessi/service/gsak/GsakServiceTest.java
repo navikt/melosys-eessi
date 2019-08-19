@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.gsak;
 
 import no.nav.melosys.eessi.integration.gsak.Sak;
-import no.nav.melosys.eessi.integration.gsak.SakConsumer;
+import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;

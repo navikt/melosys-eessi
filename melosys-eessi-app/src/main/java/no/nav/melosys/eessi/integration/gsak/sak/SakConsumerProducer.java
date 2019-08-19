@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.gsak;
+package no.nav.melosys.eessi.integration.gsak.sak;
 
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;

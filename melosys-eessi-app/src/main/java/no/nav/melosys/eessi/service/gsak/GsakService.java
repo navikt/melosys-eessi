@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.service.gsak;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
-import no.nav.melosys.eessi.integration.gsak.SakConsumer;
+import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -19,8 +19,7 @@ public class GsakService {
     private final SaksrelasjonService saksrelasjonService;
 
     @Autowired
-    public GsakService(SakConsumer sakConsumer,
-            SaksrelasjonService saksrelasjonService) {
+    public GsakService(SakConsumer sakConsumer, SaksrelasjonService saksrelasjonService) {
         this.sakConsumer = sakConsumer;
         this.saksrelasjonService = saksrelasjonService;
     }

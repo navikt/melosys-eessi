@@ -3,7 +3,7 @@ package no.nav.melosys.eessi;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
-import no.nav.melosys.eessi.integration.gsak.SakConsumer;
+import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
@@ -16,7 +16,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.util.SocketUtils;
-
 import static org.mockito.Mockito.mock;
 
 @Configuration

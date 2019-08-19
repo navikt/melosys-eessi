@@ -1,8 +1,9 @@
-package no.nav.melosys.eessi.integration.gsak;
+package no.nav.melosys.eessi.integration.gsak.sak;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.UUIDGenerator;
+import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -49,7 +50,7 @@ public class SakConsumer implements RestConsumer, UUIDGenerator {
         try {
             return restTemplate.exchange(uri, method, entity, clazz).getBody();
         } catch (RestClientException e) {
-            throw new IntegrationException("Feil i integrasjon mot gsak", e);
+            throw new IntegrationException("Feil i integrasjon mot sak", e);
         }
     }
 
