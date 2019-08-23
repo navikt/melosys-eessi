@@ -88,8 +88,11 @@ public class BehandleSedMottattService {
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(sedType);
         if (mapper != null) {
             boolean sedErEndring = euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
+
             melosysEessiProducer.publiserMelding(
-                    mapper.map(aktoerId, sed, sedHendelse, sakInformasjon, sedErEndring)
+                    mapper.map(aktoerId, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                            sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                            sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), sedErEndring)
             );
         }
     }
