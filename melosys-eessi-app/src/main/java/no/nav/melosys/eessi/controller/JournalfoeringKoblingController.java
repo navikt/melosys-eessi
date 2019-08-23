@@ -57,14 +57,14 @@ public class JournalfoeringKoblingController {
                         journalpostSedKobling.getRinaSaksnummer(),
                         journalpostSedKobling.getSedType(),
                         journalpostSedKobling.getBucType(),
-                        journalpostID,
+                        journalpostSedKobling.getJournalpostID(),
                         null,
                         gsakSaksnummer != null ? gsakSaksnummer.toString() : null,
                         Integer.valueOf(journalpostSedKobling.getSedVersjon()) != 1
                     );
     }
 
-    @ApiOperation(value = "Henter sed koblet til journalpost, det finnes en relasjon")
+    @ApiOperation(value = "Henter sed koblet til journalpost. Gir tomt svar om det ikke finnes en relasjon")
     @GetMapping("{journalpostID}")
     public JournalpostSedKoblingDto hentJournalpostInfo(@PathVariable("journalpostID") String journalpostID) {
         return journalpostSedKoblingService.finnVedJournalpostID(journalpostID)

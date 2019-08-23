@@ -44,8 +44,7 @@ public class EuxService {
             throws IntegrationException, NotFoundException {
 
         if (StringUtils.isEmpty(mottakerId)) {
-//            mottakerId = avklarMottakerId(bucType, mottakerLand);
-            mottakerId = "NO:NAVT003";
+            mottakerId = avklarMottakerId(bucType, mottakerLand);
         }
 
         Map<String, String> response = euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);

@@ -16,6 +16,7 @@ public class OppgaveService {
     }
 
     public OppgaveDto opprettOppgaveTilIdOgFordeling(String journalpostID) throws IntegrationException {
+        //TODO: parametere til Oppgave må avklares
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .aktoerId("")
