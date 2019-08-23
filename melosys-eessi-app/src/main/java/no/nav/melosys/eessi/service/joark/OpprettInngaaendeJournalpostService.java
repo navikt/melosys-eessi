@@ -32,9 +32,8 @@ public class OpprettInngaaendeJournalpostService {
 
         Sak sak = gsakService.hentEllerOpprettSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+        OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedPdf);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
-
 
         //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
         String dokumentId = response.getDokumenter() == null ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
@@ -46,12 +45,19 @@ public class OpprettInngaaendeJournalpostService {
     }
 
     public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, byte[] sedPdf) throws IntegrationException {
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedHendelse, null, sedPdf);
+        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedPdf).getJournalpostId();
+    }
+
+    private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(SedHendelse sedMottatt, Sak sak, byte[] sedPdf) throws IntegrationException {
+        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+        lagreJournalpostRelasjon(sedMottatt, response);
+        return response;
+    }
+
+    private void lagreJournalpostRelasjon(SedHendelse sedHendelse, OpprettJournalpostResponse opprettJournalpostResponse) {
         journalpostSedKoblingService.lagre(
-                response.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(),
+                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(),
                 sedHendelse.getRinaDokumentVersjon(), sedHendelse.getBucType(), sedHendelse.getSedType()
         );
-
-        return response.getJournalpostId();
     }
 }

@@ -35,6 +35,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     private SedHendelse sedMottatt;
     private static final String JOURNALPOST_ID = "11223344";
+    private static final String GSAK_SAKSNUMMER = "123";
 
     @Before
     public void setup() throws Exception {
@@ -48,7 +49,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any())).thenReturn(response);
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
-        sak.setId("1234"); // Må kunne bli parset til Long
+        sak.setId(GSAK_SAKSNUMMER);
         when(gsakService.hentEllerOpprettSak(anyString(), anyString(), any()))
                 .thenReturn(sak);
     }
@@ -59,9 +60,13 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         assertThat(sakInformasjon).isNotNull();
         assertThat(sakInformasjon.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
+        assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any());
         verify(gsakService, times(1)).hentEllerOpprettSak(any(), any(), any());
+        verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
+                eq(sedMottatt.getSedId()), eq(sedMottatt.getRinaDokumentVersjon()),
+                eq(sedMottatt.getBucType()), eq(sedMottatt.getSedType()));
     }
 
     @Test
