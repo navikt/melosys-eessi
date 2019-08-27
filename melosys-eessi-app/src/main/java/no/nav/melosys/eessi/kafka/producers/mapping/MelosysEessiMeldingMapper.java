@@ -3,8 +3,8 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 import java.util.List;
 import java.util.stream.Collectors;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
-import no.nav.melosys.eessi.kafka.producers.Statsborgerskap;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
+import no.nav.melosys.eessi.kafka.producers.model.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 

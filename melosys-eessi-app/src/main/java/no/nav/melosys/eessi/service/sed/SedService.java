@@ -1,10 +1,12 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.CreateSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -14,11 +16,14 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.lovvalg.A002Mapper;
+import no.nav.melosys.eessi.service.sed.mapper.lovvalg.A011Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,6 +94,34 @@ public class SedService {
                 .build();
     }
 
+    public void anmodningUnntakSvar(SvarAnmodningUnntakDto svarAnmodningUnntakDto, String rinaId) throws IntegrationException, NotFoundException {
+        SED nySed;
+        SED forrigeSed = hentA001ForBuc(rinaId);
+        if (svarAnmodningUnntakDto.getBeslutning() == SvarAnmodningUnntakBeslutning.INNVILGELSE) {
+            nySed = new A011Mapper().mapFraSed(forrigeSed);
+        } else {
+            String begrunnelse = svarAnmodningUnntakDto.getBegrunnelse();
+            SvarAnmodningUnntakBeslutning beslutning = svarAnmodningUnntakDto.getBeslutning();
+            LocalDate fom = svarAnmodningUnntakDto.getDelvisInnvilgetPeriode().getFom();
+            LocalDate tom = svarAnmodningUnntakDto.getDelvisInnvilgetPeriode().getTom();
+            nySed = new A002Mapper().mapFraSed(forrigeSed, begrunnelse, beslutning, fom, tom);
+        }
+
+        log.info("Sender svar på anmodning om unntak for rinasak {}", rinaId);
+        euxService.opprettOgSendSed(nySed, rinaId);
+    }
+
+    private SED hentA001ForBuc(String rinaId) throws IntegrationException, NotFoundException {
+        return euxService.hentSed(rinaId, hentA001Document(rinaId).getId());
+    }
+
+    private Document hentA001Document(String rinaId) throws IntegrationException, NotFoundException {
+        return euxService.hentBuc(rinaId).getDocuments().stream()
+                .filter(document -> SedType.A001.toString().equalsIgnoreCase(document.getType()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Finner ingen A001 for BUC " + rinaId));
+    }
+
     private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
         SedType sedType = SedType.valueOf(sed.getSed());
 
@@ -114,19 +147,21 @@ public class SedService {
         return opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, mottakerLand, mottakerId);
     }
 
-    private boolean sedKanOppdateres(BUC buc, String id) {
+    private static boolean sedKanOppdateres(BUC buc, String id) {
         return buc.getActions().stream().filter(action -> id.equals(action.getDocumentId()))
                 .anyMatch(action -> "Update".equalsIgnoreCase(action.getOperation()));
     }
 
-    private Optional<Document> finnDokumentVedSedType(List<Document> documents, String sedType) {
+    private static Optional<Document> finnDokumentVedSedType(List<Document> documents, String sedType) {
         return documents.stream().filter(d -> sedType.equals(d.getType())).findFirst();
     }
 
     private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) throws IntegrationException {
         for (FagsakRinasakKobling fagsakRinasakKobling : eksisterendeSaker) {
             BUC buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
-            if ("open".equals(buc.getStatus())) return Optional.of(buc);
+            if ("open".equals(buc.getStatus())) {
+                return Optional.of(buc);
+            }
         }
 
         return Optional.empty();
@@ -140,7 +175,7 @@ public class SedService {
         return opprettBucOgSedResponse;
     }
 
-    private Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
+    private static Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
     }
 }

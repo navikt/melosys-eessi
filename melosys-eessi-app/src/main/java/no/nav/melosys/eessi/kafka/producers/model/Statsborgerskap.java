@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.kafka.producers;
+package no.nav.melosys.eessi.kafka.producers.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

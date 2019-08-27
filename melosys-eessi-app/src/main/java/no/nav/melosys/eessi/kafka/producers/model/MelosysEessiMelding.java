@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.kafka.producers;
+package no.nav.melosys.eessi.kafka.producers.model;
 
 import java.util.List;
 import lombok.Data;
@@ -23,4 +23,5 @@ public class MelosysEessiMelding {
     private String sedType;
 
     private SvarAnmodningUnntak svarAnmodningUnntak;
+    private AnmodningUnntak anmodningUnntak;
 }

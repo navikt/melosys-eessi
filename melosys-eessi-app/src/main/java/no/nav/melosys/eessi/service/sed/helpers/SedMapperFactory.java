@@ -16,11 +16,13 @@ public class SedMapperFactory {
 
     static {
         sedMappers.put(SedType.A001, A001Mapper.class);
+        sedMappers.put(SedType.A002, A002Mapper.class);
         sedMappers.put(SedType.A003, A003Mapper.class);
         sedMappers.put(SedType.A005, A005Mapper.class);
         sedMappers.put(SedType.A008, A008Mapper.class);
         sedMappers.put(SedType.A009, A009Mapper.class);
         sedMappers.put(SedType.A010, A010Mapper.class);
+        sedMappers.put(SedType.A011, A011Mapper.class);
         sedMappers.put(SedType.H005, H005Mapper.class);
     }
 
