@@ -11,10 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsNot.not;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -44,8 +41,8 @@ public class DokumenttypeIdConsumerTest {
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
         DokumenttypeIdTo dokumenttypeIdTo = dokumenttypeIdConsumer.hentDokumenttypeId("sed", "type");
-        assertThat(dokumenttypeIdTo, not(nullValue()));
-        assertThat(dokumenttypeIdTo.getDokumenttypeId(), is("123"));
+        assertThat(dokumenttypeIdTo).isNotNull();
+        assertThat(dokumenttypeIdTo.getDokumenttypeId()).isEqualTo("123");
     }
 
     @Test(expected = IntegrationException.class)

@@ -8,8 +8,8 @@ import no.nav.melosys.eessi.controller.dto.BucinfoDto;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

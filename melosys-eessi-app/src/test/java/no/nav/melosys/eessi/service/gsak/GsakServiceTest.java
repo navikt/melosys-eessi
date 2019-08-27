@@ -7,9 +7,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -25,6 +23,6 @@ public class GsakServiceTest {
     public void getSak_expectSak() throws Exception{
         when(sakConsumer.getSak(anyLong())).thenReturn(new Sak());
         Sak sak = gsakService.hentsak(1L);
-        assertThat(sak, not(nullValue()));
+        assertThat(sak).isNotNull();
     }
 }

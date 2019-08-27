@@ -78,7 +78,7 @@ public abstract class ComponentTestBase {
         when(euxConsumer.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
         when(sakConsumer.opprettSak(anyString())).thenReturn(componentTestProvider.sak(AKTOER_ID));
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(componentTestProvider.journalpostResponse());
-        when(aktoerConsumer.getAktoerId(anyString())).thenReturn(AKTOER_ID);
+        when(aktoerConsumer.hentAktoerId(anyString())).thenReturn(AKTOER_ID);
         when(personConsumer.hentPerson(any(HentPersonRequest.class))).thenReturn(componentTestProvider.hentPersonResponse(AKTOER_ID, FØDSELSDATO, "NO"));
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(componentTestProvider.sed(FØDSELSDATO, STATSBORGERSKAP));
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdTo("dokumenttypeId"));

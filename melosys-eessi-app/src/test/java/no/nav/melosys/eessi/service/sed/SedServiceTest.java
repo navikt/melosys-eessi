@@ -22,6 +22,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslut
 import no.nav.melosys.eessi.service.caserelation.SaksrelasjonService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

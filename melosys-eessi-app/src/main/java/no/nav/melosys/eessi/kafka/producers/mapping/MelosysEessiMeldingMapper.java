@@ -11,17 +11,24 @@ import no.nav.melosys.eessi.service.joark.SakInformasjon;
 public interface MelosysEessiMeldingMapper {
 
     default MelosysEessiMelding map(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon, boolean sedErEndring) {
+        return map(aktoerId, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(), sedHendelse.getSedType(),
+                sedHendelse.getBucType(), sakInformasjon.getJournalpostId(), sakInformasjon.getDokumentId(),
+                sakInformasjon.getGsakSaksnummer(), sedErEndring);
+    }
+
+    default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
+            String sedType, String bucType, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
-        melosysEessiMelding.setSedId(sedHendelse.getRinaDokumentId());
-        melosysEessiMelding.setRinaSaksnummer(sedHendelse.getRinaSakId());
-        melosysEessiMelding.setJournalpostId(sakInformasjon.getJournalpostId());
-        melosysEessiMelding.setDokumentId(sakInformasjon.getDokumentId());
-        melosysEessiMelding.setGsakSaksnummer(Long.parseLong(sakInformasjon.getGsakSaksnummer()));
+        melosysEessiMelding.setSedId(rinaDokumentID);
+        melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
+        melosysEessiMelding.setJournalpostId(journalpostID);
+        melosysEessiMelding.setDokumentId(dokumentID);
+        melosysEessiMelding.setGsakSaksnummer(gsakSaksnummer != null ? Long.parseLong(gsakSaksnummer) : null);
         melosysEessiMelding.setAktoerId(aktoerId);
         melosysEessiMelding.setYtterligereInformasjon(sed.getNav().getYtterligereinformasjon());
 
-        melosysEessiMelding.setSedType(sedHendelse.getSedType());
-        melosysEessiMelding.setBucType(sedHendelse.getBucType());
+        melosysEessiMelding.setSedType(sedType);
+        melosysEessiMelding.setBucType(bucType);
 
         melosysEessiMelding.setStatsborgerskap(
                 mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())

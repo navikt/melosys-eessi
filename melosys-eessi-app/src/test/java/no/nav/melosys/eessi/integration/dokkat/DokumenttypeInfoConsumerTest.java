@@ -14,10 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -53,10 +50,10 @@ public class DokumenttypeInfoConsumerTest {
 
         DokumentTypeInfoToV4 responseObject = dokumenttypeInfoConsumer.hentDokumenttypeInfo(dokumentyypeId);
 
-        assertThat(responseObject, not(nullValue()));
-        assertThat(responseObject.getBehandlingstema(), is(dokumentTypeInfoToV4.getBehandlingstema()));
-        assertThat(responseObject.getTema(), is(dokumentTypeInfoToV4.getTema()));
-        assertThat(responseObject.getDokumentKategori(), is(dokumentTypeInfoToV4.getDokumentKategori()));
+        assertThat(responseObject).isNotNull();
+        assertThat(responseObject.getBehandlingstema()).isEqualTo(dokumentTypeInfoToV4.getBehandlingstema());
+        assertThat(responseObject.getTema()).isEqualTo(dokumentTypeInfoToV4.getTema());
+        assertThat(responseObject.getDokumentKategori()).isEqualTo(dokumentTypeInfoToV4.getDokumentKategori());
     }
 
     @Test(expected = IntegrationException.class)

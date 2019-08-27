@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.tps.TpsService;
@@ -25,7 +26,7 @@ public class BehandleSedMottattService {
     private final EuxService euxService;
     private final TpsService tpsService;
     private final MelosysEessiProducer melosysEessiProducer;
-    private final Personvurdering personvurdering;
+    private final PersonIdentifiseringService personIdentifiseringService;
 
     @Autowired
     public BehandleSedMottattService(
@@ -33,12 +34,12 @@ public class BehandleSedMottattService {
             EuxService euxService,
             TpsService tpsService,
             MelosysEessiProducer melosysEessiProducer,
-            Personvurdering personvurdering) {
+            PersonIdentifiseringService personIdentifiseringService) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.tpsService = tpsService;
         this.melosysEessiProducer = melosysEessiProducer;
-        this.personvurdering = personvurdering;
+        this.personIdentifiseringService = personIdentifiseringService;
     }
 
     public void behandleSed(SedHendelse sedMottatt) {
@@ -46,25 +47,40 @@ public class BehandleSedMottattService {
         try {
             SED sed = euxService.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
 
-            Optional<String> ident = personvurdering.hentNorskIdent(sedMottatt, sed);
-            if (!ident.isPresent()) {
-                throw new NotFoundException("Ingen norsk ident ble funnet for rinaSak " + sedMottatt.getRinaSakId());
+            Optional<String> ident = personIdentifiseringService.identifiserPerson(sedMottatt, sed);
+            if (ident.isPresent()) { //TODO: person identifisert, SED støtter ikke automatisk behandling MELOSYS-2903
+                log.info("Person i rinaSak {} er identifisert", sedMottatt.getRinaSakId());
+                sedMottatt.setNavBruker(ident.get());
+                personErIdentifisert(sedMottatt, sed);
+            } else {
+                log.info("Person i rinasak {} ikke identifisert", sedMottatt.getRinaSakId());
+                personIkkeIdentifisert(sedMottatt, sed);
             }
-            sedMottatt.setNavBruker(ident.get());
-            log.info("Person i rinaSak {} er verifisert mot TPS", sedMottatt.getRinaSakId());
 
-            String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());
-            SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(
-                    sedMottatt, aktoerId, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId()));
-            log.info("Midlertidig journalpost opprettet med id {}", sakInformasjon.getJournalpostId());
-
-            publiserMelosysEessiMelding(aktoerId, sed, sedMottatt, sakInformasjon);
-
-            log.info("Behandling av innkommende sed {} fullført.", sedMottatt.getRinaDokumentId());
         } catch (IntegrationException | NotFoundException e) {
             log.error("Behandling av sed {} ble ikke fullført. Melding: {}", sedMottatt.getRinaDokumentId(), e.getMessage(), e);
         }
     }
+
+    private void personIkkeIdentifisert(SedHendelse sedMottatt, SED sed) throws IntegrationException {
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+                sedMottatt, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId())
+        );
+
+        //TODO: opprett Oppgave til ID og fordeling
+
+    }
+
+    private void personErIdentifisert(SedHendelse sedMottatt, SED sed) throws IntegrationException, NotFoundException {
+        String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(
+                sedMottatt, aktoerId, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId()));
+
+        publiserMelosysEessiMelding(aktoerId, sed, sedMottatt, sakInformasjon);
+
+        log.info("Behandling av innkommende sed {} fullført.", sedMottatt.getRinaDokumentId());
+    }
+
 
     private void publiserMelosysEessiMelding(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon) throws IntegrationException {
 
