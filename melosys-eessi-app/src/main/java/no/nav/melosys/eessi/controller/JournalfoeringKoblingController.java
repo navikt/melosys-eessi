@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.JournalpostSedKobling;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
