@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.joark;
 
+import java.util.Optional;
 import com.google.common.collect.Lists;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
@@ -50,8 +51,8 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sak.setId(GSAK_SAKSNUMMER);
-        when(gsakService.hentEllerOpprettSak(anyString(), anyString(), any()))
-                .thenReturn(sak);
+        when(gsakService.finnSakForRinaID(anyString()))
+                .thenReturn(Optional.of(sak));
     }
 
     @Test
@@ -63,9 +64,9 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any());
-        verify(gsakService, times(1)).hentEllerOpprettSak(any(), any(), any());
+        verify(gsakService, times(1)).finnSakForRinaID(any());
         verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
-                eq(sedMottatt.getSedId()), eq(sedMottatt.getRinaDokumentVersjon()),
+                eq(sedMottatt.getRinaDokumentId()), eq(sedMottatt.getRinaDokumentVersjon()),
                 eq(sedMottatt.getBucType()), eq(sedMottatt.getSedType()));
     }
 

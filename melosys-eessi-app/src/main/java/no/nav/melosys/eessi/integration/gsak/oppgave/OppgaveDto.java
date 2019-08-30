@@ -33,4 +33,5 @@ public class OppgaveDto {
     private String temagruppe;
     private String tildeltEnhetsnr;
     private String behandlesAvApplikasjon;
+    private String beskrivelse;
 }

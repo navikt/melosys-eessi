@@ -12,11 +12,11 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,13 +41,19 @@ public class BehandleSedMottattServiceTest {
     @Mock
     private MelosysEessiProducer melosysEessiProducer;
 
-    @InjectMocks
+    @Mock
+    private OppgaveService oppgaveService;
+
     private BehandleSedMottattService behandleSedMottattService;
 
     private static final String IDENT = "1122334455";
 
     @Before
     public void setup() throws Exception {
+        behandleSedMottattService = new BehandleSedMottattService(
+                opprettInngaaendeJournalpostService, euxService, tpsService,
+                melosysEessiProducer, personIdentifiseringService, oppgaveService
+        );
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), anyString(), any()))
                 .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());

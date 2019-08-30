@@ -36,4 +36,20 @@ public class OppgaveService {
 
         return null;
     }
+
+    public void opprettJfrOppgave(String journalpostID) throws IntegrationException {
+        //Midlertidig opprettelse av jfr-oppgaver til overnenvnte TODO er fikset
+        OppgaveDto oppgaveDto = OppgaveDto.builder()
+                .aktivDato(LocalDate.now())
+                .beskrivelse("Identifiser person og journalfør i Melosys")
+                .fristFerdigstillelse(LocalDate.now().plusDays(7L))
+                .journalpostId(journalpostID)
+                .oppgavetype("JFR")
+                .prioritet("NORM")
+                .tema("UFM")
+                .tildeltEnhetsnr("4530")
+                .build();
+
+        oppgaveConsumer.opprettOppgave(oppgaveDto);
+    }
 }

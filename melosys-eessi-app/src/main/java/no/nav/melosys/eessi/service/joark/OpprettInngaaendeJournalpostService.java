@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
@@ -30,7 +29,7 @@ public class OpprettInngaaendeJournalpostService {
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId, byte[] sedPdf) throws IntegrationException {
 
-        Sak sak = gsakService.hentEllerOpprettSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
+        Sak sak = gsakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedPdf);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
@@ -40,7 +39,7 @@ public class OpprettInngaaendeJournalpostService {
 
         return SakInformasjon.builder().journalpostId(response.getJournalpostId())
                 .dokumentId(dokumentId)
-                .gsakSaksnummer(sak.getId())
+                .gsakSaksnummer(sak != null ? sak.getId() : null)
                 .build();
     }
 
@@ -56,7 +55,7 @@ public class OpprettInngaaendeJournalpostService {
 
     private void lagreJournalpostRelasjon(SedHendelse sedHendelse, OpprettJournalpostResponse opprettJournalpostResponse) {
         journalpostSedKoblingService.lagre(
-                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(),
+                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getRinaDokumentId(),
                 sedHendelse.getRinaDokumentVersjon(), sedHendelse.getBucType(), sedHendelse.getSedType()
         );
     }

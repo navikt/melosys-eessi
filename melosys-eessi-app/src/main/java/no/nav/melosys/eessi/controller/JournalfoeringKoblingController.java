@@ -60,7 +60,7 @@ public class JournalfoeringKoblingController {
                         journalpostSedKobling.getJournalpostID(),
                         null,
                         gsakSaksnummer != null ? gsakSaksnummer.toString() : null,
-                        Integer.valueOf(journalpostSedKobling.getSedVersjon()) != 1
+                        Integer.parseInt(journalpostSedKobling.getSedVersjon()) != 1
                     );
     }
 

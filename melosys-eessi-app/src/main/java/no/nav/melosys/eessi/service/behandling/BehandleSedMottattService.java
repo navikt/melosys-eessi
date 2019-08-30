@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class BehandleSedMottattService {
     private final TpsService tpsService;
     private final MelosysEessiProducer melosysEessiProducer;
     private final PersonIdentifiseringService personIdentifiseringService;
+    private final OppgaveService oppgaveService;
 
     @Autowired
     public BehandleSedMottattService(
@@ -34,12 +36,14 @@ public class BehandleSedMottattService {
             EuxService euxService,
             TpsService tpsService,
             MelosysEessiProducer melosysEessiProducer,
-            PersonIdentifiseringService personIdentifiseringService) {
+            PersonIdentifiseringService personIdentifiseringService,
+            OppgaveService oppgaveService) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.tpsService = tpsService;
         this.melosysEessiProducer = melosysEessiProducer;
         this.personIdentifiseringService = personIdentifiseringService;
+        this.oppgaveService = oppgaveService;
     }
 
     public void behandleSed(SedHendelse sedMottatt) {
@@ -54,7 +58,7 @@ public class BehandleSedMottattService {
                 personErIdentifisert(sedMottatt, sed);
             } else {
                 log.info("Person i rinasak {} ikke identifisert", sedMottatt.getRinaSakId());
-                personIkkeIdentifisert(sedMottatt, sed);
+                personIkkeIdentifisert(sedMottatt);
             }
 
         } catch (IntegrationException | NotFoundException e) {
@@ -62,13 +66,13 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void personIkkeIdentifisert(SedHendelse sedMottatt, SED sed) throws IntegrationException {
+    private void personIkkeIdentifisert(SedHendelse sedMottatt) throws IntegrationException {
         String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
                 sedMottatt, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId())
         );
 
-        //TODO: opprett Oppgave til ID og fordeling
-
+        oppgaveService.opprettJfrOppgave(journalpostID);
+        //TODO: opprett Oppgave til ID og fordeling. Oppretter jfr-oppgave for nå.
     }
 
     private void personErIdentifisert(SedHendelse sedMottatt, SED sed) throws IntegrationException, NotFoundException {
