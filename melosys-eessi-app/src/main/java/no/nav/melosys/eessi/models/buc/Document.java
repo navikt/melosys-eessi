@@ -1,6 +1,8 @@
 package no.nav.melosys.eessi.models.buc;
 
+import java.time.ZonedDateTime;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
@@ -9,8 +11,10 @@ import lombok.Data;
 public class Document {
 
     private String id;
-    private long creationDate;
-    private long lastUpdate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private ZonedDateTime creationDate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
+    private ZonedDateTime lastUpdate;
     private Creator creator;
     private String type;
     private String status;

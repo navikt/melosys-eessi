@@ -1,8 +1,8 @@
 {
   "id": "100485",
   "hashCode": 0,
-  "startDate": 1554400129480,
-  "lastUpdate": 1554400148000,
+  "startDate": "2019-08-29T12:40:35.017+0000",
+  "lastUpdate": "2019-08-29T13:14:40.028+0000",
   "status": "open",
   "subject": null,
   "sensitive": false,
@@ -202,8 +202,8 @@
       "id": "93f022ea50e54c08bbdb85290a5fb23d",
       "name": null,
       "mimeType": "json",
-      "lastUpdate": 1554400129000,
-      "creationDate": 1554400129000,
+      "lastUpdate": "2019-08-29T13:14:40.028+0000",
+      "creationDate": "2019-08-29T13:14:40.028+0000",
       "creator": {
         "id": "0",
         "address": null,

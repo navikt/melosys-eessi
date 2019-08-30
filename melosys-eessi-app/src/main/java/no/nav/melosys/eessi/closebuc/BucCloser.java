@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.closebuc;
 
-import java.time.Instant;
-import java.time.ZoneId;
 import java.util.Comparator;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +91,5 @@ public class BucCloser {
         return null;
     }
 
-    private static final Comparator<Document> documentComparator = Comparator.comparing(d ->
-            Instant.ofEpochMilli(d.getCreationDate()).atZone(ZoneId.systemDefault()).toLocalDate());
+    private static final Comparator<Document> documentComparator = Comparator.comparing(Document::getCreationDate);
 }

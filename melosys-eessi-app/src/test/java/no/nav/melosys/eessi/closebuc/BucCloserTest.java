@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.closebuc;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,7 +73,7 @@ public class BucCloserTest {
 
         Document x001Doc = new Document();
         x001Doc.setType(SedType.X001.name());
-        x001Doc.setCreationDate(123);
+        x001Doc.setCreationDate(ZonedDateTime.now());
         x001Doc.setConversations(Collections.emptyList());
         buc.getDocuments().add(x001Doc);
 
@@ -159,7 +158,7 @@ public class BucCloserTest {
 
         Document document = new Document();
         document.setType(SedType.A008.name());
-        document.setCreationDate(LocalDateTime.now().minusDays(1L).toEpochSecond(ZoneOffset.UTC));
+        document.setCreationDate(ZonedDateTime.now().minusDays(1L));
         document.setStatus("sent");
         document.setId("rrrr");
         document.setConversations(Collections.emptyList());
@@ -203,7 +202,7 @@ public class BucCloserTest {
         List<Document> documents = new ArrayList<>();
         Document document = new Document();
         document.setType(SedType.A009.name());
-        document.setCreationDate(LocalDateTime.now().toEpochSecond(ZoneOffset.UTC));
+        document.setCreationDate(ZonedDateTime.now());
         document.setStatus("sent");
         document.setConversations(Collections.singletonList(conversation));
         document.setId("gjrieogroei");
