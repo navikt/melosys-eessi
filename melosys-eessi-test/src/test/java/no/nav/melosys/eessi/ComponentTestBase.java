@@ -5,7 +5,8 @@ import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
-import no.nav.melosys.eessi.integration.gsak.SakConsumer;
+import no.nav.melosys.eessi.integration.gsak.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
@@ -64,6 +65,9 @@ public abstract class ComponentTestBase {
 
     @Autowired
     JournalpostapiConsumer journalpostapiConsumer;
+
+    @Autowired
+    OppgaveConsumer oppgaveConsumer;
 
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;

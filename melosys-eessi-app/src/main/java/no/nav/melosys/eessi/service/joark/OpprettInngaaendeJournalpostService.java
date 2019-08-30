@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
@@ -30,28 +29,34 @@ public class OpprettInngaaendeJournalpostService {
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId, byte[] sedPdf) throws IntegrationException {
 
-        Sak sak = gsakService.hentEllerOpprettSak(sedMottatt.getRinaSakId(), aktoerId, BucType.valueOf(sedMottatt.getBucType()));
+        Sak sak = gsakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+        OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedPdf);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
-
 
         //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
         String dokumentId = response.getDokumenter() == null ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
 
         return SakInformasjon.builder().journalpostId(response.getJournalpostId())
                 .dokumentId(dokumentId)
-                .gsakSaksnummer(sak.getId())
+                .gsakSaksnummer(sak != null ? sak.getId() : null)
                 .build();
     }
 
     public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, byte[] sedPdf) throws IntegrationException {
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedHendelse, null, sedPdf);
+        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedPdf).getJournalpostId();
+    }
+
+    private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(SedHendelse sedMottatt, Sak sak, byte[] sedPdf) throws IntegrationException {
+        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+        lagreJournalpostRelasjon(sedMottatt, response);
+        return response;
+    }
+
+    private void lagreJournalpostRelasjon(SedHendelse sedHendelse, OpprettJournalpostResponse opprettJournalpostResponse) {
         journalpostSedKoblingService.lagre(
-                response.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getSedId(),
+                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getRinaDokumentId(),
                 sedHendelse.getRinaDokumentVersjon(), sedHendelse.getBucType(), sedHendelse.getSedType()
         );
-
-        return response.getJournalpostId();
     }
 }

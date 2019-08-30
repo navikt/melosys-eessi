@@ -1,10 +1,11 @@
 package no.nav.melosys.eessi.service.gsak;
 
 import no.nav.melosys.eessi.integration.gsak.Sak;
-import no.nav.melosys.eessi.integration.gsak.SakConsumer;
+import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,11 +17,18 @@ public class GsakServiceTest {
 
     @Mock
     private SakConsumer sakConsumer;
-    @InjectMocks
+    @Mock
+    private SaksrelasjonService saksrelasjonService;
+
     private GsakService gsakService;
 
+    @Before
+    public void setup() {
+        gsakService = new GsakService(sakConsumer, saksrelasjonService);
+    }
+
     @Test
-    public void getSak_expectSak() throws Exception{
+    public void hentSak_forventSak() throws Exception{
         when(sakConsumer.getSak(anyLong())).thenReturn(new Sak());
         Sak sak = gsakService.hentsak(1L);
         assertThat(sak).isNotNull();

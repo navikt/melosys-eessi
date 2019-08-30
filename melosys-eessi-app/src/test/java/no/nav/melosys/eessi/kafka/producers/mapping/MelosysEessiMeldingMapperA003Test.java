@@ -1,11 +1,14 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import org.junit.Before;
 import org.junit.Test;
 import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -13,11 +16,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA003Test {
 
+    private SedHendelse sedHendelse;
+    private SakInformasjon sakInformasjon;
+
+    @Before
+    public void setup() {
+        sedHendelse = createSedHendelse();
+        sakInformasjon = createSakInformasjon();
+    }
+
     @Test
     public void mapA003_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap());
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory
-                .getMapper(SedType.A003).map("123", sed, createSedHendelse(), createSakInformasjon(), false);
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A003)
+                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false
+                );
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getPeriode().getFom()).isEqualTo("2000-12-12");

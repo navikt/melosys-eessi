@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -9,6 +10,8 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import org.junit.Before;
 import org.junit.Test;
 import static no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak.Beslutning.AVSLAG;
 import static no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak.Beslutning.DELVIS_INNVILGELSE;
@@ -17,12 +20,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA002Test {
 
+    private SedHendelse sedHendelse;
+    private SakInformasjon sakInformasjon;
+
+    @Before
+    public void setup() {
+        sedHendelse = createSedHendelse();
+        sakInformasjon = createSakInformasjon();
+    }
+
     @Test
     public void mapA002_delvisInnvilget_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap(false));
 
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory
-                .getMapper(SedType.A002).map("123", sed, createSedHendelse(), createSakInformasjon(), false);
+
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002)
+                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getSvarAnmodningUnntak()).isNotNull();
@@ -38,8 +53,10 @@ public class MelosysEessiMeldingMapperA002Test {
     public void mapA002_avslag_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap(true));
 
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory
-                .getMapper(SedType.A002).map("123", sed, createSedHendelse(), createSakInformasjon(), false);
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002)
+                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getSvarAnmodningUnntak()).isNotNull();

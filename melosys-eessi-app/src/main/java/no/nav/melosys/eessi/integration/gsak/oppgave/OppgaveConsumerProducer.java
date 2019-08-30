@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.gsak;
+package no.nav.melosys.eessi.integration.gsak.oppgave;
 
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,20 +9,20 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Configuration
-public class SakConsumerProducer {
+public class OppgaveConsumerProducer {
 
     private final String url;
 
-    public SakConsumerProducer(@Value("${melosys.integrations.gsak.sak-url}") String url) {
+    public OppgaveConsumerProducer(@Value("${melosys.integrations.gsak.oppgave-url}") String url) {
         this.url = url;
     }
 
     @Bean
-    public SakConsumer sakRestClient(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
+    public OppgaveConsumer oppgaveConsumer(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
                 .interceptors(basicAuthClientRequestInterceptor)
                 .build();
-        return new SakConsumer(restTemplate);
+        return new OppgaveConsumer(restTemplate);
     }
 }
