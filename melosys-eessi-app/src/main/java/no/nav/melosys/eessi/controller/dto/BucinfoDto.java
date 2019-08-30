@@ -26,7 +26,7 @@ public class BucinfoDto {
         return BucinfoDto.builder()
                 .id(buc.getId())
                 .bucType(buc.getBucType())
-                .opprettetDato(buc.getStartDate())
+                .opprettetDato(buc.getStartDate().toInstant().toEpochMilli())
                 .seder(buc.getDocuments().stream()
                         .filter(filtrerMedStatus(status))
                         .map(doc -> SedinfoDto.av(doc, buc.getId(), rinaUrlPrefix))

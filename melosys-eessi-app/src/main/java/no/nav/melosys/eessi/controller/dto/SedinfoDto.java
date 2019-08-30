@@ -25,8 +25,8 @@ public class SedinfoDto {
                 .bucId(bucId)
                 .sedId(document.getId())
                 .sedType(document.getType())
-                .opprettetDato(document.getCreationDate())
-                .sistOppdatert(document.getLastUpdate())
+                .opprettetDato(document.getCreationDate().toInstant().toEpochMilli())
+                .sistOppdatert(document.getLastUpdate().toInstant().toEpochMilli())
                 .status(tilNorskStatusEllerTomString(document.getStatus()))
                 .rinaUrl(rinaUrlPrefix + bucId)
                 .build();

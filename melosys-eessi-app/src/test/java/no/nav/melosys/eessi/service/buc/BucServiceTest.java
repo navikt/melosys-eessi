@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.melosys.eessi.controller.dto.BucinfoDto;
 import no.nav.melosys.eessi.controller.dto.SedinfoDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BucServiceTest {
-    private static Long EXPECTED_TIMESTAMP = 1554400129480L;
+    private static Long EXPECTED_TIMESTAMP = 1567082435017L;
 
     @Mock
     private EuxService euxService;
@@ -107,6 +108,6 @@ public class BucServiceTest {
 
     private BUC lagBuc() throws IOException {
         URL jsonUrl = getClass().getClassLoader().getResource("mock/buc.json");
-        return new ObjectMapper().readValue(jsonUrl, BUC.class);
+        return new ObjectMapper().registerModule(new JavaTimeModule()).readValue(jsonUrl, BUC.class);
     }
 }
