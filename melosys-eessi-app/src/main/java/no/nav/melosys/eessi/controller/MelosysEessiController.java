@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/sed")
+@RequestMapping
 public class MelosysEessiController {
 
     private final SedService sedService;
@@ -25,7 +26,7 @@ public class MelosysEessiController {
         this.sedService = sedService;
     }
 
-    @PostMapping("/createAndSend")
+    @PostMapping("/sed/createAndSend")
     public Map<String, String> opprettOgSendSed(@RequestBody SedDataDto sedDataDto)
             throws IntegrationException, NotFoundException, MappingException {
         log.info("/api/sed/createAndSend: Oppretter ny buc og sed");
@@ -36,11 +37,19 @@ public class MelosysEessiController {
         return result;
     }
 
-    @PostMapping("/create/{bucType}")
+    @PostMapping("/sed/create/{bucType}")
     public OpprettSedDto opprettUtkast(@RequestBody SedDataDto sedDataDto, @PathVariable BucType bucType)
             throws MappingException, IntegrationException, NotFoundException {
 
         log.info("/api/sed/create/{}: Oppretter sed", bucType);
         return sedService.createSed(sedDataDto, bucType);
+    }
+
+    @PostMapping("/buc/LA_BUC_01/{rinaId}/svar")
+    public void anmodningUnntakSvarInnvilgelse(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
+            throws IntegrationException, NotFoundException {
+
+        log.info("/buc/LA_BUC_01/{}/svar: Sender svar på AOU", rinaId);
+        sedService.anmodningUnntakSvar(svarAnmodningUnntakDto, rinaId);
     }
 }

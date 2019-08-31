@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.kafka.producers;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;

@@ -1,8 +1,9 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.time.LocalDate;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
-import no.nav.melosys.eessi.kafka.producers.Periode;
+import no.nav.melosys.eessi.kafka.producers.model.AnmodningUnntak;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
+import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
@@ -24,6 +25,7 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
         melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(medlemskap));
         melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(medlemskap));
         melosysEessiMelding.setMidlertidigBestemmelse(erMidlertidigBestemmelse(medlemskap));
+        melosysEessiMelding.setAnmodningUnntak(hentAnmodningUnntak(medlemskap));
 
         return melosysEessiMelding;
     }
@@ -31,6 +33,11 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
     abstract Periode mapPeriode(T medlemskap);
     abstract String hentLovvalgsland(T medlemskap);
     abstract String hentLovvalgsbestemmelse(T medlemskap);
+
+    AnmodningUnntak hentAnmodningUnntak(T medlemskap) {
+        return null;
+    }
+
     abstract Boolean sedErEndring(T medlemskap);
     abstract T hentMedlemskap(SED sed);
 

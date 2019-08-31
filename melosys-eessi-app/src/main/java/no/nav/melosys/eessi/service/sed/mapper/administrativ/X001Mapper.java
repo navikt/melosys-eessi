@@ -13,7 +13,7 @@ public class X001Mapper implements AdministrativSedMapper {
 
     public SED mapFraSed(SED sed, String aarsak) {
         SED x001 = new SED();
-        x001.setSed("X001");
+        x001.setSed(SedType.X001.toString());
         x001.setSedGVer(SED_G_VER);
         x001.setSedVer(SED_VER);
         x001.setNav(mapNav(sed, aarsak));

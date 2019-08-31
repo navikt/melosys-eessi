@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiMelding;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
@@ -13,9 +13,9 @@ import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import org.junit.Before;
 import org.junit.Test;
-import static no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak.Beslutning.AVSLAG;
-import static no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak.Beslutning.DELVIS_INNVILGELSE;
 import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
+import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.AVSLAG;
+import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.DELVIS_INNVILGELSE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA002Test {

@@ -1,11 +1,10 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.time.LocalDate;
-
-import no.nav.melosys.eessi.kafka.producers.Periode;
-import no.nav.melosys.eessi.kafka.producers.SvarAnmodningUnntak;
+import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
 
 class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA002> {
 
@@ -15,17 +14,10 @@ class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMappe
     }
 
     @Override
-    SvarAnmodningUnntak.Beslutning hentBeslutning(MedlemskapA002 medlemskap) {
+    SvarAnmodningUnntakBeslutning hentBeslutning(MedlemskapA002 medlemskap) {
         String resultat = medlemskap.getUnntak().getVedtak().getResultat();
 
-        if ("ikke_godkjent".equals(resultat)) {
-            return SvarAnmodningUnntak.Beslutning.AVSLAG;
-        } else if ("godkjent_for_annen_periode".equals(resultat)) {
-            return SvarAnmodningUnntak.Beslutning.DELVIS_INNVILGELSE;
-        }
-
-        throw new IllegalArgumentException("Feil ved mapping til beslutning for A002. "
-                + "medlemskap.unntak.vedtak.resultat har ukjent verdi: " + resultat);
+        return SvarAnmodningUnntakBeslutning.fraRinaKode(resultat);
     }
 
     @Override
@@ -35,7 +27,7 @@ class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMappe
 
     @Override
     Periode hentDelvisInnvilgetPeriode(MedlemskapA002 medlemskap) {
-        if ("ikke_godkjent".equals(medlemskap.getUnntak().getVedtak().getResultat())) {
+        if (SvarAnmodningUnntakBeslutning.fraRinaKode(medlemskap.getUnntak().getVedtak().getResultat()) == SvarAnmodningUnntakBeslutning.AVSLAG) {
             return null;
         }
 
