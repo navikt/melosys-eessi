@@ -35,7 +35,7 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
     abstract String hentLovvalgsbestemmelse(T medlemskap);
 
     AnmodningUnntak hentAnmodningUnntak(T medlemskap) {
-        return new AnmodningUnntak();
+        return null;
     }
 
     abstract Boolean sedErEndring(T medlemskap);

@@ -55,9 +55,16 @@ public class A002Mapper implements SedMapper {
 
     private Fastperiode getFastperiode(LocalDate delvisInnvilgetFom, LocalDate delvisInnvilgetTom) {
         Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setStartdato(formaterDato(delvisInnvilgetFom));
-        fastperiode.setSluttdato(formaterDato(delvisInnvilgetTom));
+        fastperiode.setStartdato(formaterDatoEllerNull(delvisInnvilgetFom));
+        fastperiode.setSluttdato(formaterDatoEllerNull(delvisInnvilgetTom));
         return fastperiode;
+    }
+
+    private String formaterDatoEllerNull(LocalDate dato) {
+        if (dato == null) {
+            return null;
+        }
+        return formaterDato(dato);
     }
 
     @Override
