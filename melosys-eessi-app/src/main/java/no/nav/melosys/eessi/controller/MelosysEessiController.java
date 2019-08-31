@@ -26,7 +26,7 @@ public class MelosysEessiController {
         this.sedService = sedService;
     }
 
-    @PostMapping("/createAndSend")
+    @PostMapping("/sed/createAndSend")
     public Map<String, String> opprettOgSendSed(@RequestBody SedDataDto sedDataDto)
             throws IntegrationException, NotFoundException, MappingException {
         log.info("/api/sed/createAndSend: Oppretter ny buc og sed");
@@ -37,7 +37,7 @@ public class MelosysEessiController {
         return result;
     }
 
-    @PostMapping("/create/{bucType}")
+    @PostMapping("/sed/create/{bucType}")
     public OpprettSedDto opprettUtkast(@RequestBody SedDataDto sedDataDto, @PathVariable BucType bucType)
             throws MappingException, IntegrationException, NotFoundException {
 
@@ -48,11 +48,8 @@ public class MelosysEessiController {
     @PostMapping("/buc/LA_BUC_01/{rinaId}/svar")
     public void anmodningUnntakSvarInnvilgelse(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
             throws IntegrationException, NotFoundException {
-        try {
-            sedService.anmodningUnntakSvar(svarAnmodningUnntakDto, rinaId);
-        } catch (IntegrationException | NotFoundException e) {
-            log.error("Feil i /aou/svar/innvilgelse", e);
-            throw e;
-        }
+
+        log.info("/buc/LA_BUC_01/{}/svar: Sender svar på AOU", rinaId);
+        sedService.anmodningUnntakSvar(svarAnmodningUnntakDto, rinaId);
     }
 }
