@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.controller;
 import java.util.Map;
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.controller.dto.CreateSedDto;
+import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -26,34 +26,23 @@ public class MelosysEessiController {
         this.sedService = sedService;
     }
 
-    @PostMapping("/sed/createAndSend")
-    public Map<String, String> createAndSendCase(@RequestBody SedDataDto sedDataDto)
-            throws MappingException, IntegrationException, NotFoundException {
+    @PostMapping("/createAndSend")
+    public Map<String, String> opprettOgSendSed(@RequestBody SedDataDto sedDataDto)
+            throws IntegrationException, NotFoundException, MappingException {
         log.info("/api/sed/createAndSend: Oppretter ny buc og sed");
 
-        try {
-            String rinaCaseId = sedService.createAndSend(sedDataDto);
-            Map<String, String> result = Maps.newHashMap();
-            result.put("rinaCaseId", rinaCaseId);
-            return result;
-        } catch (MappingException | NotFoundException | IntegrationException e) {
-            log.error("Error in /sed/createAndSend", e);
-            throw e;
-        }
-
+        String rinaCaseId = sedService.createAndSend(sedDataDto);
+        Map<String, String> result = Maps.newHashMap();
+        result.put("rinaCaseId", rinaCaseId);
+        return result;
     }
 
-    @PostMapping("/sed/create/{bucType}")
-    public CreateSedDto create(@RequestBody SedDataDto sedDataDto, @PathVariable BucType bucType)
+    @PostMapping("/create/{bucType}")
+    public OpprettSedDto opprettUtkast(@RequestBody SedDataDto sedDataDto, @PathVariable BucType bucType)
             throws MappingException, IntegrationException, NotFoundException {
-        log.info("/api/sed/create/{}: Oppretter sed", bucType);
 
-        try {
-            return sedService.createSed(sedDataDto, bucType);
-        } catch (MappingException | NotFoundException | IntegrationException e) {
-            log.error("Error in /sed/create", e);
-            throw e;
-        }
+        log.info("/api/sed/create/{}: Oppretter sed", bucType);
+        return sedService.createSed(sedDataDto, bucType);
     }
 
     @PostMapping("/buc/LA_BUC_01/{rinaId}/svar")

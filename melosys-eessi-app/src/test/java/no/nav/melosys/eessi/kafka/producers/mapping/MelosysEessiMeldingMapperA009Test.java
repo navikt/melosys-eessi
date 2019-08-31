@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
@@ -7,11 +8,22 @@ import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import org.junit.Before;
 import org.junit.Test;
 import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA009Test {
+
+    private SedHendelse sedHendelse;
+    private SakInformasjon sakInformasjon;
+
+    @Before
+    public void setup() {
+        sedHendelse = createSedHendelse();
+        sakInformasjon = createSakInformasjon();
+    }
 
     @Test
     public void mapA009_fastPeriode_verifiserPeriode() {
@@ -19,7 +31,9 @@ public class MelosysEessiMeldingMapperA009Test {
 
         SED sed = createSed(hentMedlemskap(true));
         sed.setSed("A009");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), false);
+        MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melding).isNotNull();
         assertThat(melding.getGsakSaksnummer()).isNotNull();
@@ -41,7 +55,9 @@ public class MelosysEessiMeldingMapperA009Test {
 
         SED sed = createSed(hentMedlemskap(false));
         sed.setSed("A009");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), false);
+        MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melding).isNotNull();
         assertThat(melding.getGsakSaksnummer()).isNotNull();
@@ -64,7 +80,9 @@ public class MelosysEessiMeldingMapperA009Test {
         SED sed = createSed(hentMedlemskap(false));
         sed.setSed("A009");
         ((MedlemskapA009) sed.getMedlemskap()).getVedtak().setErendringsvedtak("ja");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), false);
+        MelosysEessiMelding melding = mapper.map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melding).isNotNull();
         assertThat(melding.isErEndring()).isTrue();
@@ -76,7 +94,9 @@ public class MelosysEessiMeldingMapperA009Test {
 
         SED sed = createSed(hentMedlemskap(false));
         sed.setSed("A009");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, createSedHendelse(), createSakInformasjon(), true);
+        MelosysEessiMelding melding = mapper.map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sakInformasjon.getJournalpostId(),
+                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), true);
 
         assertThat(melding).isNotNull();
         assertThat(melding.isErEndring()).isTrue();

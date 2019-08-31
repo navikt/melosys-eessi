@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.time.LocalDate;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.AnmodningUnntak;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
@@ -9,13 +8,14 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
-import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
 public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implements MelosysEessiMeldingMapper {
 
     @Override
-    public MelosysEessiMelding map(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon, boolean sedErEndring) {
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, sedHendelse, sakInformasjon, sedErEndring);
+    public MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
+            String sedType, String bucType, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
+                rinaSaksnummer, sedType, bucType, journalpostID, dokumentID, gsakSaksnummer, sedErEndring);
 
         T medlemskap = hentMedlemskap(sed);
 
@@ -31,9 +31,7 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
     }
 
     abstract Periode mapPeriode(T medlemskap);
-
     abstract String hentLovvalgsland(T medlemskap);
-
     abstract String hentLovvalgsbestemmelse(T medlemskap);
 
     AnmodningUnntak hentAnmodningUnntak(T medlemskap) {
@@ -41,7 +39,6 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
     }
 
     abstract Boolean sedErEndring(T medlemskap);
-
     abstract T hentMedlemskap(SED sed);
 
     boolean erMidlertidigBestemmelse(T medlemskap) {

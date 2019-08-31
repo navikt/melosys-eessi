@@ -6,6 +6,7 @@ import java.util.List;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
+import org.springframework.util.StringUtils;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 
 public class OpprettJournalpostRequestMapper {
@@ -37,14 +38,14 @@ public class OpprettJournalpostRequestMapper {
         return OpprettJournalpostRequest.builder()
                 .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
                 .behandlingstema(dokkatSedInfo.getBehandlingstema())
-                .bruker(lagBruker(sedHendelse.getNavBruker()))
+                .bruker(!StringUtils.isEmpty(sedHendelse.getNavBruker()) ? lagBruker(sedHendelse.getNavBruker()) : null)
                 .dokumenter(dokumenter(sedHendelse.getSedType(), sedPdf, dokkatSedInfo))
                 .eksternReferanseId(sedHendelse.getSedId())
                 .journalfoerendeEnhet("4530")
                 .journalpostType(journalpostType)
                 .kanal("EESSI")
                 .sak(sak != null ? OpprettJournalpostRequest.Sak.builder().arkivsaksnummer(sak.getId()).build() : null)
-                .tema(sak != null ? sak.getTema() : "MED") //fixme: MED eller null?
+                .tema(sak != null ? sak.getTema() : "MED") //fixme: MED, null eller UFM?
                 .tittel(dokkatSedInfo.getDokumentTittel())
                 .tilleggsopplysninger(Collections.singletonList(Tilleggsopplysning.builder()
                         .nokkel("rinaSakId")

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.controller.dto.CreateSedDto;
+import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -75,7 +75,7 @@ public class SedService {
      * @param bucType    hvilken type buc som skal opprettes (dersom det ikke er en eksisterende buc på saken)
      * @return Dto-objekt som inneholder rinaSaksnummer, dokumentId og link til sak i rina
      */
-    public CreateSedDto createSed(SedDataDto sedDataDto, BucType bucType)
+    public OpprettSedDto createSed(SedDataDto sedDataDto, BucType bucType)
             throws MappingException, NotFoundException, IntegrationException {
 
         SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
@@ -88,7 +88,7 @@ public class SedService {
         OpprettBucOgSedResponse opprettBucOgSedResponse =
                 opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId());
 
-        return CreateSedDto.builder()
+        return OpprettSedDto.builder()
                 .bucId(opprettBucOgSedResponse.getRinaSaksnummer())
                 .rinaUrl(euxService.hentRinaUrl(opprettBucOgSedResponse.getRinaSaksnummer()))
                 .build();

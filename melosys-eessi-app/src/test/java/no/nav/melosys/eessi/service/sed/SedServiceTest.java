@@ -3,9 +3,7 @@ package no.nav.melosys.eessi.service.sed;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import no.nav.melosys.eessi.controller.dto.CreateSedDto;
-import no.nav.melosys.eessi.controller.dto.Periode;
+import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -138,7 +136,7 @@ public class SedServiceTest {
     @Test
     public void createSed_A003_forventOpprettNyBucOgSedMedUrl() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        CreateSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
+        OpprettSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
 
         verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));

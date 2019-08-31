@@ -48,6 +48,7 @@ melosys:
       typeinfo-url: ${DOKKATTYPEINFO_URL}
     gsak:
       sak-url: ${SAK_URL}
+      oppgave-url: ${OPPGAVE_URL}
   api:
     security:
       header-name: ${API_KEY_HEADER}

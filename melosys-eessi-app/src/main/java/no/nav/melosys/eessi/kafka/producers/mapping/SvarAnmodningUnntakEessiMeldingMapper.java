@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.kafka.producers.model.SvarAnmodningUnntak;
@@ -12,9 +11,10 @@ import no.nav.melosys.eessi.service.joark.SakInformasjon;
 public abstract class SvarAnmodningUnntakEessiMeldingMapper<T extends Medlemskap> implements MelosysEessiMeldingMapper {
 
     @Override
-    public MelosysEessiMelding map(String aktoerId, SED sed, SedHendelse sedHendelse, SakInformasjon sakInformasjon,
-            boolean sedErEndring) {
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, sedHendelse, sakInformasjon, sedErEndring);
+    public MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
+            String sedType, String bucType, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
+                rinaSaksnummer, sedType, bucType, journalpostID, dokumentID, gsakSaksnummer, sedErEndring);
 
         T medlemskap = hentMedlemskap(sed);
 
