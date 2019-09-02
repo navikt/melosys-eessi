@@ -46,7 +46,7 @@ public class MelosysEessiController {
     }
 
     @PostMapping("/buc/LA_BUC_01/{rinaId}/svar")
-    public void anmodningUnntakSvarInnvilgelse(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
+    public void anmodningUnntakSvar(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
             throws IntegrationException, NotFoundException {
 
         log.info("/buc/LA_BUC_01/{}/svar: Sender svar på AOU", rinaId);
