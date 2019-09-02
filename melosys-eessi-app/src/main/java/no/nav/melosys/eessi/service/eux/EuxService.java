@@ -29,11 +29,15 @@ public class EuxService {
 
     private final String rinaHostUrl;
 
+    private final String mottakerInsititusjon;
+
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
+            @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
+            @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInsititusjon) {
         this.euxConsumer = euxConsumer;
         this.rinaHostUrl = rinaHostUrl;
+        this.mottakerInsititusjon = mottakerInsititusjon;
     }
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
@@ -65,6 +69,9 @@ public class EuxService {
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
+        if (!StringUtils.isEmpty(mottakerInsititusjon)) {
+            return mottakerInsititusjon;
+        }
         List<Institusjon> institusjoner = hentMottakerinstitusjoner(bucType, landkode);
 
         return institusjoner.stream().map(Institusjon::getId).findFirst()
@@ -131,7 +138,8 @@ public class EuxService {
 
     public List<BucInfo> hentBucer(BucSearch bucSearch) throws IntegrationException {
         return euxConsumer.finnRinaSaker(bucSearch.getFnr(), bucSearch.getFornavn(), bucSearch.getEtternavn(),
-                bucSearch.getFoedselsdato(), bucSearch.getRinaSaksnummer(), bucSearch.getBucType(), bucSearch.getStatus());
+                bucSearch.getFoedselsdato(), bucSearch.getRinaSaksnummer(), bucSearch.getBucType(),
+                bucSearch.getStatus());
     }
 
     public BUC hentBuc(String rinaSakid) throws IntegrationException {
