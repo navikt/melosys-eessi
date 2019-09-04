@@ -17,7 +17,6 @@ node {
     def KUBECTL = "/usr/local/bin/kubectl"
     def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
-    def VERA_UPDATE_URL = "https://vera.adeo.no/api/v1/deploylog"
     def DEFAULT_BUILD_USER = "eessi2-jenkins"
 
     def cluster = "dev-fss"
@@ -62,15 +61,6 @@ node {
         sh "${KUBECTL} config --kubeconfig=${KUBECONFIG_NAISERATOR} use-context ${cluster}"
         sh "${KUBECTL} apply --kubeconfig=${KUBECONFIG_NAISERATOR} -f ${NAISERATOR_CONFIG}"
         sh "${KUBECTL} rollout status deployment/${application} --kubeconfig=${KUBECONFIG_NAISERATOR}"
-
-        // Oppdater Vera
-        try {
-            def deployer = getBuildUser(DEFAULT_BUILD_USER)
-            println("[INFO] Oppdaterer Vera => application=${application}, environment=${namespace}, version=${imageVersion}, deployedBy=${deployer}")
-            sh "curl -i -s --header \"Content-Type: application/json\" --request POST --data \'{\"environment\": \"${namespace}\",\"application\": \"${application}\",\"version\": \"${imageVersion}\",\"deployedBy\": \"${deployer}\"}\' ${VERA_UPDATE_URL}"
-        } catch (e) {
-            println("[ERROR] Feil ved oppdatering av Vera. Exception: " + e)
-        }
     }
 }
 
