@@ -29,15 +29,15 @@ public class EuxService {
 
     private final String rinaHostUrl;
 
-    private final String mottakerInsititusjon;
+    private final String mottakerInstitusjon;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
             @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
-            @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInsititusjon) {
+            @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInstitusjon) {
         this.euxConsumer = euxConsumer;
         this.rinaHostUrl = rinaHostUrl;
-        this.mottakerInsititusjon = mottakerInsititusjon;
+        this.mottakerInstitusjon = mottakerInstitusjon;
     }
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
@@ -69,8 +69,8 @@ public class EuxService {
     }
 
     private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
-        if (!StringUtils.isEmpty(mottakerInsititusjon)) {
-            return mottakerInsititusjon;
+        if (!StringUtils.isEmpty(mottakerInstitusjon)) {
+            return mottakerInstitusjon;
         }
         List<Institusjon> institusjoner = hentMottakerinstitusjoner(bucType, landkode);
 

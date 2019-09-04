@@ -52,6 +52,6 @@ public class OppgaveService {
                 .build();
 
         OppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
-        log.info("Journalføringsoppgave opprettet med id {}", oppgaveDto.getId());
+        log.info("Journalføringsoppgave opprettet med id {}", response.getId());
     }
 }
