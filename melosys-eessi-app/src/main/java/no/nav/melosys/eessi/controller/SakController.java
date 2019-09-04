@@ -90,7 +90,7 @@ public class SakController {
         Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaId(rinaSaksnummer);
 
         if (eksisterende.isPresent() && !eksisterende.get().getGsakSaksnummer().equals(saksrelasjonDto.getGsakSaksnummer())) {
-            throw new ValidationException("Rinasak" + saksrelasjonDto.getGsakSaksnummer() +
+            throw new ValidationException("Rinasak " + saksrelasjonDto.getGsakSaksnummer() +
                     " er allerede koblet mot gsakSaksnummer " + eksisterende.get().getGsakSaksnummer());
         }
     }

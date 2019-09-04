@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OppgaveDto {
+    private String id;
     private String aktoerId;
     private String tilordnetRessurs;
     private String tema;

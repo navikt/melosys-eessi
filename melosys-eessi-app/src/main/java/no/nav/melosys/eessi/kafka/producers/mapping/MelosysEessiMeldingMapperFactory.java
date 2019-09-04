@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.SedType;
 public class MelosysEessiMeldingMapperFactory {
 
     private static final Map<SedType, MelosysEessiMeldingMapper> mappers = new EnumMap<>(SedType.class);
+    private static final MelosysEessiMeldingMapper defaultMapper = new DefaultMapper();
 
     static {
         mappers.put(SedType.A001, new MelosysEessiMeldingMapperA001());
@@ -20,6 +21,12 @@ public class MelosysEessiMeldingMapperFactory {
     }
 
     public static MelosysEessiMeldingMapper getMapper(SedType sedType) {
-        return mappers.get(sedType);
+        MelosysEessiMeldingMapper mapper =  mappers.get(sedType);
+
+        if (mapper == null) {
+            mapper = defaultMapper;
+        }
+
+        return mapper;
     }
 }
