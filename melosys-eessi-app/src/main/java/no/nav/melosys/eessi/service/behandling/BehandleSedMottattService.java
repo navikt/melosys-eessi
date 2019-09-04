@@ -52,7 +52,7 @@ public class BehandleSedMottattService {
             SED sed = euxService.hentSed(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId());
 
             Optional<String> ident = personIdentifiseringService.identifiserPerson(sedMottatt, sed);
-            if (ident.isPresent()) { //TODO: person identifisert, SED støtter ikke automatisk behandling MELOSYS-2903
+            if (ident.isPresent()) {
                 log.info("Person i rinaSak {} er identifisert", sedMottatt.getRinaSakId());
                 sedMottatt.setNavBruker(ident.get());
                 personErIdentifisert(sedMottatt, sed);

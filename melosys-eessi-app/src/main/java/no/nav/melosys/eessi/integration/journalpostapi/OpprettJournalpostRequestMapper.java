@@ -1,15 +1,18 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import org.springframework.util.StringUtils;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 
 public class OpprettJournalpostRequestMapper {
+
+    private static final EnumSet<SedType> TEMA_UFM_SEDTYPER = EnumSet.of(
+            SedType.A001, SedType.A003, SedType.A009, SedType.A010
+    );
 
     private OpprettJournalpostRequestMapper() {
     }
@@ -45,13 +48,18 @@ public class OpprettJournalpostRequestMapper {
                 .journalpostType(journalpostType)
                 .kanal("EESSI")
                 .sak(sak != null ? OpprettJournalpostRequest.Sak.builder().arkivsaksnummer(sak.getId()).build() : null)
-                .tema(sak != null ? sak.getTema() : "MED") //fixme: MED, null eller UFM?
+                .tema(sak != null ? sak.getTema() : temaFraSedType(sedHendelse.getSedType()))
                 .tittel(dokkatSedInfo.getDokumentTittel())
-                .tilleggsopplysninger(Collections.singletonList(Tilleggsopplysning.builder()
-                        .nokkel("rinaSakId")
-                        .verdi(sedHendelse.getRinaSakId())
-                        .build()))
+                .tilleggsopplysninger(Arrays.asList(
+                        Tilleggsopplysning.builder().nokkel("rinaSakId").verdi(sedHendelse.getRinaSakId()).build(),
+                        Tilleggsopplysning.builder().nokkel("rinaDokumentId").verdi(sedHendelse.getRinaDokumentId()).build()
+                        ))
                 .build();
+    }
+
+    private static String temaFraSedType(String sedType) {
+        SedType sedTypeEnum = SedType.valueOf(sedType);
+        return TEMA_UFM_SEDTYPER.contains(sedTypeEnum) ? "UFM" : "MED";
     }
 
     private static Bruker lagBruker(final String fnr) {

@@ -22,10 +22,19 @@ public interface MelosysEessiMeldingMapper {
         melosysEessiMelding.setSedType(sedType);
         melosysEessiMelding.setBucType(bucType);
 
-        melosysEessiMelding.setStatsborgerskap(
-                mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
-        );
+        if (inneholderStatsborgerskap(sed)) {
+            melosysEessiMelding.setStatsborgerskap(
+                    mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
+            );
+        }
         return melosysEessiMelding;
+    }
+
+    default boolean inneholderStatsborgerskap(SED sed) {
+        return sed.getNav() != null
+                && sed.getNav().getBruker() != null
+                && sed.getNav().getBruker().getPerson() != null
+                && sed.getNav().getBruker().getPerson().getStatsborgerskap() != null;
     }
 
     default List<Statsborgerskap> mapStatsborgerskap(List<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {
