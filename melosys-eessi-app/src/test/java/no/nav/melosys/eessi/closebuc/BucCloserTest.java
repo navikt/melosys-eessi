@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.*;
@@ -16,9 +17,9 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.service.eux.BucSearch;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.ArgumentMatchers.*;
@@ -29,11 +30,17 @@ public class BucCloserTest {
 
     @Mock
     private EuxService euxService;
-    @InjectMocks
+    @Mock
+    private MetrikkerRegistrering metrikkerRegistrering;
+
     private BucCloser bucCloser;
 
     private EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
+    @Before
+    public void setup() {
+        bucCloser = new BucCloser(euxService, metrikkerRegistrering);
+    }
 
     @Test
     public void closeBucsByType_enBucKanLukkes_verifiserOpprettOgSend() throws Exception {

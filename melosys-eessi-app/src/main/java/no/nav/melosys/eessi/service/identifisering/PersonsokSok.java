@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -18,6 +20,7 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 class PersonsokSok {
 
@@ -25,10 +28,12 @@ class PersonsokSok {
     private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
 
     private final TpsService tpsService;
+    private final MetrikkerRegistrering metrikkerRegistrering;
 
     @Autowired
-    public PersonsokSok(TpsService tpsService) {
+    public PersonsokSok(TpsService tpsService, MetrikkerRegistrering metrikkerRegistrering) {
         this.tpsService = tpsService;
+        this.metrikkerRegistrering = metrikkerRegistrering;
     }
 
     /**
@@ -55,6 +60,8 @@ class PersonsokSok {
                 ident = soekOgVurderPerson(sed);
             }
         }
+
+        metrikkerRegistrering.personIdentifisert(ident.isPresent(), sedMottatt);
 
         return ident;
     }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
@@ -17,14 +18,17 @@ public class OpprettInngaaendeJournalpostService {
     private final GsakService gsakService;
     private final JournalpostService journalpostService;
     private final JournalpostSedKoblingService journalpostSedKoblingService;
+    private final MetrikkerRegistrering metrikkerRegistrering;
 
     @Autowired
     public OpprettInngaaendeJournalpostService(GsakService gsakService,
             JournalpostService journalpostService,
-            JournalpostSedKoblingService journalpostSedKoblingService) {
+            JournalpostSedKoblingService journalpostSedKoblingService,
+            MetrikkerRegistrering metrikkerRegistrering) {
         this.gsakService = gsakService;
         this.journalpostService = journalpostService;
         this.journalpostSedKoblingService = journalpostSedKoblingService;
+        this.metrikkerRegistrering = metrikkerRegistrering;
     }
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId, byte[] sedPdf) throws IntegrationException {
@@ -49,6 +53,7 @@ public class OpprettInngaaendeJournalpostService {
 
     private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(SedHendelse sedMottatt, Sak sak, byte[] sedPdf) throws IntegrationException {
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+        metrikkerRegistrering.journalpostInngaaendeOpprettet();
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;
     }

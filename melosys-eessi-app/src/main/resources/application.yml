@@ -53,3 +53,21 @@ melosys:
     security:
       header-name: ${API_KEY_HEADER}
       header-value: ${API_KEY_VALUE}
+
+management:
+  metrics:
+    web:
+      server:
+        auto-time-requests: true
+    enable:
+      jvm:
+        threads.peak: false
+        threads.deamon: false
+        classes.loaded: false
+        classes.unloaded: false
+      process.start.time: false
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+      base-path: /internal
