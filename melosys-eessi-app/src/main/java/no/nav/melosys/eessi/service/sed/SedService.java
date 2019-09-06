@@ -94,6 +94,13 @@ public class SedService {
                 .build();
     }
 
+    public byte[] hentSedForhaandsvisning(SedDataDto sedDataDto, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
+        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
+        SED sed = sedMapper.mapTilSed(sedDataDto);
+
+        return euxService.hentSedPdfForhaandsvisning(sed);
+    }
+
     public void anmodningUnntakSvar(SvarAnmodningUnntakDto svarAnmodningUnntakDto, String rinaId) throws IntegrationException, NotFoundException {
         SED nySed;
         SED forrigeSed = hentA001ForBuc(rinaId);

@@ -143,6 +143,12 @@ public class EuxServiceTest {
     }
 
     @Test
+    public void hentSedPdfForhaandsvisning_forventConsumerkall() throws IntegrationException {
+        euxService.hentSedPdfForhaandsvisning(new SED());
+        verify(euxConsumer).hentSedPdfForhaandsvisning(any());
+    }
+
+    @Test
     public void opprettBucOgSed_expectRinaCaseId() throws NotFoundException, IntegrationException {
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";

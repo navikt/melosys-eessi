@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
@@ -178,6 +180,18 @@ public class SedServiceTest {
 
         SED sendtSed = sedArgumentCaptor.getValue();
         assertThat(sendtSed.getSed()).isEqualTo(SedType.A002.toString());
+    }
+
+    @Test
+    public void hentSedForhaandsvisning_forventKall() throws IOException, URISyntaxException, IntegrationException, MappingException, NotFoundException {
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
+
+        when(euxService.hentSedPdfForhaandsvisning(any(SED.class))).thenReturn(MOCK_PDF);
+        byte[] pdf = sendSedService.hentSedForhaandsvisning(sedDataDto, SedType.A001);
+
+        verify(euxService).hentSedPdfForhaandsvisning(any(SED.class));
+        assertThat(pdf).isEqualTo(MOCK_PDF);
     }
 
     private SvarAnmodningUnntakDto lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning beslutning) {

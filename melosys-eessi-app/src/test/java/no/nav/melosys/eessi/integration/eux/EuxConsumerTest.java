@@ -30,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -374,6 +375,18 @@ public class EuxConsumerTest {
     }
 
     @Test
+    public void hentSedPdfForhaandsvisning_forventPdf() throws IntegrationException {
+        SED sed = new SED();
+        byte[] forventetRetur = "teststring".getBytes();
+
+        server.expect(requestTo("/sed/pdf"))
+                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_PDF));
+
+        byte[] resultat = euxConsumer.hentSedPdfForhaandsvisning(sed);
+        assertThat(forventetRetur).isEqualTo(resultat);
+    }
+
+    @Test
     public void opprettSed_forventId() throws Exception {
         String id = "123";
         String korrelasjonId = "312";
@@ -521,8 +534,4 @@ public class EuxConsumerTest {
 
         assertEquals("ho", jsonNode.get("hei").textValue());
     }
-
-
-
-
 }
