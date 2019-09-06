@@ -52,9 +52,9 @@ public class MelosysEessiController {
     }
 
     @PostMapping("/sed/{sedType}/pdf")
-    public byte[] hentSedPdfForhaandsvisning(@RequestBody SedDataDto sedDataDto, @PathVariable SedType sedType)
+    public byte[] genererPdfFraSed(@RequestBody SedDataDto sedDataDto, @PathVariable SedType sedType)
             throws IntegrationException, NotFoundException, MappingException {
 
-        return sedService.hentSedForhaandsvisning(sedDataDto, sedType);
+        return sedService.genererPdfFraSed(sedDataDto, sedType);
     }
 }

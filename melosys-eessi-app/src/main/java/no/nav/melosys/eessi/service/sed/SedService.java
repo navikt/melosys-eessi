@@ -94,11 +94,11 @@ public class SedService {
                 .build();
     }
 
-    public byte[] hentSedForhaandsvisning(SedDataDto sedDataDto, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
+    public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        return euxService.hentSedPdfForhaandsvisning(sed);
+        return euxService.genererPdfFraSed(sed);
     }
 
     public void anmodningUnntakSvar(SvarAnmodningUnntakDto svarAnmodningUnntakDto, String rinaId) throws IntegrationException, NotFoundException {

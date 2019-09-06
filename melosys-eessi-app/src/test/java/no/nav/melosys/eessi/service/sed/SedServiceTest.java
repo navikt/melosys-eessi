@@ -183,14 +183,14 @@ public class SedServiceTest {
     }
 
     @Test
-    public void hentSedForhaandsvisning_forventKall() throws IOException, URISyntaxException, IntegrationException, MappingException, NotFoundException {
+    public void genererPdfFraSed_forventKall() throws IOException, URISyntaxException, IntegrationException, MappingException, NotFoundException {
         SedDataDto sedDataDto = SedDataStub.getStub();
         final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
 
-        when(euxService.hentSedPdfForhaandsvisning(any(SED.class))).thenReturn(MOCK_PDF);
-        byte[] pdf = sendSedService.hentSedForhaandsvisning(sedDataDto, SedType.A001);
+        when(euxService.genererPdfFraSed(any(SED.class))).thenReturn(MOCK_PDF);
+        byte[] pdf = sendSedService.genererPdfFraSed(sedDataDto, SedType.A001);
 
-        verify(euxService).hentSedPdfForhaandsvisning(any(SED.class));
+        verify(euxService).genererPdfFraSed(any(SED.class));
         assertThat(pdf).isEqualTo(MOCK_PDF);
     }
 

@@ -375,14 +375,14 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedPdfForhaandsvisning_forventPdf() throws IntegrationException {
+    public void genererPdfFraSed_forventPdf() throws IntegrationException {
         SED sed = new SED();
         byte[] forventetRetur = "teststring".getBytes();
 
         server.expect(requestTo("/sed/pdf"))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_PDF));
 
-        byte[] resultat = euxConsumer.hentSedPdfForhaandsvisning(sed);
+        byte[] resultat = euxConsumer.genererPdfFraSed(sed);
         assertThat(forventetRetur).isEqualTo(resultat);
     }
 

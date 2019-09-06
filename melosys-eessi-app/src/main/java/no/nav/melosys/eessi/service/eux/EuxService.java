@@ -150,8 +150,8 @@ public class EuxService {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
     }
 
-    public byte[] hentSedPdfForhaandsvisning(SED sed) throws IntegrationException {
-        return euxConsumer.hentSedPdfForhaandsvisning(sed);
+    public byte[] genererPdfFraSed(SED sed) throws IntegrationException {
+        return euxConsumer.genererPdfFraSed(sed);
     }
 
     public boolean sedKanOpprettesPaaBuc(String rinaSaksnummer, SedType sedType) {

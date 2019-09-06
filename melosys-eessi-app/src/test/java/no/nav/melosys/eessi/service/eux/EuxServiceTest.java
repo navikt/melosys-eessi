@@ -143,9 +143,9 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentSedPdfForhaandsvisning_forventConsumerkall() throws IntegrationException {
-        euxService.hentSedPdfForhaandsvisning(new SED());
-        verify(euxConsumer).hentSedPdfForhaandsvisning(any());
+    public void genererPdfFraSed_forventConsumerkall() throws IntegrationException {
+        euxService.genererPdfFraSed(new SED());
+        verify(euxConsumer).genererPdfFraSed(any());
     }
 
     @Test

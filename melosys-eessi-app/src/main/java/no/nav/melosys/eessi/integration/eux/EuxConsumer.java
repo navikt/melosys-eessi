@@ -237,7 +237,7 @@ public class EuxConsumer implements RestConsumer {
                 );
     }
 
-    public byte[] hentSedPdfForhaandsvisning(SED sed) throws IntegrationException {
+    public byte[] genererPdfFraSed(SED sed) throws IntegrationException {
         log.info("Henter pdf for forhåndsvisning av sed med type {}", sed.getSed());
 
         HttpHeaders headers = new HttpHeaders();
