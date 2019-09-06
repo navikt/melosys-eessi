@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.gsak.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.gsak.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +52,7 @@ public class OppgaveService {
                 .tildeltEnhetsnr("4530")
                 .build();
 
-        OppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
+        OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Journalføringsoppgave opprettet med id {}", response.getId());
     }
 }

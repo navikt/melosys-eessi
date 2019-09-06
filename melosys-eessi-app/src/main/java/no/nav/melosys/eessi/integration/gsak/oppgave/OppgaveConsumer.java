@@ -19,8 +19,8 @@ public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
         this.restTemplate = restTemplate;
     }
 
-    public OppgaveDto opprettOppgave(OppgaveDto oppgaveDto) throws IntegrationException {
-        return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), OppgaveDto.class);
+    public OpprettOppgaveResponseDto opprettOppgave(OppgaveDto oppgaveDto) throws IntegrationException {
+        return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), OpprettOppgaveResponseDto.class);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
