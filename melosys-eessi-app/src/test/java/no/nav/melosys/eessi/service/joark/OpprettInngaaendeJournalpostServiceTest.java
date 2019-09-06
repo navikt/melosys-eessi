@@ -61,7 +61,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() throws Exception {
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123", new byte[0]);
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, new byte[0]);
 
         assertThat(sakInformasjon).isNotNull();
         assertThat(sakInformasjon.getJournalpostId()).isEqualTo(JOURNALPOST_ID);

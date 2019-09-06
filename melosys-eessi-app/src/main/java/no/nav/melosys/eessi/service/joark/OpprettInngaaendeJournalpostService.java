@@ -31,7 +31,8 @@ public class OpprettInngaaendeJournalpostService {
         this.metrikkerRegistrering = metrikkerRegistrering;
     }
 
-    public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(SedHendelse sedMottatt, String aktoerId, byte[] sedPdf) throws IntegrationException {
+    public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
+            SedHendelse sedMottatt, byte[] sedPdf) throws IntegrationException {
 
         Sak sak = gsakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
@@ -39,7 +40,8 @@ public class OpprettInngaaendeJournalpostService {
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
 
         //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
-        String dokumentId = response.getDokumenter() == null ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
+        String dokumentId = response.getDokumenter() == null
+                ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
 
         return SakInformasjon.builder().journalpostId(response.getJournalpostId())
                 .dokumentId(dokumentId)
@@ -51,17 +53,20 @@ public class OpprettInngaaendeJournalpostService {
         return opprettJournalpostLagreRelasjon(sedHendelse, null, sedPdf).getJournalpostId();
     }
 
-    private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(SedHendelse sedMottatt, Sak sak, byte[] sedPdf) throws IntegrationException {
+    private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
+            SedHendelse sedMottatt, Sak sak, byte[] sedPdf) throws IntegrationException {
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
         metrikkerRegistrering.journalpostInngaaendeOpprettet();
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;
     }
 
-    private void lagreJournalpostRelasjon(SedHendelse sedHendelse, OpprettJournalpostResponse opprettJournalpostResponse) {
+    private void lagreJournalpostRelasjon(
+            SedHendelse sedHendelse, OpprettJournalpostResponse opprettJournalpostResponse) {
         journalpostSedKoblingService.lagre(
-                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(), sedHendelse.getRinaDokumentId(),
-                sedHendelse.getRinaDokumentVersjon(), sedHendelse.getBucType(), sedHendelse.getSedType()
+                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(),
+                sedHendelse.getRinaDokumentId(), sedHendelse.getRinaDokumentVersjon(),
+                sedHendelse.getBucType(), sedHendelse.getSedType()
         );
     }
 }

@@ -38,8 +38,7 @@ public class SedSendtConsumer {
             //Settes pga testing for nå, da gsakSaksnummer ikke alltid vil eksistere, ved feks testing direkte fra rina eller lokalt
             log.error("Sed ikke journalført: {}, melding: {}", sedSendt, e.getMessage(), e);
         }
+
         metrikkerRegistrering.sedSendt(sedSendt);
-
-
     }
 }

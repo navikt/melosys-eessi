@@ -2,9 +2,6 @@ package no.nav.melosys.eessi.metrikker;
 
 final class MetrikkerNavn {
 
-    private MetrikkerNavn() {
-    }
-
     private static final String METRIKKER_NAMESPACE = "melosys-eessi.";
 
     static final String SED_MOTTATT = METRIKKER_NAMESPACE + "sed.mottatt";
@@ -24,5 +21,6 @@ final class MetrikkerNavn {
     static final String KEY_RINASAKSNUMMER = "rinaSaksnummer";
     static final String KEY_PERSON_IDENTIFISERT = "personIdentifisert";
 
-
+    private MetrikkerNavn() {
+    }
 }

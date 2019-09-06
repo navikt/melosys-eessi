@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.service.sed.helpers;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 
 // Mappes til verdier som finnes i 'medlemskapsunntakartikkelkoder.properties' i eux-prosjektet.
-public class UnntakArtikkelMapper {
+public final class UnntakArtikkelMapper {
 
     private UnntakArtikkelMapper() {}
 

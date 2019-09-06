@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 
 @Slf4j
-public class PostnummerMapper {
+public final class PostnummerMapper {
 
     private PostnummerMapper() {}
 
@@ -35,7 +35,7 @@ public class PostnummerMapper {
                 .collect(Collectors.toMap(
                         Postregister::getPostnummer,
                         Postregister::getPoststed,
-                        (p1, p2) -> {
+                        (String p1, String p2) -> {
                             log.error("Duplikate postnummer funnet: {} og {}", p1, p2);
                             return p1;
                         },

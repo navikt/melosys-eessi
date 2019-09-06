@@ -39,7 +39,8 @@ public class OpprettUtgaaendeJournalpostService {
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
 
-        Long gsakSaksnummer = saksrelasjonService.finnVedRinaId(sedSendt.getRinaSakId()).map(FagsakRinasakKobling::getGsakSaksnummer)
+        Long gsakSaksnummer = saksrelasjonService.finnVedRinaId(sedSendt.getRinaSakId())
+                .map(FagsakRinasakKobling::getGsakSaksnummer)
                 .orElseThrow(() -> new NotFoundException("Saksrelasjon ikke funnet med rinaSakId " + sedSendt.getRinaSakId()));
         Sak sak = gsakService.hentsak(gsakSaksnummer);
 

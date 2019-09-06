@@ -75,7 +75,9 @@ public class MetrikkerRegistrering {
     }
 
     private static String splitInstitusjonId(String institusjonId) {
-        if (StringUtils.isEmpty(institusjonId)) return "ukjent";
+        if (StringUtils.isEmpty(institusjonId)) {
+            return "ukjent";
+        }
         return institusjonId.split(":")[0];
     }
 }
