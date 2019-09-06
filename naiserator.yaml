@@ -13,11 +13,11 @@ spec:
     max: 1
     cpuThresholdPercentage: 50
   liveness:
-    path: /api/actuator/health
+    path: /api/internal/health
     initialDelay: 60
     timeout: 10
   readiness:
-    path: /api/actuator/health
+    path: /api/internal/health
     initialDelay: 60
     timeout: 10
   resources:
@@ -29,5 +29,8 @@ spec:
       memory: 512Mi
   vault:
     enabled: true
+  prometheus:
+    enabled: true
+    path: /api/internal/prometheus
   ingresses:
   - "https://melosys-eessi@@URL_NAMESPACE@@.nais.preprod.local"

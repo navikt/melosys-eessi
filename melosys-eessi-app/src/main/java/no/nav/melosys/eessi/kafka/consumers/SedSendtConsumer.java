@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
@@ -9,15 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+
 @Service
 @Slf4j
 public class SedSendtConsumer {
 
     private final OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
+    private final MetrikkerRegistrering metrikkerRegistrering;
 
     @Autowired
-    public SedSendtConsumer(OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService) {
+    public SedSendtConsumer(OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService,
+            MetrikkerRegistrering metrikkerRegistrering) {
         this.opprettUtgaaendeJournalpostService = opprettUtgaaendeJournalpostService;
+        this.metrikkerRegistrering = metrikkerRegistrering;
     }
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt", topics = "eessi-basis-sedSendt-v1",
@@ -34,5 +39,6 @@ public class SedSendtConsumer {
             log.error("Sed ikke journalført: {}, melding: {}", sedSendt, e.getMessage(), e);
         }
 
+        metrikkerRegistrering.sedSendt(sedSendt);
     }
 }

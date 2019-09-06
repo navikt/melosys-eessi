@@ -78,7 +78,7 @@ public class BehandleSedMottattService {
     private void personErIdentifisert(SedHendelse sedMottatt, SED sed) throws IntegrationException, NotFoundException {
         String aktoerId = tpsService.hentAktoerId(sedMottatt.getNavBruker());
         SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(
-                sedMottatt, aktoerId, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId()));
+                sedMottatt, euxService.hentSedPdf(sedMottatt.getRinaSakId(), sedMottatt.getRinaDokumentId()));
 
         publiserMelosysEessiMelding(aktoerId, sed, sedMottatt, sakInformasjon);
 

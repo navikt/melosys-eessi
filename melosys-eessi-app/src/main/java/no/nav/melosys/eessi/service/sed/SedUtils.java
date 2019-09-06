@@ -5,7 +5,7 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.Fagomraade;
 import no.nav.melosys.eessi.models.SedType;
 
-class SedUtils {
+final class SedUtils {
 
     private SedUtils() {
     }

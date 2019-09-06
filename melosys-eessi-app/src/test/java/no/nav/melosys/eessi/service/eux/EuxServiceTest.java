@@ -12,6 +12,7 @@ import io.github.benas.randombeans.EnhancedRandomBuilder;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -25,10 +26,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -40,8 +39,9 @@ public class EuxServiceTest {
 
     @Mock
     private EuxConsumer euxConsumer;
+    @Mock
+    private MetrikkerRegistrering metrikkerRegistrering;
 
-    @InjectMocks
     private EuxService euxService;
 
     @Rule
@@ -52,6 +52,8 @@ public class EuxServiceTest {
 
     @Before
     public void setup() throws IOException, IntegrationException {
+        euxService = new EuxService(euxConsumer, metrikkerRegistrering, RINA_MOCK_URL, null);
+
         URL jsonUrl = getClass().getClassLoader().getResource("buc_participants.json");
         JsonNode participants = new ObjectMapper().readTree(jsonUrl);
 
@@ -71,8 +73,6 @@ public class EuxServiceTest {
                 .thenReturn(Collections.singletonList(institusjon));
 
         when(euxConsumer.opprettSed(anyString(), any(), any())).thenReturn("12345");
-
-        ReflectionTestUtils.setField(euxService, "rinaHostUrl", RINA_MOCK_URL);
     }
 
     @Test

@@ -7,6 +7,7 @@ import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -15,7 +16,6 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,13 +30,14 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Mock
     private GsakService gsakService;
     @Mock
-    private EuxService euxService;
-    @Mock
     private SaksrelasjonService saksrelasjonService;
     @Mock
     private JournalpostService journalpostService;
+    @Mock
+    private EuxService euxService;
+    @Mock
+    private MetrikkerRegistrering metrikkerRegistrering;
 
-    @InjectMocks
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
     private SedHendelse sedSendt;
@@ -44,6 +45,9 @@ public class OpprettUtgaaendeJournalpostServiceTest {
 
     @Before
     public void setup() throws Exception {
+        opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
+                gsakService, saksrelasjonService, journalpostService, euxService, metrikkerRegistrering
+        );
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);
 

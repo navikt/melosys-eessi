@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -26,16 +27,18 @@ public class EuxService {
     private static final String RINA_URL_TEMPLATE = "/portal/#/caseManagement/";
 
     private final EuxConsumer euxConsumer;
+    private final MetrikkerRegistrering metrikkerRegistrering;
 
     private final String rinaHostUrl;
-
     private final String mottakerInstitusjon;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
+            MetrikkerRegistrering metrikkerRegistrering,
             @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
             @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInstitusjon) {
         this.euxConsumer = euxConsumer;
+        this.metrikkerRegistrering = metrikkerRegistrering;
         this.rinaHostUrl = rinaHostUrl;
         this.mottakerInstitusjon = mottakerInstitusjon;
     }
@@ -56,6 +59,7 @@ public class EuxService {
                 response.get("documentId"));
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
                 opprettBucOgSedResponse.getDokumentId());
+        metrikkerRegistrering.bucOpprettet(bucType);
 
         return opprettBucOgSedResponse;
     }

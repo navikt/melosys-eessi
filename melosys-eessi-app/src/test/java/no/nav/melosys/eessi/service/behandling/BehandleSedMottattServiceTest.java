@@ -55,7 +55,7 @@ public class BehandleSedMottattServiceTest {
                 melosysEessiProducer, personIdentifiseringService, oppgaveService
         );
 
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), anyString(), any()))
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any()))
                 .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
 
         when(euxService.hentSed(anyString(), anyString()))
@@ -80,7 +80,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService).identifiserPerson(any(), any());
         verify(tpsService).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), anyString(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
     }
 

@@ -10,6 +10,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.val;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.tps.TpsService;
@@ -18,7 +19,6 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,12 +33,14 @@ public class PersonsokSokTest {
 
     @Mock
     private TpsService tpsService;
+    @Mock
+    private MetrikkerRegistrering metrikkerRegistrering;
 
-    @InjectMocks
     private PersonsokSok personsokSok;
 
     @Before
     public void setup() throws Exception {
+        personsokSok = new PersonsokSok(tpsService, metrikkerRegistrering);
         PersonSoekResponse response = new PersonSoekResponse();
         response.setIdent(PERSON);
         when(tpsService.hentPerson("1234")).thenThrow(NotFoundException.class);

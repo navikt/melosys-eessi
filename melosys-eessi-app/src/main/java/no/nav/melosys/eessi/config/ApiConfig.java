@@ -34,7 +34,7 @@ public class ApiConfig implements WebMvcConfigurer {
                         "/**"
                 )
                 .excludePathPatterns(
-                        "/actuator/**"
+                        "/internal/**"
                 );
     }
 }

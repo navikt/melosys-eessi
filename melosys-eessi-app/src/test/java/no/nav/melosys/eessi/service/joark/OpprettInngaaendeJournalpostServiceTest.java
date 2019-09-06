@@ -7,6 +7,7 @@ import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
@@ -29,6 +30,8 @@ public class OpprettInngaaendeJournalpostServiceTest {
     private GsakService gsakService;
     @Mock
     private JournalpostSedKoblingService journalpostSedKoblingService;
+    @Mock
+    private MetrikkerRegistrering metrikkerRegistrering;
 
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
 
@@ -41,7 +44,8 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
 
-        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(gsakService, journalpostService, journalpostSedKoblingService);
+        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(gsakService, journalpostService, journalpostSedKoblingService,
+                metrikkerRegistrering);
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
         sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
@@ -57,7 +61,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() throws Exception {
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, "123123", new byte[0]);
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, new byte[0]);
 
         assertThat(sakInformasjon).isNotNull();
         assertThat(sakInformasjon.getJournalpostId()).isEqualTo(JOURNALPOST_ID);

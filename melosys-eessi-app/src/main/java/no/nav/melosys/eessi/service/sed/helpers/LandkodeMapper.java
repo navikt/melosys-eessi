@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 
 @Slf4j
-public class LandkodeMapper {
+public final class LandkodeMapper {
 
     private LandkodeMapper() {}
 
@@ -26,7 +26,7 @@ public class LandkodeMapper {
         try {
             landkoderIso3OgIso2 = getTreeMapFromUrl(jsonUrl);
         } catch (IOException e) {
-            log.error("Klarte ikke å lese landkoder fra fil {}. Error {}", filename, e.getMessage());
+            log.error("Klarte ikke å lese landkoder fra fil {}. Error {}", filename, e);
         }
     }
 
@@ -35,7 +35,7 @@ public class LandkodeMapper {
                 .collect(Collectors.toMap(
                         Landkode::getIso3,
                         Landkode::getIso2,
-                        (l1, l2) -> {
+                        (String l1, String  l2) -> {
                             log.error("Duplikate landkoder funnet: {} og {}", l1, l2);
                             return l1;
                         },
