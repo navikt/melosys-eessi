@@ -7,6 +7,7 @@ import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -29,7 +30,6 @@ public class MelosysEessiController {
     @PostMapping("/sed/createAndSend")
     public Map<String, String> opprettOgSendSed(@RequestBody SedDataDto sedDataDto)
             throws IntegrationException, NotFoundException, MappingException {
-        log.info("/api/sed/createAndSend: Oppretter ny buc og sed");
 
         String rinaCaseId = sedService.createAndSend(sedDataDto);
         Map<String, String> result = Maps.newHashMap();
@@ -41,7 +41,6 @@ public class MelosysEessiController {
     public OpprettSedDto opprettUtkast(@RequestBody SedDataDto sedDataDto, @PathVariable BucType bucType)
             throws MappingException, IntegrationException, NotFoundException {
 
-        log.info("/api/sed/create/{}: Oppretter sed", bucType);
         return sedService.createSed(sedDataDto, bucType);
     }
 
@@ -49,7 +48,13 @@ public class MelosysEessiController {
     public void anmodningUnntakSvar(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
             throws IntegrationException, NotFoundException {
 
-        log.info("/buc/LA_BUC_01/{}/svar: Sender svar på AOU", rinaId);
         sedService.anmodningUnntakSvar(svarAnmodningUnntakDto, rinaId);
+    }
+
+    @PostMapping("/sed/{sedType}/pdf")
+    public byte[] genererPdfFraSed(@RequestBody SedDataDto sedDataDto, @PathVariable SedType sedType)
+            throws IntegrationException, NotFoundException, MappingException {
+
+        return sedService.genererPdfFraSed(sedDataDto, sedType);
     }
 }

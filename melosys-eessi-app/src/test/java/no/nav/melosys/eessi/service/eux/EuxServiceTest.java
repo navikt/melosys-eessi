@@ -141,6 +141,12 @@ public class EuxServiceTest {
     }
 
     @Test
+    public void genererPdfFraSed_forventKonsumentkall() throws IntegrationException {
+        euxService.genererPdfFraSed(new SED());
+        verify(euxConsumer).genererPdfFraSed(any());
+    }
+
+    @Test
     public void opprettBucOgSed_forventRinaSaksnummer() throws NotFoundException, IntegrationException {
         String bucType = BucType.LA_BUC_01.name();
         String mottakerLand = "SE";
