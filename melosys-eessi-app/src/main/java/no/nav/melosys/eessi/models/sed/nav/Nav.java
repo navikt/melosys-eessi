@@ -22,6 +22,7 @@ public class Nav {
 
     private List<Arbeidsgiver> arbeidsgiver;
 
+    //Kun for X001
     private Sak sak;
 
     private EessiSak eessisak;

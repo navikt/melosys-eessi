@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParticipantInfo {
+public class DeltakerInformasjon {
     private String id;
     private String name;
 
