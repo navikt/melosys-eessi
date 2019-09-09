@@ -154,6 +154,10 @@ public class EuxService {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
     }
 
+    public byte[] genererPdfFraSed(SED sed) throws IntegrationException {
+        return euxConsumer.genererPdfFraSed(sed);
+    }
+
     public boolean sedKanOpprettesPaaBuc(String rinaSaksnummer, SedType sedType) {
         try {
             return euxConsumer.hentTilgjengeligeSedTyper(rinaSaksnummer).stream()
