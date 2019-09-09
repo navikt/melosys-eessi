@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
+@NoArgsConstructor
 public class InstitusjonDto {
 
     private String id;

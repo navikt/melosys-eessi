@@ -24,11 +24,7 @@ public class BucController {
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
                                                           @RequestParam(required = false) String land) throws IntegrationException {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
-                .map(institusjon -> InstitusjonDto.builder()
-                        .id(institusjon.getId())
-                        .navn(institusjon.getNavn())
-                        .landkode(institusjon.getLandkode())
-                        .build())
+                .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());
     }
 }

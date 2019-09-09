@@ -3,10 +3,12 @@ package no.nav.melosys.eessi.service.eux;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -14,7 +16,7 @@ import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.joark.ParticipantInfo;
+import no.nav.melosys.eessi.service.joark.DeltakerInformasjon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,9 @@ import org.springframework.util.StringUtils;
 public class EuxService {
 
     private static final String RINA_URL_TEMPLATE = "/portal/#/caseManagement/";
+    private static final String COUNTERPARTY = "CounterParty";
+    private static final String CASEOWNER = "CaseOwner";
+
 
     private final EuxConsumer euxConsumer;
     private final MetrikkerRegistrering metrikkerRegistrering;
@@ -83,16 +88,20 @@ public class EuxService {
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
-    public List<Institusjon> hentMottakerinstitusjoner(String bucType, String landkode) throws IntegrationException {
-        List<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, null);
+    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, String landkode)
+            throws IntegrationException {
+        Stream<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, null).stream();
 
         if (!StringUtils.isEmpty(landkode)) {
-            return institusjoner.stream()
-                    .filter(institusjon -> landkode.equalsIgnoreCase(institusjon.getLandkode()))
-                    .collect(Collectors.toList());
+            institusjoner = institusjoner.filter(institusjon -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
         }
 
-        return institusjoner;
+        return institusjoner.filter(i ->
+                i.getTilegnetBucs().stream().filter(
+                        tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
+                                COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
+                        .anyMatch(TilegnetBuc::erEessiKlar))
+                .collect(Collectors.toList());
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
@@ -101,7 +110,7 @@ public class EuxService {
         log.info("SED {} sendt i sak {}", sed.getSed(), rinaSaksnummer);
     }
 
-    public String opprettSed(SED sed, String rinaSaksnummer) throws IntegrationException {
+    String opprettSed(SED sed, String rinaSaksnummer) throws IntegrationException {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, null, sed);
         log.info("SED {} opprettet i sak {}", sed.getSed(), rinaSaksnummer);
 
@@ -120,9 +129,9 @@ public class EuxService {
      * Henter mottaker (Counter Party) for en rina-sak
      *
      * @param rinaSaksnummer id for rina-saken
-     * @return ParticipantInfo - inneholder id og navn for mottaker
+     * @return DeltakerInformasjon - inneholder id og navn for mottaker
      */
-    public ParticipantInfo hentMottaker(String rinaSaksnummer) throws IntegrationException {
+    DeltakerInformasjon hentMottaker(String rinaSaksnummer) throws IntegrationException {
         return extractReceiverInformation(euxConsumer.hentDeltagere(rinaSaksnummer));
     }
 
@@ -130,9 +139,9 @@ public class EuxService {
      * Henter utsender (Case Owner) for en rina-sak
      *
      * @param rinaSaksnummer id for rina-saken
-     * @return ParticipantInfo - inneholder id og navn for utsender
+     * @return DeltakerInformasjon - inneholder id og navn for utsender
      */
-    public ParticipantInfo hentUtsender(String rinaSaksnummer) throws IntegrationException {
+    DeltakerInformasjon hentUtsender(String rinaSaksnummer) throws IntegrationException {
         return extractSenderInformation(euxConsumer.hentDeltagere(rinaSaksnummer));
     }
 
@@ -154,7 +163,7 @@ public class EuxService {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
     }
 
-    public boolean sedKanOpprettesPaaBuc(String rinaSaksnummer, SedType sedType) {
+    boolean sedKanOpprettesPaaBuc(String rinaSaksnummer, SedType sedType) {
         try {
             return euxConsumer.hentTilgjengeligeSedTyper(rinaSaksnummer).stream()
                     .anyMatch(type -> type.equalsIgnoreCase(sedType.name()));
@@ -164,24 +173,24 @@ public class EuxService {
         }
     }
 
-    private static ParticipantInfo extractReceiverInformation(JsonNode participants) {
-        return extractParticipantInformation(participants, "CounterParty");
+    private static DeltakerInformasjon extractReceiverInformation(JsonNode participants) {
+        return extractParticipantInformation(participants, COUNTERPARTY);
     }
 
-    private static ParticipantInfo extractSenderInformation(JsonNode participants) {
-        return extractParticipantInformation(participants, "CaseOwner");
+    private static DeltakerInformasjon extractSenderInformation(JsonNode participants) {
+        return extractParticipantInformation(participants, CASEOWNER);
     }
 
-    private static ParticipantInfo extractParticipantInformation(JsonNode participants, String participantRole) {
+    private static DeltakerInformasjon extractParticipantInformation(JsonNode participants, String participantRole) {
         if (participants.isArray()) {
             for (JsonNode deltager : participants) {
                 if (participantRole.equalsIgnoreCase(deltager.get("role").asText())) {
                     JsonNode organization = deltager.get("organisation");
 
-                    ParticipantInfo participantInfo = new ParticipantInfo();
-                    participantInfo.setId(organization.get("id").textValue());
-                    participantInfo.setName(organization.get("name").textValue());
-                    return participantInfo;
+                    DeltakerInformasjon deltakerInformasjon = new DeltakerInformasjon();
+                    deltakerInformasjon.setId(organization.get("id").textValue());
+                    deltakerInformasjon.setName(organization.get("name").textValue());
+                    return deltakerInformasjon;
                 }
             }
         }
