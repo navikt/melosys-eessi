@@ -218,9 +218,9 @@ public class EuxConsumerTest {
 
         //Må encode uri, da non-ascii blir escaped
         String uri = UriComponentsBuilder
-                .fromUriString("/rinasaker?Fødselsnummer=" + fnr + "&Fornavn=" + fornavn + "&Etternavn=" + etternavn +
-                        "&Fødselsdato=" + fødselsdato + "&RINASaksnummer=" + saksnummer + "&BuCType=" + bucType
-                        + "&Status=" + status).toUriString();
+                .fromUriString("/rinasaker?fødselsnummer=" + fnr + "&fornavn=" + fornavn + "&etternavn=" + etternavn +
+                        "&fødselsdato=" + fødselsdato + "&rinasaksnummer=" + saksnummer + "&buctype=" + bucType
+                        + "&status=" + status).toUriString();
 
         server.expect(requestTo(uri))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));

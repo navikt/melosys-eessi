@@ -35,7 +35,7 @@ public class EuxConsumer implements RestConsumer {
 
     private final RestTemplate euxRestTemplate;
 
-    private static final String RINA_SAKSNUMMER = "RINASaksnummer";
+    private static final String RINA_SAKSNUMMER = "rinasaksnummer";
     private static final String KORRELASJONS_ID = "KorrelasjonsId";
     private static final String BUC_TYPE = "BuCType";
 
@@ -531,13 +531,13 @@ public class EuxConsumer implements RestConsumer {
             String rinaSaksnummer, String bucType, String status) throws IntegrationException {
         log.info("Søker etter rina-saker");
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/rinasaker")
-                .queryParam("Fødselsnummer", fnr)
-                .queryParam("Fornavn", fornavn)
-                .queryParam("Etternavn", etternavn)
-                .queryParam("Fødselsdato", foedselsdato)
+                .queryParam("fødselsnummer", fnr)
+                .queryParam("fornavn", fornavn)
+                .queryParam("etternavn", etternavn)
+                .queryParam("fødselsdato", foedselsdato)
                 .queryParam(RINA_SAKSNUMMER, rinaSaksnummer)
-                .queryParam(BUC_TYPE, bucType)
-                .queryParam("Status", status);
+                .queryParam("buctype", bucType)
+                .queryParam("status", status);
 
         //Må vurdere å endre returverdi til en POJO om denne integrasjonen faktisk tas i bruk
         return exchange(builder.build(false).toUriString(), HttpMethod.GET,
