@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 @Builder
 public class OpprettSedDto {
-    private String bucId;
+    private String rinaSaksnummer;
     private String rinaUrl;
 }
