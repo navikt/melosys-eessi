@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.controller;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 import io.swagger.annotations.ApiOperation;
@@ -14,7 +15,9 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -30,13 +33,18 @@ public class BucController {
     }
 
     @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne.")
-    @PostMapping("/{bucType}")
+    @PostMapping(
+            value = "/{bucType}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public OpprettSedDto opprettBucOgSed(
-            @RequestBody SedDataDto sedDataDto,
+            @RequestPart("sedData") SedDataDto sedDataDto,
+            @RequestPart(value = "vedlegg", required = false) MultipartFile vedlegg,
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "forsokSend", required = false, defaultValue = "false") boolean forsokSend
-    ) throws IntegrationException, NotFoundException, MappingException {
-        return sedService.opprettBucOgSed(sedDataDto, bucType, forsokSend);
+    ) throws IntegrationException, NotFoundException, MappingException, IOException {
+        return sedService.opprettBucOgSed(sedDataDto, vedlegg.getBytes(), bucType, forsokSend);
     }
 
     @ApiOperation(value = "Oppretter og sender svar på A001 for en spesifikk buc-type.")

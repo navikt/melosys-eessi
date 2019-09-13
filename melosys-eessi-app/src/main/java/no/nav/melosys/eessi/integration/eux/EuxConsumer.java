@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
+import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -31,7 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Service
-public class EuxConsumer implements RestConsumer {
+public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     private final RestTemplate euxRestTemplate;
 
@@ -408,34 +409,25 @@ public class EuxConsumer implements RestConsumer {
      * @param fagSakNummer Optional da eux per 17.01: unknown.. brukes ikke av eux,
      * @param mottakerId Mottaker sin Rina-id
      * @param filType filtype til vedlegg
-     * @param korrelasjonsId Optional, ikke brukt av eux per nå
      * @param sed sed'en som skal opprettes
      * @param vedlegg vedlegget som skal legges til saken
      * @return @return id til rina-sak, id til dokument og id til vedlegg som ble opprettet. Nøkler:
      * caseId, documentId og attachmentId
      */
 
-    public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String fagSakNummer,
-            String mottakerId, String filType, String korrelasjonsId, SED sed, Object vedlegg) throws IntegrationException {
-        log.info("Oppretter buc {}, med sed {}, med mottaker {} og legger til vedlegg", bucType,
+    public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String mottakerId, String filType,
+            SED sed, byte[] vedlegg) throws IntegrationException {
+        log.info("Oppretter buc {}, med sed {}, med mottaker {} og legger til vedlegg. ", bucType,
                 sed.getSed(), mottakerId);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed/vedlegg")
-                .queryParam(BUC_TYPE, bucType)
-                .queryParam("FagSakNummer", fagSakNummer)
-                .queryParam("MottakerID", mottakerId)
-                .queryParam("FilType", filType)
-                .queryParam(KORRELASJONS_ID, korrelasjonsId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         byte[] documentBytes;
-        byte[] attachmentBytes;
 
         try {
             documentBytes = new ObjectMapper().writeValueAsBytes(sed);
-            attachmentBytes = new ObjectMapper().writeValueAsBytes(vedlegg);
         } catch (JsonProcessingException ex) {
             throw new IntegrationException("Could not send document and attachment to eux", ex);
         }
@@ -446,7 +438,7 @@ public class EuxConsumer implements RestConsumer {
                 return "document";
             }
         };
-        ByteArrayResource attachment = new ByteArrayResource(attachmentBytes) {
+        ByteArrayResource attachment = new ByteArrayResource(vedlegg) {
             @Override
             public String getFilename() {
                 return "attachment";
@@ -456,6 +448,11 @@ public class EuxConsumer implements RestConsumer {
         MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add("document", document);
         map.add("attachment", attachment);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed/vedlegg")
+                .queryParam(BUC_TYPE, bucType)
+                .queryParam("MottakerID", mottakerId)
+                .queryParam("FilType", filType);
 
         return exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(map, headers),
                 new ParameterizedTypeReference<Map<String, String>>() {

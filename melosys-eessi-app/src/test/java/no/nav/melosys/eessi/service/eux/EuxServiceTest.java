@@ -6,23 +6,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableMap;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.joark.DeltakerInformasjon;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,12 +50,6 @@ public class EuxServiceTest {
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         euxService = new EuxService(euxConsumer, metrikkerRegistrering, RINA_MOCK_URL, null);
 
-        URL jsonUrl = getClass().getClassLoader().getResource("buc_participants.json");
-        JsonNode participants = objectMapper.readTree(jsonUrl);
-
-        when(euxConsumer.hentDeltagere(anyString()))
-                .thenReturn(participants);
-
         when(euxConsumer.opprettBucOgSed(anyString(), anyString(), any()))
                 .thenReturn(ImmutableMap.of(
                         "caseId", "1122334455",
@@ -72,32 +62,6 @@ public class EuxServiceTest {
                 .thenReturn(institusjoner);
 
         when(euxConsumer.opprettSed(anyString(), any(), any())).thenReturn("12345");
-    }
-
-    @Test
-    public void hentMottaker_forventMottakerInformasjon() throws Exception {
-        DeltakerInformasjon receiver = euxService.hentMottaker("123123123");
-
-        assertThat(receiver).isNotNull();
-        assertThat(receiver.getId()).isEqualTo("NO:NAVT003");
-        assertThat(receiver.getName()).isEqualTo("NAVT003");
-    }
-
-    @Test
-    public void hentUtsender_forventMottakerInformasjon() throws Exception {
-        DeltakerInformasjon sender = euxService.hentUtsender("123123123");
-
-        assertThat(sender).isNotNull();
-        assertThat(sender.getId()).isEqualTo("NO:NAVT002");
-        assertThat(sender.getName()).isEqualTo("NAVT002");
-    }
-
-    @Test
-    public void hentUtsender_forventNull() throws Exception {
-        when(euxConsumer.hentDeltagere(anyString())).thenReturn(JsonNodeFactory.instance.arrayNode());
-        DeltakerInformasjon sender = euxService.hentUtsender("123123123");
-
-        assertThat(sender).isNull();
     }
 
     @Test
@@ -153,7 +117,7 @@ public class EuxServiceTest {
         String mottakerId = null;
         SED sed = new SED();
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed, null);
 
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
 
@@ -171,7 +135,7 @@ public class EuxServiceTest {
         doThrow(IntegrationException.class).when(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
 
         expectedException.expect(IntegrationException.class);
-        euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed);
+        euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed, null);
 
         verify(euxConsumer).opprettBucOgSed(anyString(), any(), any());
     }
@@ -186,15 +150,6 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void opprettSed_medRinaSaksnummer_forventSedId() throws IntegrationException {
-        SED sed = new SED();
-        String sedId = euxService.opprettSed(sed, "123123123");
-
-        verify(euxConsumer).opprettSed(eq("123123123"), eq(null), eq(sed));
-        assertThat(sedId).isEqualTo("12345");
-    }
-
-    @Test
     public void hentRinaUrl_medRinaSaksnummer_forventUrl() {
         String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/12345";
         String resultUrl = euxService.hentRinaUrl("12345");
@@ -205,24 +160,6 @@ public class EuxServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void hentRinaUrl_utenRinaSaksnummer_forventException() {
         euxService.hentRinaUrl(null);
-    }
-
-    @Test
-    public void sedKanOpprettesPaaBuc_medRinaSaksnummer_forventTrue() throws IntegrationException {
-        when(euxConsumer.hentTilgjengeligeSedTyper(anyString())).thenReturn(Arrays.asList("X001", "H001", "A008"));
-        boolean result = euxService.sedKanOpprettesPaaBuc("123123123", SedType.A008);
-
-        verify(euxConsumer).hentTilgjengeligeSedTyper(anyString());
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    public void sedKanOpprettesPaaBuc_medRinaSaksnummer_forventFalse() throws IntegrationException {
-        when(euxConsumer.hentTilgjengeligeSedTyper(anyString())).thenReturn(Arrays.asList("X001", "H001", "A001"));
-        boolean result = euxService.sedKanOpprettesPaaBuc("123123123", SedType.A008);
-
-        verify(euxConsumer).hentTilgjengeligeSedTyper(anyString());
-        assertThat(result).isFalse();
     }
 
     @Test

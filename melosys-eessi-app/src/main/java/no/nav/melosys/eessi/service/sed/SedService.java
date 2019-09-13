@@ -41,7 +41,7 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, BucType bucType, boolean forsokSend)
+    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, byte[] vedlegg, BucType bucType, boolean forsokSend)
             throws MappingException, IntegrationException, NotFoundException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
@@ -52,7 +52,7 @@ public class SedService {
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         OpprettBucOgSedResponse response = opprettEllerOppdaterBucOgSed(
-                bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId()
+                sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId()
         );
 
         if (forsokSend) {
@@ -111,7 +111,7 @@ public class SedService {
                 .orElseThrow(() -> new NotFoundException("Finner ingen A001 for BUC " + rinaId));
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
         SedType sedType = SedType.valueOf(sed.getSed());
 
         if (sedType == SedType.A009) {
@@ -133,7 +133,7 @@ public class SedService {
             }
         }
 
-        return opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, mottakerLand, mottakerId);
+        return opprettOgLagreSaksrelasjon(sed, vedlegg, bucType, gsakSaksnummer, mottakerLand, mottakerId);
     }
 
     private static boolean sedKanOppdateres(BUC buc, String id) {
@@ -156,9 +156,9 @@ public class SedService {
         return Optional.empty();
     }
 
-    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId)
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId)
             throws NotFoundException, IntegrationException {
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, mottakerId, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, mottakerId, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
         return opprettBucOgSedResponse;

@@ -35,7 +35,7 @@ public class HeaderValidatorRequestInterceptor implements HandlerInterceptor {
     }
 
     private boolean isValidApiRequest(HttpServletRequest request) {
-        if (!activeProfile.equalsIgnoreCase("nais")) {
+        if (!"nais".equalsIgnoreCase(activeProfile)) {
             return true;
         }
         return apiHeaderValue.equalsIgnoreCase(request.getHeader(apiHeaderName));
