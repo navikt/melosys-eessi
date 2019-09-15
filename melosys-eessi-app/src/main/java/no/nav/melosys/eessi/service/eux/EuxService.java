@@ -25,6 +25,7 @@ public class EuxService {
 
     private static final String RINA_URL_TEMPLATE = "/portal/#/caseManagement/";
     private static final String COUNTERPARTY = "CounterParty";
+    private static final String FILTYPE_PDF = "pdf";
 
     private final EuxConsumer euxConsumer;
     private final MetrikkerRegistrering metrikkerRegistrering;
@@ -56,7 +57,7 @@ public class EuxService {
 
         Map<String, String> response;
         if (vedlegg != null && vedlegg.length > 0) {
-            response = euxConsumer.opprettBucOgSedMedVedlegg(bucType, mottakerId, "pdf", sed, vedlegg);
+            response = euxConsumer.opprettBucOgSedMedVedlegg(bucType, mottakerId, FILTYPE_PDF, sed, vedlegg);
         } else {
             response = euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);
         }

@@ -428,8 +428,8 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
         try {
             documentBytes = new ObjectMapper().writeValueAsBytes(sed);
-        } catch (JsonProcessingException ex) {
-            throw new IntegrationException("Could not send document and attachment to eux", ex);
+        } catch (JsonProcessingException jpe) {
+            throw new IntegrationException("Feil ved opprettelse av SED mot EUX", jpe);
         }
 
         ByteArrayResource document = new ByteArrayResource(documentBytes) {

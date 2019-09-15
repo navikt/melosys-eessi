@@ -44,7 +44,7 @@ public class BucController {
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "forsokSend", required = false, defaultValue = "false") boolean forsokSend
     ) throws IntegrationException, NotFoundException, MappingException, IOException {
-        return sedService.opprettBucOgSed(sedDataDto, vedlegg.getBytes(), bucType, forsokSend);
+        return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? vedlegg.getBytes() : null, bucType, forsokSend);
     }
 
     @ApiOperation(value = "Oppretter og sender svar på A001 for en spesifikk buc-type.")
