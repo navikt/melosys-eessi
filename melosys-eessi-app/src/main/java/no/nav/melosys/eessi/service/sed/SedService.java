@@ -41,7 +41,7 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, byte[] vedlegg, BucType bucType, boolean forsokSend)
+    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, byte[] vedlegg, BucType bucType, boolean sendAutomatisk)
             throws MappingException, IntegrationException, NotFoundException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
@@ -55,8 +55,8 @@ public class SedService {
                 sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId()
         );
 
-        if (forsokSend) {
-            forsokSendSed(response.getRinaSaksnummer(), response.getDokumentId());
+        if (sendAutomatisk) {
+            sendSed(response.getRinaSaksnummer(), response.getDokumentId());
         }
 
         return OpprettSedDto.builder()
@@ -65,7 +65,7 @@ public class SedService {
                 .build();
     }
 
-    private void forsokSendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+    private void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         try {
             euxService.sendSed(rinaSaksnummer, dokumentId);
         } catch (IntegrationException e) {
