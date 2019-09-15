@@ -42,7 +42,7 @@ public class BucController {
             @RequestPart("sedData") SedDataDto sedDataDto,
             @RequestPart(value = "vedlegg", required = false) MultipartFile vedlegg,
             @PathVariable("bucType") BucType bucType,
-            @RequestParam(value = "sendAutomatisk", required = false, defaultValue = "false") boolean sendAutomatisk
+            @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
     ) throws IntegrationException, NotFoundException, MappingException, IOException {
         return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? vedlegg.getBytes() : null, bucType, sendAutomatisk);
     }
