@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
@@ -12,7 +13,7 @@ import org.springframework.util.StringUtils;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 
 @Slf4j
-public class OpprettJournalpostRequestMapper {
+public final class OpprettJournalpostRequestMapper {
 
     private static final EnumSet<SedType> TEMA_UFM_SEDTYPER = EnumSet.of(
             SedType.A001, SedType.A003, SedType.A009, SedType.A010
@@ -106,17 +107,18 @@ public class OpprettJournalpostRequestMapper {
 
     private static List<Dokument> vedlegg(final String sedType, final List<SedMedVedlegg.BinaerFil> vedleggListe) {
         return vedleggListe.stream()
-                .filter(b -> {
-                    if (!JournalpostFiltype.filnavn(b.getFilnavn()).isPresent()) {
-                        log.warn(
-                                "fant vedlegg i lista med vedlegg som har en filtype som ikke er støttet av arkivet, filnavn={}, fjerner fra lista.",
-                                b.getFilnavn());
-                    }
-                    return JournalpostFiltype.filnavn(b.getFilnavn()).isPresent();
-                }).map(
-                        b -> dokument(sedType, b.getFilnavn(),
-                                JournalpostFiltype.filnavn(b.getFilnavn()).orElse(null),
-                                b.getInnhold()))
+                .filter(gyldigFiltypePredicate)
+                .map(b -> dokument(sedType, b.getFilnavn(),
+                        JournalpostFiltype.filnavn(b.getFilnavn()).orElse(null), b.getInnhold()))
                 .collect(Collectors.toList());
     }
+
+    private static final Predicate<SedMedVedlegg.BinaerFil> gyldigFiltypePredicate = binaerFil -> {
+        boolean gyldigFiltype = JournalpostFiltype.filnavn(binaerFil.getFilnavn()).isPresent();
+        if (!gyldigFiltype) {
+            log.warn("Et vedlegg av en SED har filtype som ikke støttes. "
+                    + "Dette vedlegget kan ikke journalføres. Filnavn: {}", binaerFil.getFilnavn());
+        }
+        return gyldigFiltype;
+    };
 }
