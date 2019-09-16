@@ -47,7 +47,7 @@ public class BucController {
         return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? vedlegg.getBytes() : null, bucType, sendAutomatisk);
     }
 
-    @ApiOperation(value = "Oppretter og sender svar på A001 for en spesifikk buc-type.")
+    @ApiOperation(value = "Oppretter og sender svar på A001 for gitt rinaId")
     @PostMapping("/LA_BUC_01/{rinaId}/svar")
     public void anmodningUnntakSvar(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
             throws IntegrationException, NotFoundException {
