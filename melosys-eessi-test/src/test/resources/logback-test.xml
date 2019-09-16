@@ -10,4 +10,11 @@
   <root level="INFO">
     <appender-ref ref="console"/>
   </root>
+
+  <logger name="org.apache.kafka" level="WARN"/>
+  <logger name="org.apache.zookeeper" level="WARN"/>
+  <logger name="org.springframework.kafka" level="WARN"/>
+  <logger name="org.hibernate" level="WARN"/>
+  <logger name="kafka" level="WARN"/>
+  <logger name="springfox" level="WARN"/>
 </configuration>
