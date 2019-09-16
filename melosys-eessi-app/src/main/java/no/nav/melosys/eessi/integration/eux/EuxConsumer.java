@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
@@ -43,6 +44,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private static final String BUC_PATH = "/buc/%s";
     private static final String SED_PATH = "/buc/%s/sed/%s";
     private static final String SED_PATH_PDF = "/buc/%s/sed/%s/pdf";
+    private static final String SED_MED_VEDLEGG_PATH = "/buc/%s/sed/%s/filer";
     private static final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
     private static final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
     private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
@@ -549,5 +551,17 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         } catch (RestClientException e) {
             throw new IntegrationException("Error in integration with eux", e);
         }
+    }
+
+    public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        log.info("Henter SED med vedlegg for sak {} og sed {}", rinaSaksnummer, dokumentId);
+
+        UriComponentsBuilder builder = UriComponentsBuilder
+                .fromPath(String.format(SED_MED_VEDLEGG_PATH, rinaSaksnummer, dokumentId));
+
+        return exchange(builder.toUriString(), HttpMethod.GET,
+                new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<SedMedVedlegg>() {
+                });
     }
 }
