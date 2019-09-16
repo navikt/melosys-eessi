@@ -34,14 +34,13 @@ public class BucCloser {
         try {
             euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).status("open").build())
                     .stream()
+                    .filter(norgeErCaseOwnerPredicate)
                     .map(this::hentBuc)
                     .filter(Objects::nonNull)
-                    .filter(norgeErCaseOwnerPredicate)
                     .filter(bucKanLukkesPredicate)
                     .forEach(this::lukkBuc);
-
         } catch (IntegrationException e) {
-            log.error("Feil ved henting av bucer av type {}", bucType);
+            log.error("Feil ved henting av bucer av type {}", bucType, e);
         }
     }
 
@@ -68,6 +67,7 @@ public class BucCloser {
     private Document hentEksisterendeX001Utkast(BUC buc) {
         return buc.getDocuments().stream()
                 .filter(dokumentErX001Predicate)
+                .filter(dokumentErOpprettet)
                 .min(documentComparator).orElse(null);
     }
 
