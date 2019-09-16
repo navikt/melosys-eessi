@@ -9,7 +9,10 @@ import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.buc.*;
+import no.nav.melosys.eessi.models.buc.Action;
+import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.buc.Conversation;
+import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -46,6 +49,7 @@ public class BucCloserTest {
     public void closeBucsByType_enBucKanLukkes_verifiserOpprettOgSend() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -72,6 +76,7 @@ public class BucCloserTest {
     public void closeBucsByType_enBucKanLukkesInneholderUtkastX001_verifiserOppdaterSåSend() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -82,6 +87,7 @@ public class BucCloserTest {
         x001Doc.setType(SedType.X001.name());
         x001Doc.setCreationDate(ZonedDateTime.now());
         x001Doc.setConversations(Collections.emptyList());
+        x001Doc.setStatus("draft");
         buc.getDocuments().add(x001Doc);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
@@ -112,6 +118,7 @@ public class BucCloserTest {
     public void closeBucsByType_feilVedHentingAvBuc_ingenVidereKall() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -129,6 +136,7 @@ public class BucCloserTest {
     public void closeBucsByType_feilVedHentingAvSed_ingenVidereKall() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -155,6 +163,7 @@ public class BucCloserTest {
     public void closeBucsByType_toDokumenter_brukSistOpprettetDokument() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -191,11 +200,6 @@ public class BucCloserTest {
         BUC buc = new BUC();
         buc.setId("ffff");
         buc.setBucType(BucType.LA_BUC_04.name());
-
-        Creator creator = new Creator();
-        creator.setOrganisation(new Organisation());
-        creator.getOrganisation().setCountryCode("NO");
-        buc.setCreator(creator);
 
         List<Action> actions = new ArrayList<>();
         Action action = new Action();
