@@ -406,7 +406,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * Oppretter en BuC med en tilhørende SED og evt vedlegg
      *
      * @param bucType Hvilken type buc som skal opprettes. Eks LA_BUC_04
-     * @param fagSakNummer Optional da eux per 17.01: unknown.. brukes ikke av eux,
      * @param mottakerId Mottaker sin Rina-id
      * @param filType filtype til vedlegg
      * @param sed sed'en som skal opprettes
