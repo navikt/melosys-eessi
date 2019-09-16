@@ -19,7 +19,7 @@ public class BucUtils {
             SedType.X001.name().equals(dokument.getType());
 
     public static final Predicate<Document> dokumentErOpprettet = dokument ->
-            !SedStatus.TOM.name().equalsIgnoreCase(dokument.getStatus());
+            !SedStatus.TOM.getEngelskStatus().equalsIgnoreCase(dokument.getStatus());
 
     public static final Predicate<BUC> bucKanLukkesPredicate = buc ->
             buc.getActions().stream().anyMatch(action -> SedType.X001.name().equals(action.getDocumentType()));
