@@ -233,8 +233,7 @@ public interface SedMapper {
         adresse.setRegion(sAdresse.getRegion());
 
         if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
-            throw new MappingException(
-                    "Element 'poststed' and 'land' and  is required for all addresses");
+            throw new MappingException("Element 'poststed' og 'land' er påkrevd for alle addresser");
         }
 
         return adresse;

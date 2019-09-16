@@ -22,6 +22,9 @@ public class SedDataDto {
     private List<Arbeidssted> arbeidssteder;
     private List<Virksomhet> utenlandskeVirksomheter;
 
+    //A008 spesifikt
+    private String avklartBostedsland;
+
     //Lovvalg
     private List<Lovvalgsperiode> lovvalgsperioder;
     private List<Lovvalgsperiode> tidligereLovvalgsperioder;
