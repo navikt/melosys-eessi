@@ -198,12 +198,10 @@ public class EuxConsumerTest {
         forventetResultat.put("caseId", "rewf24");
         forventetResultat.put("attachmentId", "ffrewf24");
 
-        server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&FagSakNummer=" + fagsak +
-                "&MottakerID=" + mottaker + "&FilType=" + filtype + "&KorrelasjonsId=" + korrelasjon))
-                .andRespond(
-                        withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
+        server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
+                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
-        Map resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, fagsak, mottaker, filtype, korrelasjon, sed, vedlegg);
+        Map resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
         assertEquals(forventetResultat, resultat);
     }
 

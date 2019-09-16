@@ -62,27 +62,27 @@ public class SedServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
-        when(euxService.opprettBucOgSed(anyString(), anyString(), any(), any(SED.class)))
+        when(euxService.opprettBucOgSed(anyString(), anyString(), any(), any(SED.class), any()))
                 .thenReturn(opprettBucOgSedResponse);
 
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
     }
 
     @Test
-    public void createAndSend_forventRinacaseId() throws Exception {
+    public void opprettBucOgSed_forventRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        String rinaId = sendSedService.createAndSend(sedData);
-        assertThat(rinaId).isEqualTo(RINA_ID);
+        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
+        assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
     }
 
     @Test
-    public void createAndSend_sendSedKasterException_forventSlettBucOgSakrelasjon() throws Exception {
+    public void opprettBucOgSed_sendSedKasterException_forventSlettBucOgSakrelasjon() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         doThrow(IntegrationException.class).when(euxService).sendSed(anyString(), anyString());
 
         Exception exception = null;
         try {
-            sendSedService.createAndSend(sedData);
+            sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
         } catch (IntegrationException e) {
             exception = e;
         }
@@ -124,27 +124,29 @@ public class SedServiceTest {
         when(euxService.hentBuc(eq(RINA_ID)))
                 .thenReturn(buc);
 
-        sendSedService.createAndSend(sedDataDto);
+        sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_04, true);
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(documentId), any(SED.class));
-        verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
+        verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any(), any());
+        verify(euxService).sendSed(anyString(), anyString());
     }
 
     @Test(expected = MappingException.class)
-    public void createAndSend_ingenGsakSaksnummer_forventMappingException() throws Exception {
+    public void opprettBucOgSed_ingenGsakSaksnummer_forventMappingException() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.setGsakSaksnummer(null);
-        sendSedService.createAndSend(sedData);
+        sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
     }
 
     @Test
-    public void createSed_A003_forventOpprettNyBucOgSedMedUrl() throws Exception {
+    public void opprettBucOgSed_A003_forventOpprettNyBucOgSedMedUrl() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        OpprettSedDto response = sendSedService.createSed(sedData, BucType.LA_BUC_03);
+        OpprettSedDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_03, false);
 
-        verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any());
+        verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
-        assertThat(response.getBucId()).isEqualTo(RINA_ID);
+        verify(euxService, never()).sendSed(anyString(), anyString());
+        assertThat(response.getRinaSaksnummer()).isEqualTo(RINA_ID);
         assertThat(response.getRinaUrl()).isEqualTo("URL");
     }
 

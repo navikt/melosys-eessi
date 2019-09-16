@@ -41,57 +41,39 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public String createAndSend(SedDataDto sedDataDto) throws MappingException, IntegrationException, NotFoundException {
+    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, byte[] vedlegg, BucType bucType, boolean sendAutomatisk)
+            throws MappingException, IntegrationException, NotFoundException {
 
-        Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
-
+        Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-        BucType bucType = SedUtils.getBucTypeFromBestemmelse(
-                sedDataDto.getLovvalgsperioder().get(0).getBestemmelse());
+
         SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
-
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse =
-                opprettEllerOppdaterBucOgSed(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId());
+        OpprettBucOgSedResponse response = opprettEllerOppdaterBucOgSed(
+                sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId()
+        );
 
-        try {
-            euxService.sendSed(opprettBucOgSedResponse.getRinaSaksnummer(), opprettBucOgSedResponse.getDokumentId());
-        } catch (IntegrationException e) {
-            log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
-            euxService.slettBuC(opprettBucOgSedResponse.getRinaSaksnummer());
-            saksrelasjonService.slettVedRinaId(opprettBucOgSedResponse.getRinaSaksnummer());
-            throw e;
+        if (sendAutomatisk) {
+            sendSed(response.getRinaSaksnummer(), response.getDokumentId());
         }
 
-        return opprettBucOgSedResponse.getRinaSaksnummer();
+        return OpprettSedDto.builder()
+                .rinaSaksnummer(response.getRinaSaksnummer())
+                .rinaUrl(euxService.hentRinaUrl(response.getRinaSaksnummer()))
+                .build();
     }
 
-    /**
-     * Oppretter en SED på en ny BUC.
-     *
-     * @param sedDataDto sed som skal opprettes
-     * @param bucType    hvilken type buc som skal opprettes (dersom det ikke er en eksisterende buc på saken)
-     * @return Dto-objekt som inneholder rinaSaksnummer, dokumentId og link til sak i rina
-     */
-    public OpprettSedDto createSed(SedDataDto sedDataDto, BucType bucType)
-            throws MappingException, NotFoundException, IntegrationException {
-
-        SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
-
-        Long gsakSaksnummer = getGsakSaksnummer(sedDataDto);
-        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
-        SED sed = sedMapper.mapTilSed(sedDataDto);
-
-        log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
-        OpprettBucOgSedResponse opprettBucOgSedResponse =
-                opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId());
-
-        return OpprettSedDto.builder()
-                .bucId(opprettBucOgSedResponse.getRinaSaksnummer())
-                .rinaUrl(euxService.hentRinaUrl(opprettBucOgSedResponse.getRinaSaksnummer()))
-                .build();
+    private void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        try {
+            euxService.sendSed(rinaSaksnummer, dokumentId);
+        } catch (IntegrationException e) {
+            log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
+            euxService.slettBuC(rinaSaksnummer);
+            saksrelasjonService.slettVedRinaId(rinaSaksnummer);
+            throw e;
+        }
     }
 
     public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
@@ -129,7 +111,7 @@ public class SedService {
                 .orElseThrow(() -> new NotFoundException("Finner ingen A001 for BUC " + rinaId));
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
         SedType sedType = SedType.valueOf(sed.getSed());
 
         if (sedType == SedType.A009) {
@@ -151,7 +133,7 @@ public class SedService {
             }
         }
 
-        return opprettOgLagreSaksrelasjon(bucType, sed, gsakSaksnummer, mottakerLand, mottakerId);
+        return opprettOgLagreSaksrelasjon(sed, vedlegg, bucType, gsakSaksnummer, mottakerLand, mottakerId);
     }
 
     private static boolean sedKanOppdateres(BUC buc, String id) {
@@ -174,15 +156,15 @@ public class SedService {
         return Optional.empty();
     }
 
-    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(BucType bucType, SED sed, Long gsakSaksnummer, String mottakerLand, String mottakerId)
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId)
             throws NotFoundException, IntegrationException {
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, mottakerId, sed);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerLand, mottakerId, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
         return opprettBucOgSedResponse;
     }
 
-    private static Long getGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
+    private static Long hentGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
     }
 }
