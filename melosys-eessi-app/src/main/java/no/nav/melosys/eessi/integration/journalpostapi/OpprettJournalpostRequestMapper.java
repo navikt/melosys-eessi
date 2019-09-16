@@ -87,7 +87,7 @@ public class OpprettJournalpostRequestMapper {
             final DokkatSedInfo dokkatSedInfo) {
         final List<Dokument> dokumenter = new ArrayList<>();
 
-        dokumenter.add(dokument(sedType, dokkatSedInfo.getDokumentTittel(), JournalpostFiltype.PDF, sedMedVedlegg.getSed().getInnhold()));
+        dokumenter.add(dokument(sedType, dokkatSedInfo.getDokumentTittel(), JournalpostFiltype.PDFA, sedMedVedlegg.getSed().getInnhold()));
         dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe()));
         return dokumenter;
     }
