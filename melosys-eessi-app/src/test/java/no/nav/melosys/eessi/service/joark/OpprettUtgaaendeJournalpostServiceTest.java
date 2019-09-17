@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.joark;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Optional;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
@@ -10,6 +11,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
@@ -51,7 +53,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);
 
-        when(euxService.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
+        when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
         FagsakRinasakKobling fagsakRinasakKobling = enhancedRandom.nextObject(FagsakRinasakKobling.class);
         when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
@@ -74,5 +76,9 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     public void journalfoer_noCaseRelation_expectNotFoundException() throws Exception {
         when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.empty());
         opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
+    }
+
+    private SedMedVedlegg sedMedVedlegg(byte[] innhold) {
+        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("","", innhold), Collections.emptyList());
     }
 }

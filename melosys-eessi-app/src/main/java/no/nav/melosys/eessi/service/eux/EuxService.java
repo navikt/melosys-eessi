@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -135,6 +136,10 @@ public class EuxService {
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
+    }
+
+    public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        return euxConsumer.hentSedMedVedlegg(rinaSaksnummer, dokumentId);
     }
 
     public byte[] genererPdfFraSed(SED sed) throws IntegrationException {

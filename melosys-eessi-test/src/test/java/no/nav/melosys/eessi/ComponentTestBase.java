@@ -78,8 +78,8 @@ public abstract class ComponentTestBase {
 
     @Before
     public void setup() throws Exception {
-        when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rindokumentid"));
-        when(euxConsumer.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
+        when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rinadokumentid"));
+        when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(componentTestProvider.sedMedVedlegg());
         when(sakConsumer.opprettSak(anyString())).thenReturn(componentTestProvider.sak(AKTOER_ID));
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(componentTestProvider.journalpostResponse());
         when(aktoerConsumer.hentAktoerId(anyString())).thenReturn(AKTOER_ID);

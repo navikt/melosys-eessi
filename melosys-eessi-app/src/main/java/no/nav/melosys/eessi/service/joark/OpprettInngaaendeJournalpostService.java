@@ -6,6 +6,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +33,11 @@ public class OpprettInngaaendeJournalpostService {
     }
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
-            SedHendelse sedMottatt, byte[] sedPdf) throws IntegrationException {
+            SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg) throws IntegrationException {
 
         Sak sak = gsakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
-        OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedPdf);
+        OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedMedVedlegg);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
 
         //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
@@ -49,13 +50,13 @@ public class OpprettInngaaendeJournalpostService {
                 .build();
     }
 
-    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, byte[] sedPdf) throws IntegrationException {
-        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedPdf).getJournalpostId();
+    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg) throws IntegrationException {
+        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg).getJournalpostId();
     }
 
     private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
-            SedHendelse sedMottatt, Sak sak, byte[] sedPdf) throws IntegrationException {
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedPdf);
+            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg) throws IntegrationException {
+        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg);
         metrikkerRegistrering.journalpostInngaaendeOpprettet();
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;

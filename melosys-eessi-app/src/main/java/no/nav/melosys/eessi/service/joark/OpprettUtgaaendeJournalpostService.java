@@ -46,7 +46,7 @@ public class OpprettUtgaaendeJournalpostService {
 
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         OpprettJournalpostResponse response = journalpostService.opprettUtgaaendeJournalpost(
-                sedSendt, sak, euxService.hentSedPdf(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()));
+                sedSendt, sak, euxService.hentSedMedVedlegg(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()));
 
         metrikkerRegistrering.journalpostUtgaaendeOpprettet(response.erFerdigstilt());
 

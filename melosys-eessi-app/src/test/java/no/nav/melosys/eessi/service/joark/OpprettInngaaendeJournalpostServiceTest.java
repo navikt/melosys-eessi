@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.joark;
 
+import java.util.Collections;
 import java.util.Optional;
 import com.google.common.collect.Lists;
 import io.github.benas.randombeans.api.EnhancedRandom;
@@ -9,6 +10,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.gsak.GsakService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import org.junit.Before;
@@ -61,7 +63,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() throws Exception {
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, new byte[0]);
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, sedMedVedlegg(new byte[0]));
 
         assertThat(sakInformasjon).isNotNull();
         assertThat(sakInformasjon.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
@@ -77,11 +79,15 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Test
     public void arkiverInngaaendeSedUtenBruker_journalpostOpprettet_forventReturnerJournalpostID() throws Exception {
 
-        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, new byte[0]);
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, sedMedVedlegg(new byte[0]));
 
         assertThat(journalpostID).isEqualTo(JOURNALPOST_ID);
 
         verify(journalpostSedKoblingService).lagre(anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
         verify(journalpostService).opprettInngaaendeJournalpost(any(), isNull(), any());
+    }
+
+    private SedMedVedlegg sedMedVedlegg(byte[] innhold) {
+        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("","", innhold), Collections.emptyList());
     }
 }

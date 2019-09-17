@@ -1,11 +1,13 @@
 package no.nav.melosys.eessi.service.joark;
 
+import java.util.Collections;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import org.junit.Before;
@@ -45,13 +47,17 @@ public class JournalpostServiceTest {
 
     @Test
     public void opprettInngaaendeJournalpost_verifiserEndeligJfr() throws Exception {
-        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, new byte[0]);
+        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]));
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false));
     }
 
     @Test
     public void opprettUtgaaendeJournalpost_verifiserEndeligJfr() throws Exception {
-        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, new byte[0]);
+        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]));
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(true));
+    }
+
+    private SedMedVedlegg sedMedVedlegg(byte[] innhold) {
+        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("","", innhold), Collections.emptyList());
     }
 }
