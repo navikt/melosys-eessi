@@ -1,7 +1,9 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public enum JournalpostFiltype {
 
@@ -23,10 +25,13 @@ public enum JournalpostFiltype {
   JSON,
   PNG;
 
+  private static final Map<String, JournalpostFiltype> JOURNALPOST_FILTYPE_MAP = Arrays.stream(JournalpostFiltype.values())
+          .collect(Collectors.toMap(JournalpostFiltype::name, v -> v));
+
   public static Optional<JournalpostFiltype> filnavn(String filnavn) {
     return Optional.ofNullable(filnavn)
-        .filter(s -> s.contains(".") && s.lastIndexOf(".") < s.length())
-        .map(s -> s.substring(s.lastIndexOf(".") + 1))
+        .filter(s -> s.contains(".") && s.lastIndexOf('.') + 1 < s.length())
+        .map(s -> s.substring(s.lastIndexOf('.') + 1))
         .map(String::toUpperCase)
         .map(JournalpostFiltype::transform)
         .filter(JournalpostFiltype::contains)
@@ -37,9 +42,7 @@ public enum JournalpostFiltype {
     return "JPG".equals(extension) ? JPEG.name() : extension;
   }
 
-  private static boolean contains(String value) {
-    return Arrays.stream(JournalpostFiltype.values())
-        .anyMatch(journalpostFiltype -> journalpostFiltype.name().equalsIgnoreCase(value));
+  private static boolean contains(String filType) {
+    return JOURNALPOST_FILTYPE_MAP.containsKey(filType);
   }
-
 }
