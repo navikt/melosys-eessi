@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.integration.eux;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +30,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -54,7 +53,7 @@ public class EuxConsumerTest {
         OidcTokenClientRequestInterceptor interceptor = new OidcTokenClientRequestInterceptor(mock(RestStsService.class));
 
         restTemplate = consumerConfig.restTemplate(new RestTemplateBuilder(), interceptor);
-        euxConsumer = new EuxConsumer(restTemplate);
+        euxConsumer = new EuxConsumer(restTemplate, objectMapper);
         server = MockRestServiceServer.createServer(restTemplate);
     }
 
@@ -62,7 +61,7 @@ public class EuxConsumerTest {
     public void hentBuC_returnerObjekt() throws Exception {
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/buc.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String buc = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         String id = "1234";
@@ -71,10 +70,10 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(buc , MediaType.APPLICATION_JSON));
 
         BUC response = euxConsumer.hentBuC(id);
-        assertNotNull(response);
-        assertFalse(response.getDocuments().isEmpty());
-        assertEquals("93f022ea50e54c08bbdb85290a5fb23d", response.getDocuments().get(0).getId());
-        assertEquals("LA_BUC_01", response.getBucType());
+        assertThat(response).isNotNull();
+        assertThat(response.getDocuments()).isNotEmpty();
+        assertThat(response.getDocuments().get(0).getId()).isEqualTo("93f022ea50e54c08bbdb85290a5fb23d");
+        assertThat(response.getBucType()).isEqualTo("LA_BUC_01");
     }
 
     @Test
@@ -85,7 +84,7 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         String response = euxConsumer.opprettBuC(buc);
-        assertEquals(id, response);
+        assertThat(response).isEqualTo(id);
     }
 
     @Test
@@ -116,13 +115,13 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
 
         List<String> resultat = euxConsumer.bucTypePerSektor();
-        assertEquals(resultat, forventetRetur);
+        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
     public void hentInstitusjoner_forventListe() throws Exception {
         URL jsonUrl = getClass().getClassLoader().getResource("mock/institusjon_liste.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String institusjonerString = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         String buctype = "LA_BUC_04";
@@ -132,12 +131,12 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(institusjonerString, MediaType.APPLICATION_JSON));
 
         List<Institusjon> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
-        assertNotNull(resultat);
+        assertThat(resultat).isNotNull();
 
         Institusjon institusjon = resultat.get(0);
-        assertNotNull(institusjon);
-        assertEquals("LT:123123", institusjon.getId());
-        assertEquals(2, institusjon.getTilegnetBucs().size());
+        assertThat(institusjon).isNotNull();
+        assertThat(institusjon.getId()).isEqualTo("LT:123123");
+        assertThat(institusjon.getTilegnetBucs().size()).isEqualTo(2);
     }
 
     @Test
@@ -152,8 +151,8 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
 
         JsonNode resultat = euxConsumer.hentKodeverk(kodeverk);
-        assertTrue(resultat.has("string"));
-        assertTrue(resultat.has("int"));
+        assertThat(resultat.has("string")).isTrue();
+        assertThat(resultat.has("int")).isTrue();
     }
 
     @Test
@@ -167,8 +166,8 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
 
         JsonNode resultat = euxConsumer.hentMuligeAksjoner(id);
-        assertTrue(resultat.has("string"));
-        assertTrue(resultat.has("int"));
+        assertThat(resultat.has("string")).isTrue();
+        assertThat(resultat.has("int")).isTrue();
     }
 
     @Test
@@ -185,7 +184,7 @@ public class EuxConsumerTest {
                         withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map resultat = euxConsumer.opprettBucOgSed(buc, mottaker, sed);
-        assertEquals(forventetResultat, resultat);
+        assertThat(resultat).isEqualTo(forventetResultat);
     }
 
     @Test
@@ -202,13 +201,13 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
-        assertEquals(forventetResultat, resultat);
+        assertThat(resultat).isEqualTo(forventetResultat);
     }
 
     @Test
     public void finnRinaSaker_forventJson() throws Exception {
         URL jsonUrl = getClass().getClassLoader().getResource("mock/bucinfo.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String forventetRetur = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         String fnr = "123", fornavn = "Andre", etternavn = "Måns", fødselsdato = "12-12-12", saksnummer = "123",
@@ -225,10 +224,10 @@ public class EuxConsumerTest {
 
         List<BucInfo> resultat = euxConsumer
                 .finnRinaSaker(fnr, fornavn, etternavn, fødselsdato, saksnummer, bucType, status);
-        assertNotNull(resultat);
-        assertFalse(resultat.isEmpty());
-        assertEquals(2, resultat.size());
-        assertEquals("100485",resultat.get(0).getId());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat).isNotEmpty();
+        assertThat(resultat.size()).isEqualTo(2);
+        assertThat(resultat.get(0).getId()).isEqualTo("100485");
     }
 
     @Test
@@ -244,14 +243,14 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertNotNull(resultat.getMedlemskap());
-        assertEquals(SedType.A001.name(), resultat.getSed());
-        assertEquals(MedlemskapA001.class, resultat.getMedlemskap().getClass());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getMedlemskap()).isNotNull();
+        assertThat(resultat.getSed()).isEqualTo(SedType.A001.name());
+        assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA001.class);
 
         MedlemskapA001 medlemskapA001 = (MedlemskapA001) resultat.getMedlemskap();
-        assertEquals("2017-12-01", medlemskapA001.getForrigesoeknad().get(0).getDato());
+        assertThat(medlemskapA001.getForrigesoeknad().get(0).getDato()).isEqualTo("2017-12-01");
     }
 
     @Test
@@ -260,21 +259,21 @@ public class EuxConsumerTest {
         String dokumentId = "312";
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA003.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertNotNull(resultat.getMedlemskap());
-        assertEquals(SedType.A003.name(), resultat.getSed());
-        assertEquals(MedlemskapA003.class, resultat.getMedlemskap().getClass());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getMedlemskap()).isNotNull();
+        assertThat(resultat.getSed()).isEqualTo(SedType.A003.name());
+        assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
 
         MedlemskapA003 medlemskap = (MedlemskapA003) resultat.getMedlemskap();
-        assertEquals("2017-12-01", medlemskap.getVedtak().getGjelderperiode().getSluttdato());
+        assertThat( medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isEqualTo("2017-12-01");
     }
 
     @Test
@@ -283,21 +282,21 @@ public class EuxConsumerTest {
         String dokumentId = "312";
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA008.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertEquals(SedType.A008.name(), resultat.getSed());
-        assertNotNull(resultat.getMedlemskap());
-        assertEquals(MedlemskapA008.class, resultat.getMedlemskap().getClass());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getSed()).isEqualTo(SedType.A008.name());
+        assertThat(resultat.getMedlemskap()).isNotNull();
+        assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA008.class);
 
         MedlemskapA008 medlemskapA008 = (MedlemskapA008) resultat.getMedlemskap();
-        assertEquals("SE", medlemskapA008.getBruker().getArbeidiflereland().getBosted().getLand());
+        assertThat(medlemskapA008.getBruker().getArbeidiflereland().getBosted().getLand()).isEqualTo("SE");
     }
 
     @Test
@@ -313,11 +312,11 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertEquals(SedType.A009.name(), resultat.getSed());
-        assertNotNull(resultat.getMedlemskap());
-        assertEquals(MedlemskapA009.class, resultat.getMedlemskap().getClass());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getSed()).isEqualTo(SedType.A009.name());
+        assertThat(resultat.getMedlemskap()).isNotNull();
+        assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
     }
 
     @Test
@@ -333,11 +332,11 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertEquals(SedType.A010.name(), resultat.getSed());
-        assertNotNull(resultat.getMedlemskap());
-        assertEquals(MedlemskapA010.class, resultat.getMedlemskap().getClass());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getSed()).isEqualTo(SedType.A010.name());
+        assertThat(resultat.getMedlemskap()).isNotNull();
+        assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
     }
 
     @Test
@@ -346,17 +345,17 @@ public class EuxConsumerTest {
         String dokumentId = "312";
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedX001.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
                 .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
-        assertNotNull(resultat);
-        assertNotNull(resultat.getNav());
-        assertEquals(SedType.X001.name(), resultat.getSed());
-        assertNull(resultat.getMedlemskap());
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getSed()).isEqualTo(SedType.X001.name());
+        assertThat(resultat.getMedlemskap()).isNull();
     }
 
     @Test
@@ -369,7 +368,7 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
 
         byte[] resultat = euxConsumer.hentSedPdf(id, dokumentId);
-        assertArrayEquals(forventetRetur, resultat);
+        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
@@ -396,7 +395,7 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.opprettSed(id, korrelasjonId, sed);
-        assertEquals(forventetRetur, resultat);
+        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
@@ -445,7 +444,7 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
 
         List<String> resultat = euxConsumer.hentTilgjengeligeSedTyper(id);
-        assertEquals(forventetRetur, resultat);
+        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
@@ -460,7 +459,7 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
 
         byte[] resultat = euxConsumer.hentVedlegg(id, dokumentId, vedleggId);
-        assertTrue(Arrays.equals(forventetRetur, resultat));
+        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
@@ -475,7 +474,7 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, "vedlegg");
-        assertEquals(forventetRetur, resultat);
+        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
@@ -491,7 +490,7 @@ public class EuxConsumerTest {
     }
 
     @Test(expected = IntegrationException.class)
-    public void exceptionHåndtering_forventMelsoysException() throws Exception {
+    public void exceptionHåndtering_utenFeilmeldingBody_forventExceptionMed400BadRequest() throws Exception {
         String id = "123";
         String dokumentId = "123321";
         String vedleggId = "2222";
@@ -530,6 +529,6 @@ public class EuxConsumerTest {
 
         JsonNode jsonNode = euxConsumer.hentDeltagere(id);
 
-        assertEquals("ho", jsonNode.get("hei").textValue());
+        assertThat(jsonNode.get("hei").textValue()).isEqualTo("ho");
     }
 }
