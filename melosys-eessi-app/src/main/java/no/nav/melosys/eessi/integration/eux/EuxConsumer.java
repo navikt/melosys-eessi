@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.eux;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -36,6 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     private final RestTemplate euxRestTemplate;
+    private final ObjectMapper objectMapper;
 
     private static final String RINA_SAKSNUMMER = "rinasaksnummer";
     private static final String KORRELASJONS_ID = "KorrelasjonsId";
@@ -50,8 +54,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
 
     @Autowired
-    public EuxConsumer(@Qualifier("euxRestTemplate") RestTemplate restTemplate) {
+    public EuxConsumer(@Qualifier("euxRestTemplate") RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.euxRestTemplate = restTemplate;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -544,15 +549,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
                 });
     }
 
-    private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            ParameterizedTypeReference<T> responseType) throws IntegrationException {
-        try {
-            return euxRestTemplate.exchange(uri, method, entity, responseType).getBody();
-        } catch (RestClientException e) {
-            throw new IntegrationException("Error in integration with eux", e);
-        }
-    }
-
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Henter SED med vedlegg for sak {} og sed {}", rinaSaksnummer, dokumentId);
 
@@ -563,5 +559,31 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
                 new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<SedMedVedlegg>() {
                 });
+    }
+
+    private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
+            ParameterizedTypeReference<T> responseType) throws IntegrationException {
+        try {
+            return euxRestTemplate.exchange(uri, method, entity, responseType).getBody();
+        } catch (HttpClientErrorException e) {
+            throw new IntegrationException("Error in integration with eux: " + hentFeilmeldingFraEux(e), e);
+        }
+    }
+
+    private String hentFeilmeldingFraEux(RestClientException e) {
+        if(e instanceof HttpClientErrorException) {
+            HttpClientErrorException clientErrorException = (HttpClientErrorException) e;
+            String feilmelding = clientErrorException.getResponseBodyAsString();
+            if (StringUtils.isEmpty(feilmelding)) return feilmelding;
+            try {
+                JsonNode json = objectMapper.readTree(feilmelding).path("messages");
+                return json.isMissingNode() ? e.getMessage() : json.asText();
+            } catch (IOException ex) {
+                log.warn("Kunne ikke lese feilmelding fra eux", ex);
+                return clientErrorException.getResponseBodyAsString();
+            }
+        }
+
+        return e.getMessage();
     }
 }
