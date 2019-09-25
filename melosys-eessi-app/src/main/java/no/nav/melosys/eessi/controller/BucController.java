@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -49,12 +48,12 @@ public class BucController {
 
     @ApiOperation(value = "Oppretter og sender svar på A001 for gitt rinaId")
     @PostMapping("/LA_BUC_01/{rinaId}/svar")
-    public void anmodningUnntakSvar(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
-            throws IntegrationException, NotFoundException {
-        sedService.anmodningUnntakSvar(svarAnmodningUnntakDto, rinaId);
+    public void anmodningUnntakSvar(@RequestBody SedDataDto sedDataDto, @PathVariable String rinaId)
+            throws IntegrationException, NotFoundException, MappingException {
+        sedService.anmodningUnntakSvar(sedDataDto, rinaId);
     }
 
-    @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klasre for den spesifikke buc-type")
+    @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
     @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
             @RequestParam(required = false) String land) throws IntegrationException {

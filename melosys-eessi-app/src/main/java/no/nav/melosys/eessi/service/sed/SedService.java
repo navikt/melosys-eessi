@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -83,32 +82,17 @@ public class SedService {
         return euxService.genererPdfFraSed(sed);
     }
 
-    public void anmodningUnntakSvar(SvarAnmodningUnntakDto svarAnmodningUnntakDto, String rinaId) throws IntegrationException, NotFoundException {
+    public void anmodningUnntakSvar(SedDataDto sedDataDto, String rinaId) throws IntegrationException, NotFoundException, MappingException {
         SED nySed;
-        SED forrigeSed = hentA001ForBuc(rinaId);
+        SvarAnmodningUnntakDto svarAnmodningUnntakDto = sedDataDto.getSvarAnmodningUnntak();
         if (svarAnmodningUnntakDto.getBeslutning() == SvarAnmodningUnntakBeslutning.INNVILGELSE) {
-            nySed = new A011Mapper().mapFraSed(forrigeSed);
+            nySed = new A011Mapper().mapTilSed(sedDataDto);
         } else {
-            String begrunnelse = svarAnmodningUnntakDto.getBegrunnelse();
-            SvarAnmodningUnntakBeslutning beslutning = svarAnmodningUnntakDto.getBeslutning();
-            LocalDate fom = svarAnmodningUnntakDto.getDelvisInnvilgetPeriode().getFom();
-            LocalDate tom = svarAnmodningUnntakDto.getDelvisInnvilgetPeriode().getTom();
-            nySed = new A002Mapper().mapFraSed(forrigeSed, begrunnelse, beslutning, fom, tom);
+            nySed = new A002Mapper().mapTilSed(sedDataDto);
         }
 
         log.info("Sender svar på anmodning om unntak for rinasak {}", rinaId);
         euxService.opprettOgSendSed(nySed, rinaId);
-    }
-
-    private SED hentA001ForBuc(String rinaId) throws IntegrationException, NotFoundException {
-        return euxService.hentSed(rinaId, hentA001Document(rinaId).getId());
-    }
-
-    private Document hentA001Document(String rinaId) throws IntegrationException, NotFoundException {
-        return euxService.hentBuc(rinaId).getDocuments().stream()
-                .filter(document -> SedType.A001.toString().equalsIgnoreCase(document.getType()))
-                .findFirst()
-                .orElseThrow(() -> new NotFoundException("Finner ingen A001 for BUC " + rinaId));
     }
 
     private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
