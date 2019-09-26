@@ -39,12 +39,12 @@ public class SakController {
     @ApiOperation(value = "Henter bucer tilknyttet en sak")
     @GetMapping("/{gsakSaksnummer}/bucer")
     public List<BucinfoDto> hentTilknyttedeBucer(@PathVariable Long gsakSaksnummer,
-                                                 @RequestParam(required = false) String status) {
+                                                 @RequestParam(required = false) List<String> statuser) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                 .map(FagsakRinasakKobling::getRinaSaksnummer)
                 .map(this::hentBuc)
                 .filter(Objects::nonNull)
-                .map(buc -> BucinfoDto.av(buc, status, euxService.hentRinaUrlPrefix()))
+                .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrlPrefix()))
                 .collect(Collectors.toList());
     }
 
