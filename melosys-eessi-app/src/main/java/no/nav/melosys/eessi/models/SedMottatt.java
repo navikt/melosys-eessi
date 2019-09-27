@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import javax.persistence.*;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.hibernate.annotations.Type;
@@ -14,6 +15,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Entity
 @Data
 @NoArgsConstructor
+@EqualsAndHashCode
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class SedMottatt {
 

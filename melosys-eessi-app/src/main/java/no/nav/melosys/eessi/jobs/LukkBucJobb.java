@@ -10,15 +10,16 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class CloseBucScheduler {
+public class LukkBucJobb {
 
     private final BucCloser bucCloser;
 
-    public CloseBucScheduler(BucCloser bucCloser) {
+    public LukkBucJobb(BucCloser bucCloser) {
         this.bucCloser = bucCloser;
     }
 
-    @Scheduled(cron = "0 0 0 * * *") // Midnight every day
+    //00:00 hver dag
+    @Scheduled(cron = "0 0 0 * * *")
     @SchedulerLock(name = "closeBuc", lockAtLeastForString = "PT10M", lockAtMostForString = "PT120M")
     public void closeBuc() {
 

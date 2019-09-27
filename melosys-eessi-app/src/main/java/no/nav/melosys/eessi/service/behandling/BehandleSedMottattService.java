@@ -50,8 +50,11 @@ public class BehandleSedMottattService {
 
     public void behandleSed(SedMottatt sedMottatt) throws NotFoundException, IntegrationException {
         SedKontekst kontekst = sedMottatt.getSedKontekst();
+        SED sed = euxService.hentSed(sedMottatt.getSedHendelse().getRinaSakId(),
+                sedMottatt.getSedHendelse().getRinaDokumentId());
+
         if (!kontekst.isForsoktIdentifisert()) {
-            identifiserPerson(sedMottatt);
+            identifiserPerson(sedMottatt, sed);
         }
 
         if (!kontekst.journalpostOpprettet()) {
@@ -60,7 +63,7 @@ public class BehandleSedMottattService {
 
         if (kontekst.personErIdentifisert()) {
             if (!kontekst.isPublisertKafka()) {
-                publiserMelding(sedMottatt);
+                publiserMelding(sedMottatt, sed);
             }
         } else {
             if (!kontekst.identifiseringsOppgaveOpprettet()) {
@@ -69,8 +72,7 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void identifiserPerson(SedMottatt sedMottatt) throws IntegrationException, NotFoundException {
-        SED sed = euxService.hentSed(sedMottatt.getSedHendelse().getRinaSakId(), sedMottatt.getSedHendelse().getRinaDokumentId());
+    private void identifiserPerson(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
         personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
@@ -99,9 +101,8 @@ public class BehandleSedMottattService {
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
 
-    private void publiserMelding(SedMottatt sedMottatt) throws IntegrationException, NotFoundException {
+    private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
         SedHendelse sedHendelse = sedMottatt.getSedHendelse();
-        SED sed = euxService.hentSed(sedHendelse.getRinaSakId(), sedHendelse.getRinaDokumentId());
         SedType sedType = SedType.valueOf(sed.getSed());
         String aktoerID = tpsService.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(sedType);

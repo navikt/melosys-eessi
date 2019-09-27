@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SedKontekst {
-    //Person-aøk
+    //Person-søk
     private boolean forsoktIdentifisert;
     private String navIdent;
 

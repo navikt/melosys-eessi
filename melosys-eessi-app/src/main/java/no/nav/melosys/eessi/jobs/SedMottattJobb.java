@@ -25,7 +25,7 @@ public class SedMottattJobb {
 
     @Scheduled(cron = "0 0,30 * * * *")
     @SchedulerLock(name = "behandleSedMottatt", lockAtMostForString = "PT1M", lockAtLeastForString = "PT20S")
-    public void sedMottattScheduler() {
+    public void sedMottattJobb() {
         Collection<SedMottatt> mottatteSeder = sedMottattService.hentAlleUbehandlet();
         log.debug("Behandler mottatt {} SED'er", mottatteSeder.size());
         mottatteSeder.forEach(this::behandleSedMottatt);
