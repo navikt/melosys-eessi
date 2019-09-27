@@ -1,0 +1,60 @@
+package no.nav.melosys.eessi.models;
+
+import java.time.LocalDate;
+import javax.persistence.*;
+import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+
+@Entity
+@Data
+@NoArgsConstructor
+@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+public class SedMottatt {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @Type(type = "jsonb")
+    @Column(name = "sed_hendelse")
+    private SedHendelse sedHendelse;
+
+    @Type(type = "jsonb")
+    @Column(name = "sed_kontekst")
+    private SedKontekst sedKontekst;
+
+    @Column(name = "versjon")
+    private int versjon = 1;
+
+    @Column(name = "ferdig")
+    private boolean ferdig;
+
+    @CreatedDate
+    @Column(name = "mottatt_dato")
+    private LocalDate mottattDato;
+
+    @LastModifiedDate
+    @Column(name = "endret_dato")
+    private LocalDate sistEndretDato;
+
+    @Column(name = "feilede_forsok")
+    private int feiledeForsok;
+
+    public static SedMottatt av(SedHendelse sedHendelse) {
+        SedMottatt sedMottatt = new SedMottatt();
+        sedMottatt.setSedHendelse(sedHendelse);
+        sedMottatt.setVersjon(1);
+        sedMottatt.setSedKontekst(new SedKontekst());
+        sedMottatt.setMottattDato(LocalDate.now());
+        sedMottatt.setSistEndretDato(LocalDate.now());
+
+        return sedMottatt;
+    }
+}
