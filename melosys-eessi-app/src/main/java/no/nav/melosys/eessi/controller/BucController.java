@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -46,17 +47,20 @@ public class BucController {
         return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? vedlegg.getBytes() : null, bucType, sendAutomatisk);
     }
 
-    @ApiOperation(value = "Oppretter og sender svar på A001 for gitt rinaId")
-    @PostMapping("/LA_BUC_01/{rinaId}/svar")
-    public void anmodningUnntakSvar(@RequestBody SedDataDto sedDataDto, @PathVariable String rinaId)
-            throws IntegrationException, NotFoundException, MappingException {
-        sedService.anmodningUnntakSvar(sedDataDto, rinaId);
+    @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")
+    @PostMapping("/{rinaSaksnummer}/sed/{sedType}")
+    public void sendPåEksisterendeBuc(
+            @RequestBody SedDataDto sedDataDto,
+            @PathVariable String rinaSaksnummer,
+            @PathVariable SedType sedType
+    ) throws IntegrationException, NotFoundException, MappingException {
+        sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 
     @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
     @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
-            @RequestParam(required = false) String land) throws IntegrationException {
+                                                          @RequestParam(required = false) String land) throws IntegrationException {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());

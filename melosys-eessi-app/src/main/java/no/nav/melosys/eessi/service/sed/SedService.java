@@ -5,7 +5,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -15,14 +14,11 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
-import no.nav.melosys.eessi.service.sed.mapper.lovvalg.A002Mapper;
-import no.nav.melosys.eessi.service.sed.mapper.lovvalg.A011Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -82,17 +78,14 @@ public class SedService {
         return euxService.genererPdfFraSed(sed);
     }
 
-    public void anmodningUnntakSvar(SedDataDto sedDataDto, String rinaId) throws IntegrationException, NotFoundException, MappingException {
-        SED nySed;
-        SvarAnmodningUnntakDto svarAnmodningUnntakDto = sedDataDto.getSvarAnmodningUnntak();
-        if (svarAnmodningUnntakDto.getBeslutning() == SvarAnmodningUnntakBeslutning.INNVILGELSE) {
-            nySed = new A011Mapper().mapTilSed(sedDataDto);
-        } else {
-            nySed = new A002Mapper().mapTilSed(sedDataDto);
+    public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
+        BUC buc = euxService.hentBuc(rinaSaksnummer);
+        if (!buc.kanOppretteSed(sedType)) {
+            throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc "+ rinaSaksnummer + " med type " + buc.getBucType());
         }
 
-        log.info("Sender svar på anmodning om unntak for rinasak {}", rinaId);
-        euxService.opprettOgSendSed(nySed, rinaId);
+        SED sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
+        euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
 
     private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {

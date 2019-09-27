@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collections;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
@@ -149,29 +150,31 @@ public class SedServiceTest {
     }
 
     @Test
-    public void anmodningUnntakSvar_innvilgelse_sendA011() throws NotFoundException, IntegrationException, IOException, URISyntaxException, MappingException {
+    public void sendPåEksisterendeBuc_forventMetodekall() throws IOException, URISyntaxException, IntegrationException, NotFoundException, MappingException {
+        BUC buc = new BUC();
+        buc.setActions(Arrays.asList(
+                new Action("A001", "A001", "111", "Read"),
+                new Action("A009", "A009", "222", "Create")
+        ));
+        when(euxService.hentBuc(anyString())).thenReturn(buc);
+
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A009);
+
+        verify(euxService).hentBuc(anyString());
+        verify(euxService).opprettOgSendSed(any(SED.class), anyString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws IntegrationException, NotFoundException, MappingException, IOException, URISyntaxException {
+        BUC buc = new BUC();
+        buc.setActions(Collections.singletonList(new Action("A001", "A001", "111", "Read")));
+        when(euxService.hentBuc(anyString())).thenReturn(buc);
+
         SedDataDto sedDataDto = SedDataStub.getStub();
         sedDataDto.setSvarAnmodningUnntak(lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning.INNVILGELSE));
 
-        sendSedService.anmodningUnntakSvar(sedDataDto, "123");
-
-        verify(euxService).opprettOgSendSed(sedArgumentCaptor.capture(), anyString());
-
-        SED sendtSed = sedArgumentCaptor.getValue();
-        assertThat(sendtSed.getSed()).isEqualTo(SedType.A011.toString());
-    }
-
-    @Test
-    public void anmodningUnntakSvar_avslag_sendA002() throws IntegrationException, NotFoundException, MappingException, IOException, URISyntaxException {
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        sedDataDto.setSvarAnmodningUnntak(lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning.AVSLAG));
-
-        sendSedService.anmodningUnntakSvar(sedDataDto, "123");
-
-        verify(euxService).opprettOgSendSed(sedArgumentCaptor.capture(), anyString());
-
-        SED sendtSed = sedArgumentCaptor.getValue();
-        assertThat(sendtSed.getSed()).isEqualTo(SedType.A002.toString());
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A011);
     }
 
     @Test
