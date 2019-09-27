@@ -40,7 +40,7 @@ public class OppgaveService {
         return null;
     }
 
-    public void opprettJfrOppgave(String journalpostID) throws IntegrationException {
+    public String opprettJfrOppgave(String journalpostID) throws IntegrationException {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .beskrivelse("Identifiser person og journalfør i Melosys")
@@ -54,5 +54,6 @@ public class OppgaveService {
 
         OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Journalføringsoppgave opprettet med id {}", response.getId());
+        return response.getId();
     }
 }

@@ -40,7 +40,6 @@ public class OpprettInngaaendeJournalpostService {
         OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedMedVedlegg);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
 
-        //fixme: midlertidig fix i påvente av at dokumentId skal bli returnert fra journalpostApi
         String dokumentId = response.getDokumenter() == null
                 ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
 
