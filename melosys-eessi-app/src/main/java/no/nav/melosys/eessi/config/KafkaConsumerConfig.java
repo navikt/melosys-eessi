@@ -14,6 +14,8 @@ import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer2;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -76,10 +78,10 @@ public class KafkaConsumerConfig {
                 props, new StringDeserializer(), deserializer);
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
         factory.setRecordFilterStrategy(recordFilterStrategy);
-        //For replay of messages
-        //factory.getContainerProperties().setAckOnError(false);
-        //factory.getContainerProperties().setAckMode(AckMode.RECORD);
+        factory.getContainerProperties().setAckOnError(false);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         return factory;
     }
 
