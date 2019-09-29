@@ -39,7 +39,6 @@ public class SedMottattConsumer {
 
     private void behandleMottatt(SedMottatt sedMottatt) {
         try {
-            //todo lagre eller ikke lagre om ferdig?
             behandleSedMottattService.behandleSed(sedMottatt);
         } catch (Exception e) {
             log.error("Feil i behandling av mottatt sed. Lagres for å prøve igjen senere", e);

@@ -73,12 +73,14 @@ public class BehandleSedMottattService {
     }
 
     private void identifiserPerson(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
+        log.info("Søker etter person for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
     }
 
     private void opprettJournalpost(SedMottatt sedMottatt) throws IntegrationException {
+        log.info("Oppretter journalpost for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         SedMedVedlegg sedMedVedlegg = euxService.hentSedMedVedlegg(
                 sedMottatt.getSedHendelse().getRinaSakId(), sedMottatt.getSedHendelse().getRinaDokumentId()
         );
@@ -97,11 +99,13 @@ public class BehandleSedMottattService {
 
     private void opprettOppgaveIdentifisering(SedMottatt sedMottatt) throws IntegrationException {
         //TODO: opprett Oppgave til ID og fordeling. Oppretter jfr-oppgave for nå.
+        log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         String oppgaveID = oppgaveService.opprettJfrOppgave(sedMottatt.getSedKontekst().getJournalpostID());
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
 
     private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
+        log.info("Publiserer melding om mottatt sed på kafak for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         SedHendelse sedHendelse = sedMottatt.getSedHendelse();
         SedType sedType = SedType.valueOf(sed.getSed());
         String aktoerID = tpsService.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
