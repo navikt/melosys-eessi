@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import no.nav.melosys.eessi.models.SedType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -22,4 +23,9 @@ public class BUC {
     private List<Action> actions;
     @JsonProperty(value = "processDefinitionName")
     private String bucType;
+
+    public boolean kanOppretteSed(SedType sedType) {
+        return actions.stream().anyMatch(action ->
+                sedType.name().equalsIgnoreCase(action.getDocumentType()) && "CREATE".equalsIgnoreCase(action.getOperation()));
+    }
 }

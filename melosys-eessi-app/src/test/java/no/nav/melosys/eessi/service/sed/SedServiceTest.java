@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -151,37 +150,31 @@ public class SedServiceTest {
     }
 
     @Test
-    public void anmodningUnntakSvar_innvilgelse_sendA011() throws NotFoundException, IntegrationException {
-        SvarAnmodningUnntakDto svarAnmodningUnntakDto = lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning.INNVILGELSE);
+    public void sendPåEksisterendeBuc_forventMetodekall() throws IOException, URISyntaxException, IntegrationException, NotFoundException, MappingException {
+        BUC buc = new BUC();
+        buc.setActions(Arrays.asList(
+                new Action("A001", "A001", "111", "Read"),
+                new Action("A009", "A009", "222", "Create")
+        ));
+        when(euxService.hentBuc(anyString())).thenReturn(buc);
 
-        when(euxService.hentBuc(anyString())).thenReturn(lagBuc());
-        when(euxService.hentSed(anyString(), anyString())).thenReturn(new SED());
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A009);
 
-        sendSedService.anmodningUnntakSvar(svarAnmodningUnntakDto, "123");
-
-        verify(euxService).hentBuc(eq("123"));
-        verify(euxService).hentSed(eq("123"), anyString());
-        verify(euxService).opprettOgSendSed(sedArgumentCaptor.capture(), anyString());
-
-        SED sendtSed = sedArgumentCaptor.getValue();
-        assertThat(sendtSed.getSed()).isEqualTo(SedType.A011.toString());
+        verify(euxService).hentBuc(anyString());
+        verify(euxService).opprettOgSendSed(any(SED.class), anyString());
     }
 
-    @Test
-    public void anmodningUnntakSvar_avslag_sendA002() throws IntegrationException, NotFoundException {
-        SvarAnmodningUnntakDto svarAnmodningUnntakDto = lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning.AVSLAG);
+    @Test(expected = IllegalArgumentException.class)
+    public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws IntegrationException, NotFoundException, MappingException, IOException, URISyntaxException {
+        BUC buc = new BUC();
+        buc.setActions(Collections.singletonList(new Action("A001", "A001", "111", "Read")));
+        when(euxService.hentBuc(anyString())).thenReturn(buc);
 
-        when(euxService.hentBuc(anyString())).thenReturn(lagBuc());
-        when(euxService.hentSed(anyString(), anyString())).thenReturn(new SED());
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        sedDataDto.setSvarAnmodningUnntak(lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning.INNVILGELSE));
 
-        sendSedService.anmodningUnntakSvar(svarAnmodningUnntakDto, "123");
-
-        verify(euxService).hentBuc(eq("123"));
-        verify(euxService).hentSed(eq("123"), anyString());
-        verify(euxService).opprettOgSendSed(sedArgumentCaptor.capture(), anyString());
-
-        SED sendtSed = sedArgumentCaptor.getValue();
-        assertThat(sendtSed.getSed()).isEqualTo(SedType.A002.toString());
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A011);
     }
 
     @Test
@@ -202,20 +195,6 @@ public class SedServiceTest {
                 "begrunnelse",
                 new Periode(LocalDate.now(), LocalDate.now().plusDays(1L))
         );
-    }
-
-    private BUC lagBuc() {
-        BUC buc = new BUC();
-        buc.setId("123");
-
-        List<Document> documents = Arrays.asList(
-                lagDocument("A001", "1"),
-                lagDocument("A005", "2"),
-                lagDocument("H003", "3")
-        );
-
-        buc.setDocuments(documents);
-        return buc;
     }
 
     private Document lagDocument(String type, String id) {
