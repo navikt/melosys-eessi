@@ -16,7 +16,7 @@ public final class UnntakArtikkelMapper {
         }
 
         switch (bestemmelse) {
-            case ART_11_4_2:
+            case ART_11_4:
                 return BESTEMMELSE_11_4;
             case ART_11_1:
                 return BESTEMMELSE_OTHER;
