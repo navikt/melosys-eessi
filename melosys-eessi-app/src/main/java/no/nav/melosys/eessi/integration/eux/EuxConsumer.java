@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.integration.eux;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -28,11 +27,10 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 @Slf4j
 @Service
@@ -433,7 +431,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         byte[] documentBytes;
 
         try {
-            documentBytes = new ObjectMapper().writeValueAsBytes(sed);
+            documentBytes = objectMapper.writeValueAsBytes(sed);
         } catch (JsonProcessingException jpe) {
             throw new IntegrationException("Feil ved opprettelse av SED mot EUX", jpe);
         }
@@ -565,25 +563,8 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
             ParameterizedTypeReference<T> responseType) throws IntegrationException {
         try {
             return euxRestTemplate.exchange(uri, method, entity, responseType).getBody();
-        } catch (HttpClientErrorException e) {
-            throw new IntegrationException("Error in integration with eux: " + hentFeilmeldingFraEux(e), e);
+        } catch (RestClientException e) {
+            throw new IntegrationException("Error in integration with eux: " + hentFeilmeldingForEux(e), e);
         }
-    }
-
-    private String hentFeilmeldingFraEux(RestClientException e) {
-        if(e instanceof HttpClientErrorException) {
-            HttpClientErrorException clientErrorException = (HttpClientErrorException) e;
-            String feilmelding = clientErrorException.getResponseBodyAsString();
-            if (StringUtils.isEmpty(feilmelding)) return feilmelding;
-            try {
-                JsonNode json = objectMapper.readTree(feilmelding).path("messages");
-                return json.isMissingNode() ? e.getMessage() : json.asText();
-            } catch (IOException ex) {
-                log.warn("Kunne ikke lese feilmelding fra eux", ex);
-                return clientErrorException.getResponseBodyAsString();
-            }
-        }
-
-        return e.getMessage();
     }
 }
