@@ -35,9 +35,6 @@ public class SedMottatt {
     @Column(name = "versjon")
     private int versjon = 1;
 
-    @Column(name = "ferdig")
-    private boolean ferdig;
-
     @CreatedDate
     @Column(name = "mottatt_dato")
     private LocalDate mottattDato;
@@ -48,6 +45,12 @@ public class SedMottatt {
 
     @Column(name = "feilede_forsok")
     private int feiledeForsok;
+
+    @Column(name = "feilet")
+    private boolean feilet;
+
+    @Column(name = "ferdig")
+    private boolean ferdig;
 
     public static SedMottatt av(SedHendelse sedHendelse) {
         SedMottatt sedMottatt = new SedMottatt();

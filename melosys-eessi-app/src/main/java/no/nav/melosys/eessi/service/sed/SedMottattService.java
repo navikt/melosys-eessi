@@ -23,6 +23,6 @@ public class SedMottattService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public Collection<SedMottatt> hentAlleUbehandlet() {
-        return sedMottattRepository.findAllByFerdigFalseAndFeiledeForsokLessThan(5);
+        return sedMottattRepository.findAllByFerdigFalseAndFeiletFalse();
     }
 }

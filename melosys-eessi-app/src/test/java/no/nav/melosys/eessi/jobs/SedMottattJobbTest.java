@@ -34,7 +34,7 @@ public class SedMottattJobbTest {
         SedMottatt feil1 = SedMottatt.av(new SedHendelse());
         feil1.setFeiledeForsok(2);
         SedMottatt feil2 = SedMottatt.av(new SedHendelse());
-        feil2.setFeiledeForsok(3);
+        feil2.setFeiledeForsok(1);
 
         SedMottatt sedMottatt1 = SedMottatt.av(new SedHendelse());
         sedMottatt1.setFeiledeForsok(0);
@@ -49,7 +49,9 @@ public class SedMottattJobbTest {
         sedMottattJobb.sedMottattJobb();
 
         assertThat(feil1.getFeiledeForsok()).isEqualTo(3);
-        assertThat(feil2.getFeiledeForsok()).isEqualTo(4);
+        assertThat(feil1.isFeilet()).isTrue();
+        assertThat(feil2.getFeiledeForsok()).isEqualTo(2);
+        assertThat(feil2.isFeilet()).isFalse();
         assertThat(sedMottatt1.getFeiledeForsok()).isEqualTo(0);
         assertThat(sedMottatt2.getFeiledeForsok()).isEqualTo(1);
 
