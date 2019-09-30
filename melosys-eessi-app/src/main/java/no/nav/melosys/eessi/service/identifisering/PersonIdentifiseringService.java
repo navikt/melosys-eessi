@@ -36,6 +36,6 @@ public class PersonIdentifiseringService {
             return Optional.ofNullable(tpsService.hentNorskIdent(aktoerID));
         }
 
-        return personsokSok.finnNorskIdent(sedHendelse,sed);
+        return personsokSok.finnNorskIdent(sedHendelse, sed);
     }
 }

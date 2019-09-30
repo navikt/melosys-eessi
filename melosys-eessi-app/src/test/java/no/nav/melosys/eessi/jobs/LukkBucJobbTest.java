@@ -10,16 +10,16 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CloseBucSchedulerTest {
+public class LukkBucJobbTest {
 
     @Mock
     private BucCloser bucCloser;
     @InjectMocks
-    private CloseBucScheduler closeBucScheduler;
+    private LukkBucJobb lukkBucJobb;
 
     @Test
     public void closeBuc_verifiserKorrekteBucTyperSkalLukkes() {
-        closeBucScheduler.closeBuc();
+        lukkBucJobb.closeBuc();
 
         verify(bucCloser).closeBucsByType(BucType.LA_BUC_02);
         verify(bucCloser).closeBucsByType(BucType.LA_BUC_03);
