@@ -12,7 +12,7 @@ import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
-@Entity
+@Entity(name = "sed_mottatt")
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
