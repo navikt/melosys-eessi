@@ -23,7 +23,7 @@ public class SedMottattJobb {
         this.behandleSedMottattService = behandleSedMottattService;
     }
 
-    @Scheduled(cron = "0 0,30 * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     @SchedulerLock(name = "behandleSedMottatt", lockAtMostForString = "PT1M", lockAtLeastForString = "PT20S")
     public void sedMottattJobb() {
         Collection<SedMottatt> mottatteSeder = sedMottattService.hentAlleUbehandlet();
@@ -42,6 +42,11 @@ public class SedMottattJobb {
             log.error("Feil ved behandling av SED {} i rinasak {}", sedMottatt.getSedHendelse().getRinaDokumentId(),
                     sedMottatt.getSedHendelse().getRinaSakId(), e);
             sedMottatt.setFeiledeForsok(sedMottatt.getFeiledeForsok() + 1);
+
+            if (sedMottatt.getFeiledeForsok() > 2) {
+                sedMottatt.setFeilet(true);
+            }
+
             sedMottattService.lagre(sedMottatt);
         }
     }
