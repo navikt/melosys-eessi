@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OppgaveService {
 
-    private static final String SOEK_PERSON = "SOEK_PERSON";
+    private static final String SOEK_PERSON = "SOEK_PERS";
     private static final String TEMA_MED = "MED";
     private static final String ENHET_ID_FORDELING = "4303";
 
@@ -32,8 +32,9 @@ public class OppgaveService {
                 .tema(TEMA_MED)
                 .tildeltEnhetsnr(ENHET_ID_FORDELING)
                 .build();
+
         OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
-        log.info("Oppgave til ID og fordeling med id {}", response.getId());
+        log.info("Oppgave til ID og fordeling opprettet med id {}", response.getId());
         return response.getId();
     }
 }
