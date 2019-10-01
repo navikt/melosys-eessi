@@ -98,9 +98,8 @@ public class BehandleSedMottattService {
     }
 
     private void opprettOppgaveIdentifisering(SedMottatt sedMottatt) throws IntegrationException {
-        //TODO: opprett Oppgave til ID og fordeling. Oppretter jfr-oppgave for nå.
         log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
-        String oppgaveID = oppgaveService.opprettJfrOppgave(sedMottatt.getSedKontekst().getJournalpostID());
+        String oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(sedMottatt.getSedKontekst().getJournalpostID());
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
 

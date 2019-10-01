@@ -12,48 +12,29 @@ import org.springframework.stereotype.Service;
 @Service
 public class OppgaveService {
 
+    private static final String SOEK_PERSON = "SOEK_PERS";
+    private static final String TEMA_MED = "MED";
+    private static final String ENHET_ID_FORDELING = "4303";
+
     private final OppgaveConsumer oppgaveConsumer;
 
     public OppgaveService(OppgaveConsumer oppgaveConsumer) {
         this.oppgaveConsumer = oppgaveConsumer;
     }
 
-    public OppgaveDto opprettOppgaveTilIdOgFordeling(String journalpostID) throws IntegrationException {
-        //TODO: parametere til Oppgave må avklares
+    public String opprettOppgaveTilIdOgFordeling(String journalpostID) throws IntegrationException {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
-                .aktoerId("")
-                .behandlesAvApplikasjon("manuell - 9999 ?")
-                .behandlingstema("???")
-                .behandlingstype("???")
-                .fristFerdigstillelse(LocalDate.now().plusDays(1L))
+                .fristFerdigstillelse(LocalDate.now().plusWeeks(2L))
                 .journalpostId(journalpostID)
-                .oppgavetype("BEH_SAK_MK ? rekvirer/identifiser?")
+                .oppgavetype(SOEK_PERSON)
                 .prioritet("HOY")
-                .saksreferanse("finnes ikke")
-                .tema("MED..?")
-                .tildeltEnhetsnr("NAV id fordeling enhetsnr")
-                .tilordnetRessurs(null)
-                .build();
-        oppgaveConsumer.opprettOppgave(oppgaveDto);
-
-        return null;
-    }
-
-    public String opprettJfrOppgave(String journalpostID) throws IntegrationException {
-        OppgaveDto oppgaveDto = OppgaveDto.builder()
-                .aktivDato(LocalDate.now())
-                .beskrivelse("Identifiser person og journalfør i Melosys")
-                .fristFerdigstillelse(LocalDate.now().plusDays(7L))
-                .journalpostId(journalpostID)
-                .oppgavetype("JFR")
-                .prioritet("NORM")
-                .tema("UFM")
-                .tildeltEnhetsnr("4530")
+                .tema(TEMA_MED)
+                .tildeltEnhetsnr(ENHET_ID_FORDELING)
                 .build();
 
         OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
-        log.info("Journalføringsoppgave opprettet med id {}", response.getId());
+        log.info("Oppgave til ID og fordeling opprettet med id {}", response.getId());
         return response.getId();
     }
 }

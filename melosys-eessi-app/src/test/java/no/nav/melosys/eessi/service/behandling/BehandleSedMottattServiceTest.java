@@ -91,7 +91,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any());
-        verify(oppgaveService).opprettJfrOppgave(anyString());
+        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
 
@@ -108,7 +108,7 @@ public class BehandleSedMottattServiceTest {
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any());
-        verify(oppgaveService).opprettJfrOppgave(anyString());
+        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
 
