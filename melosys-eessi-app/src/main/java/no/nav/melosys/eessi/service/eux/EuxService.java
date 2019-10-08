@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.dto.TilegnetBuc;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
+import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -29,18 +29,18 @@ public class EuxService {
     private static final String FILTYPE_PDF = "pdf";
 
     private final EuxConsumer euxConsumer;
-    private final MetrikkerRegistrering metrikkerRegistrering;
+    private final BucMetrikker bucMetrikker;
 
     private final String rinaHostUrl;
     private final String mottakerInstitusjon;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-            MetrikkerRegistrering metrikkerRegistrering,
+            BucMetrikker bucMetrikker,
             @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
             @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInstitusjon) {
         this.euxConsumer = euxConsumer;
-        this.metrikkerRegistrering = metrikkerRegistrering;
+        this.bucMetrikker = bucMetrikker;
         this.rinaHostUrl = rinaHostUrl;
         this.mottakerInstitusjon = mottakerInstitusjon;
     }
@@ -66,7 +66,7 @@ public class EuxService {
                 response.get("documentId"));
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
                 opprettBucOgSedResponse.getDokumentId());
-        metrikkerRegistrering.bucOpprettet(bucType);
+        bucMetrikker.bucOpprettet(bucType);
 
         return opprettBucOgSedResponse;
     }

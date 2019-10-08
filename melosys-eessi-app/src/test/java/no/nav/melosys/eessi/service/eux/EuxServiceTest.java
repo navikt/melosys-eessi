@@ -11,7 +11,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.ImmutableMap;
 import no.nav.melosys.eessi.integration.eux.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
+import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
@@ -38,7 +38,7 @@ public class EuxServiceTest {
     @Mock
     private EuxConsumer euxConsumer;
     @Mock
-    private MetrikkerRegistrering metrikkerRegistrering;
+    private BucMetrikker bucMetrikker;
 
     private EuxService euxService;
 
@@ -48,7 +48,7 @@ public class EuxServiceTest {
     @Before
     public void setup() throws IOException, IntegrationException {
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        euxService = new EuxService(euxConsumer, metrikkerRegistrering, RINA_MOCK_URL, null);
+        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL, null);
 
         when(euxConsumer.opprettBucOgSed(anyString(), anyString(), any()))
                 .thenReturn(ImmutableMap.of(

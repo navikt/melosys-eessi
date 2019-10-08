@@ -8,7 +8,6 @@ import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
@@ -37,8 +36,6 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     private JournalpostService journalpostService;
     @Mock
     private EuxService euxService;
-    @Mock
-    private MetrikkerRegistrering metrikkerRegistrering;
 
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
@@ -48,7 +45,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-                gsakService, saksrelasjonService, journalpostService, euxService, metrikkerRegistrering
+                gsakService, saksrelasjonService, journalpostService, euxService
         );
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);

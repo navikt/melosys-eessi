@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
@@ -16,15 +16,15 @@ public class SedMottattConsumer {
 
     private final SedMottattService sedMottattService;
     private final BehandleSedMottattService behandleSedMottattService;
-    private final MetrikkerRegistrering metrikkerRegistrering;
+    private final SedMetrikker sedMetrikker;
 
     @Autowired
     public SedMottattConsumer(SedMottattService sedMottattService,
             BehandleSedMottattService behandleSedMottattService,
-            MetrikkerRegistrering metrikkerRegistrering) {
+            SedMetrikker sedMetrikker) {
         this.sedMottattService = sedMottattService;
         this.behandleSedMottattService = behandleSedMottattService;
-        this.metrikkerRegistrering = metrikkerRegistrering;
+        this.sedMetrikker = sedMetrikker;
     }
 
     @KafkaListener(containerFactory = "sedMottattListenerContainerFactory",
@@ -34,7 +34,7 @@ public class SedMottattConsumer {
 
         log.info("Sed mottatt: {}", sedMottatt.getSedHendelse());
         behandleMottatt(sedMottatt);
-        metrikkerRegistrering.sedMottatt(sedMottatt.getSedHendelse());
+        sedMetrikker.sedMottatt(sedMottatt.getSedHendelse().getSedType());
     }
 
     private void behandleMottatt(SedMottatt sedMottatt) {

@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -22,19 +21,16 @@ public class OpprettUtgaaendeJournalpostService {
     private final SaksrelasjonService saksrelasjonService;
     private final JournalpostService journalpostService;
     private final EuxService euxService;
-    private final MetrikkerRegistrering metrikkerRegistrering;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
             GsakService gsakService,
             SaksrelasjonService saksrelasjonService,
-            JournalpostService journalpostService, EuxService euxService,
-            MetrikkerRegistrering metrikkerRegistrering) {
+            JournalpostService journalpostService, EuxService euxService) {
         this.journalpostService = journalpostService;
         this.gsakService = gsakService;
         this.saksrelasjonService = saksrelasjonService;
         this.euxService = euxService;
-        this.metrikkerRegistrering = metrikkerRegistrering;
     }
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
@@ -47,8 +43,6 @@ public class OpprettUtgaaendeJournalpostService {
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         OpprettJournalpostResponse response = journalpostService.opprettUtgaaendeJournalpost(
                 sedSendt, sak, euxService.hentSedMedVedlegg(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()));
-
-        metrikkerRegistrering.journalpostUtgaaendeOpprettet(response.erFerdigstilt());
 
         return response.getJournalpostId();
     }

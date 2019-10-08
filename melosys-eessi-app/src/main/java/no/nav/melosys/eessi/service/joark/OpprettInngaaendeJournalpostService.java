@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.gsak.GsakService;
@@ -19,17 +18,14 @@ public class OpprettInngaaendeJournalpostService {
     private final GsakService gsakService;
     private final JournalpostService journalpostService;
     private final JournalpostSedKoblingService journalpostSedKoblingService;
-    private final MetrikkerRegistrering metrikkerRegistrering;
 
     @Autowired
     public OpprettInngaaendeJournalpostService(GsakService gsakService,
             JournalpostService journalpostService,
-            JournalpostSedKoblingService journalpostSedKoblingService,
-            MetrikkerRegistrering metrikkerRegistrering) {
+            JournalpostSedKoblingService journalpostSedKoblingService) {
         this.gsakService = gsakService;
         this.journalpostService = journalpostService;
         this.journalpostSedKoblingService = journalpostSedKoblingService;
-        this.metrikkerRegistrering = metrikkerRegistrering;
     }
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
@@ -56,7 +52,6 @@ public class OpprettInngaaendeJournalpostService {
     private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
             SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg) throws IntegrationException {
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg);
-        metrikkerRegistrering.journalpostInngaaendeOpprettet();
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;
     }
