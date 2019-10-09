@@ -13,24 +13,24 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GsakServiceTest {
+public class SakServiceTest {
 
     @Mock
     private SakConsumer sakConsumer;
     @Mock
     private SaksrelasjonService saksrelasjonService;
 
-    private GsakService gsakService;
+    private SakService sakService;
 
     @Before
     public void setup() {
-        gsakService = new GsakService(sakConsumer, saksrelasjonService);
+        sakService = new SakService(sakConsumer, saksrelasjonService);
     }
 
     @Test
     public void hentSak_forventSak() throws Exception{
         when(sakConsumer.getSak(anyLong())).thenReturn(new Sak());
-        Sak sak = gsakService.hentsak(1L);
+        Sak sak = sakService.hentsak(1L);
         assertThat(sak).isNotNull();
     }
 }

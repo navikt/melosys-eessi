@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.sak.GsakService;
+import no.nav.melosys.eessi.service.sak.SakService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,7 +28,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Mock
     private JournalpostService journalpostService;
     @Mock
-    private GsakService gsakService;
+    private SakService sakService;
     @Mock
     private JournalpostSedKoblingService journalpostSedKoblingService;
 
@@ -43,7 +43,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
 
-        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(gsakService, journalpostService, journalpostSedKoblingService);
+        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(sakService, journalpostService, journalpostSedKoblingService);
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
         sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
@@ -53,7 +53,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sak.setId(GSAK_SAKSNUMMER);
-        when(gsakService.finnSakForRinaID(anyString()))
+        when(sakService.finnSakForRinaID(anyString()))
                 .thenReturn(Optional.of(sak));
     }
 
@@ -66,7 +66,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any());
-        verify(gsakService, times(1)).finnSakForRinaID(any());
+        verify(sakService, times(1)).finnSakForRinaID(any());
         verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
                 eq(sedMottatt.getRinaDokumentId()), eq(sedMottatt.getRinaDokumentVersjon()),
                 eq(sedMottatt.getBucType()), eq(sedMottatt.getSedType()));

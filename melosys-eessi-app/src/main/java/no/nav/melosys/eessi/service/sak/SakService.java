@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class GsakService {
+public class SakService {
 
     private final SakConsumer sakConsumer;
     private final SaksrelasjonService saksrelasjonService;
 
     @Autowired
-    public GsakService(SakConsumer sakConsumer, SaksrelasjonService saksrelasjonService) {
+    public SakService(SakConsumer sakConsumer, SaksrelasjonService saksrelasjonService) {
         this.sakConsumer = sakConsumer;
         this.saksrelasjonService = saksrelasjonService;
     }

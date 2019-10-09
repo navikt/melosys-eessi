@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.sak.GsakService;
+import no.nav.melosys.eessi.service.sak.SakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +15,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class OpprettInngaaendeJournalpostService {
 
-    private final GsakService gsakService;
+    private final SakService sakService;
     private final JournalpostService journalpostService;
     private final JournalpostSedKoblingService journalpostSedKoblingService;
 
     @Autowired
-    public OpprettInngaaendeJournalpostService(GsakService gsakService,
+    public OpprettInngaaendeJournalpostService(SakService sakService,
             JournalpostService journalpostService,
             JournalpostSedKoblingService journalpostSedKoblingService) {
-        this.gsakService = gsakService;
+        this.sakService = sakService;
         this.journalpostService = journalpostService;
         this.journalpostSedKoblingService = journalpostSedKoblingService;
     }
@@ -31,7 +31,7 @@ public class OpprettInngaaendeJournalpostService {
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
             SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg) throws IntegrationException {
 
-        Sak sak = gsakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
+        Sak sak = sakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedMedVedlegg);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
