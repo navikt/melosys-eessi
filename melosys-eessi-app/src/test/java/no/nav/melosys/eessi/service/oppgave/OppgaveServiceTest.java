@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.service.oppgave;
 
-import no.nav.melosys.eessi.integration.gsak.oppgave.OppgaveConsumer;
-import no.nav.melosys.eessi.integration.gsak.oppgave.OppgaveDto;
-import no.nav.melosys.eessi.integration.gsak.oppgave.OpprettOppgaveResponseDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.junit.Before;
 import org.junit.Test;

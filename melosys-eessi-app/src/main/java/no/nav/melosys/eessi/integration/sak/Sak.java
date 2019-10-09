@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.gsak;
+package no.nav.melosys.eessi.integration.sak;
 
 import java.time.ZonedDateTime;
 import lombok.AllArgsConstructor;

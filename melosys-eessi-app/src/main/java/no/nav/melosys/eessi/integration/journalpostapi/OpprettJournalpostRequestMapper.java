@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;

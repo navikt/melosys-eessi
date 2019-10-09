@@ -1,7 +1,7 @@
-package no.nav.melosys.eessi.service.gsak;
+package no.nav.melosys.eessi.service.sak;
 
-import no.nav.melosys.eessi.integration.gsak.Sak;
-import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Test;

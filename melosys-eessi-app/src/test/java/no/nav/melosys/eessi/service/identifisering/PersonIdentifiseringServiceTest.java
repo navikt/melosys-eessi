@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.service.identifisering;
 
 import java.util.Optional;
-import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.gsak.GsakService;
+import no.nav.melosys.eessi.service.sak.GsakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;

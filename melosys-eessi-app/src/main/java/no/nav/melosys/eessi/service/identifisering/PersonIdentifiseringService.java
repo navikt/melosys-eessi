@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.gsak.GsakService;
+import no.nav.melosys.eessi.service.sak.GsakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.stereotype.Service;

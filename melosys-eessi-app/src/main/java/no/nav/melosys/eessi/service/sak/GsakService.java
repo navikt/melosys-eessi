@@ -1,9 +1,9 @@
-package no.nav.melosys.eessi.service.gsak;
+package no.nav.melosys.eessi.service.sak;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.gsak.Sak;
-import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
