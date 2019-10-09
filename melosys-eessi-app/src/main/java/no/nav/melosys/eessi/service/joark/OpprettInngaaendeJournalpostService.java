@@ -31,7 +31,7 @@ public class OpprettInngaaendeJournalpostService {
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
             SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg) throws IntegrationException {
 
-        Sak sak = sakService.finnSakForRinaID(sedMottatt.getRinaSakId()).orElse(null);
+        Sak sak = sakService.finnSakForRinaSaksnummer(sedMottatt.getRinaSakId()).orElse(null);
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(sedMottatt, sak, sedMedVedlegg);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());

@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.eux.dto;
+package no.nav.melosys.eessi.integration.eux.rina_api.dto;
 
 import java.time.ZonedDateTime;
 import com.fasterxml.jackson.annotation.JsonFormat;

@@ -43,6 +43,8 @@ melosys:
     personsok-url: ${PERSONSOK_URL}
     rina-host-url: ${RINA_HOST_URL}
     journalpostapi-url: ${JOURNALPOSTAPI_URL}
+    eux-case-store-url: ${EUXCASESTORE_URL}
+
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}
       typeinfo-url: ${DOKKATTYPEINFO_URL}

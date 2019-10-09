@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
@@ -80,7 +80,6 @@ public abstract class ComponentTestBase {
     public void setup() throws Exception {
         when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(componentTestProvider.sedMedVedlegg());
-        when(sakConsumer.opprettSak(anyString())).thenReturn(componentTestProvider.sak(AKTOER_ID));
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(componentTestProvider.journalpostResponse());
         when(aktoerConsumer.hentAktoerId(anyString())).thenReturn(AKTOER_ID);
         when(personConsumer.hentPerson(any(HentPersonRequest.class))).thenReturn(componentTestProvider.hentPersonResponse(AKTOER_ID, FØDSELSDATO, "NO"));
