@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.gsak.oppgave;
+package no.nav.melosys.eessi.integration.oppgave;
 
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.UUIDGenerator;

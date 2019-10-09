@@ -5,14 +5,14 @@ import java.util.Collections;
 import java.util.Optional;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.gsak.GsakService;
+import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +29,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     private static final String JOURNALPOST_ID = "123";
 
     @Mock
-    private GsakService gsakService;
+    private SakService sakService;
     @Mock
     private SaksrelasjonService saksrelasjonService;
     @Mock
@@ -45,7 +45,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-                gsakService, saksrelasjonService, journalpostService, euxService
+                sakService, saksrelasjonService, journalpostService, euxService
         );
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);
@@ -60,7 +60,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sedSendt = enhancedRandom.nextObject(SedHendelse.class);
 
-        when(gsakService.hentsak(anyLong())).thenReturn(sak);
+        when(sakService.hentsak(anyLong())).thenReturn(sak);
     }
 
     @Test

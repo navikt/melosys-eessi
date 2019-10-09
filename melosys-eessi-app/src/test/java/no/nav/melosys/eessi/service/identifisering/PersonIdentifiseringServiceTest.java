@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.service.identifisering;
 
 import java.util.Optional;
-import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.gsak.GsakService;
+import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
@@ -26,7 +26,7 @@ public class PersonIdentifiseringServiceTest {
     @Mock
     private SaksrelasjonService saksrelasjonService;
     @Mock
-    private GsakService gsakService;
+    private SakService sakService;
     @Mock
     private TpsService tpsService;
     @Mock
@@ -37,7 +37,7 @@ public class PersonIdentifiseringServiceTest {
     @Before
     public void setup() {
         personIdentifiseringService = new PersonIdentifiseringService(
-                personSok, saksrelasjonService, gsakService, tpsService, personSokMetrikker
+                personSok, saksrelasjonService, sakService, tpsService, personSokMetrikker
         );
     }
 
@@ -51,7 +51,7 @@ public class PersonIdentifiseringServiceTest {
         fagsakRinasakKobling.setGsakSaksnummer(123L);
 
         when(tpsService.hentNorskIdent(anyString())).thenReturn(norskIdent);
-        when(gsakService.hentsak(anyLong())).thenReturn(sak);
+        when(sakService.hentsak(anyLong())).thenReturn(sak);
         when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse("123"), new SED());

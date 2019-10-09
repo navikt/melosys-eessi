@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.gsak.sak;
+package no.nav.melosys.eessi.integration.sak;
 
 import lombok.Data;
 

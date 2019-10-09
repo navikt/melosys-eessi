@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.gsak.oppgave;
+package no.nav.melosys.eessi.integration.oppgave;
 
 import java.time.LocalDate;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;

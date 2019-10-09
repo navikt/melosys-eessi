@@ -1,8 +1,6 @@
-package no.nav.melosys.eessi.integration.gsak;
+package no.nav.melosys.eessi.integration.sak;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
-import no.nav.melosys.eessi.integration.gsak.sak.SakDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
