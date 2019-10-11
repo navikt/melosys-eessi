@@ -73,11 +73,6 @@
             <version>${springfox-swagger2.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.dok</groupId>
-            <artifactId>dokarkivsed-api-v1</artifactId>
-            <version>${dokarkiv-api-v1.version}</version>
-        </dependency>
-        <dependency>
             <groupId>no.nav.dokkat</groupId>
             <artifactId>dokkat-api</artifactId>
             <version>${dokkat-api.version}</version>
