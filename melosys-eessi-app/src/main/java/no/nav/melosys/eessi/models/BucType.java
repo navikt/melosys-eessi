@@ -16,7 +16,9 @@ public enum BucType {
     H_BUC_03b,
     H_BUC_05,
     H_BUC_06,
-    H_BUC_07;
+    H_BUC_07,
+
+    S_BUC_24;
 
     private static final String LOVVALG_PREFIX = "LA";
 

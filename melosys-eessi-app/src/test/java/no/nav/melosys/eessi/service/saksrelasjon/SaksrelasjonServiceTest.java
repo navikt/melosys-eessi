@@ -37,6 +37,12 @@ public class SaksrelasjonServiceTest {
     private final String RINA_ID = "321";
 
     @Test
+    public void lagre_bucErIkkeLovvalg_oppdatertEuxCaseStore() throws Exception {
+        saksrelasjonService.lagreKobling(123L, "321", BucType.H_BUC_01);
+        verify(caseStoreConsumer).lagre(eq("123"), eq("321"));
+    }
+
+    @Test
     public void lagreKobling_verifiserRepositoryKall() throws IntegrationException {
         saksrelasjonService.lagreKobling(123L, RINA_ID, BucType.LA_BUC_04);
         verify(fagsakRinasakKoblingRepository).save(any(FagsakRinasakKobling.class));

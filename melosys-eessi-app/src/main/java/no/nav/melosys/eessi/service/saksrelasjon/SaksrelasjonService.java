@@ -31,12 +31,13 @@ public class SaksrelasjonService {
         fagsakRinasakKobling.setRinaSaksnummer(rinaSaksnummer);
         fagsakRinasakKobling.setGsakSaksnummer(gsakSaksnummer);
         fagsakRinasakKobling.setBucType(bucType);
-        return fagsakRinasakKoblingRepository.save(fagsakRinasakKobling);
-    }
+        fagsakRinasakKobling = fagsakRinasakKoblingRepository.save(fagsakRinasakKobling);
 
-    @Transactional
-    public Optional<FagsakRinasakKobling> finnVedRinaId(String rinaSaksnummer) {
-        return fagsakRinasakKoblingRepository.findByRinaSaksnummer(rinaSaksnummer);
+        if (!bucType.erLovvalgBuc()) {
+            caseStoreConsumer.lagre(gsakSaksnummer.toString(), rinaSaksnummer);
+        }
+
+        return fagsakRinasakKobling;
     }
 
     @Transactional
