@@ -1,8 +1,12 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumSet;
+import lombok.Getter;
 import org.springframework.util.StringUtils;
 
+@Getter
 public enum SedStatus {
     UTKAST("UTKAST", "NEW"),
     SENDT("SENDT", "SENT"),
@@ -13,6 +17,8 @@ public enum SedStatus {
     private final String norskStatus;
 
     private final String engelskStatus;
+
+    static Collection<SedStatus> gyldigOpprettetStatuser = EnumSet.of(SENDT, MOTTATT);
 
     SedStatus(String norskStatus, String engelskStatus) {
         this.engelskStatus = engelskStatus;
@@ -40,11 +46,8 @@ public enum SedStatus {
                 .orElse(null);
     }
 
-    public String getNorskStatus() {
-        return norskStatus;
-    }
-
-    public String getEngelskStatus() {
-        return engelskStatus;
+    public static boolean erGyldigEngelskStatus(String engelskstatus) {
+        return MOTTATT.engelskStatus.equalsIgnoreCase(engelskstatus)
+                || SENDT.engelskStatus.equalsIgnoreCase(engelskstatus);
     }
 }

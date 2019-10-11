@@ -22,7 +22,7 @@ public class CaseStoreConsumerTest {
         RestTemplate restTemplate = new RestTemplate();
         server = MockRestServiceServer.createServer(restTemplate);
         caseStoreConsumer = new CaseStoreConsumer(restTemplate);
-        response = new ObjectMapper().writeValueAsString(Collections.singletonList(new CaseStoreDto()));
+        response = new ObjectMapper().writeValueAsString(Collections.singletonList(new CaseStoreDto("","")));
     }
 
     @Test

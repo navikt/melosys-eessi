@@ -1,9 +1,6 @@
 package no.nav.melosys.eessi.service.sak;
 
-import java.util.Collections;
 import java.util.Optional;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -24,14 +21,12 @@ public class SakServiceTest {
     private SakConsumer sakConsumer;
     @Mock
     private SaksrelasjonService saksrelasjonService;
-    @Mock
-    private CaseStoreConsumer caseStoreConsumer;
 
     private SakService sakService;
 
     @Before
     public void setup() throws Exception {
-        sakService = new SakService(sakConsumer, saksrelasjonService, caseStoreConsumer);
+        sakService = new SakService(sakConsumer, saksrelasjonService);
         when(sakConsumer.getSak(anyString())).thenReturn(new Sak());
     }
 
@@ -45,16 +40,13 @@ public class SakServiceTest {
     public void finnSakForRinaSaksnummer_saksrelasjonLagret_forventSak() throws Exception {
         FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
         fagsakRinasakKobling.setGsakSaksnummer(123L);
-        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
+        when(saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(anyString())).thenReturn(Optional.of(123L));
         assertThat(sakService.finnSakForRinaSaksnummer("123")).isPresent();
     }
 
     @Test
     public void finnSakForRinaSaksnummer_saksrelasjonLagretHosEux_forventSak() throws Exception {
-        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.empty());
-        CaseStoreDto caseStoreDto = new CaseStoreDto();
-        caseStoreDto.setFagsaknummer("123");
-        when(caseStoreConsumer.finnVedRinaSaksnummer(anyString())).thenReturn(Collections.singletonList(caseStoreDto));
+        when(saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(anyString())).thenReturn(Optional.of(123L));
         assertThat(sakService.finnSakForRinaSaksnummer("123321")).isPresent();
     }
 }

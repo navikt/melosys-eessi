@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.util.List;
 import lombok.*;
-import no.nav.dokarkivsed.api.v1.JournalfoeringStatus;
 
 @Builder
 @Getter
@@ -20,9 +19,5 @@ public class OpprettJournalpostResponse {
   @AllArgsConstructor
   public static class Dokument {
     private String dokumentInfoId;
-  }
-
-  public boolean erFerdigstilt() {
-    return JournalfoeringStatus.ENDELIG_JOURNALFOERT.name().equals(journalstatus);
   }
 }
