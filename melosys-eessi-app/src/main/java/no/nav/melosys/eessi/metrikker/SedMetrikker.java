@@ -39,11 +39,11 @@ public class SedMetrikker {
 
     private void sedHendelse(String key, String sedType) {
         if (sedType.startsWith("A")) {
-            Metrics.counter(key, KEY_SEDTYPE, sedType);
+            Metrics.counter(key, KEY_SEDTYPE, sedType).increment();
         } else if (sedType.startsWith("X")) {
-            Metrics.counter(key, KEY_SEDTYPE, X_SED);
+            Metrics.counter(key, KEY_SEDTYPE, X_SED).increment();
         } else if(sedType.startsWith("H")) {
-            Metrics.counter(key, KEY_SEDTYPE, H_SED);
+            Metrics.counter(key, KEY_SEDTYPE, H_SED).increment();
         } else {
             log.info("Kan ikke telle ukjent sedtype {}", sedType);
         }
