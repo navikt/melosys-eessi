@@ -1,8 +1,6 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.EnumSet;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
@@ -17,8 +15,6 @@ public enum SedStatus {
     private final String norskStatus;
 
     private final String engelskStatus;
-
-    static Collection<SedStatus> gyldigOpprettetStatuser = EnumSet.of(SENDT, MOTTATT);
 
     SedStatus(String norskStatus, String engelskStatus) {
         this.engelskStatus = engelskStatus;

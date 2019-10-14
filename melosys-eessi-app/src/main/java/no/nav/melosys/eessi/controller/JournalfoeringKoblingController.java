@@ -6,9 +6,7 @@ import no.nav.melosys.eessi.controller.dto.JournalpostSedKoblingDto;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,14 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class JournalfoeringKoblingController {
 
     private final JournalpostSedKoblingService journalpostSedKoblingService;
-    private final EuxService euxService;
-    private final SaksrelasjonService saksrelasjonService;
 
-    public JournalfoeringKoblingController(JournalpostSedKoblingService journalpostSedKoblingService,
-            EuxService euxService, SaksrelasjonService saksrelasjonService) {
+    public JournalfoeringKoblingController(JournalpostSedKoblingService journalpostSedKoblingService) {
         this.journalpostSedKoblingService = journalpostSedKoblingService;
-        this.euxService = euxService;
-        this.saksrelasjonService = saksrelasjonService;
     }
 
     @ApiOperation(value = "Henter objekt som beskriver dataen mottatt i sed som journalpost er koblet til")
