@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.integration.eux;
 import java.util.Optional;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerConfig;
 import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;
 import org.junit.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;

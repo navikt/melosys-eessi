@@ -34,7 +34,7 @@ public class PersonIdentifiseringService {
 
     public Optional<String> identifiserPerson(SedHendelse sedHendelse, SED sed)
             throws IntegrationException, NotFoundException {
-        Optional<FagsakRinasakKobling> eksisterendeSak = saksrelasjonService.finnVedRinaId(sedHendelse.getRinaSakId());
+        Optional<FagsakRinasakKobling> eksisterendeSak = saksrelasjonService.finnVedRinaSaksnummer(sedHendelse.getRinaSakId());
 
         if (eksisterendeSak.isPresent()) {
             String aktoerID = sakService.hentsak(eksisterendeSak.get().getGsakSaksnummer()).getAktoerId();

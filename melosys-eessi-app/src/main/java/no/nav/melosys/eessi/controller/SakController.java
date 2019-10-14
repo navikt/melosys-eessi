@@ -36,8 +36,9 @@ public class SakController {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    @ApiOperation(value = "Henter bucer tilknyttet en sak")
+
     @GetMapping("/{gsakSaksnummer}/bucer")
+    @ApiOperation(value = "Henter bucer tilknyttet en sak")
     public List<BucinfoDto> hentTilknyttedeBucer(@PathVariable Long gsakSaksnummer,
                                                  @RequestParam(required = false) List<String> statuser) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
@@ -48,8 +49,20 @@ public class SakController {
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
+    @PostMapping
+    @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
+    public ResponseEntity lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
+            throws ValidationException, IntegrationException {
+        validerSaksrelasjonDto(saksrelasjonDto);
+
+        saksrelasjonService.lagreKobling(saksrelasjonDto.getGsakSaksnummer(),
+                saksrelasjonDto.getRinaSaksnummer(), BucType.valueOf(saksrelasjonDto.getBucType()));
+
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
+    @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
     public List<SaksrelasjonDto> hentSaksrelasjon(
             @PathParam("rinaSaksnummer") String rinaSaksnummer,
             @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
@@ -59,24 +72,13 @@ public class SakController {
                     .map(SaksrelasjonDto::av)
                     .collect(Collectors.toList());
         } else if (!StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer == null) {
-            Optional<FagsakRinasakKobling> fagsakRinasakKobling = saksrelasjonService.finnVedRinaId(rinaSaksnummer);
+            Optional<FagsakRinasakKobling> fagsakRinasakKobling = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer);
             return fagsakRinasakKobling
                     .map(rinasakKobling -> Collections.singletonList(SaksrelasjonDto.av(rinasakKobling)))
                     .orElse(Collections.emptyList());
         }
 
         throw new ValidationException("Kun en av rinaSaksnummer og gsakSaksnummer kan spørres på");
-    }
-
-    @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
-    @PostMapping
-    public ResponseEntity lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto) throws ValidationException {
-        validerSaksrelasjonDto(saksrelasjonDto);
-
-        saksrelasjonService.lagreKobling(saksrelasjonDto.getGsakSaksnummer(),
-                saksrelasjonDto.getRinaSaksnummer(), BucType.valueOf(saksrelasjonDto.getBucType()));
-
-        return ResponseEntity.ok().build();
     }
 
     private void validerSaksrelasjonDto(SaksrelasjonDto saksrelasjonDto) throws ValidationException {
@@ -87,7 +89,7 @@ public class SakController {
         }
 
         String rinaSaksnummer = saksrelasjonDto.getRinaSaksnummer();
-        Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaId(rinaSaksnummer);
+        Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer);
 
         if (eksisterende.isPresent() && !eksisterende.get().getGsakSaksnummer().equals(saksrelasjonDto.getGsakSaksnummer())) {
             throw new ValidationException("Rinasak " + saksrelasjonDto.getGsakSaksnummer() +

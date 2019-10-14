@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerConfig;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -22,8 +24,6 @@ import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -36,10 +36,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RunWith(MockitoJUnitRunner.class)
 public class EuxConsumerTest {
-
-    private RestTemplate restTemplate;
 
     private EuxConsumer euxConsumer;
 
@@ -52,7 +49,7 @@ public class EuxConsumerTest {
         EuxConsumerConfig consumerConfig = new EuxConsumerConfig(null);
         OidcTokenClientRequestInterceptor interceptor = new OidcTokenClientRequestInterceptor(mock(RestStsService.class));
 
-        restTemplate = consumerConfig.restTemplate(new RestTemplateBuilder(), interceptor);
+        RestTemplate restTemplate = consumerConfig.restTemplate(new RestTemplateBuilder(), interceptor);
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
         server = MockRestServiceServer.createServer(restTemplate);
     }

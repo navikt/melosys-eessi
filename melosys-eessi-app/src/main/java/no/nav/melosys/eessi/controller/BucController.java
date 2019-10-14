@@ -32,7 +32,7 @@ public class BucController {
         this.sedService = sedService;
     }
 
-    @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne.")
+    @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true")
     @PostMapping(
             value = "/{bucType}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,

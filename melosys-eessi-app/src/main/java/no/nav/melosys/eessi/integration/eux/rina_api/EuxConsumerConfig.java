@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.eux;
+package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;

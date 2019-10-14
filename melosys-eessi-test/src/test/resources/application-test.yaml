@@ -16,6 +16,7 @@ OPPGAVE_URL: dummy
 RINA_HOST_URL: dummy
 SRV_USERNAME: dummy
 SRV_PASSWORD: dummy
+EUXCASESTORE_URL: dummy
 
 # Database
 PG_HOST: localhost

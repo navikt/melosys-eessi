@@ -8,19 +8,18 @@ import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sak.SakService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -30,8 +29,6 @@ public class OpprettUtgaaendeJournalpostServiceTest {
 
     @Mock
     private SakService sakService;
-    @Mock
-    private SaksrelasjonService saksrelasjonService;
     @Mock
     private JournalpostService journalpostService;
     @Mock
@@ -45,22 +42,17 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-                sakService, saksrelasjonService, journalpostService, euxService
+                sakService, journalpostService, euxService
         );
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);
-
+        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any())).thenReturn(response);
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
-        FagsakRinasakKobling fagsakRinasakKobling = enhancedRandom.nextObject(FagsakRinasakKobling.class);
-        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
-
-        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any())).thenReturn(response);
-
         Sak sak = enhancedRandom.nextObject(Sak.class);
-        sedSendt = enhancedRandom.nextObject(SedHendelse.class);
+        when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));
 
-        when(sakService.hentsak(anyLong())).thenReturn(sak);
+        sedSendt = enhancedRandom.nextObject(SedHendelse.class);
     }
 
     @Test
@@ -71,7 +63,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
 
     @Test(expected = NotFoundException.class)
     public void journalfoer_noCaseRelation_expectNotFoundException() throws Exception {
-        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.empty());
+        when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.empty());
         opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
     }
 

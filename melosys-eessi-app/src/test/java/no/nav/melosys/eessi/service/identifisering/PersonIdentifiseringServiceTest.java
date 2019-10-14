@@ -52,7 +52,7 @@ public class PersonIdentifiseringServiceTest {
 
         when(tpsService.hentNorskIdent(anyString())).thenReturn(norskIdent);
         when(sakService.hentsak(anyLong())).thenReturn(sak);
-        when(saksrelasjonService.finnVedRinaId(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
+        when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse("123"), new SED());
         assertThat(res).isPresent();

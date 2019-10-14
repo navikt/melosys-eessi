@@ -53,7 +53,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sak.setId(GSAK_SAKSNUMMER);
-        when(sakService.finnSakForRinaID(anyString()))
+        when(sakService.finnSakForRinaSaksnummer(anyString()))
                 .thenReturn(Optional.of(sak));
     }
 
@@ -66,7 +66,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any());
-        verify(sakService, times(1)).finnSakForRinaID(any());
+        verify(sakService, times(1)).finnSakForRinaSaksnummer(any());
         verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
                 eq(sedMottatt.getRinaDokumentId()), eq(sedMottatt.getRinaDokumentVersjon()),
                 eq(sedMottatt.getBucType()), eq(sedMottatt.getSedType()));

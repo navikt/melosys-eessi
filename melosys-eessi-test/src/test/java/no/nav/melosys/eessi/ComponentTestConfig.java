@@ -2,7 +2,8 @@ package no.nav.melosys.eessi;
 
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
@@ -96,5 +97,11 @@ public class ComponentTestConfig {
     @Primary
     OppgaveConsumer oppgaveConsumerMock() {
         return mock(OppgaveConsumer.class);
+    }
+
+    @Bean
+    @Primary
+    CaseStoreConsumer caseStoreConsumerMock() {
+        return mock(CaseStoreConsumer.class);
     }
 }
