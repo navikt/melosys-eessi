@@ -65,16 +65,15 @@ public class SakController {
     @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
     public List<SaksrelasjonDto> hentSaksrelasjon(
             @PathParam("rinaSaksnummer") String rinaSaksnummer,
-            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
+            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException, IntegrationException {
 
         if (StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer != null) {
             return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                     .map(SaksrelasjonDto::av)
                     .collect(Collectors.toList());
         } else if (!StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer == null) {
-            Optional<FagsakRinasakKobling> fagsakRinasakKobling = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer);
-            return fagsakRinasakKobling
-                    .map(rinasakKobling -> Collections.singletonList(SaksrelasjonDto.av(rinasakKobling)))
+            return saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer)
+                    .map(saksnummer -> Collections.singletonList(new SaksrelasjonDto(saksnummer, rinaSaksnummer, null)))
                     .orElse(Collections.emptyList());
         }
 
