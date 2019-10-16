@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import javax.persistence.*;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.Data;
@@ -37,11 +37,11 @@ public class SedMottatt {
 
     @CreatedDate
     @Column(name = "mottatt_dato")
-    private LocalDate mottattDato;
+    private LocalDateTime mottattDato;
 
     @LastModifiedDate
     @Column(name = "endret_dato")
-    private LocalDate sistEndretDato;
+    private LocalDateTime sistEndretDato;
 
     @Column(name = "feilede_forsok")
     private int feiledeForsok;
@@ -57,8 +57,8 @@ public class SedMottatt {
         sedMottatt.setSedHendelse(sedHendelse);
         sedMottatt.setVersjon(1);
         sedMottatt.setSedKontekst(new SedKontekst());
-        sedMottatt.setMottattDato(LocalDate.now());
-        sedMottatt.setSistEndretDato(LocalDate.now());
+        sedMottatt.setMottattDato(LocalDateTime.now());
+        sedMottatt.setSistEndretDato(LocalDateTime.now());
 
         return sedMottatt;
     }

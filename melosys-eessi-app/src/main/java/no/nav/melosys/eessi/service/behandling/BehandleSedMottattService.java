@@ -77,6 +77,7 @@ public class BehandleSedMottattService {
         personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
+        sedMottatt.getSedHendelse().setNavBruker(sedMottatt.getSedKontekst().getNavIdent());
     }
 
     private void opprettJournalpost(SedMottatt sedMottatt) throws IntegrationException {
@@ -87,12 +88,12 @@ public class BehandleSedMottattService {
 
         if (sedMottatt.getSedKontekst().personErIdentifisert()) {
             SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(
-                    sedMottatt.getSedHendelse(), sedMedVedlegg);
+                    sedMottatt.getSedHendelse(), sedMedVedlegg, sedMottatt.getSedKontekst().getNavIdent());
             sedMottatt.getSedKontekst().setJournalpostID(sakInformasjon.getJournalpostId());
             sedMottatt.getSedKontekst().setDokumentID(sakInformasjon.getDokumentId());
         } else {
             String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-                    sedMottatt.getSedHendelse(), sedMedVedlegg);
+                    sedMottatt.getSedHendelse(), sedMedVedlegg, null);
             sedMottatt.getSedKontekst().setJournalpostID(journalpostID);
         }
     }

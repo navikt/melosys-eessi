@@ -25,15 +25,17 @@ public final class OpprettJournalpostRequestMapper {
     public static OpprettJournalpostRequest opprettInngaaendeJournalpost(final SedHendelse sedHendelse,
             final SedMedVedlegg sedMedVedlegg,
             final Sak sak,
-            final DokkatSedInfo dokkatSedInfo) {
-        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo);
+            final DokkatSedInfo dokkatSedInfo,
+            final String navIdent) {
+        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo, navIdent);
     }
 
     public static OpprettJournalpostRequest opprettUtgaaendeJournalpost(final SedHendelse sedHendelse,
             final SedMedVedlegg sedMedVedlegg,
             final Sak sak,
-            final DokkatSedInfo dokkatSedInfo) {
-        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo);
+            final DokkatSedInfo dokkatSedInfo,
+            final String navIdent) {
+        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo, navIdent);
     }
 
 
@@ -41,12 +43,13 @@ public final class OpprettJournalpostRequestMapper {
             final SedHendelse sedHendelse,
             final SedMedVedlegg sedMedVedlegg,
             final Sak sak,
-            final DokkatSedInfo dokkatSedInfo) {
+            final DokkatSedInfo dokkatSedInfo,
+            final String navIdent) {
 
         return OpprettJournalpostRequest.builder()
                 .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
                 .behandlingstema(dokkatSedInfo.getBehandlingstema())
-                .bruker(!StringUtils.isEmpty(sedHendelse.getNavBruker()) ? lagBruker(sedHendelse.getNavBruker()) : null)
+                .bruker(!StringUtils.isEmpty(navIdent) ? lagBruker(navIdent) : null)
                 .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokkatSedInfo))
                 .eksternReferanseId(sedHendelse.getSedId())
                 .journalfoerendeEnhet("4530")

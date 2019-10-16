@@ -22,17 +22,17 @@ public class JournalpostService {
         this.journalpostapiConsumer = journalpostapiConsumer;
     }
 
-    OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak, SedMedVedlegg sedMedVedlegg)
-            throws IntegrationException {
+    OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
+            SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
-                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()));
+                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), navIdent);
         return opprettJournalpost(request, false);
     }
 
-    OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak, SedMedVedlegg sedMedVedlegg)
-            throws IntegrationException {
+    OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
+            SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
-                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()));
+                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), navIdent);
         return opprettJournalpost(request, true);
     }
 

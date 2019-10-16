@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +19,16 @@ public class OpprettUtgaaendeJournalpostService {
     private final SakService sakService;
     private final JournalpostService journalpostService;
     private final EuxService euxService;
+    private final TpsService tpsService;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
-            SakService sakService, JournalpostService journalpostService, EuxService euxService) {
+            SakService sakService, JournalpostService journalpostService, EuxService euxService,
+            TpsService tpsService) {
         this.journalpostService = journalpostService;
         this.sakService = sakService;
         this.euxService = euxService;
+        this.tpsService = tpsService;
     }
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
@@ -32,8 +36,9 @@ public class OpprettUtgaaendeJournalpostService {
                 .orElseThrow(() -> new NotFoundException("Finner ikke nav-sak for rinasaksnummer " + sedSendt.getRinaSakId()));
 
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
-        OpprettJournalpostResponse response = journalpostService.opprettUtgaaendeJournalpost(
-                sedSendt, sak, euxService.hentSedMedVedlegg(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()));
+        String navIdent = tpsService.hentNorskIdent(sak.getAktoerId());
+        OpprettJournalpostResponse response = journalpostService.opprettUtgaaendeJournalpost(sedSendt, sak,
+                euxService.hentSedMedVedlegg(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()), navIdent);
 
         return response.getJournalpostId();
     }

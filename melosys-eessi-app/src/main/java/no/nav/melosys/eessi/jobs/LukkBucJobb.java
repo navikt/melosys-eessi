@@ -24,7 +24,7 @@ public class LukkBucJobb {
     public void closeBuc() {
 
         Arrays.stream(BucType.values())
-                .filter(bucType -> bucType != BucType.LA_BUC_01)
+                .filter(bucType -> bucType != BucType.LA_BUC_01 && bucType.erLovvalgBuc())
                 .forEach(bucCloser::closeBucsByType);
     }
 }

@@ -55,9 +55,9 @@ public class BehandleSedMottattServiceTest {
                 melosysEessiProducer, personIdentifiseringService, oppgaveService
         );
 
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any()))
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
                 .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any()))
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
                 .thenReturn("9988776655");
 
         when(euxService.hentSed(anyString(), anyString()))
@@ -76,7 +76,7 @@ public class BehandleSedMottattServiceTest {
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
 
@@ -90,7 +90,7 @@ public class BehandleSedMottattServiceTest {
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
@@ -106,8 +106,8 @@ public class BehandleSedMottattServiceTest {
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
@@ -124,7 +124,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService).identifiserPerson(any(), any());
         verify(tpsService).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
     }
 
@@ -143,7 +143,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
         verify(tpsService).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
     }
 
@@ -163,8 +163,8 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
         verify(tpsService).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
     }
 
@@ -182,8 +182,8 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
         verify(tpsService, never()).hentAktoerId(anyString());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
 
