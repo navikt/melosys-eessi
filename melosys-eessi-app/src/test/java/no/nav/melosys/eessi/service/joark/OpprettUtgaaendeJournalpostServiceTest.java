@@ -12,6 +12,7 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +34,8 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     private JournalpostService journalpostService;
     @Mock
     private EuxService euxService;
+    @Mock
+    private TpsService tpsService;
 
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
@@ -42,11 +45,10 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-                sakService, journalpostService, euxService
-        );
+                sakService, journalpostService, euxService, tpsService);
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "123", null);
-        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any())).thenReturn(response);
+        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
         Sak sak = enhancedRandom.nextObject(Sak.class);

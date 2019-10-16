@@ -49,7 +49,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, Lists.newArrayList(
                 new OpprettJournalpostResponse.Dokument("123")), null, null);
-        when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any())).thenReturn(response);
+        when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any(), any())).thenReturn(response);
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sak.setId(GSAK_SAKSNUMMER);
@@ -59,13 +59,13 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     public void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() throws Exception {
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, sedMedVedlegg(new byte[0]));
+        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, sedMedVedlegg(new byte[0]), "123");
 
         assertThat(sakInformasjon).isNotNull();
         assertThat(sakInformasjon.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
         assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
-        verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any());
+        verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any(), anyString());
         verify(sakService, times(1)).finnSakForRinaSaksnummer(any());
         verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
                 eq(sedMottatt.getRinaDokumentId()), eq(sedMottatt.getRinaDokumentVersjon()),
@@ -75,12 +75,12 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Test
     public void arkiverInngaaendeSedUtenBruker_journalpostOpprettet_forventReturnerJournalpostID() throws Exception {
 
-        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, sedMedVedlegg(new byte[0]));
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, sedMedVedlegg(new byte[0]), "123321");
 
         assertThat(journalpostID).isEqualTo(JOURNALPOST_ID);
 
         verify(journalpostSedKoblingService).lagre(anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
-        verify(journalpostService).opprettInngaaendeJournalpost(any(), isNull(), any());
+        verify(journalpostService).opprettInngaaendeJournalpost(any(), isNull(), any(), anyString());
     }
 
     private SedMedVedlegg sedMedVedlegg(byte[] innhold) {

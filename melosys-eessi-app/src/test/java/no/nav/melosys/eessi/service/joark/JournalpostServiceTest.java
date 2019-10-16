@@ -47,13 +47,13 @@ public class JournalpostServiceTest {
 
     @Test
     public void opprettInngaaendeJournalpost_verifiserEndeligJfr() throws Exception {
-        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]));
+        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false));
     }
 
     @Test
     public void opprettUtgaaendeJournalpost_verifiserEndeligJfr() throws Exception {
-        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]));
+        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(true));
     }
 
