@@ -33,7 +33,7 @@ public class RestUtils {
             if (StringUtils.isEmpty(feilmelding)) return e.getMessage();
             try {
                 JsonNode json = objectMapper.readTree(feilmelding).path(nøkkel);
-                return json.isMissingNode() ? e.getMessage() : json.asText();
+                return json.isMissingNode() ? e.getMessage() : json.toString();
             } catch (IOException ex) {
                 log.warn("Kunne ikke lese feilmelding fra response", ex);
                 return clientErrorException.getResponseBodyAsString();
