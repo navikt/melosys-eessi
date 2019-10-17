@@ -93,6 +93,16 @@ public class SedServiceTest {
     }
 
     @Test
+    public void opprettBucOgSed_brukerMedSperretAdresse_forventSettSakSensitiv() throws Exception {
+        SedDataDto sedData = SedDataStub.getStub();
+        sedData.getBruker().setHarSperretAdresse(true);
+        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
+
+        assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
+        verify(euxService).settSakSensitiv(RINA_ID);
+    }
+
+    @Test
     public void createAndSend_sedEksistererPaaBuc_forventOppdaterEksisterendeSed() throws Exception {
         Long gsakSaksnummer = 123L;
         SedDataDto sedDataDto = SedDataStub.getStub();
@@ -178,6 +188,24 @@ public class SedServiceTest {
     }
 
     @Test
+    public void sendPåEksisterendeBuc_brukerMedSperretAdresse_forventSettSakSensitiv() throws IntegrationException, IOException, URISyntaxException, MappingException, NotFoundException {
+        BUC buc = new BUC();
+        buc.setActions(Arrays.asList(
+                new Action("A001", "A001", "111", "Read"),
+                new Action("A009", "A009", "222", "Create")
+        ));
+        when(euxService.hentBuc(anyString())).thenReturn(buc);
+
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        sedDataDto.getBruker().setHarSperretAdresse(true);
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A009);
+
+        verify(euxService).hentBuc(anyString());
+        verify(euxService).settSakSensitiv("123");
+        verify(euxService).opprettOgSendSed(any(SED.class), anyString());
+    }
+
+    @Test
     public void genererPdfFraSed_forventKall() throws IOException, URISyntaxException, IntegrationException, MappingException, NotFoundException {
         SedDataDto sedDataDto = SedDataStub.getStub();
         final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
@@ -195,12 +223,5 @@ public class SedServiceTest {
                 "begrunnelse",
                 new Periode(LocalDate.now(), LocalDate.now().plusDays(1L))
         );
-    }
-
-    private Document lagDocument(String type, String id) {
-        Document document = new Document();
-        document.setType(type);
-        document.setId(id);
-        return document;
     }
 }
