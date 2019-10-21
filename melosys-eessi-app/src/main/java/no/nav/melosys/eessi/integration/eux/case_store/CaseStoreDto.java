@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CaseStoreDto {
+    private Long id;
     @JsonProperty("bucId")
     private String bucID;
     @JsonProperty("navId")
