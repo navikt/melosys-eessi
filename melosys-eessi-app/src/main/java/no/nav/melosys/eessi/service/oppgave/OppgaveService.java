@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OppgaveService {
 
-    private static final String SOEK_PERSON = "SOEK_PERS";
+    private static final String JFR = "JFR";
     private static final String TEMA_MED = "MED";
     private static final String ENHET_ID_FORDELING = "4303";
 
@@ -27,8 +27,8 @@ public class OppgaveService {
                 .aktivDato(LocalDate.now())
                 .fristFerdigstillelse(LocalDate.now().plusWeeks(2L))
                 .journalpostId(journalpostID)
-                .oppgavetype(SOEK_PERSON)
-                .prioritet("HOY")
+                .oppgavetype(JFR)
+                .prioritet("NORM")
                 .tema(TEMA_MED)
                 .tildeltEnhetsnr(ENHET_ID_FORDELING)
                 .build();

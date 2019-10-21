@@ -44,6 +44,6 @@ public class OppgaveServiceTest {
         OppgaveDto oppgaveDto = captor.getValue();
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
         assertThat(oppgaveDto.getTema()).isEqualTo("MED");
-        assertThat(oppgaveDto.getOppgavetype()).isEqualTo("SOEK_PERS");
+        assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR");
     }
 }
