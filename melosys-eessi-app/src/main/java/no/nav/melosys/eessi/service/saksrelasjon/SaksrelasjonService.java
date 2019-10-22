@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
+import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -16,12 +17,14 @@ public class SaksrelasjonService {
 
     private final FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     private final CaseStoreConsumer caseStoreConsumer;
+    private final SakConsumer sakConsumer;
 
 
     public SaksrelasjonService(FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository,
-            CaseStoreConsumer caseStoreConsumer) {
+            CaseStoreConsumer caseStoreConsumer, SakConsumer sakConsumer) {
         this.fagsakRinasakKoblingRepository = fagsakRinasakKoblingRepository;
         this.caseStoreConsumer = caseStoreConsumer;
+        this.sakConsumer = sakConsumer;
     }
 
     @Transactional
@@ -34,10 +37,24 @@ public class SaksrelasjonService {
         fagsakRinasakKobling = fagsakRinasakKoblingRepository.save(fagsakRinasakKobling);
 
         if (!bucType.erLovvalgBuc()) {
-            caseStoreConsumer.lagre(gsakSaksnummer.toString(), rinaSaksnummer);
+            oppdaterEllerLagreIEuxCaseStore(gsakSaksnummer, rinaSaksnummer);
         }
 
         return fagsakRinasakKobling;
+    }
+
+    private void oppdaterEllerLagreIEuxCaseStore(Long gsakSaksnummer, String rinaSaksnummer) throws IntegrationException {
+        Optional<CaseStoreDto> caseStoreDto = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer)
+                .stream().findFirst();
+        if (caseStoreDto.isPresent()) {
+            String tema = sakConsumer.getSak(gsakSaksnummer.toString()).getTema();
+            CaseStoreDto dto = caseStoreDto.get();
+            dto.setTema(tema);
+            dto.setFagsaknummer(gsakSaksnummer.toString());
+            caseStoreConsumer.lagre(dto);
+        } else {
+            caseStoreConsumer.lagre(gsakSaksnummer.toString(), rinaSaksnummer);
+        }
     }
 
     @Transactional

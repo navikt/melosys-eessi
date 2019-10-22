@@ -37,8 +37,13 @@ public class CaseStoreConsumer implements RestConsumer {
     }
 
     public CaseStoreDto lagre(String gsakSaksnummer, String rinaSaksnummer) throws IntegrationException {
-        log.info("Lagrer saksnummer {} og rinaSaksnummer {} i eux-case-store", gsakSaksnummer, rinaSaksnummer);
-        return post("/cases", new CaseStoreDto(gsakSaksnummer, rinaSaksnummer));
+        return lagre(new CaseStoreDto(gsakSaksnummer, rinaSaksnummer));
+    }
+
+    public CaseStoreDto lagre(CaseStoreDto caseStoreDto) throws IntegrationException {
+        log.info("Lagrer saksnummer {} og rinaSaksnummer {} i eux-case-store",
+                caseStoreDto.getFagsaknummer(), caseStoreDto.getRinaSaksnummer());
+        return post("/cases", caseStoreDto);
     }
 
     private List<CaseStoreDto> get(String uri) throws IntegrationException {
