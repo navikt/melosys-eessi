@@ -105,7 +105,7 @@ public class BehandleSedMottattService {
     }
 
     private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
-        log.info("Publiserer melding om mottatt sed på kafak for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
+        log.info("Publiserer melding om mottatt sed på kafka for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         SedHendelse sedHendelse = sedMottatt.getSedHendelse();
         SedType sedType = SedType.valueOf(sed.getSed());
         String aktoerID = tpsService.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
