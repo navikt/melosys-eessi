@@ -24,4 +24,5 @@ public class Bruker {
     private String statsborgerskap;
     private String fnr;
 
+    private boolean harSensitiveOpplysninger;
 }

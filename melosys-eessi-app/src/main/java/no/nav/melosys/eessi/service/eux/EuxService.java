@@ -156,4 +156,8 @@ public class EuxService {
     public String hentRinaUrlPrefix() {
         return rinaHostUrl + RINA_URL_TEMPLATE;
     }
+
+    public void settSakSensitiv(String rinaSaksnummer) throws IntegrationException {
+        euxConsumer.setSakSensitiv(rinaSaksnummer);
+    }
 }

@@ -50,6 +50,10 @@ public class SedService {
                 sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId()
         );
 
+        if (sedDataDto.getBruker().isHarSensitiveOpplysninger()) {
+            euxService.settSakSensitiv(response.getRinaSaksnummer());
+        }
+
         if (sendAutomatisk) {
             sendSed(response.getRinaSaksnummer(), response.getDokumentId());
         }
