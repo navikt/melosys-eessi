@@ -50,7 +50,7 @@ public class SedService {
                 sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerLand(), sedDataDto.getMottakerId()
         );
 
-        if (sedDataDto.getBruker().isHarSperretAdresse()) {
+        if (sedDataDto.getBruker().isHarSensitiveOpplysninger()) {
             euxService.settSakSensitiv(response.getRinaSaksnummer());
         }
 
@@ -86,10 +86,6 @@ public class SedService {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
         if (!buc.kanOppretteSed(sedType)) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc "+ rinaSaksnummer + " med type " + buc.getBucType());
-        }
-
-        if (sedDataDto.getBruker().isHarSperretAdresse()) {
-            euxService.settSakSensitiv(rinaSaksnummer);
         }
 
         SED sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
