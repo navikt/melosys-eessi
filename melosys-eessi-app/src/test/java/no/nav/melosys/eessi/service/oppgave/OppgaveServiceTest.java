@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.oppgave;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,13 +38,14 @@ public class OppgaveServiceTest {
 
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto());
         String journalpostID = "111";
-        oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID);
+        oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID, SedType.A009.name());
 
         verify(oppgaveConsumer).opprettOppgave(captor.capture());
 
         OppgaveDto oppgaveDto = captor.getValue();
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
-        assertThat(oppgaveDto.getTema()).isEqualTo("MED");
+        assertThat(oppgaveDto.getTema()).isEqualTo("UFM");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR");
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009");
     }
 }

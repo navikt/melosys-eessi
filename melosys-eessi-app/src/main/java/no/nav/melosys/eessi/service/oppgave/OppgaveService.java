@@ -7,14 +7,15 @@ import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.stereotype.Service;
+import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 
 @Slf4j
 @Service
 public class OppgaveService {
 
     private static final String JFR = "JFR";
-    private static final String TEMA_MED = "MED";
     private static final String ENHET_ID_FORDELING = "4303";
+    private static final String BESKRIVELSE = "EØS - %s";
 
     private final OppgaveConsumer oppgaveConsumer;
 
@@ -22,15 +23,16 @@ public class OppgaveService {
         this.oppgaveConsumer = oppgaveConsumer;
     }
 
-    public String opprettOppgaveTilIdOgFordeling(String journalpostID) throws IntegrationException {
+    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType) throws IntegrationException {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .fristFerdigstillelse(LocalDate.now().plusWeeks(2L))
                 .journalpostId(journalpostID)
                 .oppgavetype(JFR)
                 .prioritet("NORM")
-                .tema(TEMA_MED)
+                .tema(temaForSedType(sedType))
                 .tildeltEnhetsnr(ENHET_ID_FORDELING)
+                .beskrivelse(String.format(BESKRIVELSE, sedType))
                 .build();
 
         OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);

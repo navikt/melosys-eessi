@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import org.springframework.util.StringUtils;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
+import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 
 @Slf4j
 public final class OpprettJournalpostRequestMapper {
@@ -56,18 +57,13 @@ public final class OpprettJournalpostRequestMapper {
                 .journalpostType(journalpostType)
                 .kanal("EESSI")
                 .sak(sak != null ? OpprettJournalpostRequest.Sak.builder().arkivsaksnummer(sak.getId()).build() : null)
-                .tema(sak != null ? sak.getTema() : temaFraSedType(sedHendelse.getSedType()))
+                .tema(sak != null ? sak.getTema() : temaForSedType(sedHendelse.getSedType()))
                 .tittel(dokkatSedInfo.getDokumentTittel())
                 .tilleggsopplysninger(Arrays.asList(
                         Tilleggsopplysning.builder().nokkel("rinaSakId").verdi(sedHendelse.getRinaSakId()).build(),
                         Tilleggsopplysning.builder().nokkel("rinaDokumentId").verdi(sedHendelse.getRinaDokumentId()).build()
                         ))
                 .build();
-    }
-
-    private static String temaFraSedType(String sedType) {
-        SedType sedTypeEnum = SedType.valueOf(sedType);
-        return TEMA_UFM_SEDTYPER.contains(sedTypeEnum) ? "UFM" : "MED";
     }
 
     private static Bruker lagBruker(final String fnr) {
