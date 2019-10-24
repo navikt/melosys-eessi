@@ -18,6 +18,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable.idempotence: true
+      
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
