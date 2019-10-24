@@ -8,7 +8,7 @@ node {
 
     properties([
             parameters([
-                    choice(choices: ['t8', 'q2'],
+                    choice(choices: ['t8', 'q2', 'p'],
                             description: 'Hvilket miljø skal applikasjon deployes til. Default er q', name: 'NAMESPACE')
             ])
     ])
@@ -17,11 +17,11 @@ node {
     def KUBECTL = "/usr/local/bin/kubectl"
     def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
-    def DEFAULT_BUILD_USER = "eessi2-jenkins"
 
     def cluster = "dev-fss"
     def dockerRepo = "docker.adeo.no:5000/melosys"
-    def namespace = "${params.NAMESPACE}".toString()
+    def environment = "${params.NAMESPACE}".toString()
+    def namespace
 
     def mvnSettings = "navMavenSettingsUtenProxy"
 
@@ -32,6 +32,13 @@ node {
 
     // Set Spring profiles to activate
     def springProfiles = "nais"
+
+    if (environment == 'p') {
+        namespace = 'default'
+        cluster = 'prod-fss'
+    } else {
+        namespace = environment
+    }
 
     stage("Checkout") {
         scmInfo = checkout scm

@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.config;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -10,6 +11,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
 @EnableSwagger2
+@ConditionalOnProperty(name = "NAIS_CLUSTER_NAME", havingValue = "dev-fss", matchIfMissing = true)
 public class SwaggerConfig {
 
     @Bean
