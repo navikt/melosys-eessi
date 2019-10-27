@@ -32,7 +32,7 @@ public class SedMottattConsumer {
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedMottatt sedMottatt = SedMottatt.av(consumerRecord.value());
 
-        log.info("Sed mottatt: {}", sedMottatt.getSedHendelse());
+        log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedMottatt.getSedHendelse(), consumerRecord.offset());
         behandleMottatt(sedMottatt);
         sedMetrikker.sedMottatt(sedMottatt.getSedHendelse().getSedType());
     }

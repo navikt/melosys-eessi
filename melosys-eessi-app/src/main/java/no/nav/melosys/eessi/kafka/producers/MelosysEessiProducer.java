@@ -27,13 +27,14 @@ public class MelosysEessiProducer {
         future.addCallback(new ListenableFutureCallback<SendResult<String, MelosysEessiMelding>>() {
             @Override
             public void onFailure(Throwable throwable) {
-                log.error("Kunne ikke sende melding om mottat SED: {}", melding, throwable); //TODO: store and retry
+                log.error("Kunne ikke sende melding om mottat SED: {}", melding, throwable);
             }
 
             @Override
             public void onSuccess(SendResult<String, MelosysEessiMelding> res) {
-                log.info("Melding sendt på topic {}. Record.key: {}, record: {}",
-                        topicName, res.getProducerRecord().key(), res.getProducerRecord().value());
+                log.info("Melding sendt på topic {}. Record.key: {}, offset: {}, record: {}",
+                        topicName, res.getProducerRecord().key(),
+                        res.getRecordMetadata().offset(), res.getProducerRecord().value());
             }
         });
     }

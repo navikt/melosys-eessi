@@ -29,7 +29,7 @@ public class SedSendtConsumer {
             containerFactory = "sedSendtListenerContainerFactory")
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendt = consumerRecord.value();
-        log.info("Sed sendt: {}", sedSendt);
+        log.info("Mottatt melding om sed sendt: {}, offset: {}", sedSendt, consumerRecord.offset());
 
         try {
             String journalpostId = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
