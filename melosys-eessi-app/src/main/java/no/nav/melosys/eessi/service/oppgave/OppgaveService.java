@@ -30,7 +30,7 @@ public class OppgaveService {
     public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType) throws IntegrationException {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
-                .fristFerdigstillelse(LocalDate.now().plusWeeks(2L))
+                .fristFerdigstillelse(LocalDate.now().plusDays(1))
                 .journalpostId(journalpostID)
                 .oppgavetype(JFR)
                 .prioritet(PRIORITET_NORMAL)
@@ -48,7 +48,7 @@ public class OppgaveService {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .beskrivelse(lagBeskrivelseUtgåendeJfrOppgave(sedHendelse, rinaUrl))
-                .fristFerdigstillelse(LocalDate.now().plusDays(7L))
+                .fristFerdigstillelse(LocalDate.now().plusDays(1))
                 .journalpostId(journalpostID)
                 .oppgavetype(JFR_UT)
                 .prioritet(PRIORITET_NORMAL)
