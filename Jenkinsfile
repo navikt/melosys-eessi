@@ -61,7 +61,7 @@ node {
     }
 
     stage("Deploy to NAIS") {
-        prepareNaisYaml(NAISERATOR_CONFIG, imageVersion, namespace)
+        prepareNaisYaml(NAISERATOR_CONFIG, application, imageVersion, namespace, cluster)
 
         // set namespace to context
         sh "${KUBECTL} config --kubeconfig=${KUBECONFIG_NAISERATOR} set-context ${cluster} --namespace=${namespace}"
@@ -84,13 +84,21 @@ def getBuildUser(defaultUser) {
     }
 }
 
-def prepareNaisYaml(naiseratorFile, version, namespace) {
-    replaceInFile('@@RELEASE_VERSION@@', version, naiseratorFile)
+def prepareNaisYaml(naiseratorFile, application, imageVersion, namespace, cluster) {
+    // set version in yaml-file:
+    replaceInFile('@@IMAGE_VERSION@@', imageVersion, naiseratorFile)
+
+    def domain
+    if (cluster == "prod-fss") {
+        domain = ".nais.adeo.no"
+    } else {
+        domain = ".nais.preprod.local"
+    }
 
     if (namespace == "default") {
-        replaceInFile('@@URL_NAMESPACE@@', '', naiseratorFile)
+        replaceInFile('@@URL@@', application + domain, naiseratorFile)
     } else {
-        replaceInFile('@@URL_NAMESPACE@@', "-${namespace}" as String, naiseratorFile)
+        replaceInFile('@@URL@@', application + "-" + namespace.toString() + domain, naiseratorFile)
     }
 
     replaceInFile('@@NAMESPACE@@', namespace, naiseratorFile)
