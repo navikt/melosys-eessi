@@ -32,6 +32,7 @@ public class BucCloser {
 
     public void closeBucsByType(BucType bucType) {
         try {
+            log.info("Lukker bucer av type {}", bucType);
             euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).status("open").build())
                     .stream()
                     .filter(norgeErCaseOwnerPredicate)
