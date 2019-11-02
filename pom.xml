@@ -28,7 +28,8 @@
     <no-nav-dok-tjenester-mottainngaaendeforsendelse.version>1.0.13</no-nav-dok-tjenester-mottainngaaendeforsendelse.version>
     <flyway.version>5.2.4</flyway.version>
     <guava.version>21.0</guava.version>
-    <java.version>1.8</java.version>
+    <java.version>12</java.version>
+    <javax-xml-webservices-api.version>2.0.1</javax-xml-webservices-api.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <logstash-encoder.version>5.3</logstash-encoder.version>
     <micrometer-jvm-extras.version>0.1.4</micrometer-jvm-extras.version>

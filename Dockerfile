@@ -1,4 +1,4 @@
-FROM navikt/java:8
+FROM navikt/java:12
 LABEL maintainer="Team Melosys"
 
 ARG JAR_FILE
