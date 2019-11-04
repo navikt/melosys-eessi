@@ -68,7 +68,7 @@ public class OppgaveServiceTest {
 
         OppgaveDto oppgaveDto = captor.getValue();
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
-        assertThat(oppgaveDto.getTema()).isEqualTo("UFM");
+        assertThat(oppgaveDto.getTema()).isEqualTo("MED");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR_UT");
         assertThat(oppgaveDto.getAktoerId()).isEqualTo(aktørID);
         assertThat(oppgaveDto.getBeskrivelse()).contains("A009", "deadbeef");
