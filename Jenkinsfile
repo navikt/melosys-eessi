@@ -32,6 +32,9 @@ node {
 
     // Set Spring profiles to activate
     def springProfiles = "nais"
+    def javaHome = tool "jdk-11"
+    def mvnHome = tool "maven-3.6.0"
+    env.PATH = "${javaHome}/bin:${mvnHome}/bin:${env.PATH}"
 
     if (environment == 'p') {
         namespace = 'default'
