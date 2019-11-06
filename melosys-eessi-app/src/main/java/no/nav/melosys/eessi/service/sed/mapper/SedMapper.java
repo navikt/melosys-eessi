@@ -159,7 +159,7 @@ public interface SedMapper {
             arbeidssted.setNavn(arbStd.getNavn());
             arbeidssted.setErikkefastadresse(arbStd.isFysisk() ? "nei" : "ja");
             arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
-            arbeidssted.setHjemmebase(arbStd.isFysisk() ? null : landkodeIso2EllerNull(arbStd.getAdresse().getLand()));
+            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
             arbeidsstedList.add(arbeidssted);
         }
 
