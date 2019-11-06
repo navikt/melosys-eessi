@@ -159,6 +159,7 @@ public interface SedMapper {
             arbeidssted.setNavn(arbStd.getNavn());
             arbeidssted.setErikkefastadresse(arbStd.isFysisk() ? "nei" : "ja");
             arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
+            arbeidssted.setHjemmebase(arbStd.isFysisk() ? null : landkodeIso2EllerNull(arbStd.getAdresse().getLand()));
             arbeidsstedList.add(arbeidssted);
         }
 
@@ -261,5 +262,15 @@ public interface SedMapper {
         }
 
         return periode;
+    }
+
+    default String landkodeIso2EllerNull(String iso3) throws NotFoundException {
+        if (iso3 == null) {
+            return null;
+        } else if (iso3.length() == 2) {
+            return iso3;
+        } else {
+            return LandkodeMapper.getLandkodeIso2(iso3);
+        }
     }
 }
