@@ -157,13 +157,9 @@ public interface SedMapper {
         for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
             Arbeidssted arbeidssted = new Arbeidssted();
             arbeidssted.setNavn(arbStd.getNavn());
-            if (arbStd.isFysisk()) {
-                arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
-            } else {
-                arbeidssted.setErikkefastadresse("ja");
-                arbeidssted.setHjemmebase(
-                        ""); //TODO: maritime/ikke fysisk arbeidssteder. holder med isFysisk sjekk? Trenger muligens felt hjemmebase
-            }
+            arbeidssted.setErikkefastadresse(arbStd.isFysisk() ? "nei" : "ja");
+            arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
+            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
             arbeidsstedList.add(arbeidssted);
         }
 
@@ -226,15 +222,14 @@ public interface SedMapper {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) ?
+        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) && !StringUtils.isEmpty(sAdresse.getPostnr()) ?
                 PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
         adresse.setRegion(sAdresse.getRegion());
 
         if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
-            throw new MappingException(
-                    "Element 'poststed' and 'land' and  is required for all addresses");
+            throw new MappingException("Felter 'poststed' og 'land' er påkrevd for adresser");
         }
 
         return adresse;
@@ -267,5 +262,15 @@ public interface SedMapper {
         }
 
         return periode;
+    }
+
+    default String landkodeIso2EllerNull(String iso3) throws NotFoundException {
+        if (iso3 == null) {
+            return null;
+        } else if (iso3.length() == 2) {
+            return iso3;
+        } else {
+            return LandkodeMapper.getLandkodeIso2(iso3);
+        }
     }
 }
