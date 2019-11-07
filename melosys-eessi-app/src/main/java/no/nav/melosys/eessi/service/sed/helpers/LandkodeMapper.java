@@ -61,6 +61,24 @@ public final class LandkodeMapper {
         return landkodeIso2;
     }
 
+    public static String mapTilEuLandkode(String landkode) {
+        if ("GB".equalsIgnoreCase(landkode)) {
+            return "UK";
+        } else if ("EL".equalsIgnoreCase(landkode)) {
+            return "GR";
+        }
+        return landkode;
+    }
+
+    public static String mapTilNavLandkode(String landkode) {
+        if ("UK".equalsIgnoreCase(landkode)) {
+            return "GB";
+        } else if ("GR".equalsIgnoreCase(landkode)) {
+            return "EL";
+        }
+        return landkode;
+    }
+
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class Landkode {
