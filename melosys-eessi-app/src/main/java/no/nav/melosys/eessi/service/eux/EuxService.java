@@ -92,10 +92,12 @@ public class EuxService {
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
-    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, String landkode)
+    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode)
             throws IntegrationException {
 
-        return filtrerPåLandkode(euxConsumer.hentInstitusjoner(bucType, null), landkode)
+        return euxConsumer.hentInstitusjoner(bucType, null).stream()
+                .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
+                .filter(i -> filtrerPåLandkode(i, landkode))
                 .filter(i -> i.getTilegnetBucs().stream().filter(
                         tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
                                 COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
@@ -103,21 +105,8 @@ public class EuxService {
                 .collect(Collectors.toList());
     }
 
-    //eux-rina-api støtter søk på GB (mapper det til UK), men returnerer respons med UK
-    private Stream<Institusjon> filtrerPåLandkode(Collection<Institusjon> institusjoner, String landkode) {
-        if (StringUtils.isEmpty(landkode)) {
-            return institusjoner.stream();
-        }
-
-        final String euLandkode = LandkodeMapper.mapTilEuLandkode(landkode);
-        if (euLandkode.equalsIgnoreCase(landkode)){
-            return institusjoner.stream()
-                    .filter(institusjon -> euLandkode.equalsIgnoreCase(institusjon.getLandkode()));
-        }
-
-        return institusjoner.stream()
-                .filter(institusjon -> euLandkode.equalsIgnoreCase(institusjon.getLandkode()))
-                .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())));
+    private boolean filtrerPåLandkode(Institusjon institusjon, String landkode) {
+        return landkode == null || landkode.equalsIgnoreCase(institusjon.getLandkode());
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
