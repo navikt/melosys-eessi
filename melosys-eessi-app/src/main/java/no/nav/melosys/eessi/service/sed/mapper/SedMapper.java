@@ -109,15 +109,33 @@ public interface SedMapper {
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sedDataDto.getBostedsadresse().getLand()));
         adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
         adresse.setRegion(sedDataDto.getBostedsadresse().getRegion());
+        adresse.setType(mapAdressetype(sedDataDto.getBostedsadresse().getAdressetype()));
 
         // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
-        if ("NO".equalsIgnoreCase(adresse.getLand())) {
-            adresse.setType("bosted");
-        } else {
-            adresse.setType("opphold");
+        if (sedDataDto.getBostedsadresse().getAdressetype() == Adressetype.BOSTEDSADRESSE) {
+            if ("NO".equalsIgnoreCase(adresse.getLand())) {
+                adresse.setType("bosted");
+            } else {
+                adresse.setType("opphold");
+            }
         }
 
         return Collections.singletonList(adresse);
+    }
+
+    default String mapAdressetype(Adressetype adressetype) {
+        switch (adressetype) {
+            case BOSTEDSADRESSE:
+                return "bosted";
+            case OPPHOLDSADRESSE:
+                return "opphold";
+            case KONTAKTADRESSE:
+                return "kontakt";
+            case ANNET:
+                return "annet";
+            default:
+                throw new IllegalArgumentException("Finner ikke addressetype " + adressetype);
+        }
     }
 
     default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {
