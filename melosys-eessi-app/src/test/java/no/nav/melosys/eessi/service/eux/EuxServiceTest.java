@@ -196,6 +196,16 @@ public class EuxServiceTest {
     }
 
     @Test
+    public void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() throws IntegrationException {
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GR");
+        assertThat(institusjoner).hasSize(1);
+
+        Institusjon institusjon = institusjoner.get(0);
+        assertThat(institusjon.getAkronym()).isEqualTo("FK EL-TITTEI");
+        assertThat(institusjon.getLandkode()).isEqualTo("GR");
+    }
+
+    @Test
     public void sedErEndring_medFlereConversations_forventTrue() throws IntegrationException {
         String sedID = "3333";
         String rinaSaksnummer = "333222111";

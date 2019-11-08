@@ -106,7 +106,7 @@ public class EuxService {
     }
 
     private boolean filtrerPåLandkode(Institusjon institusjon, String landkode) {
-        return landkode == null || landkode.equalsIgnoreCase(institusjon.getLandkode());
+        return StringUtils.isEmpty(landkode) || landkode.equalsIgnoreCase(institusjon.getLandkode());
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {

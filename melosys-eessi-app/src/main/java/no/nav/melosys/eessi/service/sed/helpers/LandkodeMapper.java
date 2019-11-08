@@ -64,8 +64,8 @@ public final class LandkodeMapper {
     public static String mapTilNavLandkode(String landkode) {
         if ("UK".equalsIgnoreCase(landkode)) {
             return "GB";
-        } else if ("GR".equalsIgnoreCase(landkode)) {
-            return "EL";
+        } else if ("EL".equalsIgnoreCase(landkode)) {
+            return "GR";
         }
         return landkode;
     }
