@@ -25,7 +25,6 @@
     <cxf.version>3.1.11</cxf.version>
     <dokarkiv-api-v1.version>0.0.4</dokarkiv-api-v1.version>
     <dokkat-api.version>10.1.1</dokkat-api.version>
-    <no-nav-dok-tjenester-mottainngaaendeforsendelse.version>1.0.13</no-nav-dok-tjenester-mottainngaaendeforsendelse.version>
     <flyway.version>5.2.4</flyway.version>
     <guava.version>21.0</guava.version>
     <java.version>1.8</java.version>

@@ -78,11 +78,6 @@
             <version>${dokkat-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.tjenester.fim</groupId>
-            <artifactId>no-nav-dok-tjenester-mottainngaaendeforsendelse</artifactId>
-            <version>${no-nav-dok-tjenester-mottainngaaendeforsendelse.version}</version>
-        </dependency>
-        <dependency>
             <groupId>no.nav.tjenester</groupId>
             <artifactId>nav-person-v3-tjenestespesifikasjon</artifactId>
             <version>${tps.person.version}</version>
