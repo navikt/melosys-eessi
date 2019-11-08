@@ -22,7 +22,7 @@
 
   <properties>
     <commons-io.version>2.6</commons-io.version>
-    <cxf.version>3.1.11</cxf.version>
+    <cxf.version>3.3.4</cxf.version>
     <dokarkiv-api-v1.version>0.0.4</dokarkiv-api-v1.version>
     <dokkat-api.version>10.1.1</dokkat-api.version>
     <no-nav-dok-tjenester-mottainngaaendeforsendelse.version>1.0.13</no-nav-dok-tjenester-mottainngaaendeforsendelse.version>
