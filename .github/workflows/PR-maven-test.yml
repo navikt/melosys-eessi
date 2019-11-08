@@ -11,8 +11,6 @@ jobs:
     steps:
     - name: Checkout 
       uses: actions/checkout@v1
-      with:
-        ref: actions
     - name: Maven something
       uses: actions/cache@preview
       with:
