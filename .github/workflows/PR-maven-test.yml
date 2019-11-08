@@ -1,10 +1,6 @@
 name: Maven Test
 
-on:
-  pull_request:
-    branches: 
-      - master
-      - 'SPRINT-*'
+on: [pull_request]
 
 jobs:
   build:
