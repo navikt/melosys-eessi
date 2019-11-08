@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.eux;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,6 +16,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -90,20 +92,21 @@ public class EuxService {
                         "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
-    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, String landkode)
+    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode)
             throws IntegrationException {
-        Stream<Institusjon> institusjoner = euxConsumer.hentInstitusjoner(bucType, null).stream();
 
-        if (!StringUtils.isEmpty(landkode)) {
-            institusjoner = institusjoner.filter(institusjon -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
-        }
-
-        return institusjoner.filter(i ->
-                i.getTilegnetBucs().stream().filter(
+        return euxConsumer.hentInstitusjoner(bucType, null).stream()
+                .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
+                .filter(i -> filtrerPåLandkode(i, landkode))
+                .filter(i -> i.getTilegnetBucs().stream().filter(
                         tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
                                 COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
                         .anyMatch(TilegnetBuc::erEessiKlar))
                 .collect(Collectors.toList());
+    }
+
+    private boolean filtrerPåLandkode(Institusjon institusjon, String landkode) {
+        return StringUtils.isEmpty(landkode) || landkode.equalsIgnoreCase(institusjon.getLandkode());
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {

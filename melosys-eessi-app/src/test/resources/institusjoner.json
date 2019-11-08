@@ -142,5 +142,33 @@
         "eessiklar": true
       }
     ]
+  },
+  {
+    "id": "UK:1",
+    "navn": "The UK Social Insurance Agency",
+    "akronym": "FK UK-TITTEI",
+    "landkode": "UK",
+    "tilegnetBucs": [
+      {
+        "bucType": "LA_BUC_04",
+        "institusjonsrolle": "CounterParty",
+        "gyldigStartDato": "2018-02-28T23:00:00.000+0000",
+        "eessiklar": true
+      }
+    ]
+  },
+  {
+    "id": "EL:1",
+    "navn": "The Hellas Social Insurance Agency",
+    "akronym": "FK EL-TITTEI",
+    "landkode": "EL",
+    "tilegnetBucs": [
+      {
+        "bucType": "LA_BUC_04",
+        "institusjonsrolle": "CounterParty",
+        "gyldigStartDato": "2018-02-28T23:00:00.000+0000",
+        "eessiklar": true
+      }
+    ]
   }
 ]
