@@ -157,12 +157,7 @@
             <version>${random-benas.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>no.nav.person</groupId>
-            <artifactId>person-utils-kafka-test</artifactId>
-            <version>${person-utils.version}</version>
-            <scope>test</scope>
-        </dependency>
+
     </dependencies>
 
     <build>
