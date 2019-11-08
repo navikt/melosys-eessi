@@ -1,9 +1,9 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
-import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
@@ -84,7 +84,7 @@ public abstract class ComponentTestBase {
         when(aktoerConsumer.hentAktoerId(anyString())).thenReturn(AKTOER_ID);
         when(personConsumer.hentPerson(any(HentPersonRequest.class))).thenReturn(componentTestProvider.hentPersonResponse(AKTOER_ID, FØDSELSDATO, "NO"));
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(componentTestProvider.sed(FØDSELSDATO, STATSBORGERSKAP));
-        when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdTo("dokumenttypeId"));
-        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(componentTestProvider.dokumentTypeInfoToV4());
+        when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
+        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(componentTestProvider.dokumentTypeInfoDto());
     }
 }

@@ -1,9 +1,9 @@
 package no.nav.melosys.eessi.service.dokkat;
 
-import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
-import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,20 +26,20 @@ public class DokkatService {
 
     @Cacheable("metadataDokkat")
     public DokkatSedInfo hentMetadataFraDokkat(String sedType) throws IntegrationException {
-        DokumenttypeIdTo dokumenttypeIdTo = dokumenttypeIdConsumer
+        DokumenttypeIdDto dokumenttypeIdTo = dokumenttypeIdConsumer
             .hentDokumenttypeId(sedType, EKSTERN_ID_TYPE_SED);
-        DokumentTypeInfoToV4 dokumentTypeInfoToV4 = dokumenttypeInfoConsumer
+        DokumentTypeInfoDto dokumentTypeInfoDto = dokumenttypeInfoConsumer
             .hentDokumenttypeInfo(dokumenttypeIdTo.getDokumenttypeId());
-        return map(dokumentTypeInfoToV4);
+        return map(dokumentTypeInfoDto);
     }
 
-    private DokkatSedInfo map(DokumentTypeInfoToV4 dokumentTypeInfoToV4) {
+    private DokkatSedInfo map(DokumentTypeInfoDto dokumentTypeInfoDto) {
         DokkatSedInfo dokkatSedInfo = new DokkatSedInfo();
-        dokkatSedInfo.setDokumentKategori(dokumentTypeInfoToV4.getDokumentKategori());
-        dokkatSedInfo.setDokumentTittel(dokumentTypeInfoToV4.getDokumentTittel());
-        dokkatSedInfo.setDokumenttypeId(dokumentTypeInfoToV4.getDokumenttypeId());
-        dokkatSedInfo.setBehandlingstema(dokumentTypeInfoToV4.getBehandlingstema());
-        dokkatSedInfo.setTema(dokumentTypeInfoToV4.getTema());
+        dokkatSedInfo.setDokumentKategori(dokumentTypeInfoDto.getDokumentKategori());
+        dokkatSedInfo.setDokumentTittel(dokumentTypeInfoDto.getDokumentTittel());
+        dokkatSedInfo.setDokumenttypeId(dokumentTypeInfoDto.getDokumenttypeId());
+        dokkatSedInfo.setBehandlingstema(dokumentTypeInfoDto.getBehandlingstema());
+        dokkatSedInfo.setTema(dokumentTypeInfoDto.getTema());
 
         return dokkatSedInfo;
     }

@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -32,14 +32,14 @@ public class ComponentTestProvider {
     public ComponentTestProvider() {
     }
 
-    DokumentTypeInfoToV4 dokumentTypeInfoToV4() {
-        DokumentTypeInfoToV4 dokumentTypeInfoToV4 = new DokumentTypeInfoToV4();
-        dokumentTypeInfoToV4.setDokumentKategori("dokumentKategori");
-        dokumentTypeInfoToV4.setDokumentTittel("dokumentTittel");
-        dokumentTypeInfoToV4.setDokumenttypeId("dokumenttypeId");
-        dokumentTypeInfoToV4.setBehandlingstema("behandlingstema");
-        dokumentTypeInfoToV4.setTema("tema");
-        return dokumentTypeInfoToV4;
+    DokumentTypeInfoDto dokumentTypeInfoDto() {
+        DokumentTypeInfoDto dokumentTypeInfoDto = new DokumentTypeInfoDto();
+        dokumentTypeInfoDto.setDokumentKategori("dokumentKategori");
+        dokumentTypeInfoDto.setDokumentTittel("dokumentTittel");
+        dokumentTypeInfoDto.setDokumenttypeId("dokumenttypeId");
+        dokumentTypeInfoDto.setBehandlingstema("behandlingstema");
+        dokumentTypeInfoDto.setTema("tema");
+        return dokumentTypeInfoDto;
     }
 
     SedHendelse sedHendelse(String aktoerId) {

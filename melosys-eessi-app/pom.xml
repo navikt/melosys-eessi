@@ -61,7 +61,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>io.springfox</groupId>
@@ -72,11 +71,6 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger-ui</artifactId>
             <version>${springfox-swagger2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.dokkat</groupId>
-            <artifactId>dokkat-api</artifactId>
-            <version>${dokkat-api.version}</version>
         </dependency>
         <dependency>
             <groupId>no.nav.tjenestespesifikasjoner</groupId>
