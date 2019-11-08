@@ -79,8 +79,8 @@
             <version>${dokkat-api.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.tjenester</groupId>
-            <artifactId>nav-person-v3-tjenestespesifikasjon</artifactId>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
+            <artifactId>person-v3-tjenestespesifikasjon</artifactId>
             <version>${tps.person.version}</version>
         </dependency>
         <dependency>
@@ -114,10 +114,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>no.nav.tjenester.fim</groupId>
+            <groupId>no.nav.tjenestespesifikasjoner</groupId>
             <artifactId>nav-fim-personsok-v1-tjenestespesifikasjon</artifactId>
             <version>${personsok.version}</version>
-            <classifier>jaxws</classifier>
         </dependency>
         <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
