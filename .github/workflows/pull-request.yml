@@ -15,7 +15,7 @@ jobs:
     steps:
     - name: Checkout 
       uses: actions/checkout@v1
-    - name: Maven something
+    - name: Setup Maven
       uses: actions/cache@preview
       with:
         path: ~/.m2/repository
@@ -27,5 +27,5 @@ jobs:
       with:
        java-version: '11.x'
           
-    - name: Run maven test
-      run: mvn test
+    - name: Build and test
+      run: mvn verify
