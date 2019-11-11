@@ -4,7 +4,7 @@ metadata:
   name: melosys-eessi
   namespace: t8
   labels:
-    team: teammelosys
+    team: {{team}}
 spec:
   image: {{image}}:{{tag}}
   port: 8080
