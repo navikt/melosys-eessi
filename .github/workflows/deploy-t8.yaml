@@ -39,11 +39,11 @@ jobs:
         env:
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
       - name: Deploy til t8
-          uses: navikt/deployment-cli/action@0.4.1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            AWAIT_SECONDS: 0
-          with:
-            cluster: dev-fss
-            team: teammelosys
-            resources: deploy/naiserator-t8.yaml
+        uses: navikt/deployment-cli/action@0.4.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AWAIT_SECONDS: 0
+        with:
+        cluster: dev-fss
+          team: teammelosys
+          resources: deploy/naiserator-t8.yaml
