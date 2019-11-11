@@ -4,6 +4,7 @@ final class MetrikkerNavn {
 
     private static final String METRIKKER_NAMESPACE = "melosys-eessi.";
 
+    static final String SED_MOTTATT_FEILET = METRIKKER_NAMESPACE + "sed.feilet.antall";
     static final String SED_MOTTATT = METRIKKER_NAMESPACE + "sed.mottatt";
     static final String SED_SENDT = METRIKKER_NAMESPACE + "sed.sendt";
     static final String IDENTIFISERING = METRIKKER_NAMESPACE + "identifisering";

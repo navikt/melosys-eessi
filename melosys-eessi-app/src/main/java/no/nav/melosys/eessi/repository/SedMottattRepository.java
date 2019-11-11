@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SedMottattRepository extends JpaRepository<SedMottatt, Long> {
     Collection<SedMottatt> findAllByFerdigFalseAndFeiletFalse();
+    Double countByFeiletIsTrue();
 }
