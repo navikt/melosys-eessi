@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.integration.dokkat;
 
-import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,9 +40,9 @@ public class DokumenttypeIdConsumerTest {
         server.expect(requestTo("/sed/type"))
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
-        DokumenttypeIdTo dokumenttypeIdTo = dokumenttypeIdConsumer.hentDokumenttypeId("sed", "type");
-        assertThat(dokumenttypeIdTo).isNotNull();
-        assertThat(dokumenttypeIdTo.getDokumenttypeId()).isEqualTo("123");
+        DokumenttypeIdDto dokumenttypeIdDto = dokumenttypeIdConsumer.hentDokumenttypeId("sed", "type");
+        assertThat(dokumenttypeIdDto).isNotNull();
+        assertThat(dokumenttypeIdDto.getDokumenttypeId()).isEqualTo("123");
     }
 
     @Test(expected = IntegrationException.class)

@@ -9,9 +9,11 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +32,8 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Mock
     private SakService sakService;
     @Mock
+    private SaksrelasjonService saksrelasjonService;
+    @Mock
     private JournalpostSedKoblingService journalpostSedKoblingService;
 
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
@@ -43,7 +47,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
 
-        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(sakService, journalpostService, journalpostSedKoblingService);
+        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(sakService, saksrelasjonService, journalpostService, journalpostSedKoblingService);
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
         sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
@@ -53,8 +57,10 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         sak.setId(GSAK_SAKSNUMMER);
-        when(sakService.finnSakForRinaSaksnummer(anyString()))
-                .thenReturn(Optional.of(sak));
+        when(sakService.hentsak(anyLong())).thenReturn(sak);
+        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
+        fagsakRinasakKobling.setGsakSaksnummer(123L);
+        when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
     }
 
     @Test
@@ -66,7 +72,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any(), anyString());
-        verify(sakService, times(1)).finnSakForRinaSaksnummer(any());
+        verify(saksrelasjonService, times(1)).finnVedRinaSaksnummer(any());
         verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
                 eq(sedMottatt.getRinaDokumentId()), eq(sedMottatt.getRinaDokumentVersjon()),
                 eq(sedMottatt.getBucType()), eq(sedMottatt.getSedType()));

@@ -52,7 +52,7 @@ public class OppgaveService {
                 .journalpostId(journalpostID)
                 .oppgavetype(JFR_UT)
                 .prioritet(PRIORITET_NORMAL)
-                .tema(temaForSedType(sedHendelse.getSedType()))
+                .tema("MED") //Utgående vil alltid være MED
                 .tildeltEnhetsnr(ENHET_MEDLEMSKAP_OG_AVGIFT)
                 .aktoerId(aktørId)
                 .build();
