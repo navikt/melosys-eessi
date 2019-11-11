@@ -127,7 +127,7 @@ public interface SedMapper {
         switch (adressetype) {
             case BOSTEDSADRESSE:
                 return "bosted";
-            case OPPHOLDSADRESSE:
+            case POSTADRESSE:
                 return "opphold";
             case KONTAKTADRESSE:
                 return "kontakt";

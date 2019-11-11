@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.controller.dto;
 
 public enum Adressetype {
     BOSTEDSADRESSE,
-    OPPHOLDSADRESSE,
+    POSTADRESSE,
     KONTAKTADRESSE,
     ANNET
 }
