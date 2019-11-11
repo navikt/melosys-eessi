@@ -10,4 +10,5 @@ public class Adresse {
     private String land;
     private String gateadresse;
     private String region;
+    private Adressetype adressetype;
 }

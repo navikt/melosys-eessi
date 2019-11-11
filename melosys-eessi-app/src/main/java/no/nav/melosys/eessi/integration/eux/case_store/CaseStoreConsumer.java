@@ -59,7 +59,7 @@ public class CaseStoreConsumer implements RestConsumer {
         try {
             return restTemplate.exchange(uri, method, entity, responseType).getBody();
         } catch (RestClientException e) {
-            throw new IntegrationException("Error in integration with eux: " + hentFeilmeldingForEux(e), e);
+            throw new IntegrationException("Error in integration with eux-case-store: " + hentFeilmeldingForEux(e), e);
         }
     }
 }
