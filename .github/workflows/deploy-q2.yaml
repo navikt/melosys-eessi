@@ -16,12 +16,12 @@ jobs:
         with:
           java-version: '11.x'
       - name: Setup Maven
-          uses: actions/cache@preview
-          with:
-            path: ~/.m2/repository
-            key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-            restore-keys: |
-              ${{ runner.os }}-maven-
+        uses: actions/cache@preview
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Create docker tag
         env:
           DOCKER_IMAGE: docker.pkg.github.com/${{github.repository}}/melosys
