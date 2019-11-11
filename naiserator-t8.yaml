@@ -2,7 +2,7 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: melosys-eessi
-  namespace: q2
+  namespace: t8
   labels:
     team: teammelosys
 spec:
@@ -33,7 +33,7 @@ spec:
     enabled: true
     path: /api/internal/prometheus
   ingresses:
-    - "https://melosys-eessi-q2.nais.preprod.local"
+    - "https://melosys-eessi-t8.nais.preprod.local"
   env:
     - name: spring.profiles.active
       value: nais

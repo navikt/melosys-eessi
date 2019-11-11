@@ -1,4 +1,4 @@
-name: Deploy Q2
+name: Deploy T8
 
 on:
   push:
@@ -51,4 +51,4 @@ jobs:
         with:
           cluster: dev-fss
           team: teammelosys
-          resources: deploy/naiserator-q2.yaml
+          resources: deploy/naiserator-t8.yaml
