@@ -22,12 +22,12 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Create docker tag
+      - name: Create Docker tag
         env:
-          DOCKER_IMAGE: docker.pkg.github.com/${{github.repository}}/melosys
+          NAME: melosys-eessi
         run: |
-          echo $DOCKER_IMAGE > .docker_image
-          echo $(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
+          echo "docker.pkg.github.com"/"$GITHUB_REPOSITORY"/"$NAME" > .docker_image
+          echo "$(date "+%Y.%m.%d")-$(git rev-parse --short HEAD)" > .docker_tag
       - name: Test and build
         run: mvn clean package -B -e -U
       - name: Build docker image
