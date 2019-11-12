@@ -40,7 +40,7 @@ jobs:
         run: |
           echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin docker.pkg.github.com
       - name: Push Docker image
-          run: "docker push $(cat .docker_image):$(cat .docker_tag)"
+        run: "docker push $(cat .docker_image):$(cat .docker_tag)"
       - name: Deploy til t8
         uses: navikt/deployment-cli/action@0.4.1
         env:
