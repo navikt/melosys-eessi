@@ -162,7 +162,7 @@ public interface SedMapper {
 
             if (arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (StringUtils.isEmpty(arbeidssted.getHjemmebase())) {
+            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase())) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 
