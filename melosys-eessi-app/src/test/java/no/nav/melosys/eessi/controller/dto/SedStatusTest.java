@@ -51,4 +51,12 @@ public class SedStatusTest {
         assertThat(SedStatus.fraEngelskStatus(tomStatus)).isNull();
         assertThat(SedStatus.fraEngelskStatus(null)).isNull();
     }
+
+    @Test
+    public void erGyldigStatus() {
+        assertThat(SedStatus.erGyldigEngelskStatus("empty")).isFalse();
+        assertThat(SedStatus.erGyldigEngelskStatus("sent")).isTrue();
+        assertThat(SedStatus.erGyldigEngelskStatus("new")).isFalse();
+        assertThat(SedStatus.erGyldigEngelskStatus("received")).isTrue();
+    }
 }

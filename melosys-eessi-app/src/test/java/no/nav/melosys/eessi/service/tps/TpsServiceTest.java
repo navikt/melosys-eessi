@@ -69,17 +69,6 @@ public class TpsServiceTest {
     }
 
     @Test
-    public void hentPersonMedAdresse_expectPersonMedAdresse() throws Exception {
-        Person person = tpsService.hentPersonMedAdresse("11223344556");
-        assertThat(person).isNotNull();
-
-        Gateadresse gateadresse = (Gateadresse) person.getBostedsadresse().getStrukturertAdresse();
-        assertThat(gateadresse.getGatenavn()).isEqualTo("Gateveien");
-        assertThat(gateadresse.getHusnummer()).isEqualTo(1);
-        assertThat(gateadresse.getKommunenummer()).isEqualTo("0301");
-    }
-
-    @Test
     public void hentAktoerId_expectAktoerId() throws Exception {
         String aktoerId = tpsService.hentAktoerId("11223344556");
         assertThat(aktoerId).isNotNull();

@@ -1,16 +1,16 @@
 package no.nav.melosys.eessi.service.joark;
 
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.gsak.Sak;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.gsak.GsakService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
+import no.nav.melosys.eessi.service.oppgave.OppgaveService;
+import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,38 +18,63 @@ import org.springframework.stereotype.Service;
 @Service
 public class OpprettUtgaaendeJournalpostService {
 
-    private final GsakService gsakService;
-    private final SaksrelasjonService saksrelasjonService;
+    private final SakService sakService;
     private final JournalpostService journalpostService;
     private final EuxService euxService;
-    private final MetrikkerRegistrering metrikkerRegistrering;
+    private final TpsService tpsService;
+    private final OppgaveService oppgaveService;
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
-            GsakService gsakService,
-            SaksrelasjonService saksrelasjonService,
-            JournalpostService journalpostService, EuxService euxService,
-            MetrikkerRegistrering metrikkerRegistrering) {
+            SakService sakService, JournalpostService journalpostService, EuxService euxService,
+            TpsService tpsService, OppgaveService oppgaveService) {
         this.journalpostService = journalpostService;
-        this.gsakService = gsakService;
-        this.saksrelasjonService = saksrelasjonService;
+        this.sakService = sakService;
         this.euxService = euxService;
-        this.metrikkerRegistrering = metrikkerRegistrering;
+        this.tpsService = tpsService;
+        this.oppgaveService = oppgaveService;
     }
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
+        Optional<Sak> sak = sakService.finnSakForRinaSaksnummer(sedSendt.getRinaSakId());
 
-        Long gsakSaksnummer = saksrelasjonService.finnVedRinaId(sedSendt.getRinaSakId())
-                .map(FagsakRinasakKobling::getGsakSaksnummer)
-                .orElseThrow(() -> new NotFoundException("Saksrelasjon ikke funnet med rinaSakId " + sedSendt.getRinaSakId()));
-        Sak sak = gsakService.hentsak(gsakSaksnummer);
+        if (!sak.isPresent()) {
+            return arkiverUtenSak(sedSendt);
+        }
 
+        return arkiverMedSak(sedSendt, sak.get());
+    }
+
+    private String arkiverMedSak(SedHendelse sedSendt, Sak sak) throws NotFoundException, IntegrationException {
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
-        OpprettJournalpostResponse response = journalpostService.opprettUtgaaendeJournalpost(
-                sedSendt, sak, euxService.hentSedPdf(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()));
+        String navIdent = tpsService.hentNorskIdent(sak.getAktoerId());
+        OpprettJournalpostResponse response = opprettUtgåendeJournalpost(sedSendt, sak, navIdent);
 
-        metrikkerRegistrering.journalpostUtgaaendeOpprettet(response.erFerdigstilt());
+        if (!"ENDELIG".equalsIgnoreCase(response.getJournalstatus())) {
+            log.info("Journalpost {} ble ikke endelig journalført. Melding: {}", response.getJournalpostId(), response.getMelding());
+            opprettUtgåendeJournalføringsoppgave(sedSendt, response.getJournalpostId(), tpsService.hentAktoerId(navIdent));
+        }
 
         return response.getJournalpostId();
+    }
+
+    private String arkiverUtenSak(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
+        log.info("Journalfører dokument uten sakstilknytning: {}", sedSendt.getRinaDokumentId());
+
+        String navIdent = sedSendt.getNavBruker();
+        OpprettJournalpostResponse response = opprettUtgåendeJournalpost(sedSendt, null, navIdent);
+        opprettUtgåendeJournalføringsoppgave(sedSendt, response.getJournalpostId(), tpsService.hentAktoerId(navIdent));
+
+        return response.getJournalpostId();
+    }
+
+    private OpprettJournalpostResponse opprettUtgåendeJournalpost(SedHendelse sedSendt, Sak sak, String navIdent) throws IntegrationException {
+        return journalpostService.opprettUtgaaendeJournalpost(sedSendt, sak,
+                euxService.hentSedMedVedlegg(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()), navIdent);
+    }
+
+    private String opprettUtgåendeJournalføringsoppgave(SedHendelse sedSendt, String journalpostId, String navIdent) throws NotFoundException, IntegrationException {
+        return oppgaveService.opprettUtgåendeJfrOppgave(journalpostId, sedSendt, tpsService.hentAktoerId(navIdent),
+                euxService.hentRinaUrl(sedSendt.getRinaSakId()));
     }
 }

@@ -8,8 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -32,7 +32,7 @@ public class BucController {
         this.sedService = sedService;
     }
 
-    @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne.")
+    @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true")
     @PostMapping(
             value = "/{bucType}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -47,17 +47,20 @@ public class BucController {
         return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? vedlegg.getBytes() : null, bucType, sendAutomatisk);
     }
 
-    @ApiOperation(value = "Oppretter og sender svar på A001 for gitt rinaId")
-    @PostMapping("/LA_BUC_01/{rinaId}/svar")
-    public void anmodningUnntakSvar(@RequestBody SvarAnmodningUnntakDto svarAnmodningUnntakDto, @PathVariable String rinaId)
-            throws IntegrationException, NotFoundException {
-        sedService.anmodningUnntakSvar(svarAnmodningUnntakDto, rinaId);
+    @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")
+    @PostMapping("/{rinaSaksnummer}/sed/{sedType}")
+    public void sendPåEksisterendeBuc(
+            @RequestBody SedDataDto sedDataDto,
+            @PathVariable String rinaSaksnummer,
+            @PathVariable SedType sedType
+    ) throws IntegrationException, NotFoundException, MappingException {
+        sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 
-    @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klasre for den spesifikke buc-type")
+    @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
     @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
-            @RequestParam(required = false) String land) throws IntegrationException {
+                                                          @RequestParam(required = false) String land) throws IntegrationException {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());

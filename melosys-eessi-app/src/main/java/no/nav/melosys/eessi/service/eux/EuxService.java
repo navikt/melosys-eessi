@@ -5,15 +5,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.dto.Institusjon;
-import no.nav.melosys.eessi.integration.eux.dto.TilegnetBuc;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
+import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -28,18 +29,18 @@ public class EuxService {
     private static final String FILTYPE_PDF = "pdf";
 
     private final EuxConsumer euxConsumer;
-    private final MetrikkerRegistrering metrikkerRegistrering;
+    private final BucMetrikker bucMetrikker;
 
     private final String rinaHostUrl;
     private final String mottakerInstitusjon;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-            MetrikkerRegistrering metrikkerRegistrering,
+            BucMetrikker bucMetrikker,
             @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
             @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInstitusjon) {
         this.euxConsumer = euxConsumer;
-        this.metrikkerRegistrering = metrikkerRegistrering;
+        this.bucMetrikker = bucMetrikker;
         this.rinaHostUrl = rinaHostUrl;
         this.mottakerInstitusjon = mottakerInstitusjon;
     }
@@ -65,7 +66,7 @@ public class EuxService {
                 response.get("documentId"));
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
                 opprettBucOgSedResponse.getDokumentId());
-        metrikkerRegistrering.bucOpprettet(bucType);
+        bucMetrikker.bucOpprettet(bucType);
 
         return opprettBucOgSedResponse;
     }
@@ -137,6 +138,10 @@ public class EuxService {
         return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
     }
 
+    public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+        return euxConsumer.hentSedMedVedlegg(rinaSaksnummer, dokumentId);
+    }
+
     public byte[] genererPdfFraSed(SED sed) throws IntegrationException {
         return euxConsumer.genererPdfFraSed(sed);
     }
@@ -150,5 +155,9 @@ public class EuxService {
 
     public String hentRinaUrlPrefix() {
         return rinaHostUrl + RINA_URL_TEMPLATE;
+    }
+
+    public void settSakSensitiv(String rinaSaksnummer) throws IntegrationException {
+        euxConsumer.setSakSensitiv(rinaSaksnummer);
     }
 }

@@ -52,24 +52,6 @@ public class DatabaseConfig {
                         .dataSource(adminDataSource);
     }
 
-    @SneakyThrows
-    private HikariDataSource dataSource(String user) {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
-        config.setMaximumPoolSize(3);
-        config.setMinimumIdle(1);
-        String mountPath = "postgresql/preprod-fss";
-        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
-    }
-
-    private String dbRole(String role) {
-        final String namespace = environment.getProperty("NAIS_NAMESPACE");
-        if ("p".equalsIgnoreCase(namespace)) {
-            return String.join("-", APPLICATION_NAME, role);
-        }
-        return String.join("-", APPLICATION_NAME, namespace, role);
-    }
-
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
@@ -88,5 +70,36 @@ public class DatabaseConfig {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory);
         return transactionManager;
+    }
+
+    @SneakyThrows
+    private HikariDataSource dataSource(String user) {
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
+        config.setMaximumPoolSize(3);
+        config.setMinimumIdle(1);
+        String mountPath = isProduction() ? prodMountPath() : preprodMountPath();
+        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
+    }
+
+    private String dbRole(String role) {
+        final String namespace = environment.getProperty("NAIS_NAMESPACE");
+        if (isProduction()) {
+            return String.join("-", APPLICATION_NAME, role);
+        }
+        return String.join("-", APPLICATION_NAME, namespace, role);
+    }
+
+    private boolean isProduction() {
+        String cluster = environment.getProperty("NAIS_CLUSTER_NAME");
+        return cluster != null && cluster.equalsIgnoreCase("prod-fss");
+    }
+
+    private String prodMountPath() {
+        return "postgresql/prod-fss";
+    }
+
+    private String preprodMountPath() {
+        return "postgresql/preprod-fss";
     }
 }

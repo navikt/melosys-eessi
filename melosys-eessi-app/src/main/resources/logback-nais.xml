@@ -10,4 +10,6 @@
     <root level="INFO">
         <appender-ref ref="stdout_json"/>
     </root>
+
+    <logger name="no.nav.vault" level="WARN"/>
 </included>

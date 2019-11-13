@@ -29,7 +29,8 @@
     "gateadresse": "blulul",
     "land": "NO",
     "postnr": "2112",
-    "poststed": "Noi"
+    "poststed": "Noi",
+    "adressetype": "BOSTEDSADRESSE"
   },
   "bruker": {
     "etternavn": "MrFornavn",

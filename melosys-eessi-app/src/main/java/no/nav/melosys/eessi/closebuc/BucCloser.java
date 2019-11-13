@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.closebuc;
 import java.util.Comparator;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
+import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
@@ -22,16 +22,17 @@ public class BucCloser {
 
     private final EuxService euxService;
     private final X001Mapper x001Mapper;
-    private final MetrikkerRegistrering metrikkerRegistrering;
+    private final BucMetrikker bucMetrikker;
 
-    public BucCloser(EuxService euxService, MetrikkerRegistrering metrikkerRegistrering) {
+    public BucCloser(EuxService euxService, BucMetrikker bucMetrikker) {
         this.euxService = euxService;
-        this.metrikkerRegistrering = metrikkerRegistrering;
         this.x001Mapper = new X001Mapper();
+        this.bucMetrikker = bucMetrikker;
     }
 
     public void closeBucsByType(BucType bucType) {
         try {
+            log.info("Lukker bucer av type {}", bucType);
             euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).status("open").build())
                     .stream()
                     .filter(norgeErCaseOwnerPredicate)
@@ -57,7 +58,7 @@ public class BucCloser {
                 euxService.sendSed(buc.getId(), eksisterendeX001.getId());
             }
 
-            metrikkerRegistrering.bucLukket(buc.getBucType());
+            bucMetrikker.bucLukket(buc.getBucType());
             log.info("BUC {} lukket med årsak {}", buc.getId(), x001.getNav().getSak().getAnmodning().getAvslutning().getAarsak().getType());
         } catch (IntegrationException e) {
             log.error("Kunne ikke lukke buc {}", buc.getId(), e);

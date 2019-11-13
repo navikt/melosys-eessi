@@ -36,47 +36,48 @@ public class SakController {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    @ApiOperation(value = "Henter bucer tilknyttet en sak")
+
     @GetMapping("/{gsakSaksnummer}/bucer")
+    @ApiOperation(value = "Henter bucer tilknyttet en sak")
     public List<BucinfoDto> hentTilknyttedeBucer(@PathVariable Long gsakSaksnummer,
-                                                 @RequestParam(required = false) String status) {
+                                                 @RequestParam(required = false) List<String> statuser) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                 .map(FagsakRinasakKobling::getRinaSaksnummer)
                 .map(this::hentBuc)
                 .filter(Objects::nonNull)
-                .map(buc -> BucinfoDto.av(buc, status, euxService.hentRinaUrlPrefix()))
+                .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrlPrefix()))
                 .collect(Collectors.toList());
     }
 
-    @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
-    @GetMapping
-    public List<SaksrelasjonDto> hentSaksrelasjon(
-            @PathParam("rinaSaksnummer") String rinaSaksnummer,
-            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
-
-        if (StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer != null) {
-            return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
-                    .map(SaksrelasjonDto::av)
-                    .collect(Collectors.toList());
-        } else if (!StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer == null) {
-            Optional<FagsakRinasakKobling> fagsakRinasakKobling = saksrelasjonService.finnVedRinaId(rinaSaksnummer);
-            return fagsakRinasakKobling
-                    .map(rinasakKobling -> Collections.singletonList(SaksrelasjonDto.av(rinasakKobling)))
-                    .orElse(Collections.emptyList());
-        }
-
-        throw new ValidationException("Kun en av rinaSaksnummer og gsakSaksnummer kan spørres på");
-    }
-
-    @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
     @PostMapping
-    public ResponseEntity lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto) throws ValidationException {
+    @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
+    public ResponseEntity lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
+            throws ValidationException, IntegrationException {
         validerSaksrelasjonDto(saksrelasjonDto);
 
         saksrelasjonService.lagreKobling(saksrelasjonDto.getGsakSaksnummer(),
                 saksrelasjonDto.getRinaSaksnummer(), BucType.valueOf(saksrelasjonDto.getBucType()));
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
+    public List<SaksrelasjonDto> hentSaksrelasjon(
+            @PathParam("rinaSaksnummer") String rinaSaksnummer,
+            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException, IntegrationException {
+
+        if (StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer != null) {
+            return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
+                    .map(SaksrelasjonDto::av)
+                    .collect(Collectors.toList());
+        } else if (!StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer == null) {
+            return saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer)
+                    .map(saksnummer -> Collections.singletonList(new SaksrelasjonDto(saksnummer, rinaSaksnummer, null)))
+                    .orElse(Collections.emptyList());
+        }
+
+        throw new ValidationException("Kun en av rinaSaksnummer og gsakSaksnummer kan spørres på");
     }
 
     private void validerSaksrelasjonDto(SaksrelasjonDto saksrelasjonDto) throws ValidationException {
@@ -87,7 +88,7 @@ public class SakController {
         }
 
         String rinaSaksnummer = saksrelasjonDto.getRinaSaksnummer();
-        Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaId(rinaSaksnummer);
+        Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer);
 
         if (eksisterende.isPresent() && !eksisterende.get().getGsakSaksnummer().equals(saksrelasjonDto.getGsakSaksnummer())) {
             throw new ValidationException("Rinasak " + saksrelasjonDto.getGsakSaksnummer() +

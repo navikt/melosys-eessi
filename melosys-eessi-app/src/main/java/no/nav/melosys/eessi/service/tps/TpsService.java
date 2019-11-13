@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
@@ -19,12 +20,11 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Informasjonsbehov;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
-import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonForMangeForekomster;
-import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonUgyldigInput;
+import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault;
+import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault1;
 import no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Personnavn;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonRequest;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonResponse;
@@ -59,15 +59,6 @@ public class TpsService {
         return hentPerson(request);
     }
 
-    public Person hentPersonMedAdresse(String ident) throws SecurityException, NotFoundException {
-        HentPersonRequest request = new HentPersonRequest()
-                .withInformasjonsbehov(Informasjonsbehov.ADRESSE)
-                .withAktoer(new AktoerId()
-                        .withAktoerId(ident));
-
-        return hentPerson(request);
-    }
-
     private Person hentPerson(HentPersonRequest request) throws SecurityException, NotFoundException {
         HentPersonResponse response;
         try {
@@ -90,7 +81,8 @@ public class TpsService {
         return aktoerConsumer.hentNorskIdent(aktoerID);
     }
 
-    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) throws NotFoundException {
+    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier)
+            throws NotFoundException, IntegrationException {
 
         FinnPersonRequest request = new FinnPersonRequest();
         request.setPersonFilter(createPersonFilter(personsoekKriterier));
@@ -99,10 +91,10 @@ public class TpsService {
         FinnPersonResponse response;
         try {
             response = personsokConsumer.finnPerson(request);
-        } catch (FinnPersonUgyldigInput finnPersonUgyldigInput) {
-            throw new NotFoundException("Ugyldig input i søk", finnPersonUgyldigInput);
-        } catch (FinnPersonForMangeForekomster finnPersonForMangeForekomster) {
-            throw new NotFoundException("For mange forekomster funnet", finnPersonForMangeForekomster);
+        } catch (FinnPersonFault1 ugyldigInputEx) {
+            throw new IntegrationException("Ugyldig input i søk", ugyldigInputEx);
+        } catch (FinnPersonFault forMangeForekomsterEx) {
+            throw new NotFoundException("For mange forekomster funnet", forMangeForekomsterEx);
         }
 
         return mapTilInternRespons(response);

@@ -22,15 +22,16 @@
 
   <properties>
     <commons-io.version>2.6</commons-io.version>
-    <cxf.version>3.1.11</cxf.version>
+    <cxf.version>3.3.4</cxf.version>
     <dokarkiv-api-v1.version>0.0.4</dokarkiv-api-v1.version>
-    <dokkat-api.version>10.1.1</dokkat-api.version>
-    <no-nav-dok-tjenester-mottainngaaendeforsendelse.version>1.0.13</no-nav-dok-tjenester-mottainngaaendeforsendelse.version>
     <flyway.version>5.2.4</flyway.version>
     <guava.version>21.0</guava.version>
-    <java.version>1.8</java.version>
+    <java.version>11</java.version>
+    <javax-xml-webservices-api.version>2.0.1</javax-xml-webservices-api.version>
     <logback-classic.version>1.2.3</logback-classic.version>
     <logstash-encoder.version>5.3</logstash-encoder.version>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
     <micrometer-jvm-extras.version>0.1.4</micrometer-jvm-extras.version>
     <person-utils.version>1.35.0</person-utils.version>
     <random-benas.version>3.7.0</random-benas.version>
@@ -38,8 +39,8 @@
     <spring-boot.version>2.1.6.RELEASE</spring-boot.version>
     <spring-kafka.version>2.2.7.RELEASE</spring-kafka.version>
     <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
-    <tps.person.version>3.4.1</tps.person.version>
+    <tps.person.version>1.2019.09.25-00.21-49b69f0625e0</tps.person.version>
     <vault-jdbc.version>1.3.1</vault-jdbc.version>
-    <personsok.version>1.0.1</personsok.version>
+    <personsok.version>1.2019.09.25-00.21-49b69f0625e0</personsok.version>
   </properties>
 </project>

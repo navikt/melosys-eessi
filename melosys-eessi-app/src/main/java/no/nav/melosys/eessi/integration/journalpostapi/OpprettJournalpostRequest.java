@@ -126,9 +126,4 @@ public class OpprettJournalpostRequest {
     @NonNull
     private byte[] fysiskDokument;
   }
-
-  public enum JournalpostFiltype {
-    PDF,
-    PDFA
-  }
 }

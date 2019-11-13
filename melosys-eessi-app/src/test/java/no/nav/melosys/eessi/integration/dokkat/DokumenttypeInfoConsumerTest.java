@@ -2,8 +2,8 @@ package no.nav.melosys.eessi.integration.dokkat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.benas.randombeans.api.EnhancedRandom;
-import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,18 +42,18 @@ public class DokumenttypeInfoConsumerTest {
 
     @Test
     public void hentDokumenttypeInfo_expectValidJson() throws Exception {
-        DokumentTypeInfoToV4 dokumentTypeInfoToV4 = enhancedRandom.nextObject(DokumentTypeInfoToV4.class);
-        String responseJson = new ObjectMapper().writeValueAsString(dokumentTypeInfoToV4);
+        DokumentTypeInfoDto dokumentTypeInfoDto = enhancedRandom.nextObject(DokumentTypeInfoDto.class);
+        String responseJson = new ObjectMapper().writeValueAsString(dokumentTypeInfoDto);
 
         server.expect(requestTo("/" + dokumentyypeId))
                 .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
 
-        DokumentTypeInfoToV4 responseObject = dokumenttypeInfoConsumer.hentDokumenttypeInfo(dokumentyypeId);
+        DokumentTypeInfoDto responseObject = dokumenttypeInfoConsumer.hentDokumenttypeInfo(dokumentyypeId);
 
         assertThat(responseObject).isNotNull();
-        assertThat(responseObject.getBehandlingstema()).isEqualTo(dokumentTypeInfoToV4.getBehandlingstema());
-        assertThat(responseObject.getTema()).isEqualTo(dokumentTypeInfoToV4.getTema());
-        assertThat(responseObject.getDokumentKategori()).isEqualTo(dokumentTypeInfoToV4.getDokumentKategori());
+        assertThat(responseObject.getBehandlingstema()).isEqualTo(dokumentTypeInfoDto.getBehandlingstema());
+        assertThat(responseObject.getTema()).isEqualTo(dokumentTypeInfoDto.getTema());
+        assertThat(responseObject.getDokumentKategori()).isEqualTo(dokumentTypeInfoDto.getDokumentKategori());
     }
 
     @Test(expected = IntegrationException.class)

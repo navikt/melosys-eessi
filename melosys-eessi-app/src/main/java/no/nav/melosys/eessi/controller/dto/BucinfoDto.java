@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
-import org.springframework.util.StringUtils;
 
 @Data
 @Builder
@@ -22,23 +21,24 @@ public class BucinfoDto {
     private Long opprettetDato;
     private List<SedinfoDto> seder;
 
-    public static BucinfoDto av(BUC buc, String status, String rinaUrlPrefix) {
+    public static BucinfoDto av(BUC buc, List<String> statuser, String rinaUrlPrefix) {
         return BucinfoDto.builder()
                 .id(buc.getId())
                 .bucType(buc.getBucType())
                 .opprettetDato(buc.getStartDate().toInstant().toEpochMilli())
                 .seder(buc.getDocuments().stream()
-                        .filter(filtrerMedStatus(status))
+                        .filter(filtrerMedStatus(statuser))
                         .map(doc -> SedinfoDto.av(doc, buc.getId(), rinaUrlPrefix))
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    private static Predicate<Document> filtrerMedStatus(String status) {
-        if (StringUtils.isEmpty(status)) {
+    private static Predicate<Document> filtrerMedStatus(List<String> statuser) {
+        if (statuser == null || statuser.isEmpty()) {
             return b -> true;
         }
 
-        return b -> SedStatus.fraEngelskStatus(b.getStatus()) == SedStatus.fraNorskStatus(status);
+        return b -> statuser.stream().map(SedStatus::fraNorskStatus)
+                .anyMatch(status -> status == SedStatus.fraEngelskStatus(b.getStatus()));
     }
 }

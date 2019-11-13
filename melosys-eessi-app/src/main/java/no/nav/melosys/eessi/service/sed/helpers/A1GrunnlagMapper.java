@@ -26,7 +26,7 @@ class A1GrunnlagMapper {
             case ART_11_3_c:
             case ART_11_3_d:
             case ART_11_3_e:
-            case ART_11_4_2:
+            case ART_11_4:
             case ART_13_1_a:
             case ART_13_1_b_1:
             case ART_13_1_b_2:

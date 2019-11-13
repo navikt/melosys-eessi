@@ -1,14 +1,14 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
-import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
-import no.nav.melosys.eessi.integration.eux.EuxConsumer;
-import no.nav.melosys.eessi.integration.gsak.oppgave.OppgaveConsumer;
-import no.nav.melosys.eessi.integration.gsak.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
@@ -78,14 +78,13 @@ public abstract class ComponentTestBase {
 
     @Before
     public void setup() throws Exception {
-        when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rindokumentid"));
-        when(euxConsumer.hentSedPdf(anyString(), anyString())).thenReturn(new byte[0]);
-        when(sakConsumer.opprettSak(anyString())).thenReturn(componentTestProvider.sak(AKTOER_ID));
+        when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rinadokumentid"));
+        when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(componentTestProvider.sedMedVedlegg());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(componentTestProvider.journalpostResponse());
         when(aktoerConsumer.hentAktoerId(anyString())).thenReturn(AKTOER_ID);
         when(personConsumer.hentPerson(any(HentPersonRequest.class))).thenReturn(componentTestProvider.hentPersonResponse(AKTOER_ID, FØDSELSDATO, "NO"));
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(componentTestProvider.sed(FØDSELSDATO, STATSBORGERSKAP));
-        when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdTo("dokumenttypeId"));
-        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(componentTestProvider.dokumentTypeInfoToV4());
+        when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
+        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(componentTestProvider.dokumentTypeInfoDto());
     }
 }

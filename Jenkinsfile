@@ -8,7 +8,7 @@ node {
 
     properties([
             parameters([
-                    choice(choices: ['t8', 'q2'],
+                    choice(choices: ['t8', 'q2', 'p'],
                             description: 'Hvilket miljø skal applikasjon deployes til. Default er q', name: 'NAMESPACE')
             ])
     ])
@@ -17,11 +17,11 @@ node {
     def KUBECTL = "/usr/local/bin/kubectl"
     def KUBECONFIG_NAISERATOR = "/var/lib/jenkins/kubeconfigs/kubeconfig-teammelosys.json"
     def NAISERATOR_CONFIG = "naiserator.yaml"
-    def DEFAULT_BUILD_USER = "eessi2-jenkins"
 
     def cluster = "dev-fss"
     def dockerRepo = "docker.adeo.no:5000/melosys"
-    def namespace = "${params.NAMESPACE}".toString()
+    def environment = "${params.NAMESPACE}".toString()
+    def namespace
 
     def mvnSettings = "navMavenSettingsUtenProxy"
 
@@ -32,6 +32,16 @@ node {
 
     // Set Spring profiles to activate
     def springProfiles = "nais"
+    def javaHome = tool "jdk-11"
+    def mvnHome = tool "maven-3.6.0"
+    env.PATH = "${javaHome}/bin:${mvnHome}/bin:${env.PATH}"
+
+    if (environment == 'p') {
+        namespace = 'default'
+        cluster = 'prod-fss'
+    } else {
+        namespace = environment
+    }
 
     stage("Checkout") {
         scmInfo = checkout scm
@@ -54,7 +64,7 @@ node {
     }
 
     stage("Deploy to NAIS") {
-        prepareNaisYaml(NAISERATOR_CONFIG, imageVersion, namespace)
+        prepareNaisYaml(NAISERATOR_CONFIG, application, imageVersion, namespace, cluster)
 
         // set namespace to context
         sh "${KUBECTL} config --kubeconfig=${KUBECONFIG_NAISERATOR} set-context ${cluster} --namespace=${namespace}"
@@ -77,13 +87,21 @@ def getBuildUser(defaultUser) {
     }
 }
 
-def prepareNaisYaml(naiseratorFile, version, namespace) {
-    replaceInFile('@@RELEASE_VERSION@@', version, naiseratorFile)
+def prepareNaisYaml(naiseratorFile, application, imageVersion, namespace, cluster) {
+    // set version in yaml-file:
+    replaceInFile('@@IMAGE_VERSION@@', imageVersion, naiseratorFile)
+
+    def domain
+    if (cluster == "prod-fss") {
+        domain = ".nais.adeo.no"
+    } else {
+        domain = ".nais.preprod.local"
+    }
 
     if (namespace == "default") {
-        replaceInFile('@@URL_NAMESPACE@@', '', naiseratorFile)
+        replaceInFile('@@URL@@', application + domain, naiseratorFile)
     } else {
-        replaceInFile('@@URL_NAMESPACE@@', "-${namespace}" as String, naiseratorFile)
+        replaceInFile('@@URL@@', application + "-" + namespace.toString() + domain, naiseratorFile)
     }
 
     replaceInFile('@@NAMESPACE@@', namespace, naiseratorFile)

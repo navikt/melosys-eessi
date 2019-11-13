@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.metrikker.MetrikkerRegistrering;
+import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.Action;
@@ -34,7 +34,7 @@ public class BucCloserTest {
     @Mock
     private EuxService euxService;
     @Mock
-    private MetrikkerRegistrering metrikkerRegistrering;
+    private BucMetrikker bucMetrikker;
 
     private BucCloser bucCloser;
 
@@ -42,7 +42,7 @@ public class BucCloserTest {
 
     @Before
     public void setup() {
-        bucCloser = new BucCloser(euxService, metrikkerRegistrering);
+        bucCloser = new BucCloser(euxService, bucMetrikker);
     }
 
     @Test

@@ -3,11 +3,12 @@ package no.nav.melosys.eessi;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
-import no.nav.melosys.eessi.integration.gsak.Sak;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
@@ -21,6 +22,7 @@ import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
@@ -30,14 +32,14 @@ public class ComponentTestProvider {
     public ComponentTestProvider() {
     }
 
-    DokumentTypeInfoToV4 dokumentTypeInfoToV4() {
-        DokumentTypeInfoToV4 dokumentTypeInfoToV4 = new DokumentTypeInfoToV4();
-        dokumentTypeInfoToV4.setDokumentKategori("dokumentKategori");
-        dokumentTypeInfoToV4.setDokumentTittel("dokumentTittel");
-        dokumentTypeInfoToV4.setDokumenttypeId("dokumenttypeId");
-        dokumentTypeInfoToV4.setBehandlingstema("behandlingstema");
-        dokumentTypeInfoToV4.setTema("tema");
-        return dokumentTypeInfoToV4;
+    DokumentTypeInfoDto dokumentTypeInfoDto() {
+        DokumentTypeInfoDto dokumentTypeInfoDto = new DokumentTypeInfoDto();
+        dokumentTypeInfoDto.setDokumentKategori("dokumentKategori");
+        dokumentTypeInfoDto.setDokumentTittel("dokumentTittel");
+        dokumentTypeInfoDto.setDokumenttypeId("dokumenttypeId");
+        dokumentTypeInfoDto.setBehandlingstema("behandlingstema");
+        dokumentTypeInfoDto.setTema("tema");
+        return dokumentTypeInfoDto;
     }
 
     SedHendelse sedHendelse(String aktoerId) {
@@ -115,6 +117,10 @@ public class ComponentTestProvider {
 
     Sak sak(String aktoerId) {
         return new Sak("1", "GEN", "MELOSYS", aktoerId, "012356745", "1", "Tester", ZonedDateTime.now());
+    }
+
+    SedMedVedlegg sedMedVedlegg() {
+        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("fil123","", new byte[0]), Collections.emptyList());
     }
 
     BUC buc(String id) {

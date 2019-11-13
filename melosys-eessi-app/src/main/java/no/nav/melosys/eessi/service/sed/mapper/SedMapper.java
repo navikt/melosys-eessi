@@ -109,15 +109,33 @@ public interface SedMapper {
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sedDataDto.getBostedsadresse().getLand()));
         adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
         adresse.setRegion(sedDataDto.getBostedsadresse().getRegion());
+        adresse.setType(mapAdressetype(sedDataDto.getBostedsadresse().getAdressetype()));
 
         // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
-        if ("NO".equalsIgnoreCase(adresse.getLand())) {
-            adresse.setType("bosted");
-        } else {
-            adresse.setType("opphold");
+        if (sedDataDto.getBostedsadresse().getAdressetype() == Adressetype.BOSTEDSADRESSE) {
+            if ("NO".equalsIgnoreCase(adresse.getLand())) {
+                adresse.setType("bosted");
+            } else {
+                adresse.setType("opphold");
+            }
         }
 
         return Collections.singletonList(adresse);
+    }
+
+    default String mapAdressetype(Adressetype adressetype) {
+        switch (adressetype) {
+            case BOSTEDSADRESSE:
+                return "bosted";
+            case POSTADRESSE:
+                return "opphold";
+            case KONTAKTADRESSE:
+                return "kontakt";
+            case ANNET:
+                return "annet";
+            default:
+                throw new IllegalArgumentException("Finner ikke addressetype " + adressetype);
+        }
     }
 
     default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {
@@ -157,13 +175,9 @@ public interface SedMapper {
         for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
             Arbeidssted arbeidssted = new Arbeidssted();
             arbeidssted.setNavn(arbStd.getNavn());
-            if (arbStd.isFysisk()) {
-                arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
-            } else {
-                arbeidssted.setErikkefastadresse("ja");
-                arbeidssted.setHjemmebase(
-                        ""); //TODO: maritime/ikke fysisk arbeidssteder. holder med isFysisk sjekk? Trenger muligens felt hjemmebase
-            }
+            arbeidssted.setErikkefastadresse(arbStd.isFysisk() ? "nei" : "ja");
+            arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
+            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
             arbeidsstedList.add(arbeidssted);
         }
 
@@ -226,14 +240,14 @@ public interface SedMapper {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) ?
+        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) && !StringUtils.isEmpty(sAdresse.getPostnr()) ?
                 PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
         adresse.setRegion(sAdresse.getRegion());
 
         if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
-            throw new MappingException("Element 'poststed' og 'land' er påkrevd for alle addresser");
+            throw new MappingException("Felter 'poststed' og 'land' er påkrevd for adresser");
         }
 
         return adresse;
@@ -266,5 +280,15 @@ public interface SedMapper {
         }
 
         return periode;
+    }
+
+    default String landkodeIso2EllerNull(String iso3) throws NotFoundException {
+        if (iso3 == null) {
+            return null;
+        } else if (iso3.length() == 2) {
+            return iso3;
+        } else {
+            return LandkodeMapper.getLandkodeIso2(iso3);
+        }
     }
 }
