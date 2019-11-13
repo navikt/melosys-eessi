@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -182,6 +183,26 @@ public class EuxServiceTest {
     public void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() throws IntegrationException {
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_18", "SE");
         assertThat(institusjoner).isEmpty();
+    }
+
+    @Test
+    public void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() throws IntegrationException {
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GB");
+        assertThat(institusjoner).hasSize(1);
+
+        Institusjon institusjon = institusjoner.get(0);
+        assertThat(institusjon.getAkronym()).isEqualTo("FK UK-TITTEI");
+        assertThat(institusjon.getLandkode()).isEqualTo("GB");
+    }
+
+    @Test
+    public void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() throws IntegrationException {
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GR");
+        assertThat(institusjoner).hasSize(1);
+
+        Institusjon institusjon = institusjoner.get(0);
+        assertThat(institusjon.getAkronym()).isEqualTo("FK EL-TITTEI");
+        assertThat(institusjon.getLandkode()).isEqualTo("GR");
     }
 
     @Test
