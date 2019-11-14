@@ -35,5 +35,5 @@ spec:
   ingresses:
   - "https://@@URL@@"
   env:
-    - name: spring.profiles.active
+    - name: SPRING_PROFILES_ACTIVE
       value: nais

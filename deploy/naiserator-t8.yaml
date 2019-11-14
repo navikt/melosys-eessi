@@ -35,5 +35,5 @@ spec:
   ingresses:
     - "https://melosys-eessi-t8.nais.preprod.local"
   env:
-    - name: spring.profiles.active
+    - name: SPRING_PROFILES_ACTIVE
       value: nais
