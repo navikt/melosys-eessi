@@ -175,9 +175,15 @@ public interface SedMapper {
         for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
             Arbeidssted arbeidssted = new Arbeidssted();
             arbeidssted.setNavn(arbStd.getNavn());
-            arbeidssted.setErikkefastadresse(arbStd.isFysisk() ? "nei" : "ja");
             arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
             arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
+
+            if (arbStd.isFysisk()) {
+                arbeidssted.setErikkefastadresse("nei");
+            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase())) {
+                arbeidssted.setErikkefastadresse("ja");
+            }
+
             arbeidsstedList.add(arbeidssted);
         }
 
