@@ -23,7 +23,6 @@ import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.*;
 @Component
 class PersonSok {
 
-    private static final int LOCAL_DATE_LENGTH = 10;
     private final TpsService tpsService;
 
     @Autowired
