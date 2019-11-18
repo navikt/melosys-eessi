@@ -9,6 +9,8 @@ import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 
+import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
+
 public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implements MelosysEessiMeldingMapper {
 
     @Override
@@ -51,11 +53,11 @@ public abstract class NyttLovvalgEessiMeldingMapper<T extends Medlemskap> implem
 
         if (periode.erAapenPeriode()) {
             AapenPeriode aapenPeriode = periode.getAapenperiode();
-            fom = aapenPeriode.getStartdato() == null ? null : LocalDate.parse(aapenPeriode.getStartdato());
+            fom = tilLocalDate(aapenPeriode.getStartdato());
             tom = null;
         } else {
-            fom = periode.getStartdato() == null ? null : LocalDate.parse(periode.getStartdato());
-            tom = periode.getSluttdato() == null ? null : LocalDate.parse(periode.getSluttdato());
+            fom = tilLocalDate(periode.getStartdato());
+            tom = tilLocalDate(periode.getSluttdato());
         }
         return new Periode(fom, tom);
     }

@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.service.identifisering;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.models.DatoUtils;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
@@ -15,13 +15,14 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.*;
 
 @Slf4j
 @Component
 class PersonSok {
 
-    private static final int LOCAL_DATE_LENGTH = 10;
     private final TpsService tpsService;
 
     @Autowired
@@ -79,7 +80,7 @@ class PersonSok {
      */
     private List<PersonSoekResponse> søkEtterPerson(SED sed) throws IntegrationException {
         no.nav.melosys.eessi.models.sed.nav.Person sedPerson = sed.getNav().getBruker().getPerson();
-        LocalDate foedselsdato = LocalDate.parse(sedPerson.getFoedselsdato().substring(0, LOCAL_DATE_LENGTH), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate foedselsdato = tilLocalDate(sedPerson.getFoedselsdato());
 
         List<PersonSoekResponse> response;
         try {
