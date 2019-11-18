@@ -21,6 +21,7 @@ import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.*;
 @Component
 class PersonSok {
 
+    private static final int LOCAL_DATE_LENGTH = 10;
     private final TpsService tpsService;
 
     @Autowired
@@ -78,7 +79,7 @@ class PersonSok {
      */
     private List<PersonSoekResponse> søkEtterPerson(SED sed) throws IntegrationException {
         no.nav.melosys.eessi.models.sed.nav.Person sedPerson = sed.getNav().getBruker().getPerson();
-        LocalDate foedselsdato = LocalDate.parse(sedPerson.getFoedselsdato(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        LocalDate foedselsdato = LocalDate.parse(sedPerson.getFoedselsdato().substring(0, LOCAL_DATE_LENGTH), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         List<PersonSoekResponse> response;
         try {

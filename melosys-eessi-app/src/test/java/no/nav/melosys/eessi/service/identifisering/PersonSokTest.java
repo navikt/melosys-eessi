@@ -145,6 +145,18 @@ public class PersonSokTest {
                         .withPersonstatus(new Personstatuser().withValue("BOSA")));
     }
 
+    @Test
+    public void søkPersonFraSed_tidssoneForDatoEttTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+        SED sed = lagSed();
+        sed.getNav().getBruker().getPerson().setFoedselsdato(sed.getNav().getBruker().getPerson().getFoedselsdato() + "+02:00");
+
+        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
+
+        assertThat(sokResultat.personIdentifisert()).isTrue();
+        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+    }
+
     /**
      * @param dato format: yyyy-MM-dd
      */
