@@ -19,7 +19,7 @@ public class OppgaveService {
     private static final String ENHET_ID_FORDELING = "4303";
     private static final String ENHET_MEDLEMSKAP_OG_AVGIFT = "4530";
     private static final String PRIORITET_NORMAL = "NORM";
-    private static final String BESKRIVELSE = "EØS - %s";
+    private static final String BESKRIVELSE = "EØS - %s\n\rRina-sak - %s";
 
     private final OppgaveConsumer oppgaveConsumer;
 
@@ -27,7 +27,7 @@ public class OppgaveService {
         this.oppgaveConsumer = oppgaveConsumer;
     }
 
-    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType) throws IntegrationException {
+    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer) throws IntegrationException {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .fristFerdigstillelse(LocalDate.now().plusDays(1))
@@ -36,7 +36,7 @@ public class OppgaveService {
                 .prioritet(PRIORITET_NORMAL)
                 .tema(temaForSedType(sedType))
                 .tildeltEnhetsnr(ENHET_ID_FORDELING)
-                .beskrivelse(String.format(BESKRIVELSE, sedType))
+                .beskrivelse(String.format(BESKRIVELSE, sedType, rinaSaksnummer))
                 .build();
 
         OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);

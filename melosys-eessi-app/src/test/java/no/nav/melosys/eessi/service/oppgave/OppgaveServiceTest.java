@@ -39,7 +39,8 @@ public class OppgaveServiceTest {
 
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto());
         String journalpostID = "111";
-        oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID, SedType.A009.name());
+        String rinaSaksnummer = "123";
+        oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID, SedType.A009.name(), rinaSaksnummer);
 
         verify(oppgaveConsumer).opprettOppgave(captor.capture());
 
@@ -47,7 +48,7 @@ public class OppgaveServiceTest {
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
         assertThat(oppgaveDto.getTema()).isEqualTo("UFM");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR");
-        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009");
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009\n\rRina-sak - " + rinaSaksnummer);
     }
 
     @Test
