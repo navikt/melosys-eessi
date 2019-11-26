@@ -1,10 +1,5 @@
 package no.nav.melosys.eessi.service.eux;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -21,6 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -112,7 +111,7 @@ public class EuxService {
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, null, sed);
         euxConsumer.sendSed(rinaSaksnummer, null, sedId);
-        log.info("SED {} sendt i sak {}", sed.getSed(), rinaSaksnummer);
+        log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
 
     public boolean sedErEndring(String sedId, String rinaSaksnummer) throws IntegrationException {

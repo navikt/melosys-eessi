@@ -6,7 +6,6 @@ import no.nav.melosys.eessi.kafka.producers.model.SvarAnmodningUnntak;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
-import no.nav.melosys.eessi.service.joark.SakInformasjon;
 
 public abstract class SvarAnmodningUnntakEessiMeldingMapper<T extends Medlemskap> implements MelosysEessiMeldingMapper {
 

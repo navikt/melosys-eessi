@@ -1,11 +1,5 @@
 package no.nav.melosys.eessi;
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.Collections;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -25,6 +19,14 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.Collections;
+
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
 import static no.nav.melosys.eessi.models.SedType.A002;
 
@@ -62,7 +64,7 @@ public class ComponentTestProvider {
 
     SED sed(LocalDate fødselsdato, String statsborgerskap) {
         SED sed = new SED();
-        sed.setSed(A002.name());
+        sed.setSedType(A002.name());
 
         MedlemskapA002 medlemskap = new MedlemskapA002();
         UnntakA002 unntak = new UnntakA002();

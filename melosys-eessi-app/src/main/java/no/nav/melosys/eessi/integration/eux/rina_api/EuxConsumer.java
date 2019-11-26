@@ -1,8 +1,5 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,6 +27,11 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 @Slf4j
@@ -169,7 +171,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public String opprettSed(String rinaSaksnummer, String korrelasjonsId, SED sed)
             throws IntegrationException {
 
-        log.info("Oppretter SED {} på sak {}", sed.getSed(), rinaSaksnummer);
+        log.info("Oppretter SED {} på sak {}", sed.getSedType(), rinaSaksnummer);
         String uri = UriComponentsBuilder.fromPath(String.format("/buc/%s/sed", rinaSaksnummer))
                 .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
@@ -244,7 +246,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     }
 
     public byte[] genererPdfFraSed(SED sed) throws IntegrationException {
-        log.info("Henter pdf for forhåndsvisning av sed med type {}", sed.getSed());
+        log.info("Henter pdf for forhåndsvisning av sed med type {}", sed.getSedType());
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_PDF));
@@ -395,7 +397,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     public Map<String, String> opprettBucOgSed(String bucType, String mottakerId, SED sed)
             throws IntegrationException {
-        log.info("Oppretter buc {}, med sed {}, med mottaker {}", bucType, sed.getSed(),
+        log.info("Oppretter buc {}, med sed {}, med mottaker {}", bucType, sed.getSedType(),
                 mottakerId);
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed")
                 .queryParam("BucType", bucType)
@@ -422,7 +424,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String mottakerId, String filType,
             SED sed, byte[] vedlegg) throws IntegrationException {
         log.info("Oppretter buc {}, med sed {}, med mottaker {} og legger til vedlegg. ", bucType,
-                sed.getSed(), mottakerId);
+                sed.getSedType(), mottakerId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);

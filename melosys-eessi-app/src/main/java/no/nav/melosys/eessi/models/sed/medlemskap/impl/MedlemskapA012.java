@@ -4,6 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MedlemskapA012 extends Medlemskap {
+public class MedlemskapA012 implements Medlemskap {
 
 }

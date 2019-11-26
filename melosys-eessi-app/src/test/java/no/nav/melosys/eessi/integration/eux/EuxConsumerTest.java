@@ -1,10 +1,5 @@
 package no.nav.melosys.eessi.integration.eux;
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,6 +24,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
@@ -243,7 +245,7 @@ public class EuxConsumerTest {
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull();
         assertThat(resultat.getMedlemskap()).isNotNull();
-        assertThat(resultat.getSed()).isEqualTo(SedType.A001.name());
+        assertThat(resultat.getSedType()).isEqualTo(SedType.A001.name());
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA001.class);
 
         MedlemskapA001 medlemskapA001 = (MedlemskapA001) resultat.getMedlemskap();
@@ -266,7 +268,7 @@ public class EuxConsumerTest {
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull();
         assertThat(resultat.getMedlemskap()).isNotNull();
-        assertThat(resultat.getSed()).isEqualTo(SedType.A003.name());
+        assertThat(resultat.getSedType()).isEqualTo(SedType.A003.name());
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
 
         MedlemskapA003 medlemskap = (MedlemskapA003) resultat.getMedlemskap();
@@ -288,7 +290,7 @@ public class EuxConsumerTest {
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull();
-        assertThat(resultat.getSed()).isEqualTo(SedType.A008.name());
+        assertThat(resultat.getSedType()).isEqualTo(SedType.A008.name());
         assertThat(resultat.getMedlemskap()).isNotNull();
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA008.class);
 
@@ -311,7 +313,7 @@ public class EuxConsumerTest {
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull();
-        assertThat(resultat.getSed()).isEqualTo(SedType.A009.name());
+        assertThat(resultat.getSedType()).isEqualTo(SedType.A009.name());
         assertThat(resultat.getMedlemskap()).isNotNull();
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
     }
@@ -331,7 +333,7 @@ public class EuxConsumerTest {
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull();
-        assertThat(resultat.getSed()).isEqualTo(SedType.A010.name());
+        assertThat(resultat.getSedType()).isEqualTo(SedType.A010.name());
         assertThat(resultat.getMedlemskap()).isNotNull();
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
     }
@@ -351,7 +353,7 @@ public class EuxConsumerTest {
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull();
-        assertThat(resultat.getSed()).isEqualTo(SedType.X001.name());
+        assertThat(resultat.getSedType()).isEqualTo(SedType.X001.name());
         assertThat(resultat.getMedlemskap()).isNull();
     }
 

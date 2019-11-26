@@ -1,13 +1,15 @@
 package no.nav.melosys.eessi.service.sed.mapper.administrativ;
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
+
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
 public class X001MapperTest {
@@ -25,7 +27,7 @@ public class X001MapperTest {
 
         assertThat(x001).isNotNull();
         assertThat(x001.getMedlemskap()).isNull();
-        assertThat(x001.getSed()).isEqualTo(SedType.X001.name());
+        assertThat(x001.getSedType()).isEqualTo(SedType.X001.name());
 
         //Påkrevde felter
         assertThat(x001.getNav().getSak().getKontekst().getBruker().getPerson().getFornavn()).isNotNull();

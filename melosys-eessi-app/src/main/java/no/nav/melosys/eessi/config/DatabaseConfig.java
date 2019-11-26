@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.config;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
@@ -20,12 +18,17 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 @Profile("nais")
 @Configuration
 @EnableJpaRepositories(basePackages = "no.nav.melosys.eessi")
 public class DatabaseConfig {
 
     private static final String APPLICATION_NAME = "melosys-eessi";
+    private static final String PROD_MOUNT_PATH = "postgresql/prod-fss";
+    private static final String PREPROD_MOUNT_PATH = "postgresql/preprod-fss";
 
     private final Environment environment;
 
@@ -78,7 +81,7 @@ public class DatabaseConfig {
         config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
         config.setMaximumPoolSize(3);
         config.setMinimumIdle(1);
-        String mountPath = isProduction() ? prodMountPath() : preprodMountPath();
+        String mountPath = isProduction() ? PROD_MOUNT_PATH : PREPROD_MOUNT_PATH;
         return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
     }
 
@@ -93,13 +96,5 @@ public class DatabaseConfig {
     private boolean isProduction() {
         String cluster = environment.getProperty("NAIS_CLUSTER_NAME");
         return cluster != null && cluster.equalsIgnoreCase("prod-fss");
-    }
-
-    private String prodMountPath() {
-        return "postgresql/prod-fss";
-    }
-
-    private String preprodMountPath() {
-        return "postgresql/preprod-fss";
     }
 }

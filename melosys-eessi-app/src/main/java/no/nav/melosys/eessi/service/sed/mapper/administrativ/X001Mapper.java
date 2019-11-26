@@ -1,10 +1,12 @@
 package no.nav.melosys.eessi.service.sed.mapper.administrativ;
 
-import java.time.LocalDate;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.Constants;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.*;
+
+import java.time.LocalDate;
+
 import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
 import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
 
@@ -13,7 +15,7 @@ public class X001Mapper implements AdministrativSedMapper {
 
     public SED mapFraSed(SED sed, String aarsak) {
         SED x001 = new SED();
-        x001.setSed(SedType.X001.toString());
+        x001.setSedType(SedType.X001.toString());
         x001.setSedGVer(SED_G_VER);
         x001.setSedVer(SED_VER);
         x001.setNav(mapNav(sed, aarsak));

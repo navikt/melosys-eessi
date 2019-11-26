@@ -5,6 +5,7 @@ package no.nav.melosys.eessi.models.sed;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import lombok.Data;
@@ -22,7 +23,8 @@ public class SED {
 
     private Nav nav;
 
-    private String sed;
+    @JsonProperty(value = "sed")
+    private String sedType;
 
     private String sedGVer;
 

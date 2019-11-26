@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.util.List;
-import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -21,6 +19,9 @@ import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -93,7 +94,7 @@ public class SedService {
     }
 
     private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, String mottakerLand, String mottakerId) throws NotFoundException, IntegrationException {
-        SedType sedType = SedType.valueOf(sed.getSed());
+        SedType sedType = SedType.valueOf(sed.getSedType());
 
         if (sedType == SedType.A009) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
@@ -102,7 +103,7 @@ public class SedService {
 
             if (eksisterendeSak.isPresent()) {
                 BUC buc = eksisterendeSak.get();
-                Optional<Document> document = finnDokumentVedSedType(buc.getDocuments(), sed.getSed());
+                Optional<Document> document = finnDokumentVedSedType(buc.getDocuments(), sed.getSedType());
 
                 if (document.isPresent() && sedKanOppdateres(buc, document.get().getId())) {
                     String rinaSaksnummer = buc.getId();

@@ -1,9 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.Collections;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -15,6 +11,12 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.util.Collections;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -40,7 +42,7 @@ public class A010MapperTest {
         SED sed = a010Mapper.mapTilSed(sedData);
 
         assertThat(sed).isNotNull();
-        assertThat(sed.getSed()).isEqualTo(SedType.A010.name());
+        assertThat(sed.getSedType()).isEqualTo(SedType.A010.name());
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA010.class);
 
         MedlemskapA010 medlemskap = (MedlemskapA010) sed.getMedlemskap();
