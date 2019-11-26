@@ -1,10 +1,11 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import java.time.LocalDate;
 import no.nav.melosys.eessi.kafka.producers.model.AnmodningUnntak;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
+
+import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 class MelosysEessiMeldingMapperA001 extends NyttLovvalgEessiMeldingMapper<MedlemskapA001> {
     private static final String ARTIKKEL_16_1 = "16_1";
@@ -12,8 +13,8 @@ class MelosysEessiMeldingMapperA001 extends NyttLovvalgEessiMeldingMapper<Medlem
     @Override
     Periode mapPeriode(MedlemskapA001 medlemskap) {
         return new Periode(
-                LocalDate.parse(medlemskap.getSoeknadsperiode().getStartdato()),
-                LocalDate.parse(medlemskap.getSoeknadsperiode().getSluttdato())
+                tilLocalDate(medlemskap.getSoeknadsperiode().getStartdato()),
+                tilLocalDate(medlemskap.getSoeknadsperiode().getSluttdato())
         );
     }
 

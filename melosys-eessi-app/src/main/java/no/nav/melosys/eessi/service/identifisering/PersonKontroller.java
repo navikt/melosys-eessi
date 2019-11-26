@@ -16,6 +16,7 @@ class PersonKontroller {
 
     private static final String UTGAATT_PERSON = "UTPE";
     private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
+    private static final int LOCAL_DATE_LENGTH = 10;
 
     static boolean erOpphoert(Person person) {
         return Arrays.asList(UTGAATT_PERSON_ANNULLERT_TILGANG, UTGAATT_PERSON)
@@ -37,7 +38,7 @@ class PersonKontroller {
         dateFormatter.setTimeZone(tpsFoedselsdatoCalendar.getTimeZone());
 
         String tpsFoedselsdato = dateFormatter.format(tpsFoedselsdatoCalendar.getTime());
-        String sedFoedselsdato = sed.getNav().getBruker().getPerson().getFoedselsdato();
+        String sedFoedselsdato = sed.getNav().getBruker().getPerson().getFoedselsdato().substring(0, LOCAL_DATE_LENGTH);
 
         return tpsFoedselsdato.equalsIgnoreCase(sedFoedselsdato);
     }

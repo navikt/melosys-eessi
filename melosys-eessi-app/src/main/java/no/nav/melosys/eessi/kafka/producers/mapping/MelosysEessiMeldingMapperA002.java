@@ -1,10 +1,11 @@
 package no.nav.melosys.eessi.kafka.producers.mapping;
 
-import java.time.LocalDate;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
+
+import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA002> {
 
@@ -32,6 +33,6 @@ class MelosysEessiMeldingMapperA002 extends SvarAnmodningUnntakEessiMeldingMappe
         }
 
         no.nav.melosys.eessi.models.sed.nav.Periode periode = medlemskap.getUnntak().getVedtak().getAnnenperiode();
-        return new Periode(LocalDate.parse(periode.getFastperiode().getStartdato()), LocalDate.parse(periode.getFastperiode().getSluttdato()));
+        return new Periode(tilLocalDate(periode.getFastperiode().getStartdato()), tilLocalDate(periode.getFastperiode().getSluttdato()));
     }
 }

@@ -101,7 +101,7 @@ public class BehandleSedMottattService {
     private void opprettOppgaveIdentifisering(SedMottatt sedMottatt) throws IntegrationException {
         log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         String oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedHendelse().getSedType()
+                sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedHendelse().getSedType(), sedMottatt.getSedHendelse().getRinaSakId()
         );
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
