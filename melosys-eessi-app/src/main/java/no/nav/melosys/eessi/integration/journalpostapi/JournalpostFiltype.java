@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import com.google.common.collect.ImmutableMap;
+
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +16,7 @@ public enum JournalpostFiltype {
   AFP,
   META,
   DLF,
+  JPG,
   JPEG,
   TIFF,
   DOC,
@@ -25,10 +28,22 @@ public enum JournalpostFiltype {
   JSON,
   PNG;
 
-  private static final Map<String, JournalpostFiltype> JOURNALPOST_FILTYPE_MAP = Arrays.stream(JournalpostFiltype.values())
+  private static final Map<String, JournalpostFiltype> FILENDELSE_FILTYPE_MAP = Arrays.stream(JournalpostFiltype.values())
           .collect(Collectors.toMap(JournalpostFiltype::name, v -> v));
 
-  public static Optional<JournalpostFiltype> filnavn(String filnavn) {
+  private static final Map<String, JournalpostFiltype> MIMETYPE_FILTYPE_MAP = ImmutableMap.<String, JournalpostFiltype>builder()
+          .put("application/pdf", PDF)
+          .put("image/jpg", JPG)
+          .put("image/jpeg", JPEG)
+          .put("image/png", PNG)
+          .build();
+
+
+  public static Optional<JournalpostFiltype> filnavn(String filnavn, String mimeType) {
+    if (MIMETYPE_FILTYPE_MAP.containsKey(mimeType)) {
+      return Optional.of(MIMETYPE_FILTYPE_MAP.get(mimeType));
+    }
+
     return Optional.ofNullable(filnavn)
         .filter(s -> s.contains(".") && s.lastIndexOf('.') + 1 < s.length())
         .map(s -> s.substring(s.lastIndexOf('.') + 1))
@@ -43,6 +58,6 @@ public enum JournalpostFiltype {
   }
 
   private static boolean contains(String filType) {
-    return JOURNALPOST_FILTYPE_MAP.containsKey(filType);
+    return FILENDELSE_FILTYPE_MAP.containsKey(filType);
   }
 }
