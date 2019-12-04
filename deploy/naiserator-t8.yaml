@@ -2,11 +2,11 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: melosys-eessi
-  namespace: @@NAMESPACE@@
+  namespace: t8
   labels:
-    team: teammelosys
+    team: {{team}}
 spec:
-  image: docker.adeo.no:5000/melosys/melosys-eessi:@@IMAGE_VERSION@@
+  image: {{image}}:{{tag}}
   port: 8080
   replicas:
     min: 1
@@ -33,7 +33,7 @@ spec:
     enabled: true
     path: /api/internal/prometheus
   ingresses:
-  - "https://@@URL@@"
+    - "https://melosys-eessi-t8.nais.preprod.local"
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: nais

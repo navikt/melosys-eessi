@@ -6,7 +6,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class MedlemskapA002 extends Medlemskap {
+public class MedlemskapA002 implements Medlemskap {
 
     private UnntakA002 unntak;
 }

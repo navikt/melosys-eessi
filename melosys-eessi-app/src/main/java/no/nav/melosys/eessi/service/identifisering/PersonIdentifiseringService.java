@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.service.identifisering;
 
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -12,6 +12,9 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@Slf4j
 @Service
 public class PersonIdentifiseringService {
 
@@ -38,7 +41,7 @@ public class PersonIdentifiseringService {
 
         if (eksisterendeSak.isPresent()) {
             String aktoerID = sakService.hentsak(eksisterendeSak.get().getGsakSaksnummer()).getAktoerId();
-            return Optional.ofNullable(tpsService.hentNorskIdent(aktoerID));
+            return Optional.of(tpsService.hentNorskIdent(aktoerID));
         }
 
         Optional<String> ident = Optional.ofNullable(sedHendelse.getNavBruker());
@@ -52,6 +55,7 @@ public class PersonIdentifiseringService {
 
         PersonSokResultat resultat = personSok.søkPersonFraSed(sed);
         personSokMetrikker.counter(resultat.getBegrunnelse());
+        log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
         return Optional.ofNullable(resultat.getIdent());
     }
 }

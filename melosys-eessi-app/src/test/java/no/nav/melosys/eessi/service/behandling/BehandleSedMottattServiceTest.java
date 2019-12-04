@@ -1,8 +1,5 @@
 package no.nav.melosys.eessi.service.behandling;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedMottatt;
@@ -20,6 +17,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -208,7 +210,7 @@ public class BehandleSedMottattServiceTest {
 
         SED sed = new SED();
         sed.setNav(nav);
-        sed.setSed("A009");
+        sed.setSedType("A009");
 
         MedlemskapA009 medlemskap = new MedlemskapA009();
         medlemskap.setVedtak(new VedtakA009());

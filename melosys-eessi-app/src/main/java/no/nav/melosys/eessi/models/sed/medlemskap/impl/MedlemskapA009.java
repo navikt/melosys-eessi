@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class MedlemskapA009 extends Medlemskap {
+public class MedlemskapA009 implements Medlemskap {
 
     private Utsendingsland utsendingsland;
 

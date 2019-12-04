@@ -1,9 +1,9 @@
 package no.nav.melosys.eessi.service.dokkat;
 
-import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
-import no.nav.dokkat.api.tkat022.DokumenttypeIdTo;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,11 +32,11 @@ public class DokkatServiceTest {
 
     @Before
     public void setup() throws Exception {
-        DokumenttypeIdTo dokumenttypeIdTo = new DokumenttypeIdTo();
+        DokumenttypeIdDto dokumenttypeIdTo = new DokumenttypeIdDto();
         dokumenttypeIdTo.setDokumenttypeId(dokumentTypeId);
         when(dokumenttypeIdConsumer.hentDokumenttypeId(eq(sedType), anyString())).thenReturn(dokumenttypeIdTo);
 
-        DokumentTypeInfoToV4 dokumentTypeInfoToV4 = DokumentTypeInfoToV4.builder()
+        DokumentTypeInfoDto dokumentTypeInfoToV4 = DokumentTypeInfoDto.builder()
                 .dokumentType("type")
                 .dokumentKategori("kategori")
                 .dokumentTittel("tittel")

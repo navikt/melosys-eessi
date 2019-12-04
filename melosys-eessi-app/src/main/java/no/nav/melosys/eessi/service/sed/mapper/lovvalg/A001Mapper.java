@@ -1,9 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
@@ -13,6 +9,11 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
 
@@ -50,8 +51,6 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
             grunnlag.setAnnet(""); // maks 255 tegn
         }
         unntak.setGrunnlag(grunnlag);
-
-        //unntak.setA1grunnlag(A1GrunnlagMapper.mapFromBestemmelse(tidligereLovvalgsperiode.getUnntakFraBestemmelse()));
 
         return unntak;
     }

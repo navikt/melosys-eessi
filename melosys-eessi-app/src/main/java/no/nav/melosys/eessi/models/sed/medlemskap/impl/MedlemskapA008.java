@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.nav.MedlemskapA008Bruker;
 @EqualsAndHashCode(callSuper = false)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class MedlemskapA008 extends Medlemskap {
+public class MedlemskapA008 implements Medlemskap {
 
     private EndringA008 endring;
 

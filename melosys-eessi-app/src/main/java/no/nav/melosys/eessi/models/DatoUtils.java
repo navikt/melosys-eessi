@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @UtilityClass
 public class DatoUtils {
 
-    private static int LOCAL_DATE_LENGTH = 10;
+    private static final int LOCAL_DATE_LENGTH = 10;
 
     private static String formaterDatoString(String dato) {
         return dato.substring(0, LOCAL_DATE_LENGTH);

@@ -23,8 +23,8 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
-import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonForMangeForekomster;
-import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonUgyldigInput;
+import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault;
+import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault1;
 import no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Personnavn;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonRequest;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonResponse;
@@ -91,10 +91,10 @@ public class TpsService {
         FinnPersonResponse response;
         try {
             response = personsokConsumer.finnPerson(request);
-        } catch (FinnPersonUgyldigInput finnPersonUgyldigInput) {
-            throw new IntegrationException("Ugyldig input i søk", finnPersonUgyldigInput);
-        } catch (FinnPersonForMangeForekomster finnPersonForMangeForekomster) {
-            throw new NotFoundException("For mange forekomster funnet", finnPersonForMangeForekomster);
+        } catch (FinnPersonFault1 ugyldigInputEx) {
+            throw new IntegrationException("Ugyldig input i søk", ugyldigInputEx);
+        } catch (FinnPersonFault forMangeForekomsterEx) {
+            throw new NotFoundException("For mange forekomster funnet", forMangeForekomsterEx);
         }
 
         return mapTilInternRespons(response);

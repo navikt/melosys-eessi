@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.security;
 
-import java.util.HashMap;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Client;
@@ -11,9 +10,12 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
-import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.neethi.Policy;
+
+import java.util.HashMap;
+
+import static org.apache.cxf.rt.security.SecurityConstants.*;
 
 public class StsConfigUtil {
 
@@ -27,8 +29,8 @@ public class StsConfigUtil {
         STSClient stsClient = new STSClient(client.getBus());
         configureSTSClient(stsClient, stsUrl, username, password);
 
-        client.getRequestContext().put(SecurityConstants.STS_CLIENT, stsClient);
-        client.getRequestContext().put(SecurityConstants.CACHE_ISSUED_TOKEN_IN_ENDPOINT, true);
+        client.getRequestContext().put(STS_CLIENT, stsClient);
+        client.getRequestContext().put(CACHE_ISSUED_TOKEN_IN_ENDPOINT, true);
 
         setClientEndpointPolicy(client, resolvePolicyReference(client));
     }
@@ -40,8 +42,8 @@ public class StsConfigUtil {
         stsClient.setLocation(location);
 
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put(SecurityConstants.USERNAME, username);
-        properties.put(SecurityConstants.PASSWORD, password);
+        properties.put(USERNAME, username);
+        properties.put(PASSWORD, password);
 
         stsClient.setProperties(properties);
 

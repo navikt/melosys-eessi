@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.horisontal;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
@@ -10,6 +8,10 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class H005MapperTest {
@@ -29,6 +31,6 @@ public class H005MapperTest {
 
         assertThat(h005).isNotNull();
         assertThat(h005.getMedlemskap()).isNull();
-        assertThat(h005.getSed()).isEqualTo(SedType.H005.name());
+        assertThat(h005.getSedType()).isEqualTo(SedType.H005.name());
     }
 }

@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.integration.dokkat;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.dokkat.api.tkat020.v4.DokumentTypeInfoToV4;
 import no.nav.melosys.eessi.integration.RestConsumer;
+import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -19,11 +19,11 @@ public class DokumenttypeInfoConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public DokumentTypeInfoToV4 hentDokumenttypeInfo(final String dokumenttypeId) throws IntegrationException {
+    public DokumentTypeInfoDto hentDokumenttypeInfo(final String dokumenttypeId) throws IntegrationException {
         try {
 
             return restTemplate
-                .exchange("/" + dokumenttypeId, HttpMethod.GET, new HttpEntity<>(defaultHeaders()), DokumentTypeInfoToV4.class)
+                .exchange("/" + dokumenttypeId, HttpMethod.GET, new HttpEntity<>(defaultHeaders()), DokumentTypeInfoDto.class)
                 .getBody();
 
         } catch (HttpServerErrorException | HttpClientErrorException e) {

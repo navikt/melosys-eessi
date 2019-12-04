@@ -1,10 +1,4 @@
-FROM navikt/java:8
+FROM navikt/java:11
 LABEL maintainer="Team Melosys"
 
-ARG JAR_FILE
-RUN echo $JAR_FILE
-COPY melosys-eessi-app/target/$JAR_FILE /app/app.jar
-
-ARG SPRING_PROFILES
-RUN echo $SPRING_PROFILES
-ENV SPRING_PROFILES_ACTIVE $SPRING_PROFILES
+COPY melosys-eessi-app/target/melosys-eessi-exec.jar /app/app.jar

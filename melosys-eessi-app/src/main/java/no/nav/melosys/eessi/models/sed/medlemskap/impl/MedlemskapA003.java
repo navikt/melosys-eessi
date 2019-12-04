@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MedlemskapA003 extends Medlemskap {
+public class MedlemskapA003 implements Medlemskap {
 
     private String gjeldendereglerEC883;
 

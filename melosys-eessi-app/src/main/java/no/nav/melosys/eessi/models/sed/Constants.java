@@ -6,9 +6,9 @@ public final class Constants {
 
     private Constants() {}
 
-    public static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     //Versjonen til SED'en. Generasjon og versjon (SED_G_VER.SED_VER = 4.1)
-    public static String SED_G_VER = "4";
-    public static String SED_VER = "1";
+    public static final String SED_G_VER = "4";
+    public static final String SED_VER = "1";
 }

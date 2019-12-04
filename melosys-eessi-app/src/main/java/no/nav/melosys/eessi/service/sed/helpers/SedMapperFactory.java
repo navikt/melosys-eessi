@@ -1,13 +1,15 @@
 package no.nav.melosys.eessi.service.sed.helpers;
 
-import java.util.EnumMap;
-import java.util.Map;
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import no.nav.melosys.eessi.service.sed.mapper.horisontal.H005Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.lovvalg.*;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.EnumMap;
+import java.util.Map;
 
 @UtilityClass
 public class SedMapperFactory {
@@ -31,8 +33,8 @@ public class SedMapperFactory {
             throw new MappingException("Sed-type " + sedType.name() + " not supported");
         }
         try {
-            return sedMappers.get(sedType).newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
+            return sedMappers.get(sedType).getDeclaredConstructor().newInstance();
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new MappingException("Could not create mapper with type " + sedType, e);
         }
     }
