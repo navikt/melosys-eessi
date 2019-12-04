@@ -1,6 +1,8 @@
 package no.nav.melosys.eessi.kafka.producers.model;
 
+import java.util.ArrayList;
 import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -12,7 +14,7 @@ public class MelosysEessiMelding {
     private String dokumentId;
     private Long gsakSaksnummer;
     private String aktoerId;
-    private List<Statsborgerskap> statsborgerskap;
+    private List<Statsborgerskap> statsborgerskap = new ArrayList<>();
     private Periode periode;
     private String lovvalgsland;
     private String artikkel;
