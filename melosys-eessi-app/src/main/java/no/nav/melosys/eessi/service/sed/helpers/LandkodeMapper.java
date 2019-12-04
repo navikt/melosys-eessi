@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.service.sed.helpers;
 
+import java.util.Arrays;
+import java.util.Locale;
+
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-
-import java.util.Arrays;
-import java.util.Locale;
 
 @Slf4j
 public final class LandkodeMapper {
@@ -17,6 +17,9 @@ public final class LandkodeMapper {
 
     static {
         Arrays.stream(Locale.getISOCountries()).forEach(c -> map.put(new Locale("", c).getISO3Country(), c));
+        //TODO: midlertidig fix for landkoder utenfor iso-standard til vi blir enige om hvilke som skal brukes
+        map.put("XXX", "XXX"); //Statsløs
+        map.put("???", "???"); //Ukjent
     }
 
     public static String getLandkodeIso2(String landkodeIso3) throws NotFoundException {
