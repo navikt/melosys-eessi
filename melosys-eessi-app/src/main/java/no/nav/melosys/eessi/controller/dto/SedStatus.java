@@ -6,10 +6,10 @@ import org.springframework.util.StringUtils;
 
 @Getter
 public enum SedStatus {
-    UTKAST("UTKAST", "NEW"),
     SENDT("SENDT", "SENT"),
-    MOTTATT("MOTTATT", "RECEIVED"),
+    UTKAST("UTKAST", "NEW"),
     TOM("TOM", "EMPTY"),
+    MOTTATT("MOTTATT", "RECEIVED"),
     AVBRUTT("AVBRUTT", "CANCELLED");
 
     private final String norskStatus;
