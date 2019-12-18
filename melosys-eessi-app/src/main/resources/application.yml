@@ -20,7 +20,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         enable.idempotence: true
-      
+
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
@@ -76,3 +76,8 @@ management:
       exposure:
         include: health,prometheus
       base-path: /internal
+
+#Token-validering
+no.nav.security.jwt.issuer.reststs:
+  discovery-url: ${RESTSTS_URL}/.well-known/openid-configuration
+  accepted-audience: srvmelosys
