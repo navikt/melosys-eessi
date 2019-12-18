@@ -13,11 +13,11 @@ spec:
     max: 1
     cpuThresholdPercentage: 50
   liveness:
-    path: /api/internal/health
+    path: /internal/health
     initialDelay: 60
     timeout: 10
   readiness:
-    path: /api/internal/health
+    path: /internal/health
     initialDelay: 60
     timeout: 10
   resources:
@@ -31,7 +31,7 @@ spec:
     enabled: true
   prometheus:
     enabled: true
-    path: /api/internal/prometheus
+    path: /internal/prometheus
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: nais
