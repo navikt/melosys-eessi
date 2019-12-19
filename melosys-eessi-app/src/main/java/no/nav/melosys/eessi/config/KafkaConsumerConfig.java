@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.config;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -32,8 +33,7 @@ public class KafkaConsumerConfig {
         this.groupId = groupId;
     }
 
-    @Bean
-    public Map<String, Object> sedEventConsumerConfig() {
+    private Map<String, Object> sedEventConsumerConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);

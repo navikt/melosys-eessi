@@ -18,7 +18,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("no.nav.melosys.eessi.controller"))
+                .apis(RequestHandlerSelectors.basePackage(Konstanter.CONTROLLER_PAKKE))
                 .paths(PathSelectors.any())
                 .build();
     }
