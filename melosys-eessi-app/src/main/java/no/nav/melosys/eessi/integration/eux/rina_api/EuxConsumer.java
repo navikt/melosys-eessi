@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +16,6 @@ import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,21 +23,15 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 @Slf4j
-@Service
 public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     private final RestTemplate euxRestTemplate;
@@ -53,8 +49,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private static final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
     private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
 
-    @Autowired
-    public EuxConsumer(@Qualifier("euxRestTemplate") RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.euxRestTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }

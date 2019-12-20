@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.integration.eux.case_store;
 
-import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +18,7 @@ public class CaseStoreConfig {
 
     @Bean("caseStoreResttemplate")
     public RestTemplate caseStoreResttemplate(RestTemplateBuilder restTemplateBuilder,
-            OidcTokenClientRequestInterceptor requestInterceptor) {
+                                              SystemContextClientRequestInterceptor requestInterceptor) {
         return restTemplateBuilder
                 .defaultMessageConverters()
                 .rootUri(url)

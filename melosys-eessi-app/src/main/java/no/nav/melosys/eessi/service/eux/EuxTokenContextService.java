@@ -1,0 +1,19 @@
+package no.nav.melosys.eessi.service.eux;
+
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.metrikker.BucMetrikker;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+@Qualifier("tokenContext")
+public class EuxTokenContextService extends EuxService {
+
+    public EuxTokenContextService(@Qualifier("tokenContext") EuxConsumer euxConsumer,
+                                  BucMetrikker bucMetrikker,
+                                  @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
+                                  @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInstitusjon) {
+        super(euxConsumer, bucMetrikker, rinaHostUrl, mottakerInstitusjon);
+    }
+}

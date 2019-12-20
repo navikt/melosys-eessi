@@ -11,18 +11,19 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.mock.http.client.MockClientHttpRequest;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class OidcTokenClientRequestInterceptorTest {
+public class SystemContextClientRequestInterceptorTest {
 
     @Mock
     private RestStsService restStsService;
     @InjectMocks
-    private OidcTokenClientRequestInterceptor oidcTokenClientRequestInterceptor;
+    private SystemContextClientRequestInterceptor systemContextClientRequestInterceptor;
 
     @Mock
     private ClientHttpRequestExecution httpRequestExecution;
@@ -36,7 +37,7 @@ public class OidcTokenClientRequestInterceptorTest {
     @Test
     public void intercept() throws Exception {
         MockClientHttpRequest httpRequest = new MockClientHttpRequest();
-        oidcTokenClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
+        systemContextClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
 
         verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
         verify(restStsService).collectToken();
