@@ -52,10 +52,6 @@ melosys:
     gsak:
       sak-url: ${SAK_URL}
       oppgave-url: ${OPPGAVE_URL}
-  api:
-    security:
-      header-name: ${API_KEY_HEADER}
-      header-value: ${API_KEY_VALUE}
 
 management:
   metrics:
