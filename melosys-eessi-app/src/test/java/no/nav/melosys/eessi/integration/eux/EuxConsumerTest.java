@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerConfig;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -33,6 +33,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -73,6 +74,13 @@ public class EuxConsumerTest {
         assertThat(response.getDocuments()).isNotEmpty();
         assertThat(response.getDocuments().get(0).getId()).isEqualTo("93f022ea50e54c08bbdb85290a5fb23d");
         assertThat(response.getBucType()).isEqualTo("LA_BUC_01");
+
+        assertThat(response.getDocuments())
+                .flatExtracting(Document::getConversations)
+                .flatExtracting(Conversation::getParticipants)
+                .extracting(Participant::getOrganisation)
+                .extracting(Organisation::getId)
+                .containsAll(List.of("NO:NAVT003", "NO:NAVT007"));
     }
 
     @Test

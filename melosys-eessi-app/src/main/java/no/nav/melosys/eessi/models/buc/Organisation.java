@@ -8,4 +8,5 @@ import lombok.Data;
 public class Organisation {
     private String name;
     private String countryCode;
+    private String id;
 }
