@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.security;
 
 import java.io.IOException;
+
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.springframework.http.HttpHeaders;
@@ -11,11 +12,11 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OidcTokenClientRequestInterceptor implements ClientHttpRequestInterceptor {
+public class SystemContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsService restStsService;
 
-    public OidcTokenClientRequestInterceptor(RestStsService restStsService) {
+    public SystemContextClientRequestInterceptor(RestStsService restStsService) {
         this.restStsService = restStsService;
     }
 

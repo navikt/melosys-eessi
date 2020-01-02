@@ -1,5 +1,8 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -18,10 +21,8 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,7 +32,7 @@ public class SedService {
     private final SaksrelasjonService saksrelasjonService;
 
     @Autowired
-    public SedService(EuxService euxService,
+    public SedService(@Qualifier("tokenContext") EuxService euxService,
                       SaksrelasjonService saksrelasjonService) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;

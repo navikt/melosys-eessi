@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.service.eux;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -14,15 +18,13 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @Slf4j
 @Service
+@Primary
 public class EuxService {
 
     private static final String RINA_URL_TEMPLATE = "/portal/#/caseManagement/";

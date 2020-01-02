@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.controller;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
@@ -15,10 +16,13 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
+import no.nav.security.token.support.core.api.Protected;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+@Protected
 @Slf4j
 @RestController
 @RequestMapping("/buc")
@@ -27,7 +31,7 @@ public class BucController {
     private final EuxService euxService;
     private final SedService sedService;
 
-    public BucController(EuxService euxService, SedService sedService) {
+    public BucController(@Qualifier("tokenContext") EuxService euxService, SedService sedService) {
         this.euxService = euxService;
         this.sedService = sedService;
     }
