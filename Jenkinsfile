@@ -19,7 +19,7 @@ node {
     def NAISERATOR_CONFIG = "naiserator.yaml"
 
     def cluster = "dev-fss"
-    def dockerRepo = "docker.adeo.no:5000/melosys"
+    def dockerRepo = "repo.adeo.no:5443"
     def environment = "${params.NAMESPACE}".toString()
     def namespace
 
@@ -43,6 +43,12 @@ node {
         namespace = environment
     }
 
+    stage("Docker login") {
+        withCredentials([[$class: "UsernamePasswordMultiBinding", credentialsId: "nexus-uploader", usernameVariable: "NEXUS_USERNAME", passwordVariable: "NEXUS_PASSWORD"]]) {
+            sh "echo ${NEXUS_PASSWORD} | docker login -u ${NEXUS_USERNAME} --password-stdin ${dockerRepo}"
+        }
+    }
+
     stage("Checkout") {
         scmInfo = checkout scm
         commitId = scmInfo.GIT_COMMIT.substring(0, 10)
@@ -58,8 +64,8 @@ node {
 
     stage("Build & publish Docker image") {
         configFileProvider([configFile(fileId: "$mvnSettings", variable: "MAVEN_SETTINGS")]) {
-            sh "docker build --build-arg JAR_FILE=${applicationJar}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/${application}:${imageVersion} --rm=true ."
-            sh "docker push ${dockerRepo}/${application}:${imageVersion}"
+            sh "docker build --build-arg JAR_FILE=${applicationJar}.jar --build-arg SPRING_PROFILES=${springProfiles} -t ${dockerRepo}/melosys/${application}:${imageVersion} --rm=true ."
+            sh "docker push ${dockerRepo}/melosys/${application}:${imageVersion}"
         }
     }
 
