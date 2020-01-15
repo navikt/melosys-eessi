@@ -25,8 +25,8 @@ public class SedSendtConsumer {
         this.sedMetrikker = sedMetrikker;
     }
 
-    @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt", topics = "eessi-basis-sedSendt-v1",
-            containerFactory = "sedSendtListenerContainerFactory")
+    @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
+            topics = "${melosys.kafka.consumer.sendt.topic}", containerFactory = "sedSendtListenerContainerFactory")
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendt = consumerRecord.value();
         log.info("Mottatt melding om sed sendt: {}, offset: {}", sedSendt, consumerRecord.offset());

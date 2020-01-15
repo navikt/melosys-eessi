@@ -29,6 +29,10 @@ spring:
 melosys:
   kafka:
     consumer:
+      mottatt:
+        topic: ${KAFKA_SEDMOTTATT_TOPIC:eessi-basis-sedMottatt-v1}
+      sendt:
+        topic: ${KAFKA_SEDSENDT_TOPIC:eessi-basis-sedSendt-v1}
       groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
     producer:
       topic-name: ${KAFKA_EESSIMELDING_TOPIC}
