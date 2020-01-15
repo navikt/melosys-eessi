@@ -1,11 +1,12 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SedStatus;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -125,7 +126,11 @@ public class SedService {
     }
 
     private static Optional<Document> finnDokumentVedSedType(List<Document> documents, String sedType) {
-        return documents.stream().filter(d -> sedType.equals(d.getType())).findFirst();
+        return documents.stream().filter(d -> sedType.equals(d.getType())).min(sorterEtterStatus());
+    }
+
+    private static Comparator<? super Document> sorterEtterStatus() {
+        return Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
     }
 
     private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) throws IntegrationException {

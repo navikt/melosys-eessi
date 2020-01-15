@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -115,27 +116,40 @@ public class SedServiceTest {
         when(saksrelasjonService.finnVedGsakSaksnummerOgBucType(eq(gsakSaksnummer), eq(BucType.LA_BUC_04)))
                 .thenReturn(Collections.singletonList(fagsakRinasakKobling));
 
-        String documentId = "docid12314";
         BUC buc = new BUC();
         buc.setId(RINA_ID);
         buc.setStatus("open");
-        Document document = new Document();
-        document.setStatus("open");
-        document.setId(documentId);
-        document.setType(SedType.A009.name());
-        buc.setDocuments(Collections.singletonList(document));
 
-        Action action = new Action();
-        action.setDocumentId(documentId);
-        action.setOperation("update");
-        buc.setActions(Collections.singletonList(action));
+        String emptyDocumentId = "docid12314";
+        Document emptyDocument = new Document();
+        emptyDocument.setStatus("empty");
+        emptyDocument.setId(emptyDocumentId);
+        emptyDocument.setType(SedType.A009.name());
+
+        String sentDocumentId = "docid321";
+        Document sentDocument = new Document();
+        sentDocument.setStatus("sent");
+        sentDocument.setId(sentDocumentId);
+        sentDocument.setType(SedType.A009.name());
+
+        buc.setDocuments(List.of(emptyDocument, sentDocument));
+
+        Action emptyDocAction = new Action();
+        emptyDocAction.setDocumentId(emptyDocumentId);
+        emptyDocAction.setOperation("update");
+
+        Action sentDocAction = new Action();
+        sentDocAction.setDocumentId(sentDocumentId);
+        sentDocAction.setOperation("update");
+
+        buc.setActions(List.of(emptyDocAction, sentDocAction));
 
         when(euxService.hentBuc(eq(RINA_ID)))
                 .thenReturn(buc);
 
         sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_04, true);
 
-        verify(euxService).oppdaterSed(eq(RINA_ID), eq(documentId), any(SED.class));
+        verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
         verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any(), any());
         verify(euxService).sendSed(anyString(), anyString());
     }
