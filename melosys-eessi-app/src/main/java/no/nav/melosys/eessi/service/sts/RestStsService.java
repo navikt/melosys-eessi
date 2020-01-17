@@ -75,7 +75,7 @@ public class RestStsService implements RestConsumer {
     }
 
     private String createUriString() {
-        return UriComponentsBuilder.fromPath("/")
+        return UriComponentsBuilder.fromPath("/token")
                 .queryParam("grant_type", "client_credentials")
                 .queryParam("scope", "openid").toUriString();
     }

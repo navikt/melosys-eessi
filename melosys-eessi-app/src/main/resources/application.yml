@@ -1,7 +1,5 @@
 server:
   port: 8080
-  servlet:
-    context-path: /api
 
 spring:
   application:
@@ -20,7 +18,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
         enable.idempotence: true
-      
+
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}
     properties:
       security.protocol: SASL_SSL
@@ -31,6 +29,10 @@ spring:
 melosys:
   kafka:
     consumer:
+      mottatt:
+        topic: ${KAFKA_SEDMOTTATT_TOPIC:eessi-basis-sedMottatt-v1}
+      sendt:
+        topic: ${KAFKA_SEDSENDT_TOPIC:eessi-basis-sedSendt-v1}
       groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
     producer:
       topic-name: ${KAFKA_EESSIMELDING_TOPIC}
@@ -54,10 +56,6 @@ melosys:
     gsak:
       sak-url: ${SAK_URL}
       oppgave-url: ${OPPGAVE_URL}
-  api:
-    security:
-      header-name: ${API_KEY_HEADER}
-      header-value: ${API_KEY_VALUE}
 
 management:
   metrics:
@@ -76,3 +74,12 @@ management:
       exposure:
         include: health,prometheus
       base-path: /internal
+
+#Token-validering
+no.nav.security.jwt.issuer:
+  reststs:
+    discovery-url: ${RESTSTS_URL}/.well-known/openid-configuration
+    accepted-audience: srvmelosys
+  isso:
+    discovery-url: ${ISSO_URL}/.well-known/openid-configuration
+    accepted-audience: ${ISSO_ACCEPTED_AUDIENCE}

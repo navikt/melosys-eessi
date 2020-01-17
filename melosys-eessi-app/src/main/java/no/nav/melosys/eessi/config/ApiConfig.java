@@ -1,40 +1,22 @@
 package no.nav.melosys.eessi.config;
 
-import no.nav.melosys.eessi.security.HeaderValidatorRequestInterceptor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Profile("nais")
 @Configuration
 public class ApiConfig implements WebMvcConfigurer {
 
-    private final Environment environment;
-
-    public ApiConfig(Environment environment) {
-        this.environment = environment;
-    }
-
-    @Bean
-    public HeaderValidatorRequestInterceptor requestInterceptor() {
-        return new HeaderValidatorRequestInterceptor(
-                environment.getProperty("melosys.api.security.header-name"),
-                environment.getProperty("melosys.api.security.header-value"),
-                environment.getProperty("spring.profiles.active")
-        );
-    }
+    private static final String API_PREFIX = "/api";
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(requestInterceptor())
-                .addPathPatterns(
-                        "/**"
-                )
-                .excludePathPatterns(
-                        "/internal/**"
-                );
+    public void configurePathMatch(PathMatchConfigurer configurer) {
+        configurer.addPathPrefix(API_PREFIX, ApiConfig::erApiTjeneste);
+    }
+
+    private static boolean erApiTjeneste(Class clazz) {
+        return clazz.getPackageName().startsWith(Konstanter.CONTROLLER_PAKKE)
+                && clazz.isAnnotationPresent(RestController.class);
     }
 }

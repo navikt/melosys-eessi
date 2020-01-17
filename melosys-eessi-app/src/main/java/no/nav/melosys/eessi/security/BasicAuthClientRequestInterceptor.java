@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.security;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
 import no.nav.melosys.eessi.config.AppCredentials;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;

@@ -27,8 +27,8 @@ public class SedMottattConsumer {
         this.sedMetrikker = sedMetrikker;
     }
 
-    @KafkaListener(containerFactory = "sedMottattListenerContainerFactory",
-            topics = "eessi-basis-sedMottatt-v1", clientIdPrefix = "melosys-eessi-sedMottatt")
+    @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
+            topics = "${melosys.kafka.consumer.mottatt.topic}", containerFactory = "sedMottattListenerContainerFactory")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedMottatt sedMottatt = SedMottatt.av(consumerRecord.value());
 

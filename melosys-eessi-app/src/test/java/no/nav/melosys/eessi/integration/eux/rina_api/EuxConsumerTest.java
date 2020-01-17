@@ -1,12 +1,16 @@
-package no.nav.melosys.eessi.integration.eux;
+package no.nav.melosys.eessi.integration.eux.rina_api;
+
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerConfig;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.*;
@@ -14,7 +18,7 @@ import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
-import no.nav.melosys.eessi.security.OidcTokenClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -24,12 +28,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -49,10 +47,10 @@ public class EuxConsumerTest {
 
     @Before
     public void setup() {
-        EuxConsumerConfig consumerConfig = new EuxConsumerConfig(null);
-        OidcTokenClientRequestInterceptor interceptor = new OidcTokenClientRequestInterceptor(mock(RestStsService.class));
+        EuxConsumerProducer consumerConfig = new EuxConsumerProducer(null);
+        SystemContextClientRequestInterceptor interceptor = new SystemContextClientRequestInterceptor(mock(RestStsService.class));
 
-        RestTemplate restTemplate = consumerConfig.restTemplate(new RestTemplateBuilder(), interceptor);
+        RestTemplate restTemplate = consumerConfig.euxRestTemplate(new RestTemplateBuilder(), interceptor);
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
         server = MockRestServiceServer.createServer(restTemplate);
     }

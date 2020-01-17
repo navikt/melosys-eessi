@@ -22,6 +22,7 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
 import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -32,7 +33,7 @@ public class SedService {
     private final SaksrelasjonService saksrelasjonService;
 
     @Autowired
-    public SedService(EuxService euxService,
+    public SedService(@Qualifier("tokenContext") EuxService euxService,
                       SaksrelasjonService saksrelasjonService) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
