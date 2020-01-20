@@ -43,9 +43,9 @@ jobs:
         run: |
           docker push ${IMAGE}
 
-  # Deploy til T8 ved push på SPRINT-branch
-  deploy_t8:
-    name: Deploy til T8
+  # Deploy til Q1 ved push på SPRINT-branch
+  deploy_q1:
+    name: Deploy til Q1
     needs: build
     if: contains(github.ref, 'SPRINT-')
     runs-on: ubuntu-latest
@@ -58,7 +58,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: namespace=t8
+          VAR: namespace=default
 
   # Deploy til Q2 ved pull-request mot master
   deploy_q2:
