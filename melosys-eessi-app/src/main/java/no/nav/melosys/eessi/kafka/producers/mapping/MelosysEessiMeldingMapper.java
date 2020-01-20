@@ -2,6 +2,8 @@ package no.nav.melosys.eessi.kafka.producers.mapping;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import no.nav.melosys.eessi.kafka.producers.model.Arbeidssted;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -26,6 +28,9 @@ public interface MelosysEessiMeldingMapper {
             melosysEessiMelding.setStatsborgerskap(
                     mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
             );
+        }
+        if (sed.getNav() != null && sed.getNav().getArbeidssted() != null) {
+            melosysEessiMelding.setArbeidssteder(sed.getNav().getArbeidssted().stream().map(Arbeidssted::new).collect(Collectors.toList()));
         }
         return melosysEessiMelding;
     }
