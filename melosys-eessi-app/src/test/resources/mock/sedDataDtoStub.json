@@ -95,5 +95,9 @@
     }
   ],
   "gsakSaksnummer": 123,
-  "mottakerLand": "SE"
+  "mottakerLand": "SE",
+  "mottakerIder": [
+    "SE:123",
+    "BE:312"
+  ]
 }

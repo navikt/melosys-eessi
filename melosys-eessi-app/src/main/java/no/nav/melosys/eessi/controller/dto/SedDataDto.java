@@ -32,7 +32,7 @@ public class SedDataDto {
     private Long gsakSaksnummer;
 
     private String mottakerLand;
-    private String mottakerId;
+    private List<String> mottakerIder;
 
     private SvarAnmodningUnntakDto svarAnmodningUnntak;
 }
