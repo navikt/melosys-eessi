@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -34,6 +35,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -62,7 +64,7 @@ public class SedServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
-        when(euxService.opprettBucOgSed(anyString(), anyString(), any(), any(SED.class), any()))
+        when(euxService.opprettBucOgSed(anyString(), anyString(), any(SED.class), any()))
                 .thenReturn(opprettBucOgSedResponse);
 
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
@@ -150,7 +152,7 @@ public class SedServiceTest {
         sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_04, true);
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
-        verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any(), any());
+        verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
         verify(euxService).sendSed(anyString(), anyString());
     }
 
@@ -166,7 +168,7 @@ public class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         OpprettSedDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_03, false);
 
-        verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any(), any());
+        verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
         verify(euxService, never()).sendSed(anyString(), anyString());
         assertThat(response.getRinaSaksnummer()).isEqualTo(RINA_ID);

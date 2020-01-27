@@ -12,7 +12,6 @@ import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -35,30 +34,21 @@ public class EuxService {
     private final BucMetrikker bucMetrikker;
 
     private final String rinaHostUrl;
-    private final String mottakerInstitusjon;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
             BucMetrikker bucMetrikker,
-            @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
-            @Value("${MOTTAKER_INSTITUSJON:}") String mottakerInstitusjon) {
+            @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
         this.rinaHostUrl = rinaHostUrl;
-        this.mottakerInstitusjon = mottakerInstitusjon;
     }
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerLand, String mottakerId, SED sed, byte[] vedlegg)
-            throws IntegrationException, NotFoundException {
-
-        if (StringUtils.isEmpty(mottakerId)) {
-            mottakerId = avklarMottakerId(bucType, mottakerLand);
-        }
-
+    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerId, SED sed, byte[] vedlegg) throws IntegrationException {
         Map<String, String> response;
         if (vedlegg != null && vedlegg.length > 0) {
             response = euxConsumer.opprettBucOgSedMedVedlegg(bucType, mottakerId, FILTYPE_PDF, sed, vedlegg);
@@ -80,17 +70,6 @@ public class EuxService {
 
     public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) throws IntegrationException {
         euxConsumer.oppdaterSed(rinaSaksnummer, null, dokumentId, sed);
-    }
-
-    private String avklarMottakerId(String bucType, String landkode) throws IntegrationException, NotFoundException {
-        if (!StringUtils.isEmpty(mottakerInstitusjon)) {
-            return mottakerInstitusjon;
-        }
-        List<Institusjon> institusjoner = hentMottakerinstitusjoner(bucType, landkode);
-
-        return institusjoner.stream().map(Institusjon::getId).findFirst()
-                .orElseThrow(() -> new NotFoundException(
-                        "Finner ikke mottaker for landkode " + landkode + " og buc " + bucType));
     }
 
     public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode)
