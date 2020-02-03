@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -17,7 +18,6 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.junit.Before;
 import org.junit.Rule;
@@ -26,8 +26,8 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -49,7 +49,7 @@ public class EuxServiceTest {
     @Before
     public void setup() throws IOException, IntegrationException {
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL, null);
+        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL);
 
         when(euxConsumer.opprettBucOgSed(anyString(), anyString(), any()))
                 .thenReturn(ImmutableMap.of(
@@ -112,31 +112,28 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void opprettBucOgSed_forventRinaSaksnummer() throws NotFoundException, IntegrationException {
+    public void opprettBucOgSed_forventRinaSaksnummer() throws IntegrationException {
         String bucType = BucType.LA_BUC_01.name();
-        String mottakerLand = "SE";
-        String mottakerId = null;
+        String mottakerId = "SE:123";
         SED sed = new SED();
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed, null);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerId, sed, null);
 
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
 
         verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
-        verify(euxConsumer).hentInstitusjoner(eq(bucType), eq(null));
     }
 
     @Test
     public void opprettBucOgSed_forventException() throws Exception {
         String bucType = BucType.LA_BUC_01.name();
-        String mottakerLand = "SE";
-        String mottakerId = null;
+        String mottakerId = "SE:123";
         SED sed = new SED();
 
         doThrow(IntegrationException.class).when(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
 
         expectedException.expect(IntegrationException.class);
-        euxService.opprettBucOgSed(bucType, mottakerLand, mottakerId, sed, null);
+        euxService.opprettBucOgSed(bucType, mottakerId, sed, null);
 
         verify(euxConsumer).opprettBucOgSed(anyString(), any(), any());
     }
