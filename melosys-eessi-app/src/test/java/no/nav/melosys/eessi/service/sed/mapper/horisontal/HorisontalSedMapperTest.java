@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class H005MapperTest {
+public class HorisontalSedMapperTest {
 
     private HorisontalSedMapper h005Mapper = new HorisontalSedMapper(SedType.H005);
 
