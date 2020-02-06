@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.models.buc;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.Getter;
 
@@ -13,7 +14,9 @@ public class Participant {
         @JsonProperty("Receiver")
         MOTTAKER,
         @JsonProperty("Sender")
-        UTSENDER
+        UTSENDER,
+        @JsonProperty("Participant")
+        DELTAKER
     }
 
     private ParticipantRole role;
