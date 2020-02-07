@@ -14,6 +14,7 @@ public enum SedType {
     X011,
     X012,
     X013,
+
     A001,
     A002,
     A003,
@@ -26,6 +27,7 @@ public enum SedType {
     A010,
     A011,
     A012,
+
     H001,
     H002,
     H003,
@@ -37,6 +39,10 @@ public enum SedType {
     H061,
     H065,
     H070,
+    H120,
+    H121,
+    H130,
+
     S040,
     S041
 }
