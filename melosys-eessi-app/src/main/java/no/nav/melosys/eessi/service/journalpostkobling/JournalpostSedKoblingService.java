@@ -1,9 +1,11 @@
 package no.nav.melosys.eessi.service.journalpostkobling;
 
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
+import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -26,15 +28,17 @@ public class JournalpostSedKoblingService {
     private final CaseStoreConsumer caseStoreConsumer;
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
+    private final SafConsumer safConsumer;
 
     public JournalpostSedKoblingService(
             JournalpostSedKoblingRepository journalpostSedKoblingRepository,
             CaseStoreConsumer caseStoreConsumer, EuxService euxService,
-            SaksrelasjonService saksrelasjonService) {
+            SaksrelasjonService saksrelasjonService, SafConsumer safConsumer) {
         this.journalpostSedKoblingRepository = journalpostSedKoblingRepository;
         this.caseStoreConsumer = caseStoreConsumer;
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
+        this.safConsumer = safConsumer;
     }
 
     public Optional<JournalpostSedKobling> finnVedJournalpostID(String journalpostID) {
@@ -50,14 +54,20 @@ public class JournalpostSedKoblingService {
             return Optional.of(opprettEessiMelding(journalpostSedKobling.get()));
         }
 
-        Optional<String> saksnummer = caseStoreConsumer.finnVedJournalpostID(journalpostID)
-                .stream().findFirst().map(CaseStoreDto::getRinaSaksnummer);
+        Optional<String> rinaSaksnummer = søkEtterRinaSaksnummerForJournalpost(journalpostID);
 
-        if (saksnummer.isPresent()) {
-            return opprettEessiMelding(saksnummer.get(), journalpostID);
+        if (rinaSaksnummer.isPresent()) {
+            return opprettEessiMelding(rinaSaksnummer.get(), journalpostID);
         }
 
         return Optional.empty();
+    }
+
+    private Optional<String> søkEtterRinaSaksnummerForJournalpost(String journalpostID) throws IntegrationException {
+        Optional<String> rinaSaksnummer = safConsumer.hentRinasakForJournalpost(journalpostID);
+
+        return rinaSaksnummer.isPresent() ? rinaSaksnummer : caseStoreConsumer.finnVedJournalpostID(journalpostID)
+                .stream().findFirst().map(CaseStoreDto::getRinaSaksnummer);
     }
 
     private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling)
@@ -84,7 +94,7 @@ public class JournalpostSedKoblingService {
             throws IntegrationException {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
         Optional<Document> document = buc.hentSistOppdaterteDocument();
-        if (!document.isPresent()) {
+        if (document.isEmpty()) {
             log.warn("Finner ikke sist oppdaterte sed for rinasak {}", rinaSaksnummer);
             return Optional.empty();
         }
