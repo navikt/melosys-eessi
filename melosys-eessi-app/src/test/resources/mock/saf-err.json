@@ -1,0 +1,15 @@
+{
+  "errors": [
+    {
+      "message": "feil1",
+      "exception": "NullPointerException"
+    },
+    {
+      "message": "feil2",
+      "exception": "NullPointerException"
+    }
+  ],
+  "data": {
+    "query": null
+  }
+}
