@@ -49,6 +49,7 @@ melosys:
     rina-host-url: ${RINA_HOST_URL}
     journalpostapi-url: ${JOURNALPOSTAPI_URL}
     eux-case-store-url: ${EUXCASESTORE_URL}
+    saf-url: ${SAF_URL}
 
     dokkat:
       typeid-url: ${DOKKATTYPEID_URL}

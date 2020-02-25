@@ -24,7 +24,7 @@ public class MelosysEessiProducer {
     public void publiserMelding(MelosysEessiMelding melding) {
         ListenableFuture<SendResult<String, MelosysEessiMelding>> future = kafkaTemplate.send(topicName, melding);
 
-        future.addCallback(new ListenableFutureCallback<SendResult<String, MelosysEessiMelding>>() {
+        future.addCallback(new ListenableFutureCallback<>() {
             @Override
             public void onFailure(Throwable throwable) {
                 log.error("Kunne ikke sende melding om mottat SED: {}", melding, throwable);
@@ -32,9 +32,10 @@ public class MelosysEessiProducer {
 
             @Override
             public void onSuccess(SendResult<String, MelosysEessiMelding> res) {
-                log.info("Melding sendt på topic {}. Record.key: {}, offset: {}, record: {}",
+                log.info("Melding sendt på topic {}. Record.key: {}, offset: {}, rinaSaksnummer: {}",
                         topicName, res.getProducerRecord().key(),
-                        res.getRecordMetadata().offset(), res.getProducerRecord().value());
+                        res.getRecordMetadata().offset(),
+                        res.getProducerRecord().value().getRinaSaksnummer());
             }
         });
     }

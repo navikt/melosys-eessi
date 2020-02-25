@@ -2,11 +2,13 @@ package no.nav.melosys.eessi.service.journalpostkobling;
 
 import java.util.Collections;
 import java.util.Optional;
+
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
+import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.JournalpostSedKobling;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -21,6 +23,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -36,6 +39,8 @@ public class JournalpostSedKoblingServiceTest {
     private EuxService euxService;
     @Mock
     private SaksrelasjonService saksrelasjonService;
+    @Mock
+    private SafConsumer safConsumer;
 
     private JournalpostSedKoblingService journalpostSedKoblingService;
 
@@ -45,8 +50,8 @@ public class JournalpostSedKoblingServiceTest {
     @Before
     public void setup() {
         journalpostSedKoblingService = new JournalpostSedKoblingService(
-                journalpostSedKoblingRepository, caseStoreConsumer, euxService, saksrelasjonService
-        );
+                journalpostSedKoblingRepository, caseStoreConsumer, euxService, saksrelasjonService,
+                safConsumer);
 
         sed = new SED();
         sed.setNav(new Nav());

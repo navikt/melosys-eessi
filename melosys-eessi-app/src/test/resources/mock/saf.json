@@ -1,0 +1,16 @@
+{
+  "data": {
+    "query": {
+      "tilleggsopplysninger": [
+        {
+          "nokkel": "rinaSakId",
+          "verdi": "64789743"
+        },
+        {
+          "nokkel": "rinaDokumentId",
+          "verdi": "e9338ef8d2e64c55abfaa7718cbd92d9"
+        }
+      ]
+    }
+  }
+}
