@@ -1,5 +1,10 @@
 package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
@@ -9,11 +14,6 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
 
@@ -25,8 +25,8 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
 
         if (!sedData.getLovvalgsperioder().isEmpty()) {
             medlemskap.setUnntak(getUnntak(lovvalgsperiode));
-            medlemskap.setNaavaerendemedlemskap(getNaavaerendeMedlemskap(lovvalgsperiode));
-            medlemskap.setForespurtmedlemskap(getForespurtMedlemskap(lovvalgsperiode));
+            medlemskap.setNaavaerendemedlemskap(getLovvalgsland(lovvalgsperiode));
+            medlemskap.setForespurtmedlemskap(getLovvalgsland(lovvalgsperiode));
             medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
             medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
         }
@@ -62,14 +62,7 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
         return vertsland;
     }
 
-    private List<Land> getNaavaerendeMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
-        Land land = new Land();
-        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getUnntakFraLovvalgsland()));
-
-        return Collections.singletonList(land);
-    }
-
-    private List<Land> getForespurtMedlemskap(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
+    private List<Land> getLovvalgsland(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
         Land land = new Land();
         land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
 
