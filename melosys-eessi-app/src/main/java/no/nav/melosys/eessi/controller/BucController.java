@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -68,5 +69,11 @@ public class BucController {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());
+    }
+
+    @ApiOperation(value = "Henter sedGrunnlag for gitt sed")
+    @GetMapping("/{rinaSaksnummer}/sed/{rinaDokumentId}/grunnlag")
+    public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId) throws IntegrationException {
+        return SedGrunnlagDto.av(euxService.hentSed(rinaSaksnummer, rinaDokumentId).getNav());
     }
 }

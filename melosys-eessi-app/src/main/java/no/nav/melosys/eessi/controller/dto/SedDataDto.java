@@ -4,23 +4,17 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SedDataDto {
-
-    //Søknaddok.
-    private List<Ident> utenlandskIdent;
-
+public class SedDataDto extends SedGrunnlagDto {
     //Persondok.
     private List<FamilieMedlem> familieMedlem;
     private Bruker bruker;
 
     //Andre medlemsvariabler
-    private Adresse bostedsadresse;
-    private List<Virksomhet> arbeidsgivendeVirksomheter;
-    private List<Virksomhet> selvstendigeVirksomheter;
-    private List<Arbeidssted> arbeidssteder;
     private List<Virksomhet> utenlandskeVirksomheter;
 
     //A008 spesifikt

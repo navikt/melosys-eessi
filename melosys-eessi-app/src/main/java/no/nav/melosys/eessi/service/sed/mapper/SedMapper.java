@@ -1,5 +1,11 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.SedType;
@@ -15,12 +21,6 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
 import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
@@ -111,33 +111,18 @@ public interface SedMapper {
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sedDataDto.getBostedsadresse().getLand()));
         adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
         adresse.setRegion(sedDataDto.getBostedsadresse().getRegion());
-        adresse.setType(mapAdressetype(sedDataDto.getBostedsadresse().getAdressetype()));
+        adresse.setType(sedDataDto.getBostedsadresse().getAdressetype().getAdressetypeRina());
 
         // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
         if (sedDataDto.getBostedsadresse().getAdressetype() == Adressetype.BOSTEDSADRESSE) {
             if ("NO".equalsIgnoreCase(adresse.getLand())) {
-                adresse.setType("bosted");
+                adresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
             } else {
-                adresse.setType("opphold");
+                adresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
             }
         }
 
         return Collections.singletonList(adresse);
-    }
-
-    default String mapAdressetype(Adressetype adressetype) {
-        switch (adressetype) {
-            case BOSTEDSADRESSE:
-                return "bosted";
-            case POSTADRESSE:
-                return "opphold";
-            case KONTAKTADRESSE:
-                return "kontakt";
-            case ANNET:
-                return "annet";
-            default:
-                throw new IllegalArgumentException("Finner ikke addressetype " + adressetype);
-        }
     }
 
     default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {
