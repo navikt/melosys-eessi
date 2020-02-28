@@ -43,28 +43,11 @@ jobs:
         run: |
           docker push ${IMAGE}
 
-  # Deploy til Q1 ved push på SPRINT-branch
-  deploy_q1:
-    name: Deploy til Q1
-    needs: build
-    if: contains(github.ref, 'SPRINT-')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v1
-      - name: Deploy
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          CLUSTER: dev-fss
-          RESOURCE: deploy/nais.yaml
-          VAR: namespace=default
-
-  # Deploy til Q2 ved pull-request mot master
+  # Deploy til Q2 ved push på SPRINT-branch
   deploy_q2:
     name: Deploy til Q2
     needs: build
-    if: github.event_name == 'pull_request'
+    if: contains(github.ref, 'SPRINT-')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

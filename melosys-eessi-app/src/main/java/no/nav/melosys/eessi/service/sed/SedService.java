@@ -46,7 +46,7 @@ public class SedService {
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
 
-        SedType sedType = SedUtils.hentFoersteLovligeSedPaaBuc(bucType);
+        SedType sedType = SedUtils.hentFørsteLovligeSedPåBuc(bucType);
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
