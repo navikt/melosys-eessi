@@ -1,11 +1,22 @@
-package no.nav.melosys.eessi.controller.dto;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
 
-public class SedGrunnlagDtoTest {
+import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
-/*
+import com.fasterxml.jackson.databind.ObjectMapper;
+import no.nav.melosys.eessi.controller.dto.*;
+import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.nav.Pin;
+import org.junit.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
+
+public class SedGrunnlagMapperA003Test {
     @Test
-    public void av_medUtfyltNav_forventVerdier() throws IOException {
-        SedGrunnlagDto sedGrunnlagDto = SedGrunnlagDto.av(hentSed().getNav());
+    public void map_medUtfyltNav_forventVerdier() throws IOException {
+        SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagMapperA003().map(hentSed());
 
         assertThat(sedGrunnlagDto).isNotNull();
         assertThat(sedGrunnlagDto.getUtenlandskIdent())
@@ -38,14 +49,18 @@ public class SedGrunnlagDtoTest {
         assertThat(sedGrunnlagDto.getArbeidsgivendeVirksomheter())
                 .as("Arbeidsgivende virksomheter har rett info")
                 .extracting(Virksomhet::getNavn, Virksomhet::getOrgnr)
-                .containsExactlyInAnyOrder(tuple("Testarbeidsgiver", "TestOrgnummer"));
+                .containsExactlyInAnyOrder(
+                        tuple("Testarbeidsgiver", "TestOrgnummer"),
+                        tuple("Testarbeidsgiver andreland", "123")
+                );
 
         assertThat(sedGrunnlagDto.getArbeidsgivendeVirksomheter())
                 .as("Arbeidsgivende virksomheter har rette adresser")
                 .extracting(Virksomhet::getAdresse)
                 .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getRegion, Adresse::getGateadresse)
                 .containsExactlyInAnyOrder(
-                        tuple("CY", "Testarbeidsgiverpostkode", "Testarbeidsgiverby", "Testarbeidsgiverregion", "Testarbeidsgivergate Testarbeidsgiverbygning")
+                        tuple("CY", "Testarbeidsgiverpostkode", "Testarbeidsgiverby", "Testarbeidsgiverregion", "Testarbeidsgivergate Testarbeidsgiverbygning"),
+                        tuple("DE", "0101", "by", "region", "gate")
                 );
 
         assertThat(sedGrunnlagDto.getSelvstendigeVirksomheter())
@@ -63,58 +78,57 @@ public class SedGrunnlagDtoTest {
     }
 
     @Test
-    public void av_ingenBostedsadresse_forventPostadresse() throws IOException {
+    public void map_ingenBostedsadresse_forventPostadresse() throws IOException {
         SED sed = hentSed();
         var adresse = sed.getNav().getBruker().getAdresse().get(0);
         adresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
-        assertThat(SedGrunnlagDto.av(sed.getNav()).getBostedsadresse())
+        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse())
                 .extracting(Adresse::getAdressetype, Adresse::getLand, Adresse::getGateadresse)
                 .containsExactlyInAnyOrder(Adressetype.POSTADRESSE, "BE", "Testgate Testbyggnavn");
     }
 
     @Test
-    public void av_ingenAdresse_forventTomAdresse() throws IOException {
+    public void map_ingenAdresse_forventTomAdresse() throws IOException {
         SED sed = hentSed();
         sed.getNav().getBruker().setAdresse(List.of());
 
-        assertThat(SedGrunnlagDto.av(sed.getNav()).getBostedsadresse()).isEqualToComparingFieldByField(new Adresse());
+        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse()).isEqualToComparingFieldByField(new Adresse());
     }
 
     @Test
-    public void av_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() throws IOException {
+    public void map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() throws IOException {
         SED sed = hentSed();
         Pin pin = sed.getNav().getBruker().getPerson().getPin().get(0);
         pin.setLand("NO");
         sed.getNav().getBruker().getPerson().setPin(List.of(pin));
 
-        assertThat(SedGrunnlagDto.av(sed.getNav()).getUtenlandskIdent()).isEmpty();
+        assertThat(new SedGrunnlagMapperA003().map(sed).getUtenlandskIdent()).isEmpty();
     }
 
     @Test
-    public void av_ingenGate_forventKunBygning() throws IOException {
+    public void map_ingenGate_forventKunBygning() throws IOException {
         SED sed = hentSed();
         var adresse = sed.getNav().getBruker().getAdresse().get(0);
         adresse.setGate(null);
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
-        assertThat(SedGrunnlagDto.av(sed.getNav()).getBostedsadresse().getGateadresse()).isEqualTo("Testbyggnavn");
+        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse().getGateadresse()).isEqualTo("Testbyggnavn");
     }
 
     @Test
-    public void av_ingenBygning_forventKunGate() throws IOException {
+    public void map_ingenBygning_forventKunGate() throws IOException {
         SED sed = hentSed();
         var adresse = sed.getNav().getBruker().getAdresse().get(0);
         adresse.setBygning(null);
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
-        assertThat(SedGrunnlagDto.av(sed.getNav()).getBostedsadresse().getGateadresse()).isEqualTo("Testgate");
+        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse().getGateadresse()).isEqualTo("Testgate");
     }
 
     private static SED hentSed() throws IOException {
-        URL jsonUrl = SedGrunnlagDtoTest.class.getClassLoader().getResource("mock/sedA001.json");
+        URL jsonUrl = SedGrunnlagDtoTest.class.getClassLoader().getResource("mock/sedA003.json");
         return new ObjectMapper().readValue(jsonUrl, SED.class);
     }
-*/
 }

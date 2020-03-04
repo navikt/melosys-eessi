@@ -10,30 +10,30 @@ import no.nav.melosys.eessi.models.sed.nav.Periode;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
-class MelosysEessiMeldingMapperA009 extends NyttLovvalgEessiMeldingMapper<MedlemskapA009> {
+class MelosysEessiMeldingMapperA009 implements NyttLovvalgEessiMeldingMapper<MedlemskapA009> {
 
     @Override
-    Boolean sedErEndring(MedlemskapA009 medlemskap) {
+    public Boolean sedErEndring(MedlemskapA009 medlemskap) {
         return "ja".equalsIgnoreCase(medlemskap.getVedtak().getErendringsvedtak());
     }
 
     @Override
-    MedlemskapA009 hentMedlemskap(SED sed) {
+    public MedlemskapA009 hentMedlemskap(SED sed) {
         return (MedlemskapA009) sed.getMedlemskap();
     }
 
     @Override
-    String hentLovvalgsbestemmelse(MedlemskapA009 medlemskap) {
+    public String hentLovvalgsbestemmelse(MedlemskapA009 medlemskap) {
         return medlemskap.getVedtak().getArtikkelforordning();
     }
 
     @Override
-    String hentLovvalgsland(MedlemskapA009 medlemskap) {
+    public String hentLovvalgsland(MedlemskapA009 medlemskap) {
         return medlemskap.getVedtak().getLand();
     }
 
     @Override
-    no.nav.melosys.eessi.kafka.producers.model.Periode mapPeriode(MedlemskapA009 medlemskap) {
+    public no.nav.melosys.eessi.kafka.producers.model.Periode mapPeriode(MedlemskapA009 medlemskap) {
 
         LocalDate fom;
         LocalDate tom;

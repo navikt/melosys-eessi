@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MedlemskapA003 implements Medlemskap {
 
-    private String gjeldendereglerEC883;
+    private String gjeldendereglerEC883; // todo - hvorfor er denne en liste?
 
     private String relevantartikkelfor8832004eller9872009;
 

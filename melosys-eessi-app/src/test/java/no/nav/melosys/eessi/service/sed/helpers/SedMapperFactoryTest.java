@@ -4,9 +4,9 @@ import java.util.List;
 
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
-import no.nav.melosys.eessi.service.sed.mapper.lovvalg.A001Mapper;
-import no.nav.melosys.eessi.service.sed.mapper.lovvalg.A009Mapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A001Mapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A009Mapper;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

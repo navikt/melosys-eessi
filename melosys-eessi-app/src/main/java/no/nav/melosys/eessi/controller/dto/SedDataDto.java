@@ -21,7 +21,9 @@ public class SedDataDto extends SedGrunnlagDto {
     private String avklartBostedsland;
 
     //Lovvalg
+/*
     private List<Lovvalgsperiode> lovvalgsperioder;
+*/
     private List<Lovvalgsperiode> tidligereLovvalgsperioder;
 
     private Long gsakSaksnummer;

@@ -7,9 +7,9 @@ import com.google.common.collect.Maps;
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
-import no.nav.melosys.eessi.service.sed.mapper.horisontal.HorisontalSedMapper;
-import no.nav.melosys.eessi.service.sed.mapper.lovvalg.*;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.horisontal.HorisontalSedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.*;
 
 @UtilityClass
 public class SedMapperFactory {
