@@ -1,175 +1,110 @@
 {
-  "nav": {
-    "bruker": {
-      "mor": {
-        "person": {
-          "etternavnvedfoedsel": "Testmorsetternavnvedfødsel",
-          "fornavn": "Testmorsfornavn"
-        }
-      },
-      "person": {
-        "fornavn": "Testfornavn1",
-        "kjoenn": "M",
-        "etternavn": "Testetternavn1",
-        "foedselsdato": "1977-10-01",
-        "statsborgerskap": [
-          {
-            "land": "AT"
-          },
-          {
-            "land": "BG"
-          },
-          {
-            "land": "GR"
-          }
-        ],
-        "pin": [
-          {
-            "sektor": "sykdom",
-            "identifikator": "15225345345",
-            "land": "BG"
-          }
-        ],
-        "foedested": {
-          "region": "Testfødselsregion",
-          "land": "DK",
-          "by": "Testfødselssted"
-        },
-        "fornavnvedfoedsel": "Testfornavnvedfoedsel",
-        "etternavnvedfoedsel": "Testetternavnvedfoedsel"
-      },
-      "adresse": [
-        {
-          "by": "Testby",
-          "postnummer": "Testpostkode",
-          "bygning": "Testbyggnavn",
-          "type": "bosted",
-          "land": "BE",
-          "gate": "Testgate",
-          "region": "Testregion"
-        },
-        {
-          "postnummer": "Testpostkode2",
-          "region": "Testregion2",
-          "land": "BG",
-          "type": "kontakt",
-          "by": "Testby2",
-          "bygning": "Testbygg2",
-          "gate": "Testgate2"
-        }
-      ],
-      "far": {
-        "person": {
-          "fornavn": "Testfarsfornavn",
-          "etternavnvedfoedsel": "Testfarsetternavnvedfødsel"
-        }
-      }
-    },
-    "arbeidssted": [
-      {
-        "adresse": {
-          "land": "EE",
-          "gate": "Testarbeidsstedgate",
-          "bygning": "Testarbeidsstedbygning",
-          "region": "Testarbeidsstedregion",
-          "by": "Testarbeidsstedby",
-          "postnummer": "Testarbeidsstedpostkode"
-        },
-        "erikkefastadresse": "ja",
-        "navn": "Testarbeidsstednavn",
-        "hjemmebase": "Testarbeidsstedbase"
-      },
-      {
-        "navn": "Testarbeidsstednavn2",
-        "adresse": {
-          "gate": "Testarbeidsstedgate2",
-          "land": "CY",
-          "bygning": "Testarbeidsstedbygning2",
-          "by": "Testarbeidsstedby2"
-        },
-        "erikkefastadresse": "nei",
-        "hjemmebase": "Testarbeidsstedbase2"
-      }
-    ],
-    "selvstendig": {
-      "arbeidsgiver": [
-        {
-          "identifikator": [
-            {
-              "id": "Testselvstendignummer",
-              "type": "ukjent"
-            }
-          ],
-          "navn": "Testselvstendignavn",
-          "adresse": {
-            "region": "Testselvstendigregion",
-            "by": "Testselvstendigby",
-            "gate": "Testselvstendiggate",
-            "bygning": "Testselvstendigbygning",
-            "land": "BG",
-            "postnummer": "Testselvstendigpostkode"
-          }
-        }
-      ]
-    },
-    "arbeidsgiver": [
-      {
-        "navn": "Testarbeidsgiver",
-        "adresse": {
-          "land": "CY",
-          "bygning": "Testarbeidsgiverbygning",
-          "gate": "Testarbeidsgivergate",
-          "by": "Testarbeidsgiverby",
-          "postnummer": "Testarbeidsgiverpostkode",
-          "region": "Testarbeidsgiverregion"
-        },
-        "identifikator": [
-          {
-            "id": "TestOrgnummer",
-            "type": "trygd"
-          }
-        ]
-      }
-    ],
-    "ytterligereinformasjon": "ytterligereinformasjon\nOver\nFlere\nlinjer"
-  },
   "medlemskap": {
-    "gjeldendereglerEC883": "14_2_b",
-    "relevantartikkelfor8832004eller9872009": "13_1_b_iii",
+    "gjeldendereglerEC883": "14_a_2",
+    "relevantartikkelfor8832004eller9872009": "87_a",
     "andreland": {
       "arbeidsgiver": [
         {
           "adresse": {
-            "by": "by",
-            "postnummer": "0101",
-            "gate": "gate",
-            "region": "region",
-            "land": "DE"
+            "by": "oslo",
+            "land": "NO"
           },
           "identifikator": [
             {
-              "type": "skatt",
-              "id": "123"
+              "id": "115511",
+              "type": "registrering"
             }
           ],
-          "navn": "Testarbeidsgiver andreland"
+          "navn": "norsk"
+        },
+        {
+          "adresse": {
+            "by": "stck",
+            "land": "SE"
+          },
+          "identifikator": [
+            {
+              "id": "123",
+              "type": "trygd"
+            }
+          ],
+          "navn": "swe"
         }
-      ],
-      "arbeidsgiveraktivitet": {
-        "eraktivitetmarginal": "ja"
-      }
+      ]
     },
     "vedtak": {
-      "gjelderperiode": {
-        "startdato": "2018-09-09",
-        "sluttdato": "2017-12-01"
-      },
-      "land": "NO",
       "gjeldervarighetyrkesaktivitet": "ja",
-      "erendringsvedtak": "nei"
-    }
+      "erendringsvedtak": null,
+      "eropprinneligvedtak": "ja",
+      "gjelderperiode": {
+        "startdato": "2019-01-01",
+        "sluttdato": "2020-02-02"
+      },
+      "land": "NO"
+    },
+    "isDeterminationProvisional": null
   },
-  "sedVer": "1",
+  "nav": {
+    "bruker": {
+      "adresse": [
+        {
+          "by": "asd",
+          "gate": "dsasda 12",
+          "land": "NO",
+          "postnummer": "2121",
+          "type": "bosted"
+        }
+      ],
+      "person": {
+        "etternavn": "KNOTT",
+        "foedselsdato": "1978-12-04",
+        "fornavn": "TALENTFULL",
+        "kjoenn": "M",
+        "pin": [
+          {
+            "identifikator": "04127801156",
+            "land": "NO"
+          }
+        ],
+        "statsborgerskap": [
+          {
+            "land": "NO"
+          }
+        ]
+      }
+    },
+    "arbeidsgiver": [
+      {
+        "adresse": {
+          "by": "STAVANGER",
+          "gate": "Forusbeen 50",
+          "land": "BE",
+          "postnummer": "4035"
+        },
+        "identifikator": [
+          {
+            "id": "923609016",
+            "type": "registrering"
+          }
+        ],
+        "navn": "EQUINOR ASA"
+      },
+      {
+        "adresse": {
+          "by": "by",
+          "land": "BE"
+        },
+        "identifikator": [
+          {
+            "id": "123321",
+            "type": "ukjent"
+          }
+        ],
+        "navn": "adf"
+      }
+    ]
+  },
   "sedGVer": "4",
+  "sedVer": "1",
   "sed": "A003"
 }

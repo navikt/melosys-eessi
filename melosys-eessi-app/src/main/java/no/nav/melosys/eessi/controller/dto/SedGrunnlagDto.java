@@ -17,6 +17,6 @@ public class SedGrunnlagDto {
     private String ytterligereInformasjon;
 
     // todo: egen dto? er kun relevant for A003
-    private Bestemmelse overgangsregelbestemmelse;
+    private List<Bestemmelse> overgangsregelbestemmelse;
     private List<Virksomhet> norskeArbeidsgivendeVirksomheter;
 }

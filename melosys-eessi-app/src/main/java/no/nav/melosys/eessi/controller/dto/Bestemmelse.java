@@ -49,7 +49,7 @@ public enum Bestemmelse {
 
     public static Bestemmelse fraString(String bestemmelse) {
         if (StringUtils.isEmpty(bestemmelse)) {
-            return null; // todo - throw?
+            return null;
         }
 
         return Stream.of(values())

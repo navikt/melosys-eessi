@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.models.sed.medlemskap.impl;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
@@ -10,7 +12,7 @@ import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MedlemskapA003 implements Medlemskap {
 
-    private String gjeldendereglerEC883; // todo - hvorfor er denne en liste?
+    private List<String> gjeldendereglerEC883;
 
     private String relevantartikkelfor8832004eller9872009;
 
