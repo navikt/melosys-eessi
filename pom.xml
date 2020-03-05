@@ -29,7 +29,7 @@
     <java.version>11</java.version>
     <javax-xml-webservices-api.version>2.0.1</javax-xml-webservices-api.version>
     <logback-classic.version>1.2.3</logback-classic.version>
-    <logstash-encoder.version>5.3</logstash-encoder.version>
+    <logstash-encoder.version>6.3</logstash-encoder.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <micrometer-jvm-extras.version>0.2.0</micrometer-jvm-extras.version>
