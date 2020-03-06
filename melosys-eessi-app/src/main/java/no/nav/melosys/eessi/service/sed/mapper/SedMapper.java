@@ -54,6 +54,10 @@ public interface SedMapper {
             nav.setSelvstendig(hentSelvstendig(sedData));
         }
 
+        if (StringUtils.hasText(sedData.getYtterligereInformasjon())) {
+            nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
+        }
+
         return nav;
     }
 
