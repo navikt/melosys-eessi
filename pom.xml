@@ -23,7 +23,6 @@
   <properties>
     <commons-io.version>2.6</commons-io.version>
     <cxf.version>3.3.4</cxf.version>
-    <dokarkiv-api-v1.version>0.0.4</dokarkiv-api-v1.version>
     <flyway.version>5.2.4</flyway.version>
     <guava.version>28.2-jre</guava.version>
     <java.version>11</java.version>
