@@ -15,8 +15,4 @@ public class SedGrunnlagDto {
     private List<Arbeidssted> arbeidssteder;
     private List<Lovvalgsperiode> lovvalgsperioder;
     private String ytterligereInformasjon;
-
-    // todo: egen dto? er kun relevant for A003
-    private List<Bestemmelse> overgangsregelbestemmelse;
-    private List<Virksomhet> norskeArbeidsgivendeVirksomheter;
 }

@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.kafka.producers.mapping;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;

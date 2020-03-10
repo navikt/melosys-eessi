@@ -1,6 +1,7 @@
-package no.nav.melosys.eessi.kafka.producers.mapping;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
 import java.util.Collections;
+
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedType;
@@ -12,7 +13,8 @@ import no.nav.melosys.eessi.models.sed.nav.Land;
 import no.nav.melosys.eessi.models.sed.nav.Unntak;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import org.junit.Test;
-import static no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperStubs.*;
+
+import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA001Test {

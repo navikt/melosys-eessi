@@ -50,17 +50,19 @@ public class SedGrunnlagMapperA003Test {
                 .as("Arbeidsgivende virksomheter har rett info")
                 .extracting(Virksomhet::getNavn, Virksomhet::getOrgnr)
                 .containsExactlyInAnyOrder(
-                        tuple("Testarbeidsgiver", "TestOrgnummer"),
-                        tuple("Testarbeidsgiver andreland", "123")
+                        tuple("EQUINOR ASA", "923609016"),
+                        tuple("adf", "123321"),
+                        tuple("swe", "123")
                 );
 
         assertThat(sedGrunnlagDto.getArbeidsgivendeVirksomheter())
                 .as("Arbeidsgivende virksomheter har rette adresser")
                 .extracting(Virksomhet::getAdresse)
-                .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getRegion, Adresse::getGateadresse)
+                .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getGateadresse)
                 .containsExactlyInAnyOrder(
-                        tuple("CY", "Testarbeidsgiverpostkode", "Testarbeidsgiverby", "Testarbeidsgiverregion", "Testarbeidsgivergate Testarbeidsgiverbygning"),
-                        tuple("DE", "0101", "by", "region", "gate")
+                        tuple("BE", "4035", "STAVANGER", "Forusbeen 50"),
+                        tuple("BE", null, "by", ""),
+                        tuple("SE", null, "stck", "")
                 );
 
         assertThat(sedGrunnlagDto.getSelvstendigeVirksomheter())

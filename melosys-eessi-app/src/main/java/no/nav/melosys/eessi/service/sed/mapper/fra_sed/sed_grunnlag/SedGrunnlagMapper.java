@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.controller.dto.*;
+import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
@@ -14,7 +15,7 @@ import no.nav.melosys.eessi.models.sed.nav.Selvstendig;
 import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
 
 public interface SedGrunnlagMapper {
-     default SedGrunnlagDto map(SED sed) {
+     default SedGrunnlagDto map(SED sed) throws MappingException {
         Nav nav = sed.getNav();
         SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagDto();
 
@@ -35,7 +36,7 @@ public interface SedGrunnlagMapper {
                 .orElse(mapAdresse(adresser));
     }
 
-    static boolean erBostedsadresse(no.nav.melosys.eessi.models.sed.nav.Adresse adresse) { // todo null-safe
+    static boolean erBostedsadresse(no.nav.melosys.eessi.models.sed.nav.Adresse adresse) {
         return Adressetype.BOSTEDSADRESSE.getAdressetypeRina().equalsIgnoreCase(adresse.getType());
     }
 

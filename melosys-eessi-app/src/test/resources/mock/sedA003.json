@@ -1,6 +1,9 @@
 {
   "medlemskap": {
-    "gjeldendereglerEC883": "14_a_2",
+    "gjeldendereglerEC883": [
+      "14_a_2",
+      "14_c_a"
+    ],
     "relevantartikkelfor8832004eller9872009": "87_a",
     "andreland": {
       "arbeidsgiver": [
@@ -49,8 +52,9 @@
       "adresse": [
         {
           "by": "asd",
-          "gate": "dsasda 12",
-          "land": "NO",
+          "gate": "Testgate",
+          "bygning": "Testbyggnavn",
+          "land": "BE",
           "postnummer": "2121",
           "type": "bosted"
         }
@@ -64,6 +68,10 @@
           {
             "identifikator": "04127801156",
             "land": "NO"
+          },
+          {
+            "identifikator": "15225345345",
+            "land": "BG"
           }
         ],
         "statsborgerskap": [
@@ -102,7 +110,54 @@
         ],
         "navn": "adf"
       }
-    ]
+    ],
+    "arbeidssted": [
+      {
+        "adresse": {
+          "land": "EE",
+          "gate": "Testarbeidsstedgate",
+          "bygning": "Testarbeidsstedbygning",
+          "region": "Testarbeidsstedregion",
+          "by": "Testarbeidsstedby",
+          "postnummer": "Testarbeidsstedpostkode"
+        },
+        "erikkefastadresse": "ja",
+        "navn": "Testarbeidsstednavn",
+        "hjemmebase": "Testarbeidsstedbase"
+      },
+      {
+        "navn": "Testarbeidsstednavn2",
+        "adresse": {
+          "gate": "Testarbeidsstedgate2",
+          "land": "CY",
+          "bygning": "Testarbeidsstedbygning2",
+          "by": "Testarbeidsstedby2"
+        },
+        "erikkefastadresse": "nei",
+        "hjemmebase": "Testarbeidsstedbase2"
+      }
+    ],
+    "selvstendig": {
+      "arbeidsgiver": [
+        {
+          "identifikator": [
+            {
+              "id": "Testselvstendignummer",
+              "type": "ukjent"
+            }
+          ],
+          "navn": "Testselvstendignavn",
+          "adresse": {
+            "region": "Testselvstendigregion",
+            "by": "Testselvstendigby",
+            "gate": "Testselvstendiggate",
+            "bygning": "Testselvstendigbygning",
+            "land": "BG",
+            "postnummer": "Testselvstendigpostkode"
+          }
+        }
+      ]
+    }
   },
   "sedGVer": "4",
   "sedVer": "1",
