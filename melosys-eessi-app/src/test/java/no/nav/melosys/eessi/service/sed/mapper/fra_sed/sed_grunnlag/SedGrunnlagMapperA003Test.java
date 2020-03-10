@@ -130,7 +130,7 @@ public class SedGrunnlagMapperA003Test {
     }
 
     private static SED hentSed() throws IOException {
-        URL jsonUrl = SedGrunnlagDtoTest.class.getClassLoader().getResource("mock/sedA003.json");
+        URL jsonUrl = SedGrunnlagMapperA003Test.class.getClassLoader().getResource("mock/sedA003.json");
         return new ObjectMapper().readValue(jsonUrl, SED.class);
     }
 }

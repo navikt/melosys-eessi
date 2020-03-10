@@ -33,7 +33,7 @@ public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovva
         sedGrunnlagDto.setYtterligereInformasjon(nav.getYtterligereinformasjon());
 
         sedGrunnlagDto.setLovvalgsperioder(List.of(hentLovvalgsperiode(medlemskap)));
-        sedGrunnlagDto.setOvergangsregelbestemmelse(mapOvergangsregelbestemmelse(medlemskap));
+        sedGrunnlagDto.setOvergangsregelbestemmelser(mapOvergangsregelbestemmelse(medlemskap));
 
         // Per dags dato er det ikke mulig å hente marginalt arbeid siden det ikke er knyttet til en enkelt arbeidsgiver
         List<Arbeidsgiver> arbeidsgivere = hentArbeidsgivere(sed);

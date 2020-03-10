@@ -10,6 +10,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SedGrunnlagA003Dto extends SedGrunnlagDto {
-    private List<Bestemmelse> overgangsregelbestemmelse;
+    private List<Bestemmelse> overgangsregelbestemmelser;
     private List<Virksomhet> norskeArbeidsgivendeVirksomheter;
 }
