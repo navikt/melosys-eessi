@@ -18,11 +18,11 @@ public enum Adressetype {
 
     public static Adressetype fraAdressetypeRina(String adressetypeRina) {
         if (StringUtils.isEmpty(adressetypeRina)) {
-            return null;
+            return ANNET;
         }
 
         return Stream.of(values())
                 .filter(adressetype -> adressetype.adressetypeRina.equalsIgnoreCase(adressetypeRina))
-                .findFirst().orElse(null);
+                .findFirst().orElse(ANNET);
     }
 }

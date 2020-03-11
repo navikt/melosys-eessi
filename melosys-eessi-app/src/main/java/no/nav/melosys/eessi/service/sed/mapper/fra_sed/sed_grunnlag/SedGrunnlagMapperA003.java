@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedGrunnlagA003Dto;
 import no.nav.melosys.eessi.controller.dto.Virksomhet;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
@@ -20,18 +21,10 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper;
 public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
     @Override
     public SedGrunnlagA003Dto map(SED sed) {
-        Nav nav = sed.getNav();
         MedlemskapA003 medlemskap = hentMedlemskap(sed);
 
-        SedGrunnlagA003Dto sedGrunnlagDto = new SedGrunnlagA003Dto();
-
-        sedGrunnlagDto.setBostedsadresse(mapBosted(nav.getBruker().getAdresse()));
-        sedGrunnlagDto.setUtenlandskIdent(mapUtenlandskIdent(nav.getBruker().getPerson().getPin()));
-        sedGrunnlagDto.setArbeidssteder(mapArbeidssteder(nav.getArbeidssted()));
-        sedGrunnlagDto.setArbeidsgivendeVirksomheter(mapVirksomheter(nav.getArbeidsgiver()));
-        sedGrunnlagDto.setSelvstendigeVirksomheter(mapSelvstendig(nav.getSelvstendig()));
-        sedGrunnlagDto.setYtterligereInformasjon(nav.getYtterligereinformasjon());
-
+        SedGrunnlagA003Dto sedGrunnlagDto = new SedGrunnlagA003Dto(NyttLovvalgSedGrunnlagMapper.super.map(sed));
+        sedGrunnlagDto.setSedType(SedType.A003);
         sedGrunnlagDto.setLovvalgsperioder(List.of(hentLovvalgsperiode(medlemskap)));
         sedGrunnlagDto.setOvergangsregelbestemmelser(mapOvergangsregelbestemmelse(medlemskap));
 

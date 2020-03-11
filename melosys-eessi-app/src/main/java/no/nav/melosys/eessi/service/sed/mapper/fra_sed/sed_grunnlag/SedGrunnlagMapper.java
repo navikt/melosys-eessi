@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.controller.dto.*;
-import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
@@ -15,7 +14,7 @@ import no.nav.melosys.eessi.models.sed.nav.Selvstendig;
 import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
 
 public interface SedGrunnlagMapper {
-     default SedGrunnlagDto map(SED sed) throws MappingException {
+     default SedGrunnlagDto map(SED sed) {
         Nav nav = sed.getNav();
         SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagDto();
 
