@@ -1,5 +1,11 @@
 package no.nav.melosys.eessi.service.sed.mapper;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.SedType;
@@ -15,12 +21,6 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
 import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
@@ -182,7 +182,7 @@ public interface SedMapper {
 
             if (arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase())) {
+            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 
