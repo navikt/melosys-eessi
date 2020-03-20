@@ -12,7 +12,8 @@ public class EuxTokenContextService extends EuxService {
 
     public EuxTokenContextService(@Qualifier("tokenContext") EuxConsumer euxConsumer,
                                   BucMetrikker bucMetrikker,
-                                  @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
-        super(euxConsumer, bucMetrikker, rinaHostUrl);
+                                  @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
+                                  @Value("${melosys.feature.eessiready:false}") String featureToggleEessiReady) {
+        super(euxConsumer, bucMetrikker, rinaHostUrl, featureToggleEessiReady);
     }
 }

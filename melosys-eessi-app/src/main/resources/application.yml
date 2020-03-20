@@ -27,6 +27,8 @@ spring:
       reconnect.backoff.ms: 1000
 
 melosys:
+  feature:
+    eessiready: ${FEATURE_EESSIREADY:false}
   kafka:
     consumer:
       mottatt:
