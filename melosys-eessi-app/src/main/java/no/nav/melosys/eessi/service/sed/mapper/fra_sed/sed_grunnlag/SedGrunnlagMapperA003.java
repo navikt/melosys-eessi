@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedGrunnlagA003Dto;
@@ -17,6 +16,7 @@ import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper;
+import org.apache.cxf.common.util.CollectionUtils;
 
 public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
     @Override
@@ -65,7 +65,7 @@ public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovva
     }
 
     private static List<Arbeidsgiver> hentAndrelandArbeidsgivere(MedlemskapA003 medlemskap) {
-        if (medlemskap.getAndreland() != null && CollectionUtils.isNotEmpty(medlemskap.getAndreland().getArbeidsgiver())) {
+        if (medlemskap.getAndreland() != null && !CollectionUtils.isEmpty(medlemskap.getAndreland().getArbeidsgiver())) {
             return medlemskap.getAndreland().getArbeidsgiver();
         }
         return Collections.emptyList();
