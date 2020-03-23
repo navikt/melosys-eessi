@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.mapper.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
