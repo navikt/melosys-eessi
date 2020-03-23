@@ -49,6 +49,7 @@ public interface SedMapper {
         nav.setBruker(hentBruker(sedData));
         nav.setArbeidssted(hentArbeidssted(sedData));
         nav.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
+        nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
 
         if (!sedData.getSelvstendigeVirksomheter().isEmpty()) {
             nav.setSelvstendig(hentSelvstendig(sedData));

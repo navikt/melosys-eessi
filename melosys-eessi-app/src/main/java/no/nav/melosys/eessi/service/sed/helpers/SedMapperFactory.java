@@ -19,11 +19,13 @@ public class SedMapperFactory {
                     .put(SedType.A001, new A001Mapper())
                     .put(SedType.A002, new A002Mapper())
                     .put(SedType.A003, new A003Mapper())
+                    .put(SedType.A004, new A004Mapper())
                     .put(SedType.A005, new A005Mapper())
                     .put(SedType.A008, new A008Mapper())
                     .put(SedType.A009, new A009Mapper())
                     .put(SedType.A010, new A010Mapper())
                     .put(SedType.A011, new A011Mapper())
+                    .put(SedType.A012, new A012Mapper())
 
                     .put(SedType.H001, new HorisontalSedMapper(SedType.H001))
                     .put(SedType.H003, new HorisontalSedMapper(SedType.H003))

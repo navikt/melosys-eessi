@@ -31,11 +31,13 @@ public class SedMapperFactoryTest {
                 SedType.A001,
                 SedType.A002,
                 SedType.A003,
+                SedType.A004,
                 SedType.A005,
                 SedType.A008,
                 SedType.A009,
                 SedType.A010,
                 SedType.A011,
+                SedType.A012,
 
                 SedType.H001,
                 SedType.H003,
