@@ -1,13 +1,11 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SedStatus;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -46,7 +44,7 @@ public class SedService {
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
 
-        SedType sedType = SedUtils.hentFørsteLovligeSedPåBuc(bucType);
+        SedType sedType = bucType.hentFørsteLovligeSedPåBuc();
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
@@ -97,18 +95,17 @@ public class SedService {
     }
 
     private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) throws IntegrationException {
-        SedType sedType = SedType.valueOf(sed.getSedType());
 
-        if (sedType == SedType.A009) {
+        if (bucType.meddelerLovvalg()) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
                     saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType)
             );
 
-            if (eksisterendeSak.isPresent()) {
+            if (eksisterendeSak.isPresent() && eksisterendeSak.get().erÅpen()) {
                 BUC buc = eksisterendeSak.get();
-                Optional<Document> document = finnDokumentVedSedType(buc.getDocuments(), sed.getSedType());
+                Optional<Document> document = buc.finnDokumentVedSedType(sed.getSedType());
 
-                if (document.isPresent() && sedKanOppdateres(buc, document.get().getId())) {
+                if (document.isPresent() && buc.sedKanOppdateres(document.get().getId())) {
                     String rinaSaksnummer = buc.getId();
                     String dokumentId = document.get().getId();
                     log.info("SED {} på rinasak {} oppdateres", dokumentId, rinaSaksnummer);
@@ -119,19 +116,6 @@ public class SedService {
         }
 
         return opprettOgLagreSaksrelasjon(sed, vedlegg, bucType, gsakSaksnummer, mottakerIder);
-    }
-
-    private static boolean sedKanOppdateres(BUC buc, String id) {
-        return buc.getActions().stream().filter(action -> id.equals(action.getDocumentId()))
-                .anyMatch(action -> "Update".equalsIgnoreCase(action.getOperation()));
-    }
-
-    private static Optional<Document> finnDokumentVedSedType(List<Document> documents, String sedType) {
-        return documents.stream().filter(d -> sedType.equals(d.getType())).min(sorterEtterStatus());
-    }
-
-    private static Comparator<? super Document> sorterEtterStatus() {
-        return Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
     }
 
     private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) throws IntegrationException {
