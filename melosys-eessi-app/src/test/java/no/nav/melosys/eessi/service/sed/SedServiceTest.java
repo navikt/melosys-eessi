@@ -64,7 +64,7 @@ public class SedServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
-        when(euxService.opprettBucOgSed(anyString(), anyString(), any(SED.class), any()))
+        when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
                 .thenReturn(opprettBucOgSedResponse);
 
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
@@ -73,7 +73,7 @@ public class SedServiceTest {
     @Test
     public void opprettBucOgSed_forventRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
+        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, true);
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
     }
 
@@ -84,7 +84,7 @@ public class SedServiceTest {
 
         Exception exception = null;
         try {
-            sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
+            sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true);
         } catch (IntegrationException e) {
             exception = e;
         }
@@ -99,7 +99,7 @@ public class SedServiceTest {
     public void opprettBucOgSed_brukerMedSensitiveOpplysninger_forventSettSakSensitiv() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.getBruker().setHarSensitiveOpplysninger(true);
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true);
+        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true);
 
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
         verify(euxService).settSakSensitiv(RINA_ID);
@@ -112,10 +112,10 @@ public class SedServiceTest {
         sedDataDto.setGsakSaksnummer(gsakSaksnummer);
 
         FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
-        fagsakRinasakKobling.setBucType(BucType.LA_BUC_04);
+        fagsakRinasakKobling.setBucType(BucType.LA_BUC_02);
         fagsakRinasakKobling.setRinaSaksnummer(RINA_ID);
         fagsakRinasakKobling.setGsakSaksnummer(gsakSaksnummer);
-        when(saksrelasjonService.finnVedGsakSaksnummerOgBucType(eq(gsakSaksnummer), eq(BucType.LA_BUC_04)))
+        when(saksrelasjonService.finnVedGsakSaksnummerOgBucType(eq(gsakSaksnummer), eq(BucType.LA_BUC_02)))
                 .thenReturn(Collections.singletonList(fagsakRinasakKobling));
 
         BUC buc = new BUC();
@@ -126,13 +126,13 @@ public class SedServiceTest {
         Document emptyDocument = new Document();
         emptyDocument.setStatus("empty");
         emptyDocument.setId(emptyDocumentId);
-        emptyDocument.setType(SedType.A009.name());
+        emptyDocument.setType(SedType.A003.name());
 
         String sentDocumentId = "docid321";
         Document sentDocument = new Document();
         sentDocument.setStatus("sent");
         sentDocument.setId(sentDocumentId);
-        sentDocument.setType(SedType.A009.name());
+        sentDocument.setType(SedType.A003.name());
 
         buc.setDocuments(List.of(emptyDocument, sentDocument));
 
@@ -149,7 +149,7 @@ public class SedServiceTest {
         when(euxService.hentBuc(eq(RINA_ID)))
                 .thenReturn(buc);
 
-        sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_04, true);
+        sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_02, true);
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
         verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
@@ -164,11 +164,11 @@ public class SedServiceTest {
     }
 
     @Test
-    public void opprettBucOgSed_A003_forventOpprettNyBucOgSedMedUrl() throws Exception {
+    public void opprettBucOgSed_LABUC01_forventOpprettNyBucOgSedMedUrl() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        OpprettSedDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_03, false);
+        OpprettSedDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false);
 
-        verify(euxService).opprettBucOgSed(anyString(), anyString(), any(), any());
+        verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
         verify(euxService, never()).sendSed(anyString(), anyString());
         assertThat(response.getRinaSaksnummer()).isEqualTo(RINA_ID);

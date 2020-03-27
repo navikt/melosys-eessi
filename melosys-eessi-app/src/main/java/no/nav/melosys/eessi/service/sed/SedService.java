@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.sed;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
@@ -39,14 +41,17 @@ public class SedService {
     }
 
     public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, byte[] vedlegg, BucType bucType, boolean sendAutomatisk)
-            throws MappingException, IntegrationException, NotFoundException {
+            throws MappingException, IntegrationException, NotFoundException, ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
 
+        Collection<String> mottakere = sedDataDto.getMottakerIder();
         SedType sedType = bucType.hentFørsteLovligeSedPåBuc();
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
+
+        validerMottakerInstitusjoner(bucType, mottakere);
 
         OpprettBucOgSedResponse response = opprettEllerOppdaterBucOgSed(
                 sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerIder()
@@ -64,6 +69,14 @@ public class SedService {
                 .rinaSaksnummer(response.getRinaSaksnummer())
                 .rinaUrl(euxService.hentRinaUrl(response.getRinaSaksnummer()))
                 .build();
+    }
+
+    private void validerMottakerInstitusjoner(BucType bucType, Collection<String> mottakere) throws ValidationException {
+        if (mottakere.isEmpty()) {
+            throw new ValidationException("Mottakere er påkrevd");
+        } else if (!bucType.erMultilateralLovvalgBuc() && mottakere.size() > 1) {
+            throw new ValidationException(bucType + " kan ikke ha flere mottakere!");
+        }
     }
 
     private void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
@@ -131,7 +144,7 @@ public class SedService {
 
     private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, byte[] vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder)
             throws IntegrationException {
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType.name(), mottakerIder.get(0), sed, vedlegg); // TODO: skal sende inn liste av mottakerIder når eux støtter det.
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
         return opprettBucOgSedResponse;

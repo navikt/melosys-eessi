@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +47,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private static final String SED_PATH_PDF = "/buc/%s/sed/%s/pdf";
     private static final String SED_MED_VEDLEGG_PATH = "/buc/%s/sed/%s/filer";
     private static final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
-    private static final String BUCDELTAKERE_PATH = "/buc/%s/bucdeltakere";
-    private static final String MULIGEAKSJONER_PATH = "/buc/%s/muligeaksjoner";
 
     public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.euxRestTemplate = restTemplate;
@@ -109,15 +108,14 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * Setter mottaker på en BuC/Rina-sak
      *
      * @param rinaSaksnummer saksnummer
-     * @param mottakerId id på mottakende enhet
+     * @param mottakere id på mottakende enhet
      */
+    public void settMottakere(String rinaSaksnummer, Collection<String> mottakere) throws IntegrationException {
 
-    public void settMottaker(String rinaSaksnummer, String mottakerId) throws IntegrationException {
-
-        log.info("Setter mottaker {} til sak {}", mottakerId, rinaSaksnummer);
+        log.info("Setter mottaker {} til sak {}", mottakere, rinaSaksnummer);
         UriComponentsBuilder builder = UriComponentsBuilder
-                .fromPath(String.format(BUCDELTAKERE_PATH, rinaSaksnummer))
-                .queryParam("MottakerId", mottakerId);
+                .fromPath(String.format("/buc/%s/mottakere", rinaSaksnummer))
+                .queryParam("mottakere", mottakere.toArray());
 
         exchange(builder.toUriString(), HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
@@ -133,22 +131,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public JsonNode hentDeltagere(String rinaSaksnummer) throws IntegrationException {
 
         log.info("Henter deltakere til sak {}", rinaSaksnummer);
-        String uri = String.format(BUCDELTAKERE_PATH, rinaSaksnummer);
-
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<JsonNode>() {
-                });
-    }
-
-    /**
-     * Henter ut en liste over mulige aksjoner
-     *
-     * @return liste over mulige aksjoner på en rina-sak
-     */
-
-    public JsonNode hentMuligeAksjoner(String rinaSaksnummer) throws IntegrationException {
-        log.info("Henter mulige aksjoner for sak {}", rinaSaksnummer);
-        String uri = String.format(MULIGEAKSJONER_PATH, rinaSaksnummer);
+        String uri = String.format("/buc/%s/bucdeltakere", rinaSaksnummer);
 
         return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<JsonNode>() {
@@ -163,12 +146,11 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * @return dokumentId' til SED'en
      */
 
-    public String opprettSed(String rinaSaksnummer, String korrelasjonsId, SED sed)
+    public String opprettSed(String rinaSaksnummer, SED sed)
             throws IntegrationException {
 
         log.info("Oppretter SED {} på sak {}", sed.getSedType(), rinaSaksnummer);
-        String uri = UriComponentsBuilder.fromPath(String.format("/buc/%s/sed", rinaSaksnummer))
-                .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
+        String uri = UriComponentsBuilder.fromPath(String.format("/buc/%s/sed", rinaSaksnummer)).toUriString();
 
         return exchange(uri, HttpMethod.POST, new HttpEntity<>(sed, defaultHeaders()),
                 new ParameterizedTypeReference<String>() {
@@ -208,22 +190,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
                 .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
         exchange(uri, HttpMethod.PUT, new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
-    }
-
-    /**
-     * Sletter en eksisterende SED
-     *
-     * @param rinaSaksnummer saksnummeret
-     * @param dokumentId ID til SED som skal slettes
-     */
-
-    public void slettSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
-        log.info("Sletter sed {} på sak {}", dokumentId, rinaSaksnummer);
-        String uri = String.format(SED_PATH, rinaSaksnummer, dokumentId);
-
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
                 });
     }
@@ -295,64 +261,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     }
 
     /**
-     * Henter et vedlegg tilhørende sak og dokument
-     *
-     * @param rinaSaksnummer saksnummeret
-     * @param dokumentId id til SED'en
-     * @param vedleggId id til vedlegget
-     */
-
-    public byte[] hentVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId)
-            throws IntegrationException {
-        log.info("Henter vedlegg for sak {} og dokument {}", rinaSaksnummer, dokumentId);
-        String uri = String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId) + "/" + vedleggId;
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
-
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(headers),
-                new ParameterizedTypeReference<byte[]>() {
-                });
-    }
-
-    /**
-     * Sletter et eksisterende vedlegg tilhørende et dokument(sed)
-     *
-     * @param rinaSaksnummer saksnummeret
-     * @param dokumentId id til sed'en
-     * @param vedleggId id til vedlegget
-     */
-
-    public void slettVedlegg(String rinaSaksnummer, String dokumentId, String vedleggId)
-            throws IntegrationException {
-        log.info("Sletter vedlegg {} på sak {} og dokument {}", vedleggId, rinaSaksnummer,
-                dokumentId);
-        String uri = String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId) + "/" + vedleggId;
-
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
-    }
-
-    /**
-     * Henter liste av alle SED-typer som kan opprettes i sakens nåværende tilstand
-     *
-     * @param rinaSaksnummer saksnummeret
-     * @return liste av SED-typer
-     */
-
-    public List<String> hentTilgjengeligeSedTyper(String rinaSaksnummer)
-            throws IntegrationException {
-        log.info("Henter tilgjenglige sed-typer for sak {}", rinaSaksnummer);
-        String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sedtyper";
-
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<List<String>>() {
-                });
-    }
-
-    /**
      * Setter en sak sensitiv
      *
      * @param rinaSaksnummer saksnummeret
@@ -364,43 +272,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
         exchange(uri, HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
-                });
-    }
-
-    /**
-     * Fjerner 'sensitiv sak' markør på saken
-     *
-     * @param rinaSaksnummer saksnummeret
-     */
-
-    public void fjernSakSensitiv(String rinaSaksnummer) throws IntegrationException {
-        log.info("Fjerner 'sensitiv sak' på sak {}", rinaSaksnummer);
-        String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sensitivsak";
-
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
-    }
-
-    /**
-     * Oppretter en BuC med en tilhørende SED
-     *
-     * @param bucType Hvilken type buc som skal opprettes. Eks LA_BUC_04
-     * @param mottakerId Mottaker sin Rina-id
-     * @return id til rina-sak og id til dokument som ble opprettet. Nøkler: caseId og documentId
-     */
-
-    public Map<String, String> opprettBucOgSed(String bucType, String mottakerId, SED sed)
-            throws IntegrationException {
-        log.info("Oppretter buc {}, med sed {}, med mottaker {}", bucType, sed.getSedType(),
-                mottakerId);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed")
-                .queryParam("BucType", bucType)
-                .queryParam("MottakerId", mottakerId);
-
-        return exchange(builder.toUriString(), HttpMethod.POST,
-                new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<Map<String, String>>() {
                 });
     }
 
@@ -461,19 +332,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     }
 
     /**
-     * Henter en liste over mulige BuC'er den påloggede bruker kan opprette
-     *
-     * @return liste av BuC'er
-     */
-
-    public List<String> bucTypePerSektor() throws IntegrationException {
-        log.info("Henter buctyper per sektor");
-        return exchange("/buctypepersektor", HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<List<String>>() {
-                });
-    }
-
-    /**
      * Henter en liste over registrerte institusjoner innenfor spesifiserte EU-land
      *
      * @param bucType BuC/Rina-saksnummer
@@ -491,24 +349,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         return exchange(builder.toUriString(), HttpMethod.GET,
                 new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<List<Institusjon>>() {
-                });
-    }
-
-    /**
-     * Henter ut hele eller deler av kodeverket
-     *
-     * @param kodeverk hvilket kodeverk som skal hentes ut. Optional
-     * @return Det spesifiserte kodeverket, eller hele kodeverket om ikke spesifisert
-     */
-
-    public JsonNode hentKodeverk(String kodeverk) throws IntegrationException {
-        log.info("Henter kodeverk {}", kodeverk);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/kodeverk")
-                .queryParam("Kodeverk", kodeverk);
-
-        return exchange(builder.toUriString(), HttpMethod.GET,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<JsonNode>() {
                 });
     }
 

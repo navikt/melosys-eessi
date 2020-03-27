@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.core.api.Protected;
@@ -48,7 +49,7 @@ public class BucController {
             @RequestPart(value = "vedlegg", required = false) MultipartFile vedlegg,
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
-    ) throws IntegrationException, NotFoundException, MappingException, IOException {
+    ) throws IntegrationException, NotFoundException, MappingException, IOException, ValidationException {
         return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? vedlegg.getBytes() : null, bucType, sendAutomatisk);
     }
 
