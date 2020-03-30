@@ -1,0 +1,22 @@
+{
+  "06038029973": {
+    "identer": [
+      {
+        "ident": "1000004898116",
+        "identgruppe": "AktoerId",
+        "gjeldende": true
+      },
+      {
+        "ident": "06069900001",
+        "identgruppe": "NorskIdent",
+        "gjeldende": false
+      },
+      {
+        "ident": "06069900000",
+        "identgruppe": "NorskIdent",
+        "gjeldende": true
+      }
+    ],
+    "feilmelding": null
+  }
+}
