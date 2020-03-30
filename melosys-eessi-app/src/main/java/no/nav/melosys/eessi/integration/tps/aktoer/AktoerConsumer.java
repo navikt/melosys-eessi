@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.tps.aktoer;
 
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
@@ -28,11 +30,9 @@ public class AktoerConsumer implements RestConsumer {
         JsonNode rootNode = restTemplate.exchange(url, HttpMethod.GET, headers(ident), JsonNode.class)
                 .getBody();
 
-        if (rootNode != null) {
-            return hentAktoerIdFraResponse(rootNode, ident);
-        } else {
-            throw new NotFoundException("Finner ikke aktørId for ident" + ident);
-        }
+        return hentGjeldende(rootNode, ident, "AktoerId")
+                .orElseThrow(() -> new NotFoundException("Finner ikke aktørId for ident" + ident));
+
     }
 
     public String hentNorskIdent(String aktoerID) throws NotFoundException {
@@ -43,31 +43,21 @@ public class AktoerConsumer implements RestConsumer {
         JsonNode rootNode = restTemplate.exchange(url, HttpMethod.GET, headers(aktoerID), JsonNode.class)
                 .getBody();
 
-        if (rootNode != null) {
-            return hentNorskIdentFraResponse(rootNode, aktoerID);
-        } else {
-            throw new NotFoundException("Finner ikke ident for aktørID" + aktoerID);
-        }
+        return hentGjeldende(rootNode, aktoerID, "NorskIdent")
+                .orElseThrow(() -> new NotFoundException("Finner ikke ident for aktørID" + aktoerID));
     }
 
-    private String hentAktoerIdFraResponse(JsonNode rootNode, String ident) throws NotFoundException {
-        JsonNode identNode = rootNode.path(ident).path("identer").path(0);
+    private Optional<String> hentGjeldende(JsonNode res, String id, String identGruppe) {
+        if (res == null) return Optional.empty();
 
-        if (identNode.isMissingNode()) {
-            throw new NotFoundException("Finner ikke aktørId for ident " + ident);
+        JsonNode identer = res.path(id).path("identer");
+        for (JsonNode node : identer) {
+            JsonNode erGjeldende = node.path("gjeldende");
+            if (identGruppe.equalsIgnoreCase(node.get("identgruppe").textValue()) && !erGjeldende.isMissingNode() && erGjeldende.booleanValue()) {
+                return Optional.of(node.get("ident").textValue());
+            }
         }
-
-        return identNode.get("ident").textValue();
-    }
-
-    private String hentNorskIdentFraResponse(JsonNode rootNode, String aktoerID) throws NotFoundException {
-        JsonNode identNode = rootNode.path(aktoerID).path("identer").path(0);
-
-        if (identNode.isMissingNode()) {
-            throw new NotFoundException("Finner ikke norsk ident for aktørId " + aktoerID);
-        }
-
-        return identNode.get("ident").textValue();
+        return Optional.empty();
     }
 
     private HttpEntity<?> headers(String ident) {

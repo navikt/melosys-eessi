@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.integration.aktoer;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import org.junit.Before;
@@ -11,6 +15,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -18,26 +23,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @RunWith(MockitoJUnitRunner.class)
 public class AktoerConsumerTest {
 
-    private static final String OK_RESPONSE_AKTOER =
-            "{\"06038029973\":"
-                    + "{\"identer\":"
-                    + "[{\"ident\":\"1000004898116\","
-                    + "\"identgruppe\":\"AktoerId\","
-                    + "\"gjeldende\":true}],"
-                    + "\"feilmelding\":null}}";
-
-    private static final String OK_RESPONSE_NORSK_IDENT =
-            "{\"06038029973\":"
-                    + "{\"identer\":"
-                    + "[{\"ident\":\"1000004898117\","
-                    + "\"identgruppe\":\"NorskIdent\","
-                    + "\"gjeldende\":true}],"
-                    + "\"feilmelding\":null}}";
-
-    private static final String FUNCTIONAL_ERROR_RESPONSE =
-            "{\"12345678910\":"
-                    + "{\"identer\":null,"
-                    + "\"feilmelding\":\"Den angitte personidenten finnes ikke\"}}";
+    private String okResponseAktoer;
+    private String okResponseNorskIdent;
+    private String functionalErrorResponse;
 
     @Spy
     private RestTemplate restTemplate;
@@ -48,27 +36,35 @@ public class AktoerConsumerTest {
 
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        functionalErrorResponse = hentFil("mock/aktoer_err.json");
+        okResponseAktoer = hentFil("mock/aktoer_ok_aktoerres.json");
+        okResponseNorskIdent = hentFil("mock/aktoer_ok_identres.json");
         server = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
     public void hentAktoerIdOk() throws Exception {
-        server.expect(requestTo("/identer?identgruppe=AktoerId")).andRespond(withSuccess(OK_RESPONSE_AKTOER, MediaType.APPLICATION_JSON));
+        server.expect(requestTo("/identer?identgruppe=AktoerId")).andRespond(withSuccess(okResponseAktoer, MediaType.APPLICATION_JSON));
         assertThat(aktoerConsumer.hentAktoerId("06038029973")).isEqualTo("1000004898116");
     }
 
     @Test
     public void hentNorskIdent() throws Exception {
-        server.expect(requestTo("/identer?identgruppe=NorskIdent")).andRespond(withSuccess(OK_RESPONSE_NORSK_IDENT, MediaType.APPLICATION_JSON));
-        assertThat(aktoerConsumer.hentNorskIdent("06038029973")).isEqualTo("1000004898117");
+        server.expect(requestTo("/identer?identgruppe=NorskIdent")).andRespond(withSuccess(okResponseNorskIdent, MediaType.APPLICATION_JSON));
+        assertThat(aktoerConsumer.hentNorskIdent("06038029973")).isEqualTo("06069900000");
     }
 
     @Test(expected = NotFoundException.class)
     public void getAktoerIdIdentFinnesIkke() throws Exception {
         server.expect(requestTo("/identer?identgruppe=AktoerId"))
-                .andRespond(withSuccess(FUNCTIONAL_ERROR_RESPONSE, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(functionalErrorResponse, MediaType.APPLICATION_JSON));
 
         aktoerConsumer.hentAktoerId("12345678910");
+    }
+
+    private String hentFil(String filnavn) throws Exception {
+        Path path = Paths.get(this.getClass().getClassLoader().getResource(filnavn).toURI());
+        return Files.readString(path);
     }
 }
