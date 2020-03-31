@@ -34,5 +34,9 @@ public class SedDataDto {
 
     private List<String> mottakerIder;
 
+    private String ytterligereInformasjon;
+
     private SvarAnmodningUnntakDto svarAnmodningUnntak;
+
+    private UtpekingAvvisDto utpekingAvvis;
 }
