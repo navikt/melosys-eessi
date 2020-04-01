@@ -1,6 +1,9 @@
 package no.nav.melosys.eessi.controller.dto;
 
+import java.util.stream.Stream;
+
 import lombok.Getter;
+import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings("squid:S00115")
 public enum Bestemmelse {
@@ -24,6 +27,11 @@ public enum Bestemmelse {
     ART_13_2_b("13_2_b"),
     ART_13_3("13_3"),
     ART_13_4("13_4"),
+    ART_14_2_a("14_2_a"),
+    ART_14_2_b("14_2_b"),
+    ART_14_a_2("14_a_2"),
+    ART_14_c_a("14_c_a"),
+    ART_14_c_b("14_c_b"),
     ART_14_11("14_11"),
     ART_15("15"),
     ART_16_1("16_1"),
@@ -37,5 +45,15 @@ public enum Bestemmelse {
 
     Bestemmelse(String value) {
         this.value = value;
+    }
+
+    public static Bestemmelse fraString(String bestemmelse) {
+        if (StringUtils.isEmpty(bestemmelse)) {
+            return null;
+        }
+
+        return Stream.of(values())
+                .filter(b -> b.getValue().equalsIgnoreCase(bestemmelse))
+                .findFirst().orElse(null);
     }
 }

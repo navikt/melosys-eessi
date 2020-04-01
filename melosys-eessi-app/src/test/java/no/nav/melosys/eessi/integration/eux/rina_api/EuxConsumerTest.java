@@ -31,7 +31,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -278,7 +277,7 @@ public class EuxConsumerTest {
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
 
         MedlemskapA003 medlemskap = (MedlemskapA003) resultat.getMedlemskap();
-        assertThat( medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isEqualTo("2017-12-01");
+        assertThat( medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isEqualTo("2020-02-02");
     }
 
     @Test

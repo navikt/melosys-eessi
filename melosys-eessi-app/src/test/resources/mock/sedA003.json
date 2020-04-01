@@ -1,154 +1,165 @@
 {
-  "nav" : {
-    "bruker" : {
-      "mor" : {
-        "person" : {
-          "etternavnvedfoedsel" : "sadffsasf",
-          "fornavn" : "acvxzvsfsf"
-        }
-      },
-      "person" : {
-        "fornavn" : "Gul",
-        "kjoenn" : "M",
-        "etternavn" : "Rot",
-        "etternavnvedfoedsel" : "saffsd",
-        "foedselsdato" : "1978-04-04",
-        "statsborgerskap" : [ {
-          "land" : "FR"
-        } ],
-        "pin" : [ {
-          "institusjonsnavn" : "asfasfasfa",
-          "identifikator" : "34235435gdg",
-          "sektor" : "familieytelser",
-          "land" : "DK",
-          "institusjonsid" : "2423442"
-        } ],
-        "foedested" : {
-          "region" : "asdfasdf",
-          "by" : "qwfesafds",
-          "land" : "SE"
+  "medlemskap": {
+    "gjeldendereglerEC883": [
+      "14_a_2",
+      "14_c_a"
+    ],
+    "relevantartikkelfor8832004eller9872009": "87_a",
+    "andreland": {
+      "arbeidsgiver": [
+        {
+          "adresse": {
+            "by": "oslo",
+            "land": "NO"
+          },
+          "identifikator": [
+            {
+              "id": "115511",
+              "type": "registrering"
+            }
+          ],
+          "navn": "norsk"
         },
-        "fornavnvedfoedsel" : "sdffsdf"
-      },
-      "adresse" : [ {
-        "land" : "FI",
-        "by" : "sdfsfaadv",
-        "postnummer" : "234",
-        "bygning" : "rrwrwfs",
-        "type" : "bosted",
-        "gate" : "sfaffsaf",
-        "region" : "fsdfafasf"
-      } ],
-      "far" : {
-        "person" : {
-          "fornavn" : "werwrqwr",
-          "etternavnvedfoedsel" : "sdfsfaaa"
+        {
+          "adresse": {
+            "by": "stck",
+            "land": "SE"
+          },
+          "identifikator": [
+            {
+              "id": "123",
+              "type": "trygd"
+            }
+          ],
+          "navn": "swe"
         }
+      ]
+    },
+    "vedtak": {
+      "gjeldervarighetyrkesaktivitet": "ja",
+      "erendringsvedtak": null,
+      "eropprinneligvedtak": "ja",
+      "gjelderperiode": {
+        "startdato": "2019-01-01",
+        "sluttdato": "2020-02-02"
+      },
+      "land": "NO"
+    },
+    "isDeterminationProvisional": null
+  },
+  "nav": {
+    "bruker": {
+      "adresse": [
+        {
+          "by": "asd",
+          "gate": "Testgate",
+          "bygning": "Testbyggnavn",
+          "land": "BE",
+          "postnummer": "2121",
+          "type": "bosted"
+        }
+      ],
+      "person": {
+        "etternavn": "KNOTT",
+        "foedselsdato": "1978-12-04",
+        "fornavn": "TALENTFULL",
+        "kjoenn": "M",
+        "pin": [
+          {
+            "identifikator": "04127801156",
+            "land": "NO"
+          },
+          {
+            "identifikator": "15225345345",
+            "land": "BG"
+          }
+        ],
+        "statsborgerskap": [
+          {
+            "land": "NO"
+          }
+        ]
       }
     },
-    "arbeidsgiver" : [ {
-      "identifikator" : [ {
-        "id" : "qwer2343",
-        "type" : "registrering"
-      } ],
-      "navn" : "asdffsdf",
-      "adresse" : {
-        "gate" : "qweqwe",
-        "land" : "DK",
-        "bygning" : "fwfwqf",
-        "by" : "sdafffsca",
-        "postnummer" : "123123",
-        "region" : "werqfefew"
+    "arbeidsgiver": [
+      {
+        "adresse": {
+          "by": "STAVANGER",
+          "gate": "Forusbeen 50",
+          "land": "BE",
+          "postnummer": "4035"
+        },
+        "identifikator": [
+          {
+            "id": "923609016",
+            "type": "registrering"
+          }
+        ],
+        "navn": "EQUINOR ASA"
+      },
+      {
+        "adresse": {
+          "by": "by",
+          "land": "BE"
+        },
+        "identifikator": [
+          {
+            "id": "123321",
+            "type": "ukjent"
+          }
+        ],
+        "navn": "adf"
       }
-    }, {
-      "identifikator" : [ {
-        "type" : "trygd",
-        "id" : "2323"
-      } ],
-      "adresse" : {
-        "gate" : "asdasd",
-        "region" : "ccww",
-        "postnummer" : "2332",
-        "by" : "dasdsd323",
-        "bygning" : "asdsasd",
-        "land" : "SE"
+    ],
+    "arbeidssted": [
+      {
+        "adresse": {
+          "land": "EE",
+          "gate": "Testarbeidsstedgate",
+          "bygning": "Testarbeidsstedbygning",
+          "region": "Testarbeidsstedregion",
+          "by": "Testarbeidsstedby",
+          "postnummer": "Testarbeidsstedpostkode"
+        },
+        "erikkefastadresse": "ja",
+        "navn": "Testarbeidsstednavn",
+        "hjemmebase": "Testarbeidsstedbase"
       },
-      "navn" : "dasdsds"
-    } ],
-    "arbeidssted" : [ {
-      "adresse" : {
-        "land" : "GR",
-        "gate" : "asdda",
-        "region" : "asddasd",
-        "bygning" : "asdvasadsa",
-        "by" : "asdcas",
-        "postnummer" : "asdcascsa"
-      },
-      "erikkefastadresse" : "ja",
-      "navn" : "asdsadsa",
-      "hjemmebase" : "asasfsaf"
-    } ],
-    "selvstendig" : {
-      "arbeidsgiver" : [ {
-        "identifikator" : [ {
-          "id" : "ads3324234",
-          "type" : "ukjent"
-        } ],
-        "navn" : "asdasdvsf",
-        "adresse" : {
-          "region" : "asdsad",
-          "gate" : "asdasdasd",
-          "bygning" : "asdasdfas",
-          "land" : "SK",
-          "by" : "asdasdasd",
-          "postnummer" : "234324234"
+      {
+        "navn": "Testarbeidsstednavn2",
+        "adresse": {
+          "gate": "Testarbeidsstedgate2",
+          "land": "CY",
+          "bygning": "Testarbeidsstedbygning2",
+          "by": "Testarbeidsstedby2"
+        },
+        "erikkefastadresse": "nei",
+        "hjemmebase": "Testarbeidsstedbase2"
+      }
+    ],
+    "selvstendig": {
+      "arbeidsgiver": [
+        {
+          "identifikator": [
+            {
+              "id": "Testselvstendignummer",
+              "type": "ukjent"
+            }
+          ],
+          "navn": "Testselvstendignavn",
+          "adresse": {
+            "region": "Testselvstendigregion",
+            "by": "Testselvstendigby",
+            "gate": "Testselvstendiggate",
+            "bygning": "Testselvstendigbygning",
+            "land": "BG",
+            "postnummer": "Testselvstendigpostkode"
+          }
         }
-      } ]
-    },
-    "eessisak" : {
-      "institusjonsnummer" : "rewwsfsfsa",
-      "institusjonsid" : "asfsaf"
-    },
-    "ytterligereinformasjon" : "hkjhsdjkakjhhjkkh",
-    "arbeidsgiveraktivitet" : {
-      "eraktivitetmarginal" : "nei"
+      ]
     }
   },
-  "medlemskap" : {
-    "gjeldendereglerEC883" : "14_2_b",
-    "relevantartikkelfor8832004eller9872009" : "13_1_b_iii",
-    "andreland" : {
-      "arbeidsgiver" : [ {
-        "adresse" : {
-          "by" : "dqwdqwd",
-          "postnummer" : "qdwqccq",
-          "gate" : "qwdqwdqdw",
-          "region" : "ioqhwdiuhdhi",
-          "land" : "DE"
-        },
-        "identifikator" : [ {
-          "type" : "skatt",
-          "id" : "234234234ff"
-        } ],
-        "navn" : "sadddd2d"
-      } ],
-      "arbeidsgiveraktivitet" : {
-        "eraktivitetmarginal" : "ja"
-      }
-    },
-    "vedtak" : {
-      "gjelderperiode" : {
-        "startdato" : "2018-09-09",
-        "sluttdato" : "2017-12-01"
-      },
-      "land" : "SE",
-      "gjeldervarighetyrkesaktivitet" : "ja",
-      "erendringsvedtak" : "nei",
-      "datoforrigevedtak" : "2018-05-05"
-    },
-    "isDeterminationProvisional" : "ja"
-  },
-  "sedVer" : "1",
-  "sedGVer" : "4",
-  "sed" : "A003"
+  "sedGVer": "4",
+  "sedVer": "1",
+  "sed": "A003"
 }
