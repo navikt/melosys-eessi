@@ -6,10 +6,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedType;
@@ -33,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class EuxConsumerTest {
@@ -102,24 +99,14 @@ public class EuxConsumerTest {
 
     @Test
     public void settMottaker_ingenRetur() throws Exception {
-        String id = "1234";
-        String mottaker = "NAV_DANMARK_123";
-        server.expect(requestTo("/buc/" + id + "/bucdeltakere?MottakerId=" + mottaker))
+        String rinaSaksnummer = "1111";
+        String sverige = "SE:1234";
+        String danmark = "DK:4321";
+
+        server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "&mottakere=" + danmark))
                 .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
-        euxConsumer.settMottaker(id, mottaker);
-    }
-
-    @Test
-    public void hentBucTypePerSektor_returnerListe() throws Exception {
-
-        List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
-
-        server.expect(requestTo("/buctypepersektor"))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
-
-        List<String> resultat = euxConsumer.bucTypePerSektor();
-        assertThat(resultat).isEqualTo(forventetRetur);
+        euxConsumer.settMottakere(rinaSaksnummer, List.of(sverige, danmark));
     }
 
     @Test
@@ -144,54 +131,6 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentKodeverk_forventJson() throws Exception {
-        Map<String, Object> forventetRetur = Maps.newHashMap();
-        forventetRetur.put("string", "value");
-        forventetRetur.put("int", 1L);
-
-        String kodeverk = "Test";
-
-        server.expect(requestTo("/kodeverk?Kodeverk=" + kodeverk))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
-
-        JsonNode resultat = euxConsumer.hentKodeverk(kodeverk);
-        assertThat(resultat.has("string")).isTrue();
-        assertThat(resultat.has("int")).isTrue();
-    }
-
-    @Test
-    public void hentMuligeAksjoner_forventJson() throws Exception {
-        Map<String, Object> forventetRetur = Maps.newHashMap();
-        forventetRetur.put("string", "value");
-        forventetRetur.put("int", 1L);
-
-        String id = "1234";
-        server.expect(requestTo("/buc/" + id + "/muligeaksjoner"))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
-
-        JsonNode resultat = euxConsumer.hentMuligeAksjoner(id);
-        assertThat(resultat.has("string")).isTrue();
-        assertThat(resultat.has("int")).isTrue();
-    }
-
-    @Test
-    public void opprettBucOgSed_forventString() throws Exception {
-        String buc = "buc", mottaker = "NAV";
-        SED sed = new SED();
-
-        Map<String, String> forventetResultat = Maps.newHashMap();
-        forventetResultat.put("documentId", "123ewq123ewq");
-        forventetResultat.put("caseId", "rewf24");
-
-        server.expect(requestTo("/buc/sed?BucType=" + buc + "&MottakerId=" + mottaker))
-                .andRespond(
-                        withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
-
-        Map resultat = euxConsumer.opprettBucOgSed(buc, mottaker, sed);
-        assertThat(resultat).isEqualTo(forventetResultat);
-    }
-
-    @Test
     public void opprettBucOgSedMedVedlegg_forventString() throws Exception {
         String buc = "buc", fagsak = "123", mottaker = "NAV", filtype = "virus.exe", korrelasjon = "111", vedlegg = "vedlegg";
         SED sed = new SED();
@@ -204,7 +143,7 @@ public class EuxConsumerTest {
         server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
-        Map resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
+        Map<String, String> resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
         assertThat(resultat).isEqualTo(forventetResultat);
     }
 
@@ -395,10 +334,10 @@ public class EuxConsumerTest {
 
         String forventetRetur = "123321";
 
-        server.expect(requestTo("/buc/" + id + "/sed?KorrelasjonsId=" + korrelasjonId))
+        server.expect(requestTo("/buc/" + id + "/sed"))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
-        String resultat = euxConsumer.opprettSed(id, korrelasjonId, sed);
+        String resultat = euxConsumer.opprettSed(id, sed);
         assertThat(resultat).isEqualTo(forventetRetur);
     }
 
@@ -416,17 +355,6 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void slettSed_ingenRetur() throws Exception {
-        String id = "123";
-        String dokumentId = "1122233";
-
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess());
-
-        euxConsumer.slettSed(id, dokumentId);
-    }
-
-    @Test
     public void sendSed_ingenRetur() throws Exception {
         String id = "123";
         String korrelasjonsId = "111";
@@ -436,34 +364,6 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess());
 
         euxConsumer.sendSed(id, korrelasjonsId, dokumentId);
-    }
-
-    @Test
-    public void hentTilgjengeligeSedType_forventListeString() throws Exception, JsonProcessingException {
-        String id = "123";
-
-        List<String> forventetRetur = Lists.newArrayList("en", "to", "tre");
-
-        server.expect(requestTo("/buc/" + id + "/sedtyper"))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetRetur), MediaType.APPLICATION_JSON));
-
-        List<String> resultat = euxConsumer.hentTilgjengeligeSedTyper(id);
-        assertThat(resultat).isEqualTo(forventetRetur);
-    }
-
-    @Test
-    public void hentVedlegg_ForventByteArray() throws Exception {
-        String id = "123";
-        String dokumentId = "123321";
-        String vedleggId = "2222";
-
-        byte[] forventetRetur = "returverdi".getBytes();
-
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg/" + vedleggId))
-                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
-
-        byte[] resultat = euxConsumer.hentVedlegg(id, dokumentId, vedleggId);
-        assertThat(resultat).isEqualTo(forventetRetur);
     }
 
     @Test
@@ -482,30 +382,6 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void slettVedlegg_ingenRetur() throws Exception {
-        String id = "123";
-        String dokumentId = "123321";
-        String vedleggId = "2222";
-
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg/" + vedleggId))
-                .andRespond(withSuccess());
-
-        euxConsumer.slettVedlegg(id, dokumentId, vedleggId);
-    }
-
-    @Test(expected = IntegrationException.class)
-    public void exceptionHåndtering_utenFeilmeldingBody_forventExceptionMed400BadRequest() throws Exception {
-        String id = "123";
-        String dokumentId = "123321";
-        String vedleggId = "2222";
-
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg/" + vedleggId))
-                .andRespond(withBadRequest());
-
-        euxConsumer.slettVedlegg(id, dokumentId, vedleggId);
-    }
-
-    @Test
     public void setSakSensitiv_ingenResponseEllerException() throws Exception {
 
         String id ="123";
@@ -513,16 +389,6 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess());
 
         euxConsumer.setSakSensitiv(id);
-    }
-
-    @Test
-    public void fjernSakSensitiv_ingenResponseEllerException() throws Exception {
-
-        String id ="123";
-        server.expect(requestTo("/buc/" + id + "/sensitivsak"))
-                .andRespond(withSuccess());
-
-        euxConsumer.fjernSakSensitiv(id);
     }
 
     @Test

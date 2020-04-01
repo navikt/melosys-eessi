@@ -3,13 +3,13 @@ package no.nav.melosys.eessi.service.eux;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.collect.ImmutableMap;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
@@ -43,6 +43,9 @@ public class EuxServiceTest {
 
     private EuxService euxService;
 
+    private final String opprettetBucID = "114433";
+    private final String opprettetSedID = "12222";
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -51,18 +54,13 @@ public class EuxServiceTest {
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL, "false");
 
-        when(euxConsumer.opprettBucOgSed(anyString(), anyString(), any()))
-                .thenReturn(ImmutableMap.of(
-                        "caseId", "1122334455",
-                        "documentId", "9988776655"
-                ));
+        when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
 
         URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
         List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<List<Institusjon>>(){});
         when(euxConsumer.hentInstitusjoner(anyString(), any()))
                 .thenReturn(institusjoner);
-
-        when(euxConsumer.opprettSed(anyString(), any(), any())).thenReturn("12345");
     }
 
     @Test
@@ -99,13 +97,6 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentSedPdf_forventKonsumentKall() throws IntegrationException {
-        euxService.hentSedPdf("123123123", "12345");
-
-        verify(euxConsumer).hentSedPdf(eq("123123123"), eq("12345"));
-    }
-
-    @Test
     public void genererPdfFraSed_forventKonsumentkall() throws IntegrationException {
         euxService.genererPdfFraSed(new SED());
         verify(euxConsumer).genererPdfFraSed(any());
@@ -113,38 +104,25 @@ public class EuxServiceTest {
 
     @Test
     public void opprettBucOgSed_forventRinaSaksnummer() throws IntegrationException {
-        String bucType = BucType.LA_BUC_01.name();
-        String mottakerId = "SE:123";
+        BucType bucType = BucType.LA_BUC_01;
+        Collection<String> mottakere = List.of("SE:123");
         SED sed = new SED();
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerId, sed, null);
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, new byte[]{1,1});
 
-        assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo("1122334455");
+        verify(euxConsumer).opprettBuC(eq(bucType.name()));
+        verify(euxConsumer).opprettSed(eq(opprettetBucID), eq(sed));
+        verify(euxConsumer).leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any(byte[].class));
 
-        verify(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
-    }
-
-    @Test
-    public void opprettBucOgSed_forventException() throws Exception {
-        String bucType = BucType.LA_BUC_01.name();
-        String mottakerId = "SE:123";
-        SED sed = new SED();
-
-        doThrow(IntegrationException.class).when(euxConsumer).opprettBucOgSed(anyString(), anyString(), any());
-
-        expectedException.expect(IntegrationException.class);
-        euxService.opprettBucOgSed(bucType, mottakerId, sed, null);
-
-        verify(euxConsumer).opprettBucOgSed(anyString(), any(), any());
+        assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo(opprettetBucID);
     }
 
     @Test
     public void opprettOgSendSed_medRinaSaksnummer_forventKonsumentKall() throws IntegrationException {
         SED sed = new SED();
-        euxService.opprettOgSendSed(sed, "123123123");
+        euxService.opprettOgSendSed(sed, opprettetBucID);
 
-        verify(euxConsumer).opprettSed(eq("123123123"), eq(null), eq(sed));
-        verify(euxConsumer).sendSed(eq("123123123"), eq(null), eq("12345"));
+        verify(euxConsumer).sendSed(eq(opprettetBucID), eq(null), eq(opprettetSedID));
     }
 
     @Test

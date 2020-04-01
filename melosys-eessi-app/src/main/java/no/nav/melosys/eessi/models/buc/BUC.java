@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -36,5 +37,22 @@ public class BUC {
         return documents.stream().filter(d -> SedStatus.erGyldigEngelskStatus(d.getStatus())).max(sistOppdatert);
     }
 
+    public boolean erÅpen() {
+        return !"closed".equalsIgnoreCase(status);
+    }
+
+
+    public Optional<Document> finnDokumentVedSedType(String sedType) {
+        return documents.stream().filter(d -> sedType.equals(d.getType())).min(sorterEtterStatus);
+    }
+
     private static final Comparator<Document> sistOppdatert = Comparator.comparing(Document::getLastUpdate);
+
+    private static final Comparator<Document> sorterEtterStatus = Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
+
+    public boolean sedKanOppdateres(String id) {
+        return actions.stream()
+                .filter(action -> id.equals(action.getDocumentId()))
+                .anyMatch(action -> "Update".equalsIgnoreCase(action.getOperation()));
+    }
 }

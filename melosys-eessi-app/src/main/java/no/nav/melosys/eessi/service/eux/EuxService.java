@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.service.eux;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -53,20 +54,19 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(String bucType, String mottakerId, SED sed, byte[] vedlegg) throws IntegrationException {
-        Map<String, String> response;
-        if (vedlegg != null && vedlegg.length > 0) {
-            response = euxConsumer.opprettBucOgSedMedVedlegg(bucType, mottakerId, FILTYPE_PDF, sed, vedlegg);
-        } else {
-            response = euxConsumer.opprettBucOgSed(bucType, mottakerId, sed);
-        }
-        OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(response.get("caseId"),
-                response.get("documentId"));
-        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", opprettBucOgSedResponse.getRinaSaksnummer(),
-                opprettBucOgSedResponse.getDokumentId());
-        bucMetrikker.bucOpprettet(bucType);
+    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, byte[] vedlegg) throws IntegrationException {
 
-        return opprettBucOgSedResponse;
+        String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
+        euxConsumer.settMottakere(rinaSaksnummer, mottakere);
+        String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
+
+        if (ArrayUtils.isNotEmpty(vedlegg)) {
+            euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
+        }
+
+        bucMetrikker.bucOpprettet(bucType.name());
+        log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaSaksnummer, dokumentID);
+        return new OpprettBucOgSedResponse(rinaSaksnummer, dokumentID);
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
@@ -108,7 +108,7 @@ public class EuxService {
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
-        String sedId = euxConsumer.opprettSed(rinaSaksnummer, null, sed);
+        String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
         euxConsumer.sendSed(rinaSaksnummer, null, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
@@ -133,10 +133,6 @@ public class EuxService {
 
     public BUC hentBuc(String rinaSakid) throws IntegrationException {
         return euxConsumer.hentBuC(rinaSakid);
-    }
-
-    public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
-        return euxConsumer.hentSedPdf(rinaSaksnummer, dokumentId);
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) throws IntegrationException {
