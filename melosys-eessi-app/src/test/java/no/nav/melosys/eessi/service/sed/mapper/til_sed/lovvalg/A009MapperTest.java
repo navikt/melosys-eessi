@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class A009MapperTest {
@@ -43,19 +43,19 @@ public class A009MapperTest {
     public void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() throws MappingException, NotFoundException {
         SED sed = a009Mapper.mapTilSed(sedData);
 
-        assertEquals(MedlemskapA009.class, sed.getMedlemskap().getClass());
+        assertThat(MedlemskapA009.class).isEqualTo(sed.getMedlemskap().getClass());
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
-        assertNotNull(medlemskapA009);
-        assertNotNull(medlemskapA009.getUtsendingsland());
-        assertEquals(sed.getNav().getArbeidsgiver().get(0).getNavn(),
-                medlemskapA009.getUtsendingsland().getArbeidsgiver().get(0).getNavn());
+        assertThat(medlemskapA009).isNotNull();
+        assertThat(medlemskapA009.getUtsendingsland()).isNotNull();
+        assertThat(medlemskapA009.getUtsendingsland().getArbeidsgiver().get(0).getNavn()).isEqualTo(
+                sed.getNav().getArbeidsgiver().get(0).getNavn());
 
-        assertNotNull(medlemskapA009.getVedtak());
-        assertEquals("12_1", medlemskapA009.getVedtak().getArtikkelforordning());
-        assertNotNull(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode());
-        assertNull(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode());
+        assertThat(medlemskapA009.getVedtak()).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getArtikkelforordning()).isEqualTo("12_1");
+        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode()).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
     }
 
     @Test
@@ -63,16 +63,16 @@ public class A009MapperTest {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
         SED sed = a009Mapper.mapTilSed(sedData);
 
-        assertEquals(MedlemskapA009.class, sed.getMedlemskap().getClass());
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
-        assertNotNull(medlemskapA009);
+        assertThat(medlemskapA009).isNotNull();
 
-        assertNotNull(medlemskapA009.getVedtak());
-        assertEquals("12_2", medlemskapA009.getVedtak().getArtikkelforordning());
-        assertNotNull(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode());
-        assertNull(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode());
+        assertThat(medlemskapA009.getVedtak()).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getArtikkelforordning()).isEqualTo("12_2");
+        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode()).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
     }
 
     @Test(expected = MappingException.class)
@@ -85,5 +85,12 @@ public class A009MapperTest {
     public void ingenLovvalgsperioder_expectNullPointerException() throws MappingException, NotFoundException {
         sedData.setLovvalgsperioder(null);
         a009Mapper.mapTilSed(sedData);
+    }
+
+    @Test
+    public void erIkkeFysisk_forventErIkkeFastadresse() throws MappingException, NotFoundException {
+        sedData.getArbeidssteder().get(0).setFysisk(false);
+        SED sed = a009Mapper.mapTilSed(sedData);
+        assertThat(sed.getNav().getArbeidssted().get(0).getErikkefastadresse()).isEqualTo("ja");
     }
 }

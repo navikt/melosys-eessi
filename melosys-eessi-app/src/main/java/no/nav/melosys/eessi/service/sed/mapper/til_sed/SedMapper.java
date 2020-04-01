@@ -6,6 +6,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.SedType;
@@ -168,7 +174,7 @@ public interface SedMapper {
 
             if (arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase())) {
+            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 
