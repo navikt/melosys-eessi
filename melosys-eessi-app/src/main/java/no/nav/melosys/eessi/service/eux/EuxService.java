@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.eux;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,14 +37,17 @@ public class EuxService {
     private final BucMetrikker bucMetrikker;
 
     private final String rinaHostUrl;
+    private boolean featureToggleEessiReady;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-            BucMetrikker bucMetrikker,
-            @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
+                      BucMetrikker bucMetrikker,
+                      @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
+                      @Value("${melosys.feature.eessiready:false}") String featureToggleEessiReady) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
         this.rinaHostUrl = rinaHostUrl;
+        this.featureToggleEessiReady = Boolean.parseBoolean(featureToggleEessiReady);
     }
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
@@ -76,6 +80,10 @@ public class EuxService {
     public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode)
             throws IntegrationException {
 
+        if (!norgeErPåkoblet(bucType)) {
+            return Collections.emptyList();
+        }
+
         return euxConsumer.hentInstitusjoner(bucType, null).stream()
                 .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
                 .filter(i -> filtrerPåLandkode(i, landkode))
@@ -84,6 +92,15 @@ public class EuxService {
                                 COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
                         .anyMatch(TilegnetBuc::erEessiKlar))
                 .collect(Collectors.toList());
+    }
+
+    private boolean norgeErPåkoblet(String bucType) {
+        BucType bucTypeEnum = BucType.valueOf(bucType);
+        if (featureToggleEessiReady && bucTypeEnum.erLovvalgBuc()) {
+            return bucTypeEnum == BucType.LA_BUC_01 || bucTypeEnum == BucType.LA_BUC_04;
+        }
+
+        return true;
     }
 
     private boolean filtrerPåLandkode(Institusjon institusjon, String landkode) {

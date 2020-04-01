@@ -52,7 +52,7 @@ public class EuxServiceTest {
     @Before
     public void setup() throws IOException, IntegrationException {
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL);
+        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL, "false");
 
         when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
@@ -156,7 +156,7 @@ public class EuxServiceTest {
 
     @Test
     public void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() throws IntegrationException {
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_18", "SE");
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", "SE");
         assertThat(institusjoner).isEmpty();
     }
 
@@ -178,6 +178,15 @@ public class EuxServiceTest {
         Institusjon institusjon = institusjoner.get(0);
         assertThat(institusjon.getAkronym()).isEqualTo("FK EL-TITTEI");
         assertThat(institusjon.getLandkode()).isEqualTo("GR");
+    }
+
+    @Test
+    public void hentMottakerinstitusjoner_laBuc02LandGRNorgeIkkePåkoblet_forventTomListe() throws IntegrationException {
+        euxService = new EuxService(euxConsumer, bucMetrikker, "url", "true");
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_02", "GR");
+        assertThat(institusjoner).hasSize(0);
+
+        verify(euxConsumer, never()).hentInstitusjoner(any(), any());
     }
 
     @Test

@@ -21,7 +21,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
-import no.nav.melosys.eessi.service.sed.mapper.SedMapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
