@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -103,11 +102,11 @@ public class EuxConsumerTest {
         String rinaSaksnummer = "1111";
         String sverige = "SE:1234";
         String danmark = "DK:4321";
-        Collection<String> mottakere = List.of(sverige, danmark);
-        server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + String.join(",", mottakere)))
+
+        server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "&mottakere=" + danmark))
                 .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
-        euxConsumer.settMottakere(rinaSaksnummer, mottakere);
+        euxConsumer.settMottakere(rinaSaksnummer, List.of(sverige, danmark));
     }
 
     @Test

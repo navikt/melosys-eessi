@@ -70,7 +70,7 @@ public enum BucType {
 
                     .build());
 
-    public SedType hentFørsteLovligeSedPåBuc() {
+    public SedType hentFørsteLovligeSed() {
         if (!FØRSTE_LOVLIGE_SED_FRA_BUC_MAP.containsKey(this)) {
             throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + this);
         }

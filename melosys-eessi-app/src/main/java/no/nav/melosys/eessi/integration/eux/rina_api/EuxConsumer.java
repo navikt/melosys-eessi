@@ -108,14 +108,14 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * Setter mottaker på en BuC/Rina-sak
      *
      * @param rinaSaksnummer saksnummer
-     * @param mottakere id på mottakende enhet
+     * @param mottakerIDer id på mottakende enhet
      */
-    public void settMottakere(String rinaSaksnummer, Collection<String> mottakere) throws IntegrationException {
+    public void settMottakere(String rinaSaksnummer, Collection<String> mottakerIDer) throws IntegrationException {
 
-        log.info("Setter mottaker {} til sak {}", mottakere, rinaSaksnummer);
+        log.info("Setter mottaker {} til sak {}", mottakerIDer, rinaSaksnummer);
         UriComponentsBuilder builder = UriComponentsBuilder
                 .fromPath(String.format("/buc/%s/mottakere", rinaSaksnummer))
-                .queryParam("mottakere", mottakere.toArray());
+                .queryParam("mottakere", mottakerIDer.toArray());
 
         exchange(builder.toUriString(), HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
                 new ParameterizedTypeReference<Void>() {
