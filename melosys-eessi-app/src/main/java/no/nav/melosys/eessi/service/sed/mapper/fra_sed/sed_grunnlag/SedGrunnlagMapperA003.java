@@ -24,7 +24,7 @@ public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovva
         MedlemskapA003 medlemskap = hentMedlemskap(sed);
 
         SedGrunnlagA003Dto sedGrunnlagDto = new SedGrunnlagA003Dto(NyttLovvalgSedGrunnlagMapper.super.map(sed));
-        sedGrunnlagDto.setSedType(SedType.A003);
+        sedGrunnlagDto.setSedType(SedType.A003.name());
         sedGrunnlagDto.setLovvalgsperioder(List.of(hentLovvalgsperiode(medlemskap)));
         sedGrunnlagDto.setOvergangsregelbestemmelser(mapOvergangsregelbestemmelse(medlemskap));
 

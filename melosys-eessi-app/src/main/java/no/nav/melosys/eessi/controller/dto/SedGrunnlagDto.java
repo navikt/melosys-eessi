@@ -4,12 +4,11 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import no.nav.melosys.eessi.models.SedType;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SedGrunnlagDto {
-    private SedType sedType;
+    private String sedType;
     private List<Ident> utenlandskIdent;
     private Adresse bostedsadresse;
     private List<Virksomhet> arbeidsgivendeVirksomheter;
