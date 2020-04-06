@@ -35,7 +35,7 @@
     <micrometer-jvm-extras.version>0.2.0</micrometer-jvm-extras.version>
     <person-utils.version>1.35.0</person-utils.version>
     <random-benas.version>3.9.0</random-benas.version>
-    <shedlock-version>2.4.0</shedlock-version>
+    <shedlock-version>4.7.0</shedlock-version>
     <spring-boot.version>2.2.6.RELEASE</spring-boot.version>
     <spring-kafka.version>2.4.4.RELEASE</spring-kafka.version>
     <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
