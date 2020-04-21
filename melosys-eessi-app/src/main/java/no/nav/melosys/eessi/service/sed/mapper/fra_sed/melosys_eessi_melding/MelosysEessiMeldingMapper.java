@@ -11,10 +11,12 @@ import no.nav.melosys.eessi.models.sed.SED;
 public interface MelosysEessiMeldingMapper {
 
     default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
-            String sedType, String bucType, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+                                    String sedType, String bucType, String avsenderID,
+                                    String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setSedId(rinaDokumentID);
         melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
+        melosysEessiMelding.setAvsenderId(avsenderID);
         melosysEessiMelding.setJournalpostId(journalpostID);
         melosysEessiMelding.setDokumentId(dokumentID);
         melosysEessiMelding.setGsakSaksnummer(gsakSaksnummer != null ? Long.parseLong(gsakSaksnummer) : null);

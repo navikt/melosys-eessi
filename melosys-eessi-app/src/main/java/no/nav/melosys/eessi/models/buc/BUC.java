@@ -33,6 +33,10 @@ public class BUC {
                 sedType.name().equalsIgnoreCase(action.getDocumentType()) && "CREATE".equalsIgnoreCase(action.getOperation()));
     }
 
+    public Document hentSed(String sedID) {
+        return documents.stream().filter(d -> d.getId().equalsIgnoreCase(sedID)).findAny().orElseThrow();
+    }
+
     public Optional<Document> hentSistOppdaterteDocument() {
         return documents.stream().filter(d -> SedStatus.erGyldigEngelskStatus(d.getStatus())).max(sistOppdatert);
     }

@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.journalpostkobling;
 
-import java.util.Optional;
-
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
@@ -19,6 +17,8 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -72,6 +72,8 @@ public class JournalpostSedKoblingService {
 
     private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling)
             throws IntegrationException {
+        BUC buc = euxService.hentBuc(journalpostSedKobling.getRinaSaksnummer());
+        final var organisation = buc.hentSed(journalpostSedKobling.getSedId()).getCreator().getOrganisation();
         SED sed = euxService.hentSed(journalpostSedKobling.getRinaSaksnummer(), journalpostSedKobling.getSedId());
 
         Long gsakSaksnummer = saksrelasjonService.finnVedRinaSaksnummer(journalpostSedKobling.getRinaSaksnummer())
@@ -84,6 +86,7 @@ public class JournalpostSedKoblingService {
                 journalpostSedKobling.getRinaSaksnummer(),
                 journalpostSedKobling.getSedType(),
                 journalpostSedKobling.getBucType(),
+                organisation.getAvsenderID(),
                 journalpostSedKobling.getJournalpostID(),
                 gsakSaksnummer != null ? gsakSaksnummer.toString() : null,
                 Integer.parseInt(journalpostSedKobling.getSedVersjon()) != 1
@@ -93,18 +96,19 @@ public class JournalpostSedKoblingService {
     private Optional<MelosysEessiMelding> opprettEessiMelding(String rinaSaksnummer, String journalpostID)
             throws IntegrationException {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
-        Optional<Document> document = buc.hentSistOppdaterteDocument();
-        if (document.isEmpty()) {
+        Optional<Document> documentOptional = buc.hentSistOppdaterteDocument();
+        if (documentOptional.isEmpty()) {
             log.warn("Finner ikke sist oppdaterte sed for rinasak {}", rinaSaksnummer);
             return Optional.empty();
         }
-        String sedType = document.get().getType();
-        String sedID = document.get().getId();
+        final Document sedDocument = documentOptional.get();
+        String sedID = sedDocument.getId();
+        String sedType = sedDocument.getType();
+        final var organisation = sedDocument.getCreator().getOrganisation();
         SED sed = euxService.hentSed(rinaSaksnummer, sedID);
-        String bucType = buc.getBucType();
 
-        return Optional.of(opprettMelosysEessiMelding(sed, sedID, rinaSaksnummer, sedType, bucType, journalpostID, null,
-                false));
+        return Optional.of(opprettMelosysEessiMelding(sed, sedID, rinaSaksnummer, sedType,
+                buc.getBucType(), organisation.getAvsenderID(), journalpostID, null, false));
     }
 
     public JournalpostSedKobling lagre(String journalpostID, String rinaSaksnummer, String sedID,
@@ -114,9 +118,10 @@ public class JournalpostSedKoblingService {
         );
     }
 
-    private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String sedId, String rinaSaksnummer, String sedType,
-            String bucType, String journalpostID, String saksnummer, boolean erEndring) {
+    private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String sedId, String rinaSaksnummer,
+                                                           String sedType, String bucType, String avsenderID,
+                                                           String journalpostID, String saksnummer, boolean erEndring) {
         return MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
-                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, journalpostID, null, saksnummer, erEndring);
+                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, journalpostID, null, saksnummer, erEndring);
     }
 }

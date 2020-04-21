@@ -121,8 +121,9 @@ public class BehandleSedMottattService {
 
         melosysEessiProducer.publiserMelding(
                 mapper.map(aktoerID, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedMottatt.getSedKontekst().getJournalpostID(),
-                        sedMottatt.getSedKontekst().getDokumentID(), sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring)
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(),
+                        sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
+                        sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring)
         );
 
         sedMottatt.getSedKontekst().setPublisertKafka(Boolean.TRUE);
