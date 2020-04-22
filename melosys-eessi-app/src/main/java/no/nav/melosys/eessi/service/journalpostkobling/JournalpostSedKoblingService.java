@@ -73,7 +73,7 @@ public class JournalpostSedKoblingService {
     private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling)
             throws IntegrationException {
         BUC buc = euxService.hentBuc(journalpostSedKobling.getRinaSaksnummer());
-        final var organisation = buc.hentSed(journalpostSedKobling.getSedId()).getCreator().getOrganisation();
+        final var organisation = buc.hentDokument(journalpostSedKobling.getSedId()).getCreator().getOrganisation();
         SED sed = euxService.hentSed(journalpostSedKobling.getRinaSaksnummer(), journalpostSedKobling.getSedId());
 
         Long gsakSaksnummer = saksrelasjonService.finnVedRinaSaksnummer(journalpostSedKobling.getRinaSaksnummer())
@@ -86,7 +86,7 @@ public class JournalpostSedKoblingService {
                 journalpostSedKobling.getRinaSaksnummer(),
                 journalpostSedKobling.getSedType(),
                 journalpostSedKobling.getBucType(),
-                organisation.getAvsenderID(),
+                organisation.getId(),
                 journalpostSedKobling.getJournalpostID(),
                 gsakSaksnummer != null ? gsakSaksnummer.toString() : null,
                 Integer.parseInt(journalpostSedKobling.getSedVersjon()) != 1
@@ -108,7 +108,7 @@ public class JournalpostSedKoblingService {
         SED sed = euxService.hentSed(rinaSaksnummer, sedID);
 
         return Optional.of(opprettMelosysEessiMelding(sed, sedID, rinaSaksnummer, sedType,
-                buc.getBucType(), organisation.getAvsenderID(), journalpostID, null, false));
+                buc.getBucType(), organisation.getId(), journalpostID, null, false));
     }
 
     public JournalpostSedKobling lagre(String journalpostID, String rinaSaksnummer, String sedID,

@@ -13,8 +13,4 @@ public class Organisation {
     private String name;
     private String countryCode;
     private String id;
-
-    public String getAvsenderID() {
-        return countryCode + ":" + id;
-    }
 }

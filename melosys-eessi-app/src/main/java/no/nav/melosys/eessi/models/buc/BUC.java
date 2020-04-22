@@ -33,8 +33,8 @@ public class BUC {
                 sedType.name().equalsIgnoreCase(action.getDocumentType()) && "CREATE".equalsIgnoreCase(action.getOperation()));
     }
 
-    public Document hentSed(String sedID) {
-        return documents.stream().filter(d -> d.getId().equalsIgnoreCase(sedID)).findAny().orElseThrow();
+    public Document hentDokument(String dokumentID) {
+        return documents.stream().filter(d -> d.getId().equalsIgnoreCase(dokumentID)).findAny().orElseThrow();
     }
 
     public Optional<Document> hentSistOppdaterteDocument() {
