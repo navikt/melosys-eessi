@@ -108,20 +108,20 @@ public class BehandleSedMottattService {
 
     private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
         log.info("Publiserer melding om mottatt sed på kafka for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
-        SedHendelse sedHendelse = sedMottatt.getSedHendelse();
-        SedType sedType = SedType.valueOf(sed.getSedType());
-        String aktoerID = tpsService.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
-        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(sedType);
-
+        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sed.getSedType()));
         if (mapper == null) {
-            throw new IllegalArgumentException("Mapper for kafka-publisering er null!");
+            throw new IllegalStateException("Mapper for kafka-publisering er null!");
         }
 
+        SedHendelse sedHendelse = sedMottatt.getSedHendelse();
+        String aktoerID = tpsService.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
+        // avsenderID har formatet <landkodeISO2>:<institusjonID>
+        String landkode = sedHendelse.getAvsenderId().substring(0, 2);
         boolean sedErEndring = euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
 
         melosysEessiProducer.publiserMelding(
                 mapper.map(aktoerID, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(),
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), landkode,
                         sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
                         sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring)
         );

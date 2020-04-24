@@ -87,6 +87,7 @@ public class JournalpostSedKoblingService {
                 journalpostSedKobling.getSedType(),
                 journalpostSedKobling.getBucType(),
                 organisation.getId(),
+                organisation.getCountryCode(),
                 journalpostSedKobling.getJournalpostID(),
                 gsakSaksnummer != null ? gsakSaksnummer.toString() : null,
                 Integer.parseInt(journalpostSedKobling.getSedVersjon()) != 1
@@ -108,7 +109,7 @@ public class JournalpostSedKoblingService {
         SED sed = euxService.hentSed(rinaSaksnummer, sedID);
 
         return Optional.of(opprettMelosysEessiMelding(sed, sedID, rinaSaksnummer, sedType,
-                buc.getBucType(), organisation.getId(), journalpostID, null, false));
+                buc.getBucType(), organisation.getId(), organisation.getCountryCode(), journalpostID, null, false));
     }
 
     public JournalpostSedKobling lagre(String journalpostID, String rinaSaksnummer, String sedID,
@@ -119,9 +120,9 @@ public class JournalpostSedKoblingService {
     }
 
     private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String sedId, String rinaSaksnummer,
-                                                           String sedType, String bucType, String avsenderID,
+                                                           String sedType, String bucType, String avsenderID, String landkode,
                                                            String journalpostID, String saksnummer, boolean erEndring) {
         return MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
-                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, journalpostID, null, saksnummer, erEndring);
+                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, null, saksnummer, erEndring);
     }
 }

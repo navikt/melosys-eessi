@@ -34,7 +34,7 @@ public class MelosysEessiMeldingMapperA010Test {
         SED sed = createSed(hentMedlemskap(true));
         sed.setSedType("A010");
         MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sakInformasjon.getJournalpostId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                 sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melding).isNotNull();
@@ -58,7 +58,7 @@ public class MelosysEessiMeldingMapperA010Test {
         SED sed = createSed(hentMedlemskap(false));
         sed.setSedType("A009");
         MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sakInformasjon.getJournalpostId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                 sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melding).isNotNull();
@@ -83,7 +83,7 @@ public class MelosysEessiMeldingMapperA010Test {
         sed.setSedType("A010");
         ((MedlemskapA010) sed.getMedlemskap()).getVedtak().setEropprinneligvedtak("nei");
         MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sakInformasjon.getJournalpostId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                 sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
 
         assertThat(melding).isNotNull();
@@ -97,7 +97,7 @@ public class MelosysEessiMeldingMapperA010Test {
         SED sed = createSed(hentMedlemskap(true));
         sed.setSedType("A010");
         MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sakInformasjon.getJournalpostId(),
+                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                 sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), true);
 
         assertThat(melding).isNotNull();

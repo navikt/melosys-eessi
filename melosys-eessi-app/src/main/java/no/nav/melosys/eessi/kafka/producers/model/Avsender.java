@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class Avsender {
     private final String avsenderID;
+    private final String landkode;
 }

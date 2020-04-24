@@ -10,9 +10,9 @@ public interface NyttLovvalgEessiMeldingMapper<T extends Medlemskap> extends Nyt
     @Override
     default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
                                     String sedType, String bucType, String avsenderID,
-                                    String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
-                rinaSaksnummer, sedType, bucType, avsenderID, journalpostID, dokumentID, gsakSaksnummer, sedErEndring);
+                rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer, sedErEndring);
 
         T medlemskap = hentMedlemskap(sed);
 

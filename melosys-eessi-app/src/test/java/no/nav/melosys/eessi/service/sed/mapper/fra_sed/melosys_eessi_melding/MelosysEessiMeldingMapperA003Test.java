@@ -31,7 +31,7 @@ public class MelosysEessiMeldingMapperA003Test {
         SED sed = createSed(hentMedlemskap());
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A003)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sakInformasjon.getJournalpostId(),
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false
                 );
 
