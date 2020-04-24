@@ -85,7 +85,7 @@ public class JournalpostSedKoblingServiceTest {
 
         assertThat(melosysEessiMelding).isPresent();
         assertThat(melosysEessiMelding.get().getSedType()).isEqualTo("A008");
-        assertThat(melosysEessiMelding.get().getAvsenderId()).isEqualTo(organisation.getId());
+        assertThat(melosysEessiMelding.get().getAvsender().getAvsenderID()).isEqualTo(organisation.getId());
     }
 
     @Test
@@ -102,6 +102,6 @@ public class JournalpostSedKoblingServiceTest {
 
         assertThat(melosysEessiMelding).isPresent();
         assertThat(melosysEessiMelding.get().getSedType()).isEqualTo(document.getType());
-        assertThat(melosysEessiMelding.get().getAvsenderId()).isEqualTo(organisation.getId());
+        assertThat(melosysEessiMelding.get().getAvsender().getAvsenderID()).isEqualTo(organisation.getId());
     }
 }

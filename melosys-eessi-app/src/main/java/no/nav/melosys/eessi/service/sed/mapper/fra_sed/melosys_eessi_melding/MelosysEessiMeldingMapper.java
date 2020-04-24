@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.kafka.producers.model.Arbeidssted;
+import no.nav.melosys.eessi.kafka.producers.model.Avsender;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -16,7 +17,7 @@ public interface MelosysEessiMeldingMapper {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setSedId(rinaDokumentID);
         melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
-        melosysEessiMelding.setAvsenderId(avsenderID);
+        melosysEessiMelding.setAvsender(new Avsender(avsenderID));
         melosysEessiMelding.setJournalpostId(journalpostID);
         melosysEessiMelding.setDokumentId(dokumentID);
         melosysEessiMelding.setGsakSaksnummer(gsakSaksnummer != null ? Long.parseLong(gsakSaksnummer) : null);
