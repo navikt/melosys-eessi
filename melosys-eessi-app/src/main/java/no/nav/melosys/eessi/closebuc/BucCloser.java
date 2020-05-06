@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.closebuc;
 
 import java.util.Comparator;
 import java.util.Objects;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
@@ -12,8 +13,9 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.BucSearch;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.sed.mapper.administrativ.X001Mapper;
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X001Mapper;
 import org.springframework.stereotype.Service;
+
 import static no.nav.melosys.eessi.models.buc.BucUtils.*;
 
 @Service

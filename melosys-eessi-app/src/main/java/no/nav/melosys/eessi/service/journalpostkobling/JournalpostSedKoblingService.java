@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
-import no.nav.melosys.eessi.kafka.producers.mapping.MelosysEessiMeldingMapperFactory;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.JournalpostSedKobling;
@@ -18,6 +17,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.stereotype.Service;
 
 @Slf4j
