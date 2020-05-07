@@ -31,7 +31,8 @@ public class MelosysEessiMeldingMapperA001Test {
                         sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(),
                         sedHendelse.getBucType(),
-                        sakInformasjon.getJournalpostId(),
+                        sedHendelse.getAvsenderId(),
+                        "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(),
                         sakInformasjon.getGsakSaksnummer(),
                         false
