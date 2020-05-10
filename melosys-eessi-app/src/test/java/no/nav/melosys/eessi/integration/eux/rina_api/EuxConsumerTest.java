@@ -374,10 +374,10 @@ public class EuxConsumerTest {
 
         String forventetRetur = "{}";
 
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg?Filtype=" + filtype))
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg?Filtype=" + filtype + "&synkron=true"))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
-        String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, "vedlegg");
+        String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, "vedlegg".getBytes());
         assertThat(resultat).isEqualTo(forventetRetur);
     }
 

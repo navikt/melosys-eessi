@@ -243,21 +243,35 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      *
      * @param rinaSaksnummer saksnummeret
      * @param dokumentId id til SED'en vedlegget skal legges til
-     * @param filType filtype
+     * @param filType filtype (eks pdf)
      * @param vedlegg Selve vedlegget som skal legges til
      * @return ukjent
      */
-
     public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType,
-            Object vedlegg) throws IntegrationException {
+                                 byte[] vedlegg) throws IntegrationException {
         log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        ByteArrayResource document = new ByteArrayResource(vedlegg) {
+            @Override
+            public String getFilename() {
+                return "file";
+            }
+        };
+
+        MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
+        multipartBody.add("file", document);
+
         String uri = UriComponentsBuilder
                 .fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
-                .queryParam("Filtype", filType).toUriString();
+                .queryParam("Filtype", filType)
+                .queryParam("synkron", Boolean.TRUE).toUriString();
 
-        return exchange(uri, HttpMethod.POST, new HttpEntity<>(vedlegg, defaultHeaders()),
-                new ParameterizedTypeReference<String>() {
-                });
+        return exchange(uri, HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
+                new ParameterizedTypeReference<String>() {});
     }
 
     /**
@@ -317,16 +331,16 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
             }
         };
 
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add("document", document);
-        map.add("attachment", attachment);
+        MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
+        multipartBody.add("document", document);
+        multipartBody.add("attachment", attachment);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed/vedlegg")
                 .queryParam(BUC_TYPE, bucType)
                 .queryParam("MottakerID", mottakerId)
                 .queryParam("FilType", filType);
 
-        return exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(map, headers),
+        return exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
                 new ParameterizedTypeReference<Map<String, String>>() {
                 });
     }

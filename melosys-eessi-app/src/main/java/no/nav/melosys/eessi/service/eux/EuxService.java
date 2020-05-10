@@ -61,7 +61,8 @@ public class EuxService {
         String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
 
         if (ArrayUtils.isNotEmpty(vedlegg)) {
-            euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
+            String vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
+            log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
         }
 
         bucMetrikker.bucOpprettet(bucType.name());
