@@ -1,5 +1,8 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
+import java.util.Set;
+
+import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
@@ -11,7 +14,11 @@ import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
 
+import static no.nav.melosys.eessi.controller.dto.Bestemmelse.*;
+
 public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
+
+    private static final Set<Bestemmelse> LOVLIGE_BESTEMMELSER_A010 = Set.of(ART_11_3_b, ART_11_3_c, ART_11_3_d, ART_11_4, ART_11_5, ART_15);
 
     @Override
     public MedlemskapA010 getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException {
@@ -47,10 +54,21 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
         return vedtak;
     }
 
-    private MeldingOmLovvalg hentMeldingOmLovvalg(Lovvalgsperiode lovvalgsperiode) {
+    private MeldingOmLovvalg hentMeldingOmLovvalg(Lovvalgsperiode lovvalgsperiode) throws MappingException {
         MeldingOmLovvalg meldingOmLovvalg = new MeldingOmLovvalg();
-        meldingOmLovvalg.setArtikkel(lovvalgsperiode.getBestemmelse().getValue());
+        meldingOmLovvalg.setArtikkel(tilA010Bestemmelse(lovvalgsperiode));
         return  meldingOmLovvalg;
+    }
+
+    private String tilA010Bestemmelse(Lovvalgsperiode lovvalgsperiode) throws MappingException {
+
+        if (LOVLIGE_BESTEMMELSER_A010.contains(lovvalgsperiode.getBestemmelse())) {
+            return lovvalgsperiode.getBestemmelse().getValue();
+        } else if (lovvalgsperiode.harTilleggsbestemmelse() && LOVLIGE_BESTEMMELSER_A010.contains(lovvalgsperiode.getTilleggsBestemmelse())) {
+            return lovvalgsperiode.getTilleggsBestemmelse().getValue();
+        }
+
+        throw new MappingException("Kan ikke mappe til bestemmelse i A010 for lovvalgsperiode {}");
     }
 
     private PeriodeA010 hentPeriode(Lovvalgsperiode lovvalgsperiode) {
