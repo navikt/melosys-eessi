@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.models.Vedlegg;
 import no.nav.melosys.eessi.models.buc.Action;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
@@ -30,8 +31,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -54,9 +53,6 @@ public class SedServiceTest {
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
-    @Captor
-    public ArgumentCaptor<SED> sedArgumentCaptor;
-
     private final String RINA_ID = "aabbcc";
 
     @Before
@@ -73,7 +69,10 @@ public class SedServiceTest {
     @Test
     public void opprettBucOgSed_forventRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, true);
+        final BucType bucType = BucType.LA_BUC_01;
+        final Vedlegg vedlegg = new Vedlegg("tittei", "pdf".getBytes());
+        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
+        verify(euxService).opprettBucOgSed(eq(bucType), eq(sedData.getMottakerIder()), any(SED.class), eq(vedlegg));
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
     }
 

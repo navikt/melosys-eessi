@@ -11,13 +11,13 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.Vedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -54,13 +54,13 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, byte[] vedlegg) throws IntegrationException {
+    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, Vedlegg vedlegg) throws IntegrationException {
 
         String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
         euxConsumer.settMottakere(rinaSaksnummer, mottakere);
         String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
 
-        if (ArrayUtils.isNotEmpty(vedlegg)) {
+        if (vedlegg != null) {
             String vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
             log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
         }

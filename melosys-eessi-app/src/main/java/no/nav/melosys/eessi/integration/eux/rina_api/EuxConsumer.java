@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.models.Vedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -248,17 +249,17 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * @return ukjent
      */
     public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType,
-                                 byte[] vedlegg) throws IntegrationException {
+                                 Vedlegg vedlegg) throws IntegrationException {
         log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
-        ByteArrayResource document = new ByteArrayResource(vedlegg) {
+        ByteArrayResource document = new ByteArrayResource(vedlegg.getInnhold()) {
             @Override
             public String getFilename() {
-                return "file";
+                return vedlegg.getFilnavn();
             }
         };
 
@@ -268,7 +269,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         String uri = UriComponentsBuilder
                 .fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
                 .queryParam("Filtype", filType)
-                .queryParam("synkron", Boolean.TRUE).toUriString();
+                .queryParam("Filnavn", vedlegg.getFilnavn())
+                .queryParam("synkron", Boolean.TRUE)
+                .toUriString();
 
         return exchange(uri, HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
                 new ParameterizedTypeReference<String>() {});

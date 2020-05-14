@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.models.Vedlegg;
 import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -368,16 +369,18 @@ public class EuxConsumerTest {
 
     @Test
     public void leggTilVedlegg_forventId() throws Exception {
-        String id = "123";
-        String dokumentId = "123321";
-        String filtype = "virus.exe";
+        final String id = "123";
+        final String dokumentId = "123321";
+        final String filtype = "virus.exe";
+        final String filNavn = "filnavnn123";
+
 
         String forventetRetur = "{}";
 
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg?Filtype=" + filtype + "&synkron=true"))
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg?Filtype=" + filtype + "&Filnavn=" + filNavn + "&synkron=true"))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
-        String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, "vedlegg".getBytes());
+        String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, new Vedlegg(filNavn, "vedlegg".getBytes()));
         assertThat(resultat).isEqualTo(forventetRetur);
     }
 
