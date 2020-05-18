@@ -12,7 +12,7 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.Vedlegg;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -54,7 +54,7 @@ public class BucController {
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
     ) throws IntegrationException, NotFoundException, MappingException, IOException, ValidationException {
-        return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? new Vedlegg(vedlegg.getName(), vedlegg.getBytes()) : null, bucType, sendAutomatisk);
+        return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? new SedVedlegg(vedlegg.getOriginalFilename(), vedlegg.getBytes()) : null, bucType, sendAutomatisk);
     }
 
     @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")

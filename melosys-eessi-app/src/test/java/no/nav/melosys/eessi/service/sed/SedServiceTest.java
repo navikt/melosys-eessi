@@ -14,7 +14,7 @@ import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.Vedlegg;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.Action;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
@@ -70,7 +70,7 @@ public class SedServiceTest {
     public void opprettBucOgSed_forventRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         final BucType bucType = BucType.LA_BUC_01;
-        final Vedlegg vedlegg = new Vedlegg("tittei", "pdf".getBytes());
+        final SedVedlegg vedlegg = new SedVedlegg("tittei", "pdf".getBytes());
         OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
         verify(euxService).opprettBucOgSed(eq(bucType), eq(sedData.getMottakerIder()), any(SED.class), eq(vedlegg));
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);

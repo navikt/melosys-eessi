@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.Vedlegg;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -54,7 +54,7 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, Vedlegg vedlegg) throws IntegrationException {
+    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, SedVedlegg vedlegg) throws IntegrationException {
 
         String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
         euxConsumer.settMottakere(rinaSaksnummer, mottakere);

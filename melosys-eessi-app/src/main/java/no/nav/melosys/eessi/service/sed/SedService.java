@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.Vedlegg;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -41,7 +41,7 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, Vedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
+    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, SedVedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
             throws MappingException, IntegrationException, NotFoundException, ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
@@ -108,7 +108,7 @@ public class SedService {
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, Vedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) throws IntegrationException {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, SedVedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) throws IntegrationException {
 
         if (bucType.meddelerLovvalg()) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
@@ -143,7 +143,7 @@ public class SedService {
         return Optional.empty();
     }
 
-    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, Vedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder)
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, SedVedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder)
             throws IntegrationException {
         OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);

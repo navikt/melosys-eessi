@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
-import no.nav.melosys.eessi.models.Vedlegg;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -249,7 +251,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * @return ukjent
      */
     public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType,
-                                 Vedlegg vedlegg) throws IntegrationException {
+                                 SedVedlegg vedlegg) throws IntegrationException {
         log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
 
         HttpHeaders headers = new HttpHeaders();
@@ -269,7 +271,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         String uri = UriComponentsBuilder
                 .fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
                 .queryParam("Filtype", filType)
-                .queryParam("Filnavn", vedlegg.getFilnavn())
+                .queryParam("Filnavn", URLEncoder.encode(vedlegg.getFilnavn(), StandardCharsets.UTF_8))
                 .queryParam("synkron", Boolean.TRUE)
                 .toUriString();
 
