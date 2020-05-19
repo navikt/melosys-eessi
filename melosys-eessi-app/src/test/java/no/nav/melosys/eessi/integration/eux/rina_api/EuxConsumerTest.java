@@ -374,7 +374,7 @@ public class EuxConsumerTest {
         final String filtype = "virus.exe";
         final String filNavn = "filnavn123";
 
-        String forventetRetur = "{}";
+        final String forventetRetur = "546327ghrjek";
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg?Filtype=" + filtype
                 + "&Filnavn=" + filNavn + "&synkron=true"))
