@@ -36,12 +36,9 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
     }
 
     private Utsendingsland getAndreland(SedDataDto sedData) throws MappingException, NotFoundException {
-        if (sedData.getUtenlandskeVirksomheter() == null) {
-            return null; //Ikke påkrevd
-        }
-
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getUtenlandskeVirksomheter()));
+        utsendingsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
         return utsendingsland;
     }
 

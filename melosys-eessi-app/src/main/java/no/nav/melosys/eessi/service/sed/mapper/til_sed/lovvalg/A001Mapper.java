@@ -56,8 +56,9 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
     }
 
     private Vertsland getVertsland(SedDataDto sedData) throws MappingException, NotFoundException {
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Vertsland vertsland = new Vertsland();
-        vertsland.setArbeidsgiver(hentArbeidsGiver(sedData.getUtenlandskeVirksomheter()));
+        vertsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
 
         return vertsland;
     }

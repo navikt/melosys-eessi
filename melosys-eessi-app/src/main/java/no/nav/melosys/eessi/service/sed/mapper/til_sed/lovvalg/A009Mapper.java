@@ -40,7 +40,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         vedtak.setGjeldervarighetyrkesaktivitet(
                 "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
 
-        if (!isKorrektLovvalgbestemmelse(lovvalgsperiode.getBestemmelse())) {
+        if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.getBestemmelse())) {
             throw new MappingException("Lovvalgsbestemmelse is not of article 12!");
         }
 
@@ -59,24 +59,22 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         return vedtak;
     }
 
-    private boolean isKorrektLovvalgbestemmelse(Bestemmelse bestemmelse) {
+    private boolean erGyldigLovvalgbestemmelse(Bestemmelse bestemmelse) {
         return bestemmelse == Bestemmelse.ART_12_1
                 || bestemmelse == Bestemmelse.ART_12_2;
     }
 
     private Utsendingsland getUtsendingsland(SedDataDto sedData) throws MappingException, NotFoundException {
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
+        utsendingsland.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
         return utsendingsland;
     }
 
     private Utsendingsland getAndreland(SedDataDto sedData) throws MappingException, NotFoundException {
-        if (sedData.getUtenlandskeVirksomheter() == null) {
-            return null; //Ikke påkrevd
-        }
-
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getUtenlandskeVirksomheter()));
+        utsendingsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
         return utsendingsland;
     }
 
