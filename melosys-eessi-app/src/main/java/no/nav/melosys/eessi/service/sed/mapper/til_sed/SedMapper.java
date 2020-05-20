@@ -45,7 +45,7 @@ public interface SedMapper {
 
     SedType getSedType();
 
-    default Nav prefillNav(SedDataDto sedData) throws MappingException, NotFoundException {
+    default Nav prefillNav(SedDataDto sedData) {
         Nav nav = new Nav();
 
         nav.setBruker(hentBruker(sedData));
@@ -60,7 +60,7 @@ public interface SedMapper {
         return nav;
     }
 
-    default Bruker hentBruker(SedDataDto sedDataDto) throws NotFoundException {
+    default Bruker hentBruker(SedDataDto sedDataDto) {
         Bruker bruker = new Bruker();
 
         bruker.setPerson(hentPerson(sedDataDto));
@@ -70,7 +70,7 @@ public interface SedMapper {
         return bruker;
     }
 
-    default Person hentPerson(SedDataDto sedData) throws NotFoundException {
+    default Person hentPerson(SedDataDto sedData) {
         Person person = new Person();
 
         person.setFornavn(sedData.getBruker().getFornavn());
@@ -89,7 +89,7 @@ public interface SedMapper {
         return person;
     }
 
-    default List<Pin> hentPin(SedDataDto sedData) throws NotFoundException {
+    default List<Pin> hentPin(SedDataDto sedData) {
         List<Pin> pins = Lists.newArrayList();
 
         pins.add(new Pin(
@@ -106,7 +106,7 @@ public interface SedMapper {
         return pins;
     }
 
-    default List<Adresse> hentAdresser(SedDataDto sedDataDto) throws NotFoundException {
+    default List<Adresse> hentAdresser(SedDataDto sedDataDto) {
 
         Adresse adresse = new Adresse();
         adresse.setBy(sedDataDto.getBostedsadresse().getPoststed());
@@ -158,7 +158,7 @@ public interface SedMapper {
         }
     }
 
-    default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) throws MappingException, NotFoundException {
+    default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) {
 
         List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
 
@@ -283,7 +283,7 @@ public interface SedMapper {
         return periode;
     }
 
-    default String landkodeIso2EllerNull(String iso3) throws NotFoundException {
+    default String landkodeIso2EllerNull(String iso3) {
         if (iso3 == null) {
             return null;
         } else if (iso3.length() == 2) {

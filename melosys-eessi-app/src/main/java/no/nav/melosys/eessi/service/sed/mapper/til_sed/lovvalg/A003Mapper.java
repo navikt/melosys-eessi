@@ -12,7 +12,7 @@ import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
 public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
     @Override
-    public MedlemskapA003 getMedlemskap(SedDataDto sedData) throws MappingException {
+    public MedlemskapA003 getMedlemskap(SedDataDto sedData) {
 
         MedlemskapA003 medlemskap = new MedlemskapA003();
 
@@ -25,7 +25,7 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
         return medlemskap;
     }
 
-    private VedtakA003 getVedtak(SedDataDto sedData) throws MappingException {
+    private VedtakA003 getVedtak(SedDataDto sedData) {
 
         Lovvalgsperiode lovvalgsperiode = sedData.getLovvalgsperioder().stream().findFirst()
                 .orElseThrow(() -> new MappingException("Finner ingen lovvalgsperiode"));

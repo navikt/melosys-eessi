@@ -16,7 +16,7 @@ import no.nav.melosys.eessi.models.sed.nav.Periode;
 public class A002Mapper implements LovvalgSedMapper<MedlemskapA002> {
 
     @Override
-    public MedlemskapA002 getMedlemskap(SedDataDto sedData) throws MappingException {
+    public MedlemskapA002 getMedlemskap(SedDataDto sedData) {
         SvarAnmodningUnntakDto svarAnmodningUnntak = sedData.getSvarAnmodningUnntak();
 
         if (svarAnmodningUnntak == null) {
