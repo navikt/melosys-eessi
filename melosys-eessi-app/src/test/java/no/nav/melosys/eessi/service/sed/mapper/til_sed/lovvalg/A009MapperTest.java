@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.util.Collections;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
@@ -26,16 +25,17 @@ public class A009MapperTest {
 
     private SedDataDto sedData;
 
+    private final String lovvalgsland = "NO";
+
     @Before
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
 
-        Lovvalgsperiode lovvalgsperiode = new Lovvalgsperiode();
+        Lovvalgsperiode lovvalgsperiode = sedData.getLovvalgsperioder().get(0);
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_12_1);
         lovvalgsperiode.setFom(LocalDate.now());
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLovvalgsland("NO");
-        sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
+        lovvalgsperiode.setLovvalgsland(lovvalgsland);
     }
 
     @Test
@@ -48,8 +48,8 @@ public class A009MapperTest {
 
         assertThat(medlemskapA009).isNotNull();
         assertThat(medlemskapA009.getUtsendingsland()).isNotNull();
-        assertThat(medlemskapA009.getUtsendingsland().getArbeidsgiver().get(0).getNavn()).isEqualTo(
-                sed.getNav().getArbeidsgiver().get(0).getNavn());
+        assertThat(medlemskapA009.getUtsendingsland().getArbeidsgiver()).allMatch(a -> a.getAdresse().getLand().equals(lovvalgsland));
+        assertThat(medlemskapA009.getAndreland().getArbeidsgiver()).noneMatch(a -> a.getAdresse().getLand().equals(lovvalgsland));
 
         assertThat(medlemskapA009.getVedtak()).isNotNull();
         assertThat(medlemskapA009.getVedtak().getArtikkelforordning()).isEqualTo("12_1");

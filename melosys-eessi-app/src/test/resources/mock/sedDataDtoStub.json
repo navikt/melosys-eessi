@@ -10,6 +10,17 @@
       "navn": "Lala AS",
       "orgnr": "12312321",
       "type": "type"
+    },
+    {
+      "adresse": {
+        "gateadresse": "testadresse",
+        "land": "SE",
+        "postnr": "1212",
+        "poststed": "Hønefoss"
+      },
+      "navn": "fe",
+      "orgnr": "12312312",
+      "type": "few"
     }
   ],
   "arbeidssteder": [
@@ -57,8 +68,8 @@
     {
       "bestemmelse": "ART_12_1",
       "fom": "2020-01-01",
-      "lovvalgsland": "SE",
-      "unntakFraLovvalgsland": "NO",
+      "lovvalgsland": "NO",
+      "unntakFraLovvalgsland": "SE",
       "tom": "2020-01-01"
     }
   ],
@@ -81,21 +92,7 @@
       "landkode": "SE"
     }
   ],
-  "utenlandskeVirksomheter": [
-    {
-      "adresse": {
-        "gateadresse": "testadresse",
-        "land": "SE",
-        "postnr": "1212",
-        "poststed": "Hønefoss"
-      },
-      "navn": "fe",
-      "orgnr": "12312312",
-      "type": "few"
-    }
-  ],
   "gsakSaksnummer": 123,
-  "mottakerLand": "SE",
   "mottakerIder": [
     "SE:123",
     "BE:312"

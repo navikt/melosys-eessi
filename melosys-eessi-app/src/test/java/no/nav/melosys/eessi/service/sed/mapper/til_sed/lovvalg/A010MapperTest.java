@@ -2,8 +2,6 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.Collections;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
@@ -17,7 +15,7 @@ import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 
@@ -31,11 +29,8 @@ public class A010MapperTest {
     @Before
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
-        lovvalgsperiode = new Lovvalgsperiode();
-        lovvalgsperiode.setFom(LocalDate.now());
-        lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLovvalgsland("NOR");
-        sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
+        lovvalgsperiode = sedData.getLovvalgsperioder().get(0);
+        lovvalgsperiode.setLovvalgsland("NO");
     }
 
     @Test
@@ -48,12 +43,14 @@ public class A010MapperTest {
         assertThat(sed).isNotNull();
         assertThat(sed.getSedType()).isEqualTo(SedType.A010.name());
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA010.class);
+        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equals(a.getAdresse().getLand()));
 
         MedlemskapA010 medlemskap = (MedlemskapA010) sed.getMedlemskap();
 
         assertThat(medlemskap.getMeldingomlovvalg().getArtikkel()).isEqualTo(lovvalgsperiode.getBestemmelse().getValue());
         assertThat(medlemskap.getVedtak().getGjelderperiode().getStartdato()).isNotNull();
         assertThat(medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isNotNull();
+        assertThat(medlemskap.getAndreland().getArbeidsgiver()).noneMatch(a -> "NO".equals(a.getAdresse().getLand()));
     }
 
     @Test
