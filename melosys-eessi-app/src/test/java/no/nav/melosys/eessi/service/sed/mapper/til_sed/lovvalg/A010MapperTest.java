@@ -8,7 +8,6 @@ import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
@@ -34,7 +33,7 @@ public class A010MapperTest {
     }
 
     @Test
-    public void mapTilSed_medTilleggsbestemmelse_bestemmelseErLovligBlirMappetTilSed() throws MappingException, NotFoundException {
+    public void mapTilSed_medTilleggsbestemmelse_bestemmelseErLovligBlirMappetTilSed() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_b);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_c);
 
@@ -54,7 +53,7 @@ public class A010MapperTest {
     }
 
     @Test
-    public void mapTilSed_medTilleggsbestemmelseBestemmelseIkkeGyld_tilleggsBestemmelseBrukes() throws MappingException, NotFoundException {
+    public void mapTilSed_medTilleggsbestemmelseBestemmelseIkkeGyld_tilleggsBestemmelseBrukes() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
 

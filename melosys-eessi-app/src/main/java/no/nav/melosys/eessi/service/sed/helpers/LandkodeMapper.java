@@ -17,12 +17,12 @@ public final class LandkodeMapper {
 
     static {
         Arrays.stream(Locale.getISOCountries()).forEach(c -> map.put(new Locale("", c).getISO3Country(), c));
-        //TODO: midlertidig fix for landkoder utenfor iso-standard til vi blir enige om hvilke som skal brukes
+        //FIXME: midlertidig fix for landkoder utenfor iso-standard til vi blir enige om hvilke som skal brukes
         map.put("XXX", "XXX"); //Statsløs
         map.put("???", "???"); //Ukjent
     }
 
-    public static String getLandkodeIso2(String landkodeIso3) throws NotFoundException {
+    public static String getLandkodeIso2(String landkodeIso3) {
         if (landkodeIso3 == null) {
             return null;
         }

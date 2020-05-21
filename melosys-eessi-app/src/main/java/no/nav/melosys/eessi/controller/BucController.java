@@ -14,8 +14,6 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -53,7 +51,7 @@ public class BucController {
             @RequestPart(value = "vedlegg", required = false) MultipartFile vedlegg,
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
-    ) throws IntegrationException, NotFoundException, MappingException, IOException, ValidationException {
+    ) throws IntegrationException, IOException, ValidationException {
         return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? new SedVedlegg(vedlegg.getOriginalFilename(), vedlegg.getBytes()) : null, bucType, sendAutomatisk);
     }
 
@@ -63,7 +61,7 @@ public class BucController {
             @RequestBody SedDataDto sedDataDto,
             @PathVariable String rinaSaksnummer,
             @PathVariable SedType sedType
-    ) throws IntegrationException, NotFoundException, MappingException {
+    ) throws IntegrationException {
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 
@@ -78,7 +76,7 @@ public class BucController {
 
     @ApiOperation(value = "Henter sedGrunnlag for gitt sed")
     @GetMapping("/{rinaSaksnummer}/sed/{rinaDokumentId}/grunnlag")
-    public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId) throws IntegrationException, MappingException {
+    public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId) throws IntegrationException {
         SED sed = euxService.hentSed(rinaSaksnummer, rinaDokumentId);
         return SedGrunnlagMapperFactory.getMapper(SedType.valueOf(sed.getSedType())).map(sed);
     }

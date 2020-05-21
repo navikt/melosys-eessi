@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.service.joark;
 
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.sak.SakService;
@@ -35,7 +35,7 @@ public class OpprettUtgaaendeJournalpostService {
         this.oppgaveService = oppgaveService;
     }
 
-    public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
+    public String arkiverUtgaaendeSed(SedHendelse sedSendt) throws IntegrationException {
         Optional<Sak> sak = sakService.finnSakForRinaSaksnummer(sedSendt.getRinaSakId());
 
         if (!sak.isPresent()) {
@@ -45,7 +45,7 @@ public class OpprettUtgaaendeJournalpostService {
         return arkiverMedSak(sedSendt, sak.get());
     }
 
-    private String arkiverMedSak(SedHendelse sedSendt, Sak sak) throws NotFoundException, IntegrationException {
+    private String arkiverMedSak(SedHendelse sedSendt, Sak sak) throws IntegrationException {
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         String navIdent = tpsService.hentNorskIdent(sak.getAktoerId());
         OpprettJournalpostResponse response = opprettUtgåendeJournalpost(sedSendt, sak, navIdent);
@@ -58,7 +58,7 @@ public class OpprettUtgaaendeJournalpostService {
         return response.getJournalpostId();
     }
 
-    private String arkiverUtenSak(SedHendelse sedSendt) throws IntegrationException, NotFoundException {
+    private String arkiverUtenSak(SedHendelse sedSendt) throws IntegrationException {
         log.info("Journalfører dokument uten sakstilknytning: {}", sedSendt.getRinaDokumentId());
 
         String navIdent = sedSendt.getNavBruker();
@@ -73,7 +73,7 @@ public class OpprettUtgaaendeJournalpostService {
                 euxService.hentSedMedVedlegg(sedSendt.getRinaSakId(), sedSendt.getRinaDokumentId()), navIdent);
     }
 
-    private String opprettUtgåendeJournalføringsoppgave(SedHendelse sedSendt, String journalpostId, String navIdent) throws NotFoundException, IntegrationException {
+    private String opprettUtgåendeJournalføringsoppgave(SedHendelse sedSendt, String journalpostId, String navIdent) throws IntegrationException {
         return oppgaveService.opprettUtgåendeJfrOppgave(journalpostId, sedSendt, tpsService.hentAktoerId(navIdent),
                 euxService.hentRinaUrl(sedSendt.getRinaSakId()));
     }

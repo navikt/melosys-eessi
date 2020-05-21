@@ -43,7 +43,7 @@ public class SedMapperFactory {
 
                     .build());
 
-    public static SedMapper sedMapper(SedType sedType) throws MappingException {
+    public static SedMapper sedMapper(SedType sedType) {
         if (!SED_MAPPERS.containsKey(sedType)) {
             throw new MappingException("Sed-type " + sedType.name() + " støttes ikke");
         }
