@@ -3,8 +3,6 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import org.springframework.util.StringUtils;
@@ -12,7 +10,7 @@ import org.springframework.util.StringUtils;
 public class A008Mapper implements LovvalgSedMapper<MedlemskapA008> {
 
     @Override
-    public MedlemskapA008 getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException {
+    public MedlemskapA008 getMedlemskap(SedDataDto sedData) {
         MedlemskapA008 medlemskap = new MedlemskapA008();
         if (!StringUtils.isEmpty(sedData.getAvklartBostedsland())) {
             //For videresending av søknad - fyller ut arbeidsland, ikke påkrevd
@@ -46,7 +44,7 @@ public class A008Mapper implements LovvalgSedMapper<MedlemskapA008> {
         return bruker;
     }
 
-    private EndringA008 hentEndringA008(SedDataDto sedData) throws MappingException, NotFoundException {
+    private EndringA008 hentEndringA008(SedDataDto sedData) {
         EndringA008 endring = new EndringA008();
         endring.setAdresse(hentAdresseFraDtoAdresse(sedData.getBostedsadresse()));
         return endring;

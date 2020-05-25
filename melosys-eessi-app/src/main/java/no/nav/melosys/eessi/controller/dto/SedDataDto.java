@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -10,12 +11,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SedDataDto extends SedGrunnlagDto {
-    //Persondok.
     private List<FamilieMedlem> familieMedlem;
     private Bruker bruker;
-
-    //Andre medlemsvariabler
-    private List<Virksomhet> utenlandskeVirksomheter;
 
     //A008 spesifikt
     private String avklartBostedsland;
@@ -32,4 +29,14 @@ public class SedDataDto extends SedGrunnlagDto {
     private SvarAnmodningUnntakDto svarAnmodningUnntak;
 
     private UtpekingAvvisDto utpekingAvvis;
+
+    public Optional<String> finnLovvalgsland() {
+        return getLovvalgsperioder().stream()
+                .map(Lovvalgsperiode::getLovvalgsland)
+                .findFirst();
+    }
+
+    public String finnLovvalgslandDefaultNO() {
+        return finnLovvalgsland().orElse("NO");
+    }
 }

@@ -7,7 +7,6 @@ import no.nav.melosys.eessi.models.SedKontekst;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -48,7 +47,7 @@ public class BehandleSedMottattService {
         this.oppgaveService = oppgaveService;
     }
 
-    public void behandleSed(SedMottatt sedMottatt) throws NotFoundException, IntegrationException {
+    public void behandleSed(SedMottatt sedMottatt) throws IntegrationException {
         SedKontekst kontekst = sedMottatt.getSedKontekst();
         SED sed = euxService.hentSed(sedMottatt.getSedHendelse().getRinaSakId(),
                 sedMottatt.getSedHendelse().getRinaDokumentId());
@@ -72,7 +71,7 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void identifiserPerson(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
+    private void identifiserPerson(SedMottatt sedMottatt, SED sed) throws IntegrationException {
         log.info("Søker etter person for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
@@ -106,7 +105,7 @@ public class BehandleSedMottattService {
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
 
-    private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException, NotFoundException {
+    private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException {
         log.info("Publiserer melding om mottatt sed på kafka for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sed.getSedType()));
         if (mapper == null) {

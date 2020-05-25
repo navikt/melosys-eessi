@@ -5,7 +5,6 @@ import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
@@ -16,7 +15,7 @@ import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     @Override
-    public MedlemskapA009 getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException {
+    public MedlemskapA009 getMedlemskap(SedDataDto sedData) {
 
         final MedlemskapA009 medlemskapA009 = new MedlemskapA009();
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
@@ -31,7 +30,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         return medlemskapA009;
     }
 
-    private VedtakA009 getVedtak(Lovvalgsperiode lovvalgsperiode) throws MappingException, NotFoundException {
+    private VedtakA009 getVedtak(Lovvalgsperiode lovvalgsperiode) {
         VedtakA009 vedtak = new VedtakA009();
 
         vedtak.setEropprinneligvedtak(
@@ -40,7 +39,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         vedtak.setGjeldervarighetyrkesaktivitet(
                 "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
 
-        if (!isKorrektLovvalgbestemmelse(lovvalgsperiode.getBestemmelse())) {
+        if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.getBestemmelse())) {
             throw new MappingException("Lovvalgsbestemmelse is not of article 12!");
         }
 
@@ -59,24 +58,22 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         return vedtak;
     }
 
-    private boolean isKorrektLovvalgbestemmelse(Bestemmelse bestemmelse) {
+    private boolean erGyldigLovvalgbestemmelse(Bestemmelse bestemmelse) {
         return bestemmelse == Bestemmelse.ART_12_1
                 || bestemmelse == Bestemmelse.ART_12_2;
     }
 
-    private Utsendingsland getUtsendingsland(SedDataDto sedData) throws MappingException, NotFoundException {
+    private Utsendingsland getUtsendingsland(SedDataDto sedData) {
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getArbeidsgivendeVirksomheter()));
+        utsendingsland.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
         return utsendingsland;
     }
 
-    private Utsendingsland getAndreland(SedDataDto sedData) throws MappingException, NotFoundException {
-        if (sedData.getUtenlandskeVirksomheter() == null) {
-            return null; //Ikke påkrevd
-        }
-
+    private Utsendingsland getAndreland(SedDataDto sedData) {
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsGiver(sedData.getUtenlandskeVirksomheter()));
+        utsendingsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
         return utsendingsland;
     }
 

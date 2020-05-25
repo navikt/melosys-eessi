@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -18,7 +16,7 @@ import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper;
 public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
 
     @Override
-    public MedlemskapA001 getMedlemskap(SedDataDto sedData) throws MappingException, NotFoundException {
+    public MedlemskapA001 getMedlemskap(SedDataDto sedData) {
 
         final MedlemskapA001 medlemskap = new MedlemskapA001();
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
@@ -55,14 +53,15 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
         return unntak;
     }
 
-    private Vertsland getVertsland(SedDataDto sedData) throws MappingException, NotFoundException {
+    private Vertsland getVertsland(SedDataDto sedData) {
+        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Vertsland vertsland = new Vertsland();
-        vertsland.setArbeidsgiver(hentArbeidsGiver(sedData.getUtenlandskeVirksomheter()));
+        vertsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
 
         return vertsland;
     }
 
-    private List<Land> getLovvalgsland(Lovvalgsperiode lovvalgsperiode) throws NotFoundException {
+    private List<Land> getLovvalgsland(Lovvalgsperiode lovvalgsperiode) {
         Land land = new Land();
         land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
 

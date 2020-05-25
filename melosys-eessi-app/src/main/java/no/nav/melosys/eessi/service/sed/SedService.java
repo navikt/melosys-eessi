@@ -15,7 +15,6 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -42,7 +41,7 @@ public class SedService {
     }
 
     public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, SedVedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
-            throws MappingException, IntegrationException, NotFoundException, ValidationException {
+            throws IntegrationException, ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
@@ -91,14 +90,14 @@ public class SedService {
         }
     }
 
-    public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
+    public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) throws IntegrationException {
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         return euxService.genererPdfFraSed(sed);
     }
 
-    public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) throws MappingException, NotFoundException, IntegrationException {
+    public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) throws IntegrationException {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
         if (!buc.kanOppretteSed(sedType)) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc "+ rinaSaksnummer + " med type " + buc.getBucType());
@@ -151,7 +150,7 @@ public class SedService {
         return opprettBucOgSedResponse;
     }
 
-    private static Long hentGsakSaksnummer(SedDataDto sedDataDto) throws MappingException {
+    private static Long hentGsakSaksnummer(SedDataDto sedDataDto) {
         return Optional.ofNullable(sedDataDto.getGsakSaksnummer()).orElseThrow(() -> new MappingException("GsakId er påkrevd!"));
     }
 }
