@@ -72,11 +72,19 @@ public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovva
     }
 
     private static boolean erNorskArbeidsgiver(Arbeidsgiver arbeidsgiver) {
-        return "NO".equalsIgnoreCase(arbeidsgiver.getAdresse().getLand());
+        return "NO".equalsIgnoreCase(hentArbeidsgiverLand(arbeidsgiver));
     }
 
     private static boolean erUtenlandskArbeidsgiver(Arbeidsgiver arbeidsgiver) {
         return !erNorskArbeidsgiver(arbeidsgiver);
+    }
+
+    private static String hentArbeidsgiverLand(Arbeidsgiver arbeidsgiver) {
+        if (arbeidsgiver == null || arbeidsgiver.getAdresse() == null) {
+            return null;
+        }
+
+        return arbeidsgiver.getAdresse().getLand();
     }
 
     @Override
