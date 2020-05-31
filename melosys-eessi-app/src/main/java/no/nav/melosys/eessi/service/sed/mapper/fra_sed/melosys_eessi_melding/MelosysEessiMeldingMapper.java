@@ -4,17 +4,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.kafka.producers.model.Arbeidssted;
+import no.nav.melosys.eessi.kafka.producers.model.Avsender;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
 public interface MelosysEessiMeldingMapper {
 
     default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
-            String sedType, String bucType, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+                                    String sedType, String bucType, String avsenderID, String landkode,
+                                    String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setSedId(rinaDokumentID);
         melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
+        melosysEessiMelding.setAvsender(new Avsender(avsenderID, LandkodeMapper.mapTilNavLandkode(landkode)));
         melosysEessiMelding.setJournalpostId(journalpostID);
         melosysEessiMelding.setDokumentId(dokumentID);
         melosysEessiMelding.setGsakSaksnummer(gsakSaksnummer != null ? Long.parseLong(gsakSaksnummer) : null);

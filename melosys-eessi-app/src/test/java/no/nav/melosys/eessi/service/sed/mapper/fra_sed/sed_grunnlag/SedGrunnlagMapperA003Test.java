@@ -3,10 +3,13 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
 import org.junit.Test;
 
@@ -127,6 +130,17 @@ public class SedGrunnlagMapperA003Test {
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
         assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse().getGateadresse()).isEqualTo("Testgate");
+    }
+
+    @Test
+    public void map_ingenArbeidsgiverAdresse_forventIkkeNorskArbeidsgiver() throws IOException {
+        Consumer<Arbeidsgiver> settTomAdresse = (Arbeidsgiver arbeidsgiver) -> arbeidsgiver.setAdresse(null);
+
+        SED sed = hentSed();
+        sed.getNav().getArbeidsgiver().forEach(settTomAdresse);
+        ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().forEach(settTomAdresse);
+
+        assertThat(new SedGrunnlagMapperA003().map(sed).getNorskeArbeidsgivendeVirksomheter()).isEmpty();
     }
 
     private static SED hentSed() throws IOException {

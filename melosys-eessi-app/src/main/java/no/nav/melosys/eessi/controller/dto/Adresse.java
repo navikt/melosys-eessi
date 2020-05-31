@@ -15,6 +15,10 @@ public class Adresse {
     private Adressetype adressetype;
 
     public static Adresse av(no.nav.melosys.eessi.models.sed.nav.Adresse adresseFraRina) {
+        if (adresseFraRina == null) {
+            return new Adresse();
+        }
+
         Adresse adresse = new Adresse();
 
         adresse.poststed = adresseFraRina.getBy();

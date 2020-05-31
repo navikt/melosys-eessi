@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.models.sed.nav.Land;
 public class A004Mapper implements LovvalgSedMapper<MedlemskapA004> {
 
     @Override
-    public MedlemskapA004 getMedlemskap(SedDataDto sedData) throws MappingException {
+    public MedlemskapA004 getMedlemskap(SedDataDto sedData) {
         UtpekingAvvisDto utpekingAvvis = sedData.getUtpekingAvvis();
 
         if (utpekingAvvis == null) {

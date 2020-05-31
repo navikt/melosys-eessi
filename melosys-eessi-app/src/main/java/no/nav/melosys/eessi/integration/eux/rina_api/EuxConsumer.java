@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -243,21 +246,37 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      *
      * @param rinaSaksnummer saksnummeret
      * @param dokumentId id til SED'en vedlegget skal legges til
-     * @param filType filtype
+     * @param filType filtype (eks pdf)
      * @param vedlegg Selve vedlegget som skal legges til
      * @return ukjent
      */
-
     public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType,
-            Object vedlegg) throws IntegrationException {
+                                 SedVedlegg vedlegg) throws IntegrationException {
         log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        ByteArrayResource document = new ByteArrayResource(vedlegg.getInnhold()) {
+            @Override
+            public String getFilename() {
+                return vedlegg.getFilnavn();
+            }
+        };
+
+        MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
+        multipartBody.add("file", document);
+
         String uri = UriComponentsBuilder
                 .fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
-                .queryParam("Filtype", filType).toUriString();
+                .queryParam("Filtype", filType)
+                .queryParam("Filnavn", URLEncoder.encode(vedlegg.getFilnavn(), StandardCharsets.UTF_8))
+                .queryParam("synkron", Boolean.TRUE)
+                .toUriString();
 
-        return exchange(uri, HttpMethod.POST, new HttpEntity<>(vedlegg, defaultHeaders()),
-                new ParameterizedTypeReference<String>() {
-                });
+        return exchange(uri, HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
+                new ParameterizedTypeReference<String>() {});
     }
 
     /**
@@ -317,16 +336,16 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
             }
         };
 
-        MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add("document", document);
-        map.add("attachment", attachment);
+        MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
+        multipartBody.add("document", document);
+        multipartBody.add("attachment", attachment);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed/vedlegg")
                 .queryParam(BUC_TYPE, bucType)
                 .queryParam("MottakerID", mottakerId)
                 .queryParam("FilType", filType);
 
-        return exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(map, headers),
+        return exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
                 new ParameterizedTypeReference<Map<String, String>>() {
                 });
     }

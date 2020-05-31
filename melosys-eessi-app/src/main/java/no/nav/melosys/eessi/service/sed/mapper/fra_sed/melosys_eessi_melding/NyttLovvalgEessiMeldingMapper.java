@@ -9,9 +9,10 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper;
 public interface NyttLovvalgEessiMeldingMapper<T extends Medlemskap> extends NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
     @Override
     default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
-            String sedType, String bucType, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+                                    String sedType, String bucType, String avsenderID,
+                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
-                rinaSaksnummer, sedType, bucType, journalpostID, dokumentID, gsakSaksnummer, sedErEndring);
+                rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer, sedErEndring);
 
         T medlemskap = hentMedlemskap(sed);
 

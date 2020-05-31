@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.util.Collections;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
@@ -18,8 +17,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class A001MapperTest {
@@ -32,14 +31,13 @@ public class A001MapperTest {
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
 
-        Lovvalgsperiode lovvalgsperiode = new Lovvalgsperiode();
+        Lovvalgsperiode lovvalgsperiode = sedData.getLovvalgsperioder().get(0);
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_16_1);
         lovvalgsperiode.setFom(LocalDate.now());
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLovvalgsland("NOR");
-        lovvalgsperiode.setUnntakFraLovvalgsland("NOR");
+        lovvalgsperiode.setLovvalgsland("NO");
+        lovvalgsperiode.setUnntakFraLovvalgsland("SE");
         lovvalgsperiode.setUnntakFraBestemmelse(Bestemmelse.ART_16_1);
-        sedData.setLovvalgsperioder(Collections.singletonList(lovvalgsperiode));
     }
 
     @Test
@@ -48,12 +46,11 @@ public class A001MapperTest {
 
         assertEquals(MedlemskapA001.class, sed.getMedlemskap().getClass());
 
-        MedlemskapA001 medlemskap = (MedlemskapA001) sed.getMedlemskap();
+        assertThat(sed.getMedlemskap()).isNotNull().isInstanceOf(MedlemskapA001.class);
 
-        assertNotNull(medlemskap);
-        assertNotNull(medlemskap.getAnmodning().getErendring());
-        assertNotNull(medlemskap.getUnntak().getGrunnlag());
-        assertNotNull(medlemskap.getSoeknadsperiode());
+        MedlemskapA001 medlemskapA001 = (MedlemskapA001) sed.getMedlemskap();
+        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
+        assertThat(medlemskapA001.getVertsland().getArbeidsgiver()).noneMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
     }
 }
 

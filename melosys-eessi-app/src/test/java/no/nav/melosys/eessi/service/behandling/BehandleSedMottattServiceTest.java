@@ -226,6 +226,7 @@ public class BehandleSedMottattServiceTest {
 
     private SedHendelse sedHendelseMedBruker() {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
+        sedHendelse.setAvsenderId("SE:12345");
         sedHendelse.setNavBruker(IDENT);
         return sedHendelse;
     }

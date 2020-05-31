@@ -10,6 +10,7 @@ public class MelosysEessiMelding {
 
     private String sedId;
     private String rinaSaksnummer;
+    private Avsender avsender;
     private String journalpostId;
     private String dokumentId;
     private Long gsakSaksnummer;

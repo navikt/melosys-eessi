@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
@@ -43,7 +44,7 @@ public final class PostnummerMapper {
                 ));
     }
 
-    public static String getPoststed(String postnummer) throws NotFoundException {
+    public static String getPoststed(String postnummer) {
 
         String poststed = postnummerOgPoststed.get(postnummer);
 

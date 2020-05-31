@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,7 @@ public class BucinfoDto {
     private String id;
     private String bucType;
     private Long opprettetDato;
-    private List<String> mottakerinstitusjoner;
+    private Set<String> mottakerinstitusjoner;
     private List<SedinfoDto> seder;
 
     public static BucinfoDto av(BUC buc, List<String> statuser, String rinaUrlPrefix) {
@@ -47,12 +48,12 @@ public class BucinfoDto {
                 .anyMatch(status -> status == SedStatus.fraEngelskStatus(b.getStatus()));
     }
 
-    private static List<String> hentMottakerinstitusjonerFraBuc(BUC buc) {
+    private static Set<String> hentMottakerinstitusjonerFraBuc(BUC buc) {
         return buc.getDocuments().stream()
                 .flatMap(document -> document.getConversations().stream()
                         .flatMap(conversation -> conversation.getParticipants().stream()))
                 .filter(participant -> participant.getRole() == Participant.ParticipantRole.MOTTAKER)
                 .map(Participant::getOrganisation)
-                .map(Organisation::getId).collect(Collectors.toList());
+                .map(Organisation::getId).collect(Collectors.toSet());
     }
 }

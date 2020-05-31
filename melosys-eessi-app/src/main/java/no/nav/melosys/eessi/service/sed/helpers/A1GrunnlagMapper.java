@@ -12,7 +12,7 @@ class A1GrunnlagMapper {
     private static final String BESTEMMELSE_16_R  = "16_R";
     private static final String BESTEMMELSE_OTHER = "annet";
 
-    public static String mapFromBestemmelse(Bestemmelse bestemmelse) throws MappingException {
+    public static String mapFromBestemmelse(Bestemmelse bestemmelse) {
         switch (bestemmelse) {
             case ART_12_1:
             case ART_12_2:

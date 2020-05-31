@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.Test;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class A003MapperTest {
 
@@ -20,9 +20,14 @@ public class A003MapperTest {
     @Test
     public void mapTilSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
         SedDataDto sedDataDto = SedDataStub.getStub();
+        sedDataDto.getLovvalgsperioder().get(0).setLovvalgsland("NO");
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         assertThat(sed).isNotNull();
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA003.class);
+
+        MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
+        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equals(a.getAdresse().getLand()));
+        assertThat(medlemskapA003.getAndreland().getArbeidsgiver()).noneMatch(a -> "NO".equals(a.getAdresse().getLand()));
     }
 }

@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.buc.Document;
@@ -52,7 +53,7 @@ public class EuxServiceTest {
     @Before
     public void setup() throws IOException, IntegrationException {
         final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL, "false");
+        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL);
 
         when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
@@ -108,11 +109,11 @@ public class EuxServiceTest {
         Collection<String> mottakere = List.of("SE:123");
         SED sed = new SED();
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, new byte[]{1,1});
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, new SedVedlegg("filen min", "pdf".getBytes()));
 
         verify(euxConsumer).opprettBuC(eq(bucType.name()));
         verify(euxConsumer).opprettSed(eq(opprettetBucID), eq(sed));
-        verify(euxConsumer).leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any(byte[].class));
+        verify(euxConsumer).leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any(SedVedlegg.class));
 
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo(opprettetBucID);
     }
@@ -178,15 +179,6 @@ public class EuxServiceTest {
         Institusjon institusjon = institusjoner.get(0);
         assertThat(institusjon.getAkronym()).isEqualTo("FK EL-TITTEI");
         assertThat(institusjon.getLandkode()).isEqualTo("GR");
-    }
-
-    @Test
-    public void hentMottakerinstitusjoner_laBuc02LandGRNorgeIkkePåkoblet_forventTomListe() throws IntegrationException {
-        euxService = new EuxService(euxConsumer, bucMetrikker, "url", "true");
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_02", "GR");
-        assertThat(institusjoner).hasSize(0);
-
-        verify(euxConsumer, never()).hentInstitusjoner(any(), any());
     }
 
     @Test

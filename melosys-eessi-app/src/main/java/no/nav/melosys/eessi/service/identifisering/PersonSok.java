@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.service.identifisering;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -11,10 +15,6 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.*;
@@ -30,7 +30,7 @@ class PersonSok {
         this.tpsService = tpsService;
     }
 
-    PersonSokResultat søkPersonFraSed(SED sed) throws IntegrationException, NotFoundException {
+    PersonSokResultat søkPersonFraSed(SED sed) throws IntegrationException {
         List<PersonSoekResponse> personSøk = søkEtterPerson(sed);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);
@@ -42,7 +42,7 @@ class PersonSok {
         return vurderPerson(ident, sed);
     }
 
-    PersonSokResultat vurderPerson(String ident, SED sed) throws IntegrationException, NotFoundException {
+    PersonSokResultat vurderPerson(String ident, SED sed) throws IntegrationException {
         Person person;
 
         try {
@@ -60,7 +60,7 @@ class PersonSok {
                 : PersonSokResultat.ikkeIdentifisert(begrunnelse);
     }
 
-    private SoekBegrunnelse vurderPerson(Person person, SED sed) throws NotFoundException {
+    private SoekBegrunnelse vurderPerson(Person person, SED sed) {
         if (erOpphoert(person)) {
             return SoekBegrunnelse.PERSON_OPPHORT;
         } else if (!harSammeStatsborgerskap(person, sed)) {

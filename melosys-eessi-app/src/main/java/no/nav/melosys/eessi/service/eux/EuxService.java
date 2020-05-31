@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.service.eux;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,13 +10,13 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
@@ -37,31 +36,29 @@ public class EuxService {
     private final BucMetrikker bucMetrikker;
 
     private final String rinaHostUrl;
-    private boolean featureToggleEessiReady;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
                       BucMetrikker bucMetrikker,
-                      @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl,
-                      @Value("${melosys.feature.eessiready:false}") String featureToggleEessiReady) {
+                      @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
         this.rinaHostUrl = rinaHostUrl;
-        this.featureToggleEessiReady = Boolean.parseBoolean(featureToggleEessiReady);
     }
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, byte[] vedlegg) throws IntegrationException {
+    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, SedVedlegg vedlegg) throws IntegrationException {
 
         String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
         euxConsumer.settMottakere(rinaSaksnummer, mottakere);
         String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
 
-        if (ArrayUtils.isNotEmpty(vedlegg)) {
-            euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
+        if (vedlegg != null) {
+            String vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
+            log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
         }
 
         bucMetrikker.bucOpprettet(bucType.name());
@@ -80,10 +77,6 @@ public class EuxService {
     public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode)
             throws IntegrationException {
 
-        if (!norgeErPåkoblet(bucType)) {
-            return Collections.emptyList();
-        }
-
         return euxConsumer.hentInstitusjoner(bucType, null).stream()
                 .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
                 .filter(i -> filtrerPåLandkode(i, landkode))
@@ -92,15 +85,6 @@ public class EuxService {
                                 COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
                         .anyMatch(TilegnetBuc::erEessiKlar))
                 .collect(Collectors.toList());
-    }
-
-    private boolean norgeErPåkoblet(String bucType) {
-        BucType bucTypeEnum = BucType.valueOf(bucType);
-        if (featureToggleEessiReady && bucTypeEnum.erLovvalgBuc()) {
-            return bucTypeEnum == BucType.LA_BUC_01 || bucTypeEnum == BucType.LA_BUC_04;
-        }
-
-        return true;
     }
 
     private boolean filtrerPåLandkode(Institusjon institusjon, String landkode) {
