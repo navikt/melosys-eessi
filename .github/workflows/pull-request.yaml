@@ -3,7 +3,7 @@ name: Maven Test
 on:
   pull_request:
     branches:
-      - 'SPRINT-*'
+      - 'develop'
 
 jobs:
   build:
