@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'master'
-      - 'SPRINT-*'
+      - 'develop'
   pull_request:
     branches:
       - 'master'
@@ -43,11 +43,11 @@ jobs:
         run: |
           docker push ${IMAGE}
 
-  # Deploy til Q2 ved push på SPRINT-branch
+  # Deploy til Q2 ved push på develop-branch
   deploy_q2:
     name: Deploy til Q2
     needs: build
-    if: contains(github.ref, 'SPRINT-')
+    if: github.ref == 'refs/heads/develop'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
