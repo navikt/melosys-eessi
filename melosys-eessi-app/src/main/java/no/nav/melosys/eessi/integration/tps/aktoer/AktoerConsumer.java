@@ -21,7 +21,7 @@ public class AktoerConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public String hentAktoerId(String ident) throws NotFoundException {
+    public String hentAktoerId(String ident) {
 
         String url = UriComponentsBuilder.fromPath("/identer")
                 .queryParam("identgruppe", "AktoerId")
@@ -35,7 +35,7 @@ public class AktoerConsumer implements RestConsumer {
 
     }
 
-    public String hentNorskIdent(String aktoerID) throws NotFoundException {
+    public String hentNorskIdent(String aktoerID) {
         String url = UriComponentsBuilder.fromPath("/identer")
                 .queryParam("identgruppe", "NorskIdent")
                 .toUriString();

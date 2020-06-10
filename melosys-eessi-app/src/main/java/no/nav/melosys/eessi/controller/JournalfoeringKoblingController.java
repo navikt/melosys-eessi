@@ -27,9 +27,7 @@ public class JournalfoeringKoblingController {
 
     @ApiOperation(value = "Henter objekt som beskriver dataen mottatt i sed som journalpost er koblet til")
     @GetMapping("{journalpostID}/eessimelding")
-    public MelosysEessiMelding hentEessiMeldingFraJournalpost(@PathVariable("journalpostID") String journalpostID)
-            throws NotFoundException, IntegrationException {
-
+    public MelosysEessiMelding hentEessiMeldingFraJournalpost(@PathVariable("journalpostID") String journalpostID) throws IntegrationException {
         return journalpostSedKoblingService.finnVedJournalpostIDOpprettMelosysEessiMelding(journalpostID)
                 .orElseThrow(() -> new NotFoundException("Finner ikke rinasak tilhørende journalpostID " + journalpostID));
     }
