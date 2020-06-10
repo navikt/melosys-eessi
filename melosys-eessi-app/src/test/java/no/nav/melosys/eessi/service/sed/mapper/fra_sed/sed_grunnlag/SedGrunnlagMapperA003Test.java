@@ -143,6 +143,14 @@ public class SedGrunnlagMapperA003Test {
         assertThat(new SedGrunnlagMapperA003().map(sed).getNorskeArbeidsgivendeVirksomheter()).isEmpty();
     }
 
+    @Test
+    public void map_norskArbeidsgiverNullIdentifikator_forventIngenIdentifikator() throws IOException {
+        SED sed = hentSed();
+        ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().iterator().next().setIdentifikator(null);
+
+        assertThat(new SedGrunnlagMapperA003().map(sed).getNorskeArbeidsgivendeVirksomheter().iterator().next().getOrgnr()).isNull();
+    }
+
     private static SED hentSed() throws IOException {
         URL jsonUrl = SedGrunnlagMapperA003Test.class.getClassLoader().getResource("mock/sedA003.json");
         return new ObjectMapper().readValue(jsonUrl, SED.class);

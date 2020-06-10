@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.websocket.server.PathParam;
+
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.BucinfoDto;
@@ -93,7 +94,7 @@ public class SakController {
         Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer);
 
         if (eksisterende.isPresent() && !eksisterende.get().getGsakSaksnummer().equals(saksrelasjonDto.getGsakSaksnummer())) {
-            throw new ValidationException("Rinasak " + saksrelasjonDto.getGsakSaksnummer() +
+            throw new ValidationException("Rinasak " + saksrelasjonDto.getRinaSaksnummer() +
                     " er allerede koblet mot gsakSaksnummer " + eksisterende.get().getGsakSaksnummer());
         }
     }
