@@ -199,12 +199,7 @@ public interface SedMapper {
         Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
         arbeidsgiver.setNavn(virksomhet.getNavn());
         arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(virksomhet.getAdresse()));
-
-        Identifikator orgNr = new Identifikator();
-        orgNr.setId(virksomhet.getOrgnr());
-        orgNr.setType("registrering"); //organisasjonsindenttypekoder.properties i eux står typer
-
-        arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
+        arbeidsgiver.setIdentifikator(lagIdentifikator(virksomhet.getOrgnr()));
         return arbeidsgiver;
     }
 
@@ -216,12 +211,7 @@ public interface SedMapper {
         for (Virksomhet v : sedData.getSelvstendigeVirksomheter()) {
             Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
 
-            Identifikator orgNr = new Identifikator();
-            orgNr.setId(v.getOrgnr());
-            orgNr.setType(
-                    "registrering"); //organisasjonsindenttypekoder.properties i eux står typer
-
-            arbeidsgiver.setIdentifikator(Collections.singletonList(orgNr));
+            arbeidsgiver.setIdentifikator(lagIdentifikator(v.getOrgnr()));
             arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(v.getAdresse()));
             arbeidsgiver.setNavn(v.getNavn());
 
@@ -252,6 +242,17 @@ public interface SedMapper {
         }
 
         return adresse;
+    }
+
+    default List<Identifikator> lagIdentifikator(String orgnr) {
+        if (StringUtils.isEmpty(orgnr)) {
+            return Collections.emptyList();
+        }
+
+        Identifikator orgNr = new Identifikator();
+        orgNr.setId(orgnr);
+        orgNr.setType("registrering");
+        return List.of(orgNr);
     }
 
     default Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
