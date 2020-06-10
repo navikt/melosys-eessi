@@ -15,7 +15,7 @@ public class SedGrunnlagMapperFactory {
                     .put(SedType.A003, new SedGrunnlagMapperA003())
                     .build());
 
-    public static SedGrunnlagMapper getMapper(SedType sedType) throws MappingException {
+    public static SedGrunnlagMapper getMapper(SedType sedType) {
         if (!MAPPERS.containsKey(sedType)) {
             throw new MappingException("Sed-type " + sedType.name() + " støttes ikke");
         }

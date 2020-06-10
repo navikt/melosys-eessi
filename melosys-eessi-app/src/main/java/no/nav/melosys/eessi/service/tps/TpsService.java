@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
@@ -51,7 +52,7 @@ public class TpsService {
         this.personsokConsumer = personsokConsumer;
     }
 
-    public Person hentPerson(String ident) throws SecurityException, NotFoundException {
+    public Person hentPerson(String ident) {
         HentPersonRequest request = new HentPersonRequest()
                 .withAktoer(new AktoerId()
                         .withAktoerId(ident));
@@ -59,7 +60,7 @@ public class TpsService {
         return hentPerson(request);
     }
 
-    private Person hentPerson(HentPersonRequest request) throws SecurityException, NotFoundException {
+    private Person hentPerson(HentPersonRequest request) {
         HentPersonResponse response;
         try {
             log.info("Henter person fra tps");
@@ -73,16 +74,15 @@ public class TpsService {
         return response.getPerson();
     }
 
-    public String hentAktoerId(String ident) throws NotFoundException {
+    public String hentAktoerId(String ident) {
         return aktoerConsumer.hentAktoerId(ident);
     }
 
-    public String hentNorskIdent(String aktoerID) throws NotFoundException {
+    public String hentNorskIdent(String aktoerID) {
         return aktoerConsumer.hentNorskIdent(aktoerID);
     }
 
-    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier)
-            throws NotFoundException, IntegrationException {
+    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) throws IntegrationException {
 
         FinnPersonRequest request = new FinnPersonRequest();
         request.setPersonFilter(createPersonFilter(personsoekKriterier));

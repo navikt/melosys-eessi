@@ -1,18 +1,17 @@
 package no.nav.melosys.eessi.service.identifisering;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -36,7 +35,7 @@ public class PersonIdentifiseringService {
     }
 
     public Optional<String> identifiserPerson(SedHendelse sedHendelse, SED sed)
-            throws IntegrationException, NotFoundException {
+            throws IntegrationException {
         Optional<FagsakRinasakKobling> eksisterendeSak = saksrelasjonService.finnVedRinaSaksnummer(sedHendelse.getRinaSakId());
 
         if (eksisterendeSak.isPresent()) {
