@@ -69,6 +69,7 @@ public class EuxConsumerTest {
         assertThat(response.getDocuments()).isNotEmpty();
         assertThat(response.getDocuments().get(0).getId()).isEqualTo("93f022ea50e54c08bbdb85290a5fb23d");
         assertThat(response.getBucType()).isEqualTo("LA_BUC_01");
+        assertThat(response.getBucVersjon()).isEqualTo("v4.1");
 
         assertThat(response.getDocuments())
                 .flatExtracting(Document::getConversations)

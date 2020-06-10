@@ -26,6 +26,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import static no.nav.melosys.eessi.models.buc.BucUtils.verifiserSedVersjonErBucVersjon;
+
 @Slf4j
 @Service
 public class SedService {
@@ -104,6 +106,7 @@ public class SedService {
         }
 
         SED sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
+        verifiserSedVersjonErBucVersjon(buc, sed);
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
 
@@ -121,6 +124,7 @@ public class SedService {
                 if (document.isPresent() && buc.sedKanOppdateres(document.get().getId())) {
                     String rinaSaksnummer = buc.getId();
                     String dokumentId = document.get().getId();
+                    verifiserSedVersjonErBucVersjon(buc, sed);
                     log.info("SED {} på rinasak {} oppdateres", dokumentId, rinaSaksnummer);
                     euxService.oppdaterSed(rinaSaksnummer, dokumentId, sed);
                     return new OpprettBucOgSedResponse(rinaSaksnummer, dokumentId);

@@ -13,7 +13,7 @@ import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.Constants;
+import no.nav.melosys.eessi.models.sed.Konstanter;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Adresse;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidssted;
@@ -24,8 +24,8 @@ import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
 
-import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
-import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
+import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
+import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
 
 /**
  * Felles mapper-interface for alle typer SED. Mapper NAV-objektet i NAV-SED, som brukes av eux for
@@ -37,8 +37,8 @@ public interface SedMapper {
 
         sed.setNav(prefillNav(sedData));
         sed.setSedType(getSedType().name());
-        sed.setSedGVer(SED_G_VER);
-        sed.setSedVer(SED_VER);
+        sed.setSedGVer(DEFAULT_SED_G_VER);
+        sed.setSedVer(DEFAULT_SED_VER);
 
         return sed;
     }
@@ -224,7 +224,7 @@ public interface SedMapper {
     }
 
     default String formaterDato(LocalDate dato) {
-        return Constants.dateTimeFormatter.format(dato);
+        return Konstanter.dateTimeFormatter.format(dato);
     }
 
     default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse) {

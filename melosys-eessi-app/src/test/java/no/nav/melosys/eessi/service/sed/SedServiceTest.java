@@ -105,7 +105,7 @@ public class SedServiceTest {
     }
 
     @Test
-    public void createAndSend_sedEksistererPaaBuc_forventOppdaterEksisterendeSed() throws Exception {
+    public void opprettBucOgSed_sedEksistererPaaBuc_forventOppdaterEksisterendeSed() throws Exception {
         Long gsakSaksnummer = 123L;
         SedDataDto sedDataDto = SedDataStub.getStub();
         sedDataDto.setGsakSaksnummer(gsakSaksnummer);
@@ -119,6 +119,7 @@ public class SedServiceTest {
 
         BUC buc = new BUC();
         buc.setId(RINA_ID);
+        buc.setBucVersjon("v4.1");
         buc.setStatus("open");
 
         String emptyDocumentId = "docid12314";
@@ -177,6 +178,7 @@ public class SedServiceTest {
     @Test
     public void sendPåEksisterendeBuc_forventMetodekall() throws IOException, URISyntaxException, IntegrationException, NotFoundException, MappingException {
         BUC buc = new BUC();
+        buc.setBucVersjon("v4.1");
         buc.setActions(Arrays.asList(
                 new Action("A001", "A001", "111", "Read"),
                 new Action("A009", "A009", "222", "Create")
@@ -193,6 +195,7 @@ public class SedServiceTest {
     @Test(expected = IllegalArgumentException.class)
     public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws IntegrationException, NotFoundException, MappingException, IOException, URISyntaxException {
         BUC buc = new BUC();
+        buc.setBucVersjon("v4.1");
         buc.setActions(Collections.singletonList(new Action("A001", "A001", "111", "Read")));
         when(euxService.hentBuc(anyString())).thenReturn(buc);
 
