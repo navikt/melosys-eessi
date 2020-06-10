@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.controller.dto;
 import lombok.Data;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Identifikator;
+import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
 
 @Data
 public class Virksomhet {
@@ -17,7 +18,7 @@ public class Virksomhet {
 
         virksomhet.navn = arbeidsgiver.getNavn();
         virksomhet.adresse = Adresse.av(arbeidsgiver.getAdresse());
-        virksomhet.orgnr = arbeidsgiver.getIdentifikator().stream()
+        virksomhet.orgnr = StreamUtils.nullableStream(arbeidsgiver.getIdentifikator())
                 .findFirst().map(Identifikator::getId).orElse(null);
 
         return virksomhet;
