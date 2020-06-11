@@ -27,6 +27,8 @@ public class BUC {
     private List<Action> actions;
     @JsonProperty(value = "processDefinitionName")
     private String bucType;
+    @JsonProperty(value = "processDefinitionVersion")
+    private String bucVersjon;
 
     public boolean kanOppretteSed(SedType sedType) {
         return actions.stream().anyMatch(action ->
