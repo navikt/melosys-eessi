@@ -3,12 +3,12 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ;
 import java.time.LocalDate;
 
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.Constants;
+import no.nav.melosys.eessi.models.sed.Konstanter;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.*;
 
-import static no.nav.melosys.eessi.models.sed.Constants.SED_G_VER;
-import static no.nav.melosys.eessi.models.sed.Constants.SED_VER;
+import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
+import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
 
 
 public class X001Mapper implements AdministrativSedMapper {
@@ -16,8 +16,8 @@ public class X001Mapper implements AdministrativSedMapper {
     public SED mapFraSed(SED sed, String aarsak) {
         SED x001 = new SED();
         x001.setSedType(SedType.X001.toString());
-        x001.setSedGVer(SED_G_VER);
-        x001.setSedVer(SED_VER);
+        x001.setSedGVer(DEFAULT_SED_G_VER);
+        x001.setSedVer(DEFAULT_SED_VER);
         x001.setNav(mapNav(sed, aarsak));
 
         return x001;
@@ -49,7 +49,7 @@ public class X001Mapper implements AdministrativSedMapper {
         aarsak.setType(aarsakType);
 
         Avslutning avslutning = new Avslutning();
-        avslutning.setDato(LocalDate.now().format(Constants.dateTimeFormatter));
+        avslutning.setDato(LocalDate.now().format(Konstanter.dateTimeFormatter));
         avslutning.setAarsak(aarsak);
         avslutning.setType("automatisk");
 

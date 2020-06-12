@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,7 @@ public class SedController {
 
     @PostMapping("/sed/{sedType}/pdf")
     public byte[] genererPdfFraSed(@RequestBody SedDataDto sedDataDto, @PathVariable SedType sedType)
-            throws IntegrationException, NotFoundException, MappingException {
+            throws IntegrationException {
 
         return sedService.genererPdfFraSed(sedDataDto, sedType);
     }

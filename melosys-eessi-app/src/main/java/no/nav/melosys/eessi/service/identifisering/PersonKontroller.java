@@ -4,8 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.stream.Stream;
+
 import lombok.experimental.UtilityClass;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -23,7 +23,7 @@ class PersonKontroller {
                 .contains(person.getPersonstatus().getPersonstatus().getValue());
     }
 
-    static boolean harSammeStatsborgerskap(Person person, SED sed) throws NotFoundException {
+    static boolean harSammeStatsborgerskap(Person person, SED sed) {
         String tpsStatsborgerskap = LandkodeMapper.getLandkodeIso2(person.getStatsborgerskap().getLand().getValue());
         Stream<String> sedStatsborgerskap = sed.getNav().getBruker().getPerson().getStatsborgerskap()
                 .stream().map(Statsborgerskap::getLand);
