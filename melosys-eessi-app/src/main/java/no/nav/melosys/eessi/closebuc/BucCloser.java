@@ -50,6 +50,7 @@ public class BucCloser {
     private void lukkBuc(BUC buc) {
         try {
             SED x001 = opprettX001(buc, LukkBucAarsakMapper.hentAarsakForLukking(buc));
+            verifiserSedVersjonErBucVersjon(buc, x001);
 
             Document eksisterendeX001 = hentEksisterendeX001Utkast(buc);
 
