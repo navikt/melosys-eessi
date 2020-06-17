@@ -20,23 +20,25 @@ import static no.nav.melosys.eessi.models.buc.BucUtils.*;
 
 @Service
 @Slf4j
-public class BucCloser {
+public class BucLukker {
 
     private final EuxService euxService;
     private final X001Mapper x001Mapper;
     private final BucMetrikker bucMetrikker;
 
-    public BucCloser(EuxService euxService, BucMetrikker bucMetrikker) {
+    public BucLukker(EuxService euxService, BucMetrikker bucMetrikker) {
         this.euxService = euxService;
         this.x001Mapper = new X001Mapper();
         this.bucMetrikker = bucMetrikker;
     }
 
-    public void closeBucsByType(BucType bucType) {
+    public void lukkBucerAvType(BucType bucType) {
         try {
             log.info("Lukker bucer av type {}", bucType);
-            euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).status("open").build())
+            //FIXME: søk på BUC fungerer ikke med status open. Venter på eux/rina-fix
+            euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).build())
                     .stream()
+                    .filter(bucErÅpen)
                     .filter(norgeErCaseOwnerPredicate)
                     .map(this::hentBuc)
                     .filter(Objects::nonNull)

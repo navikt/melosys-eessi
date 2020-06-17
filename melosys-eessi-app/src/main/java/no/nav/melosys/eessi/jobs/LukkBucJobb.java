@@ -1,9 +1,10 @@
 package no.nav.melosys.eessi.jobs;
 
 import java.util.Arrays;
+
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.SchedulerLock;
-import no.nav.melosys.eessi.closebuc.BucCloser;
+import no.nav.melosys.eessi.closebuc.BucLukker;
 import no.nav.melosys.eessi.models.BucType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class LukkBucJobb {
 
-    private final BucCloser bucCloser;
+    private final BucLukker bucLukker;
 
-    public LukkBucJobb(BucCloser bucCloser) {
-        this.bucCloser = bucCloser;
+    public LukkBucJobb(BucLukker bucLukker) {
+        this.bucLukker = bucLukker;
     }
 
     //00:00 hver dag
@@ -25,6 +26,6 @@ public class LukkBucJobb {
 
         Arrays.stream(BucType.values())
                 .filter(bucType -> bucType != BucType.LA_BUC_01 && bucType.erLovvalgBuc())
-                .forEach(bucCloser::closeBucsByType);
+                .forEach(bucLukker::lukkBucerAvType);
     }
 }

@@ -31,27 +31,28 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BucCloserTest {
+public class BucLukkerTest {
 
     @Mock
     private EuxService euxService;
     @Mock
     private BucMetrikker bucMetrikker;
 
-    private BucCloser bucCloser;
+    private BucLukker bucLukker;
 
     private EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
     @Before
     public void setup() {
-        bucCloser = new BucCloser(euxService, bucMetrikker);
+        bucLukker = new BucLukker(euxService, bucMetrikker);
     }
 
     @Test
-    public void closeBucsByType_enBucKanLukkes_verifiserOpprettOgSend() throws Exception {
+    public void lukkBucerAvType_enBucKanLukkes_verifiserOpprettOgSend() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -66,7 +67,7 @@ public class BucCloserTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 
-        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -75,10 +76,11 @@ public class BucCloserTest {
     }
 
     @Test
-    public void closeBucsByType_enBucKanLukkesInneholderUtkastX001_verifiserOppdaterSåSend() throws Exception {
+    public void lukkBucerAvType_enBucKanLukkesInneholderUtkastX001_verifiserOppdaterSåSend() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -100,7 +102,7 @@ public class BucCloserTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 
-        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -110,17 +112,18 @@ public class BucCloserTest {
     }
 
     @Test
-    public void closeBucsByType_feilVedHentingAvBucer_ingenVidereKall() throws Exception {
+    public void lukkBucerAvType_feilVedHentingAvBucer_ingenVidereKall() throws Exception {
         when(euxService.hentBucer(any(BucSearch.class))).thenThrow(new IntegrationException(""));
-        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
         verify(euxService, never()).hentBuc(anyString());
     }
 
     @Test
-    public void closeBucsByType_feilVedHentingAvBuc_ingenVidereKall() throws Exception {
+    public void lukkBucerAvType_feilVedHentingAvBuc_ingenVidereKall() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -128,17 +131,18 @@ public class BucCloserTest {
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
         when(euxService.hentBuc(any())).thenThrow(new IntegrationException(""));
 
-        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBuc(anyString());
         verify(euxService, never()).hentSed(anyString(), anyString());
     }
 
     @Test
-    public void closeBucsByType_feilVedHentingAvSed_ingenVidereKall() throws Exception {
+    public void lukkBucerAvType_feilVedHentingAvSed_ingenVidereKall() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -153,7 +157,7 @@ public class BucCloserTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenThrow(new IntegrationException(""));
 
-        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -162,10 +166,11 @@ public class BucCloserTest {
     }
 
     @Test
-    public void closeBucsByType_toDokumenter_brukSistOpprettetDokument() throws Exception {
+    public void lukkBucerAvType_toDokumenter_brukSistOpprettetDokument() throws Exception {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
 
         List<BucInfo> bucInfos = new ArrayList<>();
         bucInfos.add(bucInfo);
@@ -190,12 +195,22 @@ public class BucCloserTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenThrow(new IntegrationException(""));
 
-        bucCloser.closeBucsByType(BucType.LA_BUC_04);
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
         verify(euxService).hentSed(eq(buc.getId()), eq(sisteOppdatertDokumentId));
         verify(euxService, never()).opprettOgSendSed(any(), any());
+    }
+
+    @Test
+    public void lukkBucerAvType_statusClosed_ingenBlirLukket() throws IntegrationException {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setStatus("closed");
+
+        when(euxService.hentBucer(any())).thenReturn(List.of(bucInfo));
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_02);
+        verify(euxService, never()).hentBuc(any());
     }
 
     private BUC lagBuc() {

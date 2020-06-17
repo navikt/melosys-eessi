@@ -36,6 +36,9 @@ public class BucUtils {
     public static final Predicate<BucInfo> norgeErCaseOwnerPredicate = bucInfo ->
             "PO".equalsIgnoreCase(bucInfo.getApplicationRoleId());
 
+    public static final Predicate<BucInfo> bucErÅpen = bucInfo ->
+            "open".equalsIgnoreCase(bucInfo.getStatus());
+
     public static final Predicate<Document> sisteSendtLovvalgsSedPredicate = document ->
             !document.getConversations().isEmpty()
             && document.getConversations().get(0).getVersionId() != null
