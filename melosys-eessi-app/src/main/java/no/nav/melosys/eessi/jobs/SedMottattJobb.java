@@ -1,8 +1,9 @@
 package no.nav.melosys.eessi.jobs;
 
 import java.util.Collection;
+
 import lombok.extern.slf4j.Slf4j;
-import net.javacrumbs.shedlock.core.SchedulerLock;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
@@ -24,7 +25,7 @@ public class SedMottattJobb {
     }
 
     @Scheduled(cron = "0 0 * * * *")
-    @SchedulerLock(name = "behandleSedMottatt", lockAtMostForString = "PT1M", lockAtLeastForString = "PT20S")
+    @SchedulerLock(name = "behandleSedMottatt", lockAtMostFor = "1m", lockAtLeastFor = "20s")
     public void sedMottattJobb() {
         Collection<SedMottatt> mottatteSeder = sedMottattService.hentAlleUbehandlet();
         log.debug("Behandler mottatt {} SED'er", mottatteSeder.size());
@@ -33,7 +34,6 @@ public class SedMottattJobb {
 
     @Async
     public void behandleSedMottatt(SedMottatt sedMottatt) {
-
         try {
             behandleSedMottattService.behandleSed(sedMottatt);
             sedMottatt.setFerdig(true);
