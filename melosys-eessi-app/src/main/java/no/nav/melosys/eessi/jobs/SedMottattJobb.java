@@ -7,7 +7,6 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +31,7 @@ public class SedMottattJobb {
         mottatteSeder.forEach(this::behandleSedMottatt);
     }
 
-    @Async
-    public void behandleSedMottatt(SedMottatt sedMottatt) {
+    private void behandleSedMottatt(SedMottatt sedMottatt) {
         try {
             behandleSedMottattService.behandleSed(sedMottatt);
             sedMottatt.setFerdig(true);
