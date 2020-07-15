@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public enum JournalpostFiltype {
-
   PDF,
   PDFA,
   XML,
@@ -39,7 +38,7 @@ public enum JournalpostFiltype {
           .build();
 
 
-  public static Optional<JournalpostFiltype> filnavn(String filnavn, String mimeType) {
+  public static Optional<JournalpostFiltype> fraMimeOgFilnavn(String mimeType, String filnavn) {
     if (MIMETYPE_FILTYPE_MAP.containsKey(mimeType)) {
       return Optional.of(MIMETYPE_FILTYPE_MAP.get(mimeType));
     }
