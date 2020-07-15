@@ -7,21 +7,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+// https://confluence.adeo.no/display/BOA/Filtype
 public enum JournalpostFiltype {
   PDF,
   PDFA,
   XML,
   RTF,
-  AFP,
-  META,
   DLF,
-  JPG,
   JPEG,
   TIFF,
-  DOC,
-  DOCX,
-  XLS,
-  XLSX,
   AXML,
   DXML,
   JSON,
@@ -32,7 +26,7 @@ public enum JournalpostFiltype {
 
   private static final Map<String, JournalpostFiltype> MIMETYPE_FILTYPE_MAP = ImmutableMap.<String, JournalpostFiltype>builder()
           .put("application/pdf", PDF)
-          .put("image/jpg", JPG)
+          .put("image/jpg", JPEG)
           .put("image/jpeg", JPEG)
           .put("image/png", PNG)
           .build();
