@@ -7,14 +7,24 @@ import java.util.List;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 
-public class ArbeidsgiverDeserializer extends JsonDeserializer<List<Arbeidsgiver>> {
+public class ArbeidsgiverDeserializer extends StdDeserializer<List<Arbeidsgiver>> {
 
     private static final TypeReference<List<Arbeidsgiver >> listTypeReference = new TypeReference<>(){};
+
+    @SuppressWarnings("unused")
+    public ArbeidsgiverDeserializer() {
+        this(null);
+    }
+
+    private ArbeidsgiverDeserializer(Class<?> vc) {
+        super(vc);
+    }
+
 
     @Override
     public List<Arbeidsgiver> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
