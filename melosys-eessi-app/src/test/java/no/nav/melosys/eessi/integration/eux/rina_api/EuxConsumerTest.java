@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
+import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
@@ -189,7 +190,8 @@ public class EuxConsumerTest {
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
-        assertThat(resultat.getNav()).isNotNull();
+        assertThat(resultat.getNav()).isNotNull()
+                .extracting(nav -> nav.getArbeidsgiver().get(0).getNavn()).isEqualTo("Testarbeidsgiver");
         assertThat(resultat.getMedlemskap()).isNotNull();
         assertThat(resultat.getSedType()).isEqualTo(SedType.A001.name());
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA001.class);
@@ -304,6 +306,26 @@ public class EuxConsumerTest {
     }
 
     @Test
+    public void hentSedH001MedArbeidsgiver_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedH001_medArbeidsgiver.json");
+        assertThat(jsonUrl).isNotNull();
+        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull()
+                .extracting(Nav::getArbeidsgiver).asList().hasSize(1);
+        assertThat(resultat.getSedType()).isEqualTo(SedType.H001.name());
+        assertThat(resultat.getMedlemskap()).isNull();
+    }
+
+    @Test
     public void hentSedPdf_forventPdf() throws Exception {
         String id = "123", dokumentId = "123321";
 
@@ -331,7 +353,6 @@ public class EuxConsumerTest {
     @Test
     public void opprettSed_forventId() throws Exception {
         String id = "123";
-        String korrelasjonId = "312";
         SED sed = new SED();
 
         String forventetRetur = "123321";
