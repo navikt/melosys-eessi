@@ -14,7 +14,7 @@ import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 
 public class ArbeidsgiverDeserializer extends StdDeserializer<List<Arbeidsgiver>> {
 
-    private static final TypeReference<List<Arbeidsgiver >> listTypeReference = new TypeReference<>(){};
+    private static final TypeReference<List<Arbeidsgiver >> LIST_TYPE_REFERENCE = new TypeReference<>(){};
 
     @SuppressWarnings("unused")
     public ArbeidsgiverDeserializer() {
@@ -32,7 +32,7 @@ public class ArbeidsgiverDeserializer extends StdDeserializer<List<Arbeidsgiver>
         JsonNode jsonNode = objectmapper.readTree(jsonParser);
 
         if (jsonNode.isArray()) {
-            return objectmapper.readerFor(listTypeReference).readValue(jsonNode);
+            return objectmapper.readerFor(LIST_TYPE_REFERENCE).readValue(jsonNode);
         } else {
             Arbeidsgiver arbeidsgiver = objectmapper.treeToValue(jsonNode, Arbeidsgiver.class);
             return Collections.singletonList(arbeidsgiver);
