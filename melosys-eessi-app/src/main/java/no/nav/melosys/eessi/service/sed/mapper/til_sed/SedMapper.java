@@ -64,8 +64,10 @@ public interface SedMapper {
         Bruker bruker = new Bruker();
 
         bruker.setPerson(hentPerson(sedDataDto));
-        bruker.setAdresse(hentAdresser(sedDataDto));
         setFamiliemedlemmer(sedDataDto, bruker);
+        if (sedDataDto.getBostedsadresse() != null) {
+            bruker.setAdresse(hentAdresser(sedDataDto));
+        }
 
         return bruker;
     }

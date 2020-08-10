@@ -46,7 +46,9 @@ public class A008Mapper implements LovvalgSedMapper<MedlemskapA008> {
 
     private EndringA008 hentEndringA008(SedDataDto sedData) {
         EndringA008 endring = new EndringA008();
-        endring.setAdresse(hentAdresseFraDtoAdresse(sedData.getBostedsadresse()));
+        if (sedData.getBostedsadresse() != null) {
+            endring.setAdresse(hentAdresseFraDtoAdresse(sedData.getBostedsadresse()));
+        }
         return endring;
     }
 
