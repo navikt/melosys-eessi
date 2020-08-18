@@ -74,20 +74,11 @@ public class EuxServiceTest {
     public void hentBucer_forventKonsumentKall() throws IntegrationException {
         BucSearch bucSearch = BucSearch.builder()
                 .bucType(BucType.LA_BUC_01.name())
-                .fnr("12345678910")
                 .build();
 
         euxService.hentBucer(bucSearch);
 
-        verify(euxConsumer).finnRinaSaker(
-                eq("12345678910"),
-                eq(null),
-                eq(null),
-                eq(null),
-                eq(null),
-                eq(BucType.LA_BUC_01.name()),
-                eq(null)
-        );
+        verify(euxConsumer).finnRinaSaker(eq(BucType.LA_BUC_01.name()), isNull());
     }
 
     @Test
@@ -123,7 +114,7 @@ public class EuxServiceTest {
         SED sed = new SED();
         euxService.opprettOgSendSed(sed, opprettetBucID);
 
-        verify(euxConsumer).sendSed(eq(opprettetBucID), eq(null), eq(opprettetSedID));
+        verify(euxConsumer).sendSed(eq(opprettetBucID), eq(opprettetSedID));
     }
 
     @Test
@@ -144,7 +135,7 @@ public class EuxServiceTest {
         String rinaSaksnummer = "123";
         String dokumentId = "332211";
         euxService.sendSed(rinaSaksnummer, dokumentId);
-        verify(euxConsumer).sendSed(eq(rinaSaksnummer), any(), eq(dokumentId));
+        verify(euxConsumer).sendSed(eq(rinaSaksnummer), eq(dokumentId));
     }
 
     @Test

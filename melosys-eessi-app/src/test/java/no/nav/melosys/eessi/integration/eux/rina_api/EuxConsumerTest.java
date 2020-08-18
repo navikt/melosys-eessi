@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -23,6 +22,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
@@ -31,6 +31,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -40,7 +41,7 @@ public class EuxConsumerTest {
 
     private MockRestServiceServer server;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Before
     public void setup() {
@@ -94,6 +95,7 @@ public class EuxConsumerTest {
     public void slettBuC_ingenRetur() throws Exception {
         String id = "1234";
         server.expect(requestTo("/buc/" + id))
+                .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());
 
         euxConsumer.slettBuC(id);
@@ -105,7 +107,7 @@ public class EuxConsumerTest {
         String sverige = "SE:1234";
         String danmark = "DK:4321";
 
-        server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "&mottakere=" + danmark))
+        server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "," + danmark))
                 .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         euxConsumer.settMottakere(rinaSaksnummer, List.of(sverige, danmark));
@@ -134,7 +136,7 @@ public class EuxConsumerTest {
 
     @Test
     public void opprettBucOgSedMedVedlegg_forventString() throws Exception {
-        String buc = "buc", fagsak = "123", mottaker = "NAV", filtype = "virus.exe", korrelasjon = "111", vedlegg = "vedlegg";
+        String buc = "buc", mottaker = "NAV", filtype = "virus.exe", vedlegg = "vedlegg";
         SED sed = new SED();
 
         Map<String, String> forventetResultat = Maps.newHashMap();
@@ -155,21 +157,18 @@ public class EuxConsumerTest {
         assertThat(jsonUrl).isNotNull();
         String forventetRetur = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
-        String fnr = "123", fornavn = "Andre", etternavn = "Måns", fødselsdato = "12-12-12", saksnummer = "123",
-                bucType = "LA_BUC_04", status = "ferdig";
+        String bucType = "LA_BUC_04";
+        String status = "ferdig";
 
         //Må encode uri, da non-ascii blir escaped
         String uri = UriComponentsBuilder
-                .fromUriString("/rinasaker?fødselsnummer=" + fnr + "&fornavn=" + fornavn + "&etternavn=" + etternavn +
-                        "&fødselsdato=" + fødselsdato + "&rinasaksnummer=" + saksnummer + "&buctype=" + bucType
-                        + "&status=" + status).toUriString();
+                .fromUriString("/rinasaker?buctype=" + bucType + "&status=" + status).toUriString();
 
         server.expect(requestTo(uri))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         List<BucInfo> resultat = euxConsumer
-                .finnRinaSaker(fnr, fornavn, etternavn, fødselsdato, saksnummer, bucType, status);
-        assertThat(resultat).isNotNull();
+                .finnRinaSaker(bucType, status);
         assertThat(resultat).isNotEmpty();
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0).getId()).isEqualTo("100485");
@@ -346,26 +345,24 @@ public class EuxConsumerTest {
     @Test
     public void oppdaterSed_ingenRetur() throws Exception {
         String id = "123";
-        String korrelasjonId = "312";
         String dokumentId = "1111";
         SED sed = new SED();
 
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "?KorrelasjonsId=" + korrelasjonId))
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
                 .andRespond(withSuccess());
 
-        euxConsumer.oppdaterSed(id, korrelasjonId, dokumentId, sed);
+        euxConsumer.oppdaterSed(id, dokumentId, sed);
     }
 
     @Test
     public void sendSed_ingenRetur() throws Exception {
         String id = "123";
-        String korrelasjonsId = "111";
         String dokumentId = "22";
 
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/send?KorrelasjonsId=" + korrelasjonsId))
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/send"))
                 .andRespond(withSuccess());
 
-        euxConsumer.sendSed(id, korrelasjonsId, dokumentId);
+        euxConsumer.sendSed(id, dokumentId);
     }
 
     @Test
@@ -393,16 +390,5 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess());
 
         euxConsumer.setSakSensitiv(id);
-    }
-
-    @Test
-    public void hentDeltakere_jsonResponse() throws Exception {
-        String id ="123";
-        server.expect(requestTo("/buc/" + id + "/bucdeltakere"))
-                .andRespond(withSuccess("{\"hei\":\"ho\"}", MediaType.APPLICATION_JSON));
-
-        JsonNode jsonNode = euxConsumer.hentDeltagere(id);
-
-        assertThat(jsonNode.get("hei").textValue()).isEqualTo("ho");
     }
 }
