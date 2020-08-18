@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
+import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
@@ -71,7 +71,7 @@ public class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         final BucType bucType = BucType.LA_BUC_01;
         final SedVedlegg vedlegg = new SedVedlegg("tittei", "pdf".getBytes());
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
+        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
         verify(euxService).opprettBucOgSed(eq(bucType), eq(sedData.getMottakerIder()), any(SED.class), eq(vedlegg));
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
     }
@@ -88,8 +88,7 @@ public class SedServiceTest {
             exception = e;
         }
 
-        assertThat(exception).isNotNull();
-        assertThat(exception).isInstanceOf(IntegrationException.class);
+        assertThat(exception).isNotNull().isInstanceOf(IntegrationException.class);
         verify(euxService).slettBuC(eq(RINA_ID));
         verify(saksrelasjonService).slettVedRinaId(eq(RINA_ID));
     }
@@ -98,7 +97,7 @@ public class SedServiceTest {
     public void opprettBucOgSed_brukerMedSensitiveOpplysninger_forventSettSakSensitiv() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.getBruker().setHarSensitiveOpplysninger(true);
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true);
+        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true);
 
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
         verify(euxService).settSakSensitiv(RINA_ID);
@@ -166,7 +165,7 @@ public class SedServiceTest {
     @Test
     public void opprettBucOgSed_LABUC01_forventOpprettNyBucOgSedMedUrl() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        OpprettSedDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false);
+        BucOgSedOpprettetDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false);
 
         verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));

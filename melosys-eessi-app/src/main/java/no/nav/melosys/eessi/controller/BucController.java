@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
-import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -46,7 +46,7 @@ public class BucController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public OpprettSedDto opprettBucOgSed(
+    public BucOgSedOpprettetDto opprettBucOgSed(
             @RequestPart("sedData") SedDataDto sedDataDto,
             @RequestPart(value = "vedlegg", required = false) MultipartFile vedlegg,
             @PathVariable("bucType") BucType bucType,

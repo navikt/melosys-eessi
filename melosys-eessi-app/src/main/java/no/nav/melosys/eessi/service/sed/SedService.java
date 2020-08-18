@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
+import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -42,7 +42,7 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, SedVedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
+    public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto, SedVedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
             throws IntegrationException, ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
@@ -67,7 +67,7 @@ public class SedService {
             sendSed(response.getRinaSaksnummer(), response.getDokumentId());
         }
 
-        return OpprettSedDto.builder()
+        return BucOgSedOpprettetDto.builder()
                 .rinaSaksnummer(response.getRinaSaksnummer())
                 .rinaUrl(euxService.hentRinaUrl(response.getRinaSaksnummer()))
                 .build();
