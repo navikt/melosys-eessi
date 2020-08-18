@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
@@ -31,7 +30,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
@@ -41,15 +39,11 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private final RestTemplate euxRestTemplate;
     private final ObjectMapper objectMapper;
 
-    private static final String RINA_SAKSNUMMER = "rinasaksnummer";
-    private static final String KORRELASJONS_ID = "KorrelasjonsId";
-    private static final String BUC_TYPE = "BuCType";
-
-    private static final String BUC_PATH = "/buc/%s";
-    private static final String SED_PATH = "/buc/%s/sed/%s";
-    private static final String SED_PATH_PDF = "/buc/%s/sed/%s/pdf";
-    private static final String SED_MED_VEDLEGG_PATH = "/buc/%s/sed/%s/filer";
-    private static final String VEDLEGG_PATH = "/buc/%s/sed/%s/vedlegg";
+    private static final String BUC_PATH = "/buc/{rinaSaksnummer}";
+    private static final String SED_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}";
+    private static final String SED_PATH_PDF = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/pdf";
+    private static final String SED_MED_VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/filer";
+    private static final String VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/vedlegg";
 
     public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.euxRestTemplate = restTemplate;
@@ -67,11 +61,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public BUC hentBuC(String rinaSaksnummer) throws IntegrationException {
 
         log.info("Henter buc: {}", rinaSaksnummer);
-        String uri = String.format(BUC_PATH, rinaSaksnummer);
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<BUC>() {
-                });
+        return exchange(BUC_PATH, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<BUC>() {}, rinaSaksnummer);
     }
 
     /**
@@ -83,13 +75,11 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     public String opprettBuC(String bucType) throws IntegrationException {
         log.info("Oppretter buc, type: {}", bucType);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc")
-                .queryParam(BUC_TYPE, bucType);
 
-        return exchange(builder.toUriString(), HttpMethod.POST,
+        return exchange("/buc?BuCType={bucType}", HttpMethod.POST,
                 new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<String>() {
-                });
+                new ParameterizedTypeReference<String>() {},
+                bucType);
     }
 
     /**
@@ -100,11 +90,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     public void slettBuC(String rinaSaksnummer) throws IntegrationException {
         log.info("Sletter buc: {}", rinaSaksnummer);
-        String uri = String.format(BUC_PATH, rinaSaksnummer);
 
-        exchange(uri, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
+        exchange(BUC_PATH, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {}, rinaSaksnummer);
     }
 
     /**
@@ -116,29 +104,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public void settMottakere(String rinaSaksnummer, Collection<String> mottakerIDer) throws IntegrationException {
 
         log.info("Setter mottaker {} til sak {}", mottakerIDer, rinaSaksnummer);
-        UriComponentsBuilder builder = UriComponentsBuilder
-                .fromPath(String.format("/buc/%s/mottakere", rinaSaksnummer))
-                .queryParam("mottakere", mottakerIDer.toArray());
 
-        exchange(builder.toUriString(), HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
-    }
-
-    /**
-     * Henter deltagere i saken
-     *
-     * @return liste over deltagere
-     */
-
-    public JsonNode hentDeltagere(String rinaSaksnummer) throws IntegrationException {
-
-        log.info("Henter deltakere til sak {}", rinaSaksnummer);
-        String uri = String.format("/buc/%s/bucdeltakere", rinaSaksnummer);
-
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<JsonNode>() {
-                });
+        exchange("/buc/{rinaSaksnummer}/mottakere?mottakere={mottakere}", HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {}, rinaSaksnummer, mottakerIDer.toArray());
     }
 
     /**
@@ -149,15 +117,11 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * @return dokumentId' til SED'en
      */
 
-    public String opprettSed(String rinaSaksnummer, SED sed)
-            throws IntegrationException {
-
+    public String opprettSed(String rinaSaksnummer, SED sed) throws IntegrationException {
         log.info("Oppretter SED {} på sak {}", sed.getSedType(), rinaSaksnummer);
-        String uri = UriComponentsBuilder.fromPath(String.format("/buc/%s/sed", rinaSaksnummer)).toUriString();
 
-        return exchange(uri, HttpMethod.POST, new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<String>() {
-                });
+        return exchange("/buc/{rinaSaksnummer}/sed", HttpMethod.POST, new HttpEntity<>(sed, defaultHeaders()),
+                new ParameterizedTypeReference<String>() {}, rinaSaksnummer);
     }
 
     /**
@@ -169,44 +133,34 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Henter sed med id {}, fra sak {}", dokumentId, rinaSaksnummer);
-        String uri = String.format(SED_PATH, rinaSaksnummer, dokumentId);
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<SED>() {
-                });
+        return exchange(SED_PATH, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<SED>() {}, rinaSaksnummer, dokumentId);
     }
 
     /**
      * Oppdaterer en eksisterende SED
      *
      * @param rinaSaksnummer saksnummeret
-     * @param korrelasjonsId Optional, brukes ikke av eux per nå
      * @param dokumentId Id'en til SED'en som skal oppdateres
      * @param sed Den nye versjonen av SED'en
      */
 
-    public void oppdaterSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId,
-            SED sed) throws IntegrationException {
+    public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) throws IntegrationException {
         log.info("Oppdaterer sed {} på sak {}", dokumentId, rinaSaksnummer);
-        String uri = UriComponentsBuilder
-                .fromPath(String.format(SED_PATH, rinaSaksnummer, dokumentId))
-                .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
-        exchange(uri, HttpMethod.PUT, new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
+        exchange(SED_PATH, HttpMethod.PUT, new HttpEntity<>(sed, defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {}, rinaSaksnummer, dokumentId);
     }
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Henter pdf for sed {} på sak {}", dokumentId, rinaSaksnummer);
-        String uri = String.format(SED_PATH_PDF, rinaSaksnummer, dokumentId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
 
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(headers),
-                new ParameterizedTypeReference<byte[]>() {}
-                );
+        return exchange(SED_PATH_PDF, HttpMethod.GET, new HttpEntity<>(headers),
+                new ParameterizedTypeReference<byte[]>() {}, rinaSaksnummer, dokumentId);
     }
 
     public byte[] genererPdfFraSed(SED sed) throws IntegrationException {
@@ -226,19 +180,13 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      *
      * @param rinaSaksnummer saksnummeret
      * @param dokumentId id' til SED som skal sendes
-     * @param korrelasjonsId optional, ikke brukt av eux per nå
      */
 
-    public void sendSed(String rinaSaksnummer, String korrelasjonsId, String dokumentId)
-            throws IntegrationException {
+    public void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Sender sed {} fra sak {}", dokumentId, rinaSaksnummer);
-        String uri = UriComponentsBuilder
-                .fromPath(String.format(SED_PATH, rinaSaksnummer, dokumentId) + "/send")
-                .queryParam(KORRELASJONS_ID, korrelasjonsId).toUriString();
 
-        exchange(uri, HttpMethod.POST, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
+        exchange(SED_PATH + "/send", HttpMethod.POST, new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {}, rinaSaksnummer, dokumentId);
     }
 
     /**
@@ -268,15 +216,8 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
         multipartBody.add("file", document);
 
-        String uri = UriComponentsBuilder
-                .fromPath(String.format(VEDLEGG_PATH, rinaSaksnummer, dokumentId))
-                .queryParam("Filtype", filType)
-                .queryParam("Filnavn", URLEncoder.encode(vedlegg.getFilnavn(), StandardCharsets.UTF_8))
-                .queryParam("synkron", Boolean.TRUE)
-                .toUriString();
-
-        return exchange(uri, HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
-                new ParameterizedTypeReference<String>() {});
+        return exchange(VEDLEGG_PATH + "?Filtype={filType}&Filnavn={filnavn}&synkron={synkron}", HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
+                new ParameterizedTypeReference<String>() {}, rinaSaksnummer, dokumentId, filType, URLEncoder.encode(vedlegg.getFilnavn(), StandardCharsets.UTF_8), Boolean.TRUE);
     }
 
     /**
@@ -287,11 +228,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
     public void setSakSensitiv(String rinaSaksnummer) throws IntegrationException {
         log.info("Setter sak {} sensitiv", rinaSaksnummer);
-        String uri = String.format(BUC_PATH, rinaSaksnummer) + "/sensitivsak";
 
-        exchange(uri, HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                });
+        exchange(BUC_PATH + "/sensitivsak", HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {}, rinaSaksnummer);
     }
 
     /**
@@ -340,14 +279,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         multipartBody.add("document", document);
         multipartBody.add("attachment", attachment);
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/buc/sed/vedlegg")
-                .queryParam(BUC_TYPE, bucType)
-                .queryParam("MottakerID", mottakerId)
-                .queryParam("FilType", filType);
-
-        return exchange(builder.toUriString(), HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
-                new ParameterizedTypeReference<Map<String, String>>() {
-                });
+        return exchange("/buc/sed/vedlegg?BuCType={bucType}&MottakerID={mottakerID}&FilType={filType}",
+                HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
+                new ParameterizedTypeReference<Map<String, String>>() {}, bucType, mottakerId, filType);
     }
 
     /**
@@ -361,64 +295,35 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public List<Institusjon> hentInstitusjoner(String bucType, String landkode)
             throws IntegrationException {
         log.info("Henter institusjoner for buctype {} og landkode {}", bucType, landkode);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/institusjoner")
-                .queryParam(BUC_TYPE, bucType)
-                .queryParam("LandKode", landkode);
 
-        return exchange(builder.toUriString(), HttpMethod.GET,
+        return exchange("/institusjoner?BuCType={bucType}&LandKode={landkode}", HttpMethod.GET,
                 new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<List<Institusjon>>() {
-                });
+                new ParameterizedTypeReference<List<Institusjon>>() {},
+                bucType, landkode);
     }
 
-    /**
-     * Søker etter rina-saker etter gitte parametere. Alle parametere er optional
-     *
-     * @param fnr fødselsnummer
-     * @param fornavn fornavn
-     * @param etternavn etternavn
-     * @param foedselsdato fødselsdato
-     * @param rinaSaksnummer rinaSaksnummer
-     * @param bucType bucType
-     * @param status status
-     * @return JsonNode med rina saker
-     */
+    public List<BucInfo> finnRinaSaker(String bucType, String status) throws IntegrationException {
+        log.info("Søker etter rina-saker med buctype {} og status {}", bucType, status);
 
-    public List<BucInfo> finnRinaSaker(String fnr, String fornavn, String etternavn, String foedselsdato,
-            String rinaSaksnummer, String bucType, String status) throws IntegrationException {
-        log.info("Søker etter rina-saker");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromPath("/rinasaker")
-                .queryParam("fødselsnummer", fnr)
-                .queryParam("fornavn", fornavn)
-                .queryParam("etternavn", etternavn)
-                .queryParam("fødselsdato", foedselsdato)
-                .queryParam(RINA_SAKSNUMMER, rinaSaksnummer)
-                .queryParam("buctype", bucType)
-                .queryParam("status", status);
-
-        //Må vurdere å endre returverdi til en POJO om denne integrasjonen faktisk tas i bruk
-        return exchange(builder.build(false).toUriString(), HttpMethod.GET,
+        return exchange("/rinasaker?buctype={buctype}&status={status}", HttpMethod.GET,
                 new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<List<BucInfo>>() {
-                });
+                new ParameterizedTypeReference<List<BucInfo>>() {},
+                bucType, status);
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) throws IntegrationException {
         log.info("Henter SED med vedlegg for sak {} og sed {}", rinaSaksnummer, dokumentId);
 
-        UriComponentsBuilder builder = UriComponentsBuilder
-                .fromPath(String.format(SED_MED_VEDLEGG_PATH, rinaSaksnummer, dokumentId));
-
-        return exchange(builder.toUriString(), HttpMethod.GET,
+        return exchange(SED_MED_VEDLEGG_PATH, HttpMethod.GET,
                 new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<SedMedVedlegg>() {
-                });
+                new ParameterizedTypeReference<SedMedVedlegg>() {},
+                rinaSaksnummer, dokumentId);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            ParameterizedTypeReference<T> responseType) throws IntegrationException {
+            ParameterizedTypeReference<T> responseType, Object... variabler) throws IntegrationException {
         try {
-            return euxRestTemplate.exchange(uri, method, entity, responseType).getBody();
+            return euxRestTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
         } catch (RestClientException e) {
             throw new IntegrationException("Error in integration with eux: " + hentFeilmeldingForEux(e), e);
         }

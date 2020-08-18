@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration.eux.case_store;
 
 import java.util.List;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 @Slf4j
@@ -28,12 +30,12 @@ public class CaseStoreConsumer implements RestConsumer {
 
     public List<CaseStoreDto> finnVedRinaSaksnummer(String rinaSaksnummer) throws IntegrationException {
         log.info("Søker på rinaSaksnummer {} i eux-case-store", rinaSaksnummer);
-        return get("/cases?rinaId=" + rinaSaksnummer);
+        return get("/cases?rinaId={rinaId}", rinaSaksnummer);
     }
 
     public List<CaseStoreDto> finnVedJournalpostID(String journalpostID) throws IntegrationException {
         log.info("Søker på journalpostId {} i eux-case-store", journalpostID);
-        return get("/cases?caseFileId=" + journalpostID);
+        return get("/cases?caseFileId={caseFileId}", journalpostID);
     }
 
     public CaseStoreDto lagre(String gsakSaksnummer, String rinaSaksnummer) throws IntegrationException {
@@ -46,8 +48,8 @@ public class CaseStoreConsumer implements RestConsumer {
         return post("/cases", caseStoreDto);
     }
 
-    private List<CaseStoreDto> get(String uri) throws IntegrationException {
-        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()), getTypeReference);
+    private List<CaseStoreDto> get(String uri, Object... variabler) throws IntegrationException {
+        return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()), getTypeReference, variabler);
     }
 
     private CaseStoreDto post(String uri, Object dto) throws IntegrationException {
@@ -55,9 +57,9 @@ public class CaseStoreConsumer implements RestConsumer {
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            ParameterizedTypeReference<T> responseType) throws IntegrationException {
+            ParameterizedTypeReference<T> responseType, Object... variabler) throws IntegrationException {
         try {
-            return restTemplate.exchange(uri, method, entity, responseType).getBody();
+            return restTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
         } catch (RestClientException e) {
             throw new IntegrationException("Error in integration with eux-case-store: " + hentFeilmeldingForEux(e), e);
         }

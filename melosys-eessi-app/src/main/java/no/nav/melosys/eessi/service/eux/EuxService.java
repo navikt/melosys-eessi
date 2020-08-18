@@ -67,11 +67,11 @@ public class EuxService {
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
-        euxConsumer.sendSed(rinaSaksnummer, null, dokumentId);
+        euxConsumer.sendSed(rinaSaksnummer, dokumentId);
     }
 
     public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) throws IntegrationException {
-        euxConsumer.oppdaterSed(rinaSaksnummer, null, dokumentId, sed);
+        euxConsumer.oppdaterSed(rinaSaksnummer, dokumentId, sed);
     }
 
     public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode)
@@ -93,7 +93,7 @@ public class EuxService {
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) throws IntegrationException {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
-        euxConsumer.sendSed(rinaSaksnummer, null, sedId);
+        euxConsumer.sendSed(rinaSaksnummer, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
 
@@ -110,9 +110,7 @@ public class EuxService {
     }
 
     public List<BucInfo> hentBucer(BucSearch bucSearch) throws IntegrationException {
-        return euxConsumer.finnRinaSaker(bucSearch.getFnr(), bucSearch.getFornavn(), bucSearch.getEtternavn(),
-                bucSearch.getFoedselsdato(), bucSearch.getRinaSaksnummer(), bucSearch.getBucType(),
-                bucSearch.getStatus());
+        return euxConsumer.finnRinaSaker(bucSearch.getBucType(), bucSearch.getStatus());
     }
 
     public BUC hentBuc(String rinaSakid) throws IntegrationException {
