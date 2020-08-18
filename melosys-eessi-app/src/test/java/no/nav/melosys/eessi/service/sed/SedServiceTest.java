@@ -3,9 +3,7 @@ package no.nav.melosys.eessi.service.sed;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
@@ -70,7 +68,7 @@ public class SedServiceTest {
     public void opprettBucOgSed_forventRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         final BucType bucType = BucType.LA_BUC_01;
-        final SedVedlegg vedlegg = new SedVedlegg("tittei", "pdf".getBytes());
+        final Collection<SedVedlegg> vedlegg = Set.of(new SedVedlegg("tittei", "pdf".getBytes()));
         BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
         verify(euxService).opprettBucOgSed(eq(bucType), eq(sedData.getMottakerIder()), any(SED.class), eq(vedlegg));
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);

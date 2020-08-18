@@ -1,18 +1,13 @@
 package no.nav.melosys.eessi.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
-import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto;
+import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -23,7 +18,6 @@ import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @Protected
 @Slf4j
@@ -47,12 +41,11 @@ public class BucController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public BucOgSedOpprettetDto opprettBucOgSed(
-            @RequestPart("sedData") SedDataDto sedDataDto,
-            @RequestPart(value = "vedlegg", required = false) MultipartFile vedlegg,
+            @RequestPart("sedData") OpprettBucOgSedDto opprettBucOgSedDto,
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
-    ) throws IntegrationException, IOException, ValidationException {
-        return sedService.opprettBucOgSed(sedDataDto, vedlegg != null ? new SedVedlegg(vedlegg.getOriginalFilename(), vedlegg.getBytes()) : null, bucType, sendAutomatisk);
+    ) throws IntegrationException, ValidationException {
+        return sedService.opprettBucOgSed(opprettBucOgSedDto.getSedDataDto(), opprettBucOgSedDto.getVedlegg(), bucType, sendAutomatisk);
     }
 
     @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")

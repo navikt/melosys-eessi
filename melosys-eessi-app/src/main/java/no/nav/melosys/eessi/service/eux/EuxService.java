@@ -50,20 +50,28 @@ public class EuxService {
         euxConsumer.slettBuC(rinaSaksnummer);
     }
 
-    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType, Collection<String> mottakere, SED sed, SedVedlegg vedlegg) throws IntegrationException {
+    public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType,
+                                                   Collection<String> mottakere,
+                                                   SED sed,
+                                                   Collection<SedVedlegg> vedlegg) throws IntegrationException {
 
         String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
         euxConsumer.settMottakere(rinaSaksnummer, mottakere);
         String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
-
-        if (vedlegg != null) {
-            String vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
-            log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
-        }
-
+        vedlegg.forEach(v -> leggTilVedlegg(rinaSaksnummer, dokumentID, v));
         bucMetrikker.bucOpprettet(bucType.name());
         log.info("Buc opprettet med id: {} og sed opprettet med id: {}", rinaSaksnummer, dokumentID);
         return new OpprettBucOgSedResponse(rinaSaksnummer, dokumentID);
+    }
+
+    private void leggTilVedlegg(String rinaSaksnummer, String dokumentID, SedVedlegg vedlegg) {
+        String vedleggID = null;
+        try {
+            vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg);
+        } catch (IntegrationException e) {
+            //TODO: IntegrationException -> RuntimeException
+        }
+        log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {

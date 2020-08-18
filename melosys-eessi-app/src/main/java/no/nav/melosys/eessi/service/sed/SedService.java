@@ -42,7 +42,7 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto, SedVedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
+    public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto, Collection<SedVedlegg> vedlegg, BucType bucType, boolean sendAutomatisk)
             throws IntegrationException, ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
@@ -110,7 +110,7 @@ public class SedService {
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, SedVedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) throws IntegrationException {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) throws IntegrationException {
 
         if (bucType.meddelerLovvalg()) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
@@ -146,7 +146,7 @@ public class SedService {
         return Optional.empty();
     }
 
-    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, SedVedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder)
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder)
             throws IntegrationException {
         OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);

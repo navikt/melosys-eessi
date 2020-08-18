@@ -2,10 +2,7 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -99,8 +96,9 @@ public class EuxServiceTest {
         BucType bucType = BucType.LA_BUC_01;
         Collection<String> mottakere = List.of("SE:123");
         SED sed = new SED();
+        var vedlegg = Set.of(new SedVedlegg("filen min", "pdf".getBytes()));
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, new SedVedlegg("filen min", "pdf".getBytes()));
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg);
 
         verify(euxConsumer).opprettBuC(eq(bucType.name()));
         verify(euxConsumer).opprettSed(eq(opprettetBucID), eq(sed));

@@ -4,6 +4,6 @@ import lombok.Value;
 
 @Value
 public class SedVedlegg {
-    private final String filnavn;
-    private final byte[] innhold;
+    String filnavn;
+    byte[] innhold;
 }
