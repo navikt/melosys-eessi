@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForOppgave;
 
 public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
@@ -20,12 +21,12 @@ public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
         this.restTemplate = restTemplate;
     }
 
-    public OpprettOppgaveResponseDto opprettOppgave(OppgaveDto oppgaveDto) throws IntegrationException {
+    public OpprettOppgaveResponseDto opprettOppgave(OppgaveDto oppgaveDto) {
         return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), OpprettOppgaveResponseDto.class);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            Class<T> clazz) throws IntegrationException {
+            Class<T> clazz) {
         try {
             return restTemplate.exchange(uri, method, entity, clazz).getBody();
         } catch (RestClientException e) {

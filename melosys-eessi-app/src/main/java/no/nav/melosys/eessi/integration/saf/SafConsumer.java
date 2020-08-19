@@ -25,7 +25,7 @@ public class SafConsumer implements RestConsumer {
         this.restTemplate = safRestTemplate;
     }
 
-    public Optional<String> hentRinasakForJournalpost(String journalpostID) throws IntegrationException {
+    public Optional<String> hentRinasakForJournalpost(String journalpostID) {
 
         HttpEntity httpEntity = new HttpEntity(new GraphQLWrapper(String.format(QUERY, journalpostID), null), defaultHeaders());
         GraphQLResponse response = restTemplate.exchange("/graphql", HttpMethod.POST, httpEntity, GraphQLResponse.class).getBody();

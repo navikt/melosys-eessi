@@ -19,8 +19,7 @@ public class DokumenttypeIdConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public DokumenttypeIdDto hentDokumenttypeId(final String eksternDokumenttypeId, final String eksternIdType)
-            throws IntegrationException {
+    public DokumenttypeIdDto hentDokumenttypeId(final String eksternDokumenttypeId, final String eksternIdType) {
         try {
 
             return restTemplate.exchange("/{eksternDokumenttypeId}/{eksternIdType}",

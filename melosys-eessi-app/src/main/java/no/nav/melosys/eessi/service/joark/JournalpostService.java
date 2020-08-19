@@ -6,7 +6,6 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import org.springframework.stereotype.Service;
@@ -23,14 +22,14 @@ public class JournalpostService {
     }
 
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
-            SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
+            SedMedVedlegg sedMedVedlegg, String navIdent) {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
                 sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), navIdent);
         return opprettJournalpost(request, false);
     }
 
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
-            SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
+            SedMedVedlegg sedMedVedlegg, String navIdent) {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
                 sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), navIdent);
         return opprettJournalpost(request, true);

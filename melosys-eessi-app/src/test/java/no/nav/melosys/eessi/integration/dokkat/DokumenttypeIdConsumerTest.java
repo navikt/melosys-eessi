@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
@@ -34,7 +35,7 @@ public class DokumenttypeIdConsumerTest {
     }
 
     @Test
-    public void hentDokumenttypeId_expectValidJson() throws Exception {
+    public void hentDokumenttypeId_expectValidJson() {
 
         String responseJson = "{\"dokumenttypeId\":\"123\"}";
         server.expect(requestTo("/sed/type"))
@@ -46,7 +47,7 @@ public class DokumenttypeIdConsumerTest {
     }
 
     @Test(expected = IntegrationException.class)
-    public void hentDokumenttypeId_expectException() throws Exception {
+    public void hentDokumenttypeId_expectException() {
         server.expect(requestTo("/sed/type"))
                 .andRespond(withServerError());
         dokumenttypeIdConsumer.hentDokumenttypeId("sed", "type");

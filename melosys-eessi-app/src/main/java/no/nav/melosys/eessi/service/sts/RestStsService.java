@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sts;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
@@ -39,7 +40,7 @@ public class RestStsService implements RestConsumer {
         restTemplate.getInterceptors().add(basicAuthClientRequestInterceptor);
     }
 
-    public synchronized String collectToken() throws IntegrationException {
+    public synchronized String collectToken() {
         if (shouldCollectNewToken()) {
             token = generateToken();
         }
@@ -47,7 +48,7 @@ public class RestStsService implements RestConsumer {
         return token;
     }
 
-    private String generateToken() throws IntegrationException {
+    private String generateToken() {
         log.info("Henter oidc-token fra security-token-service");
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate
