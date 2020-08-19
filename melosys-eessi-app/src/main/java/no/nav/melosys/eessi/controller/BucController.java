@@ -37,7 +37,7 @@ public class BucController {
             "Sender på eksisterende BUC hvis BUCen meddeler et lovvalg med utenlandsk myndighet, og BUCen er åpen.")
     @PostMapping(
             value = "/{bucType}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public BucOgSedOpprettetDto opprettBucOgSed(
