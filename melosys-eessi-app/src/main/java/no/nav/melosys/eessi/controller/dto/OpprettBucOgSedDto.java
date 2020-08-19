@@ -8,6 +8,6 @@ import no.nav.melosys.eessi.models.SedVedlegg;
 
 @Value
 public class OpprettBucOgSedDto {
-    SedDataDto sedDataDto;
-    Collection<SedVedlegg> vedlegg = Collections.emptySet();
+    private SedDataDto sedDataDto;
+    private Collection<SedVedlegg> vedlegg = Collections.emptySet();
 }

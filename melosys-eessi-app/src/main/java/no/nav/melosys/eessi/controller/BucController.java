@@ -40,7 +40,7 @@ public class BucController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public BucOgSedOpprettetDto opprettBucOgSed(
-            @RequestPart("sedData") OpprettBucOgSedDto opprettBucOgSedDto,
+            @RequestBody OpprettBucOgSedDto opprettBucOgSedDto,
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
     ) throws ValidationException {
