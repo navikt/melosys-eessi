@@ -37,7 +37,7 @@ public final class PostnummerMapper {
                         Postregister::getPostnummer,
                         Postregister::getPoststed,
                         (String p1, String p2) -> {
-                            log.error("Duplikate postnummer funnet: {} og {}", p1, p2);
+                            log.error("Duplikate postnummer funnet: {} og {}", p1, p2);
                             return p1;
                         },
                         TreeMap::new

@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -44,7 +43,7 @@ public class BucController {
             @RequestPart("sedData") OpprettBucOgSedDto opprettBucOgSedDto,
             @PathVariable("bucType") BucType bucType,
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
-    ) throws IntegrationException, ValidationException {
+    ) throws ValidationException {
         return sedService.opprettBucOgSed(opprettBucOgSedDto.getSedDataDto(), opprettBucOgSedDto.getVedlegg(), bucType, sendAutomatisk);
     }
 
@@ -54,14 +53,14 @@ public class BucController {
             @RequestBody SedDataDto sedDataDto,
             @PathVariable String rinaSaksnummer,
             @PathVariable SedType sedType
-    ) throws IntegrationException {
+    )  {
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 
     @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
     @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
-                                                          @RequestParam(required = false) String land) throws IntegrationException {
+                                                          @RequestParam(required = false) String land)  {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());
@@ -69,7 +68,7 @@ public class BucController {
 
     @ApiOperation(value = "Henter sedGrunnlag for gitt sed")
     @GetMapping("/{rinaSaksnummer}/sed/{rinaDokumentId}/grunnlag")
-    public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId) throws IntegrationException {
+    public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId)  {
         SED sed = euxService.hentSed(rinaSaksnummer, rinaDokumentId);
         return SedGrunnlagMapperFactory.getMapper(SedType.valueOf(sed.getSedType())).map(sed);
     }

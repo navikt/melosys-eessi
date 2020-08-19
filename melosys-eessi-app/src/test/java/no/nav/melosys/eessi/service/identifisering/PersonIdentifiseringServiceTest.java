@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.identifisering;
 
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -55,8 +57,7 @@ public class PersonIdentifiseringServiceTest {
         when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse("123"), new SED());
-        assertThat(res).isPresent();
-        assertThat(res.get()).isEqualTo(norskIdent);
+        assertThat(res).contains(norskIdent);
     }
 
     @Test
@@ -65,8 +66,7 @@ public class PersonIdentifiseringServiceTest {
 
         when(personSok.vurderPerson(anyString(), any(SED.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(norskIdent), new SED());
-        assertThat(res).isPresent();
-        assertThat(res.get()).isEqualTo(norskIdent);
+        assertThat(res).contains(norskIdent);
     }
 
     @Test
@@ -74,8 +74,7 @@ public class PersonIdentifiseringServiceTest {
         final String norskIdent = "33";
         when(personSok.søkPersonFraSed(any(SED.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(null), new SED());
-        assertThat(res).isPresent();
-        assertThat(res.get()).isEqualTo(norskIdent);
+        assertThat(res).contains(norskIdent);
     }
 
     @Test

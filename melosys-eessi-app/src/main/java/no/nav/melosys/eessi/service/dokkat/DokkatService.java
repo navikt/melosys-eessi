@@ -4,7 +4,6 @@ import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,7 @@ public class DokkatService {
     }
 
     @Cacheable("metadataDokkat")
-    public DokkatSedInfo hentMetadataFraDokkat(String sedType) throws IntegrationException {
+    public DokkatSedInfo hentMetadataFraDokkat(String sedType) {
         DokumenttypeIdDto dokumenttypeIdTo = dokumenttypeIdConsumer
             .hentDokumenttypeId(sedType, EKSTERN_ID_TYPE_SED);
         DokumentTypeInfoDto dokumentTypeInfoDto = dokumenttypeInfoConsumer

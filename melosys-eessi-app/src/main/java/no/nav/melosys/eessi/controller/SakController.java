@@ -55,7 +55,7 @@ public class SakController {
     @PostMapping
     @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
     public ResponseEntity lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
-            throws ValidationException, IntegrationException {
+            throws ValidationException {
         validerSaksrelasjonDto(saksrelasjonDto);
 
         saksrelasjonService.lagreKobling(saksrelasjonDto.getGsakSaksnummer(),
@@ -68,7 +68,7 @@ public class SakController {
     @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
     public List<SaksrelasjonDto> hentSaksrelasjon(
             @PathParam("rinaSaksnummer") String rinaSaksnummer,
-            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException, IntegrationException {
+            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
 
         if (StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer != null) {
             return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()

@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.service.sak;
 
 import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,11 @@ public class SakService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public Sak hentsak(Long id) throws IntegrationException {
+    public Sak hentsak(Long id) {
         return sakConsumer.getSak(Long.toString(id));
     }
 
-    public Optional<Sak> finnSakForRinaSaksnummer(String rinaSaksnummer) throws IntegrationException {
+    public Optional<Sak> finnSakForRinaSaksnummer(String rinaSaksnummer) {
         Optional<String> saksnummer = saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer)
                 .map(Object::toString);
 

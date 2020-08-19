@@ -54,7 +54,7 @@ public class SedServiceTest {
     private final String RINA_ID = "aabbcc";
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
@@ -190,7 +190,7 @@ public class SedServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws IntegrationException, NotFoundException, MappingException, IOException, URISyntaxException {
+    public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws Exception {
         BUC buc = new BUC();
         buc.setBucVersjon("v4.1");
         buc.setActions(Collections.singletonList(new Action("A001", "A001", "111", "Read")));
@@ -203,7 +203,7 @@ public class SedServiceTest {
     }
 
     @Test
-    public void genererPdfFraSed_forventKall() throws IOException, URISyntaxException, IntegrationException, MappingException, NotFoundException {
+    public void genererPdfFraSed_forventKall() throws Exception {
         SedDataDto sedDataDto = SedDataStub.getStub();
         final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
 

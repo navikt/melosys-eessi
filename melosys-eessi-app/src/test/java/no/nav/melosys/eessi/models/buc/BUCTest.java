@@ -2,9 +2,11 @@ package no.nav.melosys.eessi.models.buc;
 
 
 import java.time.ZonedDateTime;
+
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
 import org.junit.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class BUCTest {
@@ -22,7 +24,7 @@ public class BUCTest {
         document2.setLastUpdate(ZonedDateTime.now().plusWeeks(1));
 
         buc.setDocuments(Lists.newArrayList(document1, document2));
-        assertThat(buc.hentSistOppdaterteDocument().get()).isEqualTo(document2);
+        assertThat(buc.hentSistOppdaterteDocument()).contains(document2);
     }
 
 }

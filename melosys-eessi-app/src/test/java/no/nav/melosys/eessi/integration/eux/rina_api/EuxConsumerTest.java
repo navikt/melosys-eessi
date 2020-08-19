@@ -13,7 +13,6 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
@@ -316,7 +315,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void genererPdfFraSed_forventPdf() throws IntegrationException {
+    public void genererPdfFraSed_forventPdf() {
         SED sed = new SED();
         byte[] forventetRetur = "teststring".getBytes();
 
@@ -383,7 +382,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void setSakSensitiv_ingenResponseEllerException() throws Exception {
+    public void setSakSensitiv_ingenResponseEllerException() {
 
         String id ="123";
         server.expect(requestTo("/buc/" + id + "/sensitivsak"))
