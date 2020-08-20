@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
+import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -30,10 +31,9 @@ public class BucUtils {
     public static final Predicate<Document> dokumentErOpprettet = dokument ->
             !SedStatus.TOM.getEngelskStatus().equalsIgnoreCase(dokument.getStatus());
 
-    public static final Predicate<BUC> bucKanLukkesPredicate = buc ->
-            buc.getActions().stream().anyMatch(action -> SedType.X001.name().equals(action.getDocumentType()));
+    public static final Predicate<BUC> bucKanLukkesPredicate = BucUtils::bucKanLukkes;
 
-    public static final Predicate<BucInfo> norgeErCaseOwnerPredicate = bucInfo ->
+    public static final Predicate<BucInfo> norgeErCaseOwner = bucInfo ->
             "PO".equalsIgnoreCase(bucInfo.getApplicationRoleId());
 
     public static final Predicate<BucInfo> bucErÅpen = bucInfo ->
@@ -54,6 +54,21 @@ public class BucUtils {
             sed.setSedGVer(BucUtils.parseGVer(buc));
             sed.setSedVer(BucUtils.parseVer(buc));
         }
+    }
+
+    public static boolean bucKanLukkes(BUC buc) {
+        BucType bucType = BucType.valueOf(buc.getBucType());
+
+        if (bucType == BucType.LA_BUC_06) {
+            return buc.harMottattSedTypeAntallDagerSiden(SedType.A006, 30)
+                    && kanOppretteX001(buc);
+        }
+
+        return kanOppretteX001(buc);
+    }
+
+    private static boolean kanOppretteX001(BUC buc) {
+        return buc.getActions().stream().anyMatch(action -> SedType.X001.name().equals(action.getDocumentType()));
     }
 
     String parseGVer(BUC buc) {

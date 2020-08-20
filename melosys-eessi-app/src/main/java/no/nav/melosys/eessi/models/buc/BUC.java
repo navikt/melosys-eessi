@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -49,16 +50,32 @@ public class BUC {
 
 
     public Optional<Document> finnDokumentVedSedType(String sedType) {
-        return documents.stream().filter(d -> sedType.equals(d.getType())).min(sorterEtterStatus);
+        return finnDokumenterVedSedType(sedType).min(sorterEtterStatus);
+    }
+
+    private Stream<Document> finnDokumenterVedSedType(String sedType) {
+        return documents.stream().filter(d -> sedType.equals(d.getType()));
     }
 
     private static final Comparator<Document> sistOppdatert = Comparator.comparing(Document::getLastUpdate);
 
     private static final Comparator<Document> sorterEtterStatus = Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
 
+    public Optional<Document> finnDokumentVedTypeOgStatus(SedType sedType, SedStatus status) {
+        return finnDokumenterVedSedType(sedType.name())
+                .filter(d -> status.getEngelskStatus().equals(d.getStatus()))
+                .findFirst();
+    }
+
     public boolean sedKanOppdateres(String id) {
         return actions.stream()
                 .filter(action -> id.equals(action.getDocumentId()))
                 .anyMatch(action -> "Update".equalsIgnoreCase(action.getOperation()));
+    }
+
+    public boolean harMottattSedTypeAntallDagerSiden(SedType sedType, long minstAntallDagerSidenMottatt) {
+        return finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT)
+                .filter(d -> ZonedDateTime.now().minusDays(minstAntallDagerSidenMottatt).isAfter(d.getLastUpdate()))
+                .isPresent();
     }
 }
