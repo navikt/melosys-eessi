@@ -39,7 +39,7 @@ public class BucLukker {
             euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).build())
                     .stream()
                     .filter(bucErÅpen)
-                    .filter(norgeErCaseOwnerPredicate)
+                    .filter(norgeErCaseOwner)
                     .map(this::hentBuc)
                     .filter(Objects::nonNull)
                     .filter(bucKanLukkesPredicate)
