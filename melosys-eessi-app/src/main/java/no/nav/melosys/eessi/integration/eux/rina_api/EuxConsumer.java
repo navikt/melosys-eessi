@@ -209,7 +209,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         ByteArrayResource document = new ByteArrayResource(vedlegg.getInnhold()) {
             @Override
             public String getFilename() {
-                return vedlegg.getFilnavn();
+                return vedlegg.getTittel();
             }
         };
 
@@ -217,7 +217,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         multipartBody.add("file", document);
 
         return exchange(VEDLEGG_PATH + "?Filtype={filType}&Filnavn={filnavn}&synkron={synkron}", HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
-                new ParameterizedTypeReference<String>() {}, rinaSaksnummer, dokumentId, filType, URLEncoder.encode(vedlegg.getFilnavn(), StandardCharsets.UTF_8), Boolean.TRUE);
+                new ParameterizedTypeReference<String>() {}, rinaSaksnummer, dokumentId, filType, URLEncoder.encode(vedlegg.getTittel(), StandardCharsets.UTF_8), Boolean.TRUE);
     }
 
     /**
