@@ -28,36 +28,36 @@ public class CaseStoreConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public List<CaseStoreDto> finnVedRinaSaksnummer(String rinaSaksnummer) throws IntegrationException {
+    public List<CaseStoreDto> finnVedRinaSaksnummer(String rinaSaksnummer) {
         log.info("Søker på rinaSaksnummer {} i eux-case-store", rinaSaksnummer);
         return get("/cases?rinaId={rinaId}", rinaSaksnummer);
     }
 
-    public List<CaseStoreDto> finnVedJournalpostID(String journalpostID) throws IntegrationException {
+    public List<CaseStoreDto> finnVedJournalpostID(String journalpostID) {
         log.info("Søker på journalpostId {} i eux-case-store", journalpostID);
         return get("/cases?caseFileId={caseFileId}", journalpostID);
     }
 
-    public CaseStoreDto lagre(String gsakSaksnummer, String rinaSaksnummer) throws IntegrationException {
+    public CaseStoreDto lagre(String gsakSaksnummer, String rinaSaksnummer) {
         return lagre(new CaseStoreDto(gsakSaksnummer, rinaSaksnummer));
     }
 
-    public CaseStoreDto lagre(CaseStoreDto caseStoreDto) throws IntegrationException {
+    public CaseStoreDto lagre(CaseStoreDto caseStoreDto) {
         log.info("Lagrer saksnummer {} og rinaSaksnummer {} i eux-case-store",
                 caseStoreDto.getFagsaknummer(), caseStoreDto.getRinaSaksnummer());
         return post("/cases", caseStoreDto);
     }
 
-    private List<CaseStoreDto> get(String uri, Object... variabler) throws IntegrationException {
+    private List<CaseStoreDto> get(String uri, Object... variabler)  {
         return exchange(uri, HttpMethod.GET, new HttpEntity<>(defaultHeaders()), getTypeReference, variabler);
     }
 
-    private CaseStoreDto post(String uri, Object dto) throws IntegrationException {
+    private CaseStoreDto post(String uri, Object dto)  {
         return exchange(uri, HttpMethod.POST, new HttpEntity<>(dto, defaultHeaders()), postTypeReference);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            ParameterizedTypeReference<T> responseType, Object... variabler) throws IntegrationException {
+            ParameterizedTypeReference<T> responseType, Object... variabler)  {
         try {
             return restTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
         } catch (RestClientException e) {

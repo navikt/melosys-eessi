@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class OpprettSedDto {
+public class BucOgSedOpprettetDto {
     private String rinaSaksnummer;
     private String rinaUrl;
 }

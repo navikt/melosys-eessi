@@ -1,19 +1,18 @@
 package no.nav.melosys.eessi.service.joark;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,7 +34,7 @@ public class OpprettInngaaendeJournalpostService {
     }
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
-            SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
+            SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg, String navIdent) {
 
         Optional<Long> gsakSaksnummer = saksrelasjonService.finnVedRinaSaksnummer(sedMottatt.getRinaSakId())
                 .map(FagsakRinasakKobling::getGsakSaksnummer);
@@ -58,12 +57,12 @@ public class OpprettInngaaendeJournalpostService {
                 .build();
     }
 
-    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
+    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg, String navIdent) {
         return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg, navIdent).getJournalpostId();
     }
 
     private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
-            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg, String navIdent) throws IntegrationException {
+            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg, String navIdent) {
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg, navIdent);
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;

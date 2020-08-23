@@ -31,7 +31,7 @@ public class SystemContextClientRequestInterceptorTest {
     private final String oidcKey = "t43i56oh4yoi5";
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
         when(restStsService.collectToken()).thenReturn(oidcKey);
     }
     @Test

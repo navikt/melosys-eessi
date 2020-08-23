@@ -1,9 +1,13 @@
 package no.nav.melosys.eessi.models;
 
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SedVedlegg {
-    private final String filnavn;
-    private final byte[] innhold;
+    private String tittel;
+    private byte[] innhold;
 }

@@ -77,11 +77,11 @@ public class BucLukker {
                 .min(documentComparator).orElse(null);
     }
 
-    private SED opprettX001(BUC buc, String aarsak) throws IntegrationException {
+    private SED opprettX001(BUC buc, String aarsak) {
         return x001Mapper.mapFraSed(hentSisteLovvalgSed(buc), aarsak);
     }
 
-    private SED hentSisteLovvalgSed(BUC buc) throws IntegrationException {
+    private SED hentSisteLovvalgSed(BUC buc) {
         String sedId = buc.getDocuments().stream()
                 .filter(sisteSendtLovvalgsSedPredicate)
                 .min(documentComparator)

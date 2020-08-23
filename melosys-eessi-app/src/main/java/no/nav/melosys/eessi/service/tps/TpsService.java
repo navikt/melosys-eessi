@@ -82,7 +82,7 @@ public class TpsService {
         return aktoerConsumer.hentNorskIdent(aktoerID);
     }
 
-    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) throws IntegrationException {
+    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) {
 
         FinnPersonRequest request = new FinnPersonRequest();
         request.setPersonFilter(createPersonFilter(personsoekKriterier));

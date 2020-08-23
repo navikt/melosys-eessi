@@ -45,8 +45,7 @@ public class SafConsumerTest {
         server.expect(requestTo("/graphql")).andRespond(withSuccess(hentOkRespons(), MediaType.APPLICATION_JSON));
 
         Optional<String> optionalRinasaksnummer = safConsumer.hentRinasakForJournalpost(journalpostID);
-        assertThat(optionalRinasaksnummer).isPresent();
-        assertThat(optionalRinasaksnummer.get()).isEqualTo(rinaSaksnummer);
+        assertThat(optionalRinasaksnummer).contains(rinaSaksnummer);
     }
 
     @Test

@@ -4,7 +4,6 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.JournalpostSedKoblingDto;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.security.token.support.core.api.Protected;
@@ -27,7 +26,7 @@ public class JournalfoeringKoblingController {
 
     @ApiOperation(value = "Henter objekt som beskriver dataen mottatt i sed som journalpost er koblet til")
     @GetMapping("{journalpostID}/eessimelding")
-    public MelosysEessiMelding hentEessiMeldingFraJournalpost(@PathVariable("journalpostID") String journalpostID) throws IntegrationException {
+    public MelosysEessiMelding hentEessiMeldingFraJournalpost(@PathVariable("journalpostID") String journalpostID) {
         return journalpostSedKoblingService.finnVedJournalpostIDOpprettMelosysEessiMelding(journalpostID)
                 .orElseThrow(() -> new NotFoundException("Finner ikke rinasak tilhørende journalpostID " + journalpostID));
     }
