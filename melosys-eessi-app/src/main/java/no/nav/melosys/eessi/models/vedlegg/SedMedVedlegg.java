@@ -27,7 +27,7 @@ public class SedMedVedlegg {
     private String mimeType;
     private byte[] innhold;
 
-    @ConstructorProperties({"filnavn", "mimeType", "innhold"})
+    @ConstructorProperties({"fraMimeOgFilnavn", "mimeType", "innhold"})
     public BinaerFil(String filnavn, String mimeType, byte[] innhold) {
       this.filnavn = filnavn;
       this.mimeType = mimeType;

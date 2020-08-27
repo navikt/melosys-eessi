@@ -1,0 +1,196 @@
+{
+  "nav": {
+    "endredeforhold": {
+      "samlettilbakebetaling": {
+        "ytterligereinformasjon": "æøå",
+        "dokumentervedlagt": {
+          "type": [
+            "søknad"
+          ],
+          "annet": [
+            "æøå"
+          ]
+        },
+        "anmodningomytterligereinformasjon": "melding_om_mer_informasjon",
+        "identifikasjon": "æøå"
+      },
+      "bruker": {
+        "person": {
+          "tidligerefornavn": "æøå",
+          "etternavn": "æøå",
+          "statsborgerskap": [
+            {
+              "land": "NO"
+            }
+          ],
+          "fornavn": "æøå",
+          "fornavnvedfoedsel": "æøå",
+          "kjoenn": "M",
+          "tidligereetternavn": "æøå",
+          "annet": "æøå",
+          "foedested": "æøå",
+          "etternavnvedfoedsel": "æøå",
+          "foedselsdato": "æøå"
+        },
+        "ytterligereinformasjon": "æøå",
+        "far": {
+          "person": {
+            "fornavn": "æøå",
+            "etternavnvedfoedsel": "æøå"
+          }
+        },
+        "dokumentervedlagt": {
+          "type": [
+            "søknad"
+          ],
+          "annet": "æøå"
+        },
+        "mor": {
+          "person": {
+            "etternavnvedfoedsel": "æøå",
+            "fornavn": "æøå"
+          }
+        },
+        "anmodningomytterligereinformasjon": "melding_om_mer_informasjon"
+      },
+      "arbeidsgiver": {
+        "dokumentervedlagt": {
+          "type": [
+            "søknad"
+          ],
+          "annet": [
+            "æøå"
+          ]
+        },
+        "ytterligereinformasjon": "æøå",
+        "anmodningomytterligereinformasjon": "melding_om_mer_informasjon"
+      }
+    },
+    "bruker": {
+      "mor": {
+        "person": {
+          "etternavnvedfoedsel": "æøå",
+          "fornavn": "æøå"
+        }
+      },
+      "anmodning": {
+        "adresse": [
+          {
+            "type": [
+              "bosted"
+            ]
+          }
+        ]
+      },
+      "person": {
+        "fornavn": "æøå",
+        "kjoenn": "M",
+        "etternavn": "æøå",
+        "etternavnvedfoedsel": "æøå",
+        "foedselsdato": "æøå",
+        "statsborgerskap": [
+          {
+            "land": "NO"
+          }
+        ],
+        "pin": [
+          {
+            "institusjonsnavn": "æøå",
+            "identifikator": "æøå",
+            "sektor": "yrkesskade_og_yrkessykdom",
+            "land": "NO",
+            "institusjonsid": "æøå"
+          }
+        ],
+        "foedested": {
+          "region": "æøå",
+          "by": "æøå",
+          "land": "NO"
+        },
+        "fornavnvedfoedsel": "æøå"
+      },
+      "bostedsadresse": {
+        "bygning": "æøå",
+        "region": "æøå",
+        "type": "bosted",
+        "land": "NO",
+        "gate": "æøå",
+        "by": "æøå",
+        "postnummer": "æøå"
+      },
+      "far": {
+        "person": {
+          "fornavn": "æøå",
+          "etternavnvedfoedsel": "æøå"
+        }
+      }
+    },
+    "arbeidsgiver": {
+      "navn": "æøå",
+      "adresse": {
+        "bygning": "æøå",
+        "land": "NO",
+        "postnummer": "æøå",
+        "gate": "æøå",
+        "by": "æøå",
+        "region": "æøå"
+      },
+      "identifikator": [
+        {
+          "type": "registrering",
+          "id": "æøå"
+        }
+      ]
+    },
+    "mottakerinstitusjon": {
+      "pin": {
+        "sektor": {
+          "id": [
+            "alle"
+          ],
+          "annen": "æøå"
+        }
+      }
+    }
+  },
+  "horisontal": {
+    "bruker": {
+      "anmodningominformasjon": {
+        "sed": "æøå",
+        "identifikasjonsinformasjon": {
+          "type": [
+            "etternavn"
+          ]
+        },
+        "informasjon": "æøå",
+        "dato": "æøå",
+        "dokument": "æøå"
+      },
+      "status": {
+        "annet": "æøå",
+        "id": [
+          "ansatt"
+        ]
+      }
+    },
+    "arbeidsgiver": {
+      "anmodningominformasjon": {
+        "sed": "æøå",
+        "informasjon": "æøå",
+        "dato": "æøå",
+        "dokument": "æøå"
+      }
+    },
+    "samlettilbakebetaling": {
+      "anmodningominformasjon": {
+        "informasjon": "æøå",
+        "sed": "æøå",
+        "dokument": "æøå",
+        "dato": "æøå"
+      }
+    }
+  },
+  "sedVer": "2",
+  "sedGVer": "4",
+  "sed": "H001"
+}

@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import org.springframework.util.StringUtils;
@@ -106,7 +107,11 @@ public final class OpprettJournalpostRequestMapper {
         return vedleggListe.stream()
                 .filter(gyldigFiltypePredicate)
                 .map(b -> dokument(sedType, b.getFilnavn(),
-                        JournalpostFiltype.filnavn(b.getFilnavn(), b.getMimeType()).orElse(null), b.getInnhold()))
+                        JournalpostFiltype.fraMimeOgFilnavn(b.getMimeType(), b.getFilnavn())
+                                .orElseThrow(() -> new MappingException("Filtype kreves for "
+                                        + b.getFilnavn() + " (" + b.getMimeType() + ")")),
+                        b.getInnhold())
+                )
                 .collect(Collectors.toList());
     }
 
@@ -120,9 +125,9 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static final Predicate<SedMedVedlegg.BinaerFil> gyldigFiltypePredicate = binaerFil -> {
-        boolean gyldigFiltype = JournalpostFiltype.filnavn(binaerFil.getFilnavn(), binaerFil.getMimeType()).isPresent();
+        boolean gyldigFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).isPresent();
         if (!gyldigFiltype) {
-            log.warn("Et vedlegg av en SED har filtype som ikke støttes. "
+            log.error("Et vedlegg av en SED har filtype som ikke støttes. "
                     + "Dette vedlegget kan ikke journalføres. Filnavn: {}", binaerFil.getFilnavn());
         }
         return gyldigFiltype;

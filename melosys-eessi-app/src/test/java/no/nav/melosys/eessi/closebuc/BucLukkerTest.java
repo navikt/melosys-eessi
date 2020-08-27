@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
+import no.nav.melosys.eessi.controller.dto.SedStatus;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
@@ -151,10 +152,6 @@ public class BucLukkerTest {
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
         when(euxService.hentBuc(eq(bucInfo.getId()))).thenReturn(buc);
-
-        SED sed = new SED();
-        sed.setNav(enhancedRandom.nextObject(Nav.class));
-        sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenThrow(new IntegrationException(""));
 
         bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
@@ -213,10 +210,71 @@ public class BucLukkerTest {
         verify(euxService, never()).hentBuc(any());
     }
 
+    @Test
+    public void lukkBucerAvType_LABUC06ToMndSidenMottattA006_lukkes() throws IntegrationException {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
+
+        BUC buc = lagBuc(BucType.LA_BUC_06, SedType.A005);
+
+        String sisteOppdatertDokumentId = buc.getDocuments().get(0).getId();
+
+        Document document = new Document();
+        document.setType(SedType.A006.name());
+        document.setLastUpdate(ZonedDateTime.now().minusMonths(2));
+        document.setStatus(SedStatus.MOTTATT.getEngelskStatus());
+        document.setId("mottattA006-123");
+        document.setConversations(Collections.emptyList());
+        buc.getDocuments().add(document);
+
+        when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
+        when(euxService.hentBuc(eq(bucInfo.getId()))).thenReturn(buc);
+
+        SED sed = new SED();
+        sed.setNav(enhancedRandom.nextObject(Nav.class));
+        sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
+        when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
+
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_06);
+
+        verify(euxService).hentBucer(any(BucSearch.class));
+        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).hentSed(eq(buc.getId()), eq(sisteOppdatertDokumentId));
+        verify(euxService).opprettOgSendSed(any(), eq(buc.getId()));
+    }
+
+    @Test
+    public void lukkBucerAvType_LABUC06A006IkkeMottatt_lukkesIkke() throws IntegrationException {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
+
+        BUC buc = lagBuc(BucType.LA_BUC_06, SedType.A005);
+
+        String sisteOppdatertDokumentId = buc.getDocuments().get(0).getId();
+
+        when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
+        when(euxService.hentBuc(eq(bucInfo.getId()))).thenReturn(buc);
+
+        bucLukker.lukkBucerAvType(BucType.LA_BUC_06);
+
+        verify(euxService).hentBucer(any(BucSearch.class));
+        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService, never()).hentSed(eq(buc.getId()), eq(sisteOppdatertDokumentId));
+        verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
+    }
+
     private BUC lagBuc() {
+        return lagBuc(BucType.LA_BUC_04, SedType.A009);
+    }
+
+    private BUC lagBuc(BucType bucType, SedType sedType) {
         BUC buc = new BUC();
         buc.setId("ffff");
-        buc.setBucType(BucType.LA_BUC_04.name());
+        buc.setBucType(bucType.name());
 
         List<Action> actions = new ArrayList<>();
         Action action = new Action();
@@ -229,7 +287,7 @@ public class BucLukkerTest {
 
         List<Document> documents = new ArrayList<>();
         Document document = new Document();
-        document.setType(SedType.A009.name());
+        document.setType(sedType.name());
         document.setCreationDate(ZonedDateTime.now());
         document.setStatus("sent");
         document.setConversations(Collections.singletonList(conversation));
