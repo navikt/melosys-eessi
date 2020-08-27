@@ -19,12 +19,11 @@ public class DokumenttypeIdConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public DokumenttypeIdDto hentDokumenttypeId(final String eksternDokumenttypeId, final String eksternIdType)
-            throws IntegrationException {
+    public DokumenttypeIdDto hentDokumenttypeId(final String eksternDokumenttypeId, final String eksternIdType) {
         try {
 
-            return restTemplate.exchange(String.format("/%s/%s", eksternDokumenttypeId, eksternIdType),
-                    HttpMethod.GET, new HttpEntity<>(defaultHeaders()), DokumenttypeIdDto.class).getBody();
+            return restTemplate.exchange("/{eksternDokumenttypeId}/{eksternIdType}",
+                    HttpMethod.GET, new HttpEntity<>(defaultHeaders()), DokumenttypeIdDto.class, eksternDokumenttypeId, eksternIdType).getBody();
 
         } catch (HttpServerErrorException | HttpClientErrorException e) {
             log.error("Feil ved integrasjon mot dokkat", e);

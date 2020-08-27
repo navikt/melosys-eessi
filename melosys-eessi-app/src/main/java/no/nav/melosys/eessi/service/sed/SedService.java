@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
+import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -42,8 +42,8 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public OpprettSedDto opprettBucOgSed(SedDataDto sedDataDto, SedVedlegg vedlegg, BucType bucType, boolean sendAutomatisk)
-            throws IntegrationException, ValidationException {
+    public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto, Collection<SedVedlegg> vedlegg, BucType bucType, boolean sendAutomatisk)
+            throws ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
@@ -67,7 +67,7 @@ public class SedService {
             sendSed(response.getRinaSaksnummer(), response.getDokumentId());
         }
 
-        return OpprettSedDto.builder()
+        return BucOgSedOpprettetDto.builder()
                 .rinaSaksnummer(response.getRinaSaksnummer())
                 .rinaUrl(euxService.hentRinaUrl(response.getRinaSaksnummer()))
                 .build();
@@ -81,7 +81,7 @@ public class SedService {
         }
     }
 
-    private void sendSed(String rinaSaksnummer, String dokumentId) throws IntegrationException {
+    private void sendSed(String rinaSaksnummer, String dokumentId) {
         try {
             euxService.sendSed(rinaSaksnummer, dokumentId);
         } catch (IntegrationException e) {
@@ -92,14 +92,14 @@ public class SedService {
         }
     }
 
-    public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) throws IntegrationException {
+    public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) {
         SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
         SED sed = sedMapper.mapTilSed(sedDataDto);
 
         return euxService.genererPdfFraSed(sed);
     }
 
-    public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) throws IntegrationException {
+    public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
         if (!buc.kanOppretteSed(sedType)) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc "+ rinaSaksnummer + " med type " + buc.getBucType());
@@ -110,7 +110,7 @@ public class SedService {
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, SedVedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) throws IntegrationException {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) {
 
         if (bucType.meddelerLovvalg()) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
@@ -135,7 +135,7 @@ public class SedService {
         return opprettOgLagreSaksrelasjon(sed, vedlegg, bucType, gsakSaksnummer, mottakerIder);
     }
 
-    private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) throws IntegrationException {
+    private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) {
         for (FagsakRinasakKobling fagsakRinasakKobling : eksisterendeSaker) {
             BUC buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
             if ("open".equals(buc.getStatus())) {
@@ -146,8 +146,7 @@ public class SedService {
         return Optional.empty();
     }
 
-    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, SedVedlegg vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder)
-            throws IntegrationException {
+    private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) {
         OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());

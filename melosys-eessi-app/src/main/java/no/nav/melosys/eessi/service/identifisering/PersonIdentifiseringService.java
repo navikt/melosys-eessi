@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
@@ -34,8 +33,7 @@ public class PersonIdentifiseringService {
         this.personSokMetrikker = personSokMetrikker;
     }
 
-    public Optional<String> identifiserPerson(SedHendelse sedHendelse, SED sed)
-            throws IntegrationException {
+    public Optional<String> identifiserPerson(SedHendelse sedHendelse, SED sed) {
         Optional<FagsakRinasakKobling> eksisterendeSak = saksrelasjonService.finnVedRinaSaksnummer(sedHendelse.getRinaSakId());
 
         if (eksisterendeSak.isPresent()) {

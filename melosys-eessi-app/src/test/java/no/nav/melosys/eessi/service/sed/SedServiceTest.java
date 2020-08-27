@@ -3,11 +3,9 @@ package no.nav.melosys.eessi.service.sed;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
-import no.nav.melosys.eessi.controller.dto.OpprettSedDto;
+import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
@@ -56,7 +54,7 @@ public class SedServiceTest {
     private final String RINA_ID = "aabbcc";
 
     @Before
-    public void setup() throws Exception {
+    public void setup() {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = new OpprettBucOgSedResponse(RINA_ID, "123");
 
@@ -70,8 +68,8 @@ public class SedServiceTest {
     public void opprettBucOgSed_forventRinacaseId() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         final BucType bucType = BucType.LA_BUC_01;
-        final SedVedlegg vedlegg = new SedVedlegg("tittei", "pdf".getBytes());
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
+        final Collection<SedVedlegg> vedlegg = Set.of(new SedVedlegg("tittei", "pdf".getBytes()));
+        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true);
         verify(euxService).opprettBucOgSed(eq(bucType), eq(sedData.getMottakerIder()), any(SED.class), eq(vedlegg));
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
     }
@@ -88,8 +86,7 @@ public class SedServiceTest {
             exception = e;
         }
 
-        assertThat(exception).isNotNull();
-        assertThat(exception).isInstanceOf(IntegrationException.class);
+        assertThat(exception).isNotNull().isInstanceOf(IntegrationException.class);
         verify(euxService).slettBuC(eq(RINA_ID));
         verify(saksrelasjonService).slettVedRinaId(eq(RINA_ID));
     }
@@ -98,7 +95,7 @@ public class SedServiceTest {
     public void opprettBucOgSed_brukerMedSensitiveOpplysninger_forventSettSakSensitiv() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.getBruker().setHarSensitiveOpplysninger(true);
-        OpprettSedDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true);
+        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true);
 
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
         verify(euxService).settSakSensitiv(RINA_ID);
@@ -166,7 +163,7 @@ public class SedServiceTest {
     @Test
     public void opprettBucOgSed_LABUC01_forventOpprettNyBucOgSedMedUrl() throws Exception {
         SedDataDto sedData = SedDataStub.getStub();
-        OpprettSedDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false);
+        BucOgSedOpprettetDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false);
 
         verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
         verify(euxService).hentRinaUrl(eq(RINA_ID));
@@ -193,7 +190,7 @@ public class SedServiceTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws IntegrationException, NotFoundException, MappingException, IOException, URISyntaxException {
+    public void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws Exception {
         BUC buc = new BUC();
         buc.setBucVersjon("v4.1");
         buc.setActions(Collections.singletonList(new Action("A001", "A001", "111", "Read")));
@@ -206,7 +203,7 @@ public class SedServiceTest {
     }
 
     @Test
-    public void genererPdfFraSed_forventKall() throws IOException, URISyntaxException, IntegrationException, MappingException, NotFoundException {
+    public void genererPdfFraSed_forventKall() throws Exception {
         SedDataDto sedDataDto = SedDataStub.getStub();
         final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
 

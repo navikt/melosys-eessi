@@ -1,9 +1,9 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
 
-import org.junit.Test;
-
 import java.util.Optional;
+
+import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,13 +36,11 @@ public class JournalpostFiltypeTest {
         String filnavn = "abc_234gf_T43T_re4";
         String mimeType = "application/pdf";
         Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn);
-        assertThat(journalpostFiltype).isPresent();
-        assertThat(journalpostFiltype.get()).isEqualTo(JournalpostFiltype.PDF);
+        assertThat(journalpostFiltype).contains(JournalpostFiltype.PDF);
     }
 
     private void assertFiltype(String filnavn, String mimeType, JournalpostFiltype forventetFiltype) {
         Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn);
-        assertThat(journalpostFiltype).isPresent();
-        assertThat(journalpostFiltype.get()).isEqualTo(forventetFiltype);
+        assertThat(journalpostFiltype).contains(forventetFiltype);
     }
 }

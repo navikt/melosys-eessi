@@ -21,17 +21,17 @@ public class SakConsumer implements RestConsumer, UUIDGenerator {
         this.restTemplate = restTemplate;
     }
 
-    public Sak getSak(String sakId) throws IntegrationException {
+    public Sak getSak(String arkivsakId) {
 
         HttpHeaders headers = headers();
-        log.info("hentsak: correlationId: {}, sakId: {}", headers.get(X_CORRELATION_ID), sakId);
+        log.info("hentsak: correlationId: {}, sakId: {}", headers.get(X_CORRELATION_ID), arkivsakId);
 
-        return exchange("/" + sakId, HttpMethod.GET, new HttpEntity<>(headers), Sak.class);
+        return exchange("/{arkivsakId}", HttpMethod.GET, new HttpEntity<>(headers), Sak.class, arkivsakId);
     }
 
-    private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, Class<T> clazz) throws IntegrationException {
+    private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, Class<T> clazz, Object... variabler) {
         try {
-            return restTemplate.exchange(uri, method, entity, clazz).getBody();
+            return restTemplate.exchange(uri, method, entity, clazz, variabler).getBody();
         } catch (RestClientException e) {
             throw new IntegrationException("Feil i integrasjon mot sak", e);
         }

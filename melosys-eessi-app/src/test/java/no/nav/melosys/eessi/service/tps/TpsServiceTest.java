@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.tps;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import lombok.val;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
@@ -21,6 +22,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -63,20 +65,19 @@ public class TpsServiceTest {
     }
 
     @Test
-    public void hentPerson_expectPerson() throws Exception {
+    public void hentPerson_expectPerson() {
         Person person = tpsService.hentPerson("11223344556");
         assertThat(person).isNotNull();
     }
 
     @Test
-    public void hentAktoerId_expectAktoerId() throws Exception {
+    public void hentAktoerId_expectAktoerId() {
         String aktoerId = tpsService.hentAktoerId("11223344556");
-        assertThat(aktoerId).isNotNull();
         assertThat(aktoerId).isEqualTo("998877665544");
     }
 
     @Test
-    public void soekEtterPerson_forventIdent() throws Exception {
+    public void soekEtterPerson_forventIdent() {
         List<PersonSoekResponse> response = tpsService.soekEtterPerson(lagPersonsoekKriterier());
         assertThat(response).isNotEmpty();
         assertThat(response.get(0).getIdent()).isEqualTo("04127811111");

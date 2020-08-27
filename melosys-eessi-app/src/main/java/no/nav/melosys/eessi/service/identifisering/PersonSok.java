@@ -30,7 +30,7 @@ class PersonSok {
         this.tpsService = tpsService;
     }
 
-    PersonSokResultat søkPersonFraSed(SED sed) throws IntegrationException {
+    PersonSokResultat søkPersonFraSed(SED sed) {
         List<PersonSoekResponse> personSøk = søkEtterPerson(sed);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);
@@ -42,7 +42,7 @@ class PersonSok {
         return vurderPerson(ident, sed);
     }
 
-    PersonSokResultat vurderPerson(String ident, SED sed) throws IntegrationException {
+    PersonSokResultat vurderPerson(String ident, SED sed) {
         Person person;
 
         try {
@@ -78,7 +78,7 @@ class PersonSok {
      * @param sed SED som inneholder person med navn og fødselsdato
      * @return fødselsnummer/d-nummer for person, null hvis ikke funnet
      */
-    private List<PersonSoekResponse> søkEtterPerson(SED sed) throws IntegrationException {
+    private List<PersonSoekResponse> søkEtterPerson(SED sed) {
         no.nav.melosys.eessi.models.sed.nav.Person sedPerson = sed.getNav().getBruker().getPerson();
         LocalDate foedselsdato = tilLocalDate(sedPerson.getFoedselsdato());
 

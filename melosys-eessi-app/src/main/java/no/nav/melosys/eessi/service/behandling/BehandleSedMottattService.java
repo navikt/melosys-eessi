@@ -6,7 +6,6 @@ import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedKontekst;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -47,7 +46,7 @@ public class BehandleSedMottattService {
         this.oppgaveService = oppgaveService;
     }
 
-    public void behandleSed(SedMottatt sedMottatt) throws IntegrationException {
+    public void behandleSed(SedMottatt sedMottatt)  {
         SedKontekst kontekst = sedMottatt.getSedKontekst();
         SED sed = euxService.hentSed(sedMottatt.getSedHendelse().getRinaSakId(),
                 sedMottatt.getSedHendelse().getRinaDokumentId());
@@ -71,7 +70,7 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void identifiserPerson(SedMottatt sedMottatt, SED sed) throws IntegrationException {
+    private void identifiserPerson(SedMottatt sedMottatt, SED sed)  {
         log.info("Søker etter person for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
@@ -79,7 +78,7 @@ public class BehandleSedMottattService {
         sedMottatt.getSedHendelse().setNavBruker(sedMottatt.getSedKontekst().getNavIdent());
     }
 
-    private void opprettJournalpost(SedMottatt sedMottatt) throws IntegrationException {
+    private void opprettJournalpost(SedMottatt sedMottatt)  {
         log.info("Oppretter journalpost for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         SedMedVedlegg sedMedVedlegg = euxService.hentSedMedVedlegg(
                 sedMottatt.getSedHendelse().getRinaSakId(), sedMottatt.getSedHendelse().getRinaDokumentId()
@@ -97,7 +96,7 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void opprettOppgaveIdentifisering(SedMottatt sedMottatt) throws IntegrationException {
+    private void opprettOppgaveIdentifisering(SedMottatt sedMottatt)  {
         log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         String oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedHendelse().getSedType(), sedMottatt.getSedHendelse().getRinaSakId()
@@ -105,7 +104,7 @@ public class BehandleSedMottattService {
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
 
-    private void publiserMelding(SedMottatt sedMottatt, SED sed) throws IntegrationException {
+    private void publiserMelding(SedMottatt sedMottatt, SED sed)  {
         log.info("Publiserer melding om mottatt sed på kafka for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sed.getSedType()));
         if (mapper == null) {

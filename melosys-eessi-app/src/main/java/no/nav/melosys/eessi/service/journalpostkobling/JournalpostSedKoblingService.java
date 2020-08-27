@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.journalpostkobling;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
@@ -10,15 +12,12 @@ import no.nav.melosys.eessi.models.JournalpostSedKobling;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -45,8 +44,7 @@ public class JournalpostSedKoblingService {
         return journalpostSedKoblingRepository.findByJournalpostID(journalpostID);
     }
 
-    public Optional<MelosysEessiMelding> finnVedJournalpostIDOpprettMelosysEessiMelding(String journalpostID)
-            throws IntegrationException {
+    public Optional<MelosysEessiMelding> finnVedJournalpostIDOpprettMelosysEessiMelding(String journalpostID) {
         Optional<JournalpostSedKobling> journalpostSedKobling = journalpostSedKoblingRepository
                 .findByJournalpostID(journalpostID);
 
@@ -63,15 +61,14 @@ public class JournalpostSedKoblingService {
         return Optional.empty();
     }
 
-    private Optional<String> søkEtterRinaSaksnummerForJournalpost(String journalpostID) throws IntegrationException {
+    private Optional<String> søkEtterRinaSaksnummerForJournalpost(String journalpostID) {
         Optional<String> rinaSaksnummer = safConsumer.hentRinasakForJournalpost(journalpostID);
 
         return rinaSaksnummer.isPresent() ? rinaSaksnummer : caseStoreConsumer.finnVedJournalpostID(journalpostID)
                 .stream().findFirst().map(CaseStoreDto::getRinaSaksnummer);
     }
 
-    private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling)
-            throws IntegrationException {
+    private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling) {
         BUC buc = euxService.hentBuc(journalpostSedKobling.getRinaSaksnummer());
         final var organisation = buc.hentDokument(journalpostSedKobling.getSedId()).getCreator().getOrganisation();
         SED sed = euxService.hentSed(journalpostSedKobling.getRinaSaksnummer(), journalpostSedKobling.getSedId());
@@ -94,8 +91,7 @@ public class JournalpostSedKoblingService {
         );
     }
 
-    private Optional<MelosysEessiMelding> opprettEessiMelding(String rinaSaksnummer, String journalpostID)
-            throws IntegrationException {
+    private Optional<MelosysEessiMelding> opprettEessiMelding(String rinaSaksnummer, String journalpostID) {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
         Optional<Document> documentOptional = buc.hentSistOppdaterteDocument();
         if (documentOptional.isEmpty()) {

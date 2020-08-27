@@ -1,13 +1,14 @@
 package no.nav.melosys.eessi.service.oppgave;
 
 import java.time.LocalDate;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.stereotype.Service;
+
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 
 @Slf4j
@@ -27,7 +28,7 @@ public class OppgaveService {
         this.oppgaveConsumer = oppgaveConsumer;
     }
 
-    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer) throws IntegrationException {
+    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer) {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .fristFerdigstillelse(LocalDate.now().plusDays(1))
@@ -44,7 +45,7 @@ public class OppgaveService {
         return response.getId();
     }
 
-    public String opprettUtgåendeJfrOppgave(String journalpostID, SedHendelse sedHendelse, String aktørId, String rinaUrl) throws IntegrationException {
+    public String opprettUtgåendeJfrOppgave(String journalpostID, SedHendelse sedHendelse, String aktørId, String rinaUrl) {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .beskrivelse(lagBeskrivelseUtgåendeJfrOppgave(sedHendelse, rinaUrl))

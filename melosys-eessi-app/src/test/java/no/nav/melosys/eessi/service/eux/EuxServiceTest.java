@@ -2,10 +2,7 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,51 +62,43 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentSed_forventKonsumentKall() throws IntegrationException {
+    public void hentSed_forventKonsumentKall() {
         euxService.hentSed("123123123", "12345");
         verify(euxConsumer).hentSed(eq("123123123"), eq("12345"));
     }
 
     @Test
-    public void hentBucer_forventKonsumentKall() throws IntegrationException {
+    public void hentBucer_forventKonsumentKall() {
         BucSearch bucSearch = BucSearch.builder()
                 .bucType(BucType.LA_BUC_01.name())
-                .fnr("12345678910")
                 .build();
 
         euxService.hentBucer(bucSearch);
 
-        verify(euxConsumer).finnRinaSaker(
-                eq("12345678910"),
-                eq(null),
-                eq(null),
-                eq(null),
-                eq(null),
-                eq(BucType.LA_BUC_01.name()),
-                eq(null)
-        );
+        verify(euxConsumer).finnRinaSaker(eq(BucType.LA_BUC_01.name()), isNull());
     }
 
     @Test
-    public void hentBuc_forventKonsumentKall() throws IntegrationException {
+    public void hentBuc_forventKonsumentKall() {
         euxService.hentBuc("123123123");
 
         verify(euxConsumer).hentBuC(eq("123123123"));
     }
 
     @Test
-    public void genererPdfFraSed_forventKonsumentkall() throws IntegrationException {
+    public void genererPdfFraSed_forventKonsumentkall() {
         euxService.genererPdfFraSed(new SED());
         verify(euxConsumer).genererPdfFraSed(any());
     }
 
     @Test
-    public void opprettBucOgSed_forventRinaSaksnummer() throws IntegrationException {
+    public void opprettBucOgSed_forventRinaSaksnummer() {
         BucType bucType = BucType.LA_BUC_01;
         Collection<String> mottakere = List.of("SE:123");
         SED sed = new SED();
+        var vedlegg = Set.of(new SedVedlegg("filen min", "pdf".getBytes()));
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, new SedVedlegg("filen min", "pdf".getBytes()));
+        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg);
 
         verify(euxConsumer).opprettBuC(eq(bucType.name()));
         verify(euxConsumer).opprettSed(eq(opprettetBucID), eq(sed));
@@ -119,11 +108,11 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void opprettOgSendSed_medRinaSaksnummer_forventKonsumentKall() throws IntegrationException {
+    public void opprettOgSendSed_medRinaSaksnummer_forventKonsumentKall() {
         SED sed = new SED();
         euxService.opprettOgSendSed(sed, opprettetBucID);
 
-        verify(euxConsumer).sendSed(eq(opprettetBucID), eq(null), eq(opprettetSedID));
+        verify(euxConsumer).sendSed(eq(opprettetBucID), eq(opprettetSedID));
     }
 
     @Test
@@ -140,15 +129,15 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void sendSed_forventKonsumentKall() throws IntegrationException {
+    public void sendSed_forventKonsumentKall() {
         String rinaSaksnummer = "123";
         String dokumentId = "332211";
         euxService.sendSed(rinaSaksnummer, dokumentId);
-        verify(euxConsumer).sendSed(eq(rinaSaksnummer), any(), eq(dokumentId));
+        verify(euxConsumer).sendSed(eq(rinaSaksnummer), eq(dokumentId));
     }
 
     @Test
-    public void hentMottakerinstitusjoner_laBuc04LandSverige_forventEnInstitusjon() throws IntegrationException {
+    public void hentMottakerinstitusjoner_laBuc04LandSverige_forventEnInstitusjon() {
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name(), "SE");
         assertThat(institusjoner).hasSize(1);
         assertThat(institusjoner.get(0).getAkronym()).isEqualTo("FK Sverige-TS70");
@@ -156,13 +145,13 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() throws IntegrationException {
+    public void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() {
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", "SE");
         assertThat(institusjoner).isEmpty();
     }
 
     @Test
-    public void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() throws IntegrationException {
+    public void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() {
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GB");
         assertThat(institusjoner).hasSize(1);
 
@@ -172,7 +161,7 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() throws IntegrationException {
+    public void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() {
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GR");
         assertThat(institusjoner).hasSize(1);
 
@@ -182,7 +171,7 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void sedErEndring_medFlereConversations_forventTrue() throws IntegrationException {
+    public void sedErEndring_medFlereConversations_forventTrue() {
         String sedID = "3333";
         String rinaSaksnummer = "333222111";
         BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
@@ -196,7 +185,7 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void sedErEndring_utenNoenConversations_forventFalse() throws IntegrationException {
+    public void sedErEndring_utenNoenConversations_forventFalse() {
         final String sedID = "3556";
         final String rinaSaksnummer = "54368";
         BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
@@ -210,7 +199,7 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void sedErEndring_utenSederForBuc_forventFalse() throws IntegrationException {
+    public void sedErEndring_utenSederForBuc_forventFalse() {
         final String sedID = "33322";
         BUC buc = new BUC();
         Document document = new Document();

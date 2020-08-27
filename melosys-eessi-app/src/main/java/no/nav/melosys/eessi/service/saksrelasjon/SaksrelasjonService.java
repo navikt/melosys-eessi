@@ -2,12 +2,12 @@ package no.nav.melosys.eessi.service.saksrelasjon;
 
 import java.util.List;
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +28,7 @@ public class SaksrelasjonService {
     }
 
     @Transactional
-    public FagsakRinasakKobling lagreKobling(Long gsakSaksnummer, String rinaSaksnummer, BucType bucType)
-            throws IntegrationException {
+    public FagsakRinasakKobling lagreKobling(Long gsakSaksnummer, String rinaSaksnummer, BucType bucType) {
         FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
         fagsakRinasakKobling.setRinaSaksnummer(rinaSaksnummer);
         fagsakRinasakKobling.setGsakSaksnummer(gsakSaksnummer);
@@ -43,7 +42,7 @@ public class SaksrelasjonService {
         return fagsakRinasakKobling;
     }
 
-    private void oppdaterEllerLagreIEuxCaseStore(Long gsakSaksnummer, String rinaSaksnummer) throws IntegrationException {
+    private void oppdaterEllerLagreIEuxCaseStore(Long gsakSaksnummer, String rinaSaksnummer) {
         Optional<CaseStoreDto> caseStoreDto = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer)
                 .stream().findFirst();
         if (caseStoreDto.isPresent()) {
@@ -83,7 +82,7 @@ public class SaksrelasjonService {
      * For også å fange opp evt. lovvalgs-sed'er som er opprettet fra nEESSI
      */
     @Transactional(readOnly = true)
-    public Optional<Long> søkEtterSaksnummerFraRinaSaksnummer(String rinaSaksnummer) throws IntegrationException {
+    public Optional<Long> søkEtterSaksnummerFraRinaSaksnummer(String rinaSaksnummer) {
         Optional<Long> saksnummer = fagsakRinasakKoblingRepository.findByRinaSaksnummer(rinaSaksnummer)
                 .map(FagsakRinasakKobling::getGsakSaksnummer);
 

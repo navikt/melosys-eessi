@@ -5,7 +5,6 @@ import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -35,7 +35,7 @@ public class OppgaveServiceTest {
     }
 
     @Test
-    public void opprettOppgaveIdOgFordeling_validerFelterBlirSatt() throws IntegrationException {
+    public void opprettOppgaveIdOgFordeling_validerFelterBlirSatt() {
 
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto());
         String journalpostID = "111";
@@ -52,7 +52,7 @@ public class OppgaveServiceTest {
     }
 
     @Test
-    public void opprettUtgåendeJfrOppgave_validerFelter() throws IntegrationException {
+    public void opprettUtgåendeJfrOppgave_validerFelter() {
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto());
         String journalpostID = "111";
         String aktørID = "321";

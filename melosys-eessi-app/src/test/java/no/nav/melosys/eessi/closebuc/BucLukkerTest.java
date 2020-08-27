@@ -201,7 +201,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_statusClosed_ingenBlirLukket() throws IntegrationException {
+    public void lukkBucerAvType_statusClosed_ingenBlirLukket() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setStatus("closed");
 

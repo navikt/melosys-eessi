@@ -19,11 +19,11 @@ public class DokumenttypeInfoConsumer implements RestConsumer {
         this.restTemplate = restTemplate;
     }
 
-    public DokumentTypeInfoDto hentDokumenttypeInfo(final String dokumenttypeId) throws IntegrationException {
+    public DokumentTypeInfoDto hentDokumenttypeInfo(final String dokumenttypeId) {
         try {
 
             return restTemplate
-                .exchange("/" + dokumenttypeId, HttpMethod.GET, new HttpEntity<>(defaultHeaders()), DokumentTypeInfoDto.class)
+                .exchange("/{dokumenttypeId}", HttpMethod.GET, new HttpEntity<>(defaultHeaders()), DokumentTypeInfoDto.class, dokumenttypeId)
                 .getBody();
 
         } catch (HttpServerErrorException | HttpClientErrorException e) {
