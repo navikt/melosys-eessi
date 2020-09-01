@@ -22,7 +22,7 @@
 
   <properties>
     <commons-io.version>2.6</commons-io.version>
-    <cxf.version>3.3.7</cxf.version>
+    <cxf.version>3.4.0</cxf.version>
     <flyway.version>6.5.3</flyway.version>
     <guava.version>29.0-jre</guava.version>
     <hibernate-types.version>2.9.13</hibernate-types.version>
