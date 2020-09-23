@@ -59,9 +59,9 @@ public class BucController {
     }
 
     @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
-    @PostMapping("/{bucType}/institusjoner")
+    @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
-                                                          @RequestBody(required = false) Collection<String> land)  {
+                                                          @RequestParam(required = false) Collection<String> land)  {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());
