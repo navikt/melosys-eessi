@@ -76,11 +76,11 @@ public class EuxService {
         euxConsumer.oppdaterSed(rinaSaksnummer, dokumentId, sed);
     }
 
-    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final String landkode) {
+    public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final Collection<String> landkoder) {
 
         return euxConsumer.hentInstitusjoner(bucType, null).stream()
                 .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
-                .filter(i -> filtrerPåLandkode(i, landkode))
+                .filter(i -> filtrerPåLandkoder(i, landkoder))
                 .filter(i -> i.getTilegnetBucs().stream().filter(
                         tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
                                 COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
@@ -88,8 +88,10 @@ public class EuxService {
                 .collect(Collectors.toList());
     }
 
-    private boolean filtrerPåLandkode(Institusjon institusjon, String landkode) {
-        return StringUtils.isEmpty(landkode) || landkode.equalsIgnoreCase(institusjon.getLandkode());
+    private boolean filtrerPåLandkoder(Institusjon institusjon, Collection<String> landkoder) {
+        return landkoder.isEmpty() || landkoder.stream()
+                .map(String::toLowerCase)
+                .anyMatch(landkode -> landkode.equals(institusjon.getLandkode().toLowerCase()));
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
