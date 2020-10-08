@@ -39,7 +39,7 @@ public enum BucType {
 
     // Multilateral = kan være flere enn 2 deltakere
     public boolean erMultilateralLovvalgBuc() {
-        return this == LA_BUC_01 || this == LA_BUC_02;
+        return this != LA_BUC_04;
     }
 
     // Betyr at buc-en brukes til å meddele et lovvalg med andre myndigheter

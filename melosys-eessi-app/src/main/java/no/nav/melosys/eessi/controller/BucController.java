@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.controller;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +61,7 @@ public class BucController {
     @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
     @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
-                                                          @RequestParam(required = false) String land)  {
+                                                          @RequestParam(required = false) Collection<String> land)  {
         return euxService.hentMottakerinstitusjoner(bucType.name(), land).stream()
                 .map(institusjon -> new InstitusjonDto(institusjon.getId(), institusjon.getNavn(), institusjon.getLandkode()))
                 .collect(Collectors.toList());

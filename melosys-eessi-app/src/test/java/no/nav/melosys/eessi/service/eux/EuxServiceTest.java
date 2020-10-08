@@ -138,7 +138,7 @@ public class EuxServiceTest {
 
     @Test
     public void hentMottakerinstitusjoner_laBuc04LandSverige_forventEnInstitusjon() {
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name(), "SE");
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name(), List.of("SE"));
         assertThat(institusjoner).hasSize(1);
         assertThat(institusjoner.get(0).getAkronym()).isEqualTo("FK Sverige-TS70");
         verify(euxConsumer).hentInstitusjoner(eq(BucType.LA_BUC_04.name()), eq(null));
@@ -146,13 +146,13 @@ public class EuxServiceTest {
 
     @Test
     public void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() {
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", "SE");
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", List.of("SE"));
         assertThat(institusjoner).isEmpty();
     }
 
     @Test
     public void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() {
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GB");
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", List.of("GB"));
         assertThat(institusjoner).hasSize(1);
 
         Institusjon institusjon = institusjoner.get(0);
@@ -162,7 +162,7 @@ public class EuxServiceTest {
 
     @Test
     public void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() {
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", "GR");
+        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", List.of("GR"));
         assertThat(institusjoner).hasSize(1);
 
         Institusjon institusjon = institusjoner.get(0);
