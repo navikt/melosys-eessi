@@ -63,7 +63,7 @@ class PersonSok {
     private SoekBegrunnelse vurderPerson(Person person, SED sed) {
         if (erOpphoert(person)) {
             return SoekBegrunnelse.PERSON_OPPHORT;
-        } else if (!harSammeStatsborgerskap(person, sed)) {
+        } else if (!sed.erXSED() && !harSammeStatsborgerskap(person, sed)) {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
         } else if (!harSammeFoedselsdato(person, sed)) {
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;
@@ -79,7 +79,10 @@ class PersonSok {
      * @return fødselsnummer/d-nummer for person, null hvis ikke funnet
      */
     private List<PersonSoekResponse> søkEtterPerson(SED sed) {
-        no.nav.melosys.eessi.models.sed.nav.Person sedPerson = sed.getNav().getBruker().getPerson();
+        return sed.finnPerson().map(this::søkEtterPerson).orElse(Collections.emptyList());
+    }
+
+    private List<PersonSoekResponse> søkEtterPerson(no.nav.melosys.eessi.models.sed.nav.Person sedPerson) {
         LocalDate foedselsdato = tilLocalDate(sedPerson.getFoedselsdato());
 
         List<PersonSoekResponse> response;
