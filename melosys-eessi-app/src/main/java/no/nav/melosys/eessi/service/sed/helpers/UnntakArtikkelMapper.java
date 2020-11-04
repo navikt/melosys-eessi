@@ -19,6 +19,7 @@ public final class UnntakArtikkelMapper {
             case ART_11_4:
                 return BESTEMMELSE_11_4;
             case ART_11_1:
+            case ART_11_2:
                 return BESTEMMELSE_OTHER;
             default:
                 return bestemmelse.getValue();
