@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum Bestemmelse {
 
     ART_11_1("11_1"),
+    ART_11_2("11_2"),
     ART_11_3_a("11_3_a"),
     ART_11_3_b("11_3_b"),
     ART_11_3_c("11_3_c"),

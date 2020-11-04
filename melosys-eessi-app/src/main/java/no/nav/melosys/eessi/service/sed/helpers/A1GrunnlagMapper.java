@@ -21,6 +21,7 @@ class A1GrunnlagMapper {
             case ART_16_2:
                 return BESTEMMELSE_16_R;
             case ART_11_1:
+            case ART_11_2:
             case ART_11_3_a:
             case ART_11_3_b:
             case ART_11_3_c:
