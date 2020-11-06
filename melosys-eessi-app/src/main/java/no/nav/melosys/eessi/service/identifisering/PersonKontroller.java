@@ -38,8 +38,9 @@ class PersonKontroller {
         dateFormatter.setTimeZone(tpsFoedselsdatoCalendar.getTimeZone());
 
         String tpsFoedselsdato = dateFormatter.format(tpsFoedselsdatoCalendar.getTime());
-        String sedFoedselsdato = sed.getNav().getBruker().getPerson().getFoedselsdato().substring(0, LOCAL_DATE_LENGTH);
 
-        return tpsFoedselsdato.equalsIgnoreCase(sedFoedselsdato);
+        return sed.finnPerson().map(no.nav.melosys.eessi.models.sed.nav.Person::getFoedselsdato)
+                .map(dato -> dato.substring(0, LOCAL_DATE_LENGTH))
+                .stream().anyMatch(tpsFoedselsdato::equalsIgnoreCase);
     }
 }

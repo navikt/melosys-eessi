@@ -6,9 +6,12 @@ import java.util.Collections;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import lombok.val;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.tps.TpsService;
@@ -19,6 +22,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -121,16 +125,63 @@ public class PersonSokTest {
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT);
     }
 
+
+    @Test
+    public void søkPersonFraSed_tidssoneForDatoEttTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+        SED sed = lagSed();
+        sed.getNav().getBruker().getPerson().setFoedselsdato(sed.getNav().getBruker().getPerson().getFoedselsdato() + "+02:00");
+
+        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
+
+        assertThat(sokResultat.personIdentifisert()).isTrue();
+        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+    }
+
+    @Test
+    public void søkPersonFraSed_finnerIkkePersonFraSedStruktur_forventIngenTreff() throws Exception {
+        SED sed = lagSed();
+        sed.setSedType(SedType.X007.name());
+
+        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
+
+        assertThat(sokResultat.personIdentifisert()).isFalse();
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.INGEN_TREFF);
+    }
+
+    @Test
+    public void søkPersonFraSed_x001UtenStatsborgerskap_statsborgerskapSjekkesIkkeEttTreff() throws IOException {
+        SED sed = sedX001();
+        sed.finnPerson().ifPresent(p -> p.setFoedselsdato("1983-05-01"));
+
+        assertThat(personSok.søkPersonFraSed(sed))
+                .extracting(PersonSokResultat::getIdent, PersonSokResultat::getBegrunnelse)
+                .containsExactly(IDENT, SoekBegrunnelse.IDENTIFISERT);
+    }
+
     private SED lagSed() throws IOException {
-        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA009.json");
-        ObjectMapper mapper = new ObjectMapper();
-        SED sed = mapper.readValue(jsonUrl, SED.class);
+        SED sed = sedA009();
 
         val statsborgerskap = new no.nav.melosys.eessi.models.sed.nav.Statsborgerskap();
         statsborgerskap.setLand("NO");
         sed.getNav().getBruker().getPerson().getStatsborgerskap().add(statsborgerskap);
 
         return sed;
+    }
+
+    private SED sedA009() throws IOException {
+        return hentSedFil("mock/sedA009.json");
+    }
+
+    private SED sedX001() throws IOException {
+        return hentSedFil("mock/sedX001.json");
+    }
+
+    private SED hentSedFil(String filnavn) throws IOException {
+        URL jsonUrl = getClass().getClassLoader().getResource(filnavn);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false);
+        return mapper.readValue(jsonUrl, SED.class);
     }
 
     private Person lagTpsPerson() throws DatatypeConfigurationException {
@@ -145,17 +196,6 @@ public class PersonSokTest {
                         .withPersonstatus(new Personstatuser().withValue("BOSA")));
     }
 
-    @Test
-    public void søkPersonFraSed_tidssoneForDatoEttTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
-        SED sed = lagSed();
-        sed.getNav().getBruker().getPerson().setFoedselsdato(sed.getNav().getBruker().getPerson().getFoedselsdato() + "+02:00");
-
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
-
-        assertThat(sokResultat.personIdentifisert()).isTrue();
-        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
-    }
 
     /**
      * @param dato format: yyyy-MM-dd

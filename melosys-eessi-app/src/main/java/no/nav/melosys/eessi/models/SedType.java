@@ -45,5 +45,9 @@ public enum SedType {
     H130,
 
     S040,
-    S041
+    S041;
+
+    public boolean erXSED() {
+        return this.name().startsWith("X");
+    }
 }
