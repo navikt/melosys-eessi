@@ -16,7 +16,9 @@ public class Participant {
         @JsonProperty("Sender")
         UTSENDER,
         @JsonProperty("Participant")
-        DELTAKER
+        DELTAKER,
+        @JsonProperty("CounterParty")
+        MOTPART
     }
 
     private ParticipantRole role;

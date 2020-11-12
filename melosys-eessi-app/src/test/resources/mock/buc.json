@@ -314,7 +314,7 @@
               "selected": false
             },
             {
-              "role": "Receiver",
+              "role": "CounterParty",
               "organisation": {
                 "id": "NO:NAVT007",
                 "address": {
