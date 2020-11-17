@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
@@ -81,15 +82,30 @@ public class SedService {
         }
     }
 
+    /*
+    NB! Må legge inn en sleep grunnet problematikk i RINA.
+    Ved opprettelse av SED og umiddelbar sending rett etter, *kan* Rina-saken bli "skadd" ved opprettelse.
+    Det kan videre føre til at vi ikke kan se svar-SEDer vi mottar fra utlandet, som vil påvirke tiden det tar før vi får ut vedtak til bruker
+     */
     private void sendSed(String rinaSaksnummer, String dokumentId) {
         try {
+            TimeUnit.SECONDS.sleep(6L);
             euxService.sendSed(rinaSaksnummer, dokumentId);
         } catch (IntegrationException e) {
             log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
-            euxService.slettBuC(rinaSaksnummer);
-            saksrelasjonService.slettVedRinaId(rinaSaksnummer);
+            slettBucOgSaksrelasjon(rinaSaksnummer);
             throw e;
+        } catch (InterruptedException e) {
+            log.error("Uventet InterruptedException", e);
+            Thread.currentThread().interrupt();
+            slettBucOgSaksrelasjon(rinaSaksnummer);
+            throw new RuntimeException(e);
         }
+    }
+
+    private void slettBucOgSaksrelasjon(String rinaSaksnummer) {
+        euxService.slettBuC(rinaSaksnummer);
+        saksrelasjonService.slettVedRinaId(rinaSaksnummer);
     }
 
     public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) {
