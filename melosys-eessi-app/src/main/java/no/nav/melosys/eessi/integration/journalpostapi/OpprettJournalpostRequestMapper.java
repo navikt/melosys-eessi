@@ -1,13 +1,5 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
-import org.springframework.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,8 +7,16 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
+import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
+
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 public final class OpprettJournalpostRequestMapper {
@@ -51,7 +51,7 @@ public final class OpprettJournalpostRequestMapper {
         return OpprettJournalpostRequest.builder()
                 .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
                 .behandlingstema(dokkatSedInfo.getBehandlingstema())
-                .bruker(!StringUtils.isEmpty(navIdent) ? lagBruker(navIdent) : null)
+                .bruker(isNotEmpty(navIdent) ? lagBruker(navIdent) : null)
                 .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokkatSedInfo))
                 .eksternReferanseId(sedHendelse.getSedId())
                 .journalfoerendeEnhet("4530")

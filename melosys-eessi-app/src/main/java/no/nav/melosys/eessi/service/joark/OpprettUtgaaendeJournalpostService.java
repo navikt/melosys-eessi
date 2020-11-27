@@ -13,6 +13,8 @@ import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 @Slf4j
 @Service
 public class OpprettUtgaaendeJournalpostService {
@@ -62,7 +64,7 @@ public class OpprettUtgaaendeJournalpostService {
 
         String navIdent = sedSendt.getNavBruker();
         OpprettJournalpostResponse response = opprettUtgåendeJournalpost(sedSendt, null, navIdent);
-        opprettUtgåendeJournalføringsoppgave(sedSendt, response.getJournalpostId(), tpsService.hentAktoerId(navIdent));
+        opprettUtgåendeJournalføringsoppgave(sedSendt, response.getJournalpostId(), navIdent);
 
         return response.getJournalpostId();
     }
@@ -73,7 +75,7 @@ public class OpprettUtgaaendeJournalpostService {
     }
 
     private String opprettUtgåendeJournalføringsoppgave(SedHendelse sedSendt, String journalpostId, String navIdent) {
-        return oppgaveService.opprettUtgåendeJfrOppgave(journalpostId, sedSendt, tpsService.hentAktoerId(navIdent),
+        return oppgaveService.opprettUtgåendeJfrOppgave(journalpostId, sedSendt, isNotEmpty(navIdent) ? tpsService.hentAktoerId(navIdent) : null,
                 euxService.hentRinaUrl(sedSendt.getRinaSakId()));
     }
 }
