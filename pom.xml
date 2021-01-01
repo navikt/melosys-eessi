@@ -33,7 +33,7 @@
     <logstash-encoder.version>5.3</logstash-encoder.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
-    <micrometer-jvm-extras.version>0.2.0</micrometer-jvm-extras.version>
+    <micrometer-jvm-extras.version>0.2.1</micrometer-jvm-extras.version>
     <person-utils.version>1.35.0</person-utils.version>
     <personsok.version>1.2019.09.25-00.21-49b69f0625e0</personsok.version>
     <random-benas.version>3.9.0</random-benas.version>
