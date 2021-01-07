@@ -4,17 +4,39 @@ on:
   push:
     branches:
       - 'master'
-      - 'develop'
-  pull_request:
-    branches:
-      - 'master'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Miljø'
+        required: true
+        default: 'q2'
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
+  IMAGE_MANIFESTS: https://docker.pkg.github.com/v2/${{ github.repository }}/melosys-eessi/manifests/${{ github.sha }}
 
 jobs:
+  check_docker_image_exists:
+    name: Check if docker image exists in registry
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "DOCKER_IMAGE_EXISTS_HTTP_STATUS=$(curl -X GET -s -o /dev/null -w "%{http_code}" ${{ env.IMAGE_MANIFESTS }} -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }})" >> $GITHUB_ENV
+      - id: set_output
+        run: |
+          if [ ${{ env.DOCKER_IMAGE_EXISTS_HTTP_STATUS }} -eq 200 ]
+          then
+            echo "::set-output name=exists::true"
+          else
+            echo "::set-output name=exists::false"
+          fi
+    outputs:
+      exists: ${{ steps.set_output.outputs.exists }}
+
   build:
     runs-on: ubuntu-latest
+    needs: check_docker_image_exists
+    if: needs.check_docker_image_exists.outputs.exists != 'true'
     steps:
       - name: Checkout
         uses: actions/checkout@v1
@@ -43,11 +65,11 @@ jobs:
         run: |
           docker push ${IMAGE}
 
-  # Deploy til Q2 ved push på develop-branch
+  # Deploy til Q2 manuelt eller ved push på master-branch
   deploy_q2:
     name: Deploy til Q2
     needs: build
-    if: github.ref == 'refs/heads/develop'
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && (github.event.inputs.environment == 'q2' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -60,11 +82,11 @@ jobs:
           RESOURCE: deploy/nais.yaml
           VAR: namespace=q2
 
-  # Deploy til Q1 ved pull-request mot master
+  # Deploy til Q1 manuelt
   deploy_q1:
     name: Deploy til Q1
     needs: build
-    if: github.event_name == 'pull_request'
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && github.event.inputs.environment == 'q1'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -77,11 +99,11 @@ jobs:
           RESOURCE: deploy/nais.yaml
           VAR: namespace=default
 
-  # Deploy til prod ved push på master
+  # Deploy til prod manuelt
   deploy_prod:
     name: Deploy til prod
     needs: build
-    if: github.ref == 'refs/heads/master'
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && github.event.inputs.environment == 'p'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
