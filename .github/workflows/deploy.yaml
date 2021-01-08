@@ -13,7 +13,7 @@ on:
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
-  IMAGE_MANIFESTS: https://docker.pkg.github.com/v2/${{ github.repository }}/melosys-eessi/manifests/${{ github.sha }}
+  IMAGE_MANIFEST: https://docker.pkg.github.com/v2/${{ github.repository }}/melosys-eessi/manifests/${{ github.sha }}
 
 jobs:
   check_docker_image_exists:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "DOCKER_IMAGE_EXISTS_HTTP_STATUS=$(curl -X GET -s -o /dev/null -w "%{http_code}" ${{ env.IMAGE_MANIFESTS }} -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }})" >> $GITHUB_ENV
+          echo "DOCKER_IMAGE_EXISTS_HTTP_STATUS=$(curl -X GET -s -o /dev/null -w "%{http_code}" ${{ env.IMAGE_MANIFEST }} -u ${{ github.actor }}:${{ secrets.GITHUB_TOKEN }})" >> $GITHUB_ENV
       - id: set_output
         run: |
           if [ ${{ env.DOCKER_IMAGE_EXISTS_HTTP_STATUS }} -eq 200 ]
