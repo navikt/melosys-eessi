@@ -18,7 +18,7 @@ import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.SeekToCurrentErrorHandler;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
-import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer2;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
@@ -72,20 +72,17 @@ public class KafkaConsumerConfig {
             KafkaProperties properties, RecordFilterStrategy<String, SedHendelse> recordFilterStrategy) {
         Map<String, Object> props = properties.buildConsumerProperties();
         props.putAll(sedEventConsumerConfig());
-        ErrorHandlingDeserializer2<SedHendelse> deserializer = valueDeserializer(SedHendelse.class);
         DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-                props, new StringDeserializer(), deserializer);
+                props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
         factory.setErrorHandler(new SeekToCurrentErrorHandler());
         factory.setRecordFilterStrategy(recordFilterStrategy);
-        factory.getContainerProperties().setAckOnError(false);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
         return factory;
     }
 
-    //ErrorHandlingDeserializer2 added to prevent never ending loop if parsing fails.
-    private <T> ErrorHandlingDeserializer2<T> valueDeserializer(Class<T> targetType) {
-        return new ErrorHandlingDeserializer2<>(new JsonDeserializer<>(targetType,false ));
+    private <T> ErrorHandlingDeserializer<T> valueDeserializer(Class<T> targetType) {
+        return new ErrorHandlingDeserializer<>(new JsonDeserializer<>(targetType,false ));
     }
 }
