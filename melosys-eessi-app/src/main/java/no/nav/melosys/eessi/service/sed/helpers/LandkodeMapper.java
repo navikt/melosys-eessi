@@ -17,8 +17,7 @@ public final class LandkodeMapper {
 
     static {
         Arrays.stream(Locale.getISOCountries()).forEach(c -> map.put(new Locale("", c).getISO3Country(), c));
-        //FIXME: midlertidig fix for landkoder utenfor iso-standard til vi blir enige om hvilke som skal brukes
-        map.put("XXX", "XXX"); //Statsløs
+        map.put("XXX", "XS"); //Statsløs
         map.put("???", "???"); //Ukjent
     }
 
