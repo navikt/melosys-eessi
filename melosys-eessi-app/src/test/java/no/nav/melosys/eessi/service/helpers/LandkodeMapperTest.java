@@ -31,6 +31,6 @@ public class LandkodeMapperTest {
     @Test
     public void getIso2_medIkkeISOStandardKoder_forventSammeKodeTilbake() throws NotFoundException {
         assertThat(LandkodeMapper.getLandkodeIso2("???")).isEqualTo("???");
-        assertThat(LandkodeMapper.getLandkodeIso2("XXX")).isEqualTo("XXX");
+        assertThat(LandkodeMapper.getLandkodeIso2("XXX")).isEqualTo("XS");
     }
 }
