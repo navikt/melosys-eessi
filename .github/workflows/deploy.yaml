@@ -115,6 +115,8 @@ jobs:
           CLUSTER: prod-fss
           RESOURCE: deploy/nais.yaml
           VAR: namespace=default
+      - run: |
+          echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
         if: success()
         uses: rtCamp/action-slack-notify@v1.0.0
@@ -124,7 +126,7 @@ jobs:
           SLACK_ICON: https://github.com/github.png?size=48
           SLACK_TITLE: ':clap: melosys-eessi ble deployet til prod :rocket:'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: ${{ github.event.head_commit.message }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
       - name: Slack Notification (deploy failure)
         if: failure()
         uses: rtCamp/action-slack-notify@v1.0.0
@@ -134,4 +136,4 @@ jobs:
           SLACK_ICON: https://github.com/github.png?size=48
           SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke deployes til prod!'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: ${{ github.event.head_commit.message }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
