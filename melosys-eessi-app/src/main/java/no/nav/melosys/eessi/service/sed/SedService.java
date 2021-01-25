@@ -43,7 +43,11 @@ public class SedService {
         this.saksrelasjonService = saksrelasjonService;
     }
 
-    public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto, Collection<SedVedlegg> vedlegg, BucType bucType, boolean sendAutomatisk)
+    public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto,
+                                                Collection<SedVedlegg> vedlegg,
+                                                BucType bucType,
+                                                boolean sendAutomatisk,
+                                                boolean forsøkOppdaterEksisterende)
             throws ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
@@ -57,7 +61,7 @@ public class SedService {
         validerMottakerInstitusjoner(bucType, mottakere);
 
         OpprettBucOgSedResponse response = opprettEllerOppdaterBucOgSed(
-                sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerIder()
+                sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerIder(), forsøkOppdaterEksisterende
         );
 
         if (sedDataDto.getBruker().isHarSensitiveOpplysninger()) {
@@ -126,9 +130,13 @@ public class SedService {
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
 
-    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) {
-
-        if (bucType.meddelerLovvalg()) {
+    private OpprettBucOgSedResponse opprettEllerOppdaterBucOgSed(SED sed,
+                                                                 Collection<SedVedlegg> vedlegg,
+                                                                 BucType bucType,
+                                                                 Long gsakSaksnummer,
+                                                                 List<String> mottakerIder,
+                                                                 boolean forsøkOppdaterEksisterende) {
+        if (forsøkOppdaterEksisterende && bucType.meddelerLovvalg()) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
                     saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType)
             );
