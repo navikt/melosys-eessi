@@ -43,9 +43,15 @@ public class BucController {
     public BucOgSedOpprettetDto opprettBucOgSed(
             @RequestBody OpprettBucOgSedDto opprettBucOgSedDto,
             @PathVariable("bucType") BucType bucType,
-            @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk
+            @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk,
+            @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende
     ) throws ValidationException {
-        return sedService.opprettBucOgSed(opprettBucOgSedDto.getSedDataDto(), opprettBucOgSedDto.getVedlegg(), bucType, sendAutomatisk);
+        return sedService.opprettBucOgSed(
+                opprettBucOgSedDto.getSedDataDto(),
+                opprettBucOgSedDto.getVedlegg(),
+                bucType,
+                sendAutomatisk,
+                oppdaterEksisterende);
     }
 
     @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")
