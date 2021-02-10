@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
+
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -8,22 +9,27 @@ import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
+import no.nav.melosys.utils.PostgresContainer;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -32,42 +38,45 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class })
 @TestPropertySource(locations = "/kafka-test.properties")
 public abstract class ComponentTestBase {
-    
+
     private static final String AKTOER_ID = "1234567890123";
     private static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     private static final String STATSBORGERSKAP = "NO";
-    
+
     protected final ComponentTestProvider componentTestProvider = new ComponentTestProvider();
-    
+
     @Autowired
     KafkaTestConsumer kafkaTestConsumer;
 
-    @Autowired
+    @MockBean
     EuxConsumer euxConsumer;
 
-    @Autowired
+    @MockBean
     PersonConsumer personConsumer;
 
-    @Autowired
+    @MockBean
     AktoerConsumer aktoerConsumer;
 
-    @Autowired
+    @MockBean
     PersonsokConsumer personsokConsumer;
 
-    @Autowired
+    @MockBean
     SakConsumer sakConsumer;
 
-    @Autowired
+    @MockBean
     DokumenttypeIdConsumer dokumenttypeIdConsumer;
 
-    @Autowired
+    @MockBean
     DokumenttypeInfoConsumer dokumenttypeInfoConsumer;
 
-    @Autowired
+    @MockBean
     JournalpostapiConsumer journalpostapiConsumer;
 
-    @Autowired
+    @MockBean
     OppgaveConsumer oppgaveConsumer;
+
+    @MockBean
+    SafConsumer safConsumer;
 
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
@@ -75,6 +84,10 @@ public abstract class ComponentTestBase {
     protected ProducerRecord<String, Object> createProducerRecord() {
         return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", componentTestProvider.sedHendelse(AKTOER_ID));
     }
+
+    @ClassRule
+    public static PostgresContainer DB = PostgresContainer.getInstance();
+
 
     @Before
     public void setup() throws Exception {
