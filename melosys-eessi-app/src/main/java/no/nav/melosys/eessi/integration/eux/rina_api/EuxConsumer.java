@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,8 +27,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -101,6 +105,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      * @param rinaSaksnummer saksnummer
      * @param mottakerIDer id på mottakende enhet
      */
+    @Retryable(
+            value = NotFoundException.class,
+            backoff = @Backoff(delay = 1000, maxDelay = 2000, multiplier = 2))
     public void settMottakere(String rinaSaksnummer, Collection<String> mottakerIDer) {
 
         log.info("Setter mottaker {} til sak {}", mottakerIDer, rinaSaksnummer);
@@ -323,8 +330,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
             ParameterizedTypeReference<T> responseType, Object... variabler) {
         try {
             return euxRestTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new NotFoundException("404 fra eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
-            throw new IntegrationException("Error in integration with eux: " + hentFeilmeldingForEux(e), e);
+            throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         }
     }
 }
