@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
@@ -23,16 +24,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class EuxConsumerTest {
@@ -81,7 +85,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBuC_returnererId() throws Exception {
+    public void opprettBuC_returnererId() {
         String id = "1234";
         String buc = "LA_BUC_04";
         server.expect(requestTo("/buc?BuCType=" + buc))
@@ -92,7 +96,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void slettBuC_ingenRetur() throws Exception {
+    public void slettBuC_ingenRetur() {
         String id = "1234";
         server.expect(requestTo("/buc/" + id))
                 .andExpect(method(HttpMethod.DELETE))
@@ -102,7 +106,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void settMottaker_ingenRetur() throws Exception {
+    public void settMottaker_ingenRetur() {
         String rinaSaksnummer = "1111";
         String sverige = "SE:1234";
         String danmark = "DK:4321";
@@ -111,6 +115,20 @@ public class EuxConsumerTest {
                 .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         euxConsumer.settMottakere(rinaSaksnummer, List.of(sverige, danmark));
+    }
+
+    @Test
+    public void settMottaker_respons404_kasterNotFoundException() {
+        String rinaSaksnummer = "1111";
+        String sverige = "SE:1234";
+        String danmark = "DK:4321";
+        var mottakere = List.of(sverige, danmark);
+
+        server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "," + danmark))
+                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> euxConsumer.settMottakere(rinaSaksnummer, mottakere));
     }
 
     @Test
@@ -324,7 +342,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedPdf_forventPdf() throws Exception {
+    public void hentSedPdf_forventPdf() {
         String id = "123", dokumentId = "123321";
 
         byte[] forventetRetur = "teststring".getBytes();
@@ -349,7 +367,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettSed_forventId() throws Exception {
+    public void opprettSed_forventId() {
         String id = "123";
         SED sed = new SED();
 
@@ -363,7 +381,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void oppdaterSed_ingenRetur() throws Exception {
+    public void oppdaterSed_ingenRetur() {
         String id = "123";
         String dokumentId = "1111";
         SED sed = new SED();
@@ -375,7 +393,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void sendSed_ingenRetur() throws Exception {
+    public void sendSed_ingenRetur() {
         String id = "123";
         String dokumentId = "22";
 
@@ -386,7 +404,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void leggTilVedlegg_forventId() throws Exception {
+    public void leggTilVedlegg_forventId() {
         final String id = "123";
         final String dokumentId = "123321";
         final String filtype = "virus.exe";
