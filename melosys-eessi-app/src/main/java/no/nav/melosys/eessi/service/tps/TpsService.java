@@ -154,7 +154,7 @@ public class TpsService {
     }
 
     private static PersonSoekResponse.Kjoenn mapKjoenn(String kjoenn) {
-        if (StringUtils.isEmpty(kjoenn)) {
+        if (!StringUtils.hasText(kjoenn)) {
             return null;
         }
 

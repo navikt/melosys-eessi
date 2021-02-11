@@ -171,7 +171,7 @@ public interface SedMapper {
 
             if (arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
+            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 
@@ -237,7 +237,7 @@ public interface SedMapper {
         adresse.setBygning(null);
         adresse.setRegion(sAdresse.getRegion());
 
-        if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
+        if (!StringUtils.hasText(adresse.getBy()) || !StringUtils.hasText(adresse.getLand())) {
             throw new MappingException("Felter 'poststed' og 'land' er påkrevd for adresser");
         }
 
@@ -245,7 +245,7 @@ public interface SedMapper {
     }
 
     default List<Identifikator> lagIdentifikator(String orgnr) {
-        if (StringUtils.isEmpty(orgnr)) {
+        if (!StringUtils.hasText(orgnr)) {
             return Collections.emptyList();
         }
 
