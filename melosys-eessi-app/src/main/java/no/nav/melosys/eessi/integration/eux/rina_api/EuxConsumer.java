@@ -107,7 +107,8 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
      */
     @Retryable(
             value = NotFoundException.class,
-            backoff = @Backoff(delay = 1000, maxDelay = 2000, multiplier = 2))
+            backoff = @Backoff(delay = 2000, maxDelay = 4000, multiplier = 2),
+            maxAttempts = 5)
     public void settMottakere(String rinaSaksnummer, Collection<String> mottakerIDer) {
 
         log.info("Setter mottaker {} til sak {}", mottakerIDer, rinaSaksnummer);
