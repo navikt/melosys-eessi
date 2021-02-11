@@ -21,7 +21,6 @@ import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
@@ -172,7 +171,7 @@ public interface SedMapper {
 
             if (arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (!StringUtils.isEmpty(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
+            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 
@@ -233,13 +232,12 @@ public interface SedMapper {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) && !StringUtils.isEmpty(sAdresse.getPostnr()) ?
-                PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
+        adresse.setBy(sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
         adresse.setRegion(sAdresse.getRegion());
 
-        if (StringUtils.isEmpty(adresse.getBy()) || StringUtils.isEmpty(adresse.getLand())) {
+        if (!StringUtils.hasText(adresse.getBy()) || !StringUtils.hasText(adresse.getLand())) {
             throw new MappingException("Felter 'poststed' og 'land' er påkrevd for adresser");
         }
 
@@ -247,7 +245,7 @@ public interface SedMapper {
     }
 
     default List<Identifikator> lagIdentifikator(String orgnr) {
-        if (StringUtils.isEmpty(orgnr)) {
+        if (!StringUtils.hasText(orgnr)) {
             return Collections.emptyList();
         }
 

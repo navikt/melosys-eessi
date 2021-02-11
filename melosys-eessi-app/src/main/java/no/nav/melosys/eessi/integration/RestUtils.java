@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration;
 
 import java.io.IOException;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
@@ -30,7 +31,7 @@ public class RestUtils {
         if(e instanceof RestClientResponseException) {
             RestClientResponseException clientErrorException = (RestClientResponseException) e;
             String feilmelding = clientErrorException.getResponseBodyAsString();
-            if (StringUtils.isEmpty(feilmelding)) return e.getMessage();
+            if (!StringUtils.hasText(feilmelding)) return e.getMessage();
             try {
                 JsonNode json = objectMapper.readTree(feilmelding).path(nøkkel);
                 return json.isMissingNode() ? e.getMessage() : json.toString();

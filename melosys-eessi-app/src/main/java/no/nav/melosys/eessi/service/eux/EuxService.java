@@ -91,7 +91,7 @@ public class EuxService {
     private boolean filtrerPåLandkoder(Institusjon institusjon, Collection<String> landkoder) {
         return landkoder.isEmpty() || landkoder.stream()
                 .map(String::toLowerCase)
-                .anyMatch(landkode -> landkode.equals(institusjon.getLandkode().toLowerCase()));
+                .anyMatch(landkode -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
@@ -129,7 +129,7 @@ public class EuxService {
     }
 
     public String hentRinaUrl(String rinaCaseId) {
-        if (StringUtils.isEmpty(rinaCaseId)) {
+        if (!StringUtils.hasText(rinaCaseId)) {
             throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
         return rinaHostUrl + RINA_URL_TEMPLATE + rinaCaseId;
