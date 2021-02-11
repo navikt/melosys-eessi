@@ -21,7 +21,6 @@ import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import no.nav.melosys.eessi.service.sed.helpers.PostnummerMapper;
 import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
@@ -233,8 +232,7 @@ public interface SedMapper {
         Adresse adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(StringUtils.isEmpty(sAdresse.getPoststed()) && !StringUtils.isEmpty(sAdresse.getPostnr()) ?
-                PostnummerMapper.getPoststed(sAdresse.getPostnr()) : sAdresse.getPoststed());
+        adresse.setBy(sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
         adresse.setRegion(sAdresse.getRegion());
