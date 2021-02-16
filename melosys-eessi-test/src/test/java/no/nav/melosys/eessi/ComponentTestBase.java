@@ -19,21 +19,21 @@ import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class })
 @TestPropertySource(locations = "/kafka-test.properties")
@@ -89,7 +89,7 @@ public abstract class ComponentTestBase {
     public static PostgresContainer DB = PostgresContainer.getInstance();
 
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(componentTestProvider.sedMedVedlegg());
