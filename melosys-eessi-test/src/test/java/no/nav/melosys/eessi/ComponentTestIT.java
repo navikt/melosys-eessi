@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ComponentTest extends ComponentTestBase {
+public class ComponentTestIT extends ComponentTestBase {
 
     @Test
     public void testHappyCase() throws Exception {
