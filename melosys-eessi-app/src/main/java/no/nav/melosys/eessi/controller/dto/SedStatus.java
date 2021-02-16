@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.Arrays;
+
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
@@ -23,7 +24,7 @@ public enum SedStatus {
 
     public static SedStatus fraNorskStatus(String norskStatus) {
 
-        if (StringUtils.isEmpty(norskStatus)) {
+        if (!StringUtils.hasText(norskStatus)) {
             return null;
         }
 
@@ -32,7 +33,7 @@ public enum SedStatus {
 
     public static SedStatus fraEngelskStatus(String engelskStatus) {
 
-        if (StringUtils.isEmpty(engelskStatus)) {
+        if (!StringUtils.hasText(engelskStatus)) {
             return null;
         }
 

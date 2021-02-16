@@ -12,7 +12,7 @@ public class A008Mapper implements LovvalgSedMapper<MedlemskapA008> {
     @Override
     public MedlemskapA008 getMedlemskap(SedDataDto sedData) {
         MedlemskapA008 medlemskap = new MedlemskapA008();
-        if (!StringUtils.isEmpty(sedData.getAvklartBostedsland())) {
+        if (StringUtils.hasText(sedData.getAvklartBostedsland())) {
             //For videresending av søknad - fyller ut arbeidsland, ikke påkrevd
             medlemskap.setBruker(hentA008Bruker(sedData));
         }

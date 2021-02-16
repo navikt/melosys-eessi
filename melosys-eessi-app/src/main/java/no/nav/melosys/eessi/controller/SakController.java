@@ -54,7 +54,7 @@ public class SakController {
 
     @PostMapping
     @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
-    public ResponseEntity lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
+    public ResponseEntity<Void> lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
             throws ValidationException {
         validerSaksrelasjonDto(saksrelasjonDto);
 
@@ -70,11 +70,11 @@ public class SakController {
             @PathParam("rinaSaksnummer") String rinaSaksnummer,
             @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
 
-        if (StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer != null) {
+        if (!StringUtils.hasText(rinaSaksnummer) && gsakSaksnummer != null) {
             return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                     .map(SaksrelasjonDto::av)
                     .collect(Collectors.toList());
-        } else if (!StringUtils.isEmpty(rinaSaksnummer) && gsakSaksnummer == null) {
+        } else if (StringUtils.hasText(rinaSaksnummer) && gsakSaksnummer == null) {
             return saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer)
                     .map(saksnummer -> Collections.singletonList(new SaksrelasjonDto(saksnummer, rinaSaksnummer, null)))
                     .orElse(Collections.emptyList());
@@ -86,7 +86,7 @@ public class SakController {
     private void validerSaksrelasjonDto(SaksrelasjonDto saksrelasjonDto) throws ValidationException {
         if (saksrelasjonDto.getGsakSaksnummer() == null || saksrelasjonDto.getGsakSaksnummer() < 1L) {
             throw new ValidationException("gsakSaksnummer kan ikke være tom");
-        } else if (StringUtils.isEmpty(saksrelasjonDto.getRinaSaksnummer())) {
+        } else if (!StringUtils.hasText(saksrelasjonDto.getRinaSaksnummer())) {
             throw new ValidationException("rinaSaksnummer kan ikke være tom");
         }
 
