@@ -1,5 +1,10 @@
 package no.nav.melosys.eessi.service.behandling;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedMottatt;
@@ -11,16 +16,11 @@ import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -68,7 +68,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_finnerIkkePerson_forventJournalpostOgOppgaveOpprettes() throws Exception {
+    public void behandleSed_finnerIkkePerson_forventJournalpostOgOppgaveOpprettes() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
@@ -83,7 +83,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personIkkeIdentifisert_forventJournalpostOgOppgaveOpprettes() throws Exception {
+    public void behandleSed_personIkkeIdentifisert_forventJournalpostOgOppgaveOpprettes() {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
@@ -98,7 +98,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personIkkeIdentifisertJournalpostOpprettet_forventOppgaveOpprettes() throws Exception {
+    public void behandleSed_personIkkeIdentifisertJournalpostOpprettet_forventOppgaveOpprettes() {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
@@ -115,7 +115,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_finnerPerson_forventPubliserKafkaMelding() throws Exception {
+    public void behandleSed_finnerPerson_forventPubliserKafkaMelding() {
         final String aktoerID = "12312312312";
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
         when(tpsService.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
@@ -131,7 +131,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personAlleredeFunnet_forventIkkeIdentifiserOgPubliserKafkaMelding() throws Exception {
+    public void behandleSed_personAlleredeFunnet_forventIkkeIdentifiserOgPubliserKafkaMelding() {
         final String aktoerID = "12312312312";
         when(tpsService.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
 
@@ -150,7 +150,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personFunnetJournalpostOpprettet_forventKunPubliserKafka() throws Exception {
+    public void behandleSed_personFunnetJournalpostOpprettet_forventKunPubliserKafka() {
         final String aktoerID = "12312312312";
         when(tpsService.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
 
@@ -171,7 +171,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_alleredeUtført_forventIngenVidereKall() throws Exception {
+    public void behandleSed_alleredeUtført_forventIngenVidereKall() {
         SedHendelse sedHendelse = sedHendelseMedBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);

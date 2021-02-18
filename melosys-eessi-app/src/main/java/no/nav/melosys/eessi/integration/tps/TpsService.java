@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.tps;
+package no.nav.melosys.eessi.integration.tps;
 
 import java.time.LocalDate;
 import java.time.ZoneId;

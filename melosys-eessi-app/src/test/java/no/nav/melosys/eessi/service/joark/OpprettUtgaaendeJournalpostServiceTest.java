@@ -3,10 +3,12 @@ package no.nav.melosys.eessi.service.joark;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
+
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -14,12 +16,12 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.sak.SakService;
-import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -66,7 +68,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     }
 
     @Test
-    public void arkiverUtgaaendeSed_forventId() throws Exception {
+    public void arkiverUtgaaendeSed_forventId() {
         String result = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
         assertThat(result).isEqualTo(JOURNALPOST_ID);
     }
@@ -86,7 +88,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     }
 
     @Test
-    public void arkiverUtgaaendeSed_ingenSak_forventOpprettJfrOppgave() throws Exception {
+    public void arkiverUtgaaendeSed_ingenSak_forventOpprettJfrOppgave() {
         when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.empty());
 
         String journalpostId = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);

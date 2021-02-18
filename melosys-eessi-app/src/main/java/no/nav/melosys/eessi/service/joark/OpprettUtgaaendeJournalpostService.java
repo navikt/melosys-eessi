@@ -5,11 +5,11 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.sak.SakService;
-import no.nav.melosys.eessi.service.tps.TpsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +39,7 @@ public class OpprettUtgaaendeJournalpostService {
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) {
         Optional<Sak> sak = sakService.finnSakForRinaSaksnummer(sedSendt.getRinaSakId());
 
-        if (!sak.isPresent()) {
+        if (sak.isEmpty()) {
             return arkiverUtenSak(sedSendt);
         }
 

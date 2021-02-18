@@ -3,13 +3,13 @@ package no.nav.melosys.eessi.service.identifisering;
 import java.util.Optional;
 
 import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.tps.TpsService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +44,7 @@ public class PersonIdentifiseringServiceTest {
     }
 
     @Test
-    public void identifiserPerson_sakEksisterer_hentPersonFraSak() throws Exception {
+    public void identifiserPerson_sakEksisterer_hentPersonFraSak() {
         final String norskIdent = "333333";
         Sak sak = new Sak();
         sak.setAktoerId("32132132");
@@ -61,7 +61,7 @@ public class PersonIdentifiseringServiceTest {
     }
 
     @Test
-    public void identifiserPerson_ingenSakSedMedNorskIdent_personSuksessfultValidert() throws Exception {
+    public void identifiserPerson_ingenSakSedMedNorskIdent_personSuksessfultValidert() {
         final String norskIdent = "333333";
 
         when(personSok.vurderPerson(anyString(), any(SED.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
@@ -70,7 +70,7 @@ public class PersonIdentifiseringServiceTest {
     }
 
     @Test
-    public void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() throws Exception {
+    public void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
         final String norskIdent = "33";
         when(personSok.søkPersonFraSed(any(SED.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(null), new SED());
@@ -78,7 +78,7 @@ public class PersonIdentifiseringServiceTest {
     }
 
     @Test
-    public void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() throws Exception {
+    public void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() {
         when(personSok.søkPersonFraSed(any(SED.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
         Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(null), new SED());
         assertThat(res).isNotPresent();
