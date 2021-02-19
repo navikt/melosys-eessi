@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.identifisering;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.Collections;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -14,22 +15,22 @@ import lombok.val;
 import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class PersonSokTest {
+@ExtendWith(MockitoExtension.class)
+class PersonSokTest {
 
     private final String IDENT = "01058312345";
 
@@ -38,17 +39,22 @@ public class PersonSokTest {
 
     private PersonSok personSok;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         personSok = new PersonSok(tpsService);
+    }
+
+    private PersonSoekResponse lagPersonSøkResponse() {
         PersonSoekResponse response = new PersonSoekResponse();
         response.setIdent(IDENT);
-        when(tpsService.hentPerson(IDENT)).thenReturn(lagTpsPerson());
-        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(response));
+        return response;
     }
 
     @Test
-    public void søkPersonFraSed_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+    void søkPersonFraSed_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+        when(tpsService.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
         SED sed = lagSed();
 
         PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
@@ -59,7 +65,10 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_feilFødselsdato_forventIngenIdentFeilFødselsdato() throws Exception {
+    void søkPersonFraSed_feilFødselsdato_forventIngenIdentFeilFødselsdato() throws Exception {
+        when(tpsService.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
         SED sed = lagSed();
         sed.getNav().getBruker().getPerson().setFoedselsdato("1999-01-01");
 
@@ -71,7 +80,10 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() throws Exception {
+    void søkPersonFraSed_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() throws Exception {
+        when(tpsService.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
         SED sed = lagSed();
         sed.getNav().getBruker().getPerson().getStatsborgerskap().clear();
 
@@ -83,7 +95,7 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_ingenTreff_forventIngenIdentIngenTreff() throws Exception {
+    void søkPersonFraSed_ingenTreff_forventIngenIdentIngenTreff() throws Exception {
         when(tpsService.soekEtterPerson(any())).thenReturn(Collections.emptyList());
 
         PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
@@ -93,7 +105,7 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_flereTreff_forventIngenIdentFlereTreff() throws Exception {
+    void søkPersonFraSed_flereTreff_forventIngenIdentFlereTreff() throws Exception {
         when(tpsService.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSoekResponse(), new PersonSoekResponse()));
 
         PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
@@ -104,8 +116,9 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() throws Exception {
+    void søkPersonFraSed_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() throws Exception {
         when(tpsService.hentPerson(anyString())).thenThrow(NotFoundException.class);
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
         PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
 
@@ -114,11 +127,10 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_personFunnetOpphørt_forventIngenIdentPersonOpphørt() throws Exception {
-        Person person = lagTpsPerson().withPersonstatus(new Personstatus()
-                .withPersonstatus(new Personstatuser().withValue("UTAN")));
+    void søkPersonFraSed_personFunnetOpphørt_forventIngenIdentPersonOpphørt() throws Exception {
+        when(tpsService.hentPerson(anyString())).thenReturn(lagPersonModell(true));
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        when(tpsService.hentPerson(anyString())).thenReturn(person);
         PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
@@ -127,7 +139,10 @@ public class PersonSokTest {
 
 
     @Test
-    public void søkPersonFraSed_tidssoneForDatoEttTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+    void søkPersonFraSed_tidssoneForDatoEttTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+        when(tpsService.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
         SED sed = lagSed();
         sed.getNav().getBruker().getPerson().setFoedselsdato(sed.getNav().getBruker().getPerson().getFoedselsdato() + "+02:00");
 
@@ -139,7 +154,7 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_finnerIkkePersonFraSedStruktur_forventIngenTreff() throws Exception {
+    void søkPersonFraSed_finnerIkkePersonFraSedStruktur_forventIngenTreff() throws Exception {
         SED sed = lagSed();
         sed.setSedType(SedType.X007.name());
 
@@ -150,7 +165,10 @@ public class PersonSokTest {
     }
 
     @Test
-    public void søkPersonFraSed_x001UtenStatsborgerskap_statsborgerskapSjekkesIkkeEttTreff() throws IOException {
+    void søkPersonFraSed_x001UtenStatsborgerskap_statsborgerskapSjekkesIkkeEttTreff() throws IOException {
+        when(tpsService.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
+        when(tpsService.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
         SED sed = sedX001();
         sed.finnPerson().ifPresent(p -> p.setFoedselsdato("1983-05-01"));
 
@@ -184,16 +202,15 @@ public class PersonSokTest {
         return mapper.readValue(jsonUrl, SED.class);
     }
 
-    private Person lagTpsPerson() throws DatatypeConfigurationException {
-        return new Person()
-                .withAktoer(new AktoerId()
-                        .withAktoerId(IDENT))
-                .withStatsborgerskap(new Statsborgerskap()
-                        .withLand(new Landkoder().withValue("NOR")))
-                .withFoedselsdato(new Foedselsdato()
-                        .withFoedselsdato(lagXmlDato("1983-05-01")))
-                .withPersonstatus(new Personstatus()
-                        .withPersonstatus(new Personstatuser().withValue("BOSA")));
+    private PersonModell lagPersonModell(boolean erOpphørt) {
+        return new PersonModell(
+                IDENT,
+                "Fornavn",
+                "Etternavn",
+                LocalDate.parse("1983-05-01"),
+                "NO",
+                erOpphørt
+        );
     }
 
 

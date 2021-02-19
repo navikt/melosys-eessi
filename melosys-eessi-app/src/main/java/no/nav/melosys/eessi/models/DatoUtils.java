@@ -1,8 +1,9 @@
 package no.nav.melosys.eessi.models;
 
-import lombok.experimental.UtilityClass;
-
 import java.time.LocalDate;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class DatoUtils {
@@ -15,5 +16,9 @@ public class DatoUtils {
 
     public static LocalDate tilLocalDate(String dato) {
         return LocalDate.parse(formaterDatoString(dato));
+    }
+
+    public static LocalDate tilLocalDate(XMLGregorianCalendar xmlGregorianCalendar) {
+        return xmlGregorianCalendar != null ? LocalDate.of(xmlGregorianCalendar.getYear(), xmlGregorianCalendar.getMonth(), xmlGregorianCalendar.getDay()) : null;
     }
 }

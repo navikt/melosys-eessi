@@ -2,35 +2,37 @@ package no.nav.melosys.eessi.service.tps;
 
 import java.time.LocalDate;
 import java.util.List;
+import javax.xml.datatype.DatatypeFactory;
 
-import lombok.val;
+import lombok.SneakyThrows;
 import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Bostedsadresse;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Gateadresse;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
+import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
+import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
+import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault;
+import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault1;
 import no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.NorskIdent;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonResponse;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class TpsServiceTest {
+@ExtendWith(MockitoExtension.class)
+class TpsServiceTest {
 
     @Mock
     private PersonConsumer personConsumer;
@@ -41,44 +43,44 @@ public class TpsServiceTest {
     @Mock
     private PersonsokConsumer personsokConsumer;
 
-    @InjectMocks
     private TpsService tpsService;
 
-    @Before
+    private HentPersonResponse hentPersonResponse;
+
+    @BeforeEach
     public void setup() throws Exception {
-        Person person = new Person()
-                .withBostedsadresse(new Bostedsadresse()
-                        .withStrukturertAdresse(new Gateadresse()
-                                .withGatenavn("Gateveien")
-                                .withHusnummer(1)
-                                .withKommunenummer("0301")))
-                .withAktoer(new AktoerId()
-                        .withAktoerId("11223344556"));
+        tpsService = new TpsService(personConsumer, aktoerConsumer, personsokConsumer);
 
-        HentPersonResponse response = new HentPersonResponse();
-        response.setPerson(person);
+        hentPersonResponse = new HentPersonResponse().withPerson(lagPerson());
+    }
 
-        when(personConsumer.hentPerson(any())).thenReturn(response);
+    @Test
+    void hentPerson_expectPerson() throws HentPersonPersonIkkeFunnet, HentPersonSikkerhetsbegrensning {
+        when(personConsumer.hentPerson(any())).thenReturn(hentPersonResponse);
+        PersonModell person = tpsService.hentPerson("11223344556");
+        assertThat(person).isNotNull()
+                .isEqualTo(
+                        new PersonModell(
+                                "11223344556",
+                                "Fornavn",
+                                "Etternavn",
+                                LocalDate.parse("2000-01-01"),
+                                "SE",
+                                false
+                        )
+                );
+    }
 
+    @Test
+    void hentAktoerId_expectAktoerId() {
         when(aktoerConsumer.hentAktoerId(anyString())).thenReturn("998877665544");
-
-        when(personsokConsumer.finnPerson(any())).thenReturn(lagFinnPersonResponseMedEnPerson());
-    }
-
-    @Test
-    public void hentPerson_expectPerson() {
-        Person person = tpsService.hentPerson("11223344556");
-        assertThat(person).isNotNull();
-    }
-
-    @Test
-    public void hentAktoerId_expectAktoerId() {
         String aktoerId = tpsService.hentAktoerId("11223344556");
         assertThat(aktoerId).isEqualTo("998877665544");
     }
 
     @Test
-    public void soekEtterPerson_forventIdent() {
+    void soekEtterPerson_forventIdent() throws FinnPersonFault, FinnPersonFault1 {
+        when(personsokConsumer.finnPerson(any())).thenReturn(lagFinnPersonResponseMedEnPerson());
         List<PersonSoekResponse> response = tpsService.soekEtterPerson(lagPersonsoekKriterier());
         assertThat(response).isNotEmpty();
         assertThat(response.get(0).getIdent()).isEqualTo("04127811111");
@@ -95,17 +97,30 @@ public class TpsServiceTest {
     private FinnPersonResponse lagFinnPersonResponseMedEnPerson() {
         FinnPersonResponse response = new FinnPersonResponse();
         response.setTotaltAntallTreff(1);
-        response.getPersonListe().add(lagPerson());
+        response.getPersonListe().add(lagPersonsøkPerson());
         return response;
     }
 
-    private no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Person lagPerson() {
-        val person = new no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Person();
-        val ident = new NorskIdent();
+    private no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Person lagPersonsøkPerson() {
+        var person = new no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Person();
+        var ident = new NorskIdent();
         ident.setIdent("04127811111");
         person.setIdent(ident);
 
         return person;
+    }
+
+    @SneakyThrows
+    private Person lagPerson() {
+        return new Person()
+                .withPersonnavn(new Personnavn()
+                        .withFornavn("Fornavn")
+                        .withEtternavn("Etternavn"))
+                .withFoedselsdato(new Foedselsdato()
+                        .withFoedselsdato(DatatypeFactory.newInstance().newXMLGregorianCalendar("2000-01-01")))
+                .withStatsborgerskap(new Statsborgerskap().withLand(new Landkoder().withValue("SWE")))
+                .withAktoer(new AktoerId().withAktoerId("11223344556"))
+                .withPersonstatus(new Personstatus().withPersonstatus(new Personstatuser().withValue("BOSA")));
     }
 }
 

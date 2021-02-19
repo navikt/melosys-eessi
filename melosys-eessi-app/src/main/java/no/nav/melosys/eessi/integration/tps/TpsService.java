@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.tps;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,8 @@ import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
+import no.nav.melosys.eessi.models.person.PersonModell;
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
@@ -35,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
+
 @Slf4j
 @Service
 public class TpsService {
@@ -42,6 +47,9 @@ public class TpsService {
     private final PersonConsumer personConsumer;
     private final AktoerConsumer aktoerConsumer;
     private final PersonsokConsumer personsokConsumer;
+
+    private static final String UTGAATT_PERSON = "UTPE";
+    private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
 
     @Autowired
     public TpsService(PersonConsumer personConsumer,
@@ -52,12 +60,20 @@ public class TpsService {
         this.personsokConsumer = personsokConsumer;
     }
 
-    public Person hentPerson(String ident) {
-        HentPersonRequest request = new HentPersonRequest()
+    public PersonModell hentPerson(String ident) {
+        var request = new HentPersonRequest()
                 .withAktoer(new AktoerId()
                         .withAktoerId(ident));
 
-        return hentPerson(request);
+        var res = hentPerson(request);
+        return new PersonModell(
+                ident,
+                res.getPersonnavn().getFornavn(),
+                res.getPersonnavn().getEtternavn(),
+                tilLocalDate(res.getFoedselsdato().getFoedselsdato()),
+                LandkodeMapper.getLandkodeIso2(res.getStatsborgerskap().getLand().getValue()),
+                Arrays.asList(UTGAATT_PERSON_ANNULLERT_TILGANG, UTGAATT_PERSON)
+                        .contains(res.getPersonstatus().getPersonstatus().getValue()));
     }
 
     private Person hentPerson(HentPersonRequest request) {
