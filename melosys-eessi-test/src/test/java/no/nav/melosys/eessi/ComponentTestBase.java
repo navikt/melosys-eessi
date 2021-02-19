@@ -19,7 +19,6 @@ import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.ClassRule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +28,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.junit.jupiter.Container;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -85,7 +85,7 @@ public abstract class ComponentTestBase {
         return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", componentTestProvider.sedHendelse(AKTOER_ID));
     }
 
-    @ClassRule
+    @Container
     public static PostgresContainer DB = PostgresContainer.getInstance();
 
 
