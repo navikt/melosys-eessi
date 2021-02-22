@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
@@ -78,6 +79,9 @@ public abstract class ComponentTestBase {
 
     @MockBean
     SafConsumer safConsumer;
+
+    @MockBean
+    PDLConsumer pdlConsumer;
 
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
