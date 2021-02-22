@@ -16,7 +16,7 @@ class ComponentTestIT extends ComponentTestBase {
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(createProducerRecord()).get();
-        kafkaTestConsumer.doWait(10_000L);
+        kafkaTestConsumer.doWait(3_000L);
 
         List<ConsumerRecord<Object, Object>> outputList = kafkaTestConsumer.getRecords().stream().filter(ConsumerRecordPredicates.topic("privat-melosys-eessi-v1-local")).collect(Collectors.toList());
         assertThat(outputList).hasSize(1);
