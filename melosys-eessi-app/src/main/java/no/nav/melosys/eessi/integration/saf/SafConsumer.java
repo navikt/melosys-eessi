@@ -2,10 +2,9 @@ package no.nav.melosys.eessi.integration.saf;
 
 import java.util.Optional;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
+import no.nav.melosys.eessi.integration.common.graphql.GraphQLRequest;
 import no.nav.melosys.eessi.integration.saf.dto.GraphQLResponse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.http.HttpEntity;
@@ -27,7 +26,7 @@ public class SafConsumer implements RestConsumer {
 
     public Optional<String> hentRinasakForJournalpost(String journalpostID) {
 
-        HttpEntity httpEntity = new HttpEntity(new GraphQLWrapper(String.format(QUERY, journalpostID), null), defaultHeaders());
+        HttpEntity<GraphQLRequest> httpEntity = new HttpEntity<>(new GraphQLRequest(String.format(QUERY, journalpostID), null), defaultHeaders());
         GraphQLResponse response = restTemplate.exchange("/graphql", HttpMethod.POST, httpEntity, GraphQLResponse.class).getBody();
 
         if (response == null) {
@@ -38,12 +37,5 @@ public class SafConsumer implements RestConsumer {
         }
 
         return response.getData().getQuery().hentRinaSakId();
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static class GraphQLWrapper {
-        private String query;
-        private String variables;
     }
 }
