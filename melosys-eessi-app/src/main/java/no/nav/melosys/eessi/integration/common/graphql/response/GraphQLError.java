@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.saf.dto;
+package no.nav.melosys.eessi.integration.common.graphql.response;
 
 import lombok.Data;
 

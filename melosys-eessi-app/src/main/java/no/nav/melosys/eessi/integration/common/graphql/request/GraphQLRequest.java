@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.common.graphql;
+package no.nav.melosys.eessi.integration.common.graphql.request;
 
 import java.util.Map;
 
