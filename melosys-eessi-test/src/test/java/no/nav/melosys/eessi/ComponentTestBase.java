@@ -2,6 +2,7 @@ package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
 
+import lombok.SneakyThrows;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -14,6 +15,7 @@ import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.repository.SedMottattRepository;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
@@ -39,12 +41,10 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/kafka-test.properties")
 public abstract class ComponentTestBase {
 
-    private static final String AKTOER_ID = "1234567890123";
-    private static final String FNR = "01019912345";
     private static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     private static final String STATSBORGERSKAP = "NO";
 
-    protected final ComponentTestProvider componentTestProvider = new ComponentTestProvider();
+    protected final MockData mockData = new MockData();
 
     @Autowired
     KafkaTestConsumer kafkaTestConsumer;
@@ -82,8 +82,11 @@ public abstract class ComponentTestBase {
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
 
-    protected ProducerRecord<String, Object> createProducerRecord() {
-        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", componentTestProvider.sedHendelse(FNR));
+    @Autowired
+    SedMottattRepository sedMottattRepository;
+
+    protected ProducerRecord<String, Object> createProducerRecord(String fnr) {
+        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", mockData.sedHendelse(fnr));
     }
 
     @Container
@@ -91,14 +94,20 @@ public abstract class ComponentTestBase {
 
 
     @BeforeEach
-    public void setup() throws Exception {
-        when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rinadokumentid"));
-        when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(componentTestProvider.sedMedVedlegg());
-        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(componentTestProvider.journalpostResponse());
-        when(aktoerConsumer.hentAktoerId(eq(FNR))).thenReturn(AKTOER_ID);
-        when(personConsumer.hentPerson(argThat(req -> ((PersonIdent)req.getAktoer()).getIdent().getIdent().equals(FNR)))).thenReturn(componentTestProvider.hentPersonResponse(FNR, FØDSELSDATO, "NO"));
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(componentTestProvider.sed(FØDSELSDATO, STATSBORGERSKAP));
+    public void setup() {
+        when(euxConsumer.hentBuC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
+        when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
+        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(mockData.journalpostResponse());
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP));
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
-        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(componentTestProvider.dokumentTypeInfoDto());
+        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(mockData.dokumentTypeInfoDto());
+    }
+
+    @SneakyThrows
+    protected void mockPerson(String ident, String aktørID) {
+        when(personConsumer.hentPerson(argThat(req -> ((PersonIdent) req.getAktoer()).getIdent().getIdent().equals(ident))))
+                .thenReturn(mockData.hentPersonResponse(ident, FØDSELSDATO, "NO"));
+        when(aktoerConsumer.hentAktoerId(ident)).thenReturn(aktørID);
+        when(aktoerConsumer.hentNorskIdent(aktørID)).thenReturn(ident);
     }
 }

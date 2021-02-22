@@ -15,7 +15,7 @@ public class KafkaTestConsumer extends LatchService {
     @Getter
     private final List<ConsumerRecord<Object, Object>> records = new LinkedList<>();
 
-    @KafkaListener(topicPattern = "${person.utils.kafka.test.topicsPattern:.*}", groupId = "test", containerFactory = "testKafkaListenerContainerFactory")
+    @KafkaListener(topicPattern = ".*", groupId = "test", containerFactory = "testKafkaListenerContainerFactory")
     void handle(ConsumerRecord<Object, Object> mess) {
         log.info("Read message from topic: " + mess.topic());
         records.add(mess);
