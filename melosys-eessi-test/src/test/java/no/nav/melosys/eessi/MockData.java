@@ -30,8 +30,8 @@ import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
 import static no.nav.melosys.eessi.models.SedType.A002;
 
-public class ComponentTestProvider {
-    public ComponentTestProvider() {
+public class MockData {
+    public MockData() {
     }
 
     DokumentTypeInfoDto dokumentTypeInfoDto() {
