@@ -1,26 +1,28 @@
 package no.nav.melosys.eessi.service.sts;
 
 import java.util.Map;
+
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
+
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class RestStsServiceTest {
+@ExtendWith(MockitoExtension.class)
+class RestStsServiceTest {
 
     private RestStsService restStsService;
 
@@ -30,7 +32,7 @@ public class RestStsServiceTest {
     @Mock
     private BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         restStsService = spy(new RestStsService(restTemplate, basicAuthClientRequestInterceptor));
     }
@@ -38,7 +40,7 @@ public class RestStsServiceTest {
     //Tester at token blir hentet på nytt ved kort expires_in, og ikke ved lengre expires_in
     @Test
     @SuppressWarnings("unchecked")
-    public void testCollectToken() throws Exception {
+    void testCollectToken() {
 
         Map<String, Object> body = Maps.newHashMap();
         body.put("access_token", "123abc");
