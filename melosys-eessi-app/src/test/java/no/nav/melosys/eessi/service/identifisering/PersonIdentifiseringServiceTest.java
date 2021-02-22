@@ -2,8 +2,8 @@ package no.nav.melosys.eessi.service.identifisering;
 
 import java.util.Optional;
 
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -30,7 +30,7 @@ public class PersonIdentifiseringServiceTest {
     @Mock
     private SakService sakService;
     @Mock
-    private TpsService tpsService;
+    private PersonFasade personFasade;
     @Mock
     private PersonSokMetrikker personSokMetrikker;
 
@@ -39,7 +39,7 @@ public class PersonIdentifiseringServiceTest {
     @Before
     public void setup() {
         personIdentifiseringService = new PersonIdentifiseringService(
-                personSok, saksrelasjonService, sakService, tpsService, personSokMetrikker
+                personSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
         );
     }
 
@@ -52,7 +52,7 @@ public class PersonIdentifiseringServiceTest {
         FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
         fagsakRinasakKobling.setGsakSaksnummer(123L);
 
-        when(tpsService.hentNorskIdent(anyString())).thenReturn(norskIdent);
+        when(personFasade.hentNorskIdent(anyString())).thenReturn(norskIdent);
         when(sakService.hentsak(anyLong())).thenReturn(sak);
         when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
