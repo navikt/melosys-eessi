@@ -23,8 +23,9 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.NorskIdent;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault;
@@ -61,11 +62,16 @@ public class TpsService {
     }
 
     public PersonModell hentPerson(String ident) {
-        var request = new HentPersonRequest()
-                .withAktoer(new AktoerId()
-                        .withAktoerId(ident));
+        var res =
+                hentPerson(
+                        new HentPersonRequest()
+                                .withAktoer(
+                                        new PersonIdent().withIdent(
+                                                new NorskIdent().withIdent(ident)
+                                        )
+                                )
+                );
 
-        var res = hentPerson(request);
         return new PersonModell(
                 ident,
                 res.getPersonnavn().getFornavn(),

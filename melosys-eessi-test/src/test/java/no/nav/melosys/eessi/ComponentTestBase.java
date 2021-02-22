@@ -17,7 +17,7 @@ import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
-import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 public abstract class ComponentTestBase {
 
     private static final String AKTOER_ID = "1234567890123";
+    private static final String FNR = "01019912345";
     private static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     private static final String STATSBORGERSKAP = "NO";
 
@@ -82,7 +83,7 @@ public abstract class ComponentTestBase {
     KafkaTemplate<String, Object> kafkaTemplate;
 
     protected ProducerRecord<String, Object> createProducerRecord() {
-        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", componentTestProvider.sedHendelse(AKTOER_ID));
+        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", componentTestProvider.sedHendelse(FNR));
     }
 
     @Container
@@ -94,8 +95,8 @@ public abstract class ComponentTestBase {
         when(euxConsumer.hentBuC(anyString())).thenReturn(componentTestProvider.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(componentTestProvider.sedMedVedlegg());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(componentTestProvider.journalpostResponse());
-        when(aktoerConsumer.hentAktoerId(anyString())).thenReturn(AKTOER_ID);
-        when(personConsumer.hentPerson(any(HentPersonRequest.class))).thenReturn(componentTestProvider.hentPersonResponse(AKTOER_ID, FØDSELSDATO, "NO"));
+        when(aktoerConsumer.hentAktoerId(eq(FNR))).thenReturn(AKTOER_ID);
+        when(personConsumer.hentPerson(argThat(req -> ((PersonIdent)req.getAktoer()).getIdent().getIdent().equals(FNR)))).thenReturn(componentTestProvider.hentPersonResponse(FNR, FØDSELSDATO, "NO"));
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(componentTestProvider.sed(FØDSELSDATO, STATSBORGERSKAP));
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
         when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(componentTestProvider.dokumentTypeInfoDto());

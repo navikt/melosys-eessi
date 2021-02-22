@@ -44,7 +44,7 @@ public class ComponentTestProvider {
         return dokumentTypeInfoDto;
     }
 
-    SedHendelse sedHendelse(String aktoerId) {
+    SedHendelse sedHendelse(String ident) {
         return SedHendelse.builder()
                 .avsenderId("avsenderId")
                 .avsenderNavn("avsender")
@@ -52,7 +52,7 @@ public class ComponentTestProvider {
                 .id(42L)
                 .mottakerId("mottakerId")
                 .mottakerNavn("mottakerNavn")
-                .navBruker(aktoerId)
+                .navBruker(ident)
                 .rinaDokumentId("1")
                 .rinaSakId("1")
                 .rinaDokumentVersjon("1")
@@ -85,7 +85,7 @@ public class ComponentTestProvider {
         person.setFoedselsdato(fødselsdato.toString());
         Statsborgerskap statsborgerskap1 = new Statsborgerskap();
         statsborgerskap1.setLand(statsborgerskap);
-        person.setStatsborgerskap(Arrays.asList(statsborgerskap1));
+        person.setStatsborgerskap(Collections.singletonList(statsborgerskap1));
         Bruker bruker = new Bruker();
         bruker.setPerson(person);
         nav.setBruker(bruker);
@@ -93,11 +93,11 @@ public class ComponentTestProvider {
         return sed;
     }
 
-    HentPersonResponse hentPersonResponse(String aktoerId1, LocalDate fødselsdato, String landkode) throws DatatypeConfigurationException {
+    HentPersonResponse hentPersonResponse(String ident, LocalDate fødselsdato, String landkode) throws DatatypeConfigurationException {
         return new HentPersonResponse().withPerson(
                 new no.nav.tjeneste.virksomhet.person.v3.informasjon.Person()
                         .withPersonnavn(new Personnavn().withEtternavn("Etternavn").withFornavn("Fornavn"))
-                        .withAktoer(new AktoerId().withAktoerId(aktoerId1))
+                        .withAktoer(new PersonIdent().withIdent(new NorskIdent().withIdent(ident)))
                         .withPersonstatus(new Personstatus().withPersonstatus(new Personstatuser().withValue("ADNR")))
                         .withFoedselsdato(new Foedselsdato().withFoedselsdato(DatatypeFactory.newInstance().newXMLGregorianCalendar(fødselsdato.toString())))
                         .withStatsborgerskap(new no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap().withLand(new Landkoder().withValue(landkode)))
@@ -107,7 +107,7 @@ public class ComponentTestProvider {
     OpprettJournalpostResponse journalpostResponse() {
         return OpprettJournalpostResponse.builder()
                 .journalpostId("1")
-                .dokumenter(Arrays.asList(new OpprettJournalpostResponse.Dokument("1")))
+                .dokumenter(Collections.singletonList(new OpprettJournalpostResponse.Dokument("1")))
                 .journalstatus("OK")
                 .melding("OK")
                 .build();
@@ -127,7 +127,7 @@ public class ComponentTestProvider {
         Document document = new Document();
         document.setConversations(Arrays.asList(new Conversation(), new Conversation()));
         document.setId(id);
-        buc.setDocuments(Arrays.asList(document));
+        buc.setDocuments(Collections.singletonList(document));
         return buc;
     }
 }
