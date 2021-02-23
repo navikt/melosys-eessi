@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class PDLFoedsel {
+public class PDLFoedsel implements HarMetadata {
     private LocalDate foedselsdato;
+    private PDLMetadata metadata;
 }
