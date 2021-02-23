@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.common.graphql.request.GraphQLRequest;
 import no.nav.melosys.eessi.integration.common.graphql.response.GraphQLResponse;
-import no.nav.melosys.eessi.integration.common.graphql.response.SafResponse;
+import no.nav.melosys.eessi.integration.saf.dto.SafResponse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
