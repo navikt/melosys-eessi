@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collections;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.List;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -203,22 +201,13 @@ class PersonSokTest {
     }
 
     private PersonModell lagPersonModell(boolean erOpphørt) {
-        return new PersonModell(
-                IDENT,
-                "Fornavn",
-                "Etternavn",
-                LocalDate.parse("1983-05-01"),
-                "NO",
-                erOpphørt
-        );
-    }
-
-
-    /**
-     * @param dato format: yyyy-MM-dd
-     */
-    private XMLGregorianCalendar lagXmlDato(String dato) throws DatatypeConfigurationException {
-        return DatatypeFactory.newInstance()
-                .newXMLGregorianCalendar(dato);
+        return PersonModell.builder()
+                .ident(IDENT)
+                .fornavn("Fornavn")
+                .etternavn("Etternavn")
+                .fødselsdato(LocalDate.parse("1983-05-01"))
+                .statsborgerskapLandkodeISO2(List.of("NO"))
+                .erOpphørt(erOpphørt)
+                .build();
     }
 }

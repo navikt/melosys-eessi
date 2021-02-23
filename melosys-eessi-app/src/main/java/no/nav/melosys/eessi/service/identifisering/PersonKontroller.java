@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.identifisering;
 
 import java.time.LocalDate;
-import java.util.stream.Stream;
+import java.util.Collection;
 
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.person.PersonModell;
@@ -14,11 +14,11 @@ class PersonKontroller {
     private static final int LOCAL_DATE_LENGTH = 10;
 
     static boolean harSammeStatsborgerskap(PersonModell person, SED sed) {
-        String tpsStatsborgerskap = person.getStatsborgerskapLandkodeISO2();
-        Stream<String> sedStatsborgerskap = sed.getNav().getBruker().getPerson().getStatsborgerskap()
-                .stream().map(Statsborgerskap::getLand);
+        Collection<String> registerStatsborgerskap = person.getStatsborgerskapLandkodeISO2();
 
-        return sedStatsborgerskap.anyMatch(tpsStatsborgerskap::equalsIgnoreCase);
+        return sed.getNav().getBruker().getPerson().getStatsborgerskap()
+                .stream().map(Statsborgerskap::getLand)
+                .anyMatch(registerStatsborgerskap::contains);
     }
 
     static boolean harSammeFoedselsdato(PersonModell person, SED sed) {

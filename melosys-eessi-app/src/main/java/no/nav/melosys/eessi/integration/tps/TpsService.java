@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.integration.tps;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,14 +76,19 @@ public class TpsService implements PersonFasade {
                                 )
                 );
 
-        return new PersonModell(
-                ident,
-                res.getPersonnavn().getFornavn(),
-                res.getPersonnavn().getEtternavn(),
-                tilLocalDate(res.getFoedselsdato().getFoedselsdato()),
-                LandkodeMapper.getLandkodeIso2(res.getStatsborgerskap().getLand().getValue()),
-                Arrays.asList(UTGAATT_PERSON_ANNULLERT_TILGANG, UTGAATT_PERSON)
-                        .contains(res.getPersonstatus().getPersonstatus().getValue()));
+        return PersonModell.builder()
+                .ident(ident)
+                .fornavn(res.getPersonnavn().getFornavn())
+                .etternavn(res.getPersonnavn().getEtternavn())
+                .fødselsdato(tilLocalDate(res.getFoedselsdato().getFoedselsdato()))
+                .statsborgerskapLandkodeISO2(
+                        Collections.singleton(LandkodeMapper.getLandkodeIso2(res.getStatsborgerskap().getLand().getValue()))
+                )
+                .erOpphørt(
+                        Arrays.asList(UTGAATT_PERSON_ANNULLERT_TILGANG, UTGAATT_PERSON)
+                                .contains(res.getPersonstatus().getPersonstatus().getValue())
+                )
+                .build();
     }
 
     private Person hentPerson(HentPersonRequest request) {
