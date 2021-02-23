@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.saf.dto;
+package no.nav.melosys.eessi.integration.common.graphql.response;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,9 +7,9 @@ import lombok.Data;
 import org.springframework.util.CollectionUtils;
 
 @Data
-public class GraphQLResponse {
+public class GraphQLResponse<T> {
     private List<GraphQLError> errors;
-    private GraphQLQueryData data;
+    private T data;
 
     public boolean harFeil() {
         return !CollectionUtils.isEmpty(errors) || data == null;

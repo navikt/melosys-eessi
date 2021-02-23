@@ -11,6 +11,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
@@ -36,6 +37,7 @@ import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonResponse;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.PersonFilter;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.Soekekriterie;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -43,7 +45,8 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 @Slf4j
 @Service
-public class TpsService {
+@Primary
+public class TpsService implements PersonFasade {
 
     private final PersonConsumer personConsumer;
     private final AktoerConsumer aktoerConsumer;

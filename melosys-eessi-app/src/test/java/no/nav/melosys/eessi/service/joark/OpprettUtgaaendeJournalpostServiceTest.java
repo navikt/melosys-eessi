@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
@@ -40,7 +40,7 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Mock
     private EuxService euxService;
     @Mock
-    private TpsService tpsService;
+    private PersonFasade personFasade;
     @Mock
     private OppgaveService oppgaveService;
 
@@ -52,14 +52,14 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     @Before
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-                sakService, journalpostService, euxService, tpsService, oppgaveService);
+                sakService, journalpostService, euxService, personFasade, oppgaveService);
 
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "ENDELIG", null);
         when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
         when(euxService.hentRinaUrl(anyString())).thenReturn("https://test.local");
-        when(tpsService.hentNorskIdent(anyString())).thenReturn("54321");
-        when(tpsService.hentAktoerId(anyString())).thenReturn("12345");
+        when(personFasade.hentNorskIdent(anyString())).thenReturn("54321");
+        when(personFasade.hentAktoerId(anyString())).thenReturn("12345");
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));

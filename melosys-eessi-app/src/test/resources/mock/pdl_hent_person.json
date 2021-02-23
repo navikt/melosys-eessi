@@ -1,0 +1,27 @@
+{
+  "data": {
+    "hentPerson": {
+      "navn": [
+        {
+          "fornavn": "RASK",
+          "etternavn": "MASKIN"
+        }
+      ],
+      "foedsel": [
+        {
+          "foedselsdato": "1984-06-25"
+        }
+      ],
+      "statsborgerskap": [
+        {
+          "land": "NOR"
+        }
+      ],
+      "folkeregisterpersonstatus": [
+        {
+          "status": "bosatt"
+        }
+      ]
+    }
+  }
+}

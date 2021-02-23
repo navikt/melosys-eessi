@@ -18,6 +18,7 @@ SRV_USERNAME: dummy
 SRV_PASSWORD: dummy
 EUXCASESTORE_URL: dummy
 SAF_URL: dummy
+PDL_URL: dummy
 
 # Database
 PG_HOST: localhost

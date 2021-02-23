@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.service.identifisering;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.tps.TpsService;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -19,17 +19,19 @@ public class PersonIdentifiseringService {
     private final PersonSok personSok;
     private final SaksrelasjonService saksrelasjonService;
     private final SakService sakService;
-    private final TpsService tpsService;
+    private final PersonFasade personFasade;
     private final PersonSokMetrikker personSokMetrikker;
 
-    public PersonIdentifiseringService(PersonSok personSok,
+    public PersonIdentifiseringService(
+            PersonSok personSok,
             SaksrelasjonService saksrelasjonService,
-            SakService sakService, TpsService tpsService,
+            SakService sakService,
+            PersonFasade personFasade,
             PersonSokMetrikker personSokMetrikker) {
         this.personSok = personSok;
         this.saksrelasjonService = saksrelasjonService;
         this.sakService = sakService;
-        this.tpsService = tpsService;
+        this.personFasade = personFasade;
         this.personSokMetrikker = personSokMetrikker;
     }
 
@@ -38,7 +40,7 @@ public class PersonIdentifiseringService {
 
         if (eksisterendeSak.isPresent()) {
             String aktoerID = sakService.hentsak(eksisterendeSak.get().getGsakSaksnummer()).getAktoerId();
-            return Optional.of(tpsService.hentNorskIdent(aktoerID));
+            return Optional.of(personFasade.hentNorskIdent(aktoerID));
         }
 
         Optional<String> ident = Optional.ofNullable(sedHendelse.getNavBruker());

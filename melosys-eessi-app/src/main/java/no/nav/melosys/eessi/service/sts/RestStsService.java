@@ -40,6 +40,10 @@ public class RestStsService implements RestConsumer {
         restTemplate.getInterceptors().add(basicAuthClientRequestInterceptor);
     }
 
+    public String bearerToken() {
+        return "Bearer " + collectToken();
+    }
+
     public synchronized String collectToken() {
         if (shouldCollectNewToken()) {
             token = generateToken();
@@ -57,7 +61,7 @@ public class RestStsService implements RestConsumer {
                             });
 
             Map<String, Object> responseBody = response.getBody();
-            setExpiryTime(Long.valueOf(responseBody.get(EXPIRES_IN_KEY).toString()));
+            setExpiryTime(Long.parseLong(responseBody.get(EXPIRES_IN_KEY).toString()));
 
             return (String) responseBody.get(ACCESS_TOKEN_KEY);
 

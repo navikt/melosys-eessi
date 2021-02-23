@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.tps.TpsService;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
@@ -24,11 +24,11 @@ import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSa
 @Component
 class PersonSok {
 
-    private final TpsService tpsService;
+    private final PersonFasade personFasade;
 
     @Autowired
-    public PersonSok(TpsService tpsService) {
-        this.tpsService = tpsService;
+    public PersonSok(PersonFasade personFasade) {
+        this.personFasade = personFasade;
     }
 
     PersonSokResultat søkPersonFraSed(SED sed) {
@@ -47,7 +47,7 @@ class PersonSok {
         PersonModell person;
 
         try {
-            person = tpsService.hentPerson(ident);
+            person = personFasade.hentPerson(ident);
         } catch (SecurityException e) {
             throw new IntegrationException("Sikkerhetsfeil mot tps",e);
         } catch (NotFoundException e) {
@@ -88,7 +88,7 @@ class PersonSok {
 
         List<PersonSoekResponse> response;
         try {
-            response = tpsService.soekEtterPerson(PersonsoekKriterier.builder()
+            response = personFasade.soekEtterPerson(PersonsoekKriterier.builder()
                     .fornavn(sedPerson.getFornavn())
                     .etternavn(sedPerson.getEtternavn())
                     .foedselsdato(foedselsdato)

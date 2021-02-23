@@ -7,7 +7,7 @@ import java.util.Optional;
 import lombok.Data;
 
 @Data
-public class SafQueryData {
+public class SafJournalpost {
 
     private List<Tilleggsopplysning> tilleggsopplysninger = new ArrayList<>();
 

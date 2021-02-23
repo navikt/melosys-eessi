@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.behandling;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.tps.TpsService;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedKontekst;
@@ -25,7 +25,7 @@ public class BehandleSedMottattService {
 
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final EuxService euxService;
-    private final TpsService tpsService;
+    private final PersonFasade personFasade;
     private final MelosysEessiProducer melosysEessiProducer;
     private final PersonIdentifiseringService personIdentifiseringService;
     private final OppgaveService oppgaveService;
@@ -34,13 +34,13 @@ public class BehandleSedMottattService {
     public BehandleSedMottattService(
             OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService,
             EuxService euxService,
-            TpsService tpsService,
+            PersonFasade personFasade,
             MelosysEessiProducer melosysEessiProducer,
             PersonIdentifiseringService personIdentifiseringService,
             OppgaveService oppgaveService) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
-        this.tpsService = tpsService;
+        this.personFasade = personFasade;
         this.melosysEessiProducer = melosysEessiProducer;
         this.personIdentifiseringService = personIdentifiseringService;
         this.oppgaveService = oppgaveService;
@@ -112,7 +112,7 @@ public class BehandleSedMottattService {
         }
 
         SedHendelse sedHendelse = sedMottatt.getSedHendelse();
-        String aktoerID = tpsService.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
+        String aktoerID = personFasade.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
         // avsenderID har formatet <landkodeISO2>:<institusjonID>
         String landkode = sedHendelse.getAvsenderId().substring(0, 2);
         boolean sedErEndring = euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
