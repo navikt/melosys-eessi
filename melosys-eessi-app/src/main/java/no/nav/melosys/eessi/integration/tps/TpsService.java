@@ -32,7 +32,6 @@ import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault;
 import no.nav.tjeneste.virksomhet.personsoek.v1.FinnPersonFault1;
-import no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Personnavn;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonRequest;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonResponse;
 import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.PersonFilter;
@@ -40,7 +39,6 @@ import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.Soekekriterie;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
@@ -160,42 +158,8 @@ public class TpsService implements PersonFasade {
 
     private static List<PersonSoekResponse> mapTilInternRespons(FinnPersonResponse response) {
         return response.getPersonListe().stream()
-                .map(TpsService::mapTilInternRespons)
+                .map(p -> p.getIdent().getIdent())
+                .map(PersonSoekResponse::new)
                 .collect(Collectors.toList());
-    }
-
-    private static PersonSoekResponse mapTilInternRespons(no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Person person) {
-        PersonSoekResponse intern = new PersonSoekResponse();
-        intern.setDiskresjonskode(person.getDiskresjonskode() != null ? person.getDiskresjonskode().getValue() : null);
-        intern.setIdent(person.getIdent() != null ? person.getIdent().getIdent() : null);
-
-        Personnavn personnavn = person.getPersonnavn();
-        if (personnavn != null) {
-            intern.setEtternavn(personnavn.getEtternavn());
-            intern.setFornavn(personnavn.getFornavn());
-            intern.setMellomnavn(personnavn.getMellomnavn());
-            intern.setSammensattNavn(personnavn.getSammensattNavn());
-        }
-
-        if (person.getKjoenn() != null && person.getKjoenn().getKjoenn() != null) {
-            intern.setKjoenn(mapKjoenn(person.getKjoenn().getKjoenn().getValue()));
-        }
-
-        return intern;
-    }
-
-    private static PersonSoekResponse.Kjoenn mapKjoenn(String kjoenn) {
-        if (!StringUtils.hasText(kjoenn)) {
-            return null;
-        }
-
-        if ("M".equals(kjoenn)) {
-            return PersonSoekResponse.Kjoenn.MANN;
-        } else if ("K".equals(kjoenn)) {
-            return PersonSoekResponse.Kjoenn.KVINNE;
-        } else {
-            return PersonSoekResponse.Kjoenn.UKJENT;
-        }
-
     }
 }
