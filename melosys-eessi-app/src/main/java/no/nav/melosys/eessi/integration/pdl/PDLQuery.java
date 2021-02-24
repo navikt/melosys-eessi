@@ -44,4 +44,23 @@ final class PDLQuery {
                }
              }
             """;
+
+    static final String SØK_PERSON_QUERY = """
+            query ($paging:Paging, $criteria:[Criterion]) {
+                sokPerson (paging: $paging,  criteria: $criteria){
+                    pageNumber,
+                    totalPages,
+                    totalHits,
+                    hits {
+                        score,
+                        identer {
+                            ident
+                            gruppe
+                        }
+                    }
+                }
+            }
+            """;
+
+
 }
