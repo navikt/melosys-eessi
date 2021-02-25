@@ -14,4 +14,12 @@ public class PDLIdent {
     public boolean erFolkeregisterIdent() {
         return "FOLKEREGISTERIDENT".equals(gruppe);
     }
+
+    public boolean erAktørID() {
+        return "AKTORID".equals(gruppe);
+    }
+
+    public boolean erNPID() { //NAV PersonIdent
+        return "NPID".equals(gruppe);
+    }
 }
