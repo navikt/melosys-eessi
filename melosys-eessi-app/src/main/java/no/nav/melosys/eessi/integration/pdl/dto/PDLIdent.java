@@ -10,4 +10,8 @@ import lombok.NoArgsConstructor;
 public class PDLIdent {
     private String gruppe;
     private String ident;
+
+    public boolean erFolkeregisterIdent() {
+        return "FOLKEREGISTERIDENT".equals(gruppe);
+    }
 }

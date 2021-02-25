@@ -13,7 +13,7 @@ public class PDLSokCriteria {
     @JsonProperty("fieldName")
     String feltNavn;
     @JsonProperty("searchRule")
-    Map<String, String> søkeRegel;
+    Map<String, Object> søkeRegel;
 
     public static Builder fornavn() {
         return new Builder("person.navn.fornavn");
@@ -34,7 +34,7 @@ public class PDLSokCriteria {
     public static class Builder {
 
         private final String feltNavn;
-        private final Map<String, String> søkeRegel;
+        private final Map<String, Object> søkeRegel;
 
         private static final String INNEHOLDER = "contains";
         private static final String ER_LIK = "equals";
@@ -44,12 +44,12 @@ public class PDLSokCriteria {
             this.søkeRegel = new HashMap<>();
         }
 
-        public PDLSokCriteria inneholder(String verdi) {
+        public PDLSokCriteria inneholder(Object verdi) {
             søkeRegel.put(INNEHOLDER, verdi);
             return build();
         }
 
-        public PDLSokCriteria erLik(String verdi) {
+        public PDLSokCriteria erLik(Object verdi) {
             søkeRegel.put(ER_LIK, verdi);
             return build();
         }
