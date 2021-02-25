@@ -84,6 +84,20 @@ class PDLConsumerTest {
                 );
     }
 
+    @Test
+    void hentIdentliste_medIdent_mottarOgMapperResponseUtenFeil() {
+        mockServer.enqueue(
+                new MockResponse()
+                .setBody(hentFil("mock/pdl_hent_identliste.json"))
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        assertThat(pdlConsumer.hentIdenter("123").getIdenter())
+                .hasSize(2)
+                .flatExtracting(PDLIdent::getIdent, PDLIdent::getGruppe)
+                .containsExactlyInAnyOrder("28026522600", "FOLKEREGISTERIDENT", "2834873315250", "AKTORID");
+    }
+
     @SneakyThrows
     private String hentFil(String filnavn) {
         return Files.readString(

@@ -62,5 +62,15 @@ final class PDLQuery {
             }
             """;
 
+    static final String HENT_IDENTER_QUERY = """
+            query($ident: ID!) {
+              hentIdenter(ident: $ident) {
+                  identer {
+                      ident,
+                      gruppe
+                  }
+              }
+            }
+            """;
 
 }
