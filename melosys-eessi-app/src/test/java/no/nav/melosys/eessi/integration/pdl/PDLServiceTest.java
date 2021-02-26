@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
@@ -29,12 +30,14 @@ class PDLServiceTest {
 
     @Mock
     private PDLConsumer pdlConsumer;
+    @Mock
+    private PersonSokMetrikker personSokMetrikker;
 
     private PDLService pdlService;
 
     @BeforeEach
     public void setup() {
-        pdlService = new PDLService(pdlConsumer);
+        pdlService = new PDLService(pdlConsumer, personSokMetrikker);
     }
 
     @Test

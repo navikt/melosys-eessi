@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
@@ -50,6 +51,7 @@ public class TpsService implements PersonFasade {
     private final PersonConsumer personConsumer;
     private final AktoerConsumer aktoerConsumer;
     private final PersonsokConsumer personsokConsumer;
+    private final PersonSokMetrikker personSokMetrikker;
 
     private static final String UTGAATT_PERSON = "UTPE";
     private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
@@ -57,10 +59,11 @@ public class TpsService implements PersonFasade {
     @Autowired
     public TpsService(PersonConsumer personConsumer,
                       AktoerConsumer aktoerConsumer,
-                      PersonsokConsumer personsokConsumer) {
+                      PersonsokConsumer personsokConsumer, PersonSokMetrikker personSokMetrikker) {
         this.personConsumer = personConsumer;
         this.aktoerConsumer = aktoerConsumer;
         this.personsokConsumer = personsokConsumer;
+        this.personSokMetrikker = personSokMetrikker;
     }
 
     @Override
@@ -131,6 +134,7 @@ public class TpsService implements PersonFasade {
             return Collections.emptyList();
         }
 
+        personSokMetrikker.registrerAntallTreffTps(response.getTotaltAntallTreff());
         return mapTilInternRespons(response);
     }
 

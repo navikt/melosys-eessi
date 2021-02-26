@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.integration.tps.TpsService;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
@@ -44,13 +45,16 @@ class TpsServiceTest {
     @Mock
     private PersonsokConsumer personsokConsumer;
 
+    @Mock
+    private PersonSokMetrikker personSokMetrikker;
+
     private TpsService tpsService;
 
     private HentPersonResponse hentPersonResponse;
 
     @BeforeEach
     public void setup() throws Exception {
-        tpsService = new TpsService(personConsumer, aktoerConsumer, personsokConsumer);
+        tpsService = new TpsService(personConsumer, aktoerConsumer, personsokConsumer, personSokMetrikker);
 
         hentPersonResponse = new HentPersonResponse().withPerson(lagPerson());
     }

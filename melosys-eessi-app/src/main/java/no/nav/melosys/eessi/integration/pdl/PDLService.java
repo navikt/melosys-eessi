@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -21,9 +22,11 @@ import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriteria.*;
 public class PDLService implements PersonFasade {
 
     private final PDLConsumer pdlConsumer;
+    private final PersonSokMetrikker personSokMetrikker;
 
-    public PDLService(PDLConsumer pdlConsumer) {
+    public PDLService(PDLConsumer pdlConsumer, PersonSokMetrikker personSokMetrikker) {
         this.pdlConsumer = pdlConsumer;
+        this.personSokMetrikker = personSokMetrikker;
     }
 
     @Override
@@ -82,6 +85,7 @@ public class PDLService implements PersonFasade {
                         )))
                 .getHits()
                 .stream()
+                .peek(res -> personSokMetrikker.registrerAntallTreffPDL(res.getIdenter().size()))
                 .map(PDLSokHits::getIdenter)
                 .map(this::hentFolkeregisterIdent)
                 .map(PersonSoekResponse::new)
