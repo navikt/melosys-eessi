@@ -52,11 +52,11 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() {
+    void søkEtterPerson_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() {
         when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isTrue();
         assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
@@ -64,11 +64,11 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_feilFødselsdato_forventIngenIdentFeilFødselsdato() {
+    void søkEtterPerson_feilFødselsdato_forventIngenIdentFeilFødselsdato() {
         when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier(LocalDate.of(2000, 1, 2)));
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.of(2000, 1, 2)));
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getIdent()).isNull();
@@ -76,11 +76,11 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() {
+    void søkEtterPerson_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() {
         when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier(Set.of()));
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier(Set.of()));
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getIdent()).isNull();
@@ -88,20 +88,20 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_ingenTreff_forventIngenIdentIngenTreff() {
+    void søkEtterPerson_ingenTreff_forventIngenIdentIngenTreff() {
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.emptyList());
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.INGEN_TREFF);
     }
 
     @Test
-    void søkPersonFraSed_flereTreff_forventIngenIdentFlereTreff() {
+    void søkEtterPerson_flereTreff_forventIngenIdentFlereTreff() {
         when(personFasade.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSoekResponse(), new PersonSoekResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getIdent()).isNull();
@@ -109,22 +109,22 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() {
+    void søkEtterPerson_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() {
         when(personFasade.hentPerson(anyString())).thenThrow(NotFoundException.class);
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FNR_IKKE_FUNNET);
     }
 
     @Test
-    void søkPersonFraSed_personFunnetOpphørt_forventIngenIdentPersonOpphørt() {
+    void søkEtterPerson_personFunnetOpphørt_forventIngenIdentPersonOpphørt() {
         when(personFasade.hentPerson(anyString())).thenReturn(lagPersonModell(true));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(personsoekKriterier());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT);

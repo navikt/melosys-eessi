@@ -75,7 +75,7 @@ public class PersonIdentifiseringService {
             }
         }
 
-        PersonSokResultat resultat = personSok.søkPersonFraSed(søkeKriterier);
+        PersonSokResultat resultat = personSok.søkEtterPerson(søkeKriterier);
         personSokMetrikker.counter(resultat.getBegrunnelse());
         log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
         return Optional.ofNullable(resultat.getIdent());

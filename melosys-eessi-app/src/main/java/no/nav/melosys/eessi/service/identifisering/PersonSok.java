@@ -27,7 +27,7 @@ class PersonSok {
         this.personFasade = personFasade;
     }
 
-    PersonSokResultat søkPersonFraSed(PersonsoekKriterier personsoekKriterier) {
+    PersonSokResultat søkEtterPerson(PersonsoekKriterier personsoekKriterier) {
         Collection<PersonSoekResponse> personSøk = personFasade.soekEtterPerson(personsoekKriterier);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);

@@ -81,14 +81,14 @@ class PersonIdentifiseringServiceTest {
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
         final String norskIdent = "33";
-        when(personSok.søkPersonFraSed(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        when(personSok.søkEtterPerson(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }
 
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() {
-        when(personSok.søkPersonFraSed(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
+        when(personSok.søkEtterPerson(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).isNotPresent();
     }
