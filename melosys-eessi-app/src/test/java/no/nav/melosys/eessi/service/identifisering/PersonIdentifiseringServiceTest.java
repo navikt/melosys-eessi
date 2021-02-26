@@ -1,27 +1,34 @@
 package no.nav.melosys.eessi.service.identifisering;
 
+import java.util.List;
 import java.util.Optional;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.nav.Bruker;
+import no.nav.melosys.eessi.models.sed.nav.Nav;
+import no.nav.melosys.eessi.models.sed.nav.Person;
+import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class PersonIdentifiseringServiceTest {
+@ExtendWith(MockitoExtension.class)
+class PersonIdentifiseringServiceTest {
 
     @Mock
     private PersonSok personSok;
@@ -36,7 +43,7 @@ public class PersonIdentifiseringServiceTest {
 
     private PersonIdentifiseringService personIdentifiseringService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         personIdentifiseringService = new PersonIdentifiseringService(
                 personSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
@@ -44,7 +51,7 @@ public class PersonIdentifiseringServiceTest {
     }
 
     @Test
-    public void identifiserPerson_sakEksisterer_hentPersonFraSak() {
+    void identifiserPerson_sakEksisterer_hentPersonFraSak() {
         final String norskIdent = "333333";
         Sak sak = new Sak();
         sak.setAktoerId("32132132");
@@ -56,41 +63,62 @@ public class PersonIdentifiseringServiceTest {
         when(sakService.hentsak(anyLong())).thenReturn(sak);
         when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
-        Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse("123"), new SED());
+        Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }
 
     @Test
-    public void identifiserPerson_ingenSakSedMedNorskIdent_personSuksessfultValidert() {
+    void identifiserPerson_ingenSakSedMedNorskIdent_personSuksessfultValidert() {
         final String norskIdent = "333333";
+        SED sed = lagSED();
+        sed.getNav().getBruker().getPerson().setPin(List.of(new Pin(norskIdent, "NO", null)));
 
-        when(personSok.vurderPerson(anyString(), any(SED.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
-        Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(norskIdent), new SED());
+        when(personSok.vurderPerson(eq(norskIdent), any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        Optional<String> res = personIdentifiseringService.identifiserPerson("123", sed);
         assertThat(res).contains(norskIdent);
     }
 
     @Test
-    public void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
+    void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
         final String norskIdent = "33";
-        when(personSok.søkPersonFraSed(any(SED.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
-        Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(null), new SED());
+        when(personSok.søkPersonFraSed(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }
 
     @Test
-    public void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() {
-        when(personSok.søkPersonFraSed(any(SED.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
-        Optional<String> res = personIdentifiseringService.identifiserPerson(lagSedHendelse(null), new SED());
+    void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() {
+        when(personSok.søkPersonFraSed(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
+        Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).isNotPresent();
     }
 
-    private SedHendelse lagSedHendelse(String ident) {
-        return SedHendelse.builder()
-                .rinaDokumentId("abcd1234")
-                .rinaSakId("3232")
-                .navBruker(ident)
-                .sedType("A009")
-                .build();
+    @Test
+    void identifiserPerson_erXSEDUtenPerson_ingenTreff() {
+        SED xSED = lagXSEDUtenBruker();
+        Optional<String> res = personIdentifiseringService.identifiserPerson("123", xSED);
+        verify(personSokMetrikker).counter(eq(SoekBegrunnelse.INGEN_PERSON_I_SED));
+        assertThat(res).isNotPresent();
     }
 
+    private SED lagSED() {
+        SED sed = new SED();
+        sed.setNav(new Nav());
+        sed.getNav().setBruker(new Bruker());
+        sed.getNav().getBruker().setPerson(new Person());
+        sed.getNav().getBruker().getPerson().setFoedselsdato("2000-01-01");
+        sed.getNav().getBruker().getPerson().setStatsborgerskap(List.of());
+        sed.getNav().getBruker().getPerson().setPin(List.of());
+
+        sed.setSedType(SedType.A001.name());
+        return sed;
+    }
+
+    private SED lagXSEDUtenBruker() {
+        SED sed = new SED();
+        sed.setNav(new Nav());
+        sed.getNav().setSak(new no.nav.melosys.eessi.models.sed.nav.Sak());
+        sed.setSedType(SedType.X007.name());
+        return sed;
+    }
 }

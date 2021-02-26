@@ -23,11 +23,12 @@ import static org.mockito.Mockito.*;
 class ComponentTestIT extends ComponentTestBase {
 
     private static final String AKTOER_ID = "1234567890123";
-    private static final String FNR = "01019912345";
 
     @Test
     @DisplayName("Mottar SED med fnr, person identifisert, sender melding på kafka-topic")
     void sedMottattMedFnr_blirIdentifisert_sendtPåKafkaTopic() throws Exception {
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+
         mockPerson(FNR, AKTOER_ID);
 
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
@@ -44,6 +45,8 @@ class ComponentTestIT extends ComponentTestBase {
     @Test
     @DisplayName("Mottar SED uten fnr, identifiserer etter søk og publiserer på kafka-topic")
     void sedMottattUtenFnr_søkIdentifiserer_sendtPåTopic() throws Exception {
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+
         var person = new Person();
         person.setIdent(new NorskIdent());
         person.getIdent().setIdent(FNR);
@@ -65,6 +68,7 @@ class ComponentTestIT extends ComponentTestBase {
     @Test
     @DisplayName("Mottar SED uten fnr, ingen resultat fra person-søk, oppretter oppgave til ID og Fordeling")
     void sedMottattUtenFnr_kanIkkeIdentifiserePerson_oppretterOppgave() throws Exception {
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(personsokConsumer.finnPerson(any())).thenReturn(new FinnPersonResponse());
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto("123"));
 
@@ -79,6 +83,8 @@ class ComponentTestIT extends ComponentTestBase {
     @Test
     @DisplayName("Mottar SED med fnr, person identifisert, teknisk feil ved opprettelse av journalpost, blir lagret")
     void sedMottattMedFnr_tekniskFeilVedOpprettelseAvJournalpost_blirLagret() throws Exception {
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+
         mockPerson(FNR, AKTOER_ID);
         when(journalpostapiConsumer.opprettJournalpost(any(), anyBoolean())).thenThrow(new IntegrationException("Feil!"));
 

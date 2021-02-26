@@ -42,8 +42,9 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/kafka-test.properties")
 public abstract class ComponentTestBase {
 
-    private static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
-    private static final String STATSBORGERSKAP = "NO";
+    static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
+    static final String STATSBORGERSKAP = "NO";
+    static final String FNR = "01019912345";
 
     protected final MockData mockData = new MockData();
 
@@ -102,7 +103,6 @@ public abstract class ComponentTestBase {
         when(euxConsumer.hentBuC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(mockData.journalpostResponse());
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP));
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
         when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(mockData.dokumentTypeInfoDto());
     }

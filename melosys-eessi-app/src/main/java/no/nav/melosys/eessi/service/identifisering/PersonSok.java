@@ -1,8 +1,7 @@
 package no.nav.melosys.eessi.service.identifisering;
 
-import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -10,13 +9,11 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeFoedselsdato;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeStatsborgerskap;
 
@@ -31,19 +28,19 @@ class PersonSok {
         this.personFasade = personFasade;
     }
 
-    PersonSokResultat søkPersonFraSed(SED sed) {
-        List<PersonSoekResponse> personSøk = søkEtterPerson(sed);
+    PersonSokResultat søkPersonFraSed(PersonsoekKriterier personsoekKriterier) {
+        Collection<PersonSoekResponse> personSøk = søkEtterPerson(personsoekKriterier);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);
         } else if (personSøk.size() > 1) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF);
         }
 
-        String ident = personSøk.get(0).getIdent();
-        return vurderPerson(ident, sed);
+        String ident = personSøk.iterator().next().getIdent();
+        return vurderPerson(ident, personsoekKriterier);
     }
 
-    PersonSokResultat vurderPerson(String ident, SED sed) {
+    PersonSokResultat vurderPerson(String ident, PersonsoekKriterier personsoekKriterier) {
         PersonModell person;
 
         try {
@@ -55,47 +52,31 @@ class PersonSok {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FNR_IKKE_FUNNET);
         }
 
-        SoekBegrunnelse begrunnelse = vurderPerson(person, sed);
+        SoekBegrunnelse begrunnelse = vurderPerson(person, personsoekKriterier);
         return begrunnelse == SoekBegrunnelse.IDENTIFISERT
                 ? PersonSokResultat.identifisert(ident)
                 : PersonSokResultat.ikkeIdentifisert(begrunnelse);
     }
 
-    private SoekBegrunnelse vurderPerson(PersonModell person, SED sed) {
+    private SoekBegrunnelse vurderPerson(PersonModell person, PersonsoekKriterier personsoekKriterier) {
         if (person.isErOpphørt()) {
             return SoekBegrunnelse.PERSON_OPPHORT;
-        } else if (!sed.erXSED() && !harSammeStatsborgerskap(person, sed)) {
+        } else if (!harSammeStatsborgerskap(person, personsoekKriterier)) {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
-        } else if (!harSammeFoedselsdato(person, sed)) {
+        } else if (!harSammeFoedselsdato(person, personsoekKriterier)) {
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;
         }
 
         return SoekBegrunnelse.IDENTIFISERT;
     }
 
-    /**
-     * Søker etter person i TPS basert på fornavn, etternavn og fødselsdato.
-     *
-     * @param sed SED som inneholder person med navn og fødselsdato
-     * @return fødselsnummer/d-nummer for person, null hvis ikke funnet
-     */
-    private List<PersonSoekResponse> søkEtterPerson(SED sed) {
-        return sed.finnPerson().map(this::søkEtterPerson).orElse(Collections.emptyList());
-    }
-
-    private List<PersonSoekResponse> søkEtterPerson(no.nav.melosys.eessi.models.sed.nav.Person sedPerson) {
-        LocalDate foedselsdato = tilLocalDate(sedPerson.getFoedselsdato());
-
-        List<PersonSoekResponse> response;
+    private Collection<PersonSoekResponse> søkEtterPerson(PersonsoekKriterier personsoekKriterier) {
+        Collection<PersonSoekResponse> response;
         try {
-            response = personFasade.soekEtterPerson(PersonsoekKriterier.builder()
-                    .fornavn(sedPerson.getFornavn())
-                    .etternavn(sedPerson.getEtternavn())
-                    .foedselsdato(foedselsdato)
-                    .build());
+            response = personFasade.soekEtterPerson(personsoekKriterier);
         } catch (NotFoundException e) {
             //Mappet fra FinnPersonForMangeForekomster-exception. OK med tom liste
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
 
         return response;
