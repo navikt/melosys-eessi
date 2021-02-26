@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.service.identifisering;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -29,7 +28,7 @@ class PersonSok {
     }
 
     PersonSokResultat søkPersonFraSed(PersonsoekKriterier personsoekKriterier) {
-        Collection<PersonSoekResponse> personSøk = søkEtterPerson(personsoekKriterier);
+        Collection<PersonSoekResponse> personSøk = personFasade.soekEtterPerson(personsoekKriterier);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);
         } else if (personSøk.size() > 1) {
@@ -68,17 +67,5 @@ class PersonSok {
         }
 
         return SoekBegrunnelse.IDENTIFISERT;
-    }
-
-    private Collection<PersonSoekResponse> søkEtterPerson(PersonsoekKriterier personsoekKriterier) {
-        Collection<PersonSoekResponse> response;
-        try {
-            response = personFasade.soekEtterPerson(personsoekKriterier);
-        } catch (NotFoundException e) {
-            //Mappet fra FinnPersonForMangeForekomster-exception. OK med tom liste
-            return Collections.emptySet();
-        }
-
-        return response;
     }
 }

@@ -127,7 +127,8 @@ public class TpsService implements PersonFasade {
         } catch (FinnPersonFault1 ugyldigInputEx) {
             throw new IntegrationException("Ugyldig input i søk", ugyldigInputEx);
         } catch (FinnPersonFault forMangeForekomsterEx) {
-            throw new NotFoundException("For mange forekomster funnet", forMangeForekomsterEx);
+            log.info("For mange forekomster ved søk mot TPS. Returnerer tom liste");
+            return Collections.emptyList();
         }
 
         return mapTilInternRespons(response);
