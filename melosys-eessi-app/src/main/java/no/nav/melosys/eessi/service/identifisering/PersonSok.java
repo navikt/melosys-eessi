@@ -11,19 +11,17 @@ import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeFoedselsdato;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeStatsborgerskap;
 
 @Slf4j
-@Component
-class PersonSok {
+abstract class PersonSok {
 
     private final PersonFasade personFasade;
 
     @Autowired
-    public PersonSok(PersonFasade personFasade) {
+    PersonSok(PersonFasade personFasade) {
         this.personFasade = personFasade;
     }
 
@@ -47,7 +45,7 @@ class PersonSok {
         } catch (SecurityException e) {
             throw new IntegrationException("Sikkerhetsfeil mot tps",e);
         } catch (NotFoundException e) {
-            log.warn("Feil ved henting av person fra tps", e);
+            log.warn("Feil ved henting av person", e);
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FNR_IKKE_FUNNET);
         }
 

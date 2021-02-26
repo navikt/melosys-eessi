@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import lombok.val;
-import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -36,13 +36,13 @@ class PersonSokTest {
     private final Collection<String> defaultStatsborgerskap = Set.of("NO");
 
     @Mock
-    private PersonFasade personFasade;
+    private PDLService personFasade;
 
     private PersonSok personSok;
 
     @BeforeEach
     public void setup() throws Exception {
-        personSok = new PersonSok(personFasade);
+        personSok = new PDLPersonSok(personFasade);
     }
 
     private PersonSoekResponse lagPersonSøkResponse() {
