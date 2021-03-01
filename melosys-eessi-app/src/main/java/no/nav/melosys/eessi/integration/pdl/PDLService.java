@@ -15,7 +15,7 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.integration.pdl.PDLUtils.hentSisteOpplysning;
+import static no.nav.melosys.eessi.integration.pdl.dto.HarMetadata.hentSisteOpplysning;
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriteria.*;
 
 @Component
