@@ -12,8 +12,8 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harOverlappendeStatsborgerskap;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeFoedselsdato;
-import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeStatsborgerskap;
 
 @Slf4j
 abstract class PersonSok {
@@ -58,7 +58,7 @@ abstract class PersonSok {
     private SoekBegrunnelse vurderPerson(PersonModell person, PersonsokKriterier personsokKriterier) {
         if (person.isErOpphørt()) {
             return SoekBegrunnelse.PERSON_OPPHORT;
-        } else if (!harSammeStatsborgerskap(person, personsokKriterier)) {
+        } else if (!harOverlappendeStatsborgerskap(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
         } else if (!harSammeFoedselsdato(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;

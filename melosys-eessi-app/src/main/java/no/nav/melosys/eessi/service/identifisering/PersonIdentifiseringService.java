@@ -59,10 +59,10 @@ public class PersonIdentifiseringService {
             return Optional.empty();
         }
 
-        return vurderPersonFraSed(personFraSed.get());
+        return vurderEllerSøkEtterPerson(personFraSed.get());
     }
 
-    private Optional<String> vurderPersonFraSed(Person person) {
+    private Optional<String> vurderEllerSøkEtterPerson(Person person) {
         PersonsokKriterier søkeKriterier = PersonsokKriterier.builder()
                 .fornavn(person.getFornavn())
                 .etternavn(person.getEtternavn())

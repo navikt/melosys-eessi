@@ -59,7 +59,8 @@ public class TpsService implements PersonFasade {
     @Autowired
     public TpsService(PersonConsumer personConsumer,
                       AktoerConsumer aktoerConsumer,
-                      PersonsokConsumer personsokConsumer, PersonSokMetrikker personSokMetrikker) {
+                      PersonsokConsumer personsokConsumer,
+                      PersonSokMetrikker personSokMetrikker) {
         this.personConsumer = personConsumer;
         this.aktoerConsumer = aktoerConsumer;
         this.personsokConsumer = personsokConsumer;

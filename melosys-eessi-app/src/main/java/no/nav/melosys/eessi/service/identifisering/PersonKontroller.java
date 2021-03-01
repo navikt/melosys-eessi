@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 @UtilityClass
 class PersonKontroller {
 
-    static boolean harSammeStatsborgerskap(PersonModell person, PersonsokKriterier personsokKriterier) {
+    static boolean harOverlappendeStatsborgerskap(PersonModell person, PersonsokKriterier personsokKriterier) {
         final var søkeKriterierStatsborgerskap = personsokKriterier.getStatsborgerskapISO2();
         return person.getStatsborgerskapLandkodeISO2().stream().anyMatch(søkeKriterierStatsborgerskap::contains);
     }
