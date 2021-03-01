@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PersonSoekResponse {
+public class PersonSokResponse {
     private String ident;
 }
