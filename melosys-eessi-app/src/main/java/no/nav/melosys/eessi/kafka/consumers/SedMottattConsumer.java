@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import static no.nav.melosys.eessi.config.MDCLogging.loggSedID;
+import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
+
 @Slf4j
 @Component
 public class SedMottattConsumer {
@@ -39,11 +42,14 @@ public class SedMottattConsumer {
 
     private void behandleMottatt(SedMottatt sedMottatt) {
         try {
+            loggSedID(sedMottatt.getSedHendelse().getSedId());
             behandleSedMottattService.behandleSed(sedMottatt);
         } catch (Exception e) {
             log.error("Feil i behandling av mottatt sed. Lagres for å prøve igjen senere", e);
             sedMottatt.setFeiledeForsok(sedMottatt.getFeiledeForsok() + 1);
             sedMottattService.lagre(sedMottatt);
+        } finally {
+            slettSedIDLogging();
         }
     }
 }
