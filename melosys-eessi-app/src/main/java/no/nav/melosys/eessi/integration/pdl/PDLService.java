@@ -1,23 +1,24 @@
 package no.nav.melosys.eessi.integration.pdl;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLStatsborgerskap;
+import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.integration.pdl.PDLUtils.hentSisteOpplysning;
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriteria.*;
 
 @Component
 public class PDLService implements PersonFasade {
-
-    private static final String IKKE_IMPLEMENTERT = "Ikke implementert";
 
     private final PDLConsumer pdlConsumer;
 
@@ -52,16 +53,46 @@ public class PDLService implements PersonFasade {
 
     @Override
     public String hentAktoerId(String ident) {
-        throw new NotImplementedException(IKKE_IMPLEMENTERT);
+        return pdlConsumer.hentIdenter(ident).getIdenter()
+                .stream()
+                .filter(PDLIdent::erAktørID)
+                .findFirst()
+                .map(PDLIdent::getIdent)
+                .orElseThrow(() -> new NotFoundException("Finner ikke aktørID!"));
     }
 
     @Override
     public String hentNorskIdent(String aktoerID) {
-        throw new NotImplementedException(IKKE_IMPLEMENTERT);
+        return pdlConsumer.hentIdenter(aktoerID).getIdenter()
+                .stream()
+                .filter(PDLIdent::erFolkeregisterIdent)
+                .findFirst()
+                .map(PDLIdent::getIdent)
+                .orElseThrow(() -> new NotFoundException("Finner ikke folkeregisterident!"));
     }
 
     @Override
     public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) {
-        throw new NotImplementedException(IKKE_IMPLEMENTERT);
+        return pdlConsumer.søkPerson(new PDLSokRequestVars(
+                        new PDLPaging(1, 20),
+                        Set.of(
+                                fornavn().erLik(personsoekKriterier.getFornavn()),
+                                etternavn().erLik(personsoekKriterier.getEtternavn()),
+                                fødselsdato().erLik(personsoekKriterier.getFoedselsdato())
+                        )))
+                .getHits()
+                .stream()
+                .map(PDLSokHits::getIdenter)
+                .map(this::hentFolkeregisterIdent)
+                .map(PersonSoekResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    private String hentFolkeregisterIdent(Collection<PDLIdent> pdlIdenter) {
+        return pdlIdenter.stream()
+                .filter(PDLIdent::erFolkeregisterIdent)
+                .findFirst()
+                .map(PDLIdent::getIdent)
+                .orElseThrow();
     }
 }

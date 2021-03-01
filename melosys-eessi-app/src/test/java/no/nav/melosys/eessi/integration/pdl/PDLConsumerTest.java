@@ -5,12 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Set;
 
 import lombok.SneakyThrows;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLFoedsel;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLFolkeregisterPersonstatus;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLNavn;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLStatsborgerskap;
+import no.nav.melosys.eessi.integration.pdl.dto.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeAll;
@@ -59,6 +57,45 @@ class PDLConsumerTest {
         assertThat(res.getFolkeregisterpersonstatus())
                 .flatExtracting(PDLFolkeregisterPersonstatus::getStatus)
                 .containsExactly("bosatt");
+    }
+
+    @Test
+    void søkPerson_medRequest_mottarOgMapperResponseUtenFeil() {
+        mockServer.enqueue(
+                new MockResponse()
+                .setBody(hentFil("mock/pdl_sok_person.json"))
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        var request = new PDLSokRequestVars(
+                new PDLPaging(1, 1),
+                Set.of(PDLSokCriteria.etternavn().erLik("Mannen"))
+        );
+
+        var response = pdlConsumer.søkPerson(request);
+        assertThat(response.getTotalHits()).isOne();
+        assertThat(response.getHits())
+                .hasSize(1)
+                .flatExtracting(PDLSokHits::getIdenter)
+                .hasSize(2)
+                .containsExactly(
+                        new PDLIdent("FOLKEREGISTERIDENT", "28026522600"),
+                        new PDLIdent("AKTORID", "2834873315250")
+                );
+    }
+
+    @Test
+    void hentIdentliste_medIdent_mottarOgMapperResponseUtenFeil() {
+        mockServer.enqueue(
+                new MockResponse()
+                .setBody(hentFil("mock/pdl_hent_identliste.json"))
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
+
+        assertThat(pdlConsumer.hentIdenter("123").getIdenter())
+                .hasSize(2)
+                .flatExtracting(PDLIdent::getIdent, PDLIdent::getGruppe)
+                .containsExactlyInAnyOrder("28026522600", "FOLKEREGISTERIDENT", "2834873315250", "AKTORID");
     }
 
     @SneakyThrows

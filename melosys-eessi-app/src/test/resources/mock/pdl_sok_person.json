@@ -1,0 +1,38 @@
+{
+  "data": {
+    "sokPerson": {
+      "pageNumber": 1,
+      "totalPages": 1,
+      "totalHits": 1,
+      "hits": [
+        {
+          "score": 37.424812,
+          "identer": [
+            {
+              "ident": "28026522600",
+              "gruppe": "FOLKEREGISTERIDENT"
+            },
+            {
+              "ident": "2834873315250",
+              "gruppe": "AKTORID"
+            }
+          ],
+          "person": {
+            "navn": [
+              {
+                "fornavn": "VAKKER",
+                "etternavn": "SKILPADDE",
+                "mellomnavn": null
+              }
+            ],
+            "statsborgerskap": [
+              {
+                "land": "DNK"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

@@ -2,18 +2,26 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -99,5 +107,97 @@ class PDLServiceTest {
         pdlPerson.setStatsborgerskap(Set.of(norskStatsborgerskap, svenskStatsborgerskap, polskStatsborgerskap));
         pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
         return pdlPerson;
+    }
+
+    @Test
+    void soekEtterPerson_finnerToPersoner_mapperToIdenter() {
+        ArgumentCaptor<PDLSokRequestVars> captor = ArgumentCaptor.forClass(PDLSokRequestVars.class);
+        when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponse());
+
+        PersonsoekKriterier personsoekKriterier = PersonsoekKriterier.builder()
+                .fornavn("fornavn")
+                .etternavn("etternavn")
+                .foedselsdato(LocalDate.of(2000, 1, 1))
+                .build();
+
+        var response = pdlService.soekEtterPerson(personsoekKriterier);
+        assertThat(response).hasSize(2)
+                .flatExtracting(PersonSoekResponse::getIdent)
+                .containsExactlyInAnyOrder("1", "2");
+
+        verify(pdlConsumer).søkPerson(captor.capture());
+        var pdlRequestDto = captor.getValue();
+        assertThat(pdlRequestDto.getPaging())
+                .extracting(PDLPaging::getPageNumber, PDLPaging::getResultsPerPage)
+                .containsExactly(1, 20);
+        assertThat(pdlRequestDto.getCriteria())
+                .hasSize(3)
+                .flatExtracting(PDLSokCriteria::getFeltNavn)
+                .containsExactlyInAnyOrder(
+                        "person.navn.fornavn",
+                        "person.navn.etternavn",
+                        "person.foedsel.foedselsdato"
+                );
+    }
+
+    PDLSokPerson lagSøkPersonResponse() {
+        PDLSokPerson pdlSokPerson = new PDLSokPerson();
+
+        PDLSokHits treff1 = new PDLSokHits();
+        treff1.setIdenter(
+                Set.of(new PDLIdent("FOLKEREGISTERIDENT", "1"), new PDLIdent("AKTORID", "00"))
+        );
+
+        PDLSokHits treff2 = new PDLSokHits();
+        treff2.setIdenter(
+                Set.of(new PDLIdent("FOLKEREGISTERIDENT", "2"), new PDLIdent("NPID", "99"))
+        );
+
+        pdlSokPerson.setHits(Set.of(treff1, treff2));
+        return pdlSokPerson;
+    }
+
+    @Test
+    void hentAktørID_finnes_verifiserAktørId() {
+        when(pdlConsumer.hentIdenter(anyString())).thenReturn(lagIdentliste());
+        assertThat(pdlService.hentAktoerId("123")).isEqualTo("11111");
+    }
+
+    @Test
+    void hentAktørID_finnesIkke_kasterFeil() {
+        when(pdlConsumer.hentIdenter(anyString())).thenReturn(lagTomIdentliste());
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> pdlService.hentAktoerId("123"))
+                .withMessageContaining("Finner ikke aktørID");
+    }
+
+    @Test
+    void hentNorskIdent_finnes_verifiserIdent() {
+        when(pdlConsumer.hentIdenter(anyString())).thenReturn(lagIdentliste());
+        assertThat(pdlService.hentNorskIdent("123")).isEqualTo("22222");
+    }
+
+    @Test
+    void hentNorskIdent_finnesIkke_kasterFeil() {
+        when(pdlConsumer.hentIdenter(anyString())).thenReturn(lagTomIdentliste());
+        assertThatExceptionOfType(NotFoundException.class)
+                .isThrownBy(() -> pdlService.hentNorskIdent("123"))
+                .withMessageContaining("Finner ikke folkeregisterident");
+    }
+
+    private PDLIdentliste lagIdentliste() {
+        var identliste = new PDLIdentliste();
+        identliste.setIdenter(new HashSet<>());
+        identliste.getIdenter().add(new PDLIdent("AKTORID", "11111"));
+        identliste.getIdenter().add(new PDLIdent("FOLKEREGISTERIDENT", "22222"));
+        identliste.getIdenter().add(new PDLIdent("NPID", "33333"));
+
+        return identliste;
+    }
+
+    private PDLIdentliste lagTomIdentliste() {
+        var identliste = new PDLIdentliste();
+        identliste.setIdenter(Collections.emptySet());
+        return identliste;
     }
 }
