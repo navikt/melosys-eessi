@@ -1,14 +1,18 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -26,6 +30,7 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
+import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
 import static no.nav.melosys.eessi.models.SedType.A002;
@@ -44,7 +49,7 @@ public class MockData {
         return dokumentTypeInfoDto;
     }
 
-    SedHendelse sedHendelse(String ident) {
+    SedHendelse sedHendelse(String sedID, String ident) {
         return SedHendelse.builder()
                 .avsenderId("avsenderId")
                 .avsenderNavn("avsender")
@@ -57,12 +62,12 @@ public class MockData {
                 .rinaSakId("1")
                 .rinaDokumentVersjon("1")
                 .sedType(A002.name())
-                .sedId("sedId")
+                .sedId(sedID)
                 .sektorKode("LA")
                 .build();
     }
 
-    SED sed(LocalDate fødselsdato, String statsborgerskap) {
+    SED sed(LocalDate fødselsdato, String statsborgerskap, String ident) {
         SED sed = new SED();
         sed.setSedType(A002.name());
 
@@ -86,6 +91,7 @@ public class MockData {
         Statsborgerskap statsborgerskap1 = new Statsborgerskap();
         statsborgerskap1.setLand(statsborgerskap);
         person.setStatsborgerskap(Collections.singletonList(statsborgerskap1));
+        person.setPin(StringUtils.hasText(ident) ? List.of(new Pin(ident, "NO", null)) : Collections.emptyList());
         Bruker bruker = new Bruker();
         bruker.setPerson(person);
         nav.setBruker(bruker);
@@ -129,5 +135,41 @@ public class MockData {
         document.setId(id);
         buc.setDocuments(Collections.singletonList(document));
         return buc;
+    }
+
+    public PDLPerson pdlPerson() {
+        var pdlPerson = new PDLPerson();
+
+        var pdlNavn = new PDLNavn();
+        pdlNavn.setFornavn("NyttFornavn");
+        pdlNavn.setEtternavn("NyttEtternavn");
+        pdlNavn.setMetadata(new PDLMetadata());
+        pdlNavn.getMetadata().setEndringer(Set.of(
+                new PDLEndring("OPPRETT", LocalDateTime.of(2010, 1, 1, 0, 0)),
+                new PDLEndring("KORRIGER", LocalDateTime.of(2020, 1, 1, 0, 0))
+        ));
+
+        var pdlFødsel = new PDLFoedsel();
+        pdlFødsel.setFoedselsdato(LocalDate.of(1990, 1, 1));
+        pdlFødsel.setMetadata(new PDLMetadata());
+        pdlFødsel.getMetadata().setEndringer(Set.of(
+                new PDLEndring("OPPRETT", LocalDateTime.of(1990, 1, 1, 0, 0))
+        ));
+
+        var pdlStatsborgerskap = new PDLStatsborgerskap();
+        pdlStatsborgerskap.setLand("NOR");
+
+        var pdlPersonstatus = new PDLFolkeregisterPersonstatus();
+        pdlPersonstatus.setStatus("bosatt");
+        pdlPersonstatus.setMetadata(new PDLMetadata());
+        pdlPersonstatus.getMetadata().setEndringer(Set.of(
+                new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
+        ));
+
+        pdlPerson.setNavn(Set.of(pdlNavn));
+        pdlPerson.setFoedsel(Set.of(pdlFødsel));
+        pdlPerson.setStatsborgerskap(Set.of(pdlStatsborgerskap));
+        pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
+        return pdlPerson;
     }
 }

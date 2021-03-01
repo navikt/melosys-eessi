@@ -10,12 +10,12 @@ public class DatoUtils {
 
     private static final int LOCAL_DATE_LENGTH = 10;
 
-    private static String formaterDatoString(String dato) {
-        return dato.substring(0, LOCAL_DATE_LENGTH);
-    }
-
     public static LocalDate tilLocalDate(String dato) {
         return LocalDate.parse(formaterDatoString(dato));
+    }
+
+    private static String formaterDatoString(String dato) {
+        return dato.substring(0, LOCAL_DATE_LENGTH);
     }
 
     public static LocalDate tilLocalDate(XMLGregorianCalendar xmlGregorianCalendar) {

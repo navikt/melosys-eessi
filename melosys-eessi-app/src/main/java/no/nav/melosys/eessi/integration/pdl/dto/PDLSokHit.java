@@ -5,7 +5,7 @@ import java.util.Collection;
 import lombok.Data;
 
 @Data
-public class PDLSokHits {
+public class PDLSokHit {
     private Double score;
     private Collection<PDLIdent> identer;
 }

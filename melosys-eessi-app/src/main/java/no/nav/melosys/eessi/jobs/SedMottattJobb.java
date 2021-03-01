@@ -10,6 +10,9 @@ import no.nav.melosys.eessi.service.sed.SedMottattService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import static no.nav.melosys.eessi.config.MDCLogging.loggSedID;
+import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
+
 @Slf4j
 @Component
 public class SedMottattJobb {
@@ -33,6 +36,7 @@ public class SedMottattJobb {
 
     private void behandleSedMottatt(SedMottatt sedMottatt) {
         try {
+            loggSedID(sedMottatt.getSedHendelse().getSedId());
             behandleSedMottattService.behandleSed(sedMottatt);
             sedMottatt.setFerdig(true);
             sedMottattService.lagre(sedMottatt);
@@ -46,6 +50,8 @@ public class SedMottattJobb {
             }
 
             sedMottattService.lagre(sedMottatt);
+        } finally {
+            slettSedIDLogging();
         }
     }
 }

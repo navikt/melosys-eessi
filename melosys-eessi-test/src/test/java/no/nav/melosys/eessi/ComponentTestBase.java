@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
@@ -42,8 +43,9 @@ import static org.mockito.Mockito.when;
 @TestPropertySource(locations = "/kafka-test.properties")
 public abstract class ComponentTestBase {
 
-    private static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
-    private static final String STATSBORGERSKAP = "NO";
+    static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
+    static final String STATSBORGERSKAP = "NO";
+    static final String FNR = "01019912345";
 
     protected final MockData mockData = new MockData();
 
@@ -89,8 +91,8 @@ public abstract class ComponentTestBase {
     @Autowired
     SedMottattRepository sedMottattRepository;
 
-    protected ProducerRecord<String, Object> createProducerRecord(String fnr) {
-        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", mockData.sedHendelse(fnr));
+    protected ProducerRecord<String, Object> createProducerRecord(SedHendelse sedHendelse) {
+        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", sedHendelse);
     }
 
     @Container
@@ -102,7 +104,6 @@ public abstract class ComponentTestBase {
         when(euxConsumer.hentBuC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(mockData.journalpostResponse());
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP));
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
         when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(mockData.dokumentTypeInfoDto());
     }
@@ -113,5 +114,6 @@ public abstract class ComponentTestBase {
                 .thenReturn(mockData.hentPersonResponse(ident, FØDSELSDATO, "NO"));
         when(aktoerConsumer.hentAktoerId(ident)).thenReturn(aktørID);
         when(aktoerConsumer.hentNorskIdent(aktørID)).thenReturn(ident);
+        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(mockData.pdlPerson());
     }
 }

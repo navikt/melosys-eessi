@@ -7,10 +7,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,9 +19,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -29,19 +32,21 @@ class PDLServiceTest {
 
     @Mock
     private PDLConsumer pdlConsumer;
+    @Mock
+    private PersonSokMetrikker personSokMetrikker;
 
     private PDLService pdlService;
 
     @BeforeEach
     public void setup() {
-        pdlService = new PDLService(pdlConsumer);
+        pdlService = new PDLService(pdlConsumer, personSokMetrikker);
     }
 
     @Test
     void hentPerson_personMedFlereEndringerPåNavnFlereStatsborgerskap_nyesteEndringerForNavnAlleStatsborgerskapMappes() {
         final String ident = "12345600000";
 
-        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(lagPersonMedFlereEndringer());
+        when(pdlConsumer.hentPerson(ident)).thenReturn(lagPersonMedFlereEndringer());
         assertThat(pdlService.hentPerson(ident))
                 .extracting(
                         PersonModell::getIdent,
@@ -114,15 +119,15 @@ class PDLServiceTest {
         ArgumentCaptor<PDLSokRequestVars> captor = ArgumentCaptor.forClass(PDLSokRequestVars.class);
         when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponse());
 
-        PersonsoekKriterier personsoekKriterier = PersonsoekKriterier.builder()
+        PersonsokKriterier personsokKriterier = PersonsokKriterier.builder()
                 .fornavn("fornavn")
                 .etternavn("etternavn")
                 .foedselsdato(LocalDate.of(2000, 1, 1))
                 .build();
 
-        var response = pdlService.soekEtterPerson(personsoekKriterier);
+        var response = pdlService.soekEtterPerson(personsokKriterier);
         assertThat(response).hasSize(2)
-                .flatExtracting(PersonSoekResponse::getIdent)
+                .flatExtracting(PersonSokResponse::getIdent)
                 .containsExactlyInAnyOrder("1", "2");
 
         verify(pdlConsumer).søkPerson(captor.capture());
@@ -132,7 +137,7 @@ class PDLServiceTest {
                 .containsExactly(1, 20);
         assertThat(pdlRequestDto.getCriteria())
                 .hasSize(3)
-                .flatExtracting(PDLSokCriteria::getFeltNavn)
+                .flatExtracting(PDLSokCriterion::getFieldName)
                 .containsExactlyInAnyOrder(
                         "person.navn.fornavn",
                         "person.navn.etternavn",
@@ -143,14 +148,14 @@ class PDLServiceTest {
     PDLSokPerson lagSøkPersonResponse() {
         PDLSokPerson pdlSokPerson = new PDLSokPerson();
 
-        PDLSokHits treff1 = new PDLSokHits();
+        PDLSokHit treff1 = new PDLSokHit();
         treff1.setIdenter(
-                Set.of(new PDLIdent("FOLKEREGISTERIDENT", "1"), new PDLIdent("AKTORID", "00"))
+                Set.of(new PDLIdent(FOLKEREGISTERIDENT, "1"), new PDLIdent(AKTORID, "00"))
         );
 
-        PDLSokHits treff2 = new PDLSokHits();
+        PDLSokHit treff2 = new PDLSokHit();
         treff2.setIdenter(
-                Set.of(new PDLIdent("FOLKEREGISTERIDENT", "2"), new PDLIdent("NPID", "99"))
+                Set.of(new PDLIdent(FOLKEREGISTERIDENT, "2"), new PDLIdent(NPID, "99"))
         );
 
         pdlSokPerson.setHits(Set.of(treff1, treff2));
@@ -188,9 +193,9 @@ class PDLServiceTest {
     private PDLIdentliste lagIdentliste() {
         var identliste = new PDLIdentliste();
         identliste.setIdenter(new HashSet<>());
-        identliste.getIdenter().add(new PDLIdent("AKTORID", "11111"));
-        identliste.getIdenter().add(new PDLIdent("FOLKEREGISTERIDENT", "22222"));
-        identliste.getIdenter().add(new PDLIdent("NPID", "33333"));
+        identliste.getIdenter().add(new PDLIdent(AKTORID, "11111"));
+        identliste.getIdenter().add(new PDLIdent(FOLKEREGISTERIDENT, "22222"));
+        identliste.getIdenter().add(new PDLIdent(NPID, "33333"));
 
         return identliste;
     }

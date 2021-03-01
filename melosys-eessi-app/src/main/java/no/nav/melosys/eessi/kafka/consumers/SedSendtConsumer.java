@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import static no.nav.melosys.eessi.config.MDCLogging.loggSedID;
+import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
+
 
 @Service
 @Slf4j
@@ -27,6 +30,7 @@ public class SedSendtConsumer {
             topics = "${melosys.kafka.consumer.sendt.topic}", containerFactory = "sedSendtListenerContainerFactory")
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendt = consumerRecord.value();
+        loggSedID(sedSendt.getSedId());
         log.info("Mottatt melding om sed sendt: {}, offset: {}", sedSendt, consumerRecord.offset());
 
         try {
@@ -35,8 +39,10 @@ public class SedSendtConsumer {
         } catch (Exception e) {
             //todo: legg inn metrikk/alarm
             log.error("Sed ikke journalført: {}, melding: {}", sedSendt, e.getMessage(), e);
+        } finally {
+            slettSedIDLogging();
+            sedMetrikker.sedSendt(sedSendt.getSedType());
         }
 
-        sedMetrikker.sedSendt(sedSendt.getSedType());
     }
 }

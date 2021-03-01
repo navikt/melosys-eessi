@@ -16,13 +16,14 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.NorskIdent;
@@ -50,6 +51,7 @@ public class TpsService implements PersonFasade {
     private final PersonConsumer personConsumer;
     private final AktoerConsumer aktoerConsumer;
     private final PersonsokConsumer personsokConsumer;
+    private final PersonSokMetrikker personSokMetrikker;
 
     private static final String UTGAATT_PERSON = "UTPE";
     private static final String UTGAATT_PERSON_ANNULLERT_TILGANG = "UTAN";
@@ -57,10 +59,12 @@ public class TpsService implements PersonFasade {
     @Autowired
     public TpsService(PersonConsumer personConsumer,
                       AktoerConsumer aktoerConsumer,
-                      PersonsokConsumer personsokConsumer) {
+                      PersonsokConsumer personsokConsumer,
+                      PersonSokMetrikker personSokMetrikker) {
         this.personConsumer = personConsumer;
         this.aktoerConsumer = aktoerConsumer;
         this.personsokConsumer = personsokConsumer;
+        this.personSokMetrikker = personSokMetrikker;
     }
 
     @Override
@@ -115,11 +119,11 @@ public class TpsService implements PersonFasade {
     }
 
     @Override
-    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) {
+    public List<PersonSokResponse> soekEtterPerson(PersonsokKriterier personsokKriterier) {
 
         FinnPersonRequest request = new FinnPersonRequest();
-        request.setPersonFilter(createPersonFilter(personsoekKriterier));
-        request.setSoekekriterie(createSoekekriterie(personsoekKriterier));
+        request.setPersonFilter(createPersonFilter(personsokKriterier));
+        request.setSoekekriterie(createSoekekriterie(personsokKriterier));
 
         FinnPersonResponse response;
         try {
@@ -127,19 +131,21 @@ public class TpsService implements PersonFasade {
         } catch (FinnPersonFault1 ugyldigInputEx) {
             throw new IntegrationException("Ugyldig input i søk", ugyldigInputEx);
         } catch (FinnPersonFault forMangeForekomsterEx) {
-            throw new NotFoundException("For mange forekomster funnet", forMangeForekomsterEx);
+            log.info("For mange forekomster ved søk mot TPS. Returnerer tom liste");
+            return Collections.emptyList();
         }
 
+        personSokMetrikker.registrerAntallTreffTps(response.getTotaltAntallTreff());
         return mapTilInternRespons(response);
     }
 
-    private PersonFilter createPersonFilter(PersonsoekKriterier personsoekKriterier) {
+    private PersonFilter createPersonFilter(PersonsokKriterier personsokKriterier) {
         PersonFilter personFilter = new PersonFilter();
 
         try {
-            if (personsoekKriterier.getFoedselsdato() != null) {
-                personFilter.setFoedselsdatoFra(toXmlGregorianCalendar(personsoekKriterier.getFoedselsdato()));
-                personFilter.setFoedselsdatoTil(toXmlGregorianCalendar(personsoekKriterier.getFoedselsdato()));
+            if (personsokKriterier.getFoedselsdato() != null) {
+                personFilter.setFoedselsdatoFra(toXmlGregorianCalendar(personsokKriterier.getFoedselsdato()));
+                personFilter.setFoedselsdatoTil(toXmlGregorianCalendar(personsokKriterier.getFoedselsdato()));
             }
         } catch (DatatypeConfigurationException e) {
             log.error("Feil ved henting av dato, melding {}", e.getMessage(), e);
@@ -148,10 +154,10 @@ public class TpsService implements PersonFasade {
         return personFilter;
     }
 
-    private Soekekriterie createSoekekriterie(PersonsoekKriterier personsoekKriterier) {
+    private Soekekriterie createSoekekriterie(PersonsokKriterier personsokKriterier) {
         Soekekriterie soekekriterie = new Soekekriterie();
-        soekekriterie.setFornavn(personsoekKriterier.getFornavn());
-        soekekriterie.setEtternavn(personsoekKriterier.getEtternavn());
+        soekekriterie.setFornavn(personsokKriterier.getFornavn());
+        soekekriterie.setEtternavn(personsokKriterier.getEtternavn());
         return soekekriterie;
     }
 
@@ -160,10 +166,10 @@ public class TpsService implements PersonFasade {
                 .newXMLGregorianCalendar(GregorianCalendar.from(date.atStartOfDay(ZoneId.systemDefault())));
     }
 
-    private static List<PersonSoekResponse> mapTilInternRespons(FinnPersonResponse response) {
+    private static List<PersonSokResponse> mapTilInternRespons(FinnPersonResponse response) {
         return response.getPersonListe().stream()
                 .map(p -> p.getIdent().getIdent())
-                .map(PersonSoekResponse::new)
+                .map(PersonSokResponse::new)
                 .collect(Collectors.toList());
     }
 }

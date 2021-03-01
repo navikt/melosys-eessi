@@ -72,7 +72,7 @@ public class BehandleSedMottattService {
 
     private void identifiserPerson(SedMottatt sedMottatt, SED sed)  {
         log.info("Søker etter person for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
-        personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse(), sed)
+        personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse().getRinaSakId(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
         sedMottatt.getSedHendelse().setNavBruker(sedMottatt.getSedKontekst().getNavIdent());

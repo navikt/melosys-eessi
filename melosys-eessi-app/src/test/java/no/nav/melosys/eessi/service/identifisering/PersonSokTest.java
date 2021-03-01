@@ -3,19 +3,20 @@ package no.nav.melosys.eessi.service.identifisering;
 import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import lombok.val;
-import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,31 +32,31 @@ import static org.mockito.Mockito.when;
 class PersonSokTest {
 
     private final String IDENT = "01058312345";
+    private final LocalDate defaultFødselsdato = LocalDate.of(2000, 1, 1);
+    private final Collection<String> defaultStatsborgerskap = Set.of("NO");
 
     @Mock
-    private PersonFasade personFasade;
+    private PDLService personFasade;
 
     private PersonSok personSok;
 
     @BeforeEach
     public void setup() throws Exception {
-        personSok = new PersonSok(personFasade);
+        personSok = new PDLPersonSok(personFasade);
     }
 
-    private PersonSoekResponse lagPersonSøkResponse() {
-        PersonSoekResponse response = new PersonSoekResponse();
+    private PersonSokResponse lagPersonSøkResponse() {
+        PersonSokResponse response = new PersonSokResponse();
         response.setIdent(IDENT);
         return response;
     }
 
     @Test
-    void søkPersonFraSed_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
+    void søkEtterPerson_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() {
         when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        SED sed = lagSed();
-
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isTrue();
         assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
@@ -63,14 +64,11 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_feilFødselsdato_forventIngenIdentFeilFødselsdato() throws Exception {
+    void søkEtterPerson_feilFødselsdato_forventIngenIdentFeilFødselsdato() {
         when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        SED sed = lagSed();
-        sed.getNav().getBruker().getPerson().setFoedselsdato("1999-01-01");
-
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.of(2000, 1, 2)));
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getIdent()).isNull();
@@ -78,14 +76,11 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() throws Exception {
+    void søkEtterPerson_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() {
         when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        SED sed = lagSed();
-        sed.getNav().getBruker().getPerson().getStatsborgerskap().clear();
-
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier(Set.of()));
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getIdent()).isNull();
@@ -93,20 +88,20 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_ingenTreff_forventIngenIdentIngenTreff() throws Exception {
+    void søkEtterPerson_ingenTreff_forventIngenIdentIngenTreff() {
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.emptyList());
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.INGEN_TREFF);
     }
 
     @Test
-    void søkPersonFraSed_flereTreff_forventIngenIdentFlereTreff() throws Exception {
-        when(personFasade.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSoekResponse(), new PersonSoekResponse()));
+    void søkEtterPerson_flereTreff_forventIngenIdentFlereTreff() {
+        when(personFasade.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSokResponse(), new PersonSokResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getIdent()).isNull();
@@ -114,65 +109,47 @@ class PersonSokTest {
     }
 
     @Test
-    void søkPersonFraSed_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() throws Exception {
+    void søkEtterPerson_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() {
         when(personFasade.hentPerson(anyString())).thenThrow(NotFoundException.class);
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FNR_IKKE_FUNNET);
     }
 
     @Test
-    void søkPersonFraSed_personFunnetOpphørt_forventIngenIdentPersonOpphørt() throws Exception {
+    void søkEtterPerson_personFunnetOpphørt_forventIngenIdentPersonOpphørt() {
         when(personFasade.hentPerson(anyString())).thenReturn(lagPersonModell(true));
         when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
 
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(lagSed());
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
         assertThat(sokResultat.personIdentifisert()).isFalse();
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT);
     }
 
 
-    @Test
-    void søkPersonFraSed_tidssoneForDatoEttTreffKorrekteOpplysninger_forventIdentIdentifisert() throws Exception {
-        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
-
-        SED sed = lagSed();
-        sed.getNav().getBruker().getPerson().setFoedselsdato(sed.getNav().getBruker().getPerson().getFoedselsdato() + "+02:00");
-
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
-
-        assertThat(sokResultat.personIdentifisert()).isTrue();
-        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+    private PersonsokKriterier personsoekKriterier() {
+        return personsoekKriterier(defaultFødselsdato, defaultStatsborgerskap);
     }
 
-    @Test
-    void søkPersonFraSed_finnerIkkePersonFraSedStruktur_forventIngenTreff() throws Exception {
-        SED sed = lagSed();
-        sed.setSedType(SedType.X007.name());
-
-        PersonSokResultat sokResultat = personSok.søkPersonFraSed(sed);
-
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.INGEN_TREFF);
+    private PersonsokKriterier personsoekKriterier(LocalDate fødselsdato) {
+        return personsoekKriterier(fødselsdato, defaultStatsborgerskap);
     }
 
-    @Test
-    void søkPersonFraSed_x001UtenStatsborgerskap_statsborgerskapSjekkesIkkeEttTreff() throws IOException {
-        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+    private PersonsokKriterier personsoekKriterier(Collection<String> statsborgerskap) {
+        return personsoekKriterier(defaultFødselsdato, statsborgerskap);
+    }
 
-        SED sed = sedX001();
-        sed.finnPerson().ifPresent(p -> p.setFoedselsdato("1983-05-01"));
-
-        assertThat(personSok.søkPersonFraSed(sed))
-                .extracting(PersonSokResultat::getIdent, PersonSokResultat::getBegrunnelse)
-                .containsExactly(IDENT, SoekBegrunnelse.IDENTIFISERT);
+    private PersonsokKriterier personsoekKriterier(LocalDate fødselsdato, Collection<String> statsborgerskap) {
+        return PersonsokKriterier.builder()
+                .fornavn("Fornavn")
+                .etternavn("Etternavn")
+                .foedselsdato(fødselsdato)
+                .statsborgerskapISO2(statsborgerskap)
+                .build();
     }
 
     private SED lagSed() throws IOException {
@@ -205,8 +182,8 @@ class PersonSokTest {
                 .ident(IDENT)
                 .fornavn("Fornavn")
                 .etternavn("Etternavn")
-                .fødselsdato(LocalDate.parse("1983-05-01"))
-                .statsborgerskapLandkodeISO2(List.of("NO"))
+                .fødselsdato(defaultFødselsdato)
+                .statsborgerskapLandkodeISO2(defaultStatsborgerskap)
                 .erOpphørt(erOpphørt)
                 .build();
     }

@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public class PDLSystemAuthFilter implements ExchangeFilterFunction {
 
     private final RestStsService restStsService;
-    private static final String NAV_CONSUMER_TOKNE = "Nav-Consumer-Token";
+    private static final String NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
 
     public PDLSystemAuthFilter(RestStsService restStsService) {
         this.restStsService = restStsService;
@@ -29,7 +29,7 @@ public class PDLSystemAuthFilter implements ExchangeFilterFunction {
         return exchangeFunction.exchange(
                 ClientRequest.from(clientRequest)
                         .header(HttpHeaders.AUTHORIZATION, bearerToken)
-                        .header(NAV_CONSUMER_TOKNE, bearerToken)
+                        .header(NAV_CONSUMER_TOKEN, bearerToken)
                         .build()
         );
     }

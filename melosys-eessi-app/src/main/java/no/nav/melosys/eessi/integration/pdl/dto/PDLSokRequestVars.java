@@ -7,5 +7,5 @@ import lombok.Value;
 @Value
 public class PDLSokRequestVars {
     PDLPaging paging;
-    Collection<PDLSokCriteria> criteria;
+    Collection<PDLSokCriterion> criteria;
 }
