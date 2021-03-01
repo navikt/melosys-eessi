@@ -9,8 +9,7 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static no.nav.melosys.eessi.integration.pdl.PDLQuery.HENT_PERSON_QUERY;
-import static no.nav.melosys.eessi.integration.pdl.PDLQuery.SØK_PERSON_QUERY;
+import static no.nav.melosys.eessi.integration.pdl.PDLQuery.*;
 
 public class PDLConsumer {
 
@@ -46,6 +45,19 @@ public class PDLConsumer {
 
         håndterFeil(res);
         return res.getData().getSokPerson();
+    }
+
+    public PDLIdentliste hentIdenter(String ident) {
+        var request = new GraphQLRequest(HENT_IDENTER_QUERY, Map.of(IDENT_KEY, ident));
+
+        var res = webClient.post()
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLHentIdenterResponse>>() {})
+                .block();
+
+        håndterFeil(res);
+        return res.getData().getHentIdenter();
     }
 
     private void håndterFeil(GraphQLResponse<?> res) {

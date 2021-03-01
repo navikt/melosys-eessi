@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.integration.pdl.PDLUtils.hentSisteOpplysning;
@@ -19,8 +19,6 @@ import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriteria.*;
 
 @Component
 public class PDLService implements PersonFasade {
-
-    private static final String IKKE_IMPLEMENTERT = "Ikke implementert";
 
     private final PDLConsumer pdlConsumer;
 
@@ -55,12 +53,22 @@ public class PDLService implements PersonFasade {
 
     @Override
     public String hentAktoerId(String ident) {
-        throw new NotImplementedException(IKKE_IMPLEMENTERT);
+        return pdlConsumer.hentIdenter(ident).getIdenter()
+                .stream()
+                .filter(PDLIdent::erAktørID)
+                .findFirst()
+                .map(PDLIdent::getIdent)
+                .orElseThrow(() -> new NotFoundException("Finner ikke aktørID!"));
     }
 
     @Override
     public String hentNorskIdent(String aktoerID) {
-        throw new NotImplementedException(IKKE_IMPLEMENTERT);
+        return pdlConsumer.hentIdenter(aktoerID).getIdenter()
+                .stream()
+                .filter(PDLIdent::erFolkeregisterIdent)
+                .findFirst()
+                .map(PDLIdent::getIdent)
+                .orElseThrow(() -> new NotFoundException("Finner ikke folkeregisterident!"));
     }
 
     @Override

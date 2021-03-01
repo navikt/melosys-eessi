@@ -63,6 +63,7 @@ public class TpsService implements PersonFasade {
         this.personsokConsumer = personsokConsumer;
     }
 
+    @Override
     public PersonModell hentPerson(String ident) {
         var res =
                 hentPerson(
@@ -103,14 +104,17 @@ public class TpsService implements PersonFasade {
         return response.getPerson();
     }
 
+    @Override
     public String hentAktoerId(String ident) {
         return aktoerConsumer.hentAktoerId(ident);
     }
 
+    @Override
     public String hentNorskIdent(String aktoerID) {
         return aktoerConsumer.hentNorskIdent(aktoerID);
     }
 
+    @Override
     public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) {
 
         FinnPersonRequest request = new FinnPersonRequest();
