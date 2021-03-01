@@ -1,10 +1,14 @@
 package no.nav.melosys.eessi;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
+import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
+import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHits;
+import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
@@ -55,6 +59,12 @@ class ComponentTestIT extends ComponentTestBase {
         finnPersonResponse.setTotaltAntallTreff(1);
         finnPersonResponse.getPersonListe().add(person);
         when(personsokConsumer.finnPerson(any())).thenReturn(finnPersonResponse);
+
+        var pdlSøkPerson = new PDLSokPerson();
+        var søkHits = new PDLSokHits();
+        søkHits.setIdenter(Collections.singleton(new PDLIdent("FOLKEREGISTERIDENT", FNR)));
+        pdlSøkPerson.setHits(Collections.singleton(søkHits));
+        when(pdlConsumer.søkPerson(any())).thenReturn(pdlSøkPerson);
         mockPerson(FNR, AKTOER_ID);
 
         kafkaTestConsumer.reset(2);
@@ -70,6 +80,7 @@ class ComponentTestIT extends ComponentTestBase {
     void sedMottattUtenFnr_kanIkkeIdentifiserePerson_oppretterOppgave() throws Exception {
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(personsokConsumer.finnPerson(any())).thenReturn(new FinnPersonResponse());
+        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto("123"));
 
         kafkaTestConsumer.reset(1);

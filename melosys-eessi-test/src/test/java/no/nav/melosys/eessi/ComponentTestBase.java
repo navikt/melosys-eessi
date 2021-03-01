@@ -113,5 +113,6 @@ public abstract class ComponentTestBase {
                 .thenReturn(mockData.hentPersonResponse(ident, FØDSELSDATO, "NO"));
         when(aktoerConsumer.hentAktoerId(ident)).thenReturn(aktørID);
         when(aktoerConsumer.hentNorskIdent(aktørID)).thenReturn(ident);
+        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(mockData.pdlPerson());
     }
 }

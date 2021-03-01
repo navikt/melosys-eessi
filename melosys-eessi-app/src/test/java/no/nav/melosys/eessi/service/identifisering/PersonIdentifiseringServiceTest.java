@@ -33,6 +33,8 @@ class PersonIdentifiseringServiceTest {
     @Mock
     private PersonSok personSok;
     @Mock
+    private PDLPersonSok pdlPersonSok;
+    @Mock
     private SaksrelasjonService saksrelasjonService;
     @Mock
     private SakService sakService;
@@ -46,7 +48,7 @@ class PersonIdentifiseringServiceTest {
     @BeforeEach
     public void setup() {
         personIdentifiseringService = new PersonIdentifiseringService(
-                personSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
+                personSok, pdlPersonSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
         );
     }
 

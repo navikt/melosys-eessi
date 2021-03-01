@@ -1,15 +1,18 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -132,5 +135,41 @@ public class MockData {
         document.setId(id);
         buc.setDocuments(Collections.singletonList(document));
         return buc;
+    }
+
+    public PDLPerson pdlPerson() {
+        var pdlPerson = new PDLPerson();
+
+        var pdlNavn = new PDLNavn();
+        pdlNavn.setFornavn("NyttFornavn");
+        pdlNavn.setEtternavn("NyttEtternavn");
+        pdlNavn.setMetadata(new PDLMetadata());
+        pdlNavn.getMetadata().setEndringer(Set.of(
+                new PDLEndring("OPPRETT", LocalDateTime.of(2010, 1, 1, 0, 0)),
+                new PDLEndring("KORRIGER", LocalDateTime.of(2020, 1, 1, 0, 0))
+        ));
+
+        var pdlFødsel = new PDLFoedsel();
+        pdlFødsel.setFoedselsdato(LocalDate.of(1990, 1, 1));
+        pdlFødsel.setMetadata(new PDLMetadata());
+        pdlFødsel.getMetadata().setEndringer(Set.of(
+                new PDLEndring("OPPRETT", LocalDateTime.of(1990, 1, 1, 0, 0))
+        ));
+
+        var pdlStatsborgerskap = new PDLStatsborgerskap();
+        pdlStatsborgerskap.setLand("NOR");
+
+        var pdlPersonstatus = new PDLFolkeregisterPersonstatus();
+        pdlPersonstatus.setStatus("bosatt");
+        pdlPersonstatus.setMetadata(new PDLMetadata());
+        pdlPersonstatus.getMetadata().setEndringer(Set.of(
+                new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
+        ));
+
+        pdlPerson.setNavn(Set.of(pdlNavn));
+        pdlPerson.setFoedsel(Set.of(pdlFødsel));
+        pdlPerson.setStatsborgerskap(Set.of(pdlStatsborgerskap));
+        pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
+        return pdlPerson;
     }
 }
