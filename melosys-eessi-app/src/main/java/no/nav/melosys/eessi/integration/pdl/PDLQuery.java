@@ -6,21 +6,42 @@ final class PDLQuery {
 
     static final String HENT_PERSON_QUERY = """
             query($ident: ID!) {
-                hentPerson(ident: $ident) {
-                    navn {
-                        fornavn
-                        etternavn
-                    }
-                    foedsel {
-                        foedselsdato
-                    }
-                    statsborgerskap {
-                        land
-                    }
-                    folkeregisterpersonstatus {
-                        status
-                    }
-                }
-            }
+               hentPerson(ident: $ident) {
+                 navn {
+                     fornavn
+                     etternavn
+                     metadata {
+                         master
+                         endringer {
+                             registrert
+                             type
+                         }
+                     }
+                 }
+                 foedsel {
+                     foedselsdato
+                     metadata {
+                         master
+                         endringer {
+                             registrert
+                             type
+                         }
+                     }
+                 }
+                 statsborgerskap {
+                     land
+                 }
+                 folkeregisterpersonstatus {
+                     status
+                     metadata {
+                         master
+                         endringer {
+                             registrert
+                             type
+                         }
+                     }
+                 }
+               }
+             }
             """;
 }

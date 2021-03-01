@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.tps;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import javax.xml.datatype.DatatypeFactory;
 
@@ -58,17 +59,16 @@ class TpsServiceTest {
     void hentPerson_expectPerson() throws HentPersonPersonIkkeFunnet, HentPersonSikkerhetsbegrensning {
         when(personConsumer.hentPerson(any())).thenReturn(hentPersonResponse);
         PersonModell person = tpsService.hentPerson("11223344556");
-        assertThat(person).isNotNull()
-                .isEqualTo(
-                        new PersonModell(
-                                "11223344556",
-                                "Fornavn",
-                                "Etternavn",
-                                LocalDate.parse("2000-01-01"),
-                                "SE",
-                                false
-                        )
-                );
+        assertThat(person).isEqualTo(
+                PersonModell.builder()
+                        .ident("11223344556")
+                        .fornavn("Fornavn")
+                        .etternavn("Etternavn")
+                        .fødselsdato(LocalDate.parse("2000-01-01"))
+                        .statsborgerskapLandkodeISO2(Collections.singleton("SE"))
+                        .erOpphørt(false)
+                        .build()
+        );
     }
 
     @Test

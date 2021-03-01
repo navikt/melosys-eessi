@@ -4,12 +4,32 @@
       "navn": [
         {
           "fornavn": "RASK",
-          "etternavn": "MASKIN"
+          "etternavn": "MASKIN",
+          "metadata": {
+            "master": "Freg",
+            "historisk": false,
+            "endringer": [
+              {
+                "registrert": "2020-06-04T18:50:15",
+                "type": "OPPRETT"
+              }
+            ]
+          }
         }
       ],
       "foedsel": [
         {
-          "foedselsdato": "1984-06-25"
+          "foedselsdato": "1984-06-25",
+          "metadata": {
+            "master": "Freg",
+            "historisk": false,
+            "endringer": [
+              {
+                "registrert": "2020-06-04T18:50:15",
+                "type": "OPPRETT"
+              }
+            ]
+          }
         }
       ],
       "statsborgerskap": [
@@ -19,7 +39,17 @@
       ],
       "folkeregisterpersonstatus": [
         {
-          "status": "bosatt"
+          "status": "bosatt",
+          "metadata": {
+            "master": "Freg",
+            "historisk": false,
+            "endringer": [
+              {
+                "registrert": "2020-06-04T18:50:16",
+                "type": "OPPRETT"
+              }
+            ]
+          }
         }
       ]
     }
