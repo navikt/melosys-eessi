@@ -19,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -149,12 +150,12 @@ class PDLServiceTest {
 
         PDLSokHit treff1 = new PDLSokHit();
         treff1.setIdenter(
-                Set.of(new PDLIdent("FOLKEREGISTERIDENT", "1"), new PDLIdent("AKTORID", "00"))
+                Set.of(new PDLIdent(FOLKEREGISTERIDENT, "1"), new PDLIdent(AKTORID, "00"))
         );
 
         PDLSokHit treff2 = new PDLSokHit();
         treff2.setIdenter(
-                Set.of(new PDLIdent("FOLKEREGISTERIDENT", "2"), new PDLIdent("NPID", "99"))
+                Set.of(new PDLIdent(FOLKEREGISTERIDENT, "2"), new PDLIdent(NPID, "99"))
         );
 
         pdlSokPerson.setHits(Set.of(treff1, treff2));
@@ -192,9 +193,9 @@ class PDLServiceTest {
     private PDLIdentliste lagIdentliste() {
         var identliste = new PDLIdentliste();
         identliste.setIdenter(new HashSet<>());
-        identliste.getIdenter().add(new PDLIdent("AKTORID", "11111"));
-        identliste.getIdenter().add(new PDLIdent("FOLKEREGISTERIDENT", "22222"));
-        identliste.getIdenter().add(new PDLIdent("NPID", "33333"));
+        identliste.getIdenter().add(new PDLIdent(AKTORID, "11111"));
+        identliste.getIdenter().add(new PDLIdent(FOLKEREGISTERIDENT, "22222"));
+        identliste.getIdenter().add(new PDLIdent(NPID, "33333"));
 
         return identliste;
     }

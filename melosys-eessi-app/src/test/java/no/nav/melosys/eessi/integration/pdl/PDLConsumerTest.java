@@ -18,6 +18,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.AKTORID;
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class PDLConsumerTest {
@@ -79,8 +81,8 @@ class PDLConsumerTest {
                 .flatExtracting(PDLSokHit::getIdenter)
                 .hasSize(2)
                 .containsExactly(
-                        new PDLIdent("FOLKEREGISTERIDENT", "28026522600"),
-                        new PDLIdent("AKTORID", "2834873315250")
+                        new PDLIdent(FOLKEREGISTERIDENT, "28026522600"),
+                        new PDLIdent(AKTORID, "2834873315250")
                 );
     }
 
@@ -95,7 +97,7 @@ class PDLConsumerTest {
         assertThat(pdlConsumer.hentIdenter("123").getIdenter())
                 .hasSize(2)
                 .flatExtracting(PDLIdent::getIdent, PDLIdent::getGruppe)
-                .containsExactlyInAnyOrder("28026522600", "FOLKEREGISTERIDENT", "2834873315250", "AKTORID");
+                .containsExactlyInAnyOrder("28026522600", FOLKEREGISTERIDENT, "2834873315250", AKTORID);
     }
 
     @SneakyThrows

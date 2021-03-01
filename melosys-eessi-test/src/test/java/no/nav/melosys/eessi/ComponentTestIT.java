@@ -19,6 +19,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,7 +63,7 @@ class ComponentTestIT extends ComponentTestBase {
 
         var pdlSøkPerson = new PDLSokPerson();
         var søkHits = new PDLSokHit();
-        søkHits.setIdenter(Collections.singleton(new PDLIdent("FOLKEREGISTERIDENT", FNR)));
+        søkHits.setIdenter(Collections.singleton(new PDLIdent(FOLKEREGISTERIDENT, FNR)));
         pdlSøkPerson.setHits(Collections.singleton(søkHits));
         when(pdlConsumer.søkPerson(any())).thenReturn(pdlSøkPerson);
         mockPerson(FNR, AKTOER_ID);
