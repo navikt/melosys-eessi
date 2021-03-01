@@ -28,5 +28,6 @@ public class PDLConsumerProducer {
     private void defaultHeaders(HttpHeaders httpHeaders) {
         httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("Tema", "MED");
     }
 }
