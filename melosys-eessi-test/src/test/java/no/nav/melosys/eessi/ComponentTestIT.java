@@ -43,7 +43,7 @@ class ComponentTestIT extends ComponentTestBase {
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, FNR))).get();
-        kafkaTestConsumer.doWait(1_000L);
+        kafkaTestConsumer.doWait(2_000L);
 
         assertThat(hentRecords()).hasSize(1)
                 .extracting(Object::toString)
@@ -75,7 +75,7 @@ class ComponentTestIT extends ComponentTestBase {
 
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, null))).get();
-        kafkaTestConsumer.doWait(1_000L);
+        kafkaTestConsumer.doWait(2_000L);
 
         assertThat(hentRecords()).hasSize(1);
     }
@@ -91,9 +91,9 @@ class ComponentTestIT extends ComponentTestBase {
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, null))).get();
-        kafkaTestConsumer.doWait(1_000L);
+        kafkaTestConsumer.doWait(2_000L);
 
-        verify(oppgaveConsumer, timeout(1000)).opprettOppgave(any());
+        verify(oppgaveConsumer, timeout(2000)).opprettOppgave(any());
         assertThat(hentRecords()).isEmpty();
     }
 
@@ -108,7 +108,7 @@ class ComponentTestIT extends ComponentTestBase {
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, FNR))).get();
-        kafkaTestConsumer.doWait(1_000L);
+        kafkaTestConsumer.doWait(2_000L);
 
         await().atMost(2, TimeUnit.SECONDS).until(() -> sedMottattRepository.count() > 0);
         assertThat(sedMottattRepository.findAll())
