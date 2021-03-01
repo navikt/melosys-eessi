@@ -21,7 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +45,7 @@ class PDLServiceTest {
     void hentPerson_personMedFlereEndringerPåNavnFlereStatsborgerskap_nyesteEndringerForNavnAlleStatsborgerskapMappes() {
         final String ident = "12345600000";
 
-        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(lagPersonMedFlereEndringer());
+        when(pdlConsumer.hentPerson(ident)).thenReturn(lagPersonMedFlereEndringer());
         assertThat(pdlService.hentPerson(ident))
                 .extracting(
                         PersonModell::getIdent,
