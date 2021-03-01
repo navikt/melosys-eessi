@@ -69,14 +69,14 @@ class PDLConsumerTest {
 
         var request = new PDLSokRequestVars(
                 new PDLPaging(1, 1),
-                Set.of(PDLSokCriteria.etternavn().erLik("Mannen"))
+                Set.of(PDLSokCriterion.etternavn().erLik("Mannen"))
         );
 
         var response = pdlConsumer.søkPerson(request);
         assertThat(response.getTotalHits()).isOne();
         assertThat(response.getHits())
                 .hasSize(1)
-                .flatExtracting(PDLSokHits::getIdenter)
+                .flatExtracting(PDLSokHit::getIdenter)
                 .hasSize(2)
                 .containsExactly(
                         new PDLIdent("FOLKEREGISTERIDENT", "28026522600"),

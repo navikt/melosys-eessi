@@ -10,8 +10,8 @@ import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -118,15 +118,15 @@ class PDLServiceTest {
         ArgumentCaptor<PDLSokRequestVars> captor = ArgumentCaptor.forClass(PDLSokRequestVars.class);
         when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponse());
 
-        PersonsoekKriterier personsoekKriterier = PersonsoekKriterier.builder()
+        PersonsokKriterier personsokKriterier = PersonsokKriterier.builder()
                 .fornavn("fornavn")
                 .etternavn("etternavn")
                 .foedselsdato(LocalDate.of(2000, 1, 1))
                 .build();
 
-        var response = pdlService.soekEtterPerson(personsoekKriterier);
+        var response = pdlService.soekEtterPerson(personsokKriterier);
         assertThat(response).hasSize(2)
-                .flatExtracting(PersonSoekResponse::getIdent)
+                .flatExtracting(PersonSokResponse::getIdent)
                 .containsExactlyInAnyOrder("1", "2");
 
         verify(pdlConsumer).søkPerson(captor.capture());
@@ -136,7 +136,7 @@ class PDLServiceTest {
                 .containsExactly(1, 20);
         assertThat(pdlRequestDto.getCriteria())
                 .hasSize(3)
-                .flatExtracting(PDLSokCriteria::getFeltNavn)
+                .flatExtracting(PDLSokCriterion::getFieldName)
                 .containsExactlyInAnyOrder(
                         "person.navn.fornavn",
                         "person.navn.etternavn",
@@ -147,12 +147,12 @@ class PDLServiceTest {
     PDLSokPerson lagSøkPersonResponse() {
         PDLSokPerson pdlSokPerson = new PDLSokPerson();
 
-        PDLSokHits treff1 = new PDLSokHits();
+        PDLSokHit treff1 = new PDLSokHit();
         treff1.setIdenter(
                 Set.of(new PDLIdent("FOLKEREGISTERIDENT", "1"), new PDLIdent("AKTORID", "00"))
         );
 
-        PDLSokHits treff2 = new PDLSokHits();
+        PDLSokHit treff2 = new PDLSokHit();
         treff2.setIdenter(
                 Set.of(new PDLIdent("FOLKEREGISTERIDENT", "2"), new PDLIdent("NPID", "99"))
         );

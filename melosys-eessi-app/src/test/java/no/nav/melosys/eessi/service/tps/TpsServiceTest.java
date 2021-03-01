@@ -12,8 +12,8 @@ import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
 import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
@@ -85,13 +85,13 @@ class TpsServiceTest {
     @Test
     void soekEtterPerson_forventIdent() throws FinnPersonFault, FinnPersonFault1 {
         when(personsokConsumer.finnPerson(any())).thenReturn(lagFinnPersonResponseMedEnPerson());
-        List<PersonSoekResponse> response = tpsService.soekEtterPerson(lagPersonsoekKriterier());
+        List<PersonSokResponse> response = tpsService.soekEtterPerson(lagPersonsoekKriterier());
         assertThat(response).isNotEmpty();
         assertThat(response.get(0).getIdent()).isEqualTo("04127811111");
     }
 
-    private PersonsoekKriterier lagPersonsoekKriterier() {
-        return PersonsoekKriterier.builder()
+    private PersonsokKriterier lagPersonsoekKriterier() {
+        return PersonsokKriterier.builder()
                 .fornavn("Talentfull")
                 .etternavn("Knott")
                 .foedselsdato(LocalDate.of(1978, 12, 4))

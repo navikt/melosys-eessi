@@ -15,8 +15,8 @@ import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,8 +45,8 @@ class PersonSokTest {
         personSok = new PDLPersonSok(personFasade);
     }
 
-    private PersonSoekResponse lagPersonSøkResponse() {
-        PersonSoekResponse response = new PersonSoekResponse();
+    private PersonSokResponse lagPersonSøkResponse() {
+        PersonSokResponse response = new PersonSokResponse();
         response.setIdent(IDENT);
         return response;
     }
@@ -99,7 +99,7 @@ class PersonSokTest {
 
     @Test
     void søkEtterPerson_flereTreff_forventIngenIdentFlereTreff() {
-        when(personFasade.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSoekResponse(), new PersonSoekResponse()));
+        when(personFasade.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSokResponse(), new PersonSokResponse()));
 
         PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
 
@@ -131,20 +131,20 @@ class PersonSokTest {
     }
 
 
-    private PersonsoekKriterier personsoekKriterier() {
+    private PersonsokKriterier personsoekKriterier() {
         return personsoekKriterier(defaultFødselsdato, defaultStatsborgerskap);
     }
 
-    private PersonsoekKriterier personsoekKriterier(LocalDate fødselsdato) {
+    private PersonsokKriterier personsoekKriterier(LocalDate fødselsdato) {
         return personsoekKriterier(fødselsdato, defaultStatsborgerskap);
     }
 
-    private PersonsoekKriterier personsoekKriterier(Collection<String> statsborgerskap) {
+    private PersonsokKriterier personsoekKriterier(Collection<String> statsborgerskap) {
         return personsoekKriterier(defaultFødselsdato, statsborgerskap);
     }
 
-    private PersonsoekKriterier personsoekKriterier(LocalDate fødselsdato, Collection<String> statsborgerskap) {
-        return PersonsoekKriterier.builder()
+    private PersonsokKriterier personsoekKriterier(LocalDate fødselsdato, Collection<String> statsborgerskap) {
+        return PersonsokKriterier.builder()
                 .fornavn("Fornavn")
                 .etternavn("Etternavn")
                 .foedselsdato(fødselsdato)

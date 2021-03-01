@@ -10,5 +10,5 @@ public class PDLSokPerson {
     private int pageNumber;
     private int totalPages;
     private int totalHits;
-    private Collection<PDLSokHits> hits = new HashSet<>();
+    private Collection<PDLSokHit> hits = new HashSet<>();
 }

@@ -15,7 +15,7 @@ import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,7 +75,7 @@ class PersonIdentifiseringServiceTest {
         SED sed = lagSED();
         sed.getNav().getBruker().getPerson().setPin(List.of(new Pin(norskIdent, "NO", null)));
 
-        when(personSok.vurderPerson(eq(norskIdent), any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        when(personSok.vurderPerson(eq(norskIdent), any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", sed);
         assertThat(res).contains(norskIdent);
     }
@@ -83,14 +83,14 @@ class PersonIdentifiseringServiceTest {
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
         final String norskIdent = "33";
-        when(personSok.søkEtterPerson(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }
 
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() {
-        when(personSok.søkEtterPerson(any(PersonsoekKriterier.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
+        when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).isNotPresent();
     }

@@ -11,12 +11,12 @@ import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSoekResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.HarMetadata.hentSisteOpplysning;
-import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriteria.*;
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriterion.*;
 
 @Component
 public class PDLService implements PersonFasade {
@@ -75,20 +75,20 @@ public class PDLService implements PersonFasade {
     }
 
     @Override
-    public List<PersonSoekResponse> soekEtterPerson(PersonsoekKriterier personsoekKriterier) {
+    public List<PersonSokResponse> soekEtterPerson(PersonsokKriterier personsokKriterier) {
         return pdlConsumer.søkPerson(new PDLSokRequestVars(
                         new PDLPaging(1, 20),
                         Set.of(
-                                fornavn().erLik(personsoekKriterier.getFornavn()),
-                                etternavn().erLik(personsoekKriterier.getEtternavn()),
-                                fødselsdato().erLik(personsoekKriterier.getFoedselsdato())
+                                fornavn().erLik(personsokKriterier.getFornavn()),
+                                etternavn().erLik(personsokKriterier.getEtternavn()),
+                                fødselsdato().erLik(personsokKriterier.getFoedselsdato())
                         )))
                 .getHits()
                 .stream()
                 .peek(res -> personSokMetrikker.registrerAntallTreffPDL(res.getIdenter().size()))
-                .map(PDLSokHits::getIdenter)
+                .map(PDLSokHit::getIdenter)
                 .map(this::hentFolkeregisterIdent)
-                .map(PersonSoekResponse::new)
+                .map(PersonSokResponse::new)
                 .collect(Collectors.toList());
     }
 

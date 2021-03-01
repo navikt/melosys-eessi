@@ -3,17 +3,14 @@ package no.nav.melosys.eessi.integration.pdl.dto;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Value;
 
 @Getter
 @Value
-public class PDLSokCriteria {
-    @JsonProperty("fieldName")
-    String feltNavn;
-    @JsonProperty("searchRule")
-    Map<String, Object> søkeRegel;
+public class PDLSokCriterion {
+    String fieldName;
+    Map<String, Object> searchRule;
 
     public static Builder fornavn() {
         return new Builder("person.navn.fornavn");
@@ -44,18 +41,18 @@ public class PDLSokCriteria {
             this.søkeRegel = new HashMap<>();
         }
 
-        public PDLSokCriteria inneholder(Object verdi) {
+        public PDLSokCriterion inneholder(Object verdi) {
             søkeRegel.put(INNEHOLDER, verdi);
             return build();
         }
 
-        public PDLSokCriteria erLik(Object verdi) {
+        public PDLSokCriterion erLik(Object verdi) {
             søkeRegel.put(ER_LIK, verdi);
             return build();
         }
 
-        private PDLSokCriteria build() {
-            return new PDLSokCriteria(feltNavn, søkeRegel);
+        private PDLSokCriterion build() {
+            return new PDLSokCriterion(feltNavn, søkeRegel);
         }
     }
 }

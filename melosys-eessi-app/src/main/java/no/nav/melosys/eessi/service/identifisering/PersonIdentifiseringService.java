@@ -13,7 +13,7 @@ import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsoekKriterier;
+import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +63,7 @@ public class PersonIdentifiseringService {
     }
 
     private Optional<String> vurderPersonFraSed(Person person) {
-        PersonsoekKriterier søkeKriterier = PersonsoekKriterier.builder()
+        PersonsokKriterier søkeKriterier = PersonsokKriterier.builder()
                 .fornavn(person.getFornavn())
                 .etternavn(person.getEtternavn())
                 .foedselsdato(tilLocalDate(person.getFoedselsdato()))
@@ -85,7 +85,7 @@ public class PersonIdentifiseringService {
         return Optional.ofNullable(resultat.getIdent());
     }
 
-    private PersonSokResultat utførSøk(PersonsoekKriterier søkekriterier) {
+    private PersonSokResultat utførSøk(PersonsokKriterier søkekriterier) {
         PersonSokResultat resultatTps = tpsPersonSok.søkEtterPerson(søkekriterier);
 
         try {
