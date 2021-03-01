@@ -49,7 +49,7 @@ public class MockData {
         return dokumentTypeInfoDto;
     }
 
-    SedHendelse sedHendelse(String ident) {
+    SedHendelse sedHendelse(String sedID, String ident) {
         return SedHendelse.builder()
                 .avsenderId("avsenderId")
                 .avsenderNavn("avsender")
@@ -62,7 +62,7 @@ public class MockData {
                 .rinaSakId("1")
                 .rinaDokumentVersjon("1")
                 .sedType(A002.name())
-                .sedId("sedId")
+                .sedId(sedID)
                 .sektorKode("LA")
                 .build();
     }

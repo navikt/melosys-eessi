@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
 import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
 import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
@@ -90,8 +91,8 @@ public abstract class ComponentTestBase {
     @Autowired
     SedMottattRepository sedMottattRepository;
 
-    protected ProducerRecord<String, Object> createProducerRecord(String fnr) {
-        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", mockData.sedHendelse(fnr));
+    protected ProducerRecord<String, Object> createProducerRecord(SedHendelse sedHendelse) {
+        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", sedHendelse);
     }
 
     @Container
