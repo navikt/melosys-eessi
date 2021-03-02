@@ -105,7 +105,7 @@ public class SedGrunnlagMapperA003Test {
     @Test
     public void map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() throws IOException {
         SED sed = hentSed();
-        Pin pin = sed.getNav().getBruker().getPerson().getPin().get(0);
+        Pin pin = sed.getNav().getBruker().getPerson().getPin().iterator().next();
         pin.setLand("NO");
         sed.getNav().getBruker().getPerson().setPin(List.of(pin));
 

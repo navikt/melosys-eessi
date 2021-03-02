@@ -1,20 +1,14 @@
 package no.nav.melosys.eessi.service.identifisering;
 
-import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import lombok.val;
 import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
@@ -150,31 +144,6 @@ class PersonSokTest {
                 .foedselsdato(fødselsdato)
                 .statsborgerskapISO2(statsborgerskap)
                 .build();
-    }
-
-    private SED lagSed() throws IOException {
-        SED sed = sedA009();
-
-        val statsborgerskap = new no.nav.melosys.eessi.models.sed.nav.Statsborgerskap();
-        statsborgerskap.setLand("NO");
-        sed.getNav().getBruker().getPerson().getStatsborgerskap().add(statsborgerskap);
-
-        return sed;
-    }
-
-    private SED sedA009() throws IOException {
-        return hentSedFil("mock/sedA009.json");
-    }
-
-    private SED sedX001() throws IOException {
-        return hentSedFil("mock/sedX001.json");
-    }
-
-    private SED hentSedFil(String filnavn) throws IOException {
-        URL jsonUrl = getClass().getClassLoader().getResource(filnavn);
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false);
-        return mapper.readValue(jsonUrl, SED.class);
     }
 
     private PersonModell lagPersonModell(boolean erOpphørt) {

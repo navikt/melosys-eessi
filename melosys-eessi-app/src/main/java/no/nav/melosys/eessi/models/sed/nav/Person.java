@@ -1,8 +1,8 @@
 
 package no.nav.melosys.eessi.models.sed.nav;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,9 +28,9 @@ public class Person {
 
     private String kjoenn;
 
-    private List<Pin> pin;
+    private Collection<Pin> pin = new HashSet<>();
 
-    private List<Statsborgerskap> statsborgerskap = new ArrayList<>();
+    private Collection<Statsborgerskap> statsborgerskap = new HashSet<>();
 
     public Optional<Pin> finnNorskPin() {
         return pin.stream().filter(p -> "NO".equals(p.getLand())).findFirst();

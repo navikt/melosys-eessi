@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public interface MelosysEessiMeldingMapper {
                 && sed.getNav().getBruker().getPerson().getStatsborgerskap() != null;
     }
 
-    default List<Statsborgerskap> mapStatsborgerskap(List<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {
+    default List<Statsborgerskap> mapStatsborgerskap(Collection<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {
         return statsborgerskapListe.stream().map(no.nav.melosys.eessi.models.sed.nav.Statsborgerskap::getLand)
                 .map(Statsborgerskap::new).collect(Collectors.toList());
     }

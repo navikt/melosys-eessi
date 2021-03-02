@@ -43,7 +43,7 @@ public interface SedGrunnlagMapper {
         return StreamUtils.nullableStream(adresser).findFirst().map(Adresse::av).orElseGet(Adresse::new);
     }
 
-    default List<Ident> mapUtenlandskIdent(List<Pin> pins) {
+    default List<Ident> mapUtenlandskIdent(Collection<Pin> pins) {
         return StreamUtils.nullableStream(pins).map(Ident::av).filter(Ident::erUtenlandsk).collect(Collectors.toList());
     }
 
