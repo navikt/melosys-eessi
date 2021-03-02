@@ -11,6 +11,8 @@ final class MetrikkerNavn {
     static final String BUC_OPPRETTET = METRIKKER_NAMESPACE + "buc.opprettet";
     static final String BUC_LUKKET = METRIKKER_NAMESPACE + "buc.lukket";
     static final String PERSONSØK_SAMMENLIGNING = METRIKKER_NAMESPACE + "personsok.sammenligning";
+    static final String PERSONSOK_ANTALL_TPS = METRIKKER_NAMESPACE + "personsok.antall.tps";
+    static final String PERSONSOK_ANTALL_PDL = METRIKKER_NAMESPACE + "personsok.antall.pdl";
 
     static final String KEY_SEDTYPE = "sedType";
     static final String KEY_BUCTYPE = "bucType";

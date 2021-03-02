@@ -54,8 +54,8 @@ public class PersonSokMetrikker {
     }
 
     public PersonSokMetrikker(MeterRegistry meterRegistry) {
-        pdlSøketreff = DistributionSummary.builder("personsok.antall.pdl").baseUnit("short").register(meterRegistry);
-        tpsSøketreff = DistributionSummary.builder("personsok.antall.tps").baseUnit("short").register(meterRegistry);
+        pdlSøketreff = DistributionSummary.builder(PERSONSOK_ANTALL_PDL).baseUnit("short").register(meterRegistry);
+        tpsSøketreff = DistributionSummary.builder(PERSONSOK_ANTALL_TPS).baseUnit("short").register(meterRegistry);
     }
 
     public void counter(final SoekBegrunnelse soekBegrunnelse) {
@@ -76,6 +76,7 @@ public class PersonSokMetrikker {
     }
 
     public void registrerSammenligningPdlTps(PersonSokResultat tpsResultat, PersonSokResultat pdlResultat) {
+        log.info("Resultat personsøk tps: {}, pdl: {}", tpsResultat.getBegrunnelse(), tpsResultat.getBegrunnelse());
         if (tpsResultat.personIdentifisert() && pdlResultat.personIdentifisert()) {
             PDL_TPS_SAMMENLIGNING_RESULTAT_TELLERE.get(TREFF_I_BEGGE).increment();
         } else if (tpsResultat.personIdentifisert()) {
