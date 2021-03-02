@@ -76,7 +76,7 @@ public class PersonSokMetrikker {
     }
 
     public void registrerSammenligningPdlTps(PersonSokResultat tpsResultat, PersonSokResultat pdlResultat) {
-        log.info("Resultat personsøk tps: {}, pdl: {}", tpsResultat.getBegrunnelse(), tpsResultat.getBegrunnelse());
+        log.info("Resultat personsøk tps: {}, pdl: {}", tpsResultat.getBegrunnelse(), pdlResultat.getBegrunnelse());
         if (tpsResultat.personIdentifisert() && pdlResultat.personIdentifisert()) {
             PDL_TPS_SAMMENLIGNING_RESULTAT_TELLERE.get(TREFF_I_BEGGE).increment();
         } else if (tpsResultat.personIdentifisert()) {
