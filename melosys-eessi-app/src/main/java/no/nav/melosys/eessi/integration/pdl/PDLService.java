@@ -79,8 +79,8 @@ public class PDLService implements PersonFasade {
         return pdlConsumer.søkPerson(new PDLSokRequestVars(
                         new PDLPaging(1, 20),
                         Set.of(
-                                fornavn().erLik(personsokKriterier.getFornavn()),
-                                etternavn().erLik(personsokKriterier.getEtternavn()),
+                                fornavn().inneholder(personsokKriterier.getFornavn()),
+                                etternavn().inneholder(personsokKriterier.getEtternavn()),
                                 fødselsdato().erLik(personsokKriterier.getFoedselsdato())
                         )))
                 .getHits()
