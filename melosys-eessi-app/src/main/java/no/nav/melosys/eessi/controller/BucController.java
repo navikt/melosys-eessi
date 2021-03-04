@@ -19,6 +19,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import static java.util.Collections.emptySet;
+import static java.util.Optional.ofNullable;
+
 @Protected
 @Slf4j
 @RestController
@@ -48,7 +51,7 @@ public class BucController {
     ) throws ValidationException {
         return sedService.opprettBucOgSed(
                 opprettBucOgSedDto.getSedDataDto(),
-                opprettBucOgSedDto.getVedlegg(),
+                ofNullable(opprettBucOgSedDto.getVedlegg()).orElse(emptySet()),
                 bucType,
                 sendAutomatisk,
                 oppdaterEksisterende);
