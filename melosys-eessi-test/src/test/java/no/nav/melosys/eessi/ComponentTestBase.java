@@ -45,7 +45,7 @@ public abstract class ComponentTestBase {
 
     static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     static final String STATSBORGERSKAP = "NO";
-    static final String FNR = "01019912345";
+    static final String FNR = "25068420779";
 
     protected final MockData mockData = new MockData();
 
