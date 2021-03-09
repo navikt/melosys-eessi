@@ -30,6 +30,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PersonIdentifiseringServiceTest {
 
+    private final String norskIdent = "64068648643";
+
     @Mock
     private PersonSok personSok;
     @Mock
@@ -54,7 +56,6 @@ class PersonIdentifiseringServiceTest {
 
     @Test
     void identifiserPerson_sakEksisterer_hentPersonFraSak() {
-        final String norskIdent = "333333";
         Sak sak = new Sak();
         sak.setAktoerId("32132132");
 
@@ -71,7 +72,6 @@ class PersonIdentifiseringServiceTest {
 
     @Test
     void identifiserPerson_ingenSakSedMedNorskIdent_personSuksessfultValidert() {
-        final String norskIdent = "333333";
         SED sed = lagSED();
         sed.getNav().getBruker().getPerson().setPin(List.of(new Pin(norskIdent, "NO", null)));
 
@@ -82,7 +82,6 @@ class PersonIdentifiseringServiceTest {
 
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
-        final String norskIdent = "33";
         when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);

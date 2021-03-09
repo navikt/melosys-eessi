@@ -70,7 +70,10 @@ public class PersonIdentifiseringService {
                 .statsborgerskapISO2(person.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toSet()))
                 .build();
 
-        Optional<String> norskIdent = person.finnNorskPin().map(Pin::getIdentifikator).map(String::trim);
+        Optional<String> norskIdent = person.finnNorskPin()
+                .map(Pin::getIdentifikator)
+                .flatMap(FnrUtils::filtrerUtGyldigNorskIdent);
+
         if (norskIdent.isPresent()) {
             PersonSokResultat resultat = tpsPersonSok.vurderPerson(norskIdent.get(), søkeKriterier);
             if (resultat.personIdentifisert()) {
