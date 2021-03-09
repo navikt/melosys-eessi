@@ -134,6 +134,11 @@
             <version>${personsok.version}</version>
         </dependency>
         <dependency>
+            <groupId>no.bekk.bekkopen</groupId>
+            <artifactId>nocommons</artifactId>
+            <version>${bekk-nocommons.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.javacrumbs.shedlock</groupId>
             <artifactId>shedlock-spring</artifactId>
             <version>${shedlock-version}</version>
