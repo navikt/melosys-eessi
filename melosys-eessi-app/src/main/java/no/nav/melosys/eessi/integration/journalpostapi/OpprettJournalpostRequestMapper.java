@@ -135,7 +135,10 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static final Predicate<SedMedVedlegg.BinaerFil> gyldigFiltypePredicate = binaerFil -> {
-        boolean gyldigFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).isPresent();
+        final boolean gyldigFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn())
+                .map(JournalpostFiltype::erGyldigFiltypeForVariantformatArkiv)
+                .orElse(Boolean.FALSE);
+
         if (!gyldigFiltype) {
             log.error("Et vedlegg av en SED har filtype som ikke støttes. "
                     + "Dette vedlegget kan ikke journalføres. Filnavn: {}", binaerFil.getFilnavn());
