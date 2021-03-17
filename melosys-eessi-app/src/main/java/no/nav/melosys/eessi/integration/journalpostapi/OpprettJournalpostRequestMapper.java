@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
@@ -74,7 +75,8 @@ public final class OpprettJournalpostRequestMapper {
                 .build();
     }
 
-    private static AvsenderMottaker getAvsenderMottaker(final JournalpostType type, final SedHendelse sedHendelse) {
+    private static AvsenderMottaker getAvsenderMottaker(final JournalpostType type,
+                                                        final SedHendelse sedHendelse) {
         return AvsenderMottaker.builder()
                 .id(type == JournalpostType.UTGAAENDE ? sedHendelse.getMottakerId() : sedHendelse.getAvsenderId())
                 .navn(type == JournalpostType.UTGAAENDE ? sedHendelse.getMottakerNavn() : sedHendelse.getAvsenderNavn())
@@ -82,7 +84,8 @@ public final class OpprettJournalpostRequestMapper {
                 .build();
     }
 
-    private static List<Dokument> dokumenter(final String sedType, final SedMedVedlegg sedMedVedlegg,
+    private static List<Dokument> dokumenter(final String sedType,
+                                             final SedMedVedlegg sedMedVedlegg,
                                              final DokkatSedInfo dokkatSedInfo) {
         final List<Dokument> dokumenter = new ArrayList<>();
 
@@ -91,7 +94,10 @@ public final class OpprettJournalpostRequestMapper {
         return dokumenter;
     }
 
-    private static Dokument dokument(final String sedType, final String filnavn, JournalpostFiltype journalpostFiltype, byte[] innhold) {
+    private static Dokument dokument(final String sedType,
+                                     final String filnavn,
+                                     final JournalpostFiltype journalpostFiltype,
+                                     final byte[] innhold) {
         return Dokument.builder()
                 .dokumentvarianter(Collections.singletonList(DokumentVariant.builder()
                         .filtype(journalpostFiltype)
@@ -103,19 +109,23 @@ public final class OpprettJournalpostRequestMapper {
                 .build();
     }
 
-    private static List<Dokument> vedlegg(final String sedType, final List<SedMedVedlegg.BinaerFil> vedleggListe) {
+    private static List<Dokument> vedlegg(final String sedType,
+                                          final List<SedMedVedlegg.BinaerFil> vedleggListe) {
         return vedleggListe.stream()
                 .filter(gyldigFiltypePredicate)
-                .map(b -> dokument(sedType, b.getFilnavn(),
-                        JournalpostFiltype.fraMimeOgFilnavn(b.getMimeType(), b.getFilnavn())
-                                .orElseThrow(() -> new MappingException("Filtype kreves for "
-                                        + b.getFilnavn() + " (" + b.getMimeType() + ")")),
-                        b.getInnhold())
+                .map(binærfil ->
+                        dokument(sedType,
+                                isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn(),
+                                JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn())
+                                        .orElseThrow(() -> new MappingException("Filtype kreves for "
+                                                + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")")),
+                                binærfil.getInnhold())
                 )
                 .collect(Collectors.toList());
     }
 
-    private static String temaForSedTypeOgJournalpostType(String sedType, JournalpostType journalpostType) {
+    private static String temaForSedTypeOgJournalpostType(final String sedType,
+                                                          final JournalpostType journalpostType) {
         // Hvis vi sender ut og ikke har en sak tilknyttet går man ut fra at det er medlemskap
         if (journalpostType == JournalpostType.UTGAAENDE) {
             return "MED";
