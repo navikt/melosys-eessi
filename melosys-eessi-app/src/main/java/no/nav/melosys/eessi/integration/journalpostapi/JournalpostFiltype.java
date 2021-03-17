@@ -1,11 +1,11 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import com.google.common.collect.ImmutableMap;
-
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableMap;
 
 // https://confluence.adeo.no/display/BOA/Filtype
 public enum JournalpostFiltype {
@@ -44,6 +44,10 @@ public enum JournalpostFiltype {
         .map(JournalpostFiltype::transform)
         .filter(JournalpostFiltype::contains)
         .map(JournalpostFiltype::valueOf);
+  }
+
+  public static boolean erGyldigFiltypeForVariantformatArkiv(JournalpostFiltype journalpostFiltype) {
+    return journalpostFiltype == PDF || journalpostFiltype == PDFA;
   }
 
   private static String transform(String extension){
