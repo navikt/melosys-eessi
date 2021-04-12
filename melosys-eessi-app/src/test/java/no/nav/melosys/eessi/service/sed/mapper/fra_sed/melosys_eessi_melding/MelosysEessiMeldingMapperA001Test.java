@@ -35,7 +35,8 @@ public class MelosysEessiMeldingMapperA001Test {
                         "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(),
                         sakInformasjon.getGsakSaksnummer(),
-                        false
+                        false,
+                        "1"
                 );
 
         assertThat(melosysEessiMelding).isNotNull();

@@ -9,6 +9,7 @@ import lombok.Data;
 public class MelosysEessiMelding {
 
     private String sedId;
+    private String sedVersjon;
     private String rinaSaksnummer;
     private Avsender avsender;
     private String journalpostId;

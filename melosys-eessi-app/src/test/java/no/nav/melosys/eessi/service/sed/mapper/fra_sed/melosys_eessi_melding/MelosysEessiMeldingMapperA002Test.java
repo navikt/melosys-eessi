@@ -38,7 +38,7 @@ public class MelosysEessiMeldingMapperA002Test {
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
+                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getSvarAnmodningUnntak()).isNotNull();
@@ -57,7 +57,7 @@ public class MelosysEessiMeldingMapperA002Test {
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false);
+                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getSvarAnmodningUnntak()).isNotNull();

@@ -15,7 +15,8 @@ public interface MelosysEessiMeldingMapper {
 
     default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
                                     String sedType, String bucType, String avsenderID, String landkode,
-                                    String journalpostID, String dokumentID, String gsakSaksnummer, boolean sedErEndring) {
+                                    String journalpostID, String dokumentID, String gsakSaksnummer,
+                                    boolean sedErEndring, String sedVersjon) {
         MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setSedId(rinaDokumentID);
         melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
@@ -37,6 +38,8 @@ public interface MelosysEessiMeldingMapper {
         if (sed.getNav() != null && sed.getNav().getArbeidssted() != null) {
             melosysEessiMelding.setArbeidssteder(sed.getNav().getArbeidssted().stream().map(Arbeidssted::new).collect(Collectors.toList()));
         }
+        melosysEessiMelding.setErEndring(sedErEndring);
+        melosysEessiMelding.setSedVersjon(sedVersjon);
         return melosysEessiMelding;
     }
 
