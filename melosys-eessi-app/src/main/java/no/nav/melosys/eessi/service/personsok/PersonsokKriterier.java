@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.tps.personsok;
+package no.nav.melosys.eessi.service.personsok;
 
 import java.time.LocalDate;
 import java.util.Collection;

@@ -7,11 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import no.nav.melosys.eessi.integration.pdl.dto.*;
-import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
+import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,14 +31,12 @@ class PDLServiceTest {
 
     @Mock
     private PDLConsumer pdlConsumer;
-    @Mock
-    private PersonSokMetrikker personSokMetrikker;
 
     private PDLService pdlService;
 
     @BeforeEach
     public void setup() {
-        pdlService = new PDLService(pdlConsumer, personSokMetrikker);
+        pdlService = new PDLService(pdlConsumer);
     }
 
     @Test

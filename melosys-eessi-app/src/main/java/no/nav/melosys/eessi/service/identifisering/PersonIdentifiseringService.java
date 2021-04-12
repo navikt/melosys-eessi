@@ -11,10 +11,9 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
@@ -23,7 +22,6 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 @Service
 public class PersonIdentifiseringService {
 
-    private final PersonSok tpsPersonSok;
     private final PersonSok pdlPersonSok;
     private final SaksrelasjonService saksrelasjonService;
     private final SakService sakService;
@@ -31,13 +29,11 @@ public class PersonIdentifiseringService {
     private final PersonSokMetrikker personSokMetrikker;
 
     public PersonIdentifiseringService(
-            @Qualifier("tps") PersonSok tpsPersonSok,
-            @Qualifier("pdl") PersonSok pdlPersonSok,
+            PersonSok pdlPersonSok,
             SaksrelasjonService saksrelasjonService,
             SakService sakService,
             PersonFasade personFasade,
             PersonSokMetrikker personSokMetrikker) {
-        this.tpsPersonSok = tpsPersonSok;
         this.pdlPersonSok = pdlPersonSok;
         this.saksrelasjonService = saksrelasjonService;
         this.sakService = sakService;
@@ -75,28 +71,16 @@ public class PersonIdentifiseringService {
                 .flatMap(FnrUtils::filtrerUtGyldigNorskIdent);
 
         if (norskIdent.isPresent()) {
-            PersonSokResultat resultat = tpsPersonSok.vurderPerson(norskIdent.get(), søkeKriterier);
+            PersonSokResultat resultat = pdlPersonSok.vurderPerson(norskIdent.get(), søkeKriterier);
             if (resultat.personIdentifisert()) {
                 personSokMetrikker.counter(resultat.getBegrunnelse());
                 return norskIdent;
             }
         }
 
-        PersonSokResultat resultat = utførSøk(søkeKriterier);
+        PersonSokResultat resultat = pdlPersonSok.søkEtterPerson(søkeKriterier);
         personSokMetrikker.counter(resultat.getBegrunnelse());
         log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
         return Optional.ofNullable(resultat.getIdent());
-    }
-
-    private PersonSokResultat utførSøk(PersonsokKriterier søkekriterier) {
-        PersonSokResultat resultatTps = tpsPersonSok.søkEtterPerson(søkekriterier);
-
-        try {
-            personSokMetrikker.registrerSammenligningPdlTps(resultatTps, pdlPersonSok.søkEtterPerson(søkekriterier));
-        } catch (Exception e) {
-            log.error("Feil ved personsøk mot PDL", e);
-        }
-
-        return resultatTps;
     }
 }

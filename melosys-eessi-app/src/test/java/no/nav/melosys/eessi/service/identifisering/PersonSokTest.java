@@ -9,8 +9,8 @@ import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
+import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,7 @@ class PersonSokTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        personSok = new PDLPersonSok(personFasade);
+        personSok = new PersonSok(personFasade);
     }
 
     private PersonSokResponse lagPersonSøkResponse() {

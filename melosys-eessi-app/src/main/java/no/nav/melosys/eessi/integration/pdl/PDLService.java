@@ -7,12 +7,11 @@ import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
-import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
+import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.HarMetadata.hentSisteOpplysning;
@@ -22,11 +21,9 @@ import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriterion.*;
 public class PDLService implements PersonFasade {
 
     private final PDLConsumer pdlConsumer;
-    private final PersonSokMetrikker personSokMetrikker;
 
-    public PDLService(PDLConsumer pdlConsumer, PersonSokMetrikker personSokMetrikker) {
+    public PDLService(PDLConsumer pdlConsumer) {
         this.pdlConsumer = pdlConsumer;
-        this.personSokMetrikker = personSokMetrikker;
     }
 
     @Override
@@ -85,7 +82,6 @@ public class PDLService implements PersonFasade {
                         )))
                 .getHits()
                 .stream()
-                .peek(res -> personSokMetrikker.registrerAntallTreffPDL(res.getIdenter().size()))
                 .map(PDLSokHit::getIdenter)
                 .map(this::hentFolkeregisterIdent)
                 .map(PersonSokResponse::new)

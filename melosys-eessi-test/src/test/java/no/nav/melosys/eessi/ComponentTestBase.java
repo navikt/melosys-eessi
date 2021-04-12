@@ -13,15 +13,11 @@ import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
-import no.nav.melosys.eessi.integration.tps.aktoer.AktoerConsumer;
-import no.nav.melosys.eessi.integration.tps.person.PersonConsumer;
-import no.nav.melosys.eessi.integration.tps.personsok.PersonsokConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.PersonIdent;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,15 +50,6 @@ public abstract class ComponentTestBase {
 
     @MockBean
     EuxConsumer euxConsumer;
-
-    @MockBean
-    PersonConsumer personConsumer;
-
-    @MockBean
-    AktoerConsumer aktoerConsumer;
-
-    @MockBean
-    PersonsokConsumer personsokConsumer;
 
     @MockBean
     SakConsumer sakConsumer;
@@ -110,10 +97,8 @@ public abstract class ComponentTestBase {
 
     @SneakyThrows
     protected void mockPerson(String ident, String aktørID) {
-        when(personConsumer.hentPerson(argThat(req -> ((PersonIdent) req.getAktoer()).getIdent().getIdent().equals(ident))))
-                .thenReturn(mockData.hentPersonResponse(ident, FØDSELSDATO, "NO"));
-        when(aktoerConsumer.hentAktoerId(ident)).thenReturn(aktørID);
-        when(aktoerConsumer.hentNorskIdent(aktørID)).thenReturn(ident);
-        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(mockData.pdlPerson());
+        when(pdlConsumer.hentIdenter(ident)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
+        when(pdlConsumer.hentIdenter(aktørID)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
+        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
     }
 }

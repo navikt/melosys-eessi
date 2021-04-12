@@ -8,20 +8,20 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
-import org.springframework.beans.factory.annotation.Autowired;
+import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
+import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harOverlappendeStatsborgerskap;
 import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeFoedselsdato;
 
 @Slf4j
-abstract class PersonSok {
+@Component
+public class PersonSok {
 
     private final PersonFasade personFasade;
 
-    @Autowired
-    PersonSok(PersonFasade personFasade) {
+    public PersonSok(PersonFasade personFasade) {
         this.personFasade = personFasade;
     }
 
@@ -61,6 +61,7 @@ abstract class PersonSok {
         } else if (!harOverlappendeStatsborgerskap(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
         } else if (!harSammeFoedselsdato(person, personsokKriterier)) {
+            log.info("Fra PDL: {} ------- søkekriterier: {}", person.getFødselsdato(), personsokKriterier.getFoedselsdato());
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;
         }
 

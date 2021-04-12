@@ -83,11 +83,6 @@
             <version>${springfox-swagger2.version}</version>
         </dependency>
         <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>person-v3-tjenestespesifikasjon</artifactId>
-            <version>${tps.person.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
@@ -127,11 +122,6 @@
             <artifactId>token-validation-test-support</artifactId>
             <version>${token-support.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>no.nav.tjenestespesifikasjoner</groupId>
-            <artifactId>nav-fim-personsok-v1-tjenestespesifikasjon</artifactId>
-            <version>${personsok.version}</version>
         </dependency>
         <dependency>
             <groupId>no.bekk.bekkopen</groupId>

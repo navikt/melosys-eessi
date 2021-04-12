@@ -37,13 +37,11 @@
         <nimbus-jose-jwt.version>8.20.1</nimbus-jose-jwt.version>
         <okhttp3.version>4.9.0</okhttp3.version>
         <person-utils.version>1.35.0</person-utils.version>
-        <personsok.version>1.2019.09.25-00.21-49b69f0625e0</personsok.version>
         <random-benas.version>3.9.0</random-benas.version>
         <shedlock-version>4.19.1</shedlock-version>
         <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
         <testcontainers.version>1.15.2</testcontainers.version>
         <token-support.version>1.3.2</token-support.version>
-        <tps.person.version>1.2019.09.25-00.21-49b69f0625e0</tps.person.version>
         <vault-jdbc.version>1.3.7</vault-jdbc.version>
     </properties>
 

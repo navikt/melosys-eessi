@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.tps.personsok;
+package no.nav.melosys.eessi.service.personsok;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

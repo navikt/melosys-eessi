@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
@@ -22,14 +20,8 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
-import no.nav.melosys.eessi.models.sed.nav.Bruker;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.models.sed.nav.Person;
-import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
-import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonResponse;
 import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
@@ -99,17 +91,6 @@ public class MockData {
         return sed;
     }
 
-    HentPersonResponse hentPersonResponse(String ident, LocalDate fødselsdato, String landkode) throws DatatypeConfigurationException {
-        return new HentPersonResponse().withPerson(
-                new no.nav.tjeneste.virksomhet.person.v3.informasjon.Person()
-                        .withPersonnavn(new Personnavn().withEtternavn("Etternavn").withFornavn("Fornavn"))
-                        .withAktoer(new PersonIdent().withIdent(new NorskIdent().withIdent(ident)))
-                        .withPersonstatus(new Personstatus().withPersonstatus(new Personstatuser().withValue("ADNR")))
-                        .withFoedselsdato(new Foedselsdato().withFoedselsdato(DatatypeFactory.newInstance().newXMLGregorianCalendar(fødselsdato.toString())))
-                        .withStatsborgerskap(new no.nav.tjeneste.virksomhet.person.v3.informasjon.Statsborgerskap().withLand(new Landkoder().withValue(landkode)))
-        );
-    }
-
     OpprettJournalpostResponse journalpostResponse() {
         return OpprettJournalpostResponse.builder()
                 .journalpostId("1")
@@ -137,7 +118,7 @@ public class MockData {
         return buc;
     }
 
-    public PDLPerson pdlPerson() {
+    public PDLPerson pdlPerson(LocalDate fødselsdato, String statsborgerskapLandkode) {
         var pdlPerson = new PDLPerson();
 
         var pdlNavn = new PDLNavn();
@@ -150,14 +131,14 @@ public class MockData {
         ));
 
         var pdlFødsel = new PDLFoedsel();
-        pdlFødsel.setFoedselsdato(LocalDate.of(1990, 1, 1));
+        pdlFødsel.setFoedselsdato(fødselsdato);
         pdlFødsel.setMetadata(new PDLMetadata());
         pdlFødsel.getMetadata().setEndringer(Set.of(
                 new PDLEndring("OPPRETT", LocalDateTime.of(1990, 1, 1, 0, 0))
         ));
 
         var pdlStatsborgerskap = new PDLStatsborgerskap();
-        pdlStatsborgerskap.setLand("NOR");
+        pdlStatsborgerskap.setLand(statsborgerskapLandkode);
 
         var pdlPersonstatus = new PDLFolkeregisterPersonstatus();
         pdlPersonstatus.setStatus("bosatt");
@@ -172,4 +153,20 @@ public class MockData {
         pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
         return pdlPerson;
     }
+
+
+    PDLIdentliste lagPDLIdentListe(String ident, String aktørID) {
+        var pdlFolkeregisterIdent = new PDLIdent();
+        pdlFolkeregisterIdent.setIdent(ident);
+        pdlFolkeregisterIdent.setGruppe(PDLIdentGruppe.FOLKEREGISTERIDENT);
+
+        var pdlAktørId = new PDLIdent();
+        pdlAktørId.setIdent(aktørID);
+        pdlAktørId.setGruppe(PDLIdentGruppe.AKTORID);
+
+        var pdlIdentliste = new PDLIdentliste();
+        pdlIdentliste.setIdenter(Set.of(pdlFolkeregisterIdent, pdlAktørId));
+        return pdlIdentliste;
+    }
+
 }
