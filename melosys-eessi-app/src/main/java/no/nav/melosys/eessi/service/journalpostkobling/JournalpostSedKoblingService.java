@@ -87,7 +87,8 @@ public class JournalpostSedKoblingService {
                 organisation.getCountryCode(),
                 journalpostSedKobling.getJournalpostID(),
                 gsakSaksnummer != null ? gsakSaksnummer.toString() : null,
-                Integer.parseInt(journalpostSedKobling.getSedVersjon()) != 1
+                Integer.parseInt(journalpostSedKobling.getSedVersjon()) != 1,
+                journalpostSedKobling.getSedVersjon()
         );
     }
 
@@ -103,9 +104,10 @@ public class JournalpostSedKoblingService {
         String sedType = sedDocument.getType();
         final var organisation = sedDocument.getCreator().getOrganisation();
         SED sed = euxService.hentSed(rinaSaksnummer, sedID);
+        final String sedVersjon = "0"; //har ikke sed-versjon
 
         return Optional.of(opprettMelosysEessiMelding(sed, sedID, rinaSaksnummer, sedType,
-                buc.getBucType(), organisation.getId(), organisation.getCountryCode(), journalpostID, null, false));
+                buc.getBucType(), organisation.getId(), organisation.getCountryCode(), journalpostID, null, false, sedVersjon));
     }
 
     public JournalpostSedKobling lagre(String journalpostID, String rinaSaksnummer, String sedID,
@@ -117,8 +119,9 @@ public class JournalpostSedKoblingService {
 
     private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String sedId, String rinaSaksnummer,
                                                            String sedType, String bucType, String avsenderID, String landkode,
-                                                           String journalpostID, String saksnummer, boolean erEndring) {
+                                                           String journalpostID, String saksnummer, boolean erEndring, String sedVersjon) {
         return MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
-                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, null, saksnummer, erEndring);
+                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID,
+                        null, saksnummer, erEndring, sedVersjon);
     }
 }

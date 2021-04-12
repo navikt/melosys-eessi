@@ -121,7 +121,7 @@ public class BehandleSedMottattService {
                 mapper.map(aktoerID, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), landkode,
                         sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
-                        sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring)
+                        sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring, sedHendelse.getRinaDokumentVersjon())
         );
 
         sedMottatt.getSedKontekst().setPublisertKafka(Boolean.TRUE);
