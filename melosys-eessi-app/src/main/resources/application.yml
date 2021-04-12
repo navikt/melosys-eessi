@@ -47,7 +47,6 @@ melosys:
   integrations:
     euxapp-url: ${EUXAPP_URL}
     reststs-url: ${RESTSTS_URL}
-    sts-url: ${STS_URL}
     aktoer-url: ${AKTOER_URL}
     person-url: ${PERSON_URL}
     personsok-url: ${PERSONSOK_URL}

@@ -4,7 +4,6 @@ server:
 # Integrations
 EUXAPP_URL: dummy
 RESTSTS_URL: http://localhost:${mock-oauth2-server.port}/rest-sts
-STS_URL: dummy
 DOKKATTYPEINFO_URL: dummy
 DOKKATTYPEID_URL: dummy
 SAK_URL: dummy
