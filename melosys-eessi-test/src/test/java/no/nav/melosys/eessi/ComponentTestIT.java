@@ -14,9 +14,6 @@ import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
-import no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.NorskIdent;
-import no.nav.tjeneste.virksomhet.personsoek.v1.informasjon.Person;
-import no.nav.tjeneste.virksomhet.personsoek.v1.meldinger.FinnPersonResponse;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,15 +54,6 @@ class ComponentTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
 
-        var person = new Person();
-        person.setIdent(new NorskIdent());
-        person.getIdent().setIdent(FNR);
-
-        var finnPersonResponse = new FinnPersonResponse();
-        finnPersonResponse.setTotaltAntallTreff(1);
-        finnPersonResponse.getPersonListe().add(person);
-        when(personsokConsumer.finnPerson(any())).thenReturn(finnPersonResponse);
-
         var pdlSøkPerson = new PDLSokPerson();
         var søkHits = new PDLSokHit();
         søkHits.setIdenter(Collections.singleton(new PDLIdent(FOLKEREGISTERIDENT, FNR)));
@@ -85,7 +73,6 @@ class ComponentTestIT extends ComponentTestBase {
     void sedMottattUtenFnr_kanIkkeIdentifiserePerson_oppretterOppgave() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
-        when(personsokConsumer.finnPerson(any())).thenReturn(new FinnPersonResponse());
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto("123"));
 

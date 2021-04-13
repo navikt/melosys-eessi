@@ -13,9 +13,9 @@ import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,8 +35,6 @@ class PersonIdentifiseringServiceTest {
     @Mock
     private PersonSok personSok;
     @Mock
-    private PDLPersonSok pdlPersonSok;
-    @Mock
     private SaksrelasjonService saksrelasjonService;
     @Mock
     private SakService sakService;
@@ -50,7 +48,7 @@ class PersonIdentifiseringServiceTest {
     @BeforeEach
     public void setup() {
         personIdentifiseringService = new PersonIdentifiseringService(
-                personSok, pdlPersonSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
+                personSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
         );
     }
 

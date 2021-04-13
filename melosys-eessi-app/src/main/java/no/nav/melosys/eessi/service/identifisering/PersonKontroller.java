@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.service.identifisering;
 
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 
 @UtilityClass
 class PersonKontroller {

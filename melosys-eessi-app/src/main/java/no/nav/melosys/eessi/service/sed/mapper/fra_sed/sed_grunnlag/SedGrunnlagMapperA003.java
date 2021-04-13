@@ -16,7 +16,7 @@ import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper;
-import org.apache.cxf.common.util.CollectionUtils;
+import org.springframework.util.CollectionUtils;
 
 public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
     @Override

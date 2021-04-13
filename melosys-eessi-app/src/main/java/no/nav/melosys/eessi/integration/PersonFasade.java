@@ -3,8 +3,8 @@ package no.nav.melosys.eessi.integration;
 import java.util.List;
 
 import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.tps.personsok.PersonSokResponse;
-import no.nav.melosys.eessi.service.tps.personsok.PersonsokKriterier;
+import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 
 public interface PersonFasade {
     PersonModell hentPerson(String ident);
