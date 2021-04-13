@@ -4,9 +4,7 @@ import java.util.Collection;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.exception.SecurityException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
@@ -42,8 +40,6 @@ public class PersonSok {
 
         try {
             person = personFasade.hentPerson(ident);
-        } catch (SecurityException e) {
-            throw new IntegrationException("Sikkerhetsfeil mot tps",e);
         } catch (NotFoundException e) {
             log.warn("Feil ved henting av person", e);
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FNR_IKKE_FUNNET);
