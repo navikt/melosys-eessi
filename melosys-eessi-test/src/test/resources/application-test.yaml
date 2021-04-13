@@ -7,9 +7,6 @@ RESTSTS_URL: http://localhost:${mock-oauth2-server.port}/rest-sts
 DOKKATTYPEINFO_URL: dummy
 DOKKATTYPEID_URL: dummy
 SAK_URL: dummy
-AKTOER_URL: dummy
-PERSON_URL: dummy
-PERSONSOK_URL: dummy
 JOURNALPOSTAPI_URL: dummy
 OPPGAVE_URL: dummy
 RINA_HOST_URL: dummy
