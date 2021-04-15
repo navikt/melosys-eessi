@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BehandleSedMottattServiceTest {
+public class BehandleSedMottattGammelServiceTest {
 
     @Mock
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
@@ -46,13 +46,13 @@ public class BehandleSedMottattServiceTest {
     @Mock
     private OppgaveService oppgaveService;
 
-    private BehandleSedMottattService behandleSedMottattService;
+    private BehandleSedMottattGammelService behandleSedMottattGammelService;
 
     private static final String IDENT = "1122334455";
 
     @Before
     public void setup() throws Exception {
-        behandleSedMottattService = new BehandleSedMottattService(
+        behandleSedMottattGammelService = new BehandleSedMottattGammelService(
                 opprettInngaaendeJournalpostService, euxService, personFasade,
                 melosysEessiProducer, personIdentifiseringService, oppgaveService
         );
@@ -74,7 +74,7 @@ public class BehandleSedMottattServiceTest {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattGammelService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService).identifiserPerson(any(), any());
@@ -88,7 +88,7 @@ public class BehandleSedMottattServiceTest {
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattGammelService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
@@ -104,7 +104,7 @@ public class BehandleSedMottattServiceTest {
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
         sedMottatt.getSedKontekst().setJournalpostID("123");
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattGammelService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
@@ -121,7 +121,7 @@ public class BehandleSedMottattServiceTest {
         when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
-        behandleSedMottattService.behandleSed(SedMottatt.av(sedHendelse));
+        behandleSedMottattGammelService.behandleSed(SedMottatt.av(sedHendelse));
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService).identifiserPerson(any(), any());
@@ -140,7 +140,7 @@ public class BehandleSedMottattServiceTest {
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
         sedMottatt.getSedKontekst().setNavIdent(IDENT);
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattGammelService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
@@ -160,7 +160,7 @@ public class BehandleSedMottattServiceTest {
         sedMottatt.getSedKontekst().setNavIdent(IDENT);
         sedMottatt.getSedKontekst().setJournalpostID("123");
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattGammelService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
@@ -179,7 +179,7 @@ public class BehandleSedMottattServiceTest {
         sedMottatt.getSedKontekst().setJournalpostID("123");
         sedMottatt.getSedKontekst().setPublisertKafka(true);
 
-        behandleSedMottattService.behandleSed(sedMottatt);
+        behandleSedMottattGammelService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifiseringService, never()).identifiserPerson(any(), any());

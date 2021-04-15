@@ -6,6 +6,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class SedKontekst {
+    // BUC
+    private boolean bucForsoktIdentifisert;
+    private String bucId;
+
     //Person-søk
     private boolean forsoktIdentifisert;
     private String navIdent;
@@ -27,6 +31,10 @@ public class SedKontekst {
 
     public boolean personErIdentifisert() {
         return navIdent != null && !navIdent.isEmpty();
+    }
+
+    public boolean bucErIdentifisert() {
+        return personErIdentifisert() && bucForsoktIdentifisert;
     }
 
     public boolean identifiseringsOppgaveOpprettet() {
