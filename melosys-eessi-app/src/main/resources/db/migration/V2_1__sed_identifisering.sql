@@ -8,14 +8,12 @@ CREATE TABLE sed_mottatt_hendelse
     endret_dato timestamp
 );
 
-CREATE TABLE buc_identifisert
+CREATE TABLE buc_identifisering_oppg
 (
     id serial NOT NULL PRIMARY KEY,
-    aktoer_id VARCHAR(20) NOT NULL,
     rina_saksnummer VARCHAR(20) NOT NULL,
-    identifisert_av VARCHAR(20) NOT NULL,
-    identifisering_tidspunkt TIMESTAMP NOT NULL
+    oppgave_id VARCHAR(20) NOT NULL
 );
 
-create index idx_buc_id_aktoer ON buc_identifisert(aktoer_id);
-create unique index idx_buc_id_rina_saksnummer ON buc_identifisert(rina_saksnummer);
+create index idx_buc_oppg_rina_saksnr on buc_identifisering_oppgave(rina_saksnummer);
+create index idx_buc_oppg_oppgave_id on buc_identifisering_oppgave(oppgave_id);
