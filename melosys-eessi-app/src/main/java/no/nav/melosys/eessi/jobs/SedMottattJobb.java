@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
-import no.nav.melosys.eessi.service.behandling.SedMottattBehandleService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

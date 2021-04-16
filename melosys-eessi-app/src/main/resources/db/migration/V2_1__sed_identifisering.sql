@@ -15,5 +15,5 @@ CREATE TABLE buc_identifisering_oppg
     oppgave_id VARCHAR(20) NOT NULL
 );
 
-create index idx_buc_oppg_rina_saksnr on buc_identifisering_oppgave(rina_saksnummer);
-create index idx_buc_oppg_oppgave_id on buc_identifisering_oppgave(oppgave_id);
+create index idx_buc_oppg_rina_saksnr on buc_identifisering_oppg(rina_saksnummer);
+create index idx_buc_oppg_oppgave_id on buc_identifisering_oppg(oppgave_id);

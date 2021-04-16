@@ -42,39 +42,29 @@ public class SedMottattConsumer {
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
             topics = "${melosys.kafka.consumer.mottatt.topic}", containerFactory = "sedMottattListenerContainerFactory")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
+        log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
+        loggSedID(consumerRecord.value().getSedId());
+
         if (brukNySedMottatService) {
-            SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder()
+            sedMottattBehandleService.behandleSed(SedMottattHendelse.builder()
                     .sedHendelse(consumerRecord.value())
-                    .build();
-
-            log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedMottattHendelse.getSedHendelse(), consumerRecord.offset());
-            behandleMottatt(sedMottattHendelse);
-            sedMetrikker.sedMottatt(sedMottattHendelse.getSedHendelse().getSedType());
+                    .build());
         } else {
-            SedMottatt sedMottatt = SedMottatt.av(consumerRecord.value());
-
-            log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedMottatt.getSedHendelse(), consumerRecord.offset());
-            behandleMottatt(sedMottatt);
-            sedMetrikker.sedMottatt(sedMottatt.getSedHendelse().getSedType());
+            behandleMottatt(SedMottatt.av(consumerRecord.value()));
         }
+
+        sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
+        slettSedIDLogging();
 
     }
 
     private void behandleMottatt(SedMottatt sedMottatt) {
         try {
-            loggSedID(sedMottatt.getSedHendelse().getSedId());
             behandleSedMottattService.behandleSed(sedMottatt);
         } catch (Exception e) {
             log.error("Feil i behandling av mottatt sed. Lagres for å prøve igjen senere", e);
             sedMottatt.setFeiledeForsok(sedMottatt.getFeiledeForsok() + 1);
             sedMottattService.lagre(sedMottatt);
-        } finally {
-            slettSedIDLogging();
         }
-    }
-
-    private void behandleMottatt(SedMottattHendelse sedMottattHendelse) {
-        loggSedID(sedMottattHendelse.getSedHendelse().getSedId());
-        sedMottattBehandleService.behandleSed(sedMottattHendelse);
     }
 }
