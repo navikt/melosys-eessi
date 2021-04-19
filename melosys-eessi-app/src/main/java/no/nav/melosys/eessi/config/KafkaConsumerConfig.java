@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -70,13 +70,13 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveDto>> oppgaveListenerContainerFactory(
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretDto>> oppgaveListenerContainerFactory(
             KafkaProperties properties) {
         Map<String, Object> props = properties.buildConsumerProperties();
         props.putAll(sedEventConsumerConfig("latest"));
-        DefaultKafkaConsumerFactory<String, OppgaveDto> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-                props, new StringDeserializer(), valueDeserializer(OppgaveDto.class));
-        ConcurrentKafkaListenerContainerFactory<String, OppgaveDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        DefaultKafkaConsumerFactory<String, OppgaveEndretDto> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+                props, new StringDeserializer(), valueDeserializer(OppgaveEndretDto.class));
+        ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
         factory.setErrorHandler(new SeekToCurrentErrorHandler());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);

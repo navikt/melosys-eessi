@@ -6,6 +6,7 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.behandling.event.BucIdentifisertEvent;
@@ -26,7 +27,7 @@ public class OppgaveEndretConsumer {
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-oppgaveEndret",
             topics = "${melosys.kafka.consumer.oppgave-endret.topic}", containerFactory = "oppgaveListenerContainerFactory")
-    public void oppgaveEndret(ConsumerRecord<String, OppgaveDto> consumerRecord) {
+    public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretDto> consumerRecord) {
         log.info("Oppgave endret: {}", consumerRecord.value());
 
         if (erIdentifisertOppgave(consumerRecord.value())) {

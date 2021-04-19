@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.service.sed.SedMottattService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +47,7 @@ public class SedMottattConsumer {
         loggSedID(consumerRecord.value().getSedId());
 
         if (brukNySedMottatService) {
+            log.info("bruker ny woohooo");
             sedMottattBehandleService.behandleSed(SedMottattHendelse.builder()
                     .sedHendelse(consumerRecord.value())
                     .build());

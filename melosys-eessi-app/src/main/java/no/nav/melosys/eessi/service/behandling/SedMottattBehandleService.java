@@ -62,13 +62,13 @@ public class SedMottattBehandleService {
         String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
                 sedMottattHendelse.getSedHendelse(), sedMedVedlegg, null);
         sedMottattHendelse.setJournalpostId(journalpostID);
-        sedMottattHendelseRepository.save(sedMottattHendelse);
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {
         log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
 
         final var rinaSaksnummer = sedMottatt.getSedHendelse().getRinaSakId();
+        //TODO: sjekk at oppgave fortsatt har statuskategori = AAPEN
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer).ifPresentOrElse(
                 b -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", b.getOppgaveId(), rinaSaksnummer),
                 () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt)

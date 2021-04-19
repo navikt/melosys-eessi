@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,6 +26,7 @@ public class SedHendelse {
     private String navBruker;
 
     // avsenderID har formatet <landkodeISO2>:<institusjonID>
+    @JsonIgnore
     public String getLandkode() {
         return avsenderId.substring(0, 2);
     }

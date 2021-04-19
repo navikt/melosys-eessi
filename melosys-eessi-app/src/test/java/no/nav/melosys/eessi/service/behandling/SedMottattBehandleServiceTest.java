@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -17,13 +18,10 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -53,7 +51,10 @@ class SedMottattBehandleServiceTest {
     private SedMottattHendelseRepository sedMottattHendelseRepository;
 
     @Mock
-    BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    private BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+
+    @Mock
+    private PersonFasade personFasade;
 
     private SedMottattBehandleService sedMottattBehandleService;
 
@@ -63,7 +64,8 @@ class SedMottattBehandleServiceTest {
     public void setup() throws Exception {
         sedMottattBehandleService = new SedMottattBehandleService(
                 euxService, personIdentifiseringService, opprettInngaaendeJournalpostService,
-                oppgaveService, applicationEventPublisher, sedMottattHendelseRepository, bucIdentifiseringOppgRepository
+                oppgaveService, applicationEventPublisher, sedMottattHendelseRepository,
+                bucIdentifiseringOppgRepository, personFasade
         );
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
@@ -87,7 +89,7 @@ class SedMottattBehandleServiceTest {
         verify(personIdentifiseringService).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository, times(2)).save(any());
+        verify(sedMottattHendelseRepository).save(any());
         verify(applicationEventPublisher, never()).publishEvent(BucIdentifisertEvent.class);
     }
 
@@ -105,7 +107,7 @@ class SedMottattBehandleServiceTest {
         verify(personIdentifiseringService).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository, times(2)).save(any());
+        verify(sedMottattHendelseRepository).save(any());
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
@@ -120,7 +122,7 @@ class SedMottattBehandleServiceTest {
         verify(personIdentifiseringService).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository, times(2)).save(any());
+        verify(sedMottattHendelseRepository).save(any());
         verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
     }
 

@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration.oppgave;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -17,7 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OppgaveDto {
-    private Long id;
     private String aktørId;
     private String tilordnetRessurs;
     private String tema;
@@ -38,5 +38,5 @@ public class OppgaveDto {
     private String behandlesAvApplikasjon;
     private String beskrivelse;
     private String statuskategori;
-    private Map<OppgaveMetadataKey, String> metadata;
+    private Map<OppgaveMetadataKey, String> metadata = new HashMap<>(1);
 }

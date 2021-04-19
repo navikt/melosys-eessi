@@ -1,31 +1,37 @@
 package no.nav.melosys.eessi;
 
 import java.util.Collections;
+import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
-import no.nav.melosys.eessi.models.SedMottatt;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
-import org.junit.jupiter.api.DisplayName;
+import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.TestPropertySource;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-class ComponentTestIT extends ComponentTestBase {
+@TestPropertySource(properties = {"melosys.feature.nyttMottak=true"})
+public class SedMottakTestIT extends ComponentTestBase {
+
+    @Autowired
+    BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
 
     @Test
-    @DisplayName("Mottar SED med fnr, person identifisert, sender melding på kafka-topic")
-    void sedMottattMedFnr_blirIdentifisert_sendtPåKafkaTopic() throws Exception {
+    void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
 
@@ -43,7 +49,6 @@ class ComponentTestIT extends ComponentTestBase {
     }
 
     @Test
-    @DisplayName("Mottar SED uten fnr, identifiserer etter søk og publiserer på kafka-topic")
     void sedMottattUtenFnr_søkIdentifiserer_sendtPåTopic() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
@@ -63,53 +68,46 @@ class ComponentTestIT extends ComponentTestBase {
     }
 
     @Test
-    @DisplayName("Mottar SED uten fnr, ingen resultat fra person-søk, oppretter oppgave til ID og Fordeling")
-    void sedMottattUtenFnr_kanIkkeIdentifiserePerson_oppretterOppgave() throws Exception {
+    void toSedMottattUtenFnr_oppretterIdentifiseringsoppgave_reagererPåEndretOppgave() throws Exception {
         final var sedID = UUID.randomUUID().toString();
+        final var sedID2 = UUID.randomUUID().toString();
+        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto("123"));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto(oppgaveID));
 
-        kafkaTestConsumer.reset(1);
+        kafkaTestConsumer.reset(2);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID2, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        verify(oppgaveConsumer, timeout(2000)).opprettOppgave(any());
+        verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentRecords()).isEmpty();
-    }
+        assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
-    @Test
-    @DisplayName("Mottar SED med fnr, person identifisert, teknisk feil ved opprettelse av journalpost, blir lagret")
-    void sedMottattMedFnr_tekniskFeilVedOpprettelseAvJournalpost_blirLagret() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
-
-        mockPerson(FNR, AKTOER_ID);
-        when(journalpostapiConsumer.opprettJournalpost(any(), anyBoolean())).thenThrow(new IntegrationException("Feil!"));
-
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, FNR))).get();
+        kafkaTestConsumer.reset(4);
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, sedID)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, sedID)).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        await().atMost(2, TimeUnit.SECONDS).until(() -> sedMottattRepository.count() > 0);
-        assertThat(sedMottattRepository.findAll())
-                .hasSize(1)
-                .element(0)
-                .extracting(
-                        s -> s.getSedKontekst().isForsoktIdentifisert(),
-                        s -> s.getSedKontekst().getNavIdent(),
-                        s -> s.getSedKontekst().journalpostOpprettet(),
-                        SedMottatt::getFeiledeForsok,
-                        SedMottatt::isFeilet,
-                        SedMottatt::isFerdig
-                ).containsExactly(
-                true,
-                FNR,
-                false,
-                1,
-                false,
-                false
-        );
-        assertThat(hentRecords()).isEmpty();
+        assertThat(hentRecords()).hasSize(2);
     }
+
+    private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String aktørID) {
+        return new ProducerRecord<>("oppgave-endret", "key", lagOppgaveEndret(oppgaveID, aktørID));
+    }
+
+    private OppgaveEndretDto lagOppgaveEndret(String oppgaveID, String aktørID) {
+        var oppgaveEndret = new OppgaveEndretDto();
+        oppgaveEndret.setId(Long.valueOf(oppgaveID));
+        oppgaveEndret.setAktørId(aktørID);
+        oppgaveEndret.setOppgavetype("JFR");
+        oppgaveEndret.setStatuskategori("AAPEN");
+        oppgaveEndret.setTema("MED");
+        oppgaveEndret.setTildeltEnhetsnr("4530");
+        oppgaveEndret.getMetadata().put(OppgaveMetadataKey.RINA_SAKID, "123");
+        return oppgaveEndret;
+    }
+
 }
