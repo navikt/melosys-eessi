@@ -55,7 +55,7 @@ public class OppgaveService {
                 .prioritet(PRIORITET_NORMAL)
                 .tema("MED") //Utgående vil alltid være MED
                 .tildeltEnhetsnr(ENHET_MEDLEMSKAP_OG_AVGIFT)
-                .aktoerId(aktørId)
+                .aktørId(aktørId)
                 .build();
 
         OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);

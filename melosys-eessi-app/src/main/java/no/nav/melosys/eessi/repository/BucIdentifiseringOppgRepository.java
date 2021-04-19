@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface BucIdentifiseringOppgRepository extends JpaRepository<BucIdentifiseringOppg, Long> {
 
     Optional<BucIdentifiseringOppg> findByRinaSaksnummer(String rinaSaksnummer);
+    Optional<BucIdentifiseringOppg> findByOppgaveId(String oppgaveID);
 }

@@ -7,11 +7,11 @@ import org.springframework.context.ApplicationEvent;
 public class BucIdentifisertEvent extends ApplicationEvent {
 
     private final String bucId;
-    private final String navIdent;
+    private final String aktørId;
 
-    public BucIdentifisertEvent(String bucId, String navIdent) {
+    public BucIdentifisertEvent(String bucId, String aktørId) {
         super(bucId);
         this.bucId = bucId;
-        this.navIdent = navIdent;
+        this.aktørId = aktørId;
     }
 }

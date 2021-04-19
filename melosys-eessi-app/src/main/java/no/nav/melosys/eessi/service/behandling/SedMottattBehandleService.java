@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.behandling;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -28,6 +29,7 @@ public class SedMottattBehandleService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    private final PersonFasade personFasade;
 
 
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
@@ -44,7 +46,7 @@ public class SedMottattBehandleService {
 
         if (ident.isPresent()) {
             applicationEventPublisher.publishEvent(
-                    new BucIdentifisertEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), ident.get())
+                    new BucIdentifisertEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), personFasade.hentAktoerId(ident.get()))
             );
         } else {
             opprettOppgaveIdentifisering(sedMottattHendelse);

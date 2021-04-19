@@ -71,7 +71,7 @@ public class OppgaveServiceTest {
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
         assertThat(oppgaveDto.getTema()).isEqualTo("MED");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR_UT");
-        assertThat(oppgaveDto.getAktoerId()).isEqualTo(aktørID);
+        assertThat(oppgaveDto.getAktørId()).isEqualTo(aktørID);
         assertThat(oppgaveDto.getBeskrivelse()).contains("A009", "deadbeef");
     }
 }

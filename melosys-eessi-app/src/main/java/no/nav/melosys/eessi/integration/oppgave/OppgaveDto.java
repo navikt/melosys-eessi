@@ -1,6 +1,8 @@
 package no.nav.melosys.eessi.integration.oppgave;
 
 import java.time.LocalDate;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -15,7 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class OppgaveDto {
-    private String aktoerId;
+    private Long id;
+    private String aktørId;
     private String tilordnetRessurs;
     private String tema;
     private String oppgavetype;
@@ -34,4 +37,6 @@ public class OppgaveDto {
     private String tildeltEnhetsnr;
     private String behandlesAvApplikasjon;
     private String beskrivelse;
+    private String statuskategori;
+    private Map<OppgaveMetadataKey, String> metadata;
 }

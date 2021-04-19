@@ -23,4 +23,9 @@ public class SedHendelse {
     private String rinaDokumentVersjon;
     private String sedType;
     private String navBruker;
+
+    // avsenderID har formatet <landkodeISO2>:<institusjonID>
+    public String getLandkode() {
+        return avsenderId.substring(0, 2);
+    }
 }

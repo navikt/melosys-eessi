@@ -21,7 +21,8 @@ public class ComponentTestConfig {
         EmbeddedKafkaBroker kafka = new EmbeddedKafkaBroker(1, true, 1,
                 "privat-melosys-eessi-v1-local",
                 "eessi-basis-sedMottatt-v1",
-                "eessi-basis-sedSendt-v1");
+                "eessi-basis-sedSendt-v1",
+                "oppgave-endret");
         kafka.kafkaPorts(Integer.parseInt(env.getRequiredProperty("kafkaPort")));
         kafka.brokerProperty("offsets.topic.replication.factor", (short) 1);
         kafka.brokerProperty("transaction.state.log.replication.factor", (short) 1);

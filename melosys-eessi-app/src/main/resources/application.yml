@@ -36,6 +36,8 @@ melosys:
     nyttMottak: ${FEATURE_NYTT_MOTTAK:false}
   kafka:
     consumer:
+      oppgave-endret:
+        topic: ${OPPGAVE_ENDRET_TOPIC:oppgave-endret}
       mottatt:
         topic: ${KAFKA_SEDMOTTATT_TOPIC:eessi-basis-sedMottatt-v1}
       sendt:

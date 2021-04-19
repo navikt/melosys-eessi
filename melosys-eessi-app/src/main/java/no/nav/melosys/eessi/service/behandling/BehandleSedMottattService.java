@@ -113,13 +113,11 @@ public class BehandleSedMottattService {
 
         SedHendelse sedHendelse = sedMottatt.getSedHendelse();
         String aktoerID = personFasade.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
-        // avsenderID har formatet <landkodeISO2>:<institusjonID>
-        String landkode = sedHendelse.getAvsenderId().substring(0, 2);
         boolean sedErEndring = euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
 
         melosysEessiProducer.publiserMelding(
                 mapper.map(aktoerID, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), landkode,
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sedHendelse.getLandkode(),
                         sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
                         sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring, sedHendelse.getRinaDokumentVersjon())
         );
