@@ -11,7 +11,10 @@ import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
+import no.nav.melosys.eessi.integration.sak.Sak;
+import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,11 @@ public class SedMottakTestIT extends ComponentTestBase {
 
     @Autowired
     BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    @Autowired
+    SaksrelasjonService saksrelasjonService;
+
+
+    final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
 
     @Test
     void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {
@@ -39,7 +47,7 @@ public class SedMottakTestIT extends ComponentTestBase {
 
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, FNR))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(1)
@@ -61,7 +69,7 @@ public class SedMottakTestIT extends ComponentTestBase {
         mockPerson(FNR, AKTOER_ID);
 
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(1);
@@ -78,8 +86,8 @@ public class SedMottakTestIT extends ComponentTestBase {
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto(oppgaveID));
 
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, null))).get();
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID2, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
@@ -92,6 +100,34 @@ public class SedMottakTestIT extends ComponentTestBase {
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(2);
+    }
+
+    @Test
+    void sedMottattIkkeIdentifisert_saksrelasjonBlirOppdatert_publisererPåKafka() throws Exception {
+        final var sedID = UUID.randomUUID().toString();
+        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto(oppgaveID));
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        verify(oppgaveConsumer, timeout(6_000L)).opprettOppgave(any());
+
+        final var arkivsakID = 123L;
+        final var sak = new Sak();
+        sak.setAktoerId(AKTOER_ID);
+        when(sakConsumer.getSak(Long.toString(arkivsakID))).thenReturn(sak);
+
+        kafkaTestConsumer.reset(1);
+        saksrelasjonService.lagreKobling(arkivsakID, rinaSaksnummer, BucType.LA_BUC_04);
+        kafkaTestConsumer.doWait(5_000L);
+
+        assertThat(hentRecords()).hasSize(1);
+
     }
 
     private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String aktørID) {

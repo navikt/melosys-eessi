@@ -47,7 +47,6 @@ public class SedMottattConsumer {
         loggSedID(consumerRecord.value().getSedId());
 
         if (brukNySedMottatService) {
-            log.info("bruker ny woohooo");
             sedMottattBehandleService.behandleSed(SedMottattHendelse.builder()
                     .sedHendelse(consumerRecord.value())
                     .build());

@@ -41,7 +41,7 @@ public class MockData {
         return dokumentTypeInfoDto;
     }
 
-    SedHendelse sedHendelse(String sedID, String ident) {
+    SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident) {
         return SedHendelse.builder()
                 .avsenderId("avsenderId")
                 .avsenderNavn("avsender")
@@ -51,7 +51,7 @@ public class MockData {
                 .mottakerNavn("mottakerNavn")
                 .navBruker(ident)
                 .rinaDokumentId("1")
-                .rinaSakId("1")
+                .rinaSakId(rinaSaksnummer)
                 .rinaDokumentVersjon("1")
                 .sedType(A002.name())
                 .sedId(sedID)

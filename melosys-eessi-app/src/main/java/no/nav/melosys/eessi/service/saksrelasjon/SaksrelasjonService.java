@@ -3,29 +3,25 @@ package no.nav.melosys.eessi.service.saksrelasjon;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.AllArgsConstructor;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@AllArgsConstructor
 public class SaksrelasjonService {
 
     private final FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     private final CaseStoreConsumer caseStoreConsumer;
     private final SakConsumer sakConsumer;
-
-
-    public SaksrelasjonService(FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository,
-            CaseStoreConsumer caseStoreConsumer, SakConsumer sakConsumer) {
-        this.fagsakRinasakKoblingRepository = fagsakRinasakKoblingRepository;
-        this.caseStoreConsumer = caseStoreConsumer;
-        this.sakConsumer = sakConsumer;
-    }
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public FagsakRinasakKobling lagreKobling(Long gsakSaksnummer, String rinaSaksnummer, BucType bucType) {
@@ -39,6 +35,7 @@ public class SaksrelasjonService {
             oppdaterEllerLagreIEuxCaseStore(gsakSaksnummer, rinaSaksnummer);
         }
 
+        applicationEventPublisher.publishEvent(new SaksrelasjonOpprettetEvent(rinaSaksnummer, gsakSaksnummer));
         return fagsakRinasakKobling;
     }
 

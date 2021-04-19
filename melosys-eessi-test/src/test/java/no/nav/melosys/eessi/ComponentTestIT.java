@@ -33,7 +33,7 @@ class ComponentTestIT extends ComponentTestBase {
 
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, FNR))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(1)
@@ -56,7 +56,7 @@ class ComponentTestIT extends ComponentTestBase {
         mockPerson(FNR, AKTOER_ID);
 
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(1);
@@ -71,7 +71,7 @@ class ComponentTestIT extends ComponentTestBase {
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto("123"));
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(2000)).opprettOppgave(any());
@@ -88,7 +88,7 @@ class ComponentTestIT extends ComponentTestBase {
         when(journalpostapiConsumer.opprettJournalpost(any(), anyBoolean())).thenThrow(new IntegrationException("Feil!"));
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(sedID, FNR))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         await().atMost(2, TimeUnit.SECONDS).until(() -> sedMottattRepository.count() > 0);

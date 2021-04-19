@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.context.ApplicationEventPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -30,12 +31,14 @@ public class SaksrelasjonServiceTest {
     private CaseStoreConsumer caseStoreConsumer;
     @Mock
     private SakConsumer sakConsumer;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     private SaksrelasjonService saksrelasjonService;
 
     @Before
     public void setup() {
-        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, sakConsumer);
+        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, sakConsumer, applicationEventPublisher);
     }
 
     private final String RINA_ID = "321";

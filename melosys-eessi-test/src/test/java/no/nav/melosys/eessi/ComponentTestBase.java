@@ -2,6 +2,7 @@ package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -47,6 +48,7 @@ public abstract class ComponentTestBase {
     static final String STATSBORGERSKAP = "NO";
     static final String FNR = "25068420779";
     static final String AKTOER_ID = "1234567890123";
+    static final String RINA_SAKSNUMMER = Integer.toString(new Random().nextInt(100000));
 
     protected final MockData mockData = new MockData();
 
