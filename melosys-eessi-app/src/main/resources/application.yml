@@ -32,6 +32,8 @@ spring:
       max-request-size: 10485760 # 10MB
 
 melosys:
+  feature:
+    nyttMottak: ${FEATURE_NYTT_MOTTAK:false}
   kafka:
     consumer:
       mottatt:

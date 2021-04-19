@@ -21,7 +21,7 @@ public class SedMottattJobb {
     private final BehandleSedMottattService behandleSedMottattService;
 
     public SedMottattJobb(SedMottattService sedMottattService,
-            BehandleSedMottattService behandleSedMottattService) {
+                          BehandleSedMottattService behandleSedMottattService) {
         this.sedMottattService = sedMottattService;
         this.behandleSedMottattService = behandleSedMottattService;
     }

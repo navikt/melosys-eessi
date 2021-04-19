@@ -3,10 +3,13 @@ package no.nav.melosys.eessi.kafka.consumers;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottatt;
+import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
+import no.nav.melosys.eessi.service.behandling.SedMottattBehandleService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -18,38 +21,50 @@ import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
 public class SedMottattConsumer {
 
     private final SedMottattService sedMottattService;
+    private final SedMottattBehandleService sedMottattBehandleService;
     private final BehandleSedMottattService behandleSedMottattService;
     private final SedMetrikker sedMetrikker;
+    private final boolean brukNySedMottatService;
 
     @Autowired
     public SedMottattConsumer(SedMottattService sedMottattService,
-            BehandleSedMottattService behandleSedMottattService,
-            SedMetrikker sedMetrikker) {
+                              SedMottattBehandleService sedMottattBehandleService,
+                              BehandleSedMottattService behandleSedMottattService,
+                              SedMetrikker sedMetrikker,
+                              @Value("${melosys.feature.nyttMottak}") String brukNySedMottattService) {
         this.sedMottattService = sedMottattService;
+        this.sedMottattBehandleService = sedMottattBehandleService;
         this.behandleSedMottattService = behandleSedMottattService;
         this.sedMetrikker = sedMetrikker;
+        this.brukNySedMottatService = "true".equals(brukNySedMottattService);
     }
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
             topics = "${melosys.kafka.consumer.mottatt.topic}", containerFactory = "sedMottattListenerContainerFactory")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        SedMottatt sedMottatt = SedMottatt.av(consumerRecord.value());
+        log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
+        loggSedID(consumerRecord.value().getSedId());
 
-        log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedMottatt.getSedHendelse(), consumerRecord.offset());
-        behandleMottatt(sedMottatt);
-        sedMetrikker.sedMottatt(sedMottatt.getSedHendelse().getSedType());
+        if (brukNySedMottatService) {
+            sedMottattBehandleService.behandleSed(SedMottattHendelse.builder()
+                    .sedHendelse(consumerRecord.value())
+                    .build());
+        } else {
+            behandleMottatt(SedMottatt.av(consumerRecord.value()));
+        }
+
+        sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
+        slettSedIDLogging();
+
     }
 
     private void behandleMottatt(SedMottatt sedMottatt) {
         try {
-            loggSedID(sedMottatt.getSedHendelse().getSedId());
             behandleSedMottattService.behandleSed(sedMottatt);
         } catch (Exception e) {
             log.error("Feil i behandling av mottatt sed. Lagres for å prøve igjen senere", e);
             sedMottatt.setFeiledeForsok(sedMottatt.getFeiledeForsok() + 1);
             sedMottattService.lagre(sedMottatt);
-        } finally {
-            slettSedIDLogging();
         }
     }
 }
