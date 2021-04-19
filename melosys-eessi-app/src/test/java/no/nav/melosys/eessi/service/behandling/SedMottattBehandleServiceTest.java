@@ -12,24 +12,27 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.behandling.event.PersonIdentifisertForBucEvent;
+import no.nav.melosys.eessi.service.behandling.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SedMottattBehandleServiceTest {
+@ExtendWith(MockitoExtension.class)
+class SedMottattBehandleServiceTest {
 
     @Mock
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
@@ -56,7 +59,7 @@ public class SedMottattBehandleServiceTest {
 
     private static final String IDENT = "1122334455";
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         sedMottattBehandleService = new SedMottattBehandleService(
                 euxService, personIdentifiseringService, opprettInngaaendeJournalpostService,
@@ -72,7 +75,7 @@ public class SedMottattBehandleServiceTest {
     }
 
     @Test
-    public void behandleSed_finnerIkkePerson_journalpostOgOppgaveOpprettes() {
+    void behandleSed_finnerIkkePerson_journalpostOgOppgaveOpprettes() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
@@ -85,11 +88,11 @@ public class SedMottattBehandleServiceTest {
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository, times(2)).save(any());
-        verify(applicationEventPublisher, never()).publishEvent(PersonIdentifisertForBucEvent.class);
+        verify(applicationEventPublisher, never()).publishEvent(BucIdentifisertEvent.class);
     }
 
     @Test
-    public void behandleSed_finnerIkkePersonOppgaveLagetTidligere_journalpostOpprettesMenIkkeOppgave() {
+    void behandleSed_finnerIkkePersonOppgaveLagetTidligere_journalpostOpprettesMenIkkeOppgave() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(any())).thenReturn(Optional.of(new BucIdentifiseringOppg()));
 
@@ -107,7 +110,7 @@ public class SedMottattBehandleServiceTest {
     }
 
     @Test
-    public void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
+    void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
@@ -118,7 +121,7 @@ public class SedMottattBehandleServiceTest {
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository, times(2)).save(any());
-        verify(applicationEventPublisher).publishEvent(any(PersonIdentifisertForBucEvent.class));
+        verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
     }
 
     private SED opprettSED() {

@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.behandling.event.PersonIdentifisertForBucEvent;
+import no.nav.melosys.eessi.service.behandling.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
@@ -44,7 +44,7 @@ public class SedMottattBehandleService {
 
         if (ident.isPresent()) {
             applicationEventPublisher.publishEvent(
-                    new PersonIdentifisertForBucEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), ident.get())
+                    new BucIdentifisertEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), ident.get())
             );
         } else {
             opprettOppgaveIdentifisering(sedMottattHendelse);

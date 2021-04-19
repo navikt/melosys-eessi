@@ -2,17 +2,17 @@ package no.nav.melosys.eessi.service.behandling.event;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @Slf4j
 @AllArgsConstructor
-public class PersonIdentifisertForBucEventListener {
+public class BucIdentifisertEventListener {
 
-    @TransactionalEventListener
-    public void personIdentifisertForBuc(PersonIdentifisertForBucEvent personIdentifisertForBucEvent) {
-        log.info("Identifiserer alle SEDer for BUC {}", personIdentifisertForBucEvent.getBucId());
+    @EventListener
+    public void personIdentifisertForBuc(BucIdentifisertEvent bucIdentifisertEvent) {
+        log.info("Identifiserer alle SEDer for BUC {}", bucIdentifisertEvent.getBucId());
         // TODO: For alle SEDer til BUC
         //  publiser melding med identifisert ident til kafka
         //  oppdater SedMottattHendelseRepository
