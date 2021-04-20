@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedMottatt;
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -168,6 +170,29 @@ public class BehandleSedMottattServiceTest {
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
+    }
+
+    @Test
+    public void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
+        final String aktoerID = "12312312312";
+        when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
+        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+
+        SedHendelse sedHendelse = sedHendelseMedBruker();
+        SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
+                .thenThrow(new SedAlleredeJournalførtException("Allerede journalført", "123"));
+
+        behandleSedMottattService.behandleSed(sedMottatt);
+
+        verify(euxService).hentSed(anyString(), anyString());
+        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
+        verify(melosysEessiProducer, never()).publiserMelding(any());
+
+        assertThat(sedMottatt.isFerdig()).isTrue();
     }
 
     @Test

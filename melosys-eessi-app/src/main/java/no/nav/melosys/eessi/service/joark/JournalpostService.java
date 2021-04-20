@@ -1,9 +1,6 @@
 package no.nav.melosys.eessi.service.joark;
 
-import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequestMapper;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.journalpostapi.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
