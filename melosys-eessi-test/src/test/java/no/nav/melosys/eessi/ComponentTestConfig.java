@@ -1,8 +1,11 @@
 package no.nav.melosys.eessi;
 
+import no.finn.unleash.FakeUnleash;
+import no.finn.unleash.Unleash;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
@@ -29,5 +32,11 @@ public class ComponentTestConfig {
         kafka.brokerProperty("transaction.state.log.min.isr", 1);
 
         return kafka;
+    }
+
+    @Bean
+    @Primary
+    public Unleash fakeUnleash() {
+        return new FakeUnleash();
     }
 }

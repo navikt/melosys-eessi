@@ -6,6 +6,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -84,6 +85,9 @@ public abstract class ComponentTestBase {
 
     @Autowired
     SedMottattRepository sedMottattRepository;
+
+    @Autowired
+    Unleash unleash;
 
     protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
         return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", sedHendelse);

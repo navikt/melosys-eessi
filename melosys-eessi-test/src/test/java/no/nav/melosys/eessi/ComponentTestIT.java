@@ -5,12 +5,14 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -22,6 +24,11 @@ import static org.mockito.Mockito.*;
 
 @Slf4j
 class ComponentTestIT extends ComponentTestBase {
+
+    @BeforeEach
+    void initierFeaturetoggle() {
+        ((FakeUnleash) unleash).disable("melosys.eessi.en_identifisering_oppg");
+    }
 
     @Test
     @DisplayName("Mottar SED med fnr, person identifisert, sender melding på kafka-topic")

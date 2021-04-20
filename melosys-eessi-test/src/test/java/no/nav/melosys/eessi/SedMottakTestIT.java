@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
@@ -16,9 +17,9 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.TestPropertySource;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,8 +28,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-@TestPropertySource(properties = {"melosys.feature.nyttMottak=true"})
-public class SedMottakTestIT extends ComponentTestBase {
+class SedMottakTestIT extends ComponentTestBase {
 
     @Autowired
     BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
@@ -37,6 +37,11 @@ public class SedMottakTestIT extends ComponentTestBase {
 
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
+
+    @BeforeEach
+    void initierFeaturetoggle() {
+        ((FakeUnleash) unleash).enable("melosys.eessi.en_identifisering_oppg");
+    }
 
     @Test
     void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {
