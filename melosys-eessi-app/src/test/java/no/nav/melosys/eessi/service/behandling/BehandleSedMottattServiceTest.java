@@ -174,8 +174,6 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
-        final String aktoerID = "12312312312";
-        when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
 
         SedHendelse sedHendelse = sedHendelseMedBruker();
