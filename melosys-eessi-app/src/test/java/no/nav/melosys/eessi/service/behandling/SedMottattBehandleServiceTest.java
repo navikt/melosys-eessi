@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -59,6 +60,7 @@ class SedMottattBehandleServiceTest {
     private SedMottattBehandleService sedMottattBehandleService;
 
     private static final String IDENT = "1122334455";
+    private static final String RINA_SAKSNUMMER = "12313213";
 
     @BeforeEach
     public void setup() throws Exception {
@@ -94,24 +96,6 @@ class SedMottattBehandleServiceTest {
     }
 
     @Test
-    void behandleSed_finnerIkkePersonOppgaveLagetTidligere_journalpostOpprettesMenIkkeOppgave() {
-        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
-        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(any())).thenReturn(Optional.of(new BucIdentifiseringOppg()));
-
-        SedHendelse sedHendelse = sedHendelseUtenBruker();
-        SedMottattHendelse sedMottatt = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
-
-        sedMottattBehandleService.behandleSed(sedMottatt);
-
-        verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository).save(any());
-        verify(applicationEventPublisher, never()).publishEvent(any());
-    }
-
-    @Test
     void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
         SedHendelse sedHendelse = sedHendelseMedBruker();
@@ -124,6 +108,24 @@ class SedMottattBehandleServiceTest {
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository).save(any());
         verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
+    }
+
+    @Test
+    void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgave() {
+        final var oppgaveID = "5555";
+        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID);
+        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.of(bucIdentifiseringOppg));
+
+        final var oppgave = new OppgaveDto();
+        oppgave.setStatus("AAPNET");
+        when(oppgaveService.hentOppgave(oppgaveID)).thenReturn(oppgave);
+        SedHendelse sedHendelse = sedHendelseMedBruker();
+
+        sedMottattBehandleService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
+        verify(applicationEventPublisher, never()).publishEvent(any(BucIdentifisertEvent.class));
     }
 
     private SED opprettSED() {
@@ -165,13 +167,14 @@ class SedMottattBehandleServiceTest {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         sedHendelse.setAvsenderId("SE:12345");
         sedHendelse.setNavBruker(IDENT);
+        sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
         return sedHendelse;
     }
 
     private SedHendelse sedHendelseUtenBruker() {
         SedHendelse sedHendelse = new SedHendelse();
         sedHendelse.setNavBruker("ukjent");
-        sedHendelse.setRinaSakId("123");
+        sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
         sedHendelse.setRinaDokumentId("456");
         sedHendelse.setSedType("A009");
         return sedHendelse;

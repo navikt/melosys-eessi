@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
-import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
@@ -85,10 +85,13 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID);
+        oppgaveDto.setStatus("AAPNET");
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto(oppgaveID));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
 
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
@@ -114,7 +117,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto(oppgaveID));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto(oppgaveID));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
@@ -142,9 +145,9 @@ class SedMottakTestIT extends ComponentTestBase {
     private OppgaveEndretDto lagOppgaveEndret(String oppgaveID, String aktørID) {
         var oppgaveEndret = new OppgaveEndretDto();
         oppgaveEndret.setId(Long.valueOf(oppgaveID));
-        oppgaveEndret.setAktørId(aktørID);
+        oppgaveEndret.setAktoerId(aktørID);
         oppgaveEndret.setOppgavetype("JFR");
-        oppgaveEndret.setStatuskategori("AAPEN");
+        oppgaveEndret.setStatus("AAPNET");
         oppgaveEndret.setTema("MED");
         oppgaveEndret.setTildeltEnhetsnr("4530");
         oppgaveEndret.getMetadata().put(OppgaveMetadataKey.RINA_SAKID, "123");

@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.service.oppgave;
 
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class OppgaveServiceTest {
     @Test
     public void opprettOppgaveIdOgFordeling_validerFelterBlirSatt() {
 
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto());
         String journalpostID = "111";
         String rinaSaksnummer = "123";
         oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID, SedType.A009.name(), rinaSaksnummer);
@@ -53,7 +53,7 @@ public class OppgaveServiceTest {
 
     @Test
     public void opprettUtgåendeJfrOppgave_validerFelter() {
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto());
         String journalpostID = "111";
         String aktørID = "321";
         String rinaUrl = "https://test.local";
@@ -71,7 +71,7 @@ public class OppgaveServiceTest {
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
         assertThat(oppgaveDto.getTema()).isEqualTo("MED");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR_UT");
-        assertThat(oppgaveDto.getAktørId()).isEqualTo(aktørID);
+        assertThat(oppgaveDto.getAktoerId()).isEqualTo(aktørID);
         assertThat(oppgaveDto.getBeskrivelse()).contains("A009", "deadbeef");
     }
 }

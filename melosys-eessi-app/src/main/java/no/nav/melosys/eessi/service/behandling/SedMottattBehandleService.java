@@ -68,11 +68,12 @@ public class SedMottattBehandleService {
         log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
 
         final var rinaSaksnummer = sedMottatt.getSedHendelse().getRinaSakId();
-        //TODO: sjekk at oppgave fortsatt har statuskategori = AAPEN
-        bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer).ifPresentOrElse(
-                b -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", b.getOppgaveId(), rinaSaksnummer),
-                () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt)
-        );
+        bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
+                .filter(bucIdentifiseringOppg -> oppgaveService.hentOppgave(bucIdentifiseringOppg.getOppgaveId()).erÅpen())
+                .ifPresentOrElse(
+                        b -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", b.getOppgaveId(), rinaSaksnummer),
+                        () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt)
+                );
     }
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse) {

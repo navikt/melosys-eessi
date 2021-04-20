@@ -33,7 +33,7 @@ public class OppgaveEndretConsumer {
         if (erIdentifisertOppgave(consumerRecord.value())) {
             bucIdentifiseringOppgRepository.findByOppgaveId(consumerRecord.value().getId().toString())
                     .ifPresent(b -> {
-                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().getAktørId()));
+                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().getAktoerId()));
                         //TODO: ferdigstill jfr-oppgave
                     });
         }
@@ -42,9 +42,9 @@ public class OppgaveEndretConsumer {
     private boolean erIdentifisertOppgave(OppgaveDto oppgaveDto) {
         return "JFR".equals(oppgaveDto.getOppgavetype())
                 && "4530".equals(oppgaveDto.getTildeltEnhetsnr())
-                && oppgaveDto.getAktørId() != null
+                && oppgaveDto.getAktoerId() != null
                 && GYLDIGE_TEMA.contains(oppgaveDto.getTema())
-                && "AAPEN".equals(oppgaveDto.getStatuskategori())
+                && oppgaveDto.erÅpen()
                 && oppgaveDto.getMetadata().containsKey(OppgaveMetadataKey.RINA_SAKID);
     }
 }

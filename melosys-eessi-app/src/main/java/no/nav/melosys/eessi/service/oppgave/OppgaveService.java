@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +28,10 @@ public class OppgaveService {
         this.oppgaveConsumer = oppgaveConsumer;
     }
 
+    public OppgaveDto hentOppgave(String oppgaveID) {
+        return oppgaveConsumer.hentOppgave(oppgaveID);
+    }
+
     public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer) {
         OppgaveDto oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
@@ -40,7 +44,7 @@ public class OppgaveService {
                 .beskrivelse(String.format(BESKRIVELSE, sedType, rinaSaksnummer))
                 .build();
 
-        OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
+        HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Oppgave til ID og fordeling opprettet med id {}", response.getId());
         return response.getId();
     }
@@ -55,10 +59,10 @@ public class OppgaveService {
                 .prioritet(PRIORITET_NORMAL)
                 .tema("MED") //Utgående vil alltid være MED
                 .tildeltEnhetsnr(ENHET_MEDLEMSKAP_OG_AVGIFT)
-                .aktørId(aktørId)
+                .aktoerId(aktørId)
                 .build();
 
-        OpprettOppgaveResponseDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
+        HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Utgående journalføringsoppgave opprettet med id {}", response.getId());
         return response.getId();
     }
