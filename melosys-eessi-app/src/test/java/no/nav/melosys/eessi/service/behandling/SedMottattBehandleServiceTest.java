@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
+import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
@@ -27,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -53,7 +56,7 @@ class SedMottattBehandleServiceTest {
     private SedMottattHendelseRepository sedMottattHendelseRepository;
 
     @Mock
-    BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    private BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
 
     private SedMottattBehandleService sedMottattBehandleService;
 
@@ -122,6 +125,21 @@ class SedMottattBehandleServiceTest {
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository, times(2)).save(any());
         verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
+    }
+
+    @Test
+    void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
+        SedHendelse sedHendelse = sedHendelseMedBruker();
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
+                .thenThrow(new SedAlleredeJournalførtException("Allerede journalført", "123"));
+
+        sedMottattBehandleService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+
+        verify(euxService).hentSed(anyString(), anyString());
+        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
+        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
     }
 
     private SED opprettSED() {
