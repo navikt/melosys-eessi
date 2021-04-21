@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -27,6 +28,10 @@ public class JournalpostapiConsumer {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("")
                 .queryParam("forsoekFerdigstill", forsokEndeligJfr);
 
-        return restTemplate.postForObject(uriBuilder.toUriString(), new HttpEntity<>(request, headers), OpprettJournalpostResponse.class);
+        try {
+            return restTemplate.postForObject(uriBuilder.toUriString(), new HttpEntity<>(request, headers), OpprettJournalpostResponse.class);
+        } catch (HttpClientErrorException.Conflict e) {
+            throw new SedAlleredeJournalførtException("SED allerede journalført", request.getEksternReferanseId());
+        }
     }
 }

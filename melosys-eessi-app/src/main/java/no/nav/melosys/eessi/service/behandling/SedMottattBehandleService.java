@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.behandling;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -36,10 +37,14 @@ public class SedMottattBehandleService {
         SED sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(),
                 sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
-        // TODO: Kast et checked exceptions om duplikat (409)
-        opprettJournalpost(sedMottattHendelse);
-
         sedMottattHendelseRepository.save(sedMottattHendelse);
+
+        try {
+            opprettJournalpost(sedMottattHendelse);
+        } catch (SedAlleredeJournalførtException e) {
+            log.info("Inngående SED {} allerede journalført", e.getSedID());
+            return;
+        }
 
         log.info("Søker etter person for SED");
         var ident = personIdentifiseringService.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed);

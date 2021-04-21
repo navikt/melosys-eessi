@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.behandling;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedKontekst;
@@ -55,9 +56,15 @@ public class BehandleSedMottattService {
             identifiserPerson(sedMottatt, sed);
         }
 
-        if (!kontekst.journalpostOpprettet()) {
-            opprettJournalpost(sedMottatt);
-        }
+            if (!kontekst.journalpostOpprettet()) {
+                try {
+                    opprettJournalpost(sedMottatt);
+                } catch (SedAlleredeJournalførtException e) {
+                    log.info("Inngående SED {} allerede journalført", e.getSedID());
+                    sedMottatt.setFerdig(true);
+                    return;
+                }
+            }
 
         if (kontekst.personErIdentifisert()) {
             if (!kontekst.isPublisertKafka()) {
