@@ -93,7 +93,7 @@ public class SedService {
      */
     private void sendSed(String rinaSaksnummer, String dokumentId) {
         try {
-            TimeUnit.SECONDS.sleep(6L);
+            TimeUnit.SECONDS.sleep(10L);
             euxService.sendSed(rinaSaksnummer, dokumentId);
         } catch (IntegrationException e) {
             log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
