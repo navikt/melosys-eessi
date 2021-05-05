@@ -2,11 +2,11 @@ apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
   name: melosys-eessi
-  namespace: {{namespace}}
+  namespace: {{NAMESPACE}}
   labels:
     team: teammelosys
 spec:
-  image: {{image}}
+  image: {{IMAGE}}
   port: 8080
   replicas:
     min: 2
@@ -29,6 +29,9 @@ spec:
       memory: 512Mi
   vault:
     enabled: true
+    paths:
+      - mountPath: /var/run/secrets/nais.io/serviceuser
+        kvPath: /serviceuser/data/{{VAULT_CLUSTER}}/srvmelosys-eessi
   prometheus:
     enabled: true
     path: /internal/prometheus
