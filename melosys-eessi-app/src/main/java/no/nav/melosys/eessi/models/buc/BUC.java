@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
+import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -31,9 +32,10 @@ public class BUC {
     @JsonProperty(value = "processDefinitionVersion")
     private String bucVersjon;
 
-    public boolean kanOppretteSed(SedType sedType) {
+    public boolean kanOppretteEllerOppdatereSed(SedType sedType) {
         return actions.stream().anyMatch(action ->
-                sedType.name().equalsIgnoreCase(action.getDocumentType()) && "CREATE".equalsIgnoreCase(action.getOperation()));
+                sedType.name().equalsIgnoreCase(action.getDocumentType())
+                        && ("CREATE".equalsIgnoreCase(action.getOperation())) || "UPDATE".equalsIgnoreCase(action.getOperation()));
     }
 
     public Document hentDokument(String dokumentID) {
@@ -77,5 +79,16 @@ public class BUC {
         return finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT)
                 .filter(d -> ZonedDateTime.now().minusDays(minstAntallDagerSidenMottatt).isAfter(d.getLastUpdate()))
                 .isPresent();
+    }
+
+    public boolean kanLukkes() {
+        var bucType = BucType.valueOf(getBucType());
+
+        if (bucType == BucType.LA_BUC_06) {
+            return harMottattSedTypeAntallDagerSiden(SedType.A006, 30)
+                    && kanOppretteEllerOppdatereSed(SedType.X001);
+        }
+
+        return kanOppretteEllerOppdatereSed(SedType.X001);
     }
 }

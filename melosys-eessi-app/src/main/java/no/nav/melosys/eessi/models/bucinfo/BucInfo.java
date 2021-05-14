@@ -8,4 +8,12 @@ public class BucInfo {
     private String id;
     private String processDefinitionId;
     private String status;
+
+    public boolean norgeErCaseOwner() {
+        return "PO".equalsIgnoreCase(applicationRoleId);
+    }
+
+    public boolean bucErÅpen() {
+        return "open".equalsIgnoreCase(status);
+    }
 }

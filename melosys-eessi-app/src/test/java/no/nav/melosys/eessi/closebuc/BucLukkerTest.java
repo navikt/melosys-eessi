@@ -22,17 +22,17 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.service.eux.BucSearch;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class BucLukkerTest {
+@ExtendWith(MockitoExtension.class)
+class BucLukkerTest {
 
     @Mock
     private EuxService euxService;
@@ -41,15 +41,15 @@ public class BucLukkerTest {
 
     private BucLukker bucLukker;
 
-    private EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
+    private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
-    @Before
+    @BeforeEach
     public void setup() {
         bucLukker = new BucLukker(euxService, bucMetrikker);
     }
 
     @Test
-    public void lukkBucerAvType_enBucKanLukkes_verifiserOpprettOgSend() throws Exception {
+    void lukkBucerAvType_enBucKanLukkes_verifiserOpprettOgSend() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -77,7 +77,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_enBucKanLukkesInneholderUtkastX001_verifiserOppdaterSåSend() throws Exception {
+    void lukkBucerAvType_enBucKanLukkesInneholderUtkastX001_verifiserOppdaterSåSend() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -113,14 +113,14 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_feilVedHentingAvBucer_ingenVidereKall() throws Exception {
+    void lukkBucerAvType_feilVedHentingAvBucer_ingenVidereKall() {
         when(euxService.hentBucer(any(BucSearch.class))).thenThrow(new IntegrationException(""));
         bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
         verify(euxService, never()).hentBuc(anyString());
     }
 
     @Test
-    public void lukkBucerAvType_feilVedHentingAvBuc_ingenVidereKall() throws Exception {
+    void lukkBucerAvType_feilVedHentingAvBuc_ingenVidereKall() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -139,7 +139,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_feilVedHentingAvSed_ingenVidereKall() throws Exception {
+    void lukkBucerAvType_feilVedHentingAvSed_ingenVidereKall() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -163,7 +163,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_toDokumenter_brukSistOpprettetDokument() throws Exception {
+    void lukkBucerAvType_toDokumenter_brukSistOpprettetDokument() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -201,7 +201,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_statusClosed_ingenBlirLukket() {
+    void lukkBucerAvType_statusClosed_ingenBlirLukket() {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setStatus("closed");
 
@@ -211,7 +211,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_LABUC06ToMndSidenMottattA006_lukkes() throws IntegrationException {
+    void lukkBucerAvType_LABUC06ToMndSidenMottattA006_lukkes() throws IntegrationException {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -246,7 +246,7 @@ public class BucLukkerTest {
     }
 
     @Test
-    public void lukkBucerAvType_LABUC06A006IkkeMottatt_lukkesIkke() throws IntegrationException {
+    void lukkBucerAvType_LABUC06A006IkkeMottatt_lukkesIkke() throws IntegrationException {
         BucInfo bucInfo = new BucInfo();
         bucInfo.setId("123jfpw");
         bucInfo.setApplicationRoleId("PO");
@@ -279,6 +279,7 @@ public class BucLukkerTest {
         List<Action> actions = new ArrayList<>();
         Action action = new Action();
         action.setDocumentType(SedType.X001.name());
+        action.setOperation("create");
         actions.add(action);
         buc.setActions(actions);
 

@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.models;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 public enum SedType {
     X001,
     X002,
@@ -47,7 +51,15 @@ public enum SedType {
     S040,
     S041;
 
+    private static final Collection<SedType> LOVVALG_SED_TYPER = Arrays.stream(SedType.values())
+            .filter(s -> s.name().startsWith("A"))
+            .collect(Collectors.toSet());
+
     public boolean erXSED() {
         return this.name().startsWith("X");
+    }
+
+    public static boolean erLovvalgSed(String sedType) {
+        return LOVVALG_SED_TYPER.stream().anyMatch(s -> s.name().equals(sedType));
     }
 }

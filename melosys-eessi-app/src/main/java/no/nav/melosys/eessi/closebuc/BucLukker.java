@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.closebuc;
 
 import java.util.Comparator;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
@@ -16,7 +17,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X001Mapper;
 import org.springframework.stereotype.Service;
 
-import static no.nav.melosys.eessi.models.buc.BucUtils.*;
+import static no.nav.melosys.eessi.models.buc.SedVersjonUtils.verifiserSedVersjonErBucVersjon;
 
 @Service
 @Slf4j
@@ -38,11 +39,11 @@ public class BucLukker {
             //FIXME: søk på BUC fungerer ikke med status open. Venter på eux/rina-fix
             euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).build())
                     .stream()
-                    .filter(bucErÅpen)
-                    .filter(norgeErCaseOwner)
-                    .map(this::hentBuc)
+                    .filter(BucInfo::bucErÅpen)
+                    .filter(BucInfo::norgeErCaseOwner)
+                    .map(this::hentBucEllerNull)
                     .filter(Objects::nonNull)
-                    .filter(bucKanLukkesPredicate)
+                    .filter(BUC::kanLukkes)
                     .forEach(this::lukkBuc);
         } catch (IntegrationException e) {
             log.error("Feil ved henting av bucer av type {}", bucType, e);
@@ -72,8 +73,8 @@ public class BucLukker {
 
     private Document hentEksisterendeX001Utkast(BUC buc) {
         return buc.getDocuments().stream()
-                .filter(dokumentErX001Predicate)
-                .filter(dokumentErOpprettet)
+                .filter(Document::erX001)
+                .filter(Document::erOpprettet)
                 .min(documentComparator).orElse(null);
     }
 
@@ -83,7 +84,7 @@ public class BucLukker {
 
     private SED hentSisteLovvalgSed(BUC buc) {
         String sedId = buc.getDocuments().stream()
-                .filter(sisteSendtLovvalgsSedPredicate)
+                .filter(Document::sedErSendt)
                 .min(documentComparator)
                 .orElseThrow(() -> new IllegalStateException("Finner ingen lovvalgs-SED på buc" + buc.getId()))
                 .getId();
@@ -91,7 +92,8 @@ public class BucLukker {
         return euxService.hentSed(buc.getId(), sedId);
     }
 
-    private BUC hentBuc(BucInfo bucInfo) {
+    @Nullable
+    private BUC hentBucEllerNull(BucInfo bucInfo) {
         try {
             return euxService.hentBuc(bucInfo.getId());
         } catch (IntegrationException ex) {
