@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.models.buc;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -21,7 +22,8 @@ public class Document {
     private Creator creator;
     private String type;
     private String status;
-    private List<Conversation> conversations;
+    private String direction;
+    private List<Conversation> conversations = new ArrayList<>();
 
     public boolean sedErSendt() {
         return !getConversations().isEmpty()
@@ -35,5 +37,17 @@ public class Document {
 
     public boolean erX001() {
         return SedType.X001.name().equals(type);
+    }
+
+    public boolean erLovvalgSED() {
+        return SedType.erLovvalgSed(type);
+    }
+
+    public boolean erAntallDagerSidenOppdatering(long antallDagerSidenOppdatert) {
+        return ZonedDateTime.now().minusDays(antallDagerSidenOppdatert).isAfter(getLastUpdate());
+    }
+
+    public boolean erInngående() {
+        return "IN".equalsIgnoreCase(direction);
     }
 }

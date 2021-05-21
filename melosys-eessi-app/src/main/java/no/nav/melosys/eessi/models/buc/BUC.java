@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -77,18 +78,34 @@ public class BUC {
 
     public boolean harMottattSedTypeAntallDagerSiden(SedType sedType, long minstAntallDagerSidenMottatt) {
         return finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT)
-                .filter(d -> ZonedDateTime.now().minusDays(minstAntallDagerSidenMottatt).isAfter(d.getLastUpdate()))
+                .filter(d -> d.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt))
                 .isPresent();
     }
 
     public boolean kanLukkes() {
-        var bucType = BucType.valueOf(getBucType());
+        var bucTypeEnum = BucType.valueOf(getBucType());
 
-        if (bucType == BucType.LA_BUC_06) {
+        if (bucTypeEnum == BucType.LA_BUC_06) {
             return harMottattSedTypeAntallDagerSiden(SedType.A006, 30)
                     && kanOppretteEllerOppdatereSed(SedType.X001);
+        } else if (bucTypeEnum == BucType.LA_BUC_01) {
+            boolean harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60)
+                    || harMottattSedTypeAntallDagerSiden(SedType.A011, 60);
+
+            return harMottattA002EllerA011
+                    && kanOppretteEllerOppdatereSed(SedType.X001)
+                    && finnSistMottattSED(Document::erLovvalgSED)
+                        .map(d -> d.erAntallDagerSidenOppdatering(60)).orElse(false);
         }
 
         return kanOppretteEllerOppdatereSed(SedType.X001);
+    }
+
+    private Optional<Document> finnSistMottattSED(Predicate<Document> documentPredicate) {
+        return documents.stream()
+                .filter(Document::erInngående)
+                .filter(Document::erOpprettet)
+                .filter(documentPredicate)
+                .max(Comparator.comparing(Document::getLastUpdate));
     }
 }
