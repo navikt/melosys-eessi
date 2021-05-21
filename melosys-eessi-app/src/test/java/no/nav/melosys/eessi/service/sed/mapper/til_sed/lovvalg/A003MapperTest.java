@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -44,8 +45,11 @@ public class A003MapperTest {
 
     @Test
     public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
+        VedtakDto vedtakDto = new VedtakDto();
+        vedtakDto.setErFoerstegangsVedtak(false);
+        vedtakDto.setDatoForrigePeriode(LocalDate.now());
+        sedData.setVedtakDto(vedtakDto);
         SED sed = sedMapper.mapTilSed(sedData);
-
         assertThat(MedlemskapA003.class).isEqualTo(sed.getMedlemskap().getClass());
 
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
@@ -53,5 +57,6 @@ public class A003MapperTest {
         assertThat(medlemskapA003).isNotNull();
         assertThat(medlemskapA003.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
         assertThat(medlemskapA003.getVedtak().getDatoforrigevedtak()).isNotNull();
+        assertThat(medlemskapA003.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
 }

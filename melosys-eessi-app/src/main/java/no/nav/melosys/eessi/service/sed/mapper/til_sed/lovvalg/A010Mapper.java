@@ -55,12 +55,14 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
 
     private void setOpprinneligVedtak(VedtakDto vedtakDto, VedtakA010 vedtakA010)
     {
-        if (vedtakDto.isErFoerstegangsVedtak()) {
+        if (vedtakDto != null) {
+            if (!vedtakDto.isErFoerstegangsVedtak()) {
+                vedtakA010.setEropprinneligvedtak("nei");
+                vedtakA010.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+            }
+        }else{
             vedtakA010.setEropprinneligvedtak("ja");
-        }
-        else{
-            vedtakA010.setEropprinneligvedtak("nei");
-            vedtakA010.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+            vedtakA010.setDatoforrigevedtak(null);
         }
     }
 

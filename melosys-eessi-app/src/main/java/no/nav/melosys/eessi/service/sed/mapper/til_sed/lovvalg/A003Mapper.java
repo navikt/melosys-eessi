@@ -50,12 +50,15 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
     private void setOpprinneligVedtak(VedtakDto vedtakDto, VedtakA003 vedtakA003)
     {
-        if (vedtakDto.isErFoerstegangsVedtak()) {
-            vedtakA003.setEropprinneligvedtak("ja");
+        if (vedtakDto != null) {
+            if (!vedtakDto.isErFoerstegangsVedtak()) {
+                vedtakA003.setEropprinneligvedtak("nei");
+                vedtakA003.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+            }
         }
         else{
-            vedtakA003.setEropprinneligvedtak("nei");
-            vedtakA003.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+            vedtakA003.setEropprinneligvedtak("ja");
+            vedtakA003.setDatoforrigevedtak(null);
         }
     }
     private Andreland getAndreLand(SedDataDto sedData) {

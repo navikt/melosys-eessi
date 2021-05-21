@@ -2,10 +2,12 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -68,10 +70,13 @@ public class A010MapperTest {
         assertThat(medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isNotNull();
     }
     @Test
-    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
+    public void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
-
+        VedtakDto vedtakDto = new VedtakDto();
+        vedtakDto.setErFoerstegangsVedtak(false);
+        vedtakDto.setDatoForrigePeriode(LocalDate.now());
+        sedData.setVedtakDto(vedtakDto);
         SED sed = a010Mapper.mapTilSed(sedData);
 
         assertThat(MedlemskapA010.class).isEqualTo(sed.getMedlemskap().getClass());
@@ -80,7 +85,7 @@ public class A010MapperTest {
 
         assertThat(medlemskapA010).isNotNull();
         assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
-        assertThat(medlemskapA010.getVedtak().getDatoforrigevedtak()).isEqualTo("2020-01-01");
+        assertThat(medlemskapA010.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
     @Test
     public void mapTilSed_medTilleggsbestemmelse_bestemmelseOgTilleggsbestemmelseErUlovligKasterException() {
