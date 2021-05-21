@@ -11,6 +11,8 @@ public class VedtakA003 {
 
     private String eropprinneligvedtak;
 
+    private String datoforrigevedtak;
+
     private PeriodeA010 gjelderperiode;
 
     private String land;

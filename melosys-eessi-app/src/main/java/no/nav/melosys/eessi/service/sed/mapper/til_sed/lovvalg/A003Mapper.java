@@ -2,12 +2,14 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.Andreland;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
+import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
 
 public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
@@ -34,7 +36,7 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
         vedtak.setLand(lovvalgsperiode.getLovvalgsland());
         vedtak.setGjelderperiode(getPeriode(lovvalgsperiode));
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
-        vedtak.setEropprinneligvedtak("ja");
+        setOpprinneligVedtak(sedData.getVedtakDto(),vedtak);//vedtak.setEropprinneligvedtak("ja");
 
         return vedtak;
     }
@@ -46,7 +48,16 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
         return periode;
     }
 
-
+    private void setOpprinneligVedtak(VedtakDto vedtakDto, VedtakA003 vedtakA003)
+    {
+        if (vedtakDto.isErFoerstegangsVedtak()) {
+            vedtakA003.setEropprinneligvedtak("ja");
+        }
+        else{
+            vedtakA003.setEropprinneligvedtak("nei");
+            vedtakA003.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+        }
+    }
     private Andreland getAndreLand(SedDataDto sedData) {
         final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
         Andreland andreland = new Andreland();

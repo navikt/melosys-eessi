@@ -1,10 +1,12 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
@@ -21,13 +23,14 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
 
     @Override
     public MedlemskapA010 getMedlemskap(SedDataDto sedData) {
+        VedtakDto vedtakDto = sedData.getVedtakDto();
         MedlemskapA010 medlemskap = new MedlemskapA010();
 
         Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
 
         if (lovvalgsperiode != null) {
             medlemskap.setMeldingomlovvalg(hentMeldingOmLovvalg(lovvalgsperiode));
-            medlemskap.setVedtak(hentVedtak(lovvalgsperiode));
+            medlemskap.setVedtak(hentVedtak(lovvalgsperiode,vedtakDto));
         }
 
         medlemskap.setAndreland(getAndreland(sedData));
@@ -41,13 +44,24 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
         return utsendingsland;
     }
 
-    private VedtakA010 hentVedtak(Lovvalgsperiode lovvalgsperiode) {
+    private VedtakA010 hentVedtak(Lovvalgsperiode lovvalgsperiode, VedtakDto vedtakDto) {
         VedtakA010 vedtak = new VedtakA010();
-        vedtak.setEropprinneligvedtak("ja");
+        setOpprinneligVedtak(vedtakDto,vedtak);
         vedtak.setGjelderperiode(hentPeriode(lovvalgsperiode));
         vedtak.setLand(lovvalgsperiode.getLovvalgsland());
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
         return vedtak;
+    }
+
+    private void setOpprinneligVedtak(VedtakDto vedtakDto, VedtakA010 vedtakA010)
+    {
+        if (vedtakDto.isErFoerstegangsVedtak()) {
+            vedtakA010.setEropprinneligvedtak("ja");
+        }
+        else{
+            vedtakA010.setEropprinneligvedtak("nei");
+            vedtakA010.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+        }
     }
 
     private MeldingOmLovvalg hentMeldingOmLovvalg(Lovvalgsperiode lovvalgsperiode) {

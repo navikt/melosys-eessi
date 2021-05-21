@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
@@ -19,9 +20,10 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
         final MedlemskapA009 medlemskapA009 = new MedlemskapA009();
         final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
+        final VedtakDto vedtakDto = sedData.getVedtakDto();
 
         if (!sedData.getLovvalgsperioder().isEmpty()) {
-            medlemskapA009.setVedtak(getVedtak(lovvalgsperiode));
+            medlemskapA009.setVedtak(getVedtak(lovvalgsperiode,vedtakDto));
         }
 
         medlemskapA009.setAndreland(getAndreland(sedData));
@@ -30,11 +32,11 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         return medlemskapA009;
     }
 
-    private VedtakA009 getVedtak(Lovvalgsperiode lovvalgsperiode) {
+    private VedtakA009 getVedtak(Lovvalgsperiode lovvalgsperiode,VedtakDto vedtakDto) {
         VedtakA009 vedtak = new VedtakA009();
-
-        vedtak.setEropprinneligvedtak(
-                "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
+        setVedtakDto(vedtakDto,vedtak);
+        //vedtak.setEropprinneligvedtak(
+        //        "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
         vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
         vedtak.setGjeldervarighetyrkesaktivitet(
                 "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
@@ -75,6 +77,17 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         Utsendingsland utsendingsland = new Utsendingsland();
         utsendingsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
         return utsendingsland;
+    }
+
+    private void setVedtakDto(VedtakDto vedtakDto, VedtakA009 vedtakA009)
+    {
+        if (vedtakDto.isErFoerstegangsVedtak()){
+            vedtakA009.setEropprinneligvedtak("ja");
+        }
+        else{
+            vedtakA009.setEropprinneligvedtak("nei");
+            vedtakA009.setDatoforrigevedtak(vedtakDto.getDatoForrigePeriode().toString());
+        }
     }
 
     public SedType getSedType() {

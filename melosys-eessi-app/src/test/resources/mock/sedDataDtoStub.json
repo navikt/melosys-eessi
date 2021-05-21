@@ -51,6 +51,10 @@
     "kjoenn": "M",
     "statsborgerskap": "NO"
   },
+  "vedtakDto": {
+    "datoForrigePeriode": "2020-01-01",
+    "erFoerstegangsVedtak": false
+  },
   "egenAnsatt": false,
   "familieMedlem": [
     {

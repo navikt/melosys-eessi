@@ -58,6 +58,19 @@ public class A009MapperTest {
     }
 
     @Test
+    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
+        SED sed = a009Mapper.mapTilSed(sedData);
+
+        assertThat(MedlemskapA009.class).isEqualTo(sed.getMedlemskap().getClass());
+
+        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
+
+        assertThat(medlemskapA009).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isNotNull();
+    }
+
+    @Test
     public void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
         SED sed = a009Mapper.mapTilSed(sedData);
