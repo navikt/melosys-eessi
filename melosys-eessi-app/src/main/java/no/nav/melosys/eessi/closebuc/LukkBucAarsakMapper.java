@@ -13,11 +13,14 @@ final class LukkBucAarsakMapper {
     private static final String TRETTI_DAGER_SIDEN_A008 = "lovvalg_30_dager_siden_melding_om_relevant_informasjon";
     private static final String TRETTI_DAGER_SIDEN_MELDING_OM_UTSTASJONERING = "lovvalg_30_dager_siden_melding_om_utstasjonering";
     private static final String TRETTI_DAGER_SIDEN_SVAR_ANMODNING_MER_INFO = "gjeldende_lovgivning_30_dager_siden_svar_på_anmodning_om_mer_informasjon";
+    private static final String ENIGHET_ANMODNING_UNNTAK = "gjeldende_lovgivning_det_ble_oppnådd_enighet_om_anmodningen_om_unntak";
 
 
     static String hentAarsakForLukking(BUC buc) {
-        BucType bucType = BucType.valueOf(buc.getBucType());
+        var bucType = BucType.valueOf(buc.getBucType());
         switch (bucType) {
+            case LA_BUC_01:
+                return ENIGHET_ANMODNING_UNNTAK;
             case LA_BUC_02:
                 if (a012SendtFraBuc(buc)) {
                     return LOVVALG_BEKREFTET;
@@ -25,13 +28,12 @@ final class LukkBucAarsakMapper {
                 return INGEN_SVAR_2_MND;
             case LA_BUC_03:
                 return TRETTI_DAGER_SIDEN_A008;
-            case LA_BUC_04:
-            case LA_BUC_05:
+            case LA_BUC_04, LA_BUC_05:
                 return TRETTI_DAGER_SIDEN_MELDING_OM_UTSTASJONERING;
             case LA_BUC_06:
                 return TRETTI_DAGER_SIDEN_SVAR_ANMODNING_MER_INFO;
             default:
-                throw new IllegalArgumentException("Buctype" + bucType + " støttes ikke for lukking");
+                throw new IllegalArgumentException("Buctype " + bucType + " støttes ikke for lukking");
         }
     }
 
