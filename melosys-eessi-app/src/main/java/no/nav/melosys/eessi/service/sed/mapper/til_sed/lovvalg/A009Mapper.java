@@ -34,9 +34,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     private VedtakA009 getVedtak(Lovvalgsperiode lovvalgsperiode,VedtakDto vedtakDto) {
         VedtakA009 vedtak = new VedtakA009();
-        setVedtakDto(vedtakDto,vedtak);
-        //vedtak.setEropprinneligvedtak(
-        //        "ja"); //Confluence: "I første omgang støttes kun IntionDecision = Ja". Setter derfor ikke datoforrigevedtak eller erendringsvedtak
+        setVedtakOpprinnelse(vedtakDto,vedtak);
         vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
         vedtak.setGjeldervarighetyrkesaktivitet(
                 "nei"); //Vil være 'ja' om det er åpen periode. Melosys støtter ikke åpen periode.
@@ -79,7 +77,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         return utsendingsland;
     }
 
-    private void setVedtakDto(VedtakDto vedtakDto, VedtakA009 vedtakA009)
+    private void setVedtakOpprinnelse(VedtakDto vedtakDto, VedtakA009 vedtakA009)
     {
 
         if(vedtakDto != null) {

@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
@@ -46,14 +45,14 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
 
     private VedtakA010 hentVedtak(Lovvalgsperiode lovvalgsperiode, VedtakDto vedtakDto) {
         VedtakA010 vedtak = new VedtakA010();
-        setOpprinneligVedtak(vedtakDto,vedtak);
+        setVedtakOpprinnelse(vedtakDto,vedtak);
         vedtak.setGjelderperiode(hentPeriode(lovvalgsperiode));
         vedtak.setLand(lovvalgsperiode.getLovvalgsland());
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
         return vedtak;
     }
 
-    private void setOpprinneligVedtak(VedtakDto vedtakDto, VedtakA010 vedtakA010)
+    private void setVedtakOpprinnelse(VedtakDto vedtakDto, VedtakA010 vedtakA010)
     {
         if (vedtakDto != null) {
             if (!vedtakDto.isErFoerstegangsVedtak()) {

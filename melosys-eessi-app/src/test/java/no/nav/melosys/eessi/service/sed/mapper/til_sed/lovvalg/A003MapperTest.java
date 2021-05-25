@@ -4,15 +4,13 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
+
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.Before;
 import org.junit.Test;
