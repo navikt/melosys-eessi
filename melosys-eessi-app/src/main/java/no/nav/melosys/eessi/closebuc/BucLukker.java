@@ -17,7 +17,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X001Mapper;
 import org.springframework.stereotype.Service;
 
-import static no.nav.melosys.eessi.models.buc.SedVersjonUtils.verifiserSedVersjonErBucVersjon;
+import static no.nav.melosys.eessi.models.buc.SedVersjonSjekker.verifiserSedVersjonErBucVersjon;
 
 @Service
 @Slf4j
@@ -36,8 +36,7 @@ public class BucLukker {
     public void lukkBucerAvType(BucType bucType) {
         try {
             log.info("Lukker bucer av type {}", bucType);
-            //FIXME: søk på BUC fungerer ikke med status open. Venter på eux/rina-fix
-            euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).build())
+            euxService.hentBucer(BucSearch.builder().bucType(bucType.name()).build()) //FIXME: søk på BUC fungerer ikke med status open. Venter på eux/rina-fix
                     .stream()
                     .filter(BucInfo::bucErÅpen)
                     .filter(BucInfo::norgeErCaseOwner)

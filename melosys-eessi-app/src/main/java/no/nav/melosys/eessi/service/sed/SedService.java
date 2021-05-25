@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import static no.nav.melosys.eessi.models.buc.SedVersjonUtils.verifiserSedVersjonErBucVersjon;
+import static no.nav.melosys.eessi.models.buc.SedVersjonSjekker.verifiserSedVersjonErBucVersjon;
 
 @Slf4j
 @Service

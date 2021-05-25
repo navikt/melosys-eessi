@@ -9,9 +9,9 @@ import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
 import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
 
 @Slf4j
-public class SedVersjonUtils {
+public class SedVersjonSjekker {
 
-    private SedVersjonUtils() {
+    private SedVersjonSjekker() {
         throw new IllegalStateException("Utility");
     }
 
@@ -22,8 +22,8 @@ public class SedVersjonUtils {
 
         if (!ønsketSedVersjon.equalsIgnoreCase(buc.getBucVersjon())) {
             log.info("Rina-sak {} er på gammel versjon {}. Oppdaterer SED til å bruke gammel versjon", buc.getId(), buc.getBucVersjon());
-            sed.setSedGVer(SedVersjonUtils.parseGVer(buc));
-            sed.setSedVer(SedVersjonUtils.parseVer(buc));
+            sed.setSedGVer(SedVersjonSjekker.parseGVer(buc));
+            sed.setSedVer(SedVersjonSjekker.parseVer(buc));
         }
     }
 

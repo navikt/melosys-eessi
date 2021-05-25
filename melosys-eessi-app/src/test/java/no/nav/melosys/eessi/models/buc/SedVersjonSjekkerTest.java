@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SedVersjonUtilsTest {
+public class SedVersjonSjekkerTest {
 
     private BUC buc = new BUC();
     private SED sed = new SED();
@@ -19,7 +19,7 @@ public class SedVersjonUtilsTest {
         sed.setSedGVer("4");
         sed.setSedVer("1");
 
-        SedVersjonUtils.verifiserSedVersjonErBucVersjon(buc, sed);
+        SedVersjonSjekker.verifiserSedVersjonErBucVersjon(buc, sed);
         assertThat(sed.getSedGVer()).isEqualTo("4");
         assertThat(sed.getSedVer()).isEqualTo("1");
     }
@@ -31,7 +31,7 @@ public class SedVersjonUtilsTest {
         sed.setSedGVer("4");
         sed.setSedVer("1");
 
-        SedVersjonUtils.verifiserSedVersjonErBucVersjon(buc, sed);
+        SedVersjonSjekker.verifiserSedVersjonErBucVersjon(buc, sed);
         assertThat(sed.getSedGVer()).isEqualTo("5");
         assertThat(sed.getSedVer()).isEqualTo("4");
     }
@@ -40,16 +40,16 @@ public class SedVersjonUtilsTest {
     public void hentBucVersjon_riktigFormat_fungerer() {
         buc.setBucVersjon("v4.0");
 
-        assertThat(SedVersjonUtils.parseGVer(buc)).isEqualTo("4");
-        assertThat(SedVersjonUtils.parseVer(buc)).isEqualTo("0");
+        assertThat(SedVersjonSjekker.parseGVer(buc)).isEqualTo("4");
+        assertThat(SedVersjonSjekker.parseVer(buc)).isEqualTo("0");
     }
 
     @Test
     public void hentBucVersjon_uventetFormat_fårDefault() {
         buc.setBucVersjon("v21");
 
-        assertThat(SedVersjonUtils.parseGVer(buc)).isEqualTo(Konstanter.DEFAULT_SED_G_VER);
-        assertThat(SedVersjonUtils.parseVer(buc)).isEqualTo(Konstanter.DEFAULT_SED_VER);
+        assertThat(SedVersjonSjekker.parseGVer(buc)).isEqualTo(Konstanter.DEFAULT_SED_G_VER);
+        assertThat(SedVersjonSjekker.parseVer(buc)).isEqualTo(Konstanter.DEFAULT_SED_VER);
     }
 
 }
