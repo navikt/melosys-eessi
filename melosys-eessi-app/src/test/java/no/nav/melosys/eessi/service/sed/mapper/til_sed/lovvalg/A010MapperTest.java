@@ -11,10 +11,11 @@ import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -27,7 +28,7 @@ public class A010MapperTest {
     private SedDataDto sedData;
     private Lovvalgsperiode lovvalgsperiode;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
         lovvalgsperiode = sedData.getLovvalgsperioder().get(0);
@@ -68,17 +69,18 @@ public class A010MapperTest {
         assertThat(medlemskap.getVedtak().getGjelderperiode().getStartdato()).isNotNull();
         assertThat(medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isNotNull();
     }
+
     @Test
     public void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
         VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setErFoerstegangsVedtak(false);
-        vedtakDto.setDatoForrigePeriode(LocalDate.now());
+        vedtakDto.setFoerstegangsvedtak(false);
+        vedtakDto.setDatoforrigeperiode(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
         SED sed = a010Mapper.mapTilSed(sedData);
 
-        assertThat(MedlemskapA010.class).isEqualTo(sed.getMedlemskap().getClass());
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
 
         MedlemskapA010 medlemskapA010 = (MedlemskapA010) sed.getMedlemskap();
 
@@ -86,6 +88,7 @@ public class A010MapperTest {
         assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
         assertThat(medlemskapA010.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
+
     @Test
     public void mapTilSed_medTilleggsbestemmelse_bestemmelseOgTilleggsbestemmelseErUlovligKasterException() {
         final Bestemmelse bestemmelse = Bestemmelse.ART_11_3_a;

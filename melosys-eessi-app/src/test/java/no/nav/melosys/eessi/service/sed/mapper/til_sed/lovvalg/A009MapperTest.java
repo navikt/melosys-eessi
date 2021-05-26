@@ -12,23 +12,21 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class A009MapperTest {
 
-    private A009Mapper a009Mapper = new A009Mapper();
+    private final A009Mapper a009Mapper = new A009Mapper();
 
     private SedDataDto sedData;
 
     private final String lovvalgsland = "NO";
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
 
@@ -43,9 +41,9 @@ public class A009MapperTest {
     public void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
         SED sed = a009Mapper.mapTilSed(sedData);
 
-        assertThat(MedlemskapA009.class).isEqualTo(sed.getMedlemskap().getClass());
-
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
+
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
         assertThat(medlemskapA009).isNotNull();
         assertThat(medlemskapA009.getUtsendingsland()).isNotNull();
@@ -61,12 +59,12 @@ public class A009MapperTest {
     @Test
     public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
         VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setErFoerstegangsVedtak(false);
-        vedtakDto.setDatoForrigePeriode(LocalDate.now());
+        vedtakDto.setFoerstegangsvedtak(false);
+        vedtakDto.setDatoforrigeperiode(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
         SED sed = a009Mapper.mapTilSed(sedData);
 
-        assertThat(MedlemskapA009.class).isEqualTo(sed.getMedlemskap().getClass());
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
@@ -92,16 +90,16 @@ public class A009MapperTest {
         assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
     }
 
-    @Test(expected = MappingException.class)
+    @Test
     public void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
-        a009Mapper.mapTilSed(sedData);
+        Assertions.assertThrows(MappingException.class,() -> a009Mapper.mapTilSed(sedData));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
-        a009Mapper.mapTilSed(sedData);
+        Assertions.assertThrows(NullPointerException.class,() -> a009Mapper.mapTilSed(sedData));
     }
 
     @Test

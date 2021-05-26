@@ -12,17 +12,17 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class A003MapperTest {
 
-    private final LovvalgSedMapper sedMapper = new A003Mapper();
+    private final LovvalgSedMapper<MedlemskapA003> sedMapper = new A003Mapper();
     private SedDataDto sedData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
         sedData.getLovvalgsperioder().get(0).setLovvalgsland("NO");
@@ -44,11 +44,12 @@ public class A003MapperTest {
     @Test
     public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
         VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setErFoerstegangsVedtak(false);
-        vedtakDto.setDatoForrigePeriode(LocalDate.now());
+        vedtakDto.setFoerstegangsvedtak(false);
+        vedtakDto.setDatoforrigeperiode(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
         SED sed = sedMapper.mapTilSed(sedData);
-        assertThat(MedlemskapA003.class).isEqualTo(sed.getMedlemskap().getClass());
+
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
 
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
 
