@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.jobs;
 
-import no.nav.melosys.eessi.closebuc.BucLukker;
 import no.nav.melosys.eessi.models.BucType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import no.nav.melosys.eessi.service.buc.BucLukker;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 

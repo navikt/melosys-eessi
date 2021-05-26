@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import no.nav.melosys.eessi.closebuc.BucLukker;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.service.buc.BucLukker;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 @Service
 @Slf4j

@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.closebuc;
+package no.nav.melosys.eessi.service.buc;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;

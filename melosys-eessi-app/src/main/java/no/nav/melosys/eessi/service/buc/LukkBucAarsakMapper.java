@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.closebuc;
+package no.nav.melosys.eessi.service.buc;
 
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
