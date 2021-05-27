@@ -7,6 +7,7 @@ import java.util.Map;
 import no.nav.melosys.eessi.service.buc.KopierBucService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @Protected
@@ -20,7 +21,7 @@ public class KopierBucController {
     }
 
     @PostMapping("/bucer/kopier")
-    public Map<String, String> kopierOverBUCer(Collection<String> bucer) {
+    public Map<String, String> kopierOverBUCer(@RequestBody Collection<String> bucer) {
         var saker = new HashMap<String, String>();
         for (var rinaSaksnummer : bucer) {
             String resultat;
