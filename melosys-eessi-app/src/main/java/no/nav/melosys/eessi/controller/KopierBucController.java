@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import no.nav.melosys.eessi.service.buc.KopierBucService;
+import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Protected
 @RestController
 public class KopierBucController {
 
