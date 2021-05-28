@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
+import java.util.Optional;
 import java.util.Set;
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
@@ -19,26 +20,24 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
     @Override
     public MedlemskapA010 getMedlemskap(SedDataDto sedData) {
         MedlemskapA010 medlemskap = new MedlemskapA010();
-        Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
+        Optional<Lovvalgsperiode> lovvalgsperiode = sedData.finnLovvalgsperiode();
 
-        if (lovvalgsperiode != null) {
-            medlemskap.setMeldingomlovvalg(hentMeldingOmLovvalg(lovvalgsperiode));
-        }
+        lovvalgsperiode.ifPresent(value -> medlemskap.setMeldingomlovvalg(hentMeldingOmLovvalg(value)));
 
-        medlemskap.setVedtak(hentVedtak(lovvalgsperiode, sedData));
+        medlemskap.setVedtak(hentVedtak(sedData));
         medlemskap.setAndreland(getAndreland(sedData));
         return medlemskap;
     }
 
-    private VedtakA010 hentVedtak(Lovvalgsperiode lovvalgsperiode,SedDataDto sedDataDto){
+    private VedtakA010 hentVedtak(SedDataDto sedDataDto){
         VedtakA010 vedtak = new VedtakA010();
-
-        if (lovvalgsperiode != null){
-            vedtak.setGjelderperiode(hentPeriode(lovvalgsperiode));
-            vedtak.setLand(lovvalgsperiode.getLovvalgsland());
+        final Optional<Lovvalgsperiode> lovvalgsperiode = sedDataDto.finnLovvalgsperiode();
+        if (lovvalgsperiode.isPresent()){
+            vedtak.setGjelderperiode(hentPeriode(lovvalgsperiode.get()));
+            vedtak.setLand(lovvalgsperiode.get().getLovvalgsland());
         }
 
-        setVedtaksInfo(vedtak, sedDataDto.getVedtakDto());
+        setVedtaksdata(vedtak, sedDataDto.getVedtakDto());
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
         return vedtak;
     }

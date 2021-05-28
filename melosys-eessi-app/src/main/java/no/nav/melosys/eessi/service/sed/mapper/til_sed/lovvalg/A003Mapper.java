@@ -8,6 +8,8 @@ import no.nav.melosys.eessi.models.sed.nav.Andreland;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
 
+import java.util.Optional;
+
 public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
     @Override
@@ -27,15 +29,15 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
     private VedtakA003 getVedtak(SedDataDto sedData) {
         VedtakA003 vedtak = new VedtakA003();
-        final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
+        final Optional<Lovvalgsperiode> lovvalgsperiode = sedData.finnLovvalgsperiode();
 
-        if (!sedData.getLovvalgsperioder().isEmpty()) {
-            vedtak.setLand(lovvalgsperiode.getLovvalgsland());
-            vedtak.setGjelderperiode(getPeriode(lovvalgsperiode));
+        if (lovvalgsperiode.isPresent()) {
+            vedtak.setLand(lovvalgsperiode.get().getLovvalgsland());
+            vedtak.setGjelderperiode(getPeriode(lovvalgsperiode.get()));
         }
 
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
-        setVedtaksInfo(vedtak,sedData.getVedtakDto());
+        setVedtaksdata(vedtak,sedData.getVedtakDto());
 
         return vedtak;
     }

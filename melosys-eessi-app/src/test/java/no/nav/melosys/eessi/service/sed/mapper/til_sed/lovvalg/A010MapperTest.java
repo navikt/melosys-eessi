@@ -75,8 +75,8 @@ public class A010MapperTest {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
         VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setFoerstegangsvedtak(false);
-        vedtakDto.setDatoforrigeperiode(LocalDate.now());
+        vedtakDto.setErFørstegangsvedtak(false);
+        vedtakDto.setDatoForrigeVedtak(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
         SED sed = a010Mapper.mapTilSed(sedData);
 

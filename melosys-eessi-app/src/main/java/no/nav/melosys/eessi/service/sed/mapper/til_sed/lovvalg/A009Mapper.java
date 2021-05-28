@@ -9,6 +9,8 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
+import java.util.Optional;
+
 public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     @Override
@@ -24,23 +26,23 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     private VedtakA009 getVedtak(SedDataDto sedDataDto){
         VedtakA009 vedtak = new VedtakA009();
-        final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedDataDto);
+        final Optional<Lovvalgsperiode> lovvalgsperiode = sedDataDto.finnLovvalgsperiode();
         Periode gjelderperiode = new Periode();
 
-        if (!sedDataDto.getLovvalgsperioder().isEmpty()){
-            vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
+        if (lovvalgsperiode.isPresent()){
+            vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.get().getLovvalgsland()));
 
             //Vil alltid være fast periode
-            gjelderperiode.setFastperiode(lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode));
+            gjelderperiode.setFastperiode(lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode.get()));
 
-            if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.getBestemmelse())) {
-                throw new MappingException("Lovvalgsbestemmelse is not of article 12!");
+            if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.get().getBestemmelse())) {
+                throw new MappingException("Lovvalgsbestemmelse er ikke av artikkel 12!");
             }
-            vedtak.setArtikkelforordning(lovvalgsperiode.getBestemmelse().getValue());
+            vedtak.setArtikkelforordning(lovvalgsperiode.get().getBestemmelse().getValue());
 
         }
 
-        setVedtaksInfo(vedtak,sedDataDto.getVedtakDto());
+        setVedtaksdata(vedtak,sedDataDto.getVedtakDto());
         vedtak.setGjeldervarighetyrkesaktivitet("nei");
         vedtak.setGjelderperiode(gjelderperiode);
         return vedtak;

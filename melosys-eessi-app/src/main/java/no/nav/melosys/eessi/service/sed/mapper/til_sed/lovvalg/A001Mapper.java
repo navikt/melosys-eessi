@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
@@ -19,13 +20,13 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
     public MedlemskapA001 getMedlemskap(SedDataDto sedData) {
 
         final MedlemskapA001 medlemskap = new MedlemskapA001();
-        final Lovvalgsperiode lovvalgsperiode = getLovvalgsperiode(sedData);
+        final Optional<Lovvalgsperiode> lovvalgsperiode = sedData.finnLovvalgsperiode();
 
-        if (!sedData.getLovvalgsperioder().isEmpty()) {
-            medlemskap.setUnntak(getUnntak(lovvalgsperiode));
-            medlemskap.setNaavaerendemedlemskap(getLovvalgsland(lovvalgsperiode));
-            medlemskap.setForespurtmedlemskap(getLovvalgsland(lovvalgsperiode));
-            medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode));
+        if (lovvalgsperiode.isPresent()) {
+            medlemskap.setUnntak(getUnntak(lovvalgsperiode.get()));
+            medlemskap.setNaavaerendemedlemskap(getLovvalgsland(lovvalgsperiode.get()));
+            medlemskap.setForespurtmedlemskap(getLovvalgsland(lovvalgsperiode.get()));
+            medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode.get()));
             medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
         }
 

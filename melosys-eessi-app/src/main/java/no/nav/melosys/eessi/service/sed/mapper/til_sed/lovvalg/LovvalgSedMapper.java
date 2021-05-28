@@ -23,14 +23,14 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
         return sed;
     }
 
-    default void setVedtaksInfo(Vedtak vedtaksInformasjon, VedtakDto vedtakDto) {
+    default void setVedtaksdata(Vedtak vedtak, VedtakDto vedtakDto) {
         if (vedtakDto != null) {
-            if (!vedtakDto.isFoerstegangsvedtak()) {
-                vedtaksInformasjon.setEropprinneligvedtak("nei");
-                vedtaksInformasjon.setDatoforrigevedtak(vedtakDto.getDatoforrigeperiode().toString());
+            if (!vedtakDto.isErFørstegangsvedtak()) {
+                vedtak.setEropprinneligvedtak("nei");
+                vedtak.setDatoforrigevedtak(vedtakDto.getDatoForrigeVedtak().toString());
             }
         } else {
-            vedtaksInformasjon.setEropprinneligvedtak("ja");
+            vedtak.setEropprinneligvedtak("ja");
         }
     }
 

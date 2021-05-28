@@ -20,6 +20,6 @@ public class VedtakDto {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate datoforrigeperiode;
-    private boolean foerstegangsvedtak;
+    private LocalDate datoForrigeVedtak;
+    private boolean erFørstegangsvedtak;
 }

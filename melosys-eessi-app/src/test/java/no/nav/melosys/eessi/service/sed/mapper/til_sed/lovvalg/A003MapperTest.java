@@ -44,8 +44,8 @@ public class A003MapperTest {
     @Test
     public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
         VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setFoerstegangsvedtak(false);
-        vedtakDto.setDatoforrigeperiode(LocalDate.now());
+        vedtakDto.setErFørstegangsvedtak(false);
+        vedtakDto.setDatoForrigeVedtak(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
         SED sed = sedMapper.mapTilSed(sedData);
 

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class A009MapperTest {
 
@@ -59,8 +60,8 @@ public class A009MapperTest {
     @Test
     public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
         VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setFoerstegangsvedtak(false);
-        vedtakDto.setDatoforrigeperiode(LocalDate.now());
+        vedtakDto.setErFørstegangsvedtak(false);
+        vedtakDto.setDatoForrigeVedtak(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
         SED sed = a009Mapper.mapTilSed(sedData);
 
@@ -93,13 +94,16 @@ public class A009MapperTest {
     @Test
     public void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
-        Assertions.assertThrows(MappingException.class,() -> a009Mapper.mapTilSed(sedData));
+        assertThatExceptionOfType(MappingException.class)
+                .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
+                .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
     }
 
     @Test
     public void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
-        Assertions.assertThrows(NullPointerException.class,() -> a009Mapper.mapTilSed(sedData));
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
     }
 
     @Test
