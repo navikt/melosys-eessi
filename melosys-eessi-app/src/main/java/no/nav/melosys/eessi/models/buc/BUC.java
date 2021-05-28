@@ -82,7 +82,7 @@ public class BUC {
                 .isPresent();
     }
 
-    public boolean kanLukkes() {
+    public boolean kanLukkesAutomatisk() {
         var bucTypeEnum = BucType.valueOf(getBucType());
 
         if (bucTypeEnum == BucType.LA_BUC_06) {

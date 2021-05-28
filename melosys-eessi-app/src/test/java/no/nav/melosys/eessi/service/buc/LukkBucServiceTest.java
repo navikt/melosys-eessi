@@ -346,6 +346,34 @@ class LukkBucServiceTest {
         verify(euxService).opprettOgSendSed(any(), eq(buc.getId()));
     }
 
+    @Test
+    void forsøkLukkBuc_ingenActionForX001_lukkerIkkeBUC() {
+        final var buc = lagBuc();
+        buc.getActions().clear();
+        final var rinaSaksnummer = buc.getId();
+        when(euxService.hentBuc(rinaSaksnummer)).thenReturn(buc);
+
+        lukkBucService.forsøkLukkBuc(rinaSaksnummer);
+
+        verify(euxService, never()).sendSed(any(), any());
+    }
+
+    @Test
+    void forsøkLukkBuc_actionForX001Finnes_lukkerBUC() {
+        final var buc = lagBuc();
+        final var rinaSaksnummer = buc.getId();
+        final var sed = new SED();
+        sed.setNav(enhancedRandom.nextObject(Nav.class));
+        sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
+
+        when(euxService.hentSed(eq(rinaSaksnummer), anyString())).thenReturn(sed);
+        when(euxService.hentBuc(rinaSaksnummer)).thenReturn(buc);
+
+        lukkBucService.forsøkLukkBuc(rinaSaksnummer);
+
+        verify(euxService).opprettOgSendSed(any(SED.class), eq(rinaSaksnummer));
+    }
+
     private BUC lagBuc() {
         return lagBuc(BucType.LA_BUC_04, SedType.A009);
     }
