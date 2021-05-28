@@ -33,20 +33,20 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BucLukkerTest {
+class LukkBucServiceTest {
 
     @Mock
     private EuxService euxService;
     @Mock
     private BucMetrikker bucMetrikker;
 
-    private BucLukker bucLukker;
+    private LukkBucService lukkBucService;
 
     private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
     @BeforeEach
     public void setup() {
-        bucLukker = new BucLukker(euxService, bucMetrikker);
+        lukkBucService = new LukkBucService(euxService, bucMetrikker);
     }
 
     @Test
@@ -69,7 +69,7 @@ class BucLukkerTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -104,7 +104,7 @@ class BucLukkerTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -116,7 +116,7 @@ class BucLukkerTest {
     @Test
     void lukkBucerAvType_feilVedHentingAvBucer_ingenVidereKall() {
         when(euxService.hentBucer(any(BucSearch.class))).thenThrow(new IntegrationException(""));
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
         verify(euxService, never()).hentBuc(anyString());
     }
 
@@ -133,7 +133,7 @@ class BucLukkerTest {
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
         when(euxService.hentBuc(any())).thenThrow(new IntegrationException(""));
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBuc(anyString());
         verify(euxService, never()).hentSed(anyString(), anyString());
@@ -155,7 +155,7 @@ class BucLukkerTest {
         when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
         when(euxService.hentSed(anyString(), anyString())).thenThrow(new IntegrationException(""));
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -193,7 +193,7 @@ class BucLukkerTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenThrow(new IntegrationException(""));
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_04);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -207,7 +207,7 @@ class BucLukkerTest {
         bucInfo.setStatus("closed");
 
         when(euxService.hentBucer(any())).thenReturn(List.of(bucInfo));
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_02);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_02);
         verify(euxService, never()).hentBuc(any());
     }
 
@@ -238,7 +238,7 @@ class BucLukkerTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_06);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_06);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -260,7 +260,7 @@ class BucLukkerTest {
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
         when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_06);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_06);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -280,7 +280,7 @@ class BucLukkerTest {
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
         when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_01);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -306,7 +306,7 @@ class BucLukkerTest {
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
         when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_01);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());
@@ -339,7 +339,7 @@ class BucLukkerTest {
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
         when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
 
-        bucLukker.lukkBucerAvType(BucType.LA_BUC_01);
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
         verify(euxService).hentBuc(bucInfo.getId());

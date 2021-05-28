@@ -5,18 +5,18 @@ import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.service.buc.BucLukker;
+import no.nav.melosys.eessi.service.buc.LukkBucService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-@Service
 @Slf4j
+@Component
 public class LukkBucJobb {
 
-    private final BucLukker bucLukker;
+    private final LukkBucService lukkBucService;
 
-    public LukkBucJobb(BucLukker bucLukker) {
-        this.bucLukker = bucLukker;
+    public LukkBucJobb(LukkBucService lukkBucService) {
+        this.lukkBucService = lukkBucService;
     }
 
     //00:00 hver dag
@@ -26,6 +26,6 @@ public class LukkBucJobb {
 
         Arrays.stream(BucType.values())
                 .filter(bucType -> bucType != BucType.LA_BUC_01 && bucType.erLovvalgBuc())
-                .forEach(bucLukker::lukkBucerAvType);
+                .forEach(lukkBucService::lukkBucerAvType);
     }
 }

@@ -21,13 +21,13 @@ import static no.nav.melosys.eessi.models.buc.SedVersjonSjekker.verifiserSedVers
 
 @Service
 @Slf4j
-public class BucLukker {
+public class LukkBucService {
 
     private final EuxService euxService;
     private final X001Mapper x001Mapper;
     private final BucMetrikker bucMetrikker;
 
-    public BucLukker(EuxService euxService, BucMetrikker bucMetrikker) {
+    public LukkBucService(EuxService euxService, BucMetrikker bucMetrikker) {
         this.euxService = euxService;
         this.x001Mapper = new X001Mapper();
         this.bucMetrikker = bucMetrikker;
