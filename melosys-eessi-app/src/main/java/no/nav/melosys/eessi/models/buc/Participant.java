@@ -18,10 +18,16 @@ public class Participant {
         @JsonProperty("Participant")
         DELTAKER,
         @JsonProperty("CounterParty")
-        MOTPART
+        MOTPART,
+        @JsonProperty("CaseOwner")
+        SAKSEIER
     }
 
     private ParticipantRole role;
     private Organisation organisation;
+
+    public boolean erMotpart() {
+        return role == ParticipantRole.MOTPART;
+    }
 }
 

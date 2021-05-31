@@ -1,10 +1,9 @@
 package no.nav.melosys.eessi.models.buc;
 
 import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -32,6 +31,8 @@ public class BUC {
     private String bucType;
     @JsonProperty(value = "processDefinitionVersion")
     private String bucVersjon;
+    private Collection<Participant> participants;
+    private String internationalId;
 
     public boolean kanOppretteEllerOppdatereSed(SedType sedType) {
         return actions.stream().anyMatch(action ->
@@ -107,5 +108,12 @@ public class BUC {
                 .filter(Document::erOpprettet)
                 .filter(documentPredicate)
                 .max(Comparator.comparing(Document::getLastUpdate));
+    }
+
+    public Set<String> hentMottakere() {
+        return participants.stream()
+                .filter(Participant::erMotpart)
+                .map(p -> p.getOrganisation().getId())
+                .collect(Collectors.toSet());
     }
 }
