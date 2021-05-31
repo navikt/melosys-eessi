@@ -1,8 +1,10 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
+import no.nav.melosys.eessi.models.sed.nav.Vedtak;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 
 /**
@@ -21,5 +23,17 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
         return sed;
     }
 
+    default void setVedtaksdata(Vedtak vedtak, VedtakDto vedtakDto) {
+        if (vedtakDto != null) {
+            if (!vedtakDto.isErFørstegangsvedtak()) {
+                vedtak.setEropprinneligvedtak("nei");
+                vedtak.setDatoforrigevedtak(vedtakDto.getDatoForrigeVedtak().toString());
+            }
+        } else {
+            vedtak.setEropprinneligvedtak("ja");
+        }
+    }
+
     T getMedlemskap(SedDataDto sedData);
+
 }

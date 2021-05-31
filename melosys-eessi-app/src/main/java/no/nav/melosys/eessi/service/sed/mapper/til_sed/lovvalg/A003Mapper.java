@@ -3,11 +3,12 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.Andreland;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
+
+import java.util.Optional;
 
 public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
@@ -16,25 +17,27 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 
         MedlemskapA003 medlemskap = new MedlemskapA003();
 
+        medlemskap.setVedtak(getVedtak(sedData));
+        medlemskap.setAndreland(getAndreLand(sedData));
+
         if (!sedData.getLovvalgsperioder().isEmpty()) {
-            medlemskap.setVedtak(getVedtak(sedData));
             medlemskap.setRelevantartikkelfor8832004eller9872009(sedData.getLovvalgsperioder().get(0).getBestemmelse().getValue());
-            medlemskap.setAndreland(getAndreLand(sedData));
         }
 
         return medlemskap;
     }
 
     private VedtakA003 getVedtak(SedDataDto sedData) {
-
-        Lovvalgsperiode lovvalgsperiode = sedData.getLovvalgsperioder().stream().findFirst()
-                .orElseThrow(() -> new MappingException("Finner ingen lovvalgsperiode"));
-
         VedtakA003 vedtak = new VedtakA003();
-        vedtak.setLand(lovvalgsperiode.getLovvalgsland());
-        vedtak.setGjelderperiode(getPeriode(lovvalgsperiode));
+        final Optional<Lovvalgsperiode> lovvalgsperiode = sedData.finnLovvalgsperiode();
+
+        if (lovvalgsperiode.isPresent()) {
+            vedtak.setLand(lovvalgsperiode.get().getLovvalgsland());
+            vedtak.setGjelderperiode(getPeriode(lovvalgsperiode.get()));
+        }
+
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
-        vedtak.setEropprinneligvedtak("ja");
+        setVedtaksdata(vedtak, sedData.getVedtakDto());
 
         return vedtak;
     }
