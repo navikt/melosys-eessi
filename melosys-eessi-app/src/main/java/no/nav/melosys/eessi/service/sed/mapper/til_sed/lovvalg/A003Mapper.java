@@ -37,7 +37,7 @@ public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
         }
 
         vedtak.setGjeldervarighetyrkesaktivitet("ja");
-        setVedtaksdata(vedtak,sedData.getVedtakDto());
+        setVedtaksdata(vedtak, sedData.getVedtakDto());
 
         return vedtak;
     }

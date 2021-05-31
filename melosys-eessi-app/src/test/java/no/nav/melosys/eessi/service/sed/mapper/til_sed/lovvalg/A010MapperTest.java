@@ -71,7 +71,7 @@ public class A010MapperTest {
     }
 
     @Test
-    public void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
+    public void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
         VedtakDto vedtakDto = new VedtakDto();

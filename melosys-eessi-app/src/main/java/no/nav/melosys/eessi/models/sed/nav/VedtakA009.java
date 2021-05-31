@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude(Include.NON_NULL)
 @Data
-public class VedtakA009 extends Vedtak{
+public class VedtakA009 extends Vedtak {
 
     private String artikkelforordning;
 

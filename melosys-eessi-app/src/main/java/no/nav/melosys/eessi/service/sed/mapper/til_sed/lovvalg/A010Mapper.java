@@ -29,10 +29,10 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
         return medlemskap;
     }
 
-    private VedtakA010 hentVedtak(SedDataDto sedDataDto){
+    private VedtakA010 hentVedtak(SedDataDto sedDataDto) {
         VedtakA010 vedtak = new VedtakA010();
         final Optional<Lovvalgsperiode> lovvalgsperiode = sedDataDto.finnLovvalgsperiode();
-        if (lovvalgsperiode.isPresent()){
+        if (lovvalgsperiode.isPresent()) {
             vedtak.setGjelderperiode(hentPeriode(lovvalgsperiode.get()));
             vedtak.setLand(lovvalgsperiode.get().getLovvalgsland());
         }
@@ -52,7 +52,7 @@ public class A010Mapper implements LovvalgSedMapper<MedlemskapA010> {
     private MeldingOmLovvalg hentMeldingOmLovvalg(Lovvalgsperiode lovvalgsperiode) {
         MeldingOmLovvalg meldingOmLovvalg = new MeldingOmLovvalg();
         meldingOmLovvalg.setArtikkel(tilA010Bestemmelse(lovvalgsperiode));
-        return  meldingOmLovvalg;
+        return meldingOmLovvalg;
     }
 
     private String tilA010Bestemmelse(Lovvalgsperiode lovvalgsperiode) {

@@ -42,7 +42,7 @@ public class A003MapperTest {
     }
 
     @Test
-    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull(){
+    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
         VedtakDto vedtakDto = new VedtakDto();
         vedtakDto.setErFørstegangsvedtak(false);
         vedtakDto.setDatoForrigeVedtak(LocalDate.now());

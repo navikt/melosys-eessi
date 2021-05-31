@@ -24,12 +24,12 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         return medlemskapA009;
     }
 
-    private VedtakA009 getVedtak(SedDataDto sedDataDto){
+    private VedtakA009 getVedtak(SedDataDto sedDataDto) {
         VedtakA009 vedtak = new VedtakA009();
         final Optional<Lovvalgsperiode> lovvalgsperiode = sedDataDto.finnLovvalgsperiode();
         Periode gjelderperiode = new Periode();
 
-        if (lovvalgsperiode.isPresent()){
+        if (lovvalgsperiode.isPresent()) {
             vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.get().getLovvalgsland()));
 
             //Vil alltid være fast periode
@@ -42,14 +42,14 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
         }
 
-        setVedtaksdata(vedtak,sedDataDto.getVedtakDto());
+        setVedtaksdata(vedtak, sedDataDto.getVedtakDto());
         vedtak.setGjeldervarighetyrkesaktivitet("nei");
         vedtak.setGjelderperiode(gjelderperiode);
         return vedtak;
     }
 
 
-    private Fastperiode lagFastPeriodeFraLovvalgsPeriode(Lovvalgsperiode lovvalgsperiode){
+    private Fastperiode lagFastPeriodeFraLovvalgsPeriode(Lovvalgsperiode lovvalgsperiode) {
         Fastperiode fastperiode = new Fastperiode();
         fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
         fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
