@@ -38,3 +38,6 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: nais
+  ingresses:
+    - {{ingress}}
+

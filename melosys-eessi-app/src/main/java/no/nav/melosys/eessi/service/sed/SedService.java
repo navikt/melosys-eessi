@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import static no.nav.melosys.eessi.models.buc.BucUtils.verifiserSedVersjonErBucVersjon;
+import static no.nav.melosys.eessi.models.buc.SedVersjonSjekker.verifiserSedVersjonErBucVersjon;
 
 @Slf4j
 @Service
@@ -121,7 +121,7 @@ public class SedService {
 
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
-        if (!buc.kanOppretteSed(sedType)) {
+        if (!buc.kanOppretteEllerOppdatereSed(sedType)) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc "+ rinaSaksnummer + " med type " + buc.getBucType());
         }
 

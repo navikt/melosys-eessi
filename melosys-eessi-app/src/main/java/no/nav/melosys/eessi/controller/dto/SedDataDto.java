@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.controller.dto;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,9 @@ public class SedDataDto extends SedGrunnlagDto {
 
     //A008 spesifikt
     private String avklartBostedsland;
+
+    //A010, A009, A003 spesifikt
+    private VedtakDto vedtakDto;
 
     //Lovvalg
     private List<Lovvalgsperiode> tidligereLovvalgsperioder;
@@ -38,5 +42,10 @@ public class SedDataDto extends SedGrunnlagDto {
 
     public String finnLovvalgslandDefaultNO() {
         return finnLovvalgsland().orElse("NO");
+    }
+
+    public Optional<Lovvalgsperiode> finnLovvalgsperiode(){
+        return getLovvalgsperioder().stream()
+                .max(Comparator.comparing(Lovvalgsperiode::getFom));
     }
 }
