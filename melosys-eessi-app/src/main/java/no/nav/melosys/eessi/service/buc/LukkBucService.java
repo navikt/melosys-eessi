@@ -52,13 +52,22 @@ public class LukkBucService {
         }
     }
 
-    public void forsøkLukkBuc(final String rinaSaksnummer) {
-        finnBuc(rinaSaksnummer)
-                .filter(b -> b.kanOppretteEllerOppdatereSed(SedType.X001))
-                .ifPresentOrElse(
-                        this::lukkBuc,
-                        () -> log.info("Ikke mulig å opprette X001 i rina-sak {}", rinaSaksnummer)
-                );
+    /*
+    Async for at ekstern tjeneste ikke skal trenge å vente på resultat herfra.
+    Blir kalt eksternt for å indikere at en tilhørende behandling er avsluttet, og at man kan anse utveksling som ferdig.
+    Kan fortsatt ikke garantere at RINA har tilgjengeliggjort lukking av BUCen (create X001)
+     */
+    public void forsøkLukkBucAsync(final String rinaSaksnummer) {
+        try {
+            finnBuc(rinaSaksnummer)
+                    .filter(b -> b.kanOppretteEllerOppdatereSed(SedType.X001))
+                    .ifPresentOrElse(
+                            this::lukkBuc,
+                            () -> log.info("Ikke mulig å opprette X001 i rina-sak {}", rinaSaksnummer)
+                    );
+        } catch (Exception e) {
+            log.warn("Feil ved forsøk av lukking av BUC {}", rinaSaksnummer);
+        }
     }
 
     private void lukkBuc(BUC buc) {

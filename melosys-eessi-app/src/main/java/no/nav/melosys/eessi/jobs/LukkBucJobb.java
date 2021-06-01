@@ -28,11 +28,11 @@ public class LukkBucJobb {
     public void lukkBuc() {
 
         Arrays.stream(BucType.values())
-                .filter(this::lukkBucPredicate)
+                .filter(this::bucKanLukkes)
                 .forEach(lukkBucService::lukkBucerAvType);
     }
 
-    private boolean lukkBucPredicate(BucType bucType) {
+    private boolean bucKanLukkes(BucType bucType) {
         return unleash.isEnabled("melosys.eessi.lukk_la_buc_01_automatisk")
                 ? bucType.erLovvalgBuc()
                 : bucType.erLovvalgBuc() && bucType != BucType.LA_BUC_01;
