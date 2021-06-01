@@ -1,31 +1,49 @@
 package no.nav.melosys.eessi.jobs;
 
-import no.nav.melosys.eessi.closebuc.BucLukker;
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.models.BucType;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import no.nav.melosys.eessi.service.buc.LukkBucService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
-public class LukkBucJobbTest {
+@ExtendWith(MockitoExtension.class)
+class LukkBucJobbTest {
 
     @Mock
-    private BucLukker bucLukker;
-    @InjectMocks
+    private LukkBucService lukkBucService;
+    private FakeUnleash fakeUnleash = new FakeUnleash();
+
     private LukkBucJobb lukkBucJobb;
 
-    @Test
-    public void closeBuc_verifiserKorrekteBucTyperSkalLukkes() {
-        lukkBucJobb.closeBuc();
-
-        verify(bucLukker).lukkBucerAvType(BucType.LA_BUC_02);
-        verify(bucLukker).lukkBucerAvType(BucType.LA_BUC_03);
-        verify(bucLukker).lukkBucerAvType(BucType.LA_BUC_04);
-        verify(bucLukker).lukkBucerAvType(BucType.LA_BUC_05);
-        verify(bucLukker).lukkBucerAvType(BucType.LA_BUC_06);
+    @BeforeEach
+    void setup() {
+        lukkBucJobb = new LukkBucJobb(lukkBucService, fakeUnleash);
     }
+
+    @Test
+    void lukkBuc_featureTogglePå_alleLovvalgBucLukkes() {
+        fakeUnleash.enableAll();
+        lukkBucJobb.lukkBuc();
+
+        verify(lukkBucService).lukkBucerAvType(BucType.LA_BUC_01);
+        verify(lukkBucService).lukkBucerAvType(BucType.LA_BUC_02);
+        verify(lukkBucService).lukkBucerAvType(BucType.LA_BUC_03);
+        verify(lukkBucService).lukkBucerAvType(BucType.LA_BUC_04);
+        verify(lukkBucService).lukkBucerAvType(BucType.LA_BUC_05);
+        verify(lukkBucService).lukkBucerAvType(BucType.LA_BUC_06);
+    }
+
+    @Test
+    void lukkBuc_featureToggleAv_LaBuc01LukkesIkke() {
+        fakeUnleash.disableAll();
+        lukkBucJobb.lukkBuc();
+        verify(lukkBucService, never()).lukkBucerAvType(BucType.LA_BUC_01);
+    }
+
 }

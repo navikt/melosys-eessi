@@ -133,6 +133,11 @@
             <artifactId>hibernate-types-52</artifactId>
             <version>${hibernate-types.version}</version>
         </dependency>
+        <dependency>
+            <groupId>no.finn.unleash</groupId>
+            <artifactId>unleash-client-java</artifactId>
+            <version>${unleash.version}</version>
+        </dependency>
 
         <!-- TEST -->
         <dependency>

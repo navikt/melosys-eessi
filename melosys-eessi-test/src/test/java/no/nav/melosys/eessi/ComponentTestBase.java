@@ -3,6 +3,7 @@ package no.nav.melosys.eessi;
 import java.time.LocalDate;
 
 import lombok.SneakyThrows;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -72,6 +73,9 @@ public abstract class ComponentTestBase {
     @MockBean
     PDLConsumer pdlConsumer;
 
+    @MockBean
+    Unleash unleash;
+
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -99,6 +103,6 @@ public abstract class ComponentTestBase {
     protected void mockPerson(String ident, String aktørID) {
         when(pdlConsumer.hentIdenter(ident)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
         when(pdlConsumer.hentIdenter(aktørID)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
-        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
+        when(pdlConsumer.hentPerson(ident)).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
     }
 }
