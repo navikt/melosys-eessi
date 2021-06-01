@@ -14,6 +14,11 @@ public class LukkBucAsyncService {
         this.lukkBucService = lukkBucService;
     }
 
+    /*
+    Async for at ekstern tjeneste ikke skal trenge å vente på resultat herfra.
+    Blir kalt eksternt for å indikere at en tilhørende behandling er avsluttet, og at man kan anse utveksling som ferdig.
+    Kan fortsatt ikke garantere at RINA har tilgjengeliggjort lukking av BUCen (create X001)
+     */
     @Async
     public void forsøkLukkBUCAsync(String rinaSaksnummer) {
         try {
