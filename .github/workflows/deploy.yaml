@@ -119,7 +119,7 @@ jobs:
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
         if: success()
-        uses: rtCamp/action-slack-notify@v1.0.0
+        uses: rtCamp/action-slack-notify@v2.1.3
         env:
           SLACK_COLOR: good
           SLACK_USERNAME: Github Actions
@@ -129,7 +129,7 @@ jobs:
           SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
       - name: Slack Notification (deploy failure)
         if: failure()
-        uses: rtCamp/action-slack-notify@v1.0.0
+        uses: rtCamp/action-slack-notify@v2.1.3
         env:
           SLACK_COLOR: danger
           SLACK_USERNAME: Github Actions
