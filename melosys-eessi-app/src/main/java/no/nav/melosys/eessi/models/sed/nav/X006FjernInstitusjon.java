@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class X006Fjerninstitusjon {
+public class X006FjernInstitusjon {
 
     private Institusjon institusjon;
 }
