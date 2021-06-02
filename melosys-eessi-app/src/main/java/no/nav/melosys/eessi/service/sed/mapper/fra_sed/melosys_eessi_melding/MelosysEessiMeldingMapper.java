@@ -35,9 +35,15 @@ public interface MelosysEessiMeldingMapper {
                     mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
             );
         }
+
+        if (inneholderInstitusjon(sed)) {
+            melosysEessiMelding.setInstitusjon(sed.getNav().getSak().getFjerninstitusjon().getInstitusjon());
+        }
+
         if (sed.getNav() != null && sed.getNav().getArbeidssted() != null) {
             melosysEessiMelding.setArbeidssteder(sed.getNav().getArbeidssted().stream().map(Arbeidssted::new).collect(Collectors.toList()));
         }
+
         melosysEessiMelding.setErEndring(sedErEndring);
         melosysEessiMelding.setSedVersjon(sedVersjon);
         return melosysEessiMelding;
@@ -48,6 +54,13 @@ public interface MelosysEessiMeldingMapper {
                 && sed.getNav().getBruker() != null
                 && sed.getNav().getBruker().getPerson() != null
                 && sed.getNav().getBruker().getPerson().getStatsborgerskap() != null;
+    }
+
+    default boolean inneholderInstitusjon(SED sed) {
+        return sed.getNav() != null
+                && sed.getNav().getSak() != null
+                && sed.getNav().getSak().getFjerninstitusjon() != null
+                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null;
     }
 
     default List<Statsborgerskap> mapStatsborgerskap(Collection<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {

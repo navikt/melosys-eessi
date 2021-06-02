@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 
 @Data
 public class MelosysEessiMelding {
@@ -29,4 +30,5 @@ public class MelosysEessiMelding {
 
     private SvarAnmodningUnntak svarAnmodningUnntak;
     private AnmodningUnntak anmodningUnntak;
+    private Institusjon institusjon;
 }

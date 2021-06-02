@@ -11,5 +11,5 @@ public class Sak {
 
     private Kontekst kontekst;
 
-    private X006Fjerninstitusjon fjerninstitusjon;
+    private X006FjernInstitusjon fjerninstitusjon;
 }
