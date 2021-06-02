@@ -1,0 +1,61 @@
+{
+  "X006": {
+    "sedGVer": "$sedGVer",
+    "sedVer": "$sedVer",
+    "CaseContext": {
+      "PersonContext": {
+        "familyName": "$nav.sak.kontekst.bruker.person.etternavn",
+        "forename": "$nav.sak.kontekst.bruker.person.fornavn",
+        "dateBirth": "$nav.sak.kontekst.bruker.person.foedselsdato",
+        "sex": {
+          "value": [
+            "$nav.sak.kontekst.bruker.person.kjoenn"
+          ]
+        }
+      },
+      "EmployerContext": {
+        "name": "$nav.sak.kontekst.arbeidsgiver.navn",
+        "IdentificationNumbers": {
+          "IdentificationNumber": [
+            {
+              "number": "$nav.sak.kontekst.arbeidsgiver.identifikator[x].id",
+              "type": {
+                "value": [
+                  "$nav.sak.kontekst.arbeidsgiver.identifikator[x].type"
+                ]
+              }
+            }
+          ]
+        },
+        "Address": {
+          "street": "$nav.sak.kontekst.arbeidsgiver.adresse.gate",
+          "buildingName": "$nav.sak.kontekst.arbeidsgiver.adresse.bygning",
+          "town": "$nav.sak.kontekst.arbeidsgiver.adresse.by",
+          "postalCode": "$nav.sak.kontekst.arbeidsgiver.adresse.postnummer",
+          "region": "$nav.sak.kontekst.arbeidsgiver.adresse.region",
+          "country": {
+            "value": [
+              "$nav.sak.kontekst.arbeidsgiver.adresse.land"
+            ]
+          }
+        }
+      },
+      "ReimbursementContext": {
+        "reimbursementRequestID": "$nav.sak.kontekst.refusjonskrav.id",
+        "totalNumberIndividualClaims": "$nav.sak.kontekst.refusjonskrav.antallkrav"
+      }
+    },
+    "RemovedParticipant": {
+      "Institution": {
+        "institutionID": "$nav.sak.fjerninstitusjon.institusjon.id",
+        "institutionName": "$nav.sak.fjerninstitusjon.institusjon.navn"
+      },
+      "reason": {
+        "value": [
+          "$nav.sak.fjerninstitusjon.grunn.type"
+        ]
+      },
+      "pleaseProvideMoreDetailsIf99OtherSelected": "$nav.sak.fjerninstitusjon.grunn.annet"
+    }
+  }
+}

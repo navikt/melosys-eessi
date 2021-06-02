@@ -27,7 +27,7 @@ public class Nav {
     @JsonDeserialize(using = ArbeidsgiverDeserializer.class)
     private List<Arbeidsgiver> arbeidsgiver;
 
-    //Kun for X001
+    //Kun for X001 og X006
     private Sak sak;
 
     private EessiSak eessisak;
