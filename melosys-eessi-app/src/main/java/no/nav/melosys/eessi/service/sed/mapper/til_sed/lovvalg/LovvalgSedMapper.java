@@ -17,20 +17,22 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
     // bør denne metoden overrides.
     @Override
     default SED mapTilSed(SedDataDto sedData) {
-        SED sed = SedMapper.super.mapTilSed(sedData);
+        var sed = SedMapper.super.mapTilSed(sedData);
         sed.setMedlemskap(getMedlemskap(sedData));
 
         return sed;
     }
 
     default void setVedtaksdata(Vedtak vedtak, VedtakDto vedtakDto) {
-        if (vedtakDto != null) {
-            if (!vedtakDto.isErFørstegangsvedtak()) {
-                vedtak.setEropprinneligvedtak("nei");
-                vedtak.setDatoforrigevedtak(vedtakDto.getDatoForrigeVedtak().toString());
-            }
+        if (vedtakDto != null && !vedtakDto.isErFørstegangsvedtak()) {
+            vedtak.setEropprinneligvedtak("nei");
+            vedtak.setErendringsvedtak("nei");
+            vedtak.setDatoforrigevedtak(
+                    vedtakDto.getDatoForrigeVedtak() != null ? vedtakDto.getDatoForrigeVedtak().toString() : null
+            );
         } else {
             vedtak.setEropprinneligvedtak("ja");
+            vedtak.setErendringsvedtak("ja");
         }
     }
 

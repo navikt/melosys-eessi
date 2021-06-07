@@ -6,5 +6,5 @@ import lombok.Data;
 public abstract class Vedtak {
     private String datoforrigevedtak;
     private String eropprinneligvedtak;
-
+    private String erendringsvedtak;
 }

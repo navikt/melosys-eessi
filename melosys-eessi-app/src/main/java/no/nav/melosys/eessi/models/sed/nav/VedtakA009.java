@@ -13,8 +13,6 @@ public class VedtakA009 extends Vedtak {
 
     private String artikkelforordning;
 
-    private String erendringsvedtak;
-
     private Periode gjelderperiode;
 
     private String gjeldervarighetyrkesaktivitet;
