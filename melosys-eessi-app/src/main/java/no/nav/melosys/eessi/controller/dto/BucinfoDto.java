@@ -21,7 +21,7 @@ import no.nav.melosys.eessi.models.buc.Participant;
 public class BucinfoDto {
 
     private String id;
-    private String bucStatus;
+    private boolean erÅpen;
     private String bucType;
     private Long opprettetDato;
     private Set<String> mottakerinstitusjoner;
@@ -30,7 +30,7 @@ public class BucinfoDto {
     public static BucinfoDto av(BUC buc, List<String> statuser, String rinaUrlPrefix) {
         return BucinfoDto.builder()
                 .id(buc.getId())
-                .bucStatus(buc.getStatus())
+                .erÅpen(buc.erÅpen())
                 .bucType(buc.getBucType())
                 .opprettetDato(buc.getStartDate().toInstant().toEpochMilli())
                 .mottakerinstitusjoner(hentMottakerinstitusjonerFraBuc(buc))
