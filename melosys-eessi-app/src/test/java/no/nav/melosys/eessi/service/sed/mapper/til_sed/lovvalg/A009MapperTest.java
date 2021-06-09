@@ -7,27 +7,27 @@ import java.time.LocalDate;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@RunWith(SpringJUnit4ClassRunner.class)
 public class A009MapperTest {
 
-    private A009Mapper a009Mapper = new A009Mapper();
+    private final A009Mapper a009Mapper = new A009Mapper();
 
     private SedDataDto sedData;
 
     private final String lovvalgsland = "NO";
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
 
@@ -42,9 +42,9 @@ public class A009MapperTest {
     public void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
         SED sed = a009Mapper.mapTilSed(sedData);
 
-        assertThat(MedlemskapA009.class).isEqualTo(sed.getMedlemskap().getClass());
-
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
+
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
         assertThat(medlemskapA009).isNotNull();
         assertThat(medlemskapA009.getUtsendingsland()).isNotNull();
@@ -55,6 +55,23 @@ public class A009MapperTest {
         assertThat(medlemskapA009.getVedtak().getArtikkelforordning()).isEqualTo("12_1");
         assertThat(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode()).isNotNull();
         assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
+    }
+
+    @Test
+    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
+        VedtakDto vedtakDto = new VedtakDto();
+        vedtakDto.setErFørstegangsvedtak(false);
+        vedtakDto.setDatoForrigeVedtak(LocalDate.now());
+        sedData.setVedtakDto(vedtakDto);
+        SED sed = a009Mapper.mapTilSed(sedData);
+
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
+
+        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
+
+        assertThat(medlemskapA009).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
 
     @Test
@@ -74,16 +91,19 @@ public class A009MapperTest {
         assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
     }
 
-    @Test(expected = MappingException.class)
+    @Test
     public void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
-        a009Mapper.mapTilSed(sedData);
+        assertThatExceptionOfType(MappingException.class)
+                .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
+                .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
-        a009Mapper.mapTilSed(sedData);
+        assertThatExceptionOfType(NullPointerException.class)
+                .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
     }
 
     @Test

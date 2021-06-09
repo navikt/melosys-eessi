@@ -80,6 +80,9 @@ public abstract class ComponentTestBase {
     @MockBean
     PDLConsumer pdlConsumer;
 
+    @MockBean
+    Unleash unleash;
+
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -110,7 +113,7 @@ public abstract class ComponentTestBase {
     protected void mockPerson(String ident, String aktørID) {
         when(pdlConsumer.hentIdenter(ident)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
         when(pdlConsumer.hentIdenter(aktørID)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
-        when(pdlConsumer.hentPerson(eq(ident))).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
+        when(pdlConsumer.hentPerson(ident)).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
     }
 
     List<ConsumerRecord<Object, Object>> hentRecords() {

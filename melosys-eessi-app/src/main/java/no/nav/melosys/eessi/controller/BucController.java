@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.ValidationException;
-import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.service.buc.LukkBucService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag.SedGrunnlagMapperFactory;
@@ -30,10 +30,14 @@ public class BucController {
 
     private final EuxService euxService;
     private final SedService sedService;
+    private final LukkBucService lukkBucService;
 
-    public BucController(@Qualifier("tokenContext") EuxService euxService, SedService sedService) {
+    public BucController(@Qualifier("tokenContext") EuxService euxService,
+                         SedService sedService,
+                         LukkBucService lukkBucService) {
         this.euxService = euxService;
         this.sedService = sedService;
+        this.lukkBucService = lukkBucService;
     }
 
     @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true. " +
@@ -79,7 +83,13 @@ public class BucController {
     @ApiOperation(value = "Henter sedGrunnlag for gitt sed")
     @GetMapping("/{rinaSaksnummer}/sed/{rinaDokumentId}/grunnlag")
     public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId)  {
-        SED sed = euxService.hentSed(rinaSaksnummer, rinaDokumentId);
+        var sed = euxService.hentSed(rinaSaksnummer, rinaDokumentId);
         return SedGrunnlagMapperFactory.getMapper(SedType.valueOf(sed.getSedType())).map(sed);
+    }
+
+    @ApiOperation(value = "Oppretter en asynkron jobb som forsøker å lukke en spesifikk BUC, om den har actions som tillater det")
+    @PostMapping("/{rinaSaksnummer}/lukk")
+    public void lukkBuc(@PathVariable("rinaSaksnummer") String rinaSaksnummer) {
+        lukkBucService.forsøkLukkBucAsync(rinaSaksnummer);
     }
 }

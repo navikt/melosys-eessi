@@ -255,14 +255,6 @@ public interface SedMapper {
         return List.of(orgNr);
     }
 
-    default Lovvalgsperiode getLovvalgsperiode(SedDataDto sedData) {
-        if (sedData.getLovvalgsperioder().isEmpty()) {
-            return null;
-        }
-
-        return Collections.max(sedData.getLovvalgsperioder(), Comparator.comparing(Lovvalgsperiode::getFom));
-    }
-
     default Periode mapTilPeriodeDto(Lovvalgsperiode lovvalgsperiode) {
         Periode periode = new Periode();
 
