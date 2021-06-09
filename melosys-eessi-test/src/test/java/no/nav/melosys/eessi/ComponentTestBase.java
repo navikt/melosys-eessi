@@ -89,9 +89,6 @@ public abstract class ComponentTestBase {
     @Autowired
     SedMottattRepository sedMottattRepository;
 
-    @Autowired
-    Unleash unleash;
-
     protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
         return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", sedHendelse);
     }
