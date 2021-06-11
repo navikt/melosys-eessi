@@ -24,11 +24,11 @@ public class MelosysEessiMelding {
     private String artikkel;
     private boolean erEndring;
     private boolean midlertidigBestemmelse;
+    private boolean erMottaksInstitusjon;
     private String ytterligereInformasjon;
     private String bucType;
     private String sedType;
 
     private SvarAnmodningUnntak svarAnmodningUnntak;
     private AnmodningUnntak anmodningUnntak;
-    private Institusjon institusjon;
 }
