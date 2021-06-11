@@ -11,8 +11,8 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.AVSLAG;
 import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.DELVIS_INNVILGELSE;
@@ -24,7 +24,7 @@ public class MelosysEessiMeldingMapperA002Test {
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sedHendelse = createSedHendelse();
         sakInformasjon = createSakInformasjon();

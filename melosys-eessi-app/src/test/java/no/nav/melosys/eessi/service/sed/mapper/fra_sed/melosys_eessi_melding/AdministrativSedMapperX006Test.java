@@ -8,8 +8,8 @@ import no.nav.melosys.eessi.models.sed.nav.Institusjon;
 import no.nav.melosys.eessi.models.sed.nav.Sak;
 import no.nav.melosys.eessi.models.sed.nav.X006FjernInstitusjon;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +19,7 @@ public class AdministrativSedMapperX006Test {
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sedHendelse = createSedHendelse();
         sakInformasjon = createSakInformasjon();

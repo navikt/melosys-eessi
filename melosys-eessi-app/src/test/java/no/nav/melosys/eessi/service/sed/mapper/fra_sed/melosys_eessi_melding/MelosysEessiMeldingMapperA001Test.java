@@ -12,7 +12,7 @@ import no.nav.melosys.eessi.models.sed.nav.Grunnlag;
 import no.nav.melosys.eessi.models.sed.nav.Land;
 import no.nav.melosys.eessi.models.sed.nav.Unntak;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
