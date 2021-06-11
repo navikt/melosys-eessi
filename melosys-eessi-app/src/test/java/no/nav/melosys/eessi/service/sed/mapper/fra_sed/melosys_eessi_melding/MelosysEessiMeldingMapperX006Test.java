@@ -14,15 +14,19 @@ import org.junit.jupiter.api.Test;
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AdministrativSedMapperX006Test {
+public class MelosysEessiMeldingMapperX006Test {
 
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
+    private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
+
+    private static final String NORSK_INSTITUSJONS_ID = "NO:NAVAT07";
 
     @BeforeEach
     public void setup() {
         sedHendelse = createSedHendelse();
         sakInformasjon = createSakInformasjon();
+        melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory(NORSK_INSTITUSJONS_ID);
     }
 
     @Test
@@ -30,12 +34,12 @@ public class AdministrativSedMapperX006Test {
         SED sed = createSed(null);
         lagNavSak(sed);
 
-        Institusjon institusjon = lagInstitusjon("NO:NAVAT07", "NO:NAVAT07 Norge nav");
+        Institusjon institusjon = lagInstitusjon(NORSK_INSTITUSJONS_ID, "NO:NAVAT07 Norge nav");
 
         X006FjernInstitusjon fjernInstitusjon = new X006FjernInstitusjon();
         fjernInstitusjon.setInstitusjon(institusjon);
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.X006)
+        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
@@ -55,7 +59,7 @@ public class AdministrativSedMapperX006Test {
         fjernInstitusjon.setInstitusjon(institusjon);
 
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.X006)
+        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
@@ -75,7 +79,7 @@ public class AdministrativSedMapperX006Test {
         fjernInstitusjon.setInstitusjon(institusjon);
 
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.X006)
+        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
@@ -95,7 +99,7 @@ public class AdministrativSedMapperX006Test {
         fjernInstitusjon.setInstitusjon(institusjon);
 
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.X006)
+        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"

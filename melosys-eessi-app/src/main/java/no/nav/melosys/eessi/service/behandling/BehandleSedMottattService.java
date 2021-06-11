@@ -30,6 +30,7 @@ public class BehandleSedMottattService {
     private final MelosysEessiProducer melosysEessiProducer;
     private final PersonIdentifiseringService personIdentifiseringService;
     private final OppgaveService oppgaveService;
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
 
     @Autowired
     public BehandleSedMottattService(
@@ -38,16 +39,17 @@ public class BehandleSedMottattService {
             PersonFasade personFasade,
             MelosysEessiProducer melosysEessiProducer,
             PersonIdentifiseringService personIdentifiseringService,
-            OppgaveService oppgaveService) {
+            OppgaveService oppgaveService, MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.personFasade = personFasade;
         this.melosysEessiProducer = melosysEessiProducer;
         this.personIdentifiseringService = personIdentifiseringService;
         this.oppgaveService = oppgaveService;
+        this.melosysEessiMeldingMapperFactory = melosysEessiMeldingMapperFactory;
     }
 
-    public void behandleSed(SedMottatt sedMottatt)  {
+    public void behandleSed(SedMottatt sedMottatt) {
         SedKontekst kontekst = sedMottatt.getSedKontekst();
         SED sed = euxService.hentSed(sedMottatt.getSedHendelse().getRinaSakId(),
                 sedMottatt.getSedHendelse().getRinaDokumentId());
@@ -56,15 +58,15 @@ public class BehandleSedMottattService {
             identifiserPerson(sedMottatt, sed);
         }
 
-            if (!kontekst.journalpostOpprettet()) {
-                try {
-                    opprettJournalpost(sedMottatt);
-                } catch (SedAlleredeJournalførtException e) {
-                    log.info("Inngående SED {} allerede journalført", e.getSedID());
-                    sedMottatt.setFerdig(true);
-                    return;
-                }
+        if (!kontekst.journalpostOpprettet()) {
+            try {
+                opprettJournalpost(sedMottatt);
+            } catch (SedAlleredeJournalførtException e) {
+                log.info("Inngående SED {} allerede journalført", e.getSedID());
+                sedMottatt.setFerdig(true);
+                return;
             }
+        }
 
         if (kontekst.personErIdentifisert()) {
             if (!kontekst.isPublisertKafka()) {
@@ -77,7 +79,7 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void identifiserPerson(SedMottatt sedMottatt, SED sed)  {
+    private void identifiserPerson(SedMottatt sedMottatt, SED sed) {
         log.info("Søker etter person for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse().getRinaSakId(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
@@ -85,7 +87,7 @@ public class BehandleSedMottattService {
         sedMottatt.getSedHendelse().setNavBruker(sedMottatt.getSedKontekst().getNavIdent());
     }
 
-    private void opprettJournalpost(SedMottatt sedMottatt)  {
+    private void opprettJournalpost(SedMottatt sedMottatt) {
         log.info("Oppretter journalpost for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         SedMedVedlegg sedMedVedlegg = euxService.hentSedMedVedlegg(
                 sedMottatt.getSedHendelse().getRinaSakId(), sedMottatt.getSedHendelse().getRinaDokumentId()
@@ -103,7 +105,7 @@ public class BehandleSedMottattService {
         }
     }
 
-    private void opprettOppgaveIdentifisering(SedMottatt sedMottatt)  {
+    private void opprettOppgaveIdentifisering(SedMottatt sedMottatt) {
         log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
         String oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedHendelse().getSedType(), sedMottatt.getSedHendelse().getRinaSakId()
@@ -111,9 +113,9 @@ public class BehandleSedMottattService {
         sedMottatt.getSedKontekst().setOppgaveID(oppgaveID);
     }
 
-    private void publiserMelding(SedMottatt sedMottatt, SED sed)  {
+    private void publiserMelding(SedMottatt sedMottatt, SED sed) {
         log.info("Publiserer melding om mottatt sed på kafka for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
-        MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sed.getSedType()));
+        MelosysEessiMeldingMapper mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sed.getSedType()));
         if (mapper == null) {
             throw new IllegalStateException("Mapper for kafka-publisering er null!");
         }

@@ -1,9 +1,5 @@
 package no.nav.melosys.eessi.service.behandling;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -17,11 +13,16 @@ import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import org.junit.Before;
-import org.junit.Test;
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
@@ -32,32 +33,29 @@ public class BehandleSedMottattServiceTest {
 
     @Mock
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-
     @Mock
     private EuxService euxService;
-
     @Mock
     private PersonFasade personFasade;
-
     @Mock
     private PersonIdentifiseringService personIdentifiseringService;
-
     @Mock
     private MelosysEessiProducer melosysEessiProducer;
-
     @Mock
     private OppgaveService oppgaveService;
+
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
     private BehandleSedMottattService behandleSedMottattService;
 
     private static final String IDENT = "1122334455";
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         behandleSedMottattService = new BehandleSedMottattService(
                 opprettInngaaendeJournalpostService, euxService, personFasade,
-                melosysEessiProducer, personIdentifiseringService, oppgaveService
-        );
+                melosysEessiProducer, personIdentifiseringService, oppgaveService,
+                melosysEessiMeldingMapperFactory);
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
                 .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());

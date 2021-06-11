@@ -19,6 +19,7 @@ public class MelosysEessiMeldingMapperA003Test {
 
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
+    private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
     @BeforeEach
     public void setup() {
@@ -29,7 +30,7 @@ public class MelosysEessiMeldingMapperA003Test {
     @Test
     public void mapA003_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap());
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A003)
+        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A003)
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"

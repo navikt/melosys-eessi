@@ -1,10 +1,15 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 
-public class AdministrativSedMapperX006 implements MelosysEessiMeldingMapper {
+public class MelosysEessiMeldingMapperX006 implements MelosysEessiMeldingMapper {
+
+    private final String rinaInstitusjonId;
+
+    public MelosysEessiMeldingMapperX006(String rinaInstitusjonId) {
+        this.rinaInstitusjonId = rinaInstitusjonId;
+    }
 
     @Override
     public MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
@@ -26,6 +31,6 @@ public class AdministrativSedMapperX006 implements MelosysEessiMeldingMapper {
                 && sed.getNav().getSak().getFjerninstitusjon() != null
                 && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null
                 && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId() != null
-                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId().split(":")[0].equals("NO");
+                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId().equals(rinaInstitusjonId);
     }
 }
