@@ -45,8 +45,9 @@ public class MelosysEessiMeldingMapperX006Test {
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.isErMottaksInstitusjon()).isTrue();
+        assertThat(melosysEessiMelding)
+                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .isEqualTo(true);
     }
 
     @Test
@@ -65,8 +66,9 @@ public class MelosysEessiMeldingMapperX006Test {
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.isErMottaksInstitusjon()).isFalse();
+        assertThat(melosysEessiMelding)
+                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .isEqualTo(false);
     }
 
     @Test
@@ -85,8 +87,9 @@ public class MelosysEessiMeldingMapperX006Test {
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.isErMottaksInstitusjon()).isFalse();
+        assertThat(melosysEessiMelding)
+                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .isEqualTo(false);
     }
 
     @Test
@@ -105,8 +108,9 @@ public class MelosysEessiMeldingMapperX006Test {
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.isErMottaksInstitusjon()).isFalse();
+        assertThat(melosysEessiMelding)
+                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .isEqualTo(false);
     }
 
     private Institusjon lagInstitusjon(String id, String navn) {
