@@ -24,7 +24,7 @@ public class MelosysEessiMelding {
     private String artikkel;
     private boolean erEndring;
     private boolean midlertidigBestemmelse;
-    private boolean erX006Mottaker;
+    private boolean x006NavErFjernet;
     private String ytterligereInformasjon;
     private String bucType;
     private String sedType;

@@ -20,7 +20,7 @@ public class MelosysEessiMeldingMapperX006 implements MelosysEessiMeldingMapper 
                 rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
                 sedErEndring, sedVersjon);
 
-        melosysEessiMelding.setErX006Mottaker(inneholderOgErNorskInstitusjon(sed));
+        melosysEessiMelding.setX006NavErFjernet(inneholderOgErNorskInstitusjon(sed));
 
         return melosysEessiMelding;
     }

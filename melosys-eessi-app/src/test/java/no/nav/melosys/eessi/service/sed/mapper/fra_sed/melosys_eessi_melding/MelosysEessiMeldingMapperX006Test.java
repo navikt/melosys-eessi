@@ -46,7 +46,7 @@ public class MelosysEessiMeldingMapperX006Test {
                 );
 
         assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .extracting(MelosysEessiMelding::isX006NavErFjernet)
                 .isEqualTo(true);
     }
 
@@ -67,7 +67,7 @@ public class MelosysEessiMeldingMapperX006Test {
                 );
 
         assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .extracting(MelosysEessiMelding::isX006NavErFjernet)
                 .isEqualTo(false);
     }
 
@@ -88,7 +88,7 @@ public class MelosysEessiMeldingMapperX006Test {
                 );
 
         assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .extracting(MelosysEessiMelding::isX006NavErFjernet)
                 .isEqualTo(false);
     }
 
@@ -109,7 +109,7 @@ public class MelosysEessiMeldingMapperX006Test {
                 );
 
         assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isErX006Mottaker)
+                .extracting(MelosysEessiMelding::isX006NavErFjernet)
                 .isEqualTo(false);
     }
 
