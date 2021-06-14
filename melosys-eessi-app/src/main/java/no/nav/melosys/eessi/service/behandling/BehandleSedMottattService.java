@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Deprecated(forRemoval = true)
 public class BehandleSedMottattService {
 
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;

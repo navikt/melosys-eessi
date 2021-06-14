@@ -1,14 +1,16 @@
 package no.nav.melosys.eessi.service.identifisering;
 
+import java.util.Comparator;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
+import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapper;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,9 +28,10 @@ public class BucIdentifiseringService {
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
         sedMottattHendelseRepository.findAllByPublisertKafka(false).stream()
-                .filter(it -> rinaSaksnummer.equals(it.getSedHendelse().getRinaSakId()))
+                .filter(hendelse -> rinaSaksnummer.equals(hendelse.getSedHendelse().getRinaSakId()))
+                .sorted(Comparator.comparing(SedMottattHendelse::getMottattDato))
                 .forEach(it -> {
-                    MelosysEessiMeldingMapper mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(it.getSedHendelse().getSedType()));
+                    var mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(it.getSedHendelse().getSedType()));
                     melosysEessiProducer.publiserMelding(
                             mapper.map(aktoerId, euxService.hentSed(it.getSedHendelse().getRinaSakId(), it.getSedHendelse().getRinaDokumentId()),
                                     it.getSedHendelse().getRinaDokumentId(), it.getSedHendelse().getRinaSakId(),

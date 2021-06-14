@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
-import no.nav.melosys.eessi.service.behandling.event.BucIdentifisertEvent;
+import no.nav.melosys.eessi.service.identifisering.event.BucIdentifisertEvent;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.KafkaListener;
