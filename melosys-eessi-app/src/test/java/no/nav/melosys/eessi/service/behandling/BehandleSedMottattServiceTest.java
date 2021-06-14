@@ -16,9 +16,9 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BehandleSedMottattServiceTest {
 
     @Mock
@@ -57,10 +57,6 @@ public class BehandleSedMottattServiceTest {
                 melosysEessiProducer, personIdentifiseringService, oppgaveService,
                 melosysEessiMeldingMapperFactory);
 
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
-                .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
-                .thenReturn("9988776655");
 
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
@@ -68,7 +64,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_finnerIkkePerson_forventJournalpostOgOppgaveOpprettes() {
+    void behandleSed_finnerIkkePerson_forventJournalpostOgOppgaveOpprettes() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
@@ -83,7 +79,10 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personIkkeIdentifisert_forventJournalpostOgOppgaveOpprettes() {
+    void behandleSed_personIkkeIdentifisert_forventJournalpostOgOppgaveOpprettes() {
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
+                .thenReturn("9988776655");
+
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
@@ -98,7 +97,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personIkkeIdentifisertJournalpostOpprettet_forventOppgaveOpprettes() {
+    void behandleSed_personIkkeIdentifisertJournalpostOpprettet_forventOppgaveOpprettes() {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
@@ -115,8 +114,10 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_finnerPerson_forventPubliserKafkaMelding() {
+    void behandleSed_finnerPerson_forventPubliserKafkaMelding() {
         final String aktoerID = "12312312312";
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
+                .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
         when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
         SedHendelse sedHendelse = sedHendelseMedBruker();
@@ -131,9 +132,11 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personAlleredeFunnet_forventIkkeIdentifiserOgPubliserKafkaMelding() {
+    void behandleSed_personAlleredeFunnet_forventIkkeIdentifiserOgPubliserKafkaMelding() {
         final String aktoerID = "12312312312";
         when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
+                .thenReturn(SakInformasjon.builder().gsakSaksnummer("123").journalpostId("9988776655").build());
 
         SedHendelse sedHendelse = sedHendelseMedBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
@@ -150,7 +153,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_personFunnetJournalpostOpprettet_forventKunPubliserKafka() {
+    void behandleSed_personFunnetJournalpostOpprettet_forventKunPubliserKafka() {
         final String aktoerID = "12312312312";
         when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
 
@@ -171,7 +174,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
+    void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
         when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
 
         SedHendelse sedHendelse = sedHendelseMedBruker();
@@ -192,7 +195,7 @@ public class BehandleSedMottattServiceTest {
     }
 
     @Test
-    public void behandleSed_alleredeUtført_forventIngenVidereKall() {
+    void behandleSed_alleredeUtført_forventIngenVidereKall() {
         SedHendelse sedHendelse = sedHendelseMedBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
