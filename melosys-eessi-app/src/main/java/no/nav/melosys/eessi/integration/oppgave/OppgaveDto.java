@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.integration.oppgave;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,7 +40,7 @@ public class OppgaveDto {
     private String behandlesAvApplikasjon;
     private String beskrivelse;
     private String status;
-    private Map<OppgaveMetadataKey, String> metadata = new HashMap<>(1);
+    private Map<OppgaveMetadataKey, String> metadata = new EnumMap<>(OppgaveMetadataKey.class);
 
     private static final Collection<String> OPPGAVE_STATUSER_ÅPEN = Set.of("OPPRETTET", "AAPNET", "UNDER_BEHANDLING");
 

@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.identifisering.event.BucIdentifisertEvent;
+import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -22,6 +23,7 @@ public class OppgaveEndretConsumer {
 
     private final ApplicationEventPublisher eventPublisher;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    private final OppgaveService oppgaveService;
 
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
@@ -29,12 +31,14 @@ public class OppgaveEndretConsumer {
             topics = "${melosys.kafka.consumer.oppgave-endret.topic}", containerFactory = "oppgaveListenerContainerFactory")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretDto> consumerRecord) {
         log.info("Oppgave endret: {}", consumerRecord.value());
+        final var oppgave = consumerRecord.value();
 
-        if (erIdentifisertOppgave(consumerRecord.value())) {
+        if (erIdentifisertOppgave(oppgave)) {
             bucIdentifiseringOppgRepository.findByOppgaveId(consumerRecord.value().getId().toString())
                     .ifPresent(b -> {
+                        log.info("BUC {} identifisert av oppgave {}", b.getRinaSaksnummer(), b.getOppgaveId());
                         eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().getAktoerId()));
-                        //TODO: ferdigstill jfr-oppgave
+                        oppgaveService.ferdigstillOppgave(b.getOppgaveId());
                     });
         }
     }

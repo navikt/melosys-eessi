@@ -8,11 +8,13 @@ import java.util.Optional;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
@@ -32,8 +34,9 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    public void hentOppgave_oppgaveFinnes_verifiserMapping() {
+    void hentOppgave_oppgaveFinnes_verifiserMapping() {
         server.expect(requestTo("/oppgaver/" + OPPGAVE_ID))
+                .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
         var oppgave = oppgaveConsumer.hentOppgave(OPPGAVE_ID);
 
@@ -50,11 +53,34 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    public void opprettOppgave_verifiserMapping() {
+    void opprettOppgave_verifiserMapping() {
         server.expect(requestTo("/oppgaver"))
+                .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
         var oppgaveDto = opprettOppgave();
         var oppgave = oppgaveConsumer.opprettOppgave(oppgaveDto);
+
+        assertThat(oppgave)
+                .extracting(
+                        OppgaveDto::getJournalpostId,
+                        OppgaveDto::getAktoerId,
+                        OppgaveDto::getTema,
+                        OppgaveDto::getTildeltEnhetsnr
+                ).containsExactly(
+                oppgave.getJournalpostId(),
+                oppgave.getAktoerId(),
+                oppgave.getTema(),
+                oppgave.getTildeltEnhetsnr()
+        );
+    }
+
+    @Test
+    void oppdaterOppgave_verifiserMapping() {
+        server.expect(requestTo("/oppgaver/" + OPPGAVE_ID))
+                .andExpect(method(HttpMethod.PUT))
+                .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
+        var oppgaveDto = opprettOppgave();
+        var oppgave = oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppgaveDto);
 
         assertThat(oppgave)
                 .extracting(
