@@ -5,8 +5,7 @@ import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.identifisering.event.BucIdentifisertEvent;
@@ -27,9 +26,11 @@ public class OppgaveEndretConsumer {
 
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
-    @KafkaListener(clientIdPrefix = "melosys-eessi-oppgaveEndret",
-            topics = "${melosys.kafka.consumer.oppgave-endret.topic}", containerFactory = "oppgaveListenerContainerFactory")
-    public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretDto> consumerRecord) {
+    @KafkaListener(
+            clientIdPrefix = "melosys-eessi-oppgaveEndret",
+            topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
+            containerFactory = "oppgaveListenerContainerFactory")
+    public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
         log.info("Oppgave endret: {}", consumerRecord.value());
         final var oppgave = consumerRecord.value();
 
@@ -37,18 +38,18 @@ public class OppgaveEndretConsumer {
             bucIdentifiseringOppgRepository.findByOppgaveId(consumerRecord.value().getId().toString())
                     .ifPresent(b -> {
                         log.info("BUC {} identifisert av oppgave {}", b.getRinaSaksnummer(), b.getOppgaveId());
-                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().getAktoerId()));
+                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().hentAktørID()));
                         oppgaveService.ferdigstillOppgave(b.getOppgaveId());
                     });
         }
     }
 
-    private boolean erIdentifisertOppgave(OppgaveDto oppgaveDto) {
-        return "JFR".equals(oppgaveDto.getOppgavetype())
-                && "4530".equals(oppgaveDto.getTildeltEnhetsnr())
-                && oppgaveDto.getAktoerId() != null
-                && GYLDIGE_TEMA.contains(oppgaveDto.getTema())
-                && oppgaveDto.erÅpen()
-                && oppgaveDto.getMetadata().containsKey(OppgaveMetadataKey.RINA_SAKID);
+    private boolean erIdentifisertOppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
+        return "JFR".equals(oppgaveEndretHendelse.getOppgavetype())
+                && "4530".equals(oppgaveEndretHendelse.getTildeltEnhetsnr())
+                && oppgaveEndretHendelse.harAktørID()
+                && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
+                && oppgaveEndretHendelse.erÅpen()
+                && oppgaveEndretHendelse.getMetadata().containsKey(OppgaveMetadataKey.RINA_SAKID);
     }
 }

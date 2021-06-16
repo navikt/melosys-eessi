@@ -1,0 +1,41 @@
+{
+  "id": $id,
+  "tildeltEnhetsnr": "4530",
+  "endretAvEnhetsnr": "4303",
+  "opprettetAvEnhetsnr": "4530",
+  "tilordnetRessurs": null,
+  "tema": "MED",
+  "behandlingstema": "ab0061",
+  "oppgavetype": "JFR",
+  "versjon": 2,
+  "beskrivelse": "blabla",
+  "fristFerdigstillelse": "2021-03-15",
+  "aktivDato": "2021-03-11",
+  "opprettetTidspunkt": "2021-03-11T12:58:54.9+01:00",
+  "opprettetAv": "srvmelosys-eessi",
+  "endretAv": "Z111111",
+  "endretTidspunkt": "2021-03-11T12:59:30.785+01:00",
+  "prioritet": "NORM",
+  "status": "AAPNET",
+  "statuskategori": "AAPEN",
+  "ident": {
+    "identType": "AKTOERID",
+    "verdi": "$aktoerid",
+    "folkeregisterident": "$fnr",
+    "registrert_dato": {
+      "year": 2020,
+      "month": "JULY",
+      "monthValue": 7,
+      "dayOfMonth": 7,
+      "chronology": {
+        "calendarType": "iso8601",
+        "id": "ISO"
+      },
+      "era": "CE",
+      "dayOfWeek": "TUESDAY",
+      "leapYear": true,
+      "dayOfYear": 189
+    }
+  },
+  "metadata": {"RINA_SAKID": "$rinasaksnummer"}
+}
