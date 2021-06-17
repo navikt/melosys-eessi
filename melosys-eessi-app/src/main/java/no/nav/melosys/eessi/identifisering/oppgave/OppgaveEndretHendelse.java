@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.oppgave;
+package no.nav.melosys.eessi.identifisering.oppgave;
 
 import java.util.Map;
 import java.util.NoSuchElementException;

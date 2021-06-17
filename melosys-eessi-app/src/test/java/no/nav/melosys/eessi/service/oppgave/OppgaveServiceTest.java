@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.service.oppgave;
 
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.identifisering.oppgave.HentOppgaveDto;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import org.junit.jupiter.api.BeforeEach;

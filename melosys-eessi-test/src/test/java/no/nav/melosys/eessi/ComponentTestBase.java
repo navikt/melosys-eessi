@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
 import no.finn.unleash.Unleash;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;

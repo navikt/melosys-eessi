@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.FakeUnleash;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
+import no.nav.melosys.eessi.identifisering.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;

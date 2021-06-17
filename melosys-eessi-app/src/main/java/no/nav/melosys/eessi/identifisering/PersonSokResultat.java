@@ -1,10 +1,10 @@
-package no.nav.melosys.eessi.service.identifisering;
+package no.nav.melosys.eessi.identifisering;
 
 import javax.validation.constraints.NotNull;
 
 import lombok.Getter;
 
-public final class PersonSokResultat {
+final class PersonSokResultat {
 
     @Getter
     private final String ident;
@@ -16,7 +16,7 @@ public final class PersonSokResultat {
         this.begrunnelse = begrunnelse;
     }
 
-    public boolean personIdentifisert() {
+    boolean personIdentifisert() {
         return begrunnelse == SoekBegrunnelse.IDENTIFISERT;
     }
 

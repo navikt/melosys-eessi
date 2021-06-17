@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.oppgave;
+package no.nav.melosys.eessi.identifisering.oppgave;
 
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.oppgave;
+package no.nav.melosys.eessi.identifisering.oppgave;
 
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.UUIDGenerator;

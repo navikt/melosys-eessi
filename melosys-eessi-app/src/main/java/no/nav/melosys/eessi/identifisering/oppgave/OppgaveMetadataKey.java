@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.oppgave;
+package no.nav.melosys.eessi.identifisering.oppgave;
 
 public enum OppgaveMetadataKey {
     NORM_DATO,

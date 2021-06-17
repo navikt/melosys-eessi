@@ -4,9 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
+import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -16,8 +18,6 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
-import no.nav.melosys.eessi.service.identifisering.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
@@ -42,7 +42,7 @@ class SedMottakServiceTest {
     private EuxService euxService;
 
     @Mock
-    private PersonIdentifiseringService personIdentifiseringService;
+    private PersonIdentifisering personIdentifisering;
 
     @Mock
     private OppgaveService oppgaveService;
@@ -67,7 +67,7 @@ class SedMottakServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
-                euxService, personIdentifiseringService, opprettInngaaendeJournalpostService,
+                euxService, personIdentifisering, opprettInngaaendeJournalpostService,
                 oppgaveService, applicationEventPublisher, sedMottattHendelseRepository,
                 bucIdentifiseringOppgRepository, personFasade
         );
@@ -82,7 +82,7 @@ class SedMottakServiceTest {
 
     @Test
     void behandleSed_finnerIkkePerson_journalpostOgOppgaveOpprettes() {
-        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
+        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
@@ -90,7 +90,7 @@ class SedMottakServiceTest {
         sedMottakService.behandleSed(sedMottattHendelse);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository).save(any());
@@ -99,13 +99,13 @@ class SedMottakServiceTest {
 
     @Test
     void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
-        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository).save(any());
@@ -139,7 +139,7 @@ class SedMottakServiceTest {
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());

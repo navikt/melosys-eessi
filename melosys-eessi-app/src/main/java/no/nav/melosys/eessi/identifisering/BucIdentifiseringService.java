@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.identifisering;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.Comparator;
 

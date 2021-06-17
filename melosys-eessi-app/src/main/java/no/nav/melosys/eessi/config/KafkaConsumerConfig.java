@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretHendelse;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

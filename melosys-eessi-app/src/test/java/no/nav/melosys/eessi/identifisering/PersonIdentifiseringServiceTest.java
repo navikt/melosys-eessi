@@ -1,11 +1,10 @@
-package no.nav.melosys.eessi.service.identifisering;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.List;
 import java.util.Optional;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -96,7 +95,7 @@ class PersonIdentifiseringServiceTest {
     void identifiserPerson_erXSEDUtenPerson_ingenTreff() {
         SED xSED = lagXSEDUtenBruker();
         Optional<String> res = personIdentifiseringService.identifiserPerson("123", xSED);
-        verify(personSokMetrikker).counter(eq(SoekBegrunnelse.INGEN_PERSON_I_SED));
+        verify(personSokMetrikker).counter(SoekBegrunnelse.INGEN_PERSON_I_SED);
         assertThat(res).isNotPresent();
     }
 

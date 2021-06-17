@@ -3,9 +3,9 @@ package no.nav.melosys.eessi.service.oppgave;
 import java.time.LocalDate;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.identifisering.oppgave.HentOppgaveDto;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveConsumer;
+import no.nav.melosys.eessi.identifisering.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.springframework.stereotype.Service;
 
