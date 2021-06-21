@@ -28,16 +28,21 @@ public class JournalpostSedKoblingService {
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
     private final SafConsumer safConsumer;
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
 
     public JournalpostSedKoblingService(
             JournalpostSedKoblingRepository journalpostSedKoblingRepository,
-            CaseStoreConsumer caseStoreConsumer, EuxService euxService,
-            SaksrelasjonService saksrelasjonService, SafConsumer safConsumer) {
+            CaseStoreConsumer caseStoreConsumer,
+            EuxService euxService,
+            SaksrelasjonService saksrelasjonService,
+            SafConsumer safConsumer,
+            MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory) {
         this.journalpostSedKoblingRepository = journalpostSedKoblingRepository;
         this.caseStoreConsumer = caseStoreConsumer;
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
         this.safConsumer = safConsumer;
+        this.melosysEessiMeldingMapperFactory = melosysEessiMeldingMapperFactory;
     }
 
     public Optional<JournalpostSedKobling> finnVedJournalpostID(String journalpostID) {
@@ -120,7 +125,7 @@ public class JournalpostSedKoblingService {
     private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String sedId, String rinaSaksnummer,
                                                            String sedType, String bucType, String avsenderID, String landkode,
                                                            String journalpostID, String saksnummer, boolean erEndring, String sedVersjon) {
-        return MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
+        return melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
                 .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID,
                         null, saksnummer, erEndring, sedVersjon);
     }

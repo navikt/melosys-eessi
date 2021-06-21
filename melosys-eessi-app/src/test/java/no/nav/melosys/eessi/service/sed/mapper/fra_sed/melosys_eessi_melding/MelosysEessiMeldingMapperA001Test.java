@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
-import java.util.Collections;
-
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedType;
@@ -12,19 +10,22 @@ import no.nav.melosys.eessi.models.sed.nav.Grunnlag;
 import no.nav.melosys.eessi.models.sed.nav.Land;
 import no.nav.melosys.eessi.models.sed.nav.Unntak;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import java.util.Collections;
 
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA001Test {
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
     @Test
     public void mapA001_forventRettFelt() {
         SED sed = createSed(hentMedlemskap());
         SedHendelse sedHendelse = createSedHendelse();
         SakInformasjon sakInformasjon = createSakInformasjon();
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A001)
+        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001)
                 .map("123",
                         sed,
                         sedHendelse.getRinaDokumentId(),

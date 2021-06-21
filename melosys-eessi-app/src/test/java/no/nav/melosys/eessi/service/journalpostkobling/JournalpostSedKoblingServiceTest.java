@@ -20,6 +20,7 @@ import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,8 @@ public class JournalpostSedKoblingServiceTest {
     @Mock
     private SafConsumer safConsumer;
 
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
+
     private JournalpostSedKoblingService journalpostSedKoblingService;
 
     private BUC buc;
@@ -55,7 +58,7 @@ public class JournalpostSedKoblingServiceTest {
     public void setup() {
         journalpostSedKoblingService = new JournalpostSedKoblingService(
                 journalpostSedKoblingRepository, caseStoreConsumer, euxService, saksrelasjonService,
-                safConsumer);
+                safConsumer, melosysEessiMeldingMapperFactory);
 
         EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
         buc = enhancedRandom.nextObject(BUC.class);
@@ -70,7 +73,7 @@ public class JournalpostSedKoblingServiceTest {
         buc.setDocuments(Collections.singletonList(document));
         sed = new SED();
         sed.setNav(new Nav());
-        journalpostSedKobling = new JournalpostSedKobling("123", "321","sedID", "1", "LA_BUC_03","A008");
+        journalpostSedKobling = new JournalpostSedKobling("123", "321", "sedID", "1", "LA_BUC_03", "A008");
     }
 
     @Test
@@ -93,7 +96,7 @@ public class JournalpostSedKoblingServiceTest {
         when(journalpostSedKoblingRepository.findByJournalpostID(anyString()))
                 .thenReturn(Optional.empty());
         when(caseStoreConsumer.finnVedJournalpostID(anyString()))
-                .thenReturn(Collections.singletonList(new CaseStoreDto("123","321")));
+                .thenReturn(Collections.singletonList(new CaseStoreDto("123", "321")));
         when(euxService.hentBuc(anyString())).thenReturn(buc);
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 

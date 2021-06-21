@@ -62,6 +62,9 @@ melosys:
       sak-url: ${SAK_URL}
       oppgave-url: ${OPPGAVE_URL}
 
+rina:
+  institusjon-id: ${RINA_INSTITUSJON_ID}
+
 management:
   metrics:
     web:
