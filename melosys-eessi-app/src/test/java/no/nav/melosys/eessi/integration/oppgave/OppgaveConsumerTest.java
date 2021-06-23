@@ -6,8 +6,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import lombok.SneakyThrows;
-import no.nav.melosys.eessi.identifisering.oppgave.OppgaveConsumer;
-import no.nav.melosys.eessi.identifisering.oppgave.OppgaveDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;

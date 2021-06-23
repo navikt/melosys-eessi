@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.identifisering.oppgave;
+package no.nav.melosys.eessi.integration.oppgave;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

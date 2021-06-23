@@ -6,9 +6,9 @@ import java.util.Optional;
 
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
-import no.nav.melosys.eessi.identifisering.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
