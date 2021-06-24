@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.identifisering;
 
-import java.util.Comparator;
-
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
@@ -27,21 +25,35 @@ public class BucIdentifiseringService {
 
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
-        sedMottattHendelseRepository.findAllByPublisertKafka(false).stream()
-                .filter(hendelse -> rinaSaksnummer.equals(hendelse.getSedHendelse().getRinaSakId()))
-                .sorted(Comparator.comparing(SedMottattHendelse::getMottattDato))
-                .forEach(it -> {
-                    var mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(it.getSedHendelse().getSedType()));
-                    melosysEessiProducer.publiserMelding(
-                            mapper.map(aktoerId, euxService.hentSed(it.getSedHendelse().getRinaSakId(), it.getSedHendelse().getRinaDokumentId()),
-                                    it.getSedHendelse().getRinaDokumentId(), it.getSedHendelse().getRinaSakId(),
-                                    it.getSedHendelse().getSedType(), it.getSedHendelse().getBucType(), it.getSedHendelse().getAvsenderId(), it.getSedHendelse().getLandkode(),
-                                    it.getJournalpostId(), null,
-                                    saksrelasjonService.finnVedRinaSaksnummer(it.getSedHendelse().getRinaSakId()).map(FagsakRinasakKobling::getGsakSaksnummer).map(Object::toString).orElse(null),
-                                    euxService.sedErEndring(it.getSedHendelse().getRinaDokumentId(), it.getSedHendelse().getRinaSakId()),
-                                    it.getSedHendelse().getRinaDokumentVersjon())
-                    );
-                    it.setPublisertKafka(true);
-                });
+        sedMottattHendelseRepository.findAllByRinaSaksnummeerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
+                .forEach(sedMottattHendelse -> publiserMelding(sedMottattHendelse, aktoerId));
+    }
+
+    private void publiserMelding(SedMottattHendelse sedMottattHendelse, String aktørID) {
+        final var mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedMottattHendelse.getSedHendelse().getSedType()));
+        final var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId());
+        final var sedErEndring = euxService.sedErEndring(sedMottattHendelse.getSedHendelse().getRinaDokumentId(), sedMottattHendelse.getSedHendelse().getRinaSakId());
+        final var arkivsakID = saksrelasjonService.finnVedRinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
+                .map(FagsakRinasakKobling::getGsakSaksnummer)
+                .map(Object::toString)
+                .orElse(null);
+
+        melosysEessiProducer.publiserMelding(
+                mapper.map(
+                        aktørID,
+                        sed,
+                        sedMottattHendelse.getSedHendelse().getRinaDokumentId(),
+                        sedMottattHendelse.getSedHendelse().getRinaSakId(),
+                        sedMottattHendelse.getSedHendelse().getSedType(),
+                        sedMottattHendelse.getSedHendelse().getBucType(),
+                        sedMottattHendelse.getSedHendelse().getAvsenderId(),
+                        sedMottattHendelse.getSedHendelse().getLandkode(),
+                        sedMottattHendelse.getJournalpostId(), null,
+                        arkivsakID,
+                        sedErEndring,
+                        sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon())
+        );
+
+        sedMottattHendelse.setPublisertKafka(true);
     }
 }
