@@ -24,7 +24,6 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
@@ -115,7 +114,6 @@ class SedMottakTestIT extends ComponentTestBase {
         assertThat(hentRecords()).isEmpty();
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
-        Mockito.clearInvocations(oppgaveConsumer);
         kafkaTestConsumer.reset(3);
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
         kafkaTestConsumer.doWait(5_000L);

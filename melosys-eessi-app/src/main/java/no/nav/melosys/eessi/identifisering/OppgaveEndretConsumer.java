@@ -38,7 +38,7 @@ public class OppgaveEndretConsumer {
                     .ifPresent(b -> {
                         log.info("BUC {} identifisert av oppgave {}", b.getRinaSaksnummer(), b.getOppgaveId());
                         eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().hentAktørID()));
-                        oppgaveService.ferdigstillOppgave(b.getOppgaveId());
+                        oppgaveService.ferdigstillOppgave(b.getOppgaveId(), oppgave.getVersjon());
                     });
         }
     }

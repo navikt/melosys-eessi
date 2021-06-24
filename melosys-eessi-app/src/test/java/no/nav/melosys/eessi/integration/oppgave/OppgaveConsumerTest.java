@@ -14,8 +14,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 class OppgaveConsumerTest {
@@ -75,25 +74,22 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    void oppdaterOppgave_verifiserMapping() {
-        server.expect(requestTo("/oppgaver/" + OPPGAVE_ID))
-                .andExpect(method(HttpMethod.PUT))
-                .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
-        var oppgaveDto = opprettOppgave();
-        var oppgave = oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppgaveDto);
+    void oppdaterOppgave_utenBeskrivelse_beksrivelseMappesIkkeTilRequest() {
+        final var forventetJsonBodyRequestUtenBeskrivelseFelt = """
+                {
+                    "id": 1,
+                    "versjon": 2,
+                    "status": "status"
+                }
+                """;
 
-        assertThat(oppgave)
-                .extracting(
-                        OppgaveDto::getJournalpostId,
-                        OppgaveDto::getAktoerId,
-                        OppgaveDto::getTema,
-                        OppgaveDto::getTildeltEnhetsnr
-                ).containsExactly(
-                oppgave.getJournalpostId(),
-                oppgave.getAktoerId(),
-                oppgave.getTema(),
-                oppgave.getTildeltEnhetsnr()
-        );
+        server.expect(requestTo("/oppgaver/" + OPPGAVE_ID))
+                .andExpect(method(HttpMethod.PATCH))
+                .andExpect(content().json(forventetJsonBodyRequestUtenBeskrivelseFelt))
+                .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
+
+        var oppgaveOppdateringDto = OppgaveOppdateringDto.builder().id(1).versjon(2).status("status").build();
+        assertThat(oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppgaveOppdateringDto)).isNotNull();
     }
 
     private OppgaveDto opprettOppgave() {

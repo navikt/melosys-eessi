@@ -29,8 +29,8 @@ public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
         return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), HentOppgaveDto.class);
     }
 
-    public HentOppgaveDto oppdaterOppgave(String oppgaveID, OppgaveDto oppgaveDto) {
-        return exchange("/oppgaver/{oppgaveID}", HttpMethod.PUT, new HttpEntity<>(oppgaveDto, headers()), HentOppgaveDto.class, oppgaveID);
+    public HentOppgaveDto oppdaterOppgave(String oppgaveID, OppgaveOppdateringDto oppgaveOppdateringDto) {
+        return exchange("/oppgaver/{oppgaveID}", HttpMethod.PATCH, new HttpEntity<>(oppgaveOppdateringDto, headers()), HentOppgaveDto.class, oppgaveID);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,

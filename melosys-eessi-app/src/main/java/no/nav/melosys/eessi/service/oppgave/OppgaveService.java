@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveOppdateringDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.springframework.stereotype.Service;
 
@@ -72,10 +73,15 @@ public class OppgaveService {
                 sedHendelse.getSedType(), sedHendelse.getRinaSakId(), sedHendelse.getRinaDokumentId(), rinaUrl);
     }
 
-    public void ferdigstillOppgave(String oppgaveId) {
+    public void ferdigstillOppgave(String oppgaveId, int versjon) {
         log.info("Ferdigstiller oppgave {}", oppgaveId);
-        var oppgave = oppgaveConsumer.hentOppgave(oppgaveId);
-        oppgave.setStatus("FERDIGSTILT");
-        oppgaveConsumer.oppdaterOppgave(oppgaveId, oppgave);
+
+        oppgaveConsumer.oppdaterOppgave(oppgaveId,
+                OppgaveOppdateringDto.builder()
+                        .id(Integer.parseInt(oppgaveId))
+                        .versjon(versjon)
+                        .status("FERDIGSTILT")
+                        .build()
+        );
     }
 }

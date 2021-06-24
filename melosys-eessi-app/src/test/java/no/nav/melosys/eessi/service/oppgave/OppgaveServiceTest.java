@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.oppgave;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveOppdateringDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -78,11 +80,14 @@ class OppgaveServiceTest {
     @Test
     void ferdigstillOppgave_validerStatusFerdigstilt() {
         final var oppgaveID = "22222";
-        final var oppgaveDto = new HentOppgaveDto();
-        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+        final var oppgaveVersjon = 4;
+        var captor = ArgumentCaptor.forClass(OppgaveOppdateringDto.class);
 
-        oppgaveService.ferdigstillOppgave(oppgaveID);
+        oppgaveService.ferdigstillOppgave(oppgaveID, oppgaveVersjon);
 
-        assertThat(oppgaveDto.getStatus()).isEqualTo("FERDIGSTILT");
+        verify(oppgaveConsumer).oppdaterOppgave(eq(oppgaveID), captor.capture());
+        assertThat(captor.getValue())
+                .extracting(OppgaveOppdateringDto::getId, OppgaveOppdateringDto::getVersjon, OppgaveOppdateringDto::getStatus, OppgaveOppdateringDto::getBeskrivelse)
+                .containsExactly(Integer.parseInt(oppgaveID), oppgaveVersjon, "FERDIGSTILT", null);
     }
 }
