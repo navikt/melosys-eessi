@@ -30,7 +30,7 @@ public class OppgaveEndretConsumer {
             topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
             containerFactory = "oppgaveListenerContainerFactory")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
-        log.info("Oppgave endret: {}", consumerRecord.value());
+        log.debug("Oppgave endret: {}", consumerRecord.value());
         final var oppgave = consumerRecord.value();
 
         if (erIdentifisertOppgave(oppgave)) {
