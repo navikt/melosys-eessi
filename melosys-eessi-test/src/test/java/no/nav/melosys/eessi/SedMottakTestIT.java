@@ -109,7 +109,6 @@ class SedMottakTestIT extends ComponentTestBase {
                 .pollInterval(Duration.ofSeconds(1))
                 .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
 
-        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentRecords()).isEmpty();
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
