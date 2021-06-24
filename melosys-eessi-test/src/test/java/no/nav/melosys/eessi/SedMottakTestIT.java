@@ -2,6 +2,7 @@ package no.nav.melosys.eessi;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
@@ -18,14 +19,17 @@ import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
+import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -35,6 +39,8 @@ class SedMottakTestIT extends ComponentTestBase {
 
     @Autowired
     BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    @Autowired
+    SedMottattHendelseRepository sedMottattHendelseRepository;
     @Autowired
     SaksrelasjonService saksrelasjonService;
 
@@ -93,20 +99,28 @@ class SedMottakTestIT extends ComponentTestBase {
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
 
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
+        await().atMost(Duration.ofSeconds(4))
+                .pollInterval(Duration.ofSeconds(1))
+                .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+
         when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentRecords()).isEmpty();
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
+        Mockito.clearInvocations(oppgaveConsumer);
         kafkaTestConsumer.reset(3);
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
         kafkaTestConsumer.doWait(5_000L);
+
+        verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
         assertThat(hentRecords()).hasSize(2);
     }
