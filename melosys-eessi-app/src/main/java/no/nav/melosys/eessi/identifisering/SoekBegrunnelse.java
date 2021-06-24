@@ -1,6 +1,6 @@
-package no.nav.melosys.eessi.service.identifisering;
+package no.nav.melosys.eessi.identifisering;
 
-public enum SoekBegrunnelse {
+enum SoekBegrunnelse {
     IDENTIFISERT,
     INGEN_TREFF,
     FLERE_TREFF,

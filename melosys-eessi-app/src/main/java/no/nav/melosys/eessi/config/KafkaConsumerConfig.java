@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretHendelse;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -73,7 +73,7 @@ public class KafkaConsumerConfig {
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretHendelse>> oppgaveListenerContainerFactory(
             KafkaProperties properties) {
         Map<String, Object> props = properties.buildConsumerProperties();
-        props.putAll(consumerProperties("latest"));
+        props.putAll(consumerProperties("earliest"));
         DefaultKafkaConsumerFactory<String, OppgaveEndretHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
                 props, new StringDeserializer(), valueDeserializer(OppgaveEndretHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();

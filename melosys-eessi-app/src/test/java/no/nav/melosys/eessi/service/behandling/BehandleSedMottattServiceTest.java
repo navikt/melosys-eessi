@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -13,7 +14,6 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
@@ -24,7 +24,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -40,7 +41,7 @@ public class BehandleSedMottattServiceTest {
     private PersonFasade personFasade;
 
     @Mock
-    private PersonIdentifiseringService personIdentifiseringService;
+    private PersonIdentifisering personIdentifisering;
 
     @Mock
     private MelosysEessiProducer melosysEessiProducer;
@@ -56,7 +57,7 @@ public class BehandleSedMottattServiceTest {
     public void setup() throws Exception {
         behandleSedMottattService = new BehandleSedMottattService(
                 opprettInngaaendeJournalpostService, euxService, personFasade,
-                melosysEessiProducer, personIdentifiseringService, oppgaveService
+                melosysEessiProducer, personIdentifisering, oppgaveService
         );
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(any(), any(), any()))
@@ -71,7 +72,7 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_finnerIkkePerson_forventJournalpostOgOppgaveOpprettes() {
-        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.empty());
+        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
@@ -79,7 +80,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(melosysEessiProducer, never()).publiserMelding(any());
     }
@@ -93,7 +94,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(melosysEessiProducer, never()).publiserMelding(any());
@@ -109,7 +110,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
@@ -119,14 +120,14 @@ public class BehandleSedMottattServiceTest {
     @Test
     public void behandleSed_finnerPerson_forventPubliserKafkaMelding() {
         final String aktoerID = "12312312312";
-        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
-        when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
+        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+        when(personFasade.hentAktoerId(IDENT)).thenReturn(aktoerID);
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
         behandleSedMottattService.behandleSed(SedMottatt.av(sedHendelse));
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(personIdentifisering).identifiserPerson(any(), any());
         verify(personFasade).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
@@ -135,7 +136,7 @@ public class BehandleSedMottattServiceTest {
     @Test
     public void behandleSed_personAlleredeFunnet_forventIkkeIdentifiserOgPubliserKafkaMelding() {
         final String aktoerID = "12312312312";
-        when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
+        when(personFasade.hentAktoerId(IDENT)).thenReturn(aktoerID);
 
         SedHendelse sedHendelse = sedHendelseMedBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
@@ -145,7 +146,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(personFasade).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(melosysEessiProducer).publiserMelding(any());
@@ -154,7 +155,7 @@ public class BehandleSedMottattServiceTest {
     @Test
     public void behandleSed_personFunnetJournalpostOpprettet_forventKunPubliserKafka() {
         final String aktoerID = "12312312312";
-        when(personFasade.hentAktoerId(eq(IDENT))).thenReturn(aktoerID);
+        when(personFasade.hentAktoerId(IDENT)).thenReturn(aktoerID);
 
         SedHendelse sedHendelse = sedHendelseMedBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
@@ -165,7 +166,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(personFasade).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
@@ -174,7 +175,7 @@ public class BehandleSedMottattServiceTest {
 
     @Test
     public void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
-        when(personIdentifiseringService.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
 
         SedHendelse sedHendelse = sedHendelseMedBruker();
         SedMottatt sedMottatt = SedMottatt.av(sedHendelse);
@@ -184,7 +185,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService).identifiserPerson(any(), any());
+        verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
@@ -205,7 +206,7 @@ public class BehandleSedMottattServiceTest {
         behandleSedMottattService.behandleSed(sedMottatt);
 
         verify(euxService).hentSed(anyString(), anyString());
-        verify(personIdentifiseringService, never()).identifiserPerson(any(), any());
+        verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(personFasade, never()).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());

@@ -1,11 +1,10 @@
-package no.nav.melosys.eessi.service.identifisering;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.metrikker.PersonSokMetrikker;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Person;
@@ -20,7 +19,7 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 @Slf4j
 @Service
-public class PersonIdentifiseringService {
+class PersonIdentifiseringService implements PersonIdentifisering {
 
     private final PersonSok pdlPersonSok;
     private final SaksrelasjonService saksrelasjonService;
@@ -28,7 +27,7 @@ public class PersonIdentifiseringService {
     private final PersonFasade personFasade;
     private final PersonSokMetrikker personSokMetrikker;
 
-    public PersonIdentifiseringService(
+    PersonIdentifiseringService(
             PersonSok pdlPersonSok,
             SaksrelasjonService saksrelasjonService,
             SakService sakService,

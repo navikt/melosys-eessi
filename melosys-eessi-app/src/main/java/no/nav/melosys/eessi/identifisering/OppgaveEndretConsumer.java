@@ -1,14 +1,13 @@
-package no.nav.melosys.eessi.kafka.consumers;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.Collection;
 import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretHendelse;
+import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
-import no.nav.melosys.eessi.service.identifisering.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.ApplicationEventPublisher;

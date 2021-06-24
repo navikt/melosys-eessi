@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.oppgave;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 
 @Data
 @AllArgsConstructor
