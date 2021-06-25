@@ -1,18 +1,16 @@
-package no.nav.melosys.eessi.service.behandling;
+package no.nav.melosys.eessi.service.mottak;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
+import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.behandling.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.context.ApplicationEventPublisher;
@@ -21,10 +19,10 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class SedMottattBehandleService {
+public class SedMottakService {
 
     private final EuxService euxService;
-    private final PersonIdentifiseringService personIdentifiseringService;
+    private final PersonIdentifisering personIdentifisering;
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final OppgaveService oppgaveService;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -34,7 +32,7 @@ public class SedMottattBehandleService {
 
 
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
-        SED sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(),
+        var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(),
                 sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
         sedMottattHendelseRepository.save(sedMottattHendelse);
@@ -47,24 +45,22 @@ public class SedMottattBehandleService {
         }
 
         log.info("Søker etter person for SED");
-        var ident = personIdentifiseringService.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed);
-
-        if (ident.isPresent()) {
-            applicationEventPublisher.publishEvent(
-                    new BucIdentifisertEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), personFasade.hentAktoerId(ident.get()))
-            );
-        } else {
-            opprettOppgaveIdentifisering(sedMottattHendelse);
-        }
+        personIdentifisering.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed)
+                .ifPresentOrElse(
+                        ident -> applicationEventPublisher.publishEvent(
+                                new BucIdentifisertEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), personFasade.hentAktoerId(ident))
+                        ),
+                        () -> opprettOppgaveIdentifisering(sedMottattHendelse)
+                );
     }
 
     private void opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
         log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
-        SedMedVedlegg sedMedVedlegg = euxService.hentSedMedVedlegg(
+        var sedMedVedlegg = euxService.hentSedMedVedlegg(
                 sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
-        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+        var journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
                 sedMottattHendelse.getSedHendelse(), sedMedVedlegg, null);
         sedMottattHendelse.setJournalpostId(journalpostID);
     }
@@ -82,7 +78,7 @@ public class SedMottattBehandleService {
     }
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse) {
-        String oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
+        var oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 sedMottattHendelse.getJournalpostId(),
                 sedMottattHendelse.getSedHendelse().getSedType(),
                 sedMottattHendelse.getSedHendelse().getRinaSakId()

@@ -80,7 +80,7 @@ public abstract class ComponentTestBase {
     @MockBean
     PDLConsumer pdlConsumer;
 
-    @MockBean
+    @Autowired
     Unleash unleash;
 
     @Autowired

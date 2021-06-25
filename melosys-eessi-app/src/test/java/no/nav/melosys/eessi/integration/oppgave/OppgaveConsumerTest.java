@@ -8,12 +8,13 @@ import java.util.Optional;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 class OppgaveConsumerTest {
@@ -32,8 +33,9 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    public void hentOppgave_oppgaveFinnes_verifiserMapping() {
+    void hentOppgave_oppgaveFinnes_verifiserMapping() {
         server.expect(requestTo("/oppgaver/" + OPPGAVE_ID))
+                .andExpect(method(HttpMethod.GET))
                 .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
         var oppgave = oppgaveConsumer.hentOppgave(OPPGAVE_ID);
 
@@ -50,8 +52,9 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    public void opprettOppgave_verifiserMapping() {
+    void opprettOppgave_verifiserMapping() {
         server.expect(requestTo("/oppgaver"))
+                .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
         var oppgaveDto = opprettOppgave();
         var oppgave = oppgaveConsumer.opprettOppgave(oppgaveDto);
@@ -68,6 +71,25 @@ class OppgaveConsumerTest {
                 oppgave.getTema(),
                 oppgave.getTildeltEnhetsnr()
         );
+    }
+
+    @Test
+    void oppdaterOppgave_utenBeskrivelse_beksrivelseMappesIkkeTilRequest() {
+        final var forventetJsonBodyRequestUtenBeskrivelseFelt = """
+                {
+                    "id": 1,
+                    "versjon": 2,
+                    "status": "status"
+                }
+                """;
+
+        server.expect(requestTo("/oppgaver/" + OPPGAVE_ID))
+                .andExpect(method(HttpMethod.PATCH))
+                .andExpect(content().json(forventetJsonBodyRequestUtenBeskrivelseFelt))
+                .andRespond(withSuccess().contentType(MediaType.APPLICATION_JSON).body(hentOppgaveResponse()));
+
+        var oppgaveOppdateringDto = OppgaveOppdateringDto.builder().id(1).versjon(2).status("status").build();
+        assertThat(oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppgaveOppdateringDto)).isNotNull();
     }
 
     private OppgaveDto opprettOppgave() {

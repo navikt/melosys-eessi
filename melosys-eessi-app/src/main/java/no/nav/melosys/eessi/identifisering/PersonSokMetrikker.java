@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.metrikker;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -6,15 +6,16 @@ import java.util.Map;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.service.identifisering.SoekBegrunnelse;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.metrikker.MetrikkerNavn.IDENTIFISERING;
-import static no.nav.melosys.eessi.metrikker.MetrikkerNavn.KEY_RESULTAT;
+import static no.nav.melosys.eessi.metrikker.MetrikkerNavn.METRIKKER_NAMESPACE;
 
 @Slf4j
 @Component
-public class PersonSokMetrikker {
+class PersonSokMetrikker {
+
+    private static final String IDENTIFISERING = METRIKKER_NAMESPACE + "identifisering";
+    private static final String KEY_RESULTAT = "resultat";
 
     private static final String IDENTIFISERT = "identifisert";
     private static final String INGEN_TREFF = "nullTreff";
@@ -36,8 +37,8 @@ public class PersonSokMetrikker {
         SØKBEGRUNNELSE_TELLERE.put(SoekBegrunnelse.FNR_IKKE_FUNNET, Metrics.counter(IDENTIFISERING, KEY_RESULTAT, FNR_IKKE_FUNNET));
     }
 
-    public void counter(final SoekBegrunnelse soekBegrunnelse) {
-        Counter counter = SØKBEGRUNNELSE_TELLERE.get(soekBegrunnelse);
+    void counter(final SoekBegrunnelse soekBegrunnelse) {
+        var counter = SØKBEGRUNNELSE_TELLERE.get(soekBegrunnelse);
         if (counter != null) {
             counter.increment();
         } else {

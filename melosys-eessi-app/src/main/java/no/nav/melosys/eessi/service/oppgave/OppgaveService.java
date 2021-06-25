@@ -3,9 +3,10 @@ package no.nav.melosys.eessi.service.oppgave;
 import java.time.LocalDate;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.OppgaveOppdateringDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +34,7 @@ public class OppgaveService {
     }
 
     public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer) {
-        OppgaveDto oppgaveDto = OppgaveDto.builder()
+        var oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .fristFerdigstillelse(LocalDate.now().plusDays(1))
                 .journalpostId(journalpostID)
@@ -50,7 +51,7 @@ public class OppgaveService {
     }
 
     public String opprettUtgåendeJfrOppgave(String journalpostID, SedHendelse sedHendelse, String aktørId, String rinaUrl) {
-        OppgaveDto oppgaveDto = OppgaveDto.builder()
+        var oppgaveDto = OppgaveDto.builder()
                 .aktivDato(LocalDate.now())
                 .beskrivelse(lagBeskrivelseUtgåendeJfrOppgave(sedHendelse, rinaUrl))
                 .fristFerdigstillelse(LocalDate.now().plusDays(1))
@@ -70,5 +71,17 @@ public class OppgaveService {
     private static String lagBeskrivelseUtgåendeJfrOppgave(SedHendelse sedHendelse, String rinaUrl) {
         return String.format("%s, rinaSakId=%s, rinaDokumentId=%s, link=%s",
                 sedHendelse.getSedType(), sedHendelse.getRinaSakId(), sedHendelse.getRinaDokumentId(), rinaUrl);
+    }
+
+    public void ferdigstillOppgave(String oppgaveId, int versjon) {
+        log.info("Ferdigstiller oppgave {}", oppgaveId);
+
+        oppgaveConsumer.oppdaterOppgave(oppgaveId,
+                OppgaveOppdateringDto.builder()
+                        .id(Integer.parseInt(oppgaveId))
+                        .versjon(versjon)
+                        .status("FERDIGSTILT")
+                        .build()
+        );
     }
 }

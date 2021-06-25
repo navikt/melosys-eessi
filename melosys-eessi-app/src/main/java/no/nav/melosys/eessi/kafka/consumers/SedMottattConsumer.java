@@ -6,7 +6,7 @@ import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
-import no.nav.melosys.eessi.service.behandling.SedMottattBehandleService;
+import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,19 +21,19 @@ import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
 public class SedMottattConsumer {
 
     private final SedMottattService sedMottattService;
-    private final SedMottattBehandleService sedMottattBehandleService;
+    private final SedMottakService sedMottakService;
     private final BehandleSedMottattService behandleSedMottattService;
     private final SedMetrikker sedMetrikker;
     private final Unleash unleash;
 
     @Autowired
     public SedMottattConsumer(SedMottattService sedMottattService,
-                              SedMottattBehandleService sedMottattBehandleService,
+                              SedMottakService sedMottakService,
                               BehandleSedMottattService behandleSedMottattService,
                               SedMetrikker sedMetrikker,
                               Unleash unleash) {
         this.sedMottattService = sedMottattService;
-        this.sedMottattBehandleService = sedMottattBehandleService;
+        this.sedMottakService = sedMottakService;
         this.behandleSedMottattService = behandleSedMottattService;
         this.sedMetrikker = sedMetrikker;
         this.unleash = unleash;
@@ -46,7 +46,7 @@ public class SedMottattConsumer {
         loggSedID(consumerRecord.value().getSedId());
 
         if (unleash.isEnabled("melosys.eessi.en_identifisering_oppg")) {
-            sedMottattBehandleService.behandleSed(SedMottattHendelse.builder()
+            sedMottakService.behandleSed(SedMottattHendelse.builder()
                     .sedHendelse(consumerRecord.value())
                     .build());
         } else {

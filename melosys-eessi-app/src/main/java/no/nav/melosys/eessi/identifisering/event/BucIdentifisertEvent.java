@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.behandling.event;
+package no.nav.melosys.eessi.identifisering.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

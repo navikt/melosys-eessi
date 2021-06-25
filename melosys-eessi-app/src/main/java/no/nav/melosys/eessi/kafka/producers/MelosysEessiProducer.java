@@ -1,13 +1,13 @@
 package no.nav.melosys.eessi.kafka.producers;
 
+import java.util.concurrent.ExecutionException;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
+import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 
 @Slf4j
 @Service
@@ -22,21 +22,13 @@ public class MelosysEessiProducer {
     }
 
     public void publiserMelding(MelosysEessiMelding melding) {
-        ListenableFuture<SendResult<String, MelosysEessiMelding>> future = kafkaTemplate.send(topicName, melding);
-
-        future.addCallback(new ListenableFutureCallback<>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                log.error("Kunne ikke sende melding om mottat SED: {}", melding, throwable);
-            }
-
-            @Override
-            public void onSuccess(SendResult<String, MelosysEessiMelding> res) {
-                log.info("Melding sendt på topic {}. Record.key: {}, offset: {}, rinaSaksnummer: {}",
-                        topicName, res.getProducerRecord().key(),
-                        res.getRecordMetadata().offset(),
-                        res.getProducerRecord().value().getRinaSaksnummer());
-            }
-        });
+        try {
+            kafkaTemplate.send(topicName, melding).get();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IntegrationException("Feil ved publisering av melding på kafka", e);
+        } catch (ExecutionException e) {
+            throw new IntegrationException("Feil ved publisering av melding på kafka", e);
+        }
     }
 }

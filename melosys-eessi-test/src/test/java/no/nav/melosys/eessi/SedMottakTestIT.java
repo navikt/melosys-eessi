@@ -1,13 +1,17 @@
 package no.nav.melosys.eessi;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.FakeUnleash;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveEndretDto;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
@@ -15,6 +19,7 @@ import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
+import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -33,8 +39,9 @@ class SedMottakTestIT extends ComponentTestBase {
     @Autowired
     BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     @Autowired
+    SedMottattHendelseRepository sedMottattHendelseRepository;
+    @Autowired
     SaksrelasjonService saksrelasjonService;
-
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
 
@@ -98,14 +105,19 @@ class SedMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
+        await().atMost(Duration.ofSeconds(4))
+                .pollInterval(Duration.ofSeconds(1))
+                .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentRecords()).isEmpty();
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
-        kafkaTestConsumer.reset(4);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, sedID)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, sedID)).get();
+        kafkaTestConsumer.reset(3);
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
         kafkaTestConsumer.doWait(5_000L);
+
+        verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
         assertThat(hentRecords()).hasSize(2);
     }
@@ -138,20 +150,17 @@ class SedMottakTestIT extends ComponentTestBase {
 
     }
 
-    private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String aktørID) {
-        return new ProducerRecord<>("oppgave-endret", "key", lagOppgaveEndret(oppgaveID, aktørID));
+    private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID) {
+        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, AKTOER_ID, FNR));
     }
 
-    private OppgaveEndretDto lagOppgaveEndret(String oppgaveID, String aktørID) {
-        var oppgaveEndret = new OppgaveEndretDto();
-        oppgaveEndret.setId(Long.valueOf(oppgaveID));
-        oppgaveEndret.setAktoerId(aktørID);
-        oppgaveEndret.setOppgavetype("JFR");
-        oppgaveEndret.setStatus("AAPNET");
-        oppgaveEndret.setTema("MED");
-        oppgaveEndret.setTildeltEnhetsnr("4530");
-        oppgaveEndret.getMetadata().put(OppgaveMetadataKey.RINA_SAKID, "123");
-        return oppgaveEndret;
+    @SneakyThrows
+    private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID) {
+        var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
+        var oppgaveJsonString = Files.readString(path);
+        return new ObjectMapper().readTree( oppgaveJsonString.replaceAll("\\$id", oppgaveID)
+                                .replaceAll("\\$fnr", ident)
+                                .replaceAll("\\$aktoerid", aktørID)
+                                .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
-
 }
