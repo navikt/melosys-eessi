@@ -22,6 +22,7 @@ public class BucIdentifiseringService {
     private final SaksrelasjonService saksrelasjonService;
     private final EuxService euxService;
     private final MelosysEessiProducer melosysEessiProducer;
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
 
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
@@ -30,7 +31,7 @@ public class BucIdentifiseringService {
     }
 
     private void publiserMelding(SedMottattHendelse sedMottattHendelse, String aktørID) {
-        final var mapper = MelosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedMottattHendelse.getSedHendelse().getSedType()));
+        final var mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedMottattHendelse.getSedHendelse().getSedType()));
         final var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         final var sedErEndring = euxService.sedErEndring(sedMottattHendelse.getSedHendelse().getRinaDokumentId(), sedMottattHendelse.getSedHendelse().getRinaSakId());
         final var arkivsakID = saksrelasjonService.finnVedRinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
