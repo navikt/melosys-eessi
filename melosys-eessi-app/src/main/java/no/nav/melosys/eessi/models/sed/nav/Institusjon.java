@@ -5,11 +5,8 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Sak {
+public class Institusjon {
 
-    private X001Anmodning anmodning;
-
-    private Kontekst kontekst;
-
-    private X006FjernInstitusjon fjerninstitusjon;
+    private String id;
+    private String navn;
 }

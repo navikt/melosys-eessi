@@ -1,0 +1,35 @@
+{
+  "nav": {
+    "sak": {
+      "anmodning": {
+        "avslutning": {
+          "dato": "2018-09-08",
+          "aarsak": {
+            "annet": "dasd asdasdasda",
+            "type": "annet"
+          },
+          "type": "manuell"
+        }
+      },
+      "kontekst": {
+        "bruker": {
+          "person": {
+            "kjoenn": "M",
+            "fornavn": "asdsdjoiuo",
+            "etternavn": "asd asdsd",
+            "foedselsdato": "2000-01-01"
+          }
+        }
+      },
+      "X006FjernInstitusjon": {
+        "Institusjon": {
+          "id": "NO:NAVAT07",
+          "navn": "NO:NAVAT07"
+        }
+      }
+    }
+  },
+  "sed": "X006",
+  "sedGVer": "4",
+  "sedVer": "1"
+}

@@ -10,8 +10,8 @@ import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +21,7 @@ public class MelosysEessiMeldingMapperA010Test {
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
 
-    @Before
+    @BeforeEach
     public void setup() {
         sedHendelse = createSedHendelse();
         sakInformasjon = createSakInformasjon();

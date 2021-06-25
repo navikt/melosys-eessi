@@ -11,8 +11,8 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.AVSLAG;
 import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.DELVIS_INNVILGELSE;
@@ -23,11 +23,14 @@ public class MelosysEessiMeldingMapperA002Test {
 
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
+    private MelosysEessiMeldingMapper mapper;
+    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
-    @Before
+    @BeforeEach
     public void setup() {
         sedHendelse = createSedHendelse();
         sakInformasjon = createSakInformasjon();
+        mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A002);
     }
 
     @Test
@@ -35,7 +38,7 @@ public class MelosysEessiMeldingMapperA002Test {
         SED sed = createSed(hentMedlemskap(false));
 
 
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002)
+        MelosysEessiMelding melosysEessiMelding = mapper
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
@@ -54,7 +57,7 @@ public class MelosysEessiMeldingMapperA002Test {
     public void mapA002_avslag_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap(true));
 
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapperFactory.getMapper(SedType.A002)
+        MelosysEessiMelding melosysEessiMelding = mapper
                 .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");

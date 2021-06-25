@@ -35,9 +35,9 @@ public class BUC {
     private String internationalId;
 
     public boolean kanOppretteEllerOppdatereSed(SedType sedType) {
-        return actions.stream().anyMatch(action ->
-                sedType.name().equalsIgnoreCase(action.getDocumentType())
-                        && ("CREATE".equalsIgnoreCase(action.getOperation())) || "UPDATE".equalsIgnoreCase(action.getOperation()));
+        return actions.stream()
+                .filter(a -> sedType.name().equalsIgnoreCase(a.getDocumentType()))
+                .anyMatch(action -> "CREATE".equalsIgnoreCase(action.getOperation()) || "UPDATE".equalsIgnoreCase(action.getOperation()));
     }
 
     public Document hentDokument(String dokumentID) {

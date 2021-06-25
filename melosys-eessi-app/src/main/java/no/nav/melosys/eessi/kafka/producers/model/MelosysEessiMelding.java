@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 
 @Data
 public class MelosysEessiMelding {
@@ -23,6 +24,7 @@ public class MelosysEessiMelding {
     private String artikkel;
     private boolean erEndring;
     private boolean midlertidigBestemmelse;
+    private boolean x006NavErFjernet;
     private String ytterligereInformasjon;
     private String bucType;
     private String sedType;

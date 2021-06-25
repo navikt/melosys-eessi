@@ -347,6 +347,28 @@ class LukkBucServiceTest {
     }
 
     @Test
+    void lukkBucerAvType_LaBuc02kanBareOppretteA012_lukkesIkke() {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
+
+        BUC buc = lagBuc(BucType.LA_BUC_02, SedType.A003);
+        buc.getActions().iterator().next().setDocumentType(SedType.A012.name());
+
+        when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
+        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
+
+        verify(euxService).hentBucer(any(BucSearch.class));
+        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService, never()).hentSed(any(), any());
+        verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
+    }
+
+
+    @Test
     void forsøkLukkBucAsync_ingenActionForX001_lukkerIkkeBUC() {
         final var buc = lagBuc();
         buc.getActions().clear();
