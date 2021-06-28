@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
@@ -128,11 +129,11 @@ public class EuxService {
         return euxConsumer.genererPdfFraSed(sed);
     }
 
-    public String hentRinaUrl(String rinaCaseId) {
+    public String hentRinaUrl(String rinaCaseId){
         if (!StringUtils.hasText(rinaCaseId)) {
             throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
-        return rinaHostUrl + RINA_URL_TEMPLATE + rinaCaseId;
+        return euxConsumer.hentRinaUrl(rinaCaseId);
     }
 
     public String hentRinaUrlPrefix() {

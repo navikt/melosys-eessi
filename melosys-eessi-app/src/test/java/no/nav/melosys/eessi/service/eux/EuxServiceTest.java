@@ -117,8 +117,11 @@ public class EuxServiceTest {
 
     @Test
     public void hentRinaUrl_medRinaSaksnummer_forventUrl() {
-        String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/12345";
-        String resultUrl = euxService.hentRinaUrl("12345");
+        String rinaSak = "12345";
+        when(euxConsumer.hentRinaUrl(rinaSak)).thenReturn(RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak);
+
+        String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak;
+        String resultUrl = euxService.hentRinaUrl(rinaSak);
 
         assertThat(resultUrl).isEqualTo(expectedUrl);
     }

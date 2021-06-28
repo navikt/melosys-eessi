@@ -122,7 +122,7 @@ public class SedService {
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
         if (!buc.kanOppretteEllerOppdatereSed(sedType)) {
-            throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc "+ rinaSaksnummer + " med type " + buc.getBucType());
+            throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc " + rinaSaksnummer + " med type " + buc.getBucType());
         }
 
         SED sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
