@@ -8,14 +8,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class X001MapperTest {
+class X001MapperTest {
 
     @Test
-    public void mapFraSed() throws Exception {
+    void mapFraSed() throws Exception {
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA009.json");
 
@@ -25,9 +25,8 @@ public class X001MapperTest {
         X001Mapper mapper = new X001Mapper();
         SED x001 = mapper.mapFraSed(fraSed, "aarsaken");
 
-        assertThat(x001).isNotNull();
-        assertThat(x001.getMedlemskap()).isNull();
-        assertThat(x001.getSedType()).isEqualTo(SedType.X001.name());
+        assertThat(x001).extracting(SED::getSedType, SED::getMedlemskap)
+                .containsExactly(SedType.X001.name(), null);
 
         //Påkrevde felter
         assertThat(x001.getNav().getSak().getKontekst().getBruker().getPerson().getFornavn()).isNotNull();

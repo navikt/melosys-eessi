@@ -21,18 +21,18 @@ import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class JournalpostSedKoblingServiceTest {
+@ExtendWith(MockitoExtension.class)
+class JournalpostSedKoblingServiceTest {
     @Mock
     private JournalpostSedKoblingRepository journalpostSedKoblingRepository;
     @Mock
@@ -54,7 +54,7 @@ public class JournalpostSedKoblingServiceTest {
     private Organisation organisation;
     private JournalpostSedKobling journalpostSedKobling;
 
-    @Before
+    @BeforeEach
     public void setup() {
         journalpostSedKoblingService = new JournalpostSedKoblingService(
                 journalpostSedKoblingRepository, caseStoreConsumer, euxService, saksrelasjonService,
@@ -77,7 +77,7 @@ public class JournalpostSedKoblingServiceTest {
     }
 
     @Test
-    public void finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIDB_forventMelosysEessiMelding() throws Exception {
+    void finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIDB_forventMelosysEessiMelding() {
         when(journalpostSedKoblingRepository.findByJournalpostID(anyString()))
                 .thenReturn(Optional.of(journalpostSedKobling));
         when(euxService.hentBuc(anyString())).thenReturn(buc);
@@ -92,7 +92,7 @@ public class JournalpostSedKoblingServiceTest {
     }
 
     @Test
-    public void finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIEuxCaseStore_forventMelosysEessiMelding() throws Exception {
+    void finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIEuxCaseStore_forventMelosysEessiMelding() {
         when(journalpostSedKoblingRepository.findByJournalpostID(anyString()))
                 .thenReturn(Optional.empty());
         when(caseStoreConsumer.finnVedJournalpostID(anyString()))

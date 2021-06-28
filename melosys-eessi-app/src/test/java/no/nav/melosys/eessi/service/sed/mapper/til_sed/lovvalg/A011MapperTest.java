@@ -7,25 +7,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class A011MapperTest {
+class A011MapperTest {
 
-    private A011Mapper a011Mapper = new A011Mapper();
+    private final A011Mapper a011Mapper = new A011Mapper();
 
     private SED a001;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException {
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA001.json");
         a001 = new ObjectMapper().readValue(jsonUrl, SED.class);
     }
 
     @Test
-    public void mapFraEksisterendeSedA001() {
+    void mapFraEksisterendeSedA001() {
         SED a011 = a011Mapper.mapFraSed(a001);
 
         assertThat(a011.getSedType()).isEqualToIgnoringCase(SedType.A011.toString());

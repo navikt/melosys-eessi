@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -46,7 +46,7 @@ class RestStsServiceTest {
         body.put("access_token", "123abc");
         body.put("expires_in", 30L);
 
-        ResponseEntity<Map> responseEntity = new ResponseEntity<>(body, HttpStatus.OK);
+        ResponseEntity<Map<String, Object>> responseEntity = new ResponseEntity<>(body, HttpStatus.OK);
 
         when(restTemplate.exchange(anyString(), any(HttpMethod.class), any(HttpEntity.class), any(
                 ParameterizedTypeReference.class)))
@@ -55,8 +55,7 @@ class RestStsServiceTest {
         String token = restStsService.collectToken();
         verify(restTemplate, times(1))
                 .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
-        assertNotNull(token);
-        assertFalse(token.isEmpty());
+        assertThat(token).isNotEmpty();
 
         body.put("access_token", "cba321");
         body.put("expires_in", 3600L);
@@ -64,13 +63,13 @@ class RestStsServiceTest {
         String secondToken = restStsService.collectToken();
         verify(restTemplate, times(2))
                 .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
-        assertNotEquals(token, secondToken);
+        assertThat(token).isNotEqualTo(secondToken);
 
         body.put("access_token", "abccba");
 
         String thirdToken = restStsService.collectToken();
         verify(restTemplate, times(2))
                 .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
-        assertEquals(secondToken, thirdToken);
+        assertThat(secondToken).isEqualTo(thirdToken);
     }
 }

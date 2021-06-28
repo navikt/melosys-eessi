@@ -9,24 +9,24 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HorisontalSedMapperTest {
+class HorisontalSedMapperTest {
 
-    private HorisontalSedMapper h005Mapper = new HorisontalSedMapper(SedType.H005);
+    private final HorisontalSedMapper h005Mapper = new HorisontalSedMapper(SedType.H005);
 
     private SedDataDto sedData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
     }
 
     @Test
-    public void mapTilSed() throws MappingException, NotFoundException {
+    void mapTilSed() throws MappingException, NotFoundException {
         SED h005 = h005Mapper.mapTilSed(sedData);
 
         assertThat(h005).isNotNull();

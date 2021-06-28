@@ -1,12 +1,11 @@
 package no.nav.melosys.eessi.security;
 
 import no.nav.melosys.eessi.service.sts.RestStsService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
@@ -17,12 +16,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SystemContextClientRequestInterceptorTest {
+@ExtendWith(MockitoExtension.class)
+class SystemContextClientRequestInterceptorTest {
 
     @Mock
     private RestStsService restStsService;
-    @InjectMocks
+
     private SystemContextClientRequestInterceptor systemContextClientRequestInterceptor;
 
     @Mock
@@ -30,12 +29,14 @@ public class SystemContextClientRequestInterceptorTest {
 
     private final String oidcKey = "t43i56oh4yoi5";
 
-    @Before
+    @BeforeEach
     public void setup() {
+        systemContextClientRequestInterceptor = new SystemContextClientRequestInterceptor(restStsService);
         when(restStsService.collectToken()).thenReturn(oidcKey);
     }
+
     @Test
-    public void intercept() throws Exception {
+    void intercept() throws Exception {
         MockClientHttpRequest httpRequest = new MockClientHttpRequest();
         systemContextClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
 

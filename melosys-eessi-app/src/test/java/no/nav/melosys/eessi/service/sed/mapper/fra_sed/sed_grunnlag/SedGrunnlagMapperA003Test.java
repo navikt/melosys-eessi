@@ -11,14 +11,14 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-public class SedGrunnlagMapperA003Test {
+class SedGrunnlagMapperA003Test {
     @Test
-    public void map_medUtfyltNav_forventVerdier() throws IOException {
+    void map_medUtfyltNav_forventVerdier() throws IOException {
         SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagMapperA003().map(hentSed());
 
         assertThat(sedGrunnlagDto).isNotNull();
@@ -83,7 +83,7 @@ public class SedGrunnlagMapperA003Test {
     }
 
     @Test
-    public void map_ingenBostedsadresse_forventPostadresse() throws IOException {
+    void map_ingenBostedsadresse_forventPostadresse() throws IOException {
         SED sed = hentSed();
         var adresse = sed.getNav().getBruker().getAdresse().get(0);
         adresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
@@ -95,15 +95,15 @@ public class SedGrunnlagMapperA003Test {
     }
 
     @Test
-    public void map_ingenAdresse_forventTomAdresse() throws IOException {
+    void map_ingenAdresse_forventTomAdresse() throws IOException {
         SED sed = hentSed();
         sed.getNav().getBruker().setAdresse(List.of());
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse()).isEqualToComparingFieldByField(new Adresse());
+        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse()).isEqualTo(new Adresse());
     }
 
     @Test
-    public void map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() throws IOException {
+    void map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() throws IOException {
         SED sed = hentSed();
         Pin pin = sed.getNav().getBruker().getPerson().getPin().iterator().next();
         pin.setLand("NO");
@@ -113,7 +113,7 @@ public class SedGrunnlagMapperA003Test {
     }
 
     @Test
-    public void map_ingenGate_forventKunBygning() throws IOException {
+    void map_ingenGate_forventKunBygning() throws IOException {
         SED sed = hentSed();
         var adresse = sed.getNav().getBruker().getAdresse().get(0);
         adresse.setGate(null);
@@ -123,7 +123,7 @@ public class SedGrunnlagMapperA003Test {
     }
 
     @Test
-    public void map_ingenBygning_forventKunGate() throws IOException {
+    void map_ingenBygning_forventKunGate() throws IOException {
         SED sed = hentSed();
         var adresse = sed.getNav().getBruker().getAdresse().get(0);
         adresse.setBygning(null);
@@ -133,7 +133,7 @@ public class SedGrunnlagMapperA003Test {
     }
 
     @Test
-    public void map_ingenArbeidsgiverAdresse_forventIkkeNorskArbeidsgiver() throws IOException {
+    void map_ingenArbeidsgiverAdresse_forventIkkeNorskArbeidsgiver() throws IOException {
         Consumer<Arbeidsgiver> settTomAdresse = (Arbeidsgiver arbeidsgiver) -> arbeidsgiver.setAdresse(null);
 
         SED sed = hentSed();
@@ -144,7 +144,7 @@ public class SedGrunnlagMapperA003Test {
     }
 
     @Test
-    public void map_norskArbeidsgiverNullIdentifikator_forventIngenIdentifikator() throws IOException {
+    void map_norskArbeidsgiverNullIdentifikator_forventIngenIdentifikator() throws IOException {
         SED sed = hentSed();
         ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().iterator().next().setIdentifikator(null);
 

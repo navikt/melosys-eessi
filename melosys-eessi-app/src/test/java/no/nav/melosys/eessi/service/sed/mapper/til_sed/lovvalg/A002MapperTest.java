@@ -8,20 +8,20 @@ import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class A002MapperTest {
-    private A002Mapper a002Mapper = new A002Mapper();
+class A002MapperTest {
+    private final A002Mapper a002Mapper = new A002Mapper();
 
     @Test
-    public void mapTilSed_forventSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
+    void mapTilSed_forventSed() throws IOException, URISyntaxException {
         SedDataDto sedData = SedDataStub.getStub();
         SvarAnmodningUnntakDto svarAnmodningUnntakDto = new SvarAnmodningUnntakDto(
                 SvarAnmodningUnntakBeslutning.AVSLAG,
@@ -35,9 +35,11 @@ public class A002MapperTest {
         assertThat(a002.getMedlemskap()).isInstanceOf(MedlemskapA002.class);
     }
 
-    @Test(expected = MappingException.class)
-    public void mapTilSed_utenSvarAnmodningUnntak_forventException() throws MappingException, NotFoundException, IOException, URISyntaxException {
+    @Test
+    void mapTilSed_utenSvarAnmodningUnntak_forventException() throws IOException, URISyntaxException {
         SedDataDto sedData = SedDataStub.getStub();
-        a002Mapper.mapTilSed(sedData);
+        assertThatExceptionOfType(MappingException.class)
+                .isThrownBy(() -> a002Mapper.mapTilSed(sedData))
+                .withMessageContaining("Trenger SvarAnmodningUnntak");
     }
 }
