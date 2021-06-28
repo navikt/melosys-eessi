@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.identifisering;
+package no.nav.melosys.eessi.identifisering;
 
 import java.util.Collection;
 
@@ -10,16 +10,16 @@ import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harOverlappendeStatsborgerskap;
-import static no.nav.melosys.eessi.service.identifisering.PersonKontroller.harSammeFoedselsdato;
+import static no.nav.melosys.eessi.identifisering.PersonKontroller.harOverlappendeStatsborgerskap;
+import static no.nav.melosys.eessi.identifisering.PersonKontroller.harSammeFoedselsdato;
 
 @Slf4j
 @Component
-public class PersonSok {
+class PersonSok {
 
     private final PersonFasade personFasade;
 
-    public PersonSok(PersonFasade personFasade) {
+    PersonSok(PersonFasade personFasade) {
         this.personFasade = personFasade;
     }
 

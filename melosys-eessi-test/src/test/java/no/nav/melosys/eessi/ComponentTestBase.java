@@ -1,6 +1,9 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
 import no.finn.unleash.Unleash;
@@ -16,9 +19,11 @@ import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
+import no.nav.melosys.utils.ConsumerRecordPredicates;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +48,8 @@ public abstract class ComponentTestBase {
     static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     static final String STATSBORGERSKAP = "NO";
     static final String FNR = "25068420779";
+    static final String AKTOER_ID = "1234567890123";
+    static final String RINA_SAKSNUMMER = Integer.toString(new Random().nextInt(100000));
 
     protected final MockData mockData = new MockData();
 
@@ -73,7 +80,7 @@ public abstract class ComponentTestBase {
     @MockBean
     PDLConsumer pdlConsumer;
 
-    @MockBean
+    @Autowired
     Unleash unleash;
 
     @Autowired
@@ -82,7 +89,7 @@ public abstract class ComponentTestBase {
     @Autowired
     SedMottattRepository sedMottattRepository;
 
-    protected ProducerRecord<String, Object> createProducerRecord(SedHendelse sedHendelse) {
+    protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
         return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", sedHendelse);
     }
 
@@ -104,5 +111,9 @@ public abstract class ComponentTestBase {
         when(pdlConsumer.hentIdenter(ident)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
         when(pdlConsumer.hentIdenter(aktørID)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
         when(pdlConsumer.hentPerson(ident)).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
+    }
+
+    List<ConsumerRecord<Object, Object>> hentRecords() {
+        return kafkaTestConsumer.getRecords().stream().filter(ConsumerRecordPredicates.topic("privat-melosys-eessi-v1-local")).collect(Collectors.toList());
     }
 }

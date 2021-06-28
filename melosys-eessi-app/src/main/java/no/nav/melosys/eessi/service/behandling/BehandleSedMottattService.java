@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.behandling;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -11,7 +12,6 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.identifisering.PersonIdentifiseringService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
@@ -22,13 +22,14 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@Deprecated(forRemoval = true)
 public class BehandleSedMottattService {
 
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final EuxService euxService;
     private final PersonFasade personFasade;
     private final MelosysEessiProducer melosysEessiProducer;
-    private final PersonIdentifiseringService personIdentifiseringService;
+    private final PersonIdentifisering personIdentifisering;
     private final OppgaveService oppgaveService;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
 
@@ -38,13 +39,13 @@ public class BehandleSedMottattService {
             EuxService euxService,
             PersonFasade personFasade,
             MelosysEessiProducer melosysEessiProducer,
-            PersonIdentifiseringService personIdentifiseringService,
+            PersonIdentifisering personIdentifisering,
             OppgaveService oppgaveService, MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.personFasade = personFasade;
         this.melosysEessiProducer = melosysEessiProducer;
-        this.personIdentifiseringService = personIdentifiseringService;
+        this.personIdentifisering = personIdentifisering;
         this.oppgaveService = oppgaveService;
         this.melosysEessiMeldingMapperFactory = melosysEessiMeldingMapperFactory;
     }
@@ -81,7 +82,7 @@ public class BehandleSedMottattService {
 
     private void identifiserPerson(SedMottatt sedMottatt, SED sed) {
         log.info("Søker etter person for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
-        personIdentifiseringService.identifiserPerson(sedMottatt.getSedHendelse().getRinaSakId(), sed)
+        personIdentifisering.identifiserPerson(sedMottatt.getSedHendelse().getRinaSakId(), sed)
                 .ifPresent(s -> sedMottatt.getSedKontekst().setNavIdent(s));
         sedMottatt.getSedKontekst().setForsoktIdentifisert(true);
         sedMottatt.getSedHendelse().setNavBruker(sedMottatt.getSedKontekst().getNavIdent());
@@ -122,13 +123,11 @@ public class BehandleSedMottattService {
 
         SedHendelse sedHendelse = sedMottatt.getSedHendelse();
         String aktoerID = personFasade.hentAktoerId(sedMottatt.getSedKontekst().getNavIdent());
-        // avsenderID har formatet <landkodeISO2>:<institusjonID>
-        String landkode = sedHendelse.getAvsenderId().substring(0, 2);
         boolean sedErEndring = euxService.sedErEndring(sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId());
 
         melosysEessiProducer.publiserMelding(
                 mapper.map(aktoerID, sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), landkode,
+                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), sedHendelse.getLandkode(),
                         sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
                         sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring, sedHendelse.getRinaDokumentVersjon())
         );

@@ -1,6 +1,11 @@
 package no.nav.melosys.eessi.integration.oppgave;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
@@ -34,4 +39,12 @@ public class OppgaveDto {
     private String tildeltEnhetsnr;
     private String behandlesAvApplikasjon;
     private String beskrivelse;
+    private String status;
+    private Map<OppgaveMetadataKey, String> metadata = new EnumMap<>(OppgaveMetadataKey.class);
+
+    private static final Collection<String> OPPGAVE_STATUSER_ÅPEN = Set.of("OPPRETTET", "AAPNET", "UNDER_BEHANDLING");
+
+    public boolean erÅpen() {
+        return OPPGAVE_STATUSER_ÅPEN.contains(status);
+    }
 }

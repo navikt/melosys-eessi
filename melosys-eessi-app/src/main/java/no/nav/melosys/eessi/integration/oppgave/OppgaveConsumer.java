@@ -21,14 +21,22 @@ public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
         this.restTemplate = restTemplate;
     }
 
-    public OpprettOppgaveResponseDto opprettOppgave(OppgaveDto oppgaveDto) {
-        return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), OpprettOppgaveResponseDto.class);
+    public HentOppgaveDto hentOppgave(String oppgaveID) {
+        return exchange("/oppgaver/{oppgaveID}", HttpMethod.GET, new HttpEntity<>(headers()), HentOppgaveDto.class, oppgaveID);
+    }
+
+    public HentOppgaveDto opprettOppgave(OppgaveDto oppgaveDto) {
+        return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), HentOppgaveDto.class);
+    }
+
+    public HentOppgaveDto oppdaterOppgave(String oppgaveID, OppgaveOppdateringDto oppgaveOppdateringDto) {
+        return exchange("/oppgaver/{oppgaveID}", HttpMethod.PATCH, new HttpEntity<>(oppgaveOppdateringDto, headers()), HentOppgaveDto.class, oppgaveID);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            Class<T> clazz) {
+            Class<T> clazz, Object... params) {
         try {
-            return restTemplate.exchange(uri, method, entity, clazz).getBody();
+            return restTemplate.exchange(uri, method, entity, clazz, params).getBody();
         } catch (RestClientException e) {
             throw new IntegrationException("Feil i integrasjon mot oppgave: " + hentFeilmeldingForOppgave(e), e);
         }

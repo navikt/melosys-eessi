@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -33,11 +34,11 @@ public class KafkaConsumerConfig {
         this.groupId = groupId;
     }
 
-    private Map<String, Object> sedEventConsumerConfig() {
+    private Map<String, Object> consumerProperties(String offsetResetConfig) {
         Map<String, Object> props = new HashMap<>();
         props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, offsetResetConfig);
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 15000);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -48,12 +49,12 @@ public class KafkaConsumerConfig {
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedSendt() {
         // Return false to be dismissed
-        return record -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(record.value().getSektorKode());
+        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
     }
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedMottatt() {
         // Return false to be dismissed
-        return record -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(record.value().getSektorKode());
+        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
     }
 
     @Bean
@@ -68,10 +69,24 @@ public class KafkaConsumerConfig {
         return sedListenerContainerFactory(properties, recordFilterStrategySedSendt());
     }
 
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretHendelse>> oppgaveListenerContainerFactory(
+            KafkaProperties properties) {
+        Map<String, Object> props = properties.buildConsumerProperties();
+        props.putAll(consumerProperties("earliest"));
+        DefaultKafkaConsumerFactory<String, OppgaveEndretHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+                props, new StringDeserializer(), valueDeserializer(OppgaveEndretHendelse.class));
+        ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.setErrorHandler(new SeekToCurrentErrorHandler());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+        return factory;
+    }
+
     private KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedListenerContainerFactory(
             KafkaProperties properties, RecordFilterStrategy<String, SedHendelse> recordFilterStrategy) {
         Map<String, Object> props = properties.buildConsumerProperties();
-        props.putAll(sedEventConsumerConfig());
+        props.putAll(consumerProperties("earliest"));
         DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
                 props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();

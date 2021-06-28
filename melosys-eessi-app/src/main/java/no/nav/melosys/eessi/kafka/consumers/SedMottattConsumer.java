@@ -1,15 +1,15 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.behandling.BehandleSedMottattService;
-import no.nav.melosys.eessi.service.behandling.SedMottattBehandleService;
+import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.sed.SedMottattService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -21,22 +21,22 @@ import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
 public class SedMottattConsumer {
 
     private final SedMottattService sedMottattService;
-    private final SedMottattBehandleService sedMottattBehandleService;
+    private final SedMottakService sedMottakService;
     private final BehandleSedMottattService behandleSedMottattService;
     private final SedMetrikker sedMetrikker;
-    private final boolean brukNySedMottatService;
+    private final Unleash unleash;
 
     @Autowired
     public SedMottattConsumer(SedMottattService sedMottattService,
-                              SedMottattBehandleService sedMottattBehandleService,
+                              SedMottakService sedMottakService,
                               BehandleSedMottattService behandleSedMottattService,
                               SedMetrikker sedMetrikker,
-                              @Value("${melosys.feature.nyttMottak}") String brukNySedMottattService) {
+                              Unleash unleash) {
         this.sedMottattService = sedMottattService;
-        this.sedMottattBehandleService = sedMottattBehandleService;
+        this.sedMottakService = sedMottakService;
         this.behandleSedMottattService = behandleSedMottattService;
         this.sedMetrikker = sedMetrikker;
-        this.brukNySedMottatService = "true".equals(brukNySedMottattService);
+        this.unleash = unleash;
     }
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
@@ -45,8 +45,8 @@ public class SedMottattConsumer {
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
         loggSedID(consumerRecord.value().getSedId());
 
-        if (brukNySedMottatService) {
-            sedMottattBehandleService.behandleSed(SedMottattHendelse.builder()
+        if (unleash.isEnabled("melosys.eessi.en_identifisering_oppg")) {
+            sedMottakService.behandleSed(SedMottattHendelse.builder()
                     .sedHendelse(consumerRecord.value())
                     .build());
         } else {

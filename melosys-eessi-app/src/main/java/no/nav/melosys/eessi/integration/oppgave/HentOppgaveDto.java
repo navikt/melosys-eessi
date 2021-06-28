@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OpprettOppgaveResponseDto extends OppgaveDto {
+public class HentOppgaveDto extends OppgaveDto {
     private String id;
 }

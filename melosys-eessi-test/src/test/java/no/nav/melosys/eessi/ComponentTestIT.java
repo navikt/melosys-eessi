@@ -1,20 +1,18 @@
 package no.nav.melosys.eessi;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.oppgave.OpprettOppgaveResponseDto;
+import no.finn.unleash.FakeUnleash;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.utils.ConsumerRecordPredicates;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +25,10 @@ import static org.mockito.Mockito.*;
 @Slf4j
 class ComponentTestIT extends ComponentTestBase {
 
-    private static final String AKTOER_ID = "1234567890123";
+    @BeforeEach
+    void initierFeaturetoggle() {
+        ((FakeUnleash) unleash).disable("melosys.eessi.en_identifisering_oppg");
+    }
 
     @Test
     @DisplayName("Mottar SED med fnr, person identifisert, sender melding på kafka-topic")
@@ -39,7 +40,7 @@ class ComponentTestIT extends ComponentTestBase {
 
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, FNR))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(1)
@@ -62,7 +63,7 @@ class ComponentTestIT extends ComponentTestBase {
         mockPerson(FNR, AKTOER_ID);
 
         kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         assertThat(hentRecords()).hasSize(1);
@@ -74,10 +75,10 @@ class ComponentTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new OpprettOppgaveResponseDto("123"));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto("123"));
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(2000)).opprettOppgave(any());
@@ -94,7 +95,7 @@ class ComponentTestIT extends ComponentTestBase {
         when(journalpostapiConsumer.opprettJournalpost(any(), anyBoolean())).thenThrow(new IntegrationException("Feil!"));
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(createProducerRecord(mockData.sedHendelse(sedID, FNR))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         await().atMost(2, TimeUnit.SECONDS).until(() -> sedMottattRepository.count() > 0);
@@ -117,9 +118,5 @@ class ComponentTestIT extends ComponentTestBase {
                 false
         );
         assertThat(hentRecords()).isEmpty();
-    }
-
-    private List<ConsumerRecord<Object, Object>> hentRecords() {
-        return kafkaTestConsumer.getRecords().stream().filter(ConsumerRecordPredicates.topic("privat-melosys-eessi-v1-local")).collect(Collectors.toList());
     }
 }
