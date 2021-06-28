@@ -9,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 
 @Data
 @AllArgsConstructor
@@ -30,7 +29,11 @@ public class OppgaveEndretHendelse {
     private String statuskategori;
     private String behandlesAvApplikasjon;
     private Ident ident;
-    private Map<OppgaveMetadataKey, String> metadata;
+    private Map<String, String> metadata;
+
+    public boolean harMetadataRinasaksnummer() {
+        return metadata.containsKey("RINA_SAKID");
+    }
 
     @Data
     @JsonIgnoreProperties(ignoreUnknown = true)

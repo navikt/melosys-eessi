@@ -6,7 +6,6 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveMetadataKey;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -49,6 +48,6 @@ public class OppgaveEndretConsumer {
                 && oppgaveEndretHendelse.harAktørID()
                 && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
                 && oppgaveEndretHendelse.erÅpen()
-                && oppgaveEndretHendelse.getMetadata().containsKey(OppgaveMetadataKey.RINA_SAKID);
+                && oppgaveEndretHendelse.harMetadataRinasaksnummer();
     }
 }
