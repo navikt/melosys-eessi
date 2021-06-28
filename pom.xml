@@ -26,7 +26,7 @@
         <guava.version>29.0-jre</guava.version>
         <hibernate-types.version>2.10.1</hibernate-types.version>
         <java.version>15</java.version>
-        <json-smart.version>2.3</json-smart.version>
+        <json-smart.version>2.4.1</json-smart.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <logstash-encoder.version>5.3</logstash-encoder.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
