@@ -92,8 +92,8 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID);
-        oppgaveDto.setStatus("AAPNET");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        oppgaveDto.setStatuskategori("AAPEN");
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -129,7 +129,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto(oppgaveID));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto(oppgaveID, "AAPEN"));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();

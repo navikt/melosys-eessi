@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -118,8 +118,8 @@ class SedMottakServiceTest {
         var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID);
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.of(bucIdentifiseringOppg));
 
-        final var oppgave = new OppgaveDto();
-        oppgave.setStatus("AAPNET");
+        final var oppgave = new HentOppgaveDto();
+        oppgave.setStatuskategori("AAPEN");
         when(oppgaveService.hentOppgave(oppgaveID)).thenReturn(oppgave);
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
