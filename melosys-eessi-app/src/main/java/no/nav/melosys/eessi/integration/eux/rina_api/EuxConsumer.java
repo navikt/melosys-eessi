@@ -48,7 +48,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private static final String SED_PATH_PDF = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/pdf";
     private static final String SED_MED_VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/filer";
     private static final String VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/vedlegg";
-    private static final String RINA_LENKE_PATH = "/cpi/buc/{rinaSaksnummer}";
+    private static final String RINA_LENKE_PATH = "/url/buc/{rinaSaksnummer}";
 
     public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.euxRestTemplate = restTemplate;
@@ -68,8 +68,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         log.info("Henter buc: {}", rinaSaksnummer);
 
         return exchange(BUC_PATH, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<BUC>() {
-                }, rinaSaksnummer);
+                new ParameterizedTypeReference<BUC>() {}, rinaSaksnummer);
     }
 
     /**
@@ -84,8 +83,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
         return exchange("/buc?BuCType={bucType}", HttpMethod.POST,
                 new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<String>() {
-                },
+                new ParameterizedTypeReference<String>() {},
                 bucType);
     }
 
@@ -99,8 +97,8 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         log.info("Sletter buc: {}", rinaSaksnummer);
 
         exchange(BUC_PATH, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                }, rinaSaksnummer);
+                new ParameterizedTypeReference<Void>() {},
+                rinaSaksnummer);
     }
 
     /**
@@ -118,8 +116,8 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         log.info("Setter mottaker {} til sak {}", mottakerIDer, rinaSaksnummer);
 
         exchange("/buc/{rinaSaksnummer}/mottakere?mottakere={mottakere}", HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                }, rinaSaksnummer, mottakerIDer.toArray());
+                new ParameterizedTypeReference<Void>() {},
+                rinaSaksnummer, mottakerIDer.toArray());
     }
 
     /**
@@ -133,9 +131,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public String opprettSed(String rinaSaksnummer, SED sed) {
         log.info("Oppretter SED {} på sak {}", sed.getSedType(), rinaSaksnummer);
 
-        return exchange("/buc/{rinaSaksnummer}/sed", HttpMethod.POST, new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<String>() {
-                }, rinaSaksnummer);
+        return exchange("/buc/{rinaSaksnummer}/sed", HttpMethod.POST,
+                new HttpEntity<>(sed, defaultHeaders()),
+                new ParameterizedTypeReference<String>() {},
+                rinaSaksnummer);
     }
 
     /**
@@ -148,9 +147,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public SED hentSed(String rinaSaksnummer, String dokumentId) {
         log.info("Henter sed med id {}, fra sak {}", dokumentId, rinaSaksnummer);
 
-        return exchange(SED_PATH, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<SED>() {
-                }, rinaSaksnummer, dokumentId);
+        return exchange(SED_PATH, HttpMethod.GET,
+                new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<SED>() {},
+                rinaSaksnummer, dokumentId);
     }
 
     /**
@@ -164,9 +164,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) {
         log.info("Oppdaterer sed {} på sak {}", dokumentId, rinaSaksnummer);
 
-        exchange(SED_PATH, HttpMethod.PUT, new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                }, rinaSaksnummer, dokumentId);
+        exchange(SED_PATH, HttpMethod.PUT,
+                new HttpEntity<>(sed, defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {},
+                rinaSaksnummer, dokumentId);
     }
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) {
@@ -175,9 +176,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
 
-        return exchange(SED_PATH_PDF, HttpMethod.GET, new HttpEntity<>(headers),
-                new ParameterizedTypeReference<byte[]>() {
-                }, rinaSaksnummer, dokumentId);
+        return exchange(SED_PATH_PDF, HttpMethod.GET,
+                new HttpEntity<>(headers),
+                new ParameterizedTypeReference<byte[]>() {},
+                rinaSaksnummer, dokumentId);
     }
 
     public byte[] genererPdfFraSed(SED sed) {
@@ -186,9 +188,9 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_PDF));
 
-        return exchange("/sed/pdf", HttpMethod.POST, new HttpEntity<>(sed, headers),
-                new ParameterizedTypeReference<byte[]>() {
-                }
+        return exchange("/sed/pdf", HttpMethod.POST,
+                new HttpEntity<>(sed, headers),
+                new ParameterizedTypeReference<byte[]>() {}
         );
     }
 
@@ -203,9 +205,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public void sendSed(String rinaSaksnummer, String dokumentId) {
         log.info("Sender sed {} fra sak {}", dokumentId, rinaSaksnummer);
 
-        exchange(SED_PATH + "/send", HttpMethod.POST, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                }, rinaSaksnummer, dokumentId);
+        exchange(SED_PATH + "/send", HttpMethod.POST,
+                new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {},
+                rinaSaksnummer, dokumentId);
     }
 
     /**
@@ -235,9 +238,11 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         MultiValueMap<String, Object> multipartBody = new LinkedMultiValueMap<>();
         multipartBody.add("file", document);
 
-        return exchange(VEDLEGG_PATH + "?Filtype={filType}&Filnavn={filnavn}&synkron={synkron}", HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
-                new ParameterizedTypeReference<String>() {
-                }, rinaSaksnummer, dokumentId, filType, URLEncoder.encode(vedlegg.getTittel(), StandardCharsets.UTF_8), Boolean.TRUE);
+        return exchange(VEDLEGG_PATH + "?Filtype={filType}&Filnavn={filnavn}&synkron={synkron}", HttpMethod.POST,
+                new HttpEntity<>(multipartBody, headers),
+                new ParameterizedTypeReference<String>() {},
+                rinaSaksnummer, dokumentId, filType,
+                URLEncoder.encode(vedlegg.getTittel(), StandardCharsets.UTF_8), Boolean.TRUE);
     }
 
     /**
@@ -249,9 +254,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public void setSakSensitiv(String rinaSaksnummer) {
         log.info("Setter sak {} sensitiv", rinaSaksnummer);
 
-        exchange(BUC_PATH + "/sensitivsak", HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {
-                }, rinaSaksnummer);
+        exchange(BUC_PATH + "/sensitivsak", HttpMethod.PUT,
+                new HttpEntity<>(defaultHeaders()),
+                new ParameterizedTypeReference<Void>() {},
+                rinaSaksnummer);
     }
 
     /**
@@ -301,9 +307,10 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
         multipartBody.add("attachment", attachment);
 
         return exchange("/buc/sed/vedlegg?BuCType={bucType}&MottakerID={mottakerID}&FilType={filType}",
-                HttpMethod.POST, new HttpEntity<>(multipartBody, headers),
-                new ParameterizedTypeReference<Map<String, String>>() {
-                }, bucType, mottakerId, filType);
+                HttpMethod.POST,
+                new HttpEntity<>(multipartBody, headers),
+                new ParameterizedTypeReference<Map<String, String>>() {},
+                bucType, mottakerId, filType);
     }
 
     /**
@@ -319,8 +326,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
 
         return exchange("/institusjoner?BuCType={bucType}&LandKode={landkode}", HttpMethod.GET,
                 new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<List<Institusjon>>() {
-                },
+                new ParameterizedTypeReference<List<Institusjon>>() {},
                 bucType, landkode);
     }
 

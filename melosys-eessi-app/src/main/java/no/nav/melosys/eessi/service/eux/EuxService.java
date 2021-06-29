@@ -28,22 +28,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Primary
 public class EuxService {
 
-    private static final String RINA_URL_TEMPLATE = "/portal/#/caseManagement/";
     private static final String COUNTERPARTY = "CounterParty";
     private static final String FILTYPE_PDF = "pdf";
 
     private final EuxConsumer euxConsumer;
     private final BucMetrikker bucMetrikker;
 
-    private final String rinaHostUrl;
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker,
-                      @Value("${melosys.integrations.rina-host-url}") String rinaHostUrl) {
+                      BucMetrikker bucMetrikker) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
-        this.rinaHostUrl = rinaHostUrl;
     }
 
     public void slettBuC(String rinaSaksnummer) {
@@ -134,10 +130,6 @@ public class EuxService {
             throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
         }
         return euxConsumer.hentRinaUrl(rinaCaseId);
-    }
-
-    public String hentRinaUrlPrefix() {
-        return rinaHostUrl + RINA_URL_TEMPLATE;
     }
 
     public void settSakSensitiv(String rinaSaksnummer) {
