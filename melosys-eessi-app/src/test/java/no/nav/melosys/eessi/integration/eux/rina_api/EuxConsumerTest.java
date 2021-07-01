@@ -1,11 +1,5 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -29,6 +23,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -67,7 +67,7 @@ public class EuxConsumerTest {
         String id = "1234";
 
         server.expect(requestTo("/buc/" + id))
-                .andRespond(withSuccess(buc , MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(buc, MediaType.APPLICATION_JSON));
 
         BUC response = euxConsumer.hentBuC(id);
         assertThat(response).isNotNull();
@@ -129,6 +129,18 @@ public class EuxConsumerTest {
 
         assertThatExceptionOfType(NotFoundException.class)
                 .isThrownBy(() -> euxConsumer.settMottakere(rinaSaksnummer, mottakere));
+    }
+
+    @Test
+    public void hentRinaSak_forventUrlSomTekst() throws Exception {
+        String rinaSaksnummer = "1111";
+        String domene = "https://rina-ss1-q.adeo.no/portal/#/caseManagement/";
+
+        server.expect(requestTo("/url/buc/" + rinaSaksnummer))
+                .andRespond(withSuccess(domene + rinaSaksnummer, MediaType.TEXT_PLAIN));
+
+        String response = euxConsumer.hentRinaUrl(rinaSaksnummer);
+        assertThat(response).isEqualTo(domene + rinaSaksnummer);
     }
 
     @Test
@@ -236,7 +248,7 @@ public class EuxConsumerTest {
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
 
         MedlemskapA003 medlemskap = (MedlemskapA003) resultat.getMedlemskap();
-        assertThat( medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isEqualTo("2020-02-02");
+        assertThat(medlemskap.getVedtak().getGjelderperiode().getSluttdato()).isEqualTo("2020-02-02");
     }
 
     @Test
@@ -423,7 +435,7 @@ public class EuxConsumerTest {
     @Test
     public void setSakSensitiv_ingenResponseEllerException() {
 
-        String id ="123";
+        String id = "123";
         server.expect(requestTo("/buc/" + id + "/sensitivsak"))
                 .andRespond(withSuccess());
 
