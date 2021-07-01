@@ -341,7 +341,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     }
 
     public String hentRinaUrl(String rinaSaksnummer) {
-        log.info("Søker etter rina-url mot Rina 2020 med saksnummer {}", rinaSaksnummer);
+        log.info("Søker etter rina-url mot Rina med saksnummer {}", rinaSaksnummer);
 
         return exchange(RINA_LENKE_PATH, HttpMethod.GET,
                 new HttpEntity<>(defaultHeaders()),
