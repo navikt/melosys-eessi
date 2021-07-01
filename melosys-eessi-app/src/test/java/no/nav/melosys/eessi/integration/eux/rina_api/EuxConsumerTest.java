@@ -132,7 +132,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentRinaSak_forventUrlSomTekst() throws Exception {
+    public void hentRinaSak_forventUrlSomTekst() {
         String rinaSaksnummer = "1111";
         String domene = "https://rina-ss1-q.adeo.no/portal/#/caseManagement/";
 
