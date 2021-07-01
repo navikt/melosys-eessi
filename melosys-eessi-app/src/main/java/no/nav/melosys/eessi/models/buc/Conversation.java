@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.models.buc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -11,5 +12,5 @@ public class Conversation {
 
     private String id;
     private String versionId;
-    private List<Participant> participants;
+    private List<Participant> participants = new ArrayList<>();
 }

@@ -25,13 +25,13 @@ public class BUC {
     private ZonedDateTime lastUpdate;
     private String status;
     private Creator creator;
-    private List<Document> documents;
-    private List<Action> actions;
+    private List<Document> documents = new ArrayList<>();
+    private List<Action> actions = new ArrayList<>();
     @JsonProperty(value = "processDefinitionName")
     private String bucType;
     @JsonProperty(value = "processDefinitionVersion")
     private String bucVersjon;
-    private Collection<Participant> participants;
+    private Collection<Participant> participants = new ArrayList<>();
     private String internationalId;
 
     public boolean kanOppretteEllerOppdatereSed(SedType sedType) {

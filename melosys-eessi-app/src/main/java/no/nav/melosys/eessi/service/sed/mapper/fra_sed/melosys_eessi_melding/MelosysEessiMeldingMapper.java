@@ -17,7 +17,7 @@ public interface MelosysEessiMeldingMapper {
                                     String sedType, String bucType, String avsenderID, String landkode,
                                     String journalpostID, String dokumentID, String gsakSaksnummer,
                                     boolean sedErEndring, String sedVersjon) {
-        MelosysEessiMelding melosysEessiMelding = new MelosysEessiMelding();
+        var melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setSedId(rinaDokumentID);
         melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
         melosysEessiMelding.setAvsender(new Avsender(avsenderID, LandkodeMapper.mapTilNavLandkode(landkode)));
@@ -32,7 +32,7 @@ public interface MelosysEessiMeldingMapper {
 
         if (inneholderStatsborgerskap(sed)) {
             melosysEessiMelding.setStatsborgerskap(
-                    mapStatsborgerskap(sed.getNav().getBruker().getPerson().getStatsborgerskap())
+                    mapStatsborgerskap(sed.getNav().getBruker().getPerson().hentStatsborgerksapsliste())
             );
         }
 
@@ -53,8 +53,7 @@ public interface MelosysEessiMeldingMapper {
     }
 
 
-    default List<Statsborgerskap> mapStatsborgerskap(Collection<no.nav.melosys.eessi.models.sed.nav.Statsborgerskap> statsborgerskapListe) {
-        return statsborgerskapListe.stream().map(no.nav.melosys.eessi.models.sed.nav.Statsborgerskap::getLand)
-                .map(Statsborgerskap::new).collect(Collectors.toList());
+    default List<Statsborgerskap> mapStatsborgerskap(Collection<String> statsborgerskapListe) {
+        return statsborgerskapListe.stream().map(Statsborgerskap::new).collect(Collectors.toList());
     }
 }

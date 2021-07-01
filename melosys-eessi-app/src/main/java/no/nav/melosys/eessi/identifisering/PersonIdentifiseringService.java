@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.identifisering;
 
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -9,7 +8,6 @@ import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
-import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
@@ -62,7 +60,7 @@ class PersonIdentifiseringService implements PersonIdentifisering {
                 .fornavn(person.getFornavn())
                 .etternavn(person.getEtternavn())
                 .foedselsdato(tilLocalDate(person.getFoedselsdato()))
-                .statsborgerskapISO2(person.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toSet()))
+                .statsborgerskapISO2(person.hentStatsborgerksapsliste())
                 .build();
 
         Optional<String> norskIdent = person.finnNorskPin()
