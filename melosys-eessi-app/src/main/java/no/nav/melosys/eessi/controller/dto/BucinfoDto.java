@@ -27,7 +27,7 @@ public class BucinfoDto {
     private Set<String> mottakerinstitusjoner;
     private List<SedinfoDto> seder;
 
-    public static BucinfoDto av(BUC buc, List<String> statuser, String rinaUrlPrefix) {
+    public static BucinfoDto av(BUC buc, List<String> statuser, String rinaSedUrl) {
         return BucinfoDto.builder()
                 .id(buc.getId())
                 .erÅpen(buc.erÅpen())
@@ -36,7 +36,7 @@ public class BucinfoDto {
                 .mottakerinstitusjoner(hentMottakerinstitusjonerFraBuc(buc))
                 .seder(buc.getDocuments().stream()
                         .filter(filtrerMedStatus(statuser))
-                        .map(doc -> SedinfoDto.av(doc, buc.getId(), rinaUrlPrefix))
+                        .map(doc -> SedinfoDto.av(doc, buc.getId(), rinaSedUrl))
                         .collect(Collectors.toList()))
                 .build();
     }

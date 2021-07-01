@@ -20,7 +20,7 @@ public class SedinfoDto {
     private String status;
     private String rinaUrl;
 
-    public static SedinfoDto av(Document document, String bucId, String rinaUrlPrefix) {
+    public static SedinfoDto av(Document document, String bucId, String rinaSedUrl) {
         return SedinfoDto.builder()
                 .bucId(bucId)
                 .sedId(document.getId())
@@ -28,7 +28,7 @@ public class SedinfoDto {
                 .opprettetDato(document.getCreationDate().toInstant().toEpochMilli())
                 .sistOppdatert(document.getLastUpdate().toInstant().toEpochMilli())
                 .status(tilNorskStatusEllerTomString(document.getStatus()))
-                .rinaUrl(rinaUrlPrefix + bucId)
+                .rinaUrl(rinaSedUrl)
                 .build();
     }
 

@@ -48,7 +48,7 @@ public class SakController {
                 .map(FagsakRinasakKobling::getRinaSaksnummer)
                 .map(this::hentBuc)
                 .filter(Objects::nonNull)
-                .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrlPrefix()))
+                .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrl(buc.getId())))
                 .collect(Collectors.toList());
     }
 
