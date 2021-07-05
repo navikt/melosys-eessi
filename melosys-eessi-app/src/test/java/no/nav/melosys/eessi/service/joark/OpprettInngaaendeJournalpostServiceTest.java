@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.joark;
 
 import java.util.Collections;
 import java.util.Optional;
+
 import com.google.common.collect.Lists;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
@@ -14,18 +15,19 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class OpprettInngaaendeJournalpostServiceTest {
+@ExtendWith(MockitoExtension.class)
+class OpprettInngaaendeJournalpostServiceTest {
 
     @Mock
     private JournalpostService journalpostService;
@@ -44,7 +46,7 @@ public class OpprettInngaaendeJournalpostServiceTest {
     private static final String JOURNALPOST_ID = "11223344";
     private static final String GSAK_SAKSNUMMER = "123";
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(sakService, saksrelasjonService, journalpostService, journalpostSedKoblingService);
@@ -54,17 +56,18 @@ public class OpprettInngaaendeJournalpostServiceTest {
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, Lists.newArrayList(
                 new OpprettJournalpostResponse.Dokument("123")), null, null);
         when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any(), any())).thenReturn(response);
-
-        Sak sak = enhancedRandom.nextObject(Sak.class);
-        sak.setId(GSAK_SAKSNUMMER);
-        when(sakService.hentsak(anyLong())).thenReturn(sak);
-        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
-        fagsakRinasakKobling.setGsakSaksnummer(123L);
-        when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
     }
 
     @Test
-    public void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() throws Exception {
+    void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() {
+        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
+        fagsakRinasakKobling.setGsakSaksnummer(123L);
+        when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
+
+        var sak = enhancedRandom.nextObject(Sak.class);
+        sak.setId(GSAK_SAKSNUMMER);
+        when(sakService.hentsak(anyLong())).thenReturn(sak);
+
         SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, sedMedVedlegg(new byte[0]), "123");
 
         assertThat(sakInformasjon).isNotNull();
@@ -73,13 +76,13 @@ public class OpprettInngaaendeJournalpostServiceTest {
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any(), anyString());
         verify(saksrelasjonService, times(1)).finnVedRinaSaksnummer(any());
-        verify(journalpostSedKoblingService).lagre(eq(JOURNALPOST_ID), eq(sedMottatt.getRinaSakId()),
-                eq(sedMottatt.getRinaDokumentId()), eq(sedMottatt.getRinaDokumentVersjon()),
-                eq(sedMottatt.getBucType()), eq(sedMottatt.getSedType()));
+        verify(journalpostSedKoblingService).lagre(JOURNALPOST_ID, sedMottatt.getRinaSakId(),
+                sedMottatt.getRinaDokumentId(), sedMottatt.getRinaDokumentVersjon(),
+                sedMottatt.getBucType(), sedMottatt.getSedType());
     }
 
     @Test
-    public void arkiverInngaaendeSedUtenBruker_journalpostOpprettet_forventReturnerJournalpostID() throws Exception {
+    void arkiverInngaaendeSedUtenBruker_journalpostOpprettet_forventReturnerJournalpostID() {
 
         String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, sedMedVedlegg(new byte[0]), "123321");
 

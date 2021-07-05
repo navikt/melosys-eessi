@@ -10,17 +10,15 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.sak.SakService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,8 +26,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class OpprettUtgaaendeJournalpostServiceTest {
+@ExtendWith(MockitoExtension.class)
+class OpprettUtgaaendeJournalpostServiceTest {
 
     private static final String JOURNALPOST_ID = "123";
 
@@ -49,17 +47,12 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     private SedHendelse sedSendt;
     private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
                 sakService, journalpostService, euxService, personFasade, oppgaveService);
 
-        OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "ENDELIG", null);
-        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
-        when(euxService.hentRinaUrl(anyString())).thenReturn("https://test.local");
-        when(personFasade.hentNorskIdent(anyString())).thenReturn("54321");
-        when(personFasade.hentAktoerId(anyString())).thenReturn("12345");
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
         when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));
@@ -68,15 +61,22 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     }
 
     @Test
-    public void arkiverUtgaaendeSed_forventId() {
+    void arkiverUtgaaendeSed_forventId() {
+        OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "ENDELIG", null);
+        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
+        when(personFasade.hentNorskIdent(anyString())).thenReturn("54321");
+
         String result = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
         assertThat(result).isEqualTo(JOURNALPOST_ID);
     }
 
     @Test
-    public void arkiverUtgaaendeSed_ikkeEndelig_forventOpprettJfrOppgave() throws NotFoundException, IntegrationException {
+    void arkiverUtgaaendeSed_ikkeEndelig_forventOpprettJfrOppgave() {
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "MIDLERTIDIG", null);
         when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
+        when(euxService.hentRinaUrl(anyString())).thenReturn("https://test.local");
+        when(personFasade.hentAktoerId(anyString())).thenReturn("12345");
+        when(personFasade.hentNorskIdent(anyString())).thenReturn("54321");
 
         String result = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
 
@@ -88,8 +88,12 @@ public class OpprettUtgaaendeJournalpostServiceTest {
     }
 
     @Test
-    public void arkiverUtgaaendeSed_ingenSak_forventOpprettJfrOppgave() {
+    void arkiverUtgaaendeSed_ingenSak_forventOpprettJfrOppgave() {
+        OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "ENDELIG", null);
+        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
+        when(euxService.hentRinaUrl(anyString())).thenReturn("https://test.local");
         when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.empty());
+        when(personFasade.hentAktoerId(anyString())).thenReturn("12345");
 
         String journalpostId = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
 

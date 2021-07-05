@@ -12,22 +12,18 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-public class A001MapperTest {
+class A001MapperTest {
 
-    private A001Mapper a001Mapper = new A001Mapper();
+    private final A001Mapper a001Mapper = new A001Mapper();
 
     private SedDataDto sedData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
 
@@ -41,10 +37,10 @@ public class A001MapperTest {
     }
 
     @Test
-    public void mapTilSed() throws MappingException, NotFoundException {
+    void mapTilSed() throws MappingException, NotFoundException {
         SED sed = a001Mapper.mapTilSed(sedData);
 
-        assertEquals(MedlemskapA001.class, sed.getMedlemskap().getClass());
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA001.class);
 
         assertThat(sed.getMedlemskap()).isNotNull().isInstanceOf(MedlemskapA001.class);
 

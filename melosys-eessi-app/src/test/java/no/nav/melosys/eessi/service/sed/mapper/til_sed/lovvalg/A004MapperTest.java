@@ -6,24 +6,19 @@ import java.net.URISyntaxException;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.UtpekingAvvisDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA004;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class A004MapperTest {
-    private A004Mapper a004Mapper = new A004Mapper();
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+class A004MapperTest {
+    private final A004Mapper a004Mapper = new A004Mapper();
 
     @Test
-    public void mapTilSed_forventSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
+    void mapTilSed_forventSed() throws IOException, URISyntaxException {
         SedDataDto sedData = SedDataStub.getStub();
         UtpekingAvvisDto utpekingAvvisDto = new UtpekingAvvisDto(
             "DK",
@@ -38,10 +33,9 @@ public class A004MapperTest {
     }
 
     @Test
-    public void mapTilSed_utenUtpekingAvvis_forventException() throws IOException, URISyntaxException, MappingException, NotFoundException {
+    void mapTilSed_utenUtpekingAvvis_forventException() throws IOException, URISyntaxException {
         SedDataDto sedData = SedDataStub.getStub();
-
-        expectedException.expect(MappingException.class);
-        expectedException.expectMessage("Trenger UtpekingAvvis for å opprette A004");
-        a004Mapper.mapTilSed(sedData);
+        assertThatExceptionOfType(MappingException.class)
+                .isThrownBy(() -> a004Mapper.mapTilSed(sedData))
+                .withMessageContaining("Trenger UtpekingAvvis for å opprette A004");
     }}

@@ -5,14 +5,14 @@ import java.time.ZonedDateTime;
 
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BUCTest {
+class BUCTest {
 
     @Test
-    public void hentSistOppdaterteDocument() {
+    void hentSistOppdaterteDocument() {
         BUC buc = new BUC();
 
         Document document1 = new Document();

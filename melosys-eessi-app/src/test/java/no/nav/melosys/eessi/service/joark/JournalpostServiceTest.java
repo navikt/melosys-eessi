@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.joark;
 
 import java.util.Collections;
+
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
@@ -10,24 +11,24 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import no.nav.melosys.eessi.service.dokkat.DokkatService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class JournalpostServiceTest {
+@ExtendWith(MockitoExtension.class)
+class JournalpostServiceTest {
 
     @Mock
     private DokkatService dokkatService;
     @Mock
     private JournalpostapiConsumer journalpostapiConsumer;
-    @InjectMocks
+
     private JournalpostService journalpostService;
 
     private EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
@@ -36,8 +37,10 @@ public class JournalpostServiceTest {
     private Sak sak;
     private DokkatSedInfo dokkatSedInfo;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
+        journalpostService = new JournalpostService(dokkatService, journalpostapiConsumer);
+
         sedHendelse = random.nextObject(SedHendelse.class);
         sak = random.nextObject(Sak.class);
         dokkatSedInfo = random.nextObject(DokkatSedInfo.class);
@@ -46,13 +49,13 @@ public class JournalpostServiceTest {
     }
 
     @Test
-    public void opprettInngaaendeJournalpost_verifiserEndeligJfr() throws Exception {
+    void opprettInngaaendeJournalpost_verifiserEndeligJfr() {
         journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false));
     }
 
     @Test
-    public void opprettUtgaaendeJournalpost_verifiserEndeligJfr() throws Exception {
+    void opprettUtgaaendeJournalpost_verifiserEndeligJfr() {
         journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(true));
     }

@@ -7,6 +7,7 @@ import java.util.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.SneakyThrows;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
@@ -17,20 +18,19 @@ import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.sed.SED;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
-public class EuxServiceTest {
+@ExtendWith(MockitoExtension.class)
+class EuxServiceTest {
 
     private final String RINA_MOCK_URL = "https://rina-host-url.local";
 
@@ -41,34 +41,24 @@ public class EuxServiceTest {
 
     private EuxService euxService;
 
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
     private final String opprettetBucID = "114433";
     private final String opprettetSedID = "12222";
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setup() throws IOException, IntegrationException {
-        final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL);
-
-        when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-
-        URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
-        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<List<Institusjon>>(){});
-        when(euxConsumer.hentInstitusjoner(anyString(), any()))
-                .thenReturn(institusjoner);
     }
 
     @Test
-    public void hentSed_forventKonsumentKall() {
+    void hentSed_forventKonsumentKall() {
         euxService.hentSed("123123123", "12345");
-        verify(euxConsumer).hentSed(eq("123123123"), eq("12345"));
+        verify(euxConsumer).hentSed("123123123", "12345");
     }
 
     @Test
-    public void hentBucer_forventKonsumentKall() {
+    void hentBucer_forventKonsumentKall() {
         BucSearch bucSearch = BucSearch.builder()
                 .bucType(BucType.LA_BUC_01.name())
                 .build();
@@ -79,20 +69,23 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentBuc_forventKonsumentKall() {
+    void hentBuc_forventKonsumentKall() {
         euxService.hentBuc("123123123");
 
-        verify(euxConsumer).hentBuC(eq("123123123"));
+        verify(euxConsumer).hentBuC("123123123");
     }
 
     @Test
-    public void genererPdfFraSed_forventKonsumentkall() {
+    void genererPdfFraSed_forventKonsumentkall() {
         euxService.genererPdfFraSed(new SED());
         verify(euxConsumer).genererPdfFraSed(any());
     }
 
     @Test
-    public void opprettBucOgSed_forventRinaSaksnummer() {
+    void opprettBucOgSed_forventRinaSaksnummer() {
+        when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+
         BucType bucType = BucType.LA_BUC_01;
         Collection<String> mottakere = List.of("SE:123");
         SED sed = new SED();
@@ -100,58 +93,66 @@ public class EuxServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg);
 
-        verify(euxConsumer).opprettBuC(eq(bucType.name()));
-        verify(euxConsumer).opprettSed(eq(opprettetBucID), eq(sed));
+        verify(euxConsumer).opprettBuC(bucType.name());
+        verify(euxConsumer).opprettSed(opprettetBucID, sed);
         verify(euxConsumer).leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any(SedVedlegg.class));
 
         assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo(opprettetBucID);
     }
 
     @Test
-    public void opprettOgSendSed_medRinaSaksnummer_forventKonsumentKall() {
+    void opprettOgSendSed_medRinaSaksnummer_forventKonsumentKall() {
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+
         SED sed = new SED();
         euxService.opprettOgSendSed(sed, opprettetBucID);
 
-        verify(euxConsumer).sendSed(eq(opprettetBucID), eq(opprettetSedID));
+        verify(euxConsumer).sendSed(opprettetBucID, opprettetSedID);
     }
 
     @Test
-    public void hentRinaUrl_medRinaSaksnummer_forventUrl() {
+    void hentRinaUrl_medRinaSaksnummer_forventUrl() {
         String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/12345";
         String resultUrl = euxService.hentRinaUrl("12345");
 
         assertThat(resultUrl).isEqualTo(expectedUrl);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void hentRinaUrl_utenRinaSaksnummer_forventException() {
-        euxService.hentRinaUrl(null);
+    @Test
+    void hentRinaUrl_utenRinaSaksnummer_forventException() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> euxService.hentRinaUrl(null))
+                .withMessageContaining("Trenger rina-saksnummer");
     }
 
     @Test
-    public void sendSed_forventKonsumentKall() {
+    void sendSed_forventKonsumentKall() {
         String rinaSaksnummer = "123";
         String dokumentId = "332211";
         euxService.sendSed(rinaSaksnummer, dokumentId);
-        verify(euxConsumer).sendSed(eq(rinaSaksnummer), eq(dokumentId));
+        verify(euxConsumer).sendSed(rinaSaksnummer, dokumentId);
     }
 
     @Test
-    public void hentMottakerinstitusjoner_laBuc04LandSverige_forventEnInstitusjon() {
+    void hentMottakerinstitusjoner_laBuc04LandSverige_forventEnInstitusjon() {
+        mockInstitusjoner();
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name(), List.of("SE"));
         assertThat(institusjoner).hasSize(1);
         assertThat(institusjoner.get(0).getAkronym()).isEqualTo("FK Sverige-TS70");
-        verify(euxConsumer).hentInstitusjoner(eq(BucType.LA_BUC_04.name()), eq(null));
+        verify(euxConsumer).hentInstitusjoner(BucType.LA_BUC_04.name(), null);
     }
 
     @Test
-    public void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() {
+    void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() {
+        mockInstitusjoner();
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", List.of("SE"));
         assertThat(institusjoner).isEmpty();
     }
 
     @Test
-    public void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() {
+    void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() {
+        mockInstitusjoner();
+
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", List.of("GB"));
         assertThat(institusjoner).hasSize(1);
 
@@ -161,7 +162,8 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() {
+    void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() {
+        mockInstitusjoner();
         List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", List.of("GR"));
         assertThat(institusjoner).hasSize(1);
 
@@ -171,35 +173,35 @@ public class EuxServiceTest {
     }
 
     @Test
-    public void sedErEndring_medFlereConversations_forventTrue() {
+    void sedErEndring_medFlereConversations_forventTrue() {
         String sedID = "3333";
         String rinaSaksnummer = "333222111";
         BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
         buc.getDocuments().get(0).setConversations(Arrays.asList(new Conversation(), new Conversation()));
-        when(euxConsumer.hentBuC(eq(rinaSaksnummer))).thenReturn(buc);
+        when(euxConsumer.hentBuC(rinaSaksnummer)).thenReturn(buc);
 
         boolean erEndring = euxService.sedErEndring(sedID, rinaSaksnummer);
 
-        verify(euxConsumer).hentBuC(eq(rinaSaksnummer));
+        verify(euxConsumer).hentBuC(rinaSaksnummer);
         assertThat(erEndring).isTrue();
     }
 
     @Test
-    public void sedErEndring_utenNoenConversations_forventFalse() {
+    void sedErEndring_utenNoenConversations_forventFalse() {
         final String sedID = "3556";
         final String rinaSaksnummer = "54368";
         BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
         buc.getDocuments().get(0).setConversations(Collections.singletonList(new Conversation()));
-        when(euxConsumer.hentBuC(eq(rinaSaksnummer))).thenReturn(buc);
+        when(euxConsumer.hentBuC(rinaSaksnummer)).thenReturn(buc);
 
         boolean erEndring = euxService.sedErEndring(sedID, rinaSaksnummer);
 
-        verify(euxConsumer).hentBuC(eq(rinaSaksnummer));
+        verify(euxConsumer).hentBuC(rinaSaksnummer);
         assertThat(erEndring).isFalse();
     }
 
     @Test
-    public void sedErEndring_utenSederForBuc_forventFalse() {
+    void sedErEndring_utenSederForBuc_forventFalse() {
         final String sedID = "33322";
         BUC buc = new BUC();
         Document document = new Document();
@@ -210,14 +212,22 @@ public class EuxServiceTest {
         when(euxConsumer.hentBuC(anyString())).thenReturn(buc);
 
         boolean erEndring = euxService.sedErEndring(sedID, "123");
-        verify(euxConsumer).hentBuC(eq("123"));
+        verify(euxConsumer).hentBuC("123");
         assertThat(erEndring).isFalse();
     }
 
     @Test
-    public void hentRinaUrlPrefix_forventRettString() {
+    void hentRinaUrlPrefix_forventRettString() {
         String rinaUrlPrefix = euxService.hentRinaUrlPrefix();
         assertThat(rinaUrlPrefix).isEqualTo(RINA_MOCK_URL + "/portal/#/caseManagement/");
+    }
+
+    @SneakyThrows
+    private void mockInstitusjoner() {
+        URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
+        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<List<Institusjon>>(){});
+        when(euxConsumer.hentInstitusjoner(anyString(), any()))
+                .thenReturn(institusjoner);
     }
 
     private BUC lagBucMedDocument(String rinaSaksnummer, String sedID) {

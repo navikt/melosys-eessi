@@ -1,12 +1,14 @@
 package no.nav.melosys.eessi.controller.dto;
 
-import org.junit.Test;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
-public class SedStatusTest {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+class SedStatusTest {
 
     @Test
-    public void fraNorskStatus_medGyldigeStatuser_forventRettStatus() {
+    void fraNorskStatus_medGyldigeStatuser_forventRettStatus() {
         String tom = "tom";
         String utkast = "utkast";
 
@@ -14,14 +16,15 @@ public class SedStatusTest {
         assertThat(SedStatus.fraNorskStatus(utkast)).isEqualTo(SedStatus.UTKAST);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void fraNorskStatus_medUgyldigStatus_forventException() {
+    @Test
+    void fraNorskStatus_medUgyldigStatus_forventException() {
         String ugyldigStatus = "abc123";
-        SedStatus.fraNorskStatus(ugyldigStatus);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> SedStatus.fraNorskStatus(ugyldigStatus));
     }
 
     @Test
-    public void fraNorskStatus_medTomStatus_forventNull() {
+    void fraNorskStatus_medTomStatus_forventNull() {
         String tomStatus = "";
 
         assertThat(SedStatus.fraNorskStatus(tomStatus)).isNull();
@@ -29,7 +32,7 @@ public class SedStatusTest {
     }
 
     @Test
-    public void fraEngelskStatus_medGyldigeStatuser_forventRettStatus() {
+    void fraEngelskStatus_medGyldigeStatuser_forventRettStatus() {
         String empty = "empty";
         String statusNew = "new";
 
@@ -38,14 +41,14 @@ public class SedStatusTest {
     }
 
     @Test
-    public void fraEngelskStatus_medUgyldigStatus_forventNull() {
+    void fraEngelskStatus_medUgyldigStatus_forventNull() {
         String ugyldigStatus = "abc123";
 
         assertThat(SedStatus.fraEngelskStatus(ugyldigStatus)).isNull();
     }
 
     @Test
-    public void fraEngelskStatus_medTomStatus_forventNull() {
+    void fraEngelskStatus_medTomStatus_forventNull() {
         String tomStatus = "";
 
         assertThat(SedStatus.fraEngelskStatus(tomStatus)).isNull();
@@ -53,7 +56,7 @@ public class SedStatusTest {
     }
 
     @Test
-    public void erGyldigStatus() {
+    void erGyldigStatus() {
         assertThat(SedStatus.erGyldigEngelskStatus("empty")).isFalse();
         assertThat(SedStatus.erGyldigEngelskStatus("sent")).isTrue();
         assertThat(SedStatus.erGyldigEngelskStatus("new")).isFalse();

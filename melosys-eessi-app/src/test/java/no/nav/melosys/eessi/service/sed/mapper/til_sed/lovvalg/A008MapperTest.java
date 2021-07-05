@@ -9,24 +9,24 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class A008MapperTest {
+class A008MapperTest {
 
-    private A008Mapper a008Mapper = new A008Mapper();
+    private final A008Mapper a008Mapper = new A008Mapper();
 
     private SedDataDto sedData;
 
-    @Before
+    @BeforeEach
     public void setup() throws IOException, URISyntaxException {
         sedData = SedDataStub.getStub();
     }
 
     @Test
-    public void mapTilSed() throws MappingException, NotFoundException {
+    void mapTilSed() throws MappingException, NotFoundException {
         SED sed = a008Mapper.mapTilSed(sedData);
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA008.class);
 

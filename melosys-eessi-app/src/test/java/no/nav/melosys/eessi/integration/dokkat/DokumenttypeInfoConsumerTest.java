@@ -5,27 +5,27 @@ import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RunWith(MockitoJUnitRunner.class)
-public class DokumenttypeInfoConsumerTest {
+@ExtendWith(MockitoExtension.class)
+class DokumenttypeInfoConsumerTest {
 
     @Spy
     private RestTemplate restTemplate;
 
-    @InjectMocks
     private DokumenttypeInfoConsumer dokumenttypeInfoConsumer;
 
     private MockRestServiceServer server;
@@ -34,14 +34,15 @@ public class DokumenttypeInfoConsumerTest {
 
     private final String dokumentyypeId = "123";
 
-    @Before
+    @BeforeEach
     public void setup() {
+        dokumenttypeInfoConsumer = new DokumenttypeInfoConsumer(restTemplate);
         server = MockRestServiceServer.createServer(restTemplate);
         enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
     }
 
     @Test
-    public void hentDokumenttypeInfo_expectValidJson() throws Exception {
+    void hentDokumenttypeInfo_expectValidJson() throws Exception {
         DokumentTypeInfoDto dokumentTypeInfoDto = enhancedRandom.nextObject(DokumentTypeInfoDto.class);
         String responseJson = new ObjectMapper().writeValueAsString(dokumentTypeInfoDto);
 
@@ -56,10 +57,12 @@ public class DokumenttypeInfoConsumerTest {
         assertThat(responseObject.getDokumentKategori()).isEqualTo(dokumentTypeInfoDto.getDokumentKategori());
     }
 
-    @Test(expected = IntegrationException.class)
-    public void hentDokumenttypeId_expectException() throws Exception {
+    @Test
+    void hentDokumenttypeId_expectException() {
         server.expect(requestTo("/" + dokumentyypeId))
                 .andRespond(withServerError());
-        dokumenttypeInfoConsumer.hentDokumenttypeInfo(dokumentyypeId);
+        assertThatExceptionOfType(IntegrationException.class)
+                .isThrownBy(() -> dokumenttypeInfoConsumer.hentDokumenttypeInfo(dokumentyypeId))
+                .withMessageContaining("Feil ved integrasjon mot dokkat");
     }
 }
