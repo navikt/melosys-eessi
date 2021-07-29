@@ -12,8 +12,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SedDataDto extends SedGrunnlagDto {
-    private List<FamilieMedlem> familieMedlem;
     private Bruker bruker;
+    private Adresse kontaktadresse;
+    private Adresse oppholdsadresse;
+    private List<FamilieMedlem> familieMedlem;
 
     //A008 spesifikt
     private String avklartBostedsland;
