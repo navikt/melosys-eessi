@@ -32,8 +32,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class EuxServiceTest {
 
-    private final String RINA_MOCK_URL = "https://rina-host-url.local";
-
     @Mock
     private EuxConsumer euxConsumer;
     @Mock
@@ -48,7 +46,7 @@ class EuxServiceTest {
 
     @BeforeEach
     public void setup() throws IOException, IntegrationException {
-        euxService = new EuxService(euxConsumer, bucMetrikker, RINA_MOCK_URL);
+        euxService = new EuxService(euxConsumer, bucMetrikker);
     }
 
     @Test
@@ -111,9 +109,19 @@ class EuxServiceTest {
     }
 
     @Test
-    void hentRinaUrl_medRinaSaksnummer_forventUrl() {
-        String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/12345";
-        String resultUrl = euxService.hentRinaUrl("12345");
+    public void hentRinaUrl_medSaksnummer_verifiserEuxConsumerKall() {
+        euxService.hentRinaUrl("1234");
+        verify(euxConsumer).hentRinaUrl(eq("1234"));
+    }
+
+    @Test
+    public void hentRinaUrl_medRinaSaksnummer_forventUrl() {
+        String rinaSak = "12345";
+        String RINA_MOCK_URL = "https://rina-host-url.local";
+        when(euxConsumer.hentRinaUrl(rinaSak)).thenReturn(RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak);
+
+        String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak;
+        String resultUrl = euxService.hentRinaUrl(rinaSak);
 
         assertThat(resultUrl).isEqualTo(expectedUrl);
     }
@@ -216,11 +224,6 @@ class EuxServiceTest {
         assertThat(erEndring).isFalse();
     }
 
-    @Test
-    void hentRinaUrlPrefix_forventRettString() {
-        String rinaUrlPrefix = euxService.hentRinaUrlPrefix();
-        assertThat(rinaUrlPrefix).isEqualTo(RINA_MOCK_URL + "/portal/#/caseManagement/");
-    }
 
     @SneakyThrows
     private void mockInstitusjoner() {
