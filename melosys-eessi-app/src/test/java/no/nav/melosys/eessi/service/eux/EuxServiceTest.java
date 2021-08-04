@@ -46,16 +46,7 @@ class EuxServiceTest {
 
     @BeforeEach
     public void setup() throws IOException, IntegrationException {
-        final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         euxService = new EuxService(euxConsumer, bucMetrikker);
-
-        when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-
-        URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
-        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<List<Institusjon>>(){});
-        when(euxConsumer.hentInstitusjoner(anyString(), any()))
-                .thenReturn(institusjoner);
     }
 
     @Test
