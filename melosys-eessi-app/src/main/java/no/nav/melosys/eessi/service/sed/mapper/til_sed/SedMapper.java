@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -61,13 +61,9 @@ public interface SedMapper {
 
     default Bruker hentBruker(SedDataDto sedDataDto) {
         Bruker bruker = new Bruker();
-
         bruker.setPerson(hentPerson(sedDataDto));
+        bruker.setAdresse(hentAdresser(sedDataDto));
         setFamiliemedlemmer(sedDataDto, bruker);
-        if (sedDataDto.getBostedsadresse() != null) {
-            bruker.setAdresse(hentAdresser(sedDataDto));
-        }
-
         return bruker;
     }
 
@@ -108,25 +104,41 @@ public interface SedMapper {
     }
 
     default List<Adresse> hentAdresser(SedDataDto sedDataDto) {
+        List<Adresse> adresser = new ArrayList<>();
+        if (sedDataDto.getBostedsadresse() != null) {
+            adresser.add(mapBostedsadresse(sedDataDto.getBostedsadresse()));
+        }
+        if (sedDataDto.getKontaktadresse() != null) {
+            adresser.add(mapAdresse(sedDataDto.getKontaktadresse()));
+        }
+        if (sedDataDto.getOppholdsadresse() != null) {
+            adresser.add(mapAdresse(sedDataDto.getOppholdsadresse()));
+        }
+        return adresser;
+    }
 
-        Adresse adresse = new Adresse();
-        adresse.setBy(sedDataDto.getBostedsadresse().getPoststed());
-        adresse.setPostnummer(sedDataDto.getBostedsadresse().getPostnr());
-        adresse.setLand(LandkodeMapper.getLandkodeIso2(sedDataDto.getBostedsadresse().getLand()));
-        adresse.setGate(sedDataDto.getBostedsadresse().getGateadresse());
-        adresse.setRegion(sedDataDto.getBostedsadresse().getRegion());
-        adresse.setType(sedDataDto.getBostedsadresse().getAdressetype().getAdressetypeRina());
-
+    private Adresse mapBostedsadresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
+        Adresse bostedsadresse = mapAdresse(adresse);
         // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
-        if (sedDataDto.getBostedsadresse().getAdressetype() == Adressetype.BOSTEDSADRESSE) {
-            if ("NO".equalsIgnoreCase(adresse.getLand())) {
-                adresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
+        if (adresse.getAdressetype() == Adressetype.BOSTEDSADRESSE) {
+            if ("NO".equalsIgnoreCase(bostedsadresse.getLand())) {
+                bostedsadresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
             } else {
-                adresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
+                bostedsadresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
             }
         }
+        return bostedsadresse;
+    }
 
-        return Collections.singletonList(adresse);
+    private Adresse mapAdresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
+        Adresse bostedsadresse = new Adresse();
+        bostedsadresse.setType(adresse.getAdressetype().getAdressetypeRina());
+        bostedsadresse.setGate(adresse.getGateadresse());
+        bostedsadresse.setBy(adresse.getPoststed());
+        bostedsadresse.setPostnummer(adresse.getPostnr());
+        bostedsadresse.setRegion(adresse.getRegion());
+        bostedsadresse.setLand(LandkodeMapper.getLandkodeIso2(adresse.getLand()));
+        return bostedsadresse;
     }
 
     default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {

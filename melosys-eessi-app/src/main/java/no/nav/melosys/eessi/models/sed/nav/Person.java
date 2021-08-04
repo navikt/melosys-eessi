@@ -3,7 +3,9 @@ package no.nav.melosys.eessi.models.sed.nav;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -34,5 +36,12 @@ public class Person {
 
     public Optional<Pin> finnNorskPin() {
         return pin.stream().filter(p -> "NO".equals(p.getLand())).findFirst();
+    }
+
+    public Collection<String> hentStatsborgerksapsliste() {
+        return statsborgerskap.stream()
+                .filter(Objects::nonNull) //Kan av en mystisk grunn inneholde null-felter
+                .map(Statsborgerskap::getLand)
+                .collect(Collectors.toSet());
     }
 }

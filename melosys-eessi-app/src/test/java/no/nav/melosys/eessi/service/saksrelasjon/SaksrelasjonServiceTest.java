@@ -10,20 +10,21 @@ import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SaksrelasjonServiceTest {
+@ExtendWith(MockitoExtension.class)
+class SaksrelasjonServiceTest {
 
     @Mock
     private FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
@@ -36,7 +37,7 @@ public class SaksrelasjonServiceTest {
 
     private SaksrelasjonService saksrelasjonService;
 
-    @Before
+    @BeforeEach
     public void setup() {
         saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, sakConsumer, applicationEventPublisher);
     }
@@ -44,20 +45,20 @@ public class SaksrelasjonServiceTest {
     private final String RINA_ID = "321";
 
     @Test
-    public void lagre_bucErIkkeLovvalg_oppdatertEuxCaseStore() {
+    void lagre_bucErIkkeLovvalg_oppdatertEuxCaseStore() {
         when(caseStoreConsumer.finnVedRinaSaksnummer(anyString())).thenReturn(Collections.emptyList());
         saksrelasjonService.lagreKobling(123L, "321", BucType.H_BUC_01);
-        verify(caseStoreConsumer).lagre(eq("123"), eq("321"));
+        verify(caseStoreConsumer).lagre("123", "321");
     }
 
     @Test
-    public void lagreKobling_verifiserRepositoryKall() {
+    void lagreKobling_verifiserRepositoryKall() {
         saksrelasjonService.lagreKobling(123L, RINA_ID, BucType.LA_BUC_04);
         verify(fagsakRinasakKoblingRepository).save(any(FagsakRinasakKobling.class));
     }
 
     @Test
-    public void lagreKobling_ikkeLovvalgBucSakEksistererICaseStore_oppdaterCaseStore() {
+    void lagreKobling_ikkeLovvalgBucSakEksistererICaseStore_oppdaterCaseStore() {
         CaseStoreDto caseStoreDto = new CaseStoreDto(1L, "bucid", "saksnummer", "rinasaksnummer", "journalpostid", "tema");
         when(sakConsumer.getSak(anyString())).thenReturn(new Sak());
         when(caseStoreConsumer.finnVedRinaSaksnummer(anyString())).thenReturn(Collections.singletonList(caseStoreDto));
@@ -66,25 +67,25 @@ public class SaksrelasjonServiceTest {
     }
 
     @Test
-    public void finnVedRinaId_verifiserRepositoryKall() {
+    void finnVedRinaId_verifiserRepositoryKall() {
         saksrelasjonService.finnVedRinaSaksnummer(RINA_ID);
-        verify(fagsakRinasakKoblingRepository).findByRinaSaksnummer(eq(RINA_ID));
+        verify(fagsakRinasakKoblingRepository).findByRinaSaksnummer(RINA_ID);
     }
 
     @Test
-    public void slettRinaId_verifiserRepositoryKall() {
+    void slettRinaId_verifiserRepositoryKall() {
         saksrelasjonService.slettVedRinaId(RINA_ID);
-        verify(fagsakRinasakKoblingRepository).deleteByRinaSaksnummer(eq(RINA_ID));
+        verify(fagsakRinasakKoblingRepository).deleteByRinaSaksnummer(RINA_ID);
     }
 
     @Test
-    public void finnVedGsakSaksnummer_verifiserRepositoryKall() {
+    void finnVedGsakSaksnummer_verifiserRepositoryKall() {
         saksrelasjonService.finnVedGsakSaksnummer(123L);
-        verify(fagsakRinasakKoblingRepository).findAllByGsakSaksnummer(eq(123L));
+        verify(fagsakRinasakKoblingRepository).findAllByGsakSaksnummer(123L);
     }
 
     @Test
-    public void søkEtterSaksnummerFraRinaSaksnummer_finnesIEuxCaseStore_forventSaksnummer() {
+    void søkEtterSaksnummerFraRinaSaksnummer_finnesIEuxCaseStore_forventSaksnummer() {
         final String rinaSaksnummer = "1231232";
         when(caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer))
                 .thenReturn(Collections.singletonList(new CaseStoreDto("123", rinaSaksnummer)));

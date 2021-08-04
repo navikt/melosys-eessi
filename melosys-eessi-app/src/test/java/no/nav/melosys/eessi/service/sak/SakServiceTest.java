@@ -1,21 +1,23 @@
 package no.nav.melosys.eessi.service.sak;
 
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
-public class SakServiceTest {
+@ExtendWith(MockitoExtension.class)
+class SakServiceTest {
 
     @Mock
     private SakConsumer sakConsumer;
@@ -24,20 +26,20 @@ public class SakServiceTest {
 
     private SakService sakService;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         sakService = new SakService(sakConsumer, saksrelasjonService);
         when(sakConsumer.getSak(anyString())).thenReturn(new Sak());
     }
 
     @Test
-    public void hentSak_forventSak() throws Exception{
+    void hentSak_forventSak() {
         Sak sak = sakService.hentsak(1L);
         assertThat(sak).isNotNull();
     }
 
     @Test
-    public void finnSakForRinaSaksnummer_saksrelasjonLagret_forventSak() throws Exception {
+    void finnSakForRinaSaksnummer_saksrelasjonLagret_forventSak() {
         FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
         fagsakRinasakKobling.setGsakSaksnummer(123L);
         when(saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(anyString())).thenReturn(Optional.of(123L));
@@ -45,7 +47,7 @@ public class SakServiceTest {
     }
 
     @Test
-    public void finnSakForRinaSaksnummer_saksrelasjonLagretHosEux_forventSak() throws Exception {
+    void finnSakForRinaSaksnummer_saksrelasjonLagretHosEux_forventSak() {
         when(saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(anyString())).thenReturn(Optional.of(123L));
         assertThat(sakService.finnSakForRinaSaksnummer("123321")).isPresent();
     }

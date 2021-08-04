@@ -5,18 +5,18 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class EuxConsumerProducerTest {
+class EuxConsumerProducerTest {
 
     @Test
-    public void opprettResttemplate_verifiserModifisertObjectMapper() {
+    void opprettResttemplate_verifiserModifisertObjectMapper() {
         EuxConsumerProducer euxConsumerProducer = new EuxConsumerProducer("uri");
         RestTemplate restTemplate = euxConsumerProducer.euxRestTemplate(new RestTemplateBuilder(r -> {}), mock(
                 SystemContextClientRequestInterceptor.class));
@@ -27,13 +27,13 @@ public class EuxConsumerProducerTest {
                 .map(MappingJackson2HttpMessageConverter.class::cast)
                 .findFirst();
 
-        assertThat(converter.isPresent()).isTrue();
+        assertThat(converter).isPresent();
 
         //Sjekker at objectMapper ikke feiler ved manglende typeId (eks SED.medlemskap)
         ObjectMapper objectMapper = converter.get().getObjectMapper();
-        assertThat(
-                objectMapper.getDeserializationConfig()
-                        .hasDeserializationFeatures(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY.getMask())
+        assertThat(objectMapper
+                .getDeserializationConfig()
+                .hasDeserializationFeatures(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY.getMask())
         ).isFalse();
     }
 }

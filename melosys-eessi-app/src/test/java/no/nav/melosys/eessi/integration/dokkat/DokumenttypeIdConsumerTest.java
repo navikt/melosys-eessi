@@ -2,40 +2,40 @@ package no.nav.melosys.eessi.integration.dokkat;
 
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RunWith(MockitoJUnitRunner.class)
-public class DokumenttypeIdConsumerTest {
+@ExtendWith(MockitoExtension.class)
+class DokumenttypeIdConsumerTest {
 
 
     @Spy
     private RestTemplate restTemplate;
 
-    @InjectMocks
     private DokumenttypeIdConsumer dokumenttypeIdConsumer;
 
     private MockRestServiceServer server;
 
-    @Before
+    @BeforeEach
     public void setup() {
+        dokumenttypeIdConsumer = new DokumenttypeIdConsumer(restTemplate);
         server = MockRestServiceServer.createServer(restTemplate);
     }
 
     @Test
-    public void hentDokumenttypeId_expectValidJson() {
+    void hentDokumenttypeId_expectValidJson() {
 
         String responseJson = "{\"dokumenttypeId\":\"123\"}";
         server.expect(requestTo("/sed/type"))
@@ -46,10 +46,12 @@ public class DokumenttypeIdConsumerTest {
         assertThat(dokumenttypeIdDto.getDokumenttypeId()).isEqualTo("123");
     }
 
-    @Test(expected = IntegrationException.class)
-    public void hentDokumenttypeId_expectException() {
+    @Test
+    void hentDokumenttypeId_expectException() {
         server.expect(requestTo("/sed/type"))
                 .andRespond(withServerError());
-        dokumenttypeIdConsumer.hentDokumenttypeId("sed", "type");
+        assertThatExceptionOfType(IntegrationException.class)
+                .isThrownBy(() -> dokumenttypeIdConsumer.hentDokumenttypeId("sed", "type"))
+                .withMessageContaining("Feil ved integrasjon mot dokkat");
     }
 }

@@ -41,11 +41,11 @@ class OppgaveConsumerTest {
 
         assertThat(oppgave)
                 .extracting(
-                        OppgaveDto::getStatus,
-                        OppgaveDto::getAktoerId,
-                        OppgaveDto::getTema
+                        HentOppgaveDto::getStatuskategori,
+                        HentOppgaveDto::getAktoerId,
+                        HentOppgaveDto::getTema
                 ).containsExactly(
-                "AAPNET",
+                "AAPEN",
                 "1332607802528",
                 "MED"
         );

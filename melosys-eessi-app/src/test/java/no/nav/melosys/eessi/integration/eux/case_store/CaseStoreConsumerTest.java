@@ -1,23 +1,25 @@
 package no.nav.melosys.eessi.integration.eux.case_store;
 
 import java.util.Collections;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-public class CaseStoreConsumerTest {
+class CaseStoreConsumerTest {
 
     private CaseStoreConsumer caseStoreConsumer;
 
     private MockRestServiceServer server;
     private String response;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
         RestTemplate restTemplate = new RestTemplate();
         server = MockRestServiceServer.createServer(restTemplate);
@@ -26,7 +28,7 @@ public class CaseStoreConsumerTest {
     }
 
     @Test
-    public void finnVedRinaSaksnummer() throws Exception {
+    void finnVedRinaSaksnummer() {
         String rinaSaksnummer = "12312432";
         server.expect(requestTo("/cases?rinaId=" + rinaSaksnummer))
                 .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
@@ -34,7 +36,7 @@ public class CaseStoreConsumerTest {
     }
 
     @Test
-    public void finnVedJournalpostID() throws Exception {
+    void finnVedJournalpostID() {
         String journalpostID = "12312432";
         server.expect(requestTo("/cases?caseFileId=" + journalpostID))
                 .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));

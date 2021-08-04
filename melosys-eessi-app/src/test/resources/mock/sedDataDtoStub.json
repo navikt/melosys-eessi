@@ -43,6 +43,20 @@
     "poststed": "Noi",
     "adressetype": "BOSTEDSADRESSE"
   },
+  "kontaktadresse": {
+    "gateadresse": "kontakt meg her",
+    "land": "NO",
+    "postnr": "0001",
+    "poststed": "Oslo",
+    "adressetype": "KONTAKTADRESSE"
+  },
+  "oppholdsadresse": {
+    "gateadresse": "eksotisk gate",
+    "land": "NZ",
+    "postnr": "XJY",
+    "poststed": "Far away",
+    "adressetype": "POSTADRESSE"
+  },
   "bruker": {
     "etternavn": "MrFornavn",
     "fnr": "11111111111",

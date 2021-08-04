@@ -98,7 +98,7 @@ public class EuxService {
     }
 
     public boolean sedErEndring(String sedId, String rinaSaksnummer) {
-        BUC buc = euxConsumer.hentBuC(rinaSaksnummer);
+        var buc = euxConsumer.hentBuC(rinaSaksnummer);
 
         return buc.getDocuments().stream()
                 .filter(document -> document.getId().equals(sedId)).findFirst()
@@ -127,7 +127,7 @@ public class EuxService {
 
     public String hentRinaUrl(String rinaCaseId){
         if (!StringUtils.hasText(rinaCaseId)) {
-            throw new IllegalArgumentException("Trenger RinaSaksnummer for å opprette url til rina");
+            throw new IllegalArgumentException("Trenger rina-saksnummer for å opprette url til rina");
         }
         return euxConsumer.hentRinaUrl(rinaCaseId);
     }

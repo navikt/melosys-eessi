@@ -29,7 +29,7 @@ public class OppgaveService {
         this.oppgaveConsumer = oppgaveConsumer;
     }
 
-    public OppgaveDto hentOppgave(String oppgaveID) {
+    public HentOppgaveDto hentOppgave(String oppgaveID) {
         return oppgaveConsumer.hentOppgave(oppgaveID);
     }
 

@@ -7,26 +7,26 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A001Mapper;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A009Mapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SedMapperFactoryTest {
+class SedMapperFactoryTest {
 
     @Test
-    public void oppslagavSedA001GirKorrektMapper() throws Exception {
+    void oppslagavSedA001GirKorrektMapper() {
         SedMapper sedMapper = SedMapperFactory.sedMapper(SedType.A001);
         assertThat(sedMapper).isInstanceOf(A001Mapper.class);
     }
 
     @Test
-    public void oppslagavSedA009GirKorrektMapper() throws Exception {
+    void oppslagavSedA009GirKorrektMapper() {
         SedMapper sedMapper = SedMapperFactory.sedMapper(SedType.A009);
         assertThat(sedMapper).isInstanceOf(A009Mapper.class);
     }
 
     @Test
-    public void oppslagAvAlleSeder_girKorrektMapper() throws MappingException {
+    void oppslagAvAlleSeder_girKorrektMapper() throws MappingException {
         var sedTyperMedMapper = List.of(
                 SedType.A001,
                 SedType.A002,

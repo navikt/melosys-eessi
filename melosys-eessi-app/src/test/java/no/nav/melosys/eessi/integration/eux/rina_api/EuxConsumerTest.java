@@ -14,8 +14,8 @@ import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.service.sts.RestStsService;
 import org.apache.commons.io.IOUtils;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -32,14 +32,13 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-public class EuxConsumerTest {
+class EuxConsumerTest {
 
     private EuxConsumer euxConsumer;
 
@@ -47,8 +46,8 @@ public class EuxConsumerTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Before
-    public void setup() {
+    @BeforeEach
+    void setup() {
         EuxConsumerProducer consumerConfig = new EuxConsumerProducer(null);
         SystemContextClientRequestInterceptor interceptor = new SystemContextClientRequestInterceptor(mock(RestStsService.class));
 
@@ -58,7 +57,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentBuC_returnerObjekt() throws Exception {
+    void hentBuC_returnerObjekt() throws Exception {
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/buc.json");
         assertThat(jsonUrl).isNotNull();
@@ -85,7 +84,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBuC_returnererId() {
+    void opprettBuC_returnererId() {
         String id = "1234";
         String buc = "LA_BUC_04";
         server.expect(requestTo("/buc?BuCType=" + buc))
@@ -96,7 +95,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void slettBuC_ingenRetur() {
+    void slettBuC_ingenRetur() {
         String id = "1234";
         server.expect(requestTo("/buc/" + id))
                 .andExpect(method(HttpMethod.DELETE))
@@ -106,7 +105,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void settMottaker_ingenRetur() {
+    void settMottaker_ingenRetur() {
         String rinaSaksnummer = "1111";
         String sverige = "SE:1234";
         String danmark = "DK:4321";
@@ -118,7 +117,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void settMottaker_respons404_kasterNotFoundException() {
+    void settMottaker_respons404_kasterNotFoundException() {
         String rinaSaksnummer = "1111";
         String sverige = "SE:1234";
         String danmark = "DK:4321";
@@ -145,6 +144,7 @@ public class EuxConsumerTest {
 
     @Test
     public void hentInstitusjoner_forventListe() throws Exception {
+
         URL jsonUrl = getClass().getClassLoader().getResource("mock/institusjon_liste.json");
         assertThat(jsonUrl).isNotNull();
         String institusjonerString = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
@@ -165,7 +165,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettBucOgSedMedVedlegg_forventString() throws Exception {
+    void opprettBucOgSedMedVedlegg_forventString() throws Exception {
         String buc = "buc", mottaker = "NAV", filtype = "virus.exe", vedlegg = "vedlegg";
         SED sed = new SED();
 
@@ -182,7 +182,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void finnRinaSaker_forventJson() throws Exception {
+    void finnRinaSaker_forventJson() throws Exception {
         URL jsonUrl = getClass().getClassLoader().getResource("mock/bucinfo.json");
         assertThat(jsonUrl).isNotNull();
         String forventetRetur = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
@@ -205,12 +205,12 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA001_forventSed() throws Exception {
+    void hentSedA001_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA001.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
@@ -229,7 +229,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA003_forventSed() throws Exception {
+    void hentSedA003_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -252,7 +252,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA008_forventSed() throws Exception {
+    void hentSedA008_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -275,12 +275,12 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA009_forventSed() throws Exception {
+    void hentSedA009_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA009.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
@@ -295,12 +295,12 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedA010_forventSed() throws Exception {
+    void hentSedA010_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA010.json");
-        assertNotNull(jsonUrl);
+        assertThat(jsonUrl).isNotNull();
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
@@ -315,7 +315,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedX001_forventSed() throws Exception {
+    void hentSedX001_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -334,7 +334,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedH001MedArbeidsgiver_forventSed() throws Exception {
+    void hentSedH001MedArbeidsgiver_forventSed() throws Exception {
         String id = "123";
         String dokumentId = "312";
 
@@ -354,7 +354,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void hentSedPdf_forventPdf() {
+    void hentSedPdf_forventPdf() {
         String id = "123", dokumentId = "123321";
 
         byte[] forventetRetur = "teststring".getBytes();
@@ -367,7 +367,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void genererPdfFraSed_forventPdf() {
+    void genererPdfFraSed_forventPdf() {
         SED sed = new SED();
         byte[] forventetRetur = "teststring".getBytes();
 
@@ -379,7 +379,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void opprettSed_forventId() {
+    void opprettSed_forventId() {
         String id = "123";
         SED sed = new SED();
 
@@ -393,7 +393,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void oppdaterSed_ingenRetur() {
+    void oppdaterSed_ingenRetur() {
         String id = "123";
         String dokumentId = "1111";
         SED sed = new SED();
@@ -405,7 +405,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void sendSed_ingenRetur() {
+    void sendSed_ingenRetur() {
         String id = "123";
         String dokumentId = "22";
 
@@ -416,7 +416,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void leggTilVedlegg_forventId() {
+    void leggTilVedlegg_forventId() {
         final String id = "123";
         final String dokumentId = "123321";
         final String filtype = "virus.exe";
@@ -433,7 +433,7 @@ public class EuxConsumerTest {
     }
 
     @Test
-    public void setSakSensitiv_ingenResponseEllerException() {
+    void setSakSensitiv_ingenResponseEllerException() {
 
         String id = "123";
         server.expect(requestTo("/buc/" + id + "/sensitivsak"))
