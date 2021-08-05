@@ -15,10 +15,9 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,8 +39,7 @@ class OppgaveConsumerTest {
 
     @BeforeEach
     public void setUp() {
-        RestTemplate restTemplate = new RestTemplateBuilder().rootUri(rootUri).build();
-        oppgaveConsumer = new OppgaveConsumer(restTemplate);
+        oppgaveConsumer = new OppgaveConsumer(WebClient.builder().baseUrl(rootUri).build());
     }
 
     @Test
@@ -54,9 +52,11 @@ class OppgaveConsumerTest {
 
         var oppgave = oppgaveConsumer.hentOppgave(OPPGAVE_ID);
         assertOppgaveFelter(oppgave);
-        assertThat(mockWebServer.takeRequest())
+        var request = mockWebServer.takeRequest();
+        assertThat(request)
                 .extracting(RecordedRequest::getPath, RecordedRequest::getMethod)
                 .containsExactly("/oppgaver/" + OPPGAVE_ID, "GET");
+        assertThat(request.getHeaders().names()).contains(OppgaveConsumer.X_CORRELATION_ID);
     }
 
     @Test
@@ -69,9 +69,11 @@ class OppgaveConsumerTest {
 
         var oppgave = oppgaveConsumer.opprettOppgave(opprettOppgave());
         assertOppgaveFelter(oppgave);
-        assertThat(mockWebServer.takeRequest())
+        var request = mockWebServer.takeRequest();
+        assertThat(request)
                 .extracting(RecordedRequest::getPath, RecordedRequest::getMethod)
                 .containsExactly("/oppgaver", "POST");
+        assertThat(request.getHeaders().names()).contains(OppgaveConsumer.X_CORRELATION_ID);
     }
 
     @Test
@@ -98,6 +100,7 @@ class OppgaveConsumerTest {
         assertThat(request)
                 .extracting(RecordedRequest::getPath, RecordedRequest::getMethod)
                 .containsExactly("/oppgaver/" + OPPGAVE_ID, "PATCH");
+        assertThat(request.getHeaders().names()).contains(OppgaveConsumer.X_CORRELATION_ID);
 
         var objectMapper = new ObjectMapper();
         assertThat(objectMapper.readTree(requestBody))
