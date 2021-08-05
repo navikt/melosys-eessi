@@ -33,6 +33,7 @@ public class OppgaveEndretConsumer {
         final var oppgave = consumerRecord.value();
 
         if (erIdentifisertOppgave(oppgave)) {
+            log.info("Oppgave {} markert som identifisert. Søker etter tilknyttet RINA-sak", oppgave.getId());
             bucIdentifiseringOppgRepository.findByOppgaveId(consumerRecord.value().getId().toString())
                     .ifPresent(b -> {
                         log.info("BUC {} identifisert av oppgave {}", b.getRinaSaksnummer(), b.getOppgaveId());
