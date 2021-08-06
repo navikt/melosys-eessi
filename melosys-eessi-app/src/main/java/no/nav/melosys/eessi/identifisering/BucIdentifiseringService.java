@@ -39,6 +39,7 @@ public class BucIdentifiseringService {
                 .map(Object::toString)
                 .orElse(null);
 
+        log.info("Publiserer melding om SED mottatt. SED: {}", sedMottattHendelse.getSedHendelse().getSedId());
         melosysEessiProducer.publiserMelding(
                 mapper.map(
                         aktørID,
