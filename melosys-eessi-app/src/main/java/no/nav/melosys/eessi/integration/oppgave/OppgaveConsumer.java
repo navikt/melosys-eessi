@@ -1,50 +1,67 @@
 package no.nav.melosys.eessi.integration.oppgave;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
+import no.nav.melosys.eessi.integration.RestUtils;
 import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
-import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForOppgave;
-
+@Slf4j
 public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
-    private static final String X_CORRELATION_ID = "X-Correlation-ID";
+    static final String X_CORRELATION_ID = "X-Correlation-ID";
 
-    public OppgaveConsumer(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public OppgaveConsumer(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     public HentOppgaveDto hentOppgave(String oppgaveID) {
-        return exchange("/oppgaver/{oppgaveID}", HttpMethod.GET, new HttpEntity<>(headers()), HentOppgaveDto.class, oppgaveID);
+        var correlationID = generateUUID();
+        log.info("hentOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
+        return webClient.get()
+                .uri("/oppgaver/{oppgaveID}", oppgaveID)
+                .header(X_CORRELATION_ID, correlationID)
+                .retrieve()
+                .onStatus(HttpStatus::isError, this::håndterFeil)
+                .bodyToMono(HentOppgaveDto.class)
+                .block();
     }
 
     public HentOppgaveDto opprettOppgave(OppgaveDto oppgaveDto) {
-        return exchange("/oppgaver", HttpMethod.POST, new HttpEntity<>(oppgaveDto, headers()), HentOppgaveDto.class);
+        var correlationID = generateUUID();
+        log.info("opprettOppgave, correlationID: {}", correlationID);
+        return webClient.post()
+                .uri("/oppgaver")
+                .header(X_CORRELATION_ID, correlationID)
+                .bodyValue(oppgaveDto)
+                .retrieve()
+                .onStatus(HttpStatus::isError, this::håndterFeil)
+                .bodyToMono(HentOppgaveDto.class)
+                .block();
     }
 
     public HentOppgaveDto oppdaterOppgave(String oppgaveID, OppgaveOppdateringDto oppgaveOppdateringDto) {
-        return exchange("/oppgaver/{oppgaveID}", HttpMethod.PATCH, new HttpEntity<>(oppgaveOppdateringDto, headers()), HentOppgaveDto.class, oppgaveID);
+        var correlationID = generateUUID();
+        log.info("oppdaterOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
+        return webClient.patch()
+                .uri("/oppgaver/{oppgaveID}", oppgaveID)
+                .header(X_CORRELATION_ID, correlationID)
+                .bodyValue(oppgaveOppdateringDto)
+                .retrieve()
+                .onStatus(HttpStatus::isError, this::håndterFeil)
+                .bodyToMono(HentOppgaveDto.class)
+                .block();
     }
 
-    private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
-            Class<T> clazz, Object... params) {
-        try {
-            return restTemplate.exchange(uri, method, entity, clazz, params).getBody();
-        } catch (RestClientException e) {
-            throw new IntegrationException("Feil i integrasjon mot oppgave: " + hentFeilmeldingForOppgave(e), e);
-        }
-    }
-
-    private HttpHeaders headers() {
-        HttpHeaders headers = defaultHeaders();
-        headers.add(X_CORRELATION_ID, generateUUID());
-        return headers;
+    private Mono<? extends Throwable> håndterFeil(ClientResponse clientResponse) {
+        return clientResponse.bodyToMono(String.class)
+                .map(RestUtils::hentFeilmeldingForOppgave)
+                .map(IntegrationException::new);
     }
 }

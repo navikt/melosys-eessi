@@ -1,12 +1,14 @@
 package no.nav.melosys.eessi.integration.oppgave;
 
-import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import java.util.Collections;
+
+import no.nav.melosys.eessi.security.SystemContextRequestFilter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class OppgaveConsumerProducer {
@@ -18,11 +20,18 @@ public class OppgaveConsumerProducer {
     }
 
     @Bean
-    public OppgaveConsumer oppgaveConsumer(SystemContextClientRequestInterceptor systemContextClientRequestInterceptor) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-                .interceptors(systemContextClientRequestInterceptor)
-                .build();
-        return new OppgaveConsumer(restTemplate);
+    public OppgaveConsumer oppgaveConsumer(WebClient.Builder webClientBuilder, SystemContextRequestFilter systemContextRequestFilter) {
+        return new OppgaveConsumer(
+                webClientBuilder
+                        .baseUrl(url)
+                        .defaultHeaders(this::defaultHeaders)
+                        .filter(systemContextRequestFilter)
+                        .build()
+        );
+    }
+
+    private void defaultHeaders(HttpHeaders httpHeaders) {
+        httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
     }
 }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -40,6 +41,7 @@ public class OppgaveEndretHendelse {
     public static class Ident {
         private String identType;
         private String verdi;
+        @ToString.Exclude
         private String folkeregisterident;
     }
 

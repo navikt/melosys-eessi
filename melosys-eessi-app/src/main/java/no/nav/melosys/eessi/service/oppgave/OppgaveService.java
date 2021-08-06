@@ -1,12 +1,10 @@
 package no.nav.melosys.eessi.service.oppgave;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveDto;
-import no.nav.melosys.eessi.integration.oppgave.OppgaveOppdateringDto;
+import no.nav.melosys.eessi.integration.oppgave.*;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.springframework.stereotype.Service;
 
@@ -43,6 +41,7 @@ public class OppgaveService {
                 .tema(temaForSedType(sedType))
                 .tildeltEnhetsnr(ENHET_ID_FORDELING)
                 .beskrivelse(String.format(BESKRIVELSE, sedType, rinaSaksnummer))
+                .metadata(Map.of(OppgaveMetadataKey.RINA_SAKID, rinaSaksnummer))
                 .build();
 
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);

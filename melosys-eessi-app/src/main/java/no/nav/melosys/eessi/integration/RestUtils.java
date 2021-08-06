@@ -20,28 +20,28 @@ public class RestUtils {
     private static final String OPPGAVE_FEIL_KEY = "feilmelding";
 
     public static String hentFeilmeldingForEux(RestClientException e) {
-        return hentFeilmelding(e, EUX_FEIL_KEY);
-    }
-
-    public static String hentFeilmeldingForOppgave(RestClientException e) {
-        return hentFeilmelding(e, OPPGAVE_FEIL_KEY);
-    }
-
-    private static String hentFeilmelding(RestClientException e, String nøkkel) {
         if(e instanceof RestClientResponseException) {
             RestClientResponseException clientErrorException = (RestClientResponseException) e;
-            String feilmelding = clientErrorException.getResponseBodyAsString();
+            var feilmelding = clientErrorException.getResponseBodyAsString();
             if (!StringUtils.hasText(feilmelding)) return e.getMessage();
-            try {
-                JsonNode json = objectMapper.readTree(feilmelding).path(nøkkel);
-                return json.isMissingNode() ? e.getMessage() : json.toString();
-            } catch (IOException ex) {
-                log.warn("Kunne ikke lese feilmelding fra response", ex);
-                return clientErrorException.getResponseBodyAsString();
-            }
+            return hentFeilmelding(feilmelding, EUX_FEIL_KEY);
         }
 
         return e.getMessage();
+    }
+
+    public static String hentFeilmeldingForOppgave(String feilmelding) {
+        return hentFeilmelding(feilmelding, OPPGAVE_FEIL_KEY);
+    }
+
+    private static String hentFeilmelding(String feilmelding, String nøkkel) {
+        try {
+            JsonNode json = objectMapper.readTree(feilmelding).path(nøkkel);
+            return json.isMissingNode() ? feilmelding : json.toString();
+        } catch (IOException ex) {
+            log.warn("Kunne ikke lese feilmelding fra response", ex);
+            return feilmelding;
+        }
     }
 
 }

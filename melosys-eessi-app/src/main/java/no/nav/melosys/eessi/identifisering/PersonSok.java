@@ -57,7 +57,6 @@ class PersonSok {
         } else if (!harOverlappendeStatsborgerskap(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
         } else if (!harSammeFoedselsdato(person, personsokKriterier)) {
-            log.info("Fra PDL: {} ------- søkekriterier: {}", person.getFødselsdato(), personsokKriterier.getFoedselsdato());
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;
         }
 

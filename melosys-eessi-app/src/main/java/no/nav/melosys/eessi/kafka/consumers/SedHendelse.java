@@ -1,10 +1,7 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +20,7 @@ public class SedHendelse {
     private String rinaDokumentId;
     private String rinaDokumentVersjon;
     private String sedType;
+    @ToString.Exclude
     private String navBruker;
 
     // avsenderID har formatet <landkodeISO2>:<institusjonID>

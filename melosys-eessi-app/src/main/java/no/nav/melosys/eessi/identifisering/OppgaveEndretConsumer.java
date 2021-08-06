@@ -29,14 +29,15 @@ public class OppgaveEndretConsumer {
             topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
             containerFactory = "oppgaveListenerContainerFactory")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
-        log.debug("Oppgave endret: {}", consumerRecord.value());
         final var oppgave = consumerRecord.value();
+        log.debug("Oppgave endret: {}", oppgave);
 
         if (erIdentifisertOppgave(oppgave)) {
-            bucIdentifiseringOppgRepository.findByOppgaveId(consumerRecord.value().getId().toString())
+            log.info("Oppgave {} markert som identifisert. Søker etter tilknyttet RINA-sak", oppgave.getId());
+            bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                     .ifPresent(b -> {
                         log.info("BUC {} identifisert av oppgave {}", b.getRinaSaksnummer(), b.getOppgaveId());
-                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), consumerRecord.value().hentAktørID()));
+                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), oppgave.hentAktørID()));
                         oppgaveService.ferdigstillOppgave(b.getOppgaveId(), oppgave.getVersjon());
                     });
         }

@@ -8,10 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @AllArgsConstructor
@@ -36,6 +33,7 @@ public class OppgaveDto {
     private String temagruppe;
     private String tildeltEnhetsnr;
     private String behandlesAvApplikasjon;
+    @ToString.Exclude
     private String beskrivelse;
     private Map<OppgaveMetadataKey, String> metadata = new EnumMap<>(OppgaveMetadataKey.class);
 }
