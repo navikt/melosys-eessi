@@ -48,7 +48,7 @@
         <javassist.version>3.27.0-GA</javassist.version>
         <jna.version>5.5.0</jna.version>
         <objenesis.version>3.2</objenesis.version>
-        <scala.version>2.13.2</scala.version>
+        <scala.version>2.13.6</scala.version>
     </properties>
 
     <dependencyManagement>
