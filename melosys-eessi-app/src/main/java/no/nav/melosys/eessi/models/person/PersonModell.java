@@ -14,5 +14,6 @@ public class PersonModell {
     String etternavn;
     LocalDate fødselsdato;
     Collection<String> statsborgerskapLandkodeISO2;
+    Collection<UtenlandskId> utenlandskId;
     boolean erOpphørt;
 }
