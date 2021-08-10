@@ -28,7 +28,7 @@ public class Person {
 
     private String fornavnvedfoedsel;
 
-    private String kjoenn;
+    private Kjønn kjoenn;
 
     private Collection<Pin> pin = new HashSet<>();
 
@@ -43,5 +43,13 @@ public class Person {
                 .filter(Objects::nonNull) //Kan av en mystisk grunn inneholde null-felter
                 .map(Statsborgerskap::getLand)
                 .collect(Collectors.toSet());
+    }
+
+    public boolean harStatsborgerskap(String land) {
+        return statsborgerskap.stream().anyMatch(s -> s.getLand().equals(land));
+    }
+
+    public Optional<Pin> finnUtenlandskIdFraLand(String land) {
+        return pin.stream().filter(p -> p.getLand().equals(land)).findFirst();
     }
 }

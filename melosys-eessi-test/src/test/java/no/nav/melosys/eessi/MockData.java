@@ -147,10 +147,23 @@ public class MockData {
                 new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
         ));
 
+        var pdlKjønn = new PDLKjoenn();
+        pdlKjønn.setKjoenn(PDLKjoennType.MANN);
+        pdlKjønn.setMetadata(new PDLMetadata());
+        pdlKjønn.getMetadata().setEndringer(Set.of(
+            new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
+        ));
+
+        var pdlUtenlandskId = new PDLUtenlandskIdentifikator();
+        pdlUtenlandskId.setIdentifikasjonsnummer("Ikke-brukt-enda-123");
+        pdlUtenlandskId.setUtstederland("SE");
+
         pdlPerson.setNavn(Set.of(pdlNavn));
         pdlPerson.setFoedsel(Set.of(pdlFødsel));
         pdlPerson.setStatsborgerskap(Set.of(pdlStatsborgerskap));
         pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
+        pdlPerson.setKjoenn(Set.of(pdlKjønn));
+        pdlPerson.setUtenlandskIdentifikasjonsnummer(Set.of(pdlUtenlandskId));
         return pdlPerson;
     }
 
