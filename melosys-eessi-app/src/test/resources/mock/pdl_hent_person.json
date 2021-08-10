@@ -6,8 +6,7 @@
           "fornavn": "RASK",
           "etternavn": "MASKIN",
           "metadata": {
-            "master": "Freg",
-            "historisk": false,
+            "master": "FREG",
             "endringer": [
               {
                 "registrert": "2020-06-04T18:50:15",
@@ -21,11 +20,10 @@
         {
           "foedselsdato": "1984-06-25",
           "metadata": {
-            "master": "Freg",
-            "historisk": false,
+            "master": "FREG",
             "endringer": [
               {
-                "registrert": "2020-06-04T18:50:15",
+                "registrert": "2021-08-10T16:09:12",
                 "type": "OPPRETT"
               }
             ]
@@ -41,15 +39,20 @@
         {
           "status": "bosatt",
           "metadata": {
-            "master": "Freg",
-            "historisk": false,
+            "master": "FREG",
             "endringer": [
               {
-                "registrert": "2020-06-04T18:50:16",
+                "registrert": "2021-08-10T16:09:13",
                 "type": "OPPRETT"
               }
             ]
           }
+        }
+      ],
+      "utenlandskIdentifikasjonsnummer": [
+        {
+          "identifikasjonsnummer": "212121-9944332",
+          "utstederland": "SWE"
         }
       ]
     }

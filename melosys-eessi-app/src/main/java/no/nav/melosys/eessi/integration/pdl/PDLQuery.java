@@ -41,6 +41,10 @@ final class PDLQuery {
                          }
                      }
                  }
+                 utenlandskIdentifikasjonsnummer {
+                    identifikasjonsnummer
+                    utstederland
+                 }
                }
              }
             """;
