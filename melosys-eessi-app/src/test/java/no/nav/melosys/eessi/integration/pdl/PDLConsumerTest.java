@@ -62,6 +62,9 @@ class PDLConsumerTest {
         assertThat(res.getUtenlandskIdentifikasjonsnummer())
             .flatExtracting(PDLUtenlandskIdentifikator::getIdentifikasjonsnummer, PDLUtenlandskIdentifikator::getUtstederland)
             .containsExactly("212121-9944332", "SWE");
+        assertThat(res.getKjoenn())
+            .flatExtracting(PDLKjoenn::getKjoenn)
+            .contains(PDLKjoennType.KVINNE);
     }
 
     @Test

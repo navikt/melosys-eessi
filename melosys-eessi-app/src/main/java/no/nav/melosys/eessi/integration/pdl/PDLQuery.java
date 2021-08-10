@@ -45,6 +45,16 @@ final class PDLQuery {
                     identifikasjonsnummer
                     utstederland
                  }
+                 kjoenn {
+                    kjoenn
+                    metadata {
+                         master
+                         endringer {
+                             registrert
+                             type
+                         }
+                     }
+                 }
                }
              }
             """;

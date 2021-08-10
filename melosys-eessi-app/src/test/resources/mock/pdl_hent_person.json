@@ -35,6 +35,20 @@
           "land": "NOR"
         }
       ],
+      "kjoenn": [
+        {
+          "kjoenn": "KVINNE",
+          "metadata": {
+            "master": "FREG",
+            "endringer": [
+              {
+                "registrert": "2021-08-10T16:09:13",
+                "type": "OPPRETT"
+              }
+            ]
+          }
+        }
+      ],
       "folkeregisterpersonstatus": [
         {
           "status": "bosatt",
