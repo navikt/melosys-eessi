@@ -16,4 +16,5 @@ public class PersonModell {
     Collection<String> statsborgerskapLandkodeISO2;
     Collection<UtenlandskId> utenlandskId;
     boolean erOpphørt;
+    Kjønn kjønn;
 }

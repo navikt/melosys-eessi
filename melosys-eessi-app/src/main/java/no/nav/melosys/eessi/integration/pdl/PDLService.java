@@ -42,6 +42,8 @@ public class PDLService implements PersonFasade {
                 .ifPresent(fødsel -> personModellBuilder.fødselsdato(fødsel.getFoedselsdato()));
         hentSisteOpplysning(pdlPerson.getFolkeregisterpersonstatus())
                 .ifPresent(status -> personModellBuilder.erOpphørt(status.statusErOpphørt()));
+        hentSisteOpplysning(pdlPerson.getKjoenn())
+                .ifPresent(kjønn -> personModellBuilder.kjønn(kjønn.getKjoenn().tilDomene()));
 
         return personModellBuilder
             .statsborgerskapLandkodeISO2(
