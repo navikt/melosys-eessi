@@ -83,4 +83,17 @@ public class OppgaveService {
                         .build()
         );
     }
+
+    public void flyttOppgaveTilIdOgFordeling(String oppgaveID, int versjon, String beskrivelse) {
+        var eksisterendeOppgaveBeskrivelse = oppgaveConsumer.hentOppgave(oppgaveID).getBeskrivelse();
+        var oppgaveOppdatering = OppgaveOppdateringDto.builder()
+            .id(Integer.parseInt(oppgaveID))
+            .beskrivelse(eksisterendeOppgaveBeskrivelse, beskrivelse)
+            .versjon(versjon)
+            .tildeltEnhetsnr(ENHET_ID_FORDELING)
+            .tilordnetRessurs("")
+            .build();
+
+        oppgaveConsumer.oppdaterOppgave(oppgaveID, oppgaveOppdatering);
+    }
 }
