@@ -1,4 +1,4 @@
-FROM navikt/java:15
+FROM navikt/java:16
 LABEL maintainer="Team Melosys"
 
 COPY docker-init-scripts/*.sh /init-scripts/
