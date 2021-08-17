@@ -13,9 +13,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Conversation;
-import no.nav.melosys.eessi.models.buc.Document;
+import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
@@ -80,6 +78,7 @@ public class MockData {
         Nav nav = new Nav();
         Person person = new Person();
         person.setFoedselsdato(fødselsdato.toString());
+        person.setKjoenn(Kjønn.M);
         Statsborgerskap statsborgerskap1 = new Statsborgerskap();
         statsborgerskap1.setLand(statsborgerskap);
         person.setStatsborgerskap(Collections.singletonList(statsborgerskap1));
@@ -111,10 +110,18 @@ public class MockData {
     BUC buc(String id) {
         BUC buc = new BUC();
         buc.setId(id);
+
         Document document = new Document();
         document.setConversations(Arrays.asList(new Conversation(), new Conversation()));
         document.setId(id);
+        document.setStatus("CREATED");
+        document.setDirection("IN");
         buc.setDocuments(Collections.singletonList(document));
+
+        Organisation organisation = new Organisation();
+        organisation.setCountryCode("SE");
+        buc.setCreator(new Creator());
+        buc.getCreator().setOrganisation(organisation);
         return buc;
     }
 

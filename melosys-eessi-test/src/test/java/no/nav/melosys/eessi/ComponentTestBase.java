@@ -108,9 +108,13 @@ public abstract class ComponentTestBase {
 
     @SneakyThrows
     protected void mockPerson(String ident, String aktørID) {
+        mockPerson(ident, aktørID, FØDSELSDATO, STATSBORGERSKAP);
+    }
+
+    protected void mockPerson(String ident, String aktørID, LocalDate fødselsdato, String statsborgerskap) {
         when(pdlConsumer.hentIdenter(ident)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
         when(pdlConsumer.hentIdenter(aktørID)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
-        when(pdlConsumer.hentPerson(ident)).thenReturn(mockData.pdlPerson(FØDSELSDATO, STATSBORGERSKAP));
+        when(pdlConsumer.hentPerson(ident)).thenReturn(mockData.pdlPerson(fødselsdato, statsborgerskap));
     }
 
     List<ConsumerRecord<Object, Object>> hentRecords() {
