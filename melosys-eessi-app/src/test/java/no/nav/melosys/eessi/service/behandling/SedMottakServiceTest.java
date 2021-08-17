@@ -93,7 +93,7 @@ class SedMottakServiceTest {
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository).save(any());
+        verify(sedMottattHendelseRepository, times(2)).save(any());
         verify(applicationEventPublisher, never()).publishEvent(BucIdentifisertEvent.class);
     }
 
@@ -108,7 +108,7 @@ class SedMottakServiceTest {
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository).save(any());
+        verify(sedMottattHendelseRepository, times(2)).save(any());
         verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
     }
 
