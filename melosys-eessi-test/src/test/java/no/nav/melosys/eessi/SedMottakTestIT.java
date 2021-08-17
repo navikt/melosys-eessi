@@ -172,7 +172,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         await().atMost(Duration.ofSeconds(4))
             .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
 
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentRecords()).isEmpty();
