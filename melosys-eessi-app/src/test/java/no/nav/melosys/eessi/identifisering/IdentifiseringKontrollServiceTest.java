@@ -132,7 +132,7 @@ class IdentifiseringKontrollServiceTest {
     }
 
     @Test
-    void kontrollerIdentifisertPerson_personHarIkkeRiktigUtenlandskId() {
+    void kontrollerIdentifisertPerson_personHarIkkeRiktigUtenlandskId_ikkeIdentifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.utenlandskId(Set.of(new UtenlandskId("feil-pin", avsenderLand))).build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
