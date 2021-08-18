@@ -21,6 +21,7 @@ public class OppgaveEndretConsumer {
     private final ApplicationEventPublisher eventPublisher;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final OppgaveService oppgaveService;
+    private final IdentifiseringKontrollService identifiseringKontrollService;
 
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
@@ -33,13 +34,9 @@ public class OppgaveEndretConsumer {
         log.debug("Oppgave endret: {}", oppgave);
 
         if (erIdentifisertOppgave(oppgave)) {
-            log.info("Oppgave {} markert som identifisert. Søker etter tilknyttet RINA-sak", oppgave.getId());
+            log.info("Oppgave {} markert som identifisert av ID og Fordeling. Søker etter tilknyttet RINA-sak", oppgave.getId());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
-                    .ifPresent(b -> {
-                        log.info("BUC {} identifisert av oppgave {}", b.getRinaSaksnummer(), b.getOppgaveId());
-                        eventPublisher.publishEvent(new BucIdentifisertEvent(b.getRinaSaksnummer(), oppgave.hentAktørID()));
-                        oppgaveService.ferdigstillOppgave(b.getOppgaveId(), oppgave.getVersjon());
-                    });
+                    .ifPresent(b -> validerIdentifisertPerson(b.getRinaSaksnummer(), oppgave));
         }
     }
 
@@ -50,5 +47,21 @@ public class OppgaveEndretConsumer {
                 && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
                 && oppgaveEndretHendelse.erÅpen()
                 && oppgaveEndretHendelse.harMetadataRinasaksnummer();
+    }
+
+    private void validerIdentifisertPerson(String rinaSaksnummer,
+                                           OppgaveEndretHendelse oppgave) {
+        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
+        if (kontrollResultat.erIdentifisert()) {
+            log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
+            eventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, oppgave.hentAktørID()));
+            oppgaveService.ferdigstillOppgave(oppgave.getId().toString(), oppgave.getVersjon());
+        } else {
+            log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgave.getId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
+            oppgaveService.flyttOppgaveTilIdOgFordeling(
+                    oppgave.getId().toString(),
+                    oppgave.getVersjon(),
+                    kontrollResultat.hentFeilIOpplysningerTekst());
+        }
     }
 }

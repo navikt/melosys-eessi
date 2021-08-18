@@ -62,10 +62,7 @@ class SedMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        assertThat(hentRecords()).hasSize(1)
-                .extracting(Object::toString)
-                .singleElement()
-                .matches(e -> e.contains("2019-06-01") && e.contains("2019-12-01"));
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
     }
 
     @Test
@@ -84,7 +81,7 @@ class SedMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        assertThat(hentRecords()).hasSize(1);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
     }
 
     @Test
@@ -94,6 +91,8 @@ class SedMottakTestIT extends ComponentTestBase {
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
         oppgaveDto.setStatuskategori("AAPEN");
+
+        mockPerson(FNR, AKTOER_ID);
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -110,7 +109,7 @@ class SedMottakTestIT extends ComponentTestBase {
                 .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
 
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
-        assertThat(hentRecords()).isEmpty();
+        assertThat(hentMelosysEessiRecords()).isEmpty();
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
         kafkaTestConsumer.reset(3);
@@ -119,7 +118,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
-        assertThat(hentRecords()).hasSize(2);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 2);
     }
 
     @Test
@@ -146,12 +145,48 @@ class SedMottakTestIT extends ComponentTestBase {
         saksrelasjonService.lagreKobling(arkivsakID, rinaSaksnummer, BucType.LA_BUC_04);
         kafkaTestConsumer.doWait(5_000L);
 
-        assertThat(hentRecords()).hasSize(1);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+    }
 
+    @Test
+    void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_flyttesTilIdOgFordeling() throws Exception {
+        final var sedID = UUID.randomUUID().toString();
+        final var sedID2 = UUID.randomUUID().toString();
+        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        oppgaveDto.setStatuskategori("AAPEN");
+
+        mockPerson(FNR, AKTOER_ID, FØDSELSDATO.minusYears(1), "DK");
+
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        await().atMost(Duration.ofSeconds(4))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
+
+        verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
+        assertThat(hentMelosysEessiRecords()).isEmpty();
+        assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
+
+        //Forventer kun én melding, som er oppgave-endret record
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
+
+        assertThat(hentMelosysEessiRecords()).isEmpty();
     }
 
     private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID) {
-        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, AKTOER_ID, FNR));
+        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, FNR, AKTOER_ID));
     }
 
     @SneakyThrows
