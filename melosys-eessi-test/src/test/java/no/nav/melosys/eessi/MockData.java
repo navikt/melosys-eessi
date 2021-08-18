@@ -15,15 +15,13 @@ import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.springframework.util.StringUtils;
 
-import static no.nav.melosys.eessi.models.BucType.LA_BUC_01;
-import static no.nav.melosys.eessi.models.SedType.A002;
+import static no.nav.melosys.eessi.models.BucType.LA_BUC_02;
+import static no.nav.melosys.eessi.models.SedType.A003;
 
 public class MockData {
     public MockData() {
@@ -43,7 +41,7 @@ public class MockData {
         return SedHendelse.builder()
                 .avsenderId("avsenderId")
                 .avsenderNavn("avsender")
-                .bucType(LA_BUC_01.name())
+                .bucType(LA_BUC_02.name())
                 .id(42L)
                 .mottakerId("mottakerId")
                 .mottakerNavn("mottakerNavn")
@@ -51,7 +49,7 @@ public class MockData {
                 .rinaDokumentId("1")
                 .rinaSakId(rinaSaksnummer)
                 .rinaDokumentVersjon("1")
-                .sedType(A002.name())
+                .sedType(A003.name())
                 .sedId(sedID)
                 .sektorKode("LA")
                 .build();
@@ -59,22 +57,23 @@ public class MockData {
 
     SED sed(LocalDate fødselsdato, String statsborgerskap, String ident) {
         SED sed = new SED();
-        sed.setSedType(A002.name());
+        sed.setSedType(A003.name());
 
-        MedlemskapA002 medlemskap = new MedlemskapA002();
-        UnntakA002 unntak = new UnntakA002();
-        VedtakA002 vedtak = new VedtakA002();
-        vedtak.setResultat("godkjent_for_annen_periode");
-        vedtak.setBegrunnelse("begrunnelse");
-        Periode periode = new Periode();
-        Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setStartdato("2019-06-01");
-        fastperiode.setSluttdato("2019-12-01");
-        periode.setFastperiode(fastperiode);
-        vedtak.setAnnenperiode(periode);
-        unntak.setVedtak(vedtak);
-        medlemskap.setUnntak(unntak);
+        MedlemskapA003 medlemskap = new MedlemskapA003();
+        medlemskap.setRelevantartikkelfor8832004eller9872009("13_1_a");
+        medlemskap.setIsDeterminationProvisional("nei");
+
+        PeriodeA010 periode = new PeriodeA010();
+        periode.setStartdato("2019-06-01");
+        periode.setSluttdato("2019-12-01");
+
+        VedtakA003 vedtak = new VedtakA003();
+        vedtak.setLand("SE");
+        vedtak.setGjelderperiode(periode);
+        vedtak.setErendringsvedtak("nei");
+        medlemskap.setVedtak(vedtak);
         sed.setMedlemskap(medlemskap);
+
         Nav nav = new Nav();
         Person person = new Person();
         person.setFoedselsdato(fødselsdato.toString());
@@ -87,6 +86,7 @@ public class MockData {
         bruker.setPerson(person);
         nav.setBruker(bruker);
         sed.setNav(nav);
+
         return sed;
     }
 

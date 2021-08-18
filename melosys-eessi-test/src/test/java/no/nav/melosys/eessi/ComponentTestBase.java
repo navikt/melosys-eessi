@@ -1,10 +1,13 @@
 package no.nav.melosys.eessi;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
@@ -18,6 +21,8 @@ import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
+import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
 import no.nav.melosys.utils.KafkaTestConfig;
@@ -36,6 +41,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Container;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -50,6 +56,11 @@ public abstract class ComponentTestBase {
     static final String FNR = "25068420779";
     static final String AKTOER_ID = "1234567890123";
     static final String RINA_SAKSNUMMER = Integer.toString(new Random().nextInt(100000));
+    static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
     protected final MockData mockData = new MockData();
 
@@ -112,12 +123,36 @@ public abstract class ComponentTestBase {
     }
 
     protected void mockPerson(String ident, String aktørID, LocalDate fødselsdato, String statsborgerskap) {
-        when(pdlConsumer.hentIdenter(ident)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
-        when(pdlConsumer.hentIdenter(aktørID)).thenReturn(mockData.lagPDLIdentListe(ident, aktørID));
-        when(pdlConsumer.hentPerson(ident)).thenReturn(mockData.pdlPerson(fødselsdato, statsborgerskap));
+        var pdlIdentListe = mockData.lagPDLIdentListe(ident, aktørID);
+        when(pdlConsumer.hentIdenter(ident)).thenReturn(pdlIdentListe);
+        when(pdlConsumer.hentIdenter(aktørID)).thenReturn(pdlIdentListe);
+
+        var pdlPerson = mockData.pdlPerson(fødselsdato, statsborgerskap);
+        when(pdlConsumer.hentPerson(ident)).thenReturn(pdlPerson);
+        when(pdlConsumer.hentPerson(aktørID)).thenReturn(pdlPerson);
     }
 
-    List<ConsumerRecord<Object, Object>> hentRecords() {
-        return kafkaTestConsumer.getRecords().stream().filter(ConsumerRecordPredicates.topic("privat-melosys-eessi-v1-local")).collect(Collectors.toList());
+    List<MelosysEessiMelding> hentMelosysEessiRecords() {
+        return kafkaTestConsumer.getRecords()
+            .stream()
+            .filter(ConsumerRecordPredicates.topic("privat-melosys-eessi-v1-local"))
+            .map(ConsumerRecord::value)
+            .map(this::tilMelosysEessiMelding)
+            .collect(Collectors.toList());
+    }
+
+    @SneakyThrows
+    private MelosysEessiMelding tilMelosysEessiMelding(String value) {
+        return objectMapper.readValue(value, MelosysEessiMelding.class);
+    }
+
+    void assertMelosysEessiMelding(Collection<MelosysEessiMelding> melosysEessiMelding, int forventetStørrelse) {
+        assertThat(melosysEessiMelding)
+            .hasSize(forventetStørrelse)
+            .allMatch(eessiMelding ->
+                eessiMelding.getPeriode().equals(new Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01")))
+                && eessiMelding.getJournalpostId().equals("1")
+                && eessiMelding.getAktoerId().equals(AKTOER_ID)
+            );
     }
 }
