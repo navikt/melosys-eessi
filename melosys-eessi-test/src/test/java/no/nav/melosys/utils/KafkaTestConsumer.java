@@ -13,10 +13,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class KafkaTestConsumer extends LatchService {
     @Getter
-    private final List<ConsumerRecord<Object, Object>> records = new LinkedList<>();
+    private final List<ConsumerRecord<Object, String>> records = new LinkedList<>();
 
     @KafkaListener(topicPattern = ".*", groupId = "test", containerFactory = "testKafkaListenerContainerFactory")
-    void handle(ConsumerRecord<Object, Object> mess) {
+    void handle(ConsumerRecord<Object, String> mess) {
         log.info("Read message from topic: " + mess.topic());
         records.add(mess);
         countDown();

@@ -45,6 +45,7 @@ public class SedMottakService {
             return;
         }
 
+        sedMottattHendelseRepository.save(sedMottattHendelse);
         log.info("Søker etter person for SED");
         personIdentifisering.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed)
                 .ifPresentOrElse(

@@ -34,6 +34,9 @@ public class BUC {
     private Collection<Participant> participants = new ArrayList<>();
     private String internationalId;
 
+    public String hentAvsenderLand() {
+        return creator.getOrganisation().getCountryCode();
+    }
     public boolean kanOppretteEllerOppdatereSed(SedType sedType) {
         return actions.stream()
                 .filter(a -> sedType.name().equalsIgnoreCase(a.getDocumentType()))
@@ -108,6 +111,13 @@ public class BUC {
                 .filter(Document::erOpprettet)
                 .filter(documentPredicate)
                 .max(Comparator.comparing(Document::getLastUpdate));
+    }
+
+    public Optional<Document> finnFørstMottatteSed() {
+        return documents.stream()
+            .filter(Document::erInngående)
+            .filter(Document::erOpprettet)
+            .min(Comparator.comparing(Document::getCreationDate));
     }
 
     public Set<String> hentMottakere() {

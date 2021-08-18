@@ -27,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class PersonIdentifiseringServiceTest {
+class SedIdentifiseringServiceTest {
 
     private final String norskIdent = "64068648643";
 
@@ -42,11 +42,11 @@ class PersonIdentifiseringServiceTest {
     @Mock
     private PersonSokMetrikker personSokMetrikker;
 
-    private PersonIdentifiseringService personIdentifiseringService;
+    private SedIdentifiseringService sedIdentifiseringService;
 
     @BeforeEach
     public void setup() {
-        personIdentifiseringService = new PersonIdentifiseringService(
+        sedIdentifiseringService = new SedIdentifiseringService(
                 personSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
         );
     }
@@ -63,7 +63,7 @@ class PersonIdentifiseringServiceTest {
         when(sakService.hentsak(anyLong())).thenReturn(sak);
         when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
 
-        Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
+        Optional<String> res = sedIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }
 
@@ -73,28 +73,28 @@ class PersonIdentifiseringServiceTest {
         sed.getNav().getBruker().getPerson().setPin(List.of(new Pin(norskIdent, "NO", null)));
 
         when(personSok.vurderPerson(eq(norskIdent), any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
-        Optional<String> res = personIdentifiseringService.identifiserPerson("123", sed);
+        Optional<String> res = sedIdentifiseringService.identifiserPerson("123", sed);
         assertThat(res).contains(norskIdent);
     }
 
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
         when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
-        Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
+        Optional<String> res = sedIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }
 
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerIkkeFraSøk() {
         when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FLERE_TREFF));
-        Optional<String> res = personIdentifiseringService.identifiserPerson("123", lagSED());
+        Optional<String> res = sedIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).isNotPresent();
     }
 
     @Test
     void identifiserPerson_erXSEDUtenPerson_ingenTreff() {
         SED xSED = lagXSEDUtenBruker();
-        Optional<String> res = personIdentifiseringService.identifiserPerson("123", xSED);
+        Optional<String> res = sedIdentifiseringService.identifiserPerson("123", xSED);
         verify(personSokMetrikker).counter(SoekBegrunnelse.INGEN_PERSON_I_SED);
         assertThat(res).isNotPresent();
     }

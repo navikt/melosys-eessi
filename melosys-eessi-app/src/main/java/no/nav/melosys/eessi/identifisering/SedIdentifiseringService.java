@@ -17,21 +17,21 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 @Slf4j
 @Service
-class PersonIdentifiseringService implements PersonIdentifisering {
+class SedIdentifiseringService implements PersonIdentifisering {
 
-    private final PersonSok pdlPersonSok;
+    private final PersonSok personSøk;
     private final SaksrelasjonService saksrelasjonService;
     private final SakService sakService;
     private final PersonFasade personFasade;
     private final PersonSokMetrikker personSokMetrikker;
 
-    PersonIdentifiseringService(
-            PersonSok pdlPersonSok,
+    SedIdentifiseringService(
+            PersonSok personSøk,
             SaksrelasjonService saksrelasjonService,
             SakService sakService,
             PersonFasade personFasade,
             PersonSokMetrikker personSokMetrikker) {
-        this.pdlPersonSok = pdlPersonSok;
+        this.personSøk = personSøk;
         this.saksrelasjonService = saksrelasjonService;
         this.sakService = sakService;
         this.personFasade = personFasade;
@@ -55,27 +55,27 @@ class PersonIdentifiseringService implements PersonIdentifisering {
         return vurderEllerSøkEtterPerson(personFraSed.get());
     }
 
-    private Optional<String> vurderEllerSøkEtterPerson(Person person) {
+    private Optional<String> vurderEllerSøkEtterPerson(Person sedPerson) {
         PersonsokKriterier søkeKriterier = PersonsokKriterier.builder()
-                .fornavn(person.getFornavn())
-                .etternavn(person.getEtternavn())
-                .foedselsdato(tilLocalDate(person.getFoedselsdato()))
-                .statsborgerskapISO2(person.hentStatsborgerksapsliste())
+                .fornavn(sedPerson.getFornavn())
+                .etternavn(sedPerson.getEtternavn())
+                .foedselsdato(tilLocalDate(sedPerson.getFoedselsdato()))
+                .statsborgerskapISO2(sedPerson.hentStatsborgerksapsliste())
                 .build();
 
-        Optional<String> norskIdent = person.finnNorskPin()
+        Optional<String> norskIdent = sedPerson.finnNorskPin()
                 .map(Pin::getIdentifikator)
                 .flatMap(FnrUtils::filtrerUtGyldigNorskIdent);
 
         if (norskIdent.isPresent()) {
-            PersonSokResultat resultat = pdlPersonSok.vurderPerson(norskIdent.get(), søkeKriterier);
+            PersonSokResultat resultat = personSøk.vurderPerson(norskIdent.get(), søkeKriterier);
             if (resultat.personIdentifisert()) {
                 personSokMetrikker.counter(resultat.getBegrunnelse());
                 return norskIdent;
             }
         }
 
-        PersonSokResultat resultat = pdlPersonSok.søkEtterPerson(søkeKriterier);
+        PersonSokResultat resultat = personSøk.søkEtterPerson(søkeKriterier);
         personSokMetrikker.counter(resultat.getBegrunnelse());
         log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
         return Optional.ofNullable(resultat.getIdent());

@@ -8,7 +8,9 @@ import java.util.Set;
 
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.person.Kjønn;
 import no.nav.melosys.eessi.models.person.PersonModell;
+import no.nav.melosys.eessi.models.person.UtenlandskId;
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,14 +53,19 @@ class PDLServiceTest {
                         PersonModell::getEtternavn,
                         PersonModell::getFødselsdato,
                         PersonModell::getStatsborgerskapLandkodeISO2,
-                        PersonModell::isErOpphørt)
+                        PersonModell::isErOpphørt,
+                        PersonModell::getUtenlandskId,
+                        PersonModell::getKjønn)
                 .containsExactly(
                         ident,
                         "NyttFornavn",
                         "NyttEtternavn",
                         LocalDate.of(1990, 1, 1),
                         Set.of("NO", "SE", "PL"),
-                        false);
+                        false,
+                        Set.of(new UtenlandskId("2222-1111", "SE")),
+                        Kjønn.KVINNE
+                    );
     }
 
     private PDLPerson lagPersonMedFlereEndringer() {
@@ -104,10 +111,23 @@ class PDLServiceTest {
                 new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
         ));
 
+        var pdlUtenlandskIdentifikator = new PDLUtenlandskIdentifikator();
+        pdlUtenlandskIdentifikator.setIdentifikasjonsnummer("2222-1111");
+        pdlUtenlandskIdentifikator.setUtstederland("SWE");
+
+        var pdlKjønn = new PDLKjoenn();
+        pdlKjønn.setKjoenn(PDLKjoennType.KVINNE);
+        pdlKjønn.setMetadata(new PDLMetadata());
+        pdlKjønn.getMetadata().setEndringer(Set.of(
+            new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0)))
+        );
+
         pdlPerson.setNavn(Set.of(gammeltPdlNavn, nyttPdlNavn));
         pdlPerson.setFoedsel(Set.of(pdlFødsel));
         pdlPerson.setStatsborgerskap(Set.of(norskStatsborgerskap, svenskStatsborgerskap, polskStatsborgerskap));
         pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
+        pdlPerson.setUtenlandskIdentifikasjonsnummer(Set.of(pdlUtenlandskIdentifikator));
+        pdlPerson.setKjoenn(Set.of(pdlKjønn));
         return pdlPerson;
     }
 

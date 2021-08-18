@@ -32,7 +32,7 @@ import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
  */
 public interface SedMapper {
     default SED mapTilSed(SedDataDto sedData) {
-        SED sed = new SED();
+        var sed = new SED();
 
         sed.setNav(prefillNav(sedData));
         sed.setSedType(getSedType().name());
@@ -45,7 +45,7 @@ public interface SedMapper {
     SedType getSedType();
 
     default Nav prefillNav(SedDataDto sedData) {
-        Nav nav = new Nav();
+        var nav = new Nav();
 
         nav.setBruker(hentBruker(sedData));
         nav.setArbeidssted(hentArbeidssted(sedData));
@@ -60,7 +60,7 @@ public interface SedMapper {
     }
 
     default Bruker hentBruker(SedDataDto sedDataDto) {
-        Bruker bruker = new Bruker();
+        var bruker = new Bruker();
         bruker.setPerson(hentPerson(sedDataDto));
         bruker.setAdresse(hentAdresser(sedDataDto));
         setFamiliemedlemmer(sedDataDto, bruker);
@@ -68,15 +68,15 @@ public interface SedMapper {
     }
 
     default Person hentPerson(SedDataDto sedData) {
-        Person person = new Person();
+        var person = new Person();
 
         person.setFornavn(sedData.getBruker().getFornavn());
         person.setEtternavn(sedData.getBruker().getEtternavn());
         person.setFoedselsdato(formaterDato(sedData.getBruker().getFoedseldato()));
         person.setFoedested(null); //det antas at ikke trengs når NAV fyller ut.
-        person.setKjoenn(sedData.getBruker().getKjoenn());
+        person.setKjoenn(Kjønn.valueOf(sedData.getBruker().getKjoenn()));
 
-        Statsborgerskap statsborgerskap = new Statsborgerskap();
+        var statsborgerskap = new Statsborgerskap();
         statsborgerskap.setLand(LandkodeMapper.getLandkodeIso2(sedData.getBruker().getStatsborgerskap()));
 
         person.setStatsborgerskap(Collections.singletonList(statsborgerskap));
@@ -118,7 +118,7 @@ public interface SedMapper {
     }
 
     private Adresse mapBostedsadresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
-        Adresse bostedsadresse = mapAdresse(adresse);
+        var bostedsadresse = mapAdresse(adresse);
         // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
         if (adresse.getAdressetype() == Adressetype.BOSTEDSADRESSE) {
             if ("NO".equalsIgnoreCase(bostedsadresse.getLand())) {
@@ -131,7 +131,7 @@ public interface SedMapper {
     }
 
     private Adresse mapAdresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
-        Adresse bostedsadresse = new Adresse();
+        var bostedsadresse = new Adresse();
         bostedsadresse.setType(adresse.getAdressetype().getAdressetypeRina());
         bostedsadresse.setGate(adresse.getGateadresse());
         bostedsadresse.setBy(adresse.getPoststed());
@@ -148,8 +148,8 @@ public interface SedMapper {
                 .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
 
         if (optionalFar.isPresent()) {
-            Far far = new Far();
-            Person person = new Person();
+            var far = new Far();
+            var person = new Person();
             person.setEtternavnvedfoedsel(optionalFar.get().getEtternavn());
             person.setFornavn(optionalFar.get().getFornavn());
 
@@ -161,8 +161,8 @@ public interface SedMapper {
                 .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
 
         if (optionalMor.isPresent()) {
-            Mor mor = new Mor();
-            Person person = new Person();
+            var mor = new Mor();
+            var person = new Person();
             person.setEtternavnvedfoedsel(optionalMor.get().getEtternavn());
             person.setFornavn(optionalMor.get().getFornavn());
 
@@ -176,7 +176,7 @@ public interface SedMapper {
         List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
 
         for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
-            Arbeidssted arbeidssted = new Arbeidssted();
+            var arbeidssted = new Arbeidssted();
             arbeidssted.setNavn(arbStd.getNavn());
             arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
             arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
@@ -209,7 +209,7 @@ public interface SedMapper {
     }
 
     default Arbeidsgiver hentArbeidsgiver(Virksomhet virksomhet) {
-        Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
+        var arbeidsgiver = new Arbeidsgiver();
         arbeidsgiver.setNavn(virksomhet.getNavn());
         arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(virksomhet.getAdresse()));
         arbeidsgiver.setIdentifikator(lagIdentifikator(virksomhet.getOrgnr()));
@@ -218,11 +218,11 @@ public interface SedMapper {
 
     default Selvstendig hentSelvstendig(SedDataDto sedData) {
 
-        Selvstendig selvstendig = new Selvstendig();
+        var selvstendig = new Selvstendig();
         List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
 
         for (Virksomhet v : sedData.getSelvstendigeVirksomheter()) {
-            Arbeidsgiver arbeidsgiver = new Arbeidsgiver();
+            var arbeidsgiver = new Arbeidsgiver();
 
             arbeidsgiver.setIdentifikator(lagIdentifikator(v.getOrgnr()));
             arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(v.getAdresse()));
@@ -241,7 +241,7 @@ public interface SedMapper {
     }
 
     default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse) {
-        Adresse adresse = new Adresse();
+        var adresse = new Adresse();
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
         adresse.setBy(sAdresse.getPoststed());
@@ -261,23 +261,23 @@ public interface SedMapper {
             return Collections.emptyList();
         }
 
-        Identifikator orgNr = new Identifikator();
+        var orgNr = new Identifikator();
         orgNr.setId(orgnr);
         orgNr.setType("registrering");
         return List.of(orgNr);
     }
 
     default Periode mapTilPeriodeDto(Lovvalgsperiode lovvalgsperiode) {
-        Periode periode = new Periode();
+        var periode = new Periode();
 
         if (lovvalgsperiode.getFom() != null) {
             if (lovvalgsperiode.getTom() != null) {
-                Fastperiode fastperiode = new Fastperiode();
+                var fastperiode = new Fastperiode();
                 fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
                 fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
                 periode.setFastperiode(fastperiode);
             } else {
-                AapenPeriode aapenPeriode = new AapenPeriode();
+                var aapenPeriode = new AapenPeriode();
                 aapenPeriode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
                 periode.setAapenperiode(aapenPeriode);
             }
