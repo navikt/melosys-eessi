@@ -35,6 +35,8 @@ class IdentifiseringKontrollServiceTest {
     private EuxService euxService;
     @Mock
     private PersonFasade personFasade;
+    @Mock
+    private PersonSokMetrikker personSokMetrikker;
 
     private IdentifiseringKontrollService identifiseringKontrollService;
 
@@ -56,7 +58,7 @@ class IdentifiseringKontrollServiceTest {
 
     @BeforeEach
     void setup() {
-        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService);
+        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker);
 
         var utenlandskPin = new Pin(utenlandskId, avsenderLand, null);
 
