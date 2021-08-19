@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.behandling;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
@@ -116,7 +117,7 @@ class SedMottakServiceTest {
     void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgave() {
         final var oppgaveID = "5555";
         var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID);
-        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.of(bucIdentifiseringOppg));
+        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
 
         final var oppgave = new HentOppgaveDto();
         oppgave.setStatus("OPPRETTET");

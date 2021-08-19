@@ -72,11 +72,17 @@ public class SedMottakService {
 
         final var rinaSaksnummer = sedMottatt.getSedHendelse().getRinaSakId();
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
-                .filter(bucIdentifiseringOppg -> oppgaveService.hentOppgave(bucIdentifiseringOppg.getOppgaveId()).erÅpen())
+                .stream()
+                .filter(this::oppgaveErÅpen)
+                .findFirst()
                 .ifPresentOrElse(
                         b -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", b.getOppgaveId(), rinaSaksnummer),
                         () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt)
                 );
+    }
+
+    private boolean oppgaveErÅpen(BucIdentifiseringOppg bucIdentifiseringOppg) {
+        return oppgaveService.hentOppgave(bucIdentifiseringOppg.getOppgaveId()).erÅpen();
     }
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse) {
