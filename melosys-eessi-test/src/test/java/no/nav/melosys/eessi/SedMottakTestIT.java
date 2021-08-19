@@ -90,7 +90,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
-        oppgaveDto.setStatuskategori("AAPEN");
+        oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID);
 
@@ -154,7 +154,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
-        oppgaveDto.setStatuskategori("AAPEN");
+        oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID, FØDSELSDATO.minusYears(1), "DK");
 

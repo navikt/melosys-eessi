@@ -119,7 +119,7 @@ class SedMottakServiceTest {
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.of(bucIdentifiseringOppg));
 
         final var oppgave = new HentOppgaveDto();
-        oppgave.setStatuskategori("AAPEN");
+        oppgave.setStatus("OPPRETTET");
         when(oppgaveService.hentOppgave(oppgaveID)).thenReturn(oppgave);
         SedHendelse sedHendelse = sedHendelseMedBruker();
 

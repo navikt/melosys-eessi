@@ -109,8 +109,8 @@ class OppgaveConsumerTest {
 
     private void assertOppgaveFelter(HentOppgaveDto oppgaveDto) {
         assertThat(oppgaveDto)
-                .extracting(HentOppgaveDto::getStatuskategori, HentOppgaveDto::getAktoerId, HentOppgaveDto::getTema)
-                .containsExactly("AAPEN", "1332607802528", "MED");
+                .extracting(HentOppgaveDto::getStatus, HentOppgaveDto::getAktoerId, HentOppgaveDto::getTema)
+                .containsExactly("AAPNET", "1332607802528", "MED");
     }
 
     private OppgaveDto opprettOppgave() {

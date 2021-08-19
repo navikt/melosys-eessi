@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class HentOppgaveDto extends OppgaveDto {
     private String id;
-    private String statuskategori;
+    private String status;
 
     public boolean erÅpen() {
-        return "AAPEN".equalsIgnoreCase(statuskategori);
+        return !"FERDIGSTILT".equalsIgnoreCase(status) && !"FEILREGISTRERT".equalsIgnoreCase(status);
     }
 }
