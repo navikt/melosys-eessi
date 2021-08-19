@@ -17,11 +17,9 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
@@ -42,8 +40,8 @@ public class EuxService {
         this.bucMetrikker = bucMetrikker;
     }
 
-    public void slettBuC(String rinaSaksnummer) {
-        euxConsumer.slettBuC(rinaSaksnummer);
+    public void slettBUC(String rinaSaksnummer) {
+        euxConsumer.slettBUC(rinaSaksnummer);
     }
 
     public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType,
@@ -51,7 +49,7 @@ public class EuxService {
                                                    SED sed,
                                                    Collection<SedVedlegg> vedlegg) {
 
-        String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
+        String rinaSaksnummer = euxConsumer.opprettBUC(bucType.name());
         euxConsumer.settMottakere(rinaSaksnummer, mottakere);
         String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
         vedlegg.forEach(v -> leggTilVedlegg(rinaSaksnummer, dokumentID, v));
@@ -98,7 +96,7 @@ public class EuxService {
     }
 
     public boolean sedErEndring(String sedId, String rinaSaksnummer) {
-        var buc = euxConsumer.hentBuC(rinaSaksnummer);
+        var buc = euxConsumer.hentBUC(rinaSaksnummer);
 
         return buc.getDocuments().stream()
                 .filter(document -> document.getId().equals(sedId)).findFirst()
@@ -114,7 +112,7 @@ public class EuxService {
     }
 
     public BUC hentBuc(String rinaSakid) {
-        return euxConsumer.hentBuC(rinaSakid);
+        return euxConsumer.hentBUC(rinaSakid);
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {

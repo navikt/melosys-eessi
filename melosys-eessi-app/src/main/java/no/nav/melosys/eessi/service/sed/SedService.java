@@ -22,7 +22,6 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
-import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -54,9 +53,9 @@ public class SedService {
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
 
         Collection<String> mottakere = sedDataDto.getMottakerIder();
-        SedType sedType = bucType.hentFørsteLovligeSed();
-        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
-        SED sed = sedMapper.mapTilSed(sedDataDto);
+        var sedType = bucType.hentFørsteLovligeSed();
+        var sedMapper = SedMapperFactory.sedMapper(sedType);
+        var sed = sedMapper.mapTilSed(sedDataDto);
 
         validerMottakerInstitusjoner(bucType, mottakere);
 
@@ -108,24 +107,24 @@ public class SedService {
     }
 
     private void slettBucOgSaksrelasjon(String rinaSaksnummer) {
-        euxService.slettBuC(rinaSaksnummer);
+        euxService.slettBUC(rinaSaksnummer);
         saksrelasjonService.slettVedRinaId(rinaSaksnummer);
     }
 
     public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) {
-        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
-        SED sed = sedMapper.mapTilSed(sedDataDto);
+        var sedMapper = SedMapperFactory.sedMapper(sedType);
+        var sed = sedMapper.mapTilSed(sedDataDto);
 
         return euxService.genererPdfFraSed(sed);
     }
 
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
-        BUC buc = euxService.hentBuc(rinaSaksnummer);
+        var buc = euxService.hentBuc(rinaSaksnummer);
         if (!buc.kanOppretteEllerOppdatereSed(sedType)) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc " + rinaSaksnummer + " med type " + buc.getBucType());
         }
 
-        SED sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
+        var sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
         verifiserSedVersjonErBucVersjon(buc, sed);
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
@@ -142,7 +141,7 @@ public class SedService {
             );
 
             if (eksisterendeSak.isPresent() && eksisterendeSak.get().erÅpen()) {
-                BUC buc = eksisterendeSak.get();
+                var buc = eksisterendeSak.get();
                 Optional<Document> document = buc.finnDokumentVedSedType(sed.getSedType());
 
                 if (document.isPresent() && buc.sedKanOppdateres(document.get().getId())) {
@@ -161,7 +160,7 @@ public class SedService {
 
     private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) {
         for (FagsakRinasakKobling fagsakRinasakKobling : eksisterendeSaker) {
-            BUC buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
+            var buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
             if ("open".equals(buc.getStatus())) {
                 return Optional.of(buc);
             }
@@ -171,7 +170,7 @@ public class SedService {
     }
 
     private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) {
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
+        var opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
         return opprettBucOgSedResponse;

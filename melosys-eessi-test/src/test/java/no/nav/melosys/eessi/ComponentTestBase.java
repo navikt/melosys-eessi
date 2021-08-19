@@ -110,7 +110,7 @@ public abstract class ComponentTestBase {
 
     @BeforeEach
     public void setup() {
-        when(euxConsumer.hentBuC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
+        when(euxConsumer.hentBUC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(mockData.journalpostResponse());
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
