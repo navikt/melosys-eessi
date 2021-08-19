@@ -55,7 +55,7 @@ public class OppgaveOppdateringDto {
         }
 
         public Builder beskrivelse(String eksisterendeBeskrivelse, String tilleggsBeskrivelse) {
-            this.beskrivelse = eksisterendeBeskrivelse + "\n\n" + tilleggsBeskrivelse;
+            this.beskrivelse = tilleggsBeskrivelse + "\n\n" + eksisterendeBeskrivelse;
             return this;
         }
 

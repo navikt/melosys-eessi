@@ -117,7 +117,7 @@ class OppgaveServiceTest {
             ).containsExactly(
                 Integer.parseInt(oppgaveID),
                 oppgaveVersjon,
-                eksisterendeOppgave.getBeskrivelse() + "\n\n" + nyBeskrivelse,
+                nyBeskrivelse + "\n\n" + eksisterendeOppgave.getBeskrivelse(),
                 "4303",
                 ""
         );
