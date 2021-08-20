@@ -63,7 +63,7 @@ class PersonSokMetrikker {
         Optional.ofNullable(counterMap.get(enumVerdi))
             .ifPresentOrElse(
                 Counter::increment,
-                () -> log.warn("Kunne ikke finne teller for enum {}, verdi {}", enumVerdi, enumVerdi.getClass().getSimpleName())
+                () -> log.warn("Kunne ikke finne teller for enum {}, verdi {}", enumVerdi.getClass().getSimpleName(), enumVerdi)
             );
     }
 }
