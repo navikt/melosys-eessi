@@ -70,7 +70,7 @@ class EuxServiceTest {
     void hentBuc_forventKonsumentKall() {
         euxService.hentBuc("123123123");
 
-        verify(euxConsumer).hentBuC("123123123");
+        verify(euxConsumer).hentBUC("123123123");
     }
 
     @Test
@@ -81,7 +81,7 @@ class EuxServiceTest {
 
     @Test
     void opprettBucOgSed_forventRinaSaksnummer() {
-        when(euxConsumer.opprettBuC(anyString())).thenReturn(opprettetBucID);
+        when(euxConsumer.opprettBUC(anyString())).thenReturn(opprettetBucID);
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
 
         BucType bucType = BucType.LA_BUC_01;
@@ -91,7 +91,7 @@ class EuxServiceTest {
 
         OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg);
 
-        verify(euxConsumer).opprettBuC(bucType.name());
+        verify(euxConsumer).opprettBUC(bucType.name());
         verify(euxConsumer).opprettSed(opprettetBucID, sed);
         verify(euxConsumer).leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any(SedVedlegg.class));
 
@@ -109,13 +109,13 @@ class EuxServiceTest {
     }
 
     @Test
-    public void hentRinaUrl_medSaksnummer_verifiserEuxConsumerKall() {
+    void hentRinaUrl_medSaksnummer_verifiserEuxConsumerKall() {
         euxService.hentRinaUrl("1234");
-        verify(euxConsumer).hentRinaUrl(eq("1234"));
+        verify(euxConsumer).hentRinaUrl("1234");
     }
 
     @Test
-    public void hentRinaUrl_medRinaSaksnummer_forventUrl() {
+    void hentRinaUrl_medRinaSaksnummer_forventUrl() {
         String rinaSak = "12345";
         String RINA_MOCK_URL = "https://rina-host-url.local";
         when(euxConsumer.hentRinaUrl(rinaSak)).thenReturn(RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak);
@@ -186,11 +186,11 @@ class EuxServiceTest {
         String rinaSaksnummer = "333222111";
         BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
         buc.getDocuments().get(0).setConversations(Arrays.asList(new Conversation(), new Conversation()));
-        when(euxConsumer.hentBuC(rinaSaksnummer)).thenReturn(buc);
+        when(euxConsumer.hentBUC(rinaSaksnummer)).thenReturn(buc);
 
         boolean erEndring = euxService.sedErEndring(sedID, rinaSaksnummer);
 
-        verify(euxConsumer).hentBuC(rinaSaksnummer);
+        verify(euxConsumer).hentBUC(rinaSaksnummer);
         assertThat(erEndring).isTrue();
     }
 
@@ -200,11 +200,11 @@ class EuxServiceTest {
         final String rinaSaksnummer = "54368";
         BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
         buc.getDocuments().get(0).setConversations(Collections.singletonList(new Conversation()));
-        when(euxConsumer.hentBuC(rinaSaksnummer)).thenReturn(buc);
+        when(euxConsumer.hentBUC(rinaSaksnummer)).thenReturn(buc);
 
         boolean erEndring = euxService.sedErEndring(sedID, rinaSaksnummer);
 
-        verify(euxConsumer).hentBuC(rinaSaksnummer);
+        verify(euxConsumer).hentBUC(rinaSaksnummer);
         assertThat(erEndring).isFalse();
     }
 
@@ -217,10 +217,10 @@ class EuxServiceTest {
         document.setConversations(Collections.singletonList(new Conversation()));
         buc.setDocuments(Arrays.asList(document, document, document));
 
-        when(euxConsumer.hentBuC(anyString())).thenReturn(buc);
+        when(euxConsumer.hentBUC(anyString())).thenReturn(buc);
 
         boolean erEndring = euxService.sedErEndring(sedID, "123");
-        verify(euxConsumer).hentBuC("123");
+        verify(euxConsumer).hentBUC("123");
         assertThat(erEndring).isFalse();
     }
 
@@ -228,7 +228,7 @@ class EuxServiceTest {
     @SneakyThrows
     private void mockInstitusjoner() {
         URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
-        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<List<Institusjon>>(){});
+        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<>(){});
         when(euxConsumer.hentInstitusjoner(anyString(), any()))
                 .thenReturn(institusjoner);
     }

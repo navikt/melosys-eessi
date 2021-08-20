@@ -82,7 +82,7 @@ class SedServiceTest {
         }
 
         assertThat(exception).isNotNull().isInstanceOf(IntegrationException.class);
-        verify(euxService).slettBuC(RINA_ID);
+        verify(euxService).slettBUC(RINA_ID);
         verify(saksrelasjonService).slettVedRinaId(RINA_ID);
     }
 

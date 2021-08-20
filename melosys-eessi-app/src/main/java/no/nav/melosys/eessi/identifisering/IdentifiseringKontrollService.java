@@ -19,10 +19,12 @@ public class IdentifiseringKontrollService {
 
     private final PersonFasade personFasade;
     private final EuxService euxService;
+    private final PersonSokMetrikker personSokMetrikker;
 
-    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService) {
+    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker) {
         this.personFasade = personFasade;
         this.euxService = euxService;
+        this.personSokMetrikker = personSokMetrikker;
     }
 
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørID, String rinaSaksnummer) {
@@ -59,6 +61,7 @@ public class IdentifiseringKontrollService {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID);
         }
 
+        begrunnelser.forEach(personSokMetrikker::counter);
         return begrunnelser;
     }
 }
