@@ -16,6 +16,7 @@ public class SedDataDto extends SedGrunnlagDto {
     private Adresse kontaktadresse;
     private Adresse oppholdsadresse;
     private List<FamilieMedlem> familieMedlem;
+    private Periode søknadsperiode;
 
     //A008 spesifikt
     private String avklartBostedsland;
