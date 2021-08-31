@@ -7,6 +7,7 @@ import java.util.List;
 import no.nav.melosys.eessi.controller.dto.Adressetype;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.sed.nav.Adresse;
+import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,5 +31,13 @@ class SedMapperTest {
                 .anyMatch(adresse -> Adressetype.BOSTEDSADRESSE.getAdressetypeRina().equals(adresse.getType()))
                 .anyMatch(adresse -> Adressetype.KONTAKTADRESSE.getAdressetypeRina().equals(adresse.getType()))
                 .anyMatch(adresse -> Adressetype.POSTADRESSE.getAdressetypeRina().equals(adresse.getType()));
+    }
+
+    @Test
+    void hentStatsborgerskap() {
+        final List<Statsborgerskap> statsborgerskap = sedMapper.hentStatsborgerskap(sedData);
+        assertThat(statsborgerskap).hasSize(2)
+            .anyMatch(statsborgerskap1 -> "NO".equals(statsborgerskap1.getLand()))
+            .anyMatch(statsborgerskap1 -> "SE".equals(statsborgerskap1.getLand()));
     }
 }
