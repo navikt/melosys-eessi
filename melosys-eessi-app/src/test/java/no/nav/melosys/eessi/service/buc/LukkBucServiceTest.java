@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
@@ -62,7 +63,7 @@ class LukkBucServiceTest {
         BUC buc = lagBuc();
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         SED sed = new SED();
         sed.setNav(enhancedRandom.nextObject(Nav.class));
@@ -72,7 +73,7 @@ class LukkBucServiceTest {
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).hentSed(buc.getId(), buc.getDocuments().get(0).getId());
         verify(euxService).opprettOgSendSed(any(SED.class), eq(buc.getId()));
     }
@@ -97,7 +98,7 @@ class LukkBucServiceTest {
         buc.getDocuments().add(x001Doc);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         SED sed = new SED();
         sed.setNav(enhancedRandom.nextObject(Nav.class));
@@ -107,7 +108,7 @@ class LukkBucServiceTest {
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).hentSed(buc.getId(), buc.getDocuments().get(0).getId());
         verify(euxService).oppdaterSed(eq(buc.getId()), eq(x001Doc.getId()), any(SED.class));
         verify(euxService).sendSed(buc.getId(), x001Doc.getId());
@@ -131,11 +132,11 @@ class LukkBucServiceTest {
         bucInfos.add(bucInfo);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
-        when(euxService.hentBuc(any())).thenThrow(new IntegrationException(""));
+        when(euxService.finnBUC(any())).thenReturn(Optional.empty());
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
-        verify(euxService).hentBuc(anyString());
+        verify(euxService).finnBUC(anyString());
         verify(euxService, never()).hentSed(anyString(), anyString());
     }
 
@@ -152,13 +153,13 @@ class LukkBucServiceTest {
         BUC buc = lagBuc();
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
         when(euxService.hentSed(anyString(), anyString())).thenThrow(new IntegrationException(""));
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).hentSed(buc.getId(), buc.getDocuments().get(0).getId());
         verify(euxService, never()).opprettOgSendSed(any(), any());
     }
@@ -186,7 +187,7 @@ class LukkBucServiceTest {
         buc.getDocuments().add(document);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(bucInfos);
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         SED sed = new SED();
         sed.setNav(enhancedRandom.nextObject(Nav.class));
@@ -196,7 +197,7 @@ class LukkBucServiceTest {
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_04);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).hentSed(buc.getId(), sisteOppdatertDokumentId);
         verify(euxService, never()).opprettOgSendSed(any(), any());
     }
@@ -231,7 +232,7 @@ class LukkBucServiceTest {
         buc.getDocuments().add(document);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         SED sed = new SED();
         sed.setNav(enhancedRandom.nextObject(Nav.class));
@@ -241,7 +242,7 @@ class LukkBucServiceTest {
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_06);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).hentSed(buc.getId(), sisteOppdatertDokumentId);
         verify(euxService).opprettOgSendSed(any(), eq(buc.getId()));
     }
@@ -258,12 +259,12 @@ class LukkBucServiceTest {
         String sisteOppdatertDokumentId = buc.getDocuments().get(0).getId();
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_06);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService, never()).hentSed(buc.getId(), sisteOppdatertDokumentId);
         verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
     }
@@ -278,12 +279,12 @@ class LukkBucServiceTest {
         BUC buc = lagBuc(BucType.LA_BUC_01, SedType.A001);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService, never()).hentSed(any(), any());
         verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
     }
@@ -304,12 +305,12 @@ class LukkBucServiceTest {
         buc.getDocuments().add(a011);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService, never()).hentSed(any(), any());
         verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
     }
@@ -337,12 +338,12 @@ class LukkBucServiceTest {
         when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).opprettOgSendSed(any(), eq(buc.getId()));
     }
 
@@ -357,12 +358,12 @@ class LukkBucServiceTest {
         buc.getActions().iterator().next().setDocumentType(SedType.A012.name());
 
         when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
-        when(euxService.hentBuc(bucInfo.getId())).thenReturn(buc);
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
 
         lukkBucService.lukkBucerAvType(BucType.LA_BUC_01);
 
         verify(euxService).hentBucer(any(BucSearch.class));
-        verify(euxService).hentBuc(bucInfo.getId());
+        verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService, never()).hentSed(any(), any());
         verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
     }
@@ -373,7 +374,7 @@ class LukkBucServiceTest {
         final var buc = lagBuc();
         buc.getActions().clear();
         final var rinaSaksnummer = buc.getId();
-        when(euxService.hentBuc(rinaSaksnummer)).thenReturn(buc);
+        when(euxService.finnBUC(rinaSaksnummer)).thenReturn(Optional.of(buc));
 
         lukkBucService.forsøkLukkBucAsync(rinaSaksnummer);
 
@@ -389,7 +390,7 @@ class LukkBucServiceTest {
         sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA009.class));
 
         when(euxService.hentSed(eq(rinaSaksnummer), anyString())).thenReturn(sed);
-        when(euxService.hentBuc(rinaSaksnummer)).thenReturn(buc);
+        when(euxService.finnBUC(rinaSaksnummer)).thenReturn(Optional.of(buc));
 
         lukkBucService.forsøkLukkBucAsync(rinaSaksnummer);
 
