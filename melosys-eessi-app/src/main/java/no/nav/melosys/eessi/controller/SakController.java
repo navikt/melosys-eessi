@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.controller;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.websocket.server.PathParam;
@@ -13,8 +12,6 @@ import no.nav.melosys.eessi.controller.dto.BucinfoDto;
 import no.nav.melosys.eessi.controller.dto.SaksrelasjonDto;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
@@ -46,8 +43,8 @@ public class SakController {
                                                  @RequestParam(required = false) List<String> statuser) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
                 .map(FagsakRinasakKobling::getRinaSaksnummer)
-                .map(this::hentBuc)
-                .filter(Objects::nonNull)
+                .map(euxService::finnBUC)
+                .flatMap(Optional::stream)
                 .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrl(buc.getId())))
                 .collect(Collectors.toList());
     }
@@ -96,15 +93,6 @@ public class SakController {
         if (eksisterende.isPresent() && !eksisterende.get().getGsakSaksnummer().equals(saksrelasjonDto.getGsakSaksnummer())) {
             throw new ValidationException("Rinasak " + saksrelasjonDto.getRinaSaksnummer() +
                     " er allerede koblet mot gsakSaksnummer " + eksisterende.get().getGsakSaksnummer());
-        }
-    }
-
-    private BUC hentBuc(String rinaSaksnummer) {
-        try {
-            return euxService.hentBuc(rinaSaksnummer);
-        } catch (IntegrationException e) {
-            log.error("Kunne ikke hente BUC {}", rinaSaksnummer, e);
-            return null;
         }
     }
 }

@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,8 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
+import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -111,8 +114,20 @@ public class EuxService {
         return euxConsumer.finnRinaSaker(bucSearch.getBucType(), bucSearch.getStatus());
     }
 
-    public BUC hentBuc(String rinaSakid) {
-        return euxConsumer.hentBUC(rinaSakid);
+    public BUC hentBuc(String rinaSaksnummer) {
+        return euxConsumer.hentBUC(rinaSaksnummer);
+    }
+
+    /**
+     * Kaster ikke exception om en BUC er arkivert eller ikke finnes
+     */
+    public Optional<BUC> finnBUC(String rinaSaksnummer) {
+        try {
+            return Optional.of(euxConsumer.hentBUC(rinaSaksnummer));
+        } catch (IntegrationException | NotFoundException e) {
+            log.warn("Kan ikke hente BUC {}", rinaSaksnummer, e);
+            return Optional.empty();
+        }
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {

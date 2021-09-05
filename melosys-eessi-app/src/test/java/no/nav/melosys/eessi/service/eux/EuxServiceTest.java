@@ -74,6 +74,12 @@ class EuxServiceTest {
     }
 
     @Test
+    void finnBuc_integrasjonsfeil_tomRespons() {
+        when(euxConsumer.hentBUC("123123123")).thenThrow(new IntegrationException("err"));
+        assertThat(euxService.finnBUC("123123123")).isEmpty();
+    }
+
+    @Test
     void genererPdfFraSed_forventKonsumentkall() {
         euxService.genererPdfFraSed(new SED());
         verify(euxConsumer).genererPdfFraSed(any());
