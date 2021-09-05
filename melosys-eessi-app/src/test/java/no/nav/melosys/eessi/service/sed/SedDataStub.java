@@ -15,7 +15,7 @@ public class SedDataStub {
 
     public static SedDataDto getStub() throws IOException, URISyntaxException {
         URI søknadURI = Objects.requireNonNull(SedDataStub.class.getClassLoader().getResource("mock/sedDataDtoStub.json")).toURI();
-        String json = new String(Files.readAllBytes(Paths.get(søknadURI)));
+        String json = Files.readString(Paths.get(søknadURI));
         var objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         return objectMapper.readValue(json, SedDataDto.class);
