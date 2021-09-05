@@ -142,8 +142,7 @@ class SedServiceTest {
 
         buc.setActions(List.of(emptyDocAction, sentDocAction));
 
-        when(euxService.hentBuc(RINA_ID))
-                .thenReturn(buc);
+        when(euxService.finnBUC(RINA_ID)).thenReturn(Optional.of(buc));
 
         sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_02, true, true);
 

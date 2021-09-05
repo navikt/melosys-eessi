@@ -160,9 +160,9 @@ public class SedService {
 
     private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) {
         for (FagsakRinasakKobling fagsakRinasakKobling : eksisterendeSaker) {
-            var buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
-            if ("open".equals(buc.getStatus())) {
-                return Optional.of(buc);
+            var buc = euxService.finnBUC(fagsakRinasakKobling.getRinaSaksnummer());
+            if (buc.isPresent() && buc.get().erÅpen()) {
+                return buc;
             }
         }
 
