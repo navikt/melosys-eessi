@@ -8,12 +8,12 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class SakService {
+public class ArkivsakService {
 
     private final SakConsumer sakConsumer;
 
     @Autowired
-    public SakService(SakConsumer sakConsumer) {
+    public ArkivsakService(SakConsumer sakConsumer) {
         this.sakConsumer = sakConsumer;
     }
 

@@ -13,22 +13,22 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SakServiceTest {
+class ArkivsakServiceTest {
 
     @Mock
     private SakConsumer sakConsumer;
 
-    private SakService sakService;
+    private ArkivsakService arkivsakService;
 
     @BeforeEach
     public void setup() throws Exception {
-        sakService = new SakService(sakConsumer);
+        arkivsakService = new ArkivsakService(sakConsumer);
         when(sakConsumer.getSak(anyString())).thenReturn(new Sak());
     }
 
     @Test
     void hentSak_forventSak() {
-        Sak sak = sakService.hentsak(1L);
+        Sak sak = arkivsakService.hentsak(1L);
         assertThat(sak).isNotNull();
     }
 }

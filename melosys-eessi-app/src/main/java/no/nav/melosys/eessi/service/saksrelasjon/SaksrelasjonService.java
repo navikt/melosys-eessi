@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
-import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.sak.ArkivsakService;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +21,7 @@ public class SaksrelasjonService {
 
     private final FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     private final CaseStoreConsumer caseStoreConsumer;
-    private final SakService sakService;
+    private final ArkivsakService arkivsakService;
     private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
@@ -46,7 +46,7 @@ public class SaksrelasjonService {
             .findFirst()
             .ifPresentOrElse(
                 dto -> {
-                    String tema = sakService.hentsak(gsakSaksnummer).getTema();
+                    String tema = arkivsakService.hentsak(gsakSaksnummer).getTema();
                     dto.setTema(tema);
                     dto.setFagsaknummer(gsakSaksnummer.toString());
                     caseStoreConsumer.lagre(dto);
@@ -99,6 +99,6 @@ public class SaksrelasjonService {
     public Optional<Sak> finnArkivsakForRinaSaksnummer(String rinaSaksnummer) {
         return finnVedRinaSaksnummer(rinaSaksnummer)
             .map(FagsakRinasakKobling::getGsakSaksnummer)
-            .map(sakService::hentsak);
+            .map(arkivsakService::hentsak);
     }
 }
