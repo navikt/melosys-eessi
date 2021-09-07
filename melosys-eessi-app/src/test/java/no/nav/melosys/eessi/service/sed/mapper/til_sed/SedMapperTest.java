@@ -28,16 +28,17 @@ class SedMapperTest {
     void hentAdresser() {
         final List<Adresse> adresser = sedMapper.hentAdresser(sedData);
         assertThat(adresser).hasSize(3)
-                .anyMatch(adresse -> Adressetype.BOSTEDSADRESSE.getAdressetypeRina().equals(adresse.getType()))
-                .anyMatch(adresse -> Adressetype.KONTAKTADRESSE.getAdressetypeRina().equals(adresse.getType()))
-                .anyMatch(adresse -> Adressetype.POSTADRESSE.getAdressetypeRina().equals(adresse.getType()));
+            .anyMatch(adresse -> Adressetype.BOSTEDSADRESSE.getAdressetypeRina().equals(adresse.getType()))
+            .anyMatch(adresse -> Adressetype.KONTAKTADRESSE.getAdressetypeRina().equals(adresse.getType()))
+            .anyMatch(adresse -> Adressetype.POSTADRESSE.getAdressetypeRina().equals(adresse.getType()));
     }
 
     @Test
     void hentStatsborgerskap() {
         final List<Statsborgerskap> statsborgerskap = sedMapper.hentStatsborgerskap(sedData);
-        assertThat(statsborgerskap).hasSize(2)
-            .anyMatch(statsborgerskap1 -> "NO".equals(statsborgerskap1.getLand()))
-            .anyMatch(statsborgerskap1 -> "SE".equals(statsborgerskap1.getLand()));
+        assertThat(statsborgerskap).hasSize(2).containsExactly(
+            new Statsborgerskap("NO"),
+            new Statsborgerskap("SE")
+        );
     }
 }
