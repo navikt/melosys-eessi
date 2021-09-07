@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
-public class BucIdentifiseringService {
+public class BehandleBucIdentifisertService {
 
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final SaksrelasjonService saksrelasjonService;
