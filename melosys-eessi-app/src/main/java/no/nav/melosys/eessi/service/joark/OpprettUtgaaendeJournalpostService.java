@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 @Service
 public class OpprettUtgaaendeJournalpostService {
 
-    private final SakService sakService;
+    private final SaksrelasjonService saksrelasjonService;
     private final JournalpostService journalpostService;
     private final EuxService euxService;
     private final PersonFasade personFasade;
@@ -27,20 +27,20 @@ public class OpprettUtgaaendeJournalpostService {
 
     @Autowired
     public OpprettUtgaaendeJournalpostService(
-            SakService sakService,
+            SaksrelasjonService saksrelasjonService,
             JournalpostService journalpostService,
             EuxService euxService,
             PersonFasade personFasade,
             OppgaveService oppgaveService) {
+        this.saksrelasjonService = saksrelasjonService;
         this.journalpostService = journalpostService;
-        this.sakService = sakService;
         this.euxService = euxService;
         this.personFasade = personFasade;
         this.oppgaveService = oppgaveService;
     }
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) {
-        Optional<Sak> sak = sakService.finnSakForRinaSaksnummer(sedSendt.getRinaSakId());
+        Optional<Sak> sak = saksrelasjonService.finnArkivsakForRinaSaksnummer(sedSendt.getRinaSakId());
 
         if (sak.isEmpty()) {
             return arkiverUtenSak(sedSendt);

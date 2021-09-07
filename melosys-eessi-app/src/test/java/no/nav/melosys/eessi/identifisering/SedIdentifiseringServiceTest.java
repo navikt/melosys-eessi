@@ -3,9 +3,6 @@ package no.nav.melosys.eessi.identifisering;
 import java.util.List;
 import java.util.Optional;
 
-import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Bruker;
@@ -13,8 +10,6 @@ import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
-import no.nav.melosys.eessi.service.sak.SakService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,36 +30,22 @@ class SedIdentifiseringServiceTest {
     @Mock
     private PersonSok personSok;
     @Mock
-    private SaksrelasjonService saksrelasjonService;
-    @Mock
-    private SakService sakService;
-    @Mock
-    private PersonFasade personFasade;
-    @Mock
     private PersonSokMetrikker personSokMetrikker;
+    @Mock
+    private BucIdentifisertService bucIdentifisertService;
 
     private SedIdentifiseringService sedIdentifiseringService;
 
     @BeforeEach
     public void setup() {
-        sedIdentifiseringService = new SedIdentifiseringService(
-                personSok, saksrelasjonService, sakService, personFasade, personSokMetrikker
-        );
+        sedIdentifiseringService = new SedIdentifiseringService(personSok, personSokMetrikker, bucIdentifisertService);
     }
 
     @Test
     void identifiserPerson_sakEksisterer_hentPersonFraSak() {
-        Sak sak = new Sak();
-        sak.setAktoerId("32132132");
-
-        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
-        fagsakRinasakKobling.setGsakSaksnummer(123L);
-
-        when(personFasade.hentNorskIdent(anyString())).thenReturn(norskIdent);
-        when(sakService.hentsak(anyLong())).thenReturn(sak);
-        when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
-
-        Optional<String> res = sedIdentifiseringService.identifiserPerson("123", lagSED());
+        final var rinaSaksnummer = "123321";
+        when(bucIdentifisertService.finnIdentifisertPerson(rinaSaksnummer)).thenReturn(Optional.of(norskIdent));
+        Optional<String> res = sedIdentifiseringService.identifiserPerson(rinaSaksnummer, lagSED());
         assertThat(res).contains(norskIdent);
     }
 
