@@ -90,4 +90,15 @@ public class SaksrelasjonService {
 
         return saksnummer;
     }
+
+    public Optional<String> finnAktørIDTilhørendeRinasak(String rinaSaksnummer) {
+        return finnArkivsakForRinaSaksnummer(rinaSaksnummer)
+            .map(Sak::getAktoerId);
+    }
+
+    public Optional<Sak> finnArkivsakForRinaSaksnummer(String rinaSaksnummer) {
+        return finnVedRinaSaksnummer(rinaSaksnummer)
+            .map(FagsakRinasakKobling::getGsakSaksnummer)
+            .map(sakService::hentsak);
+    }
 }
