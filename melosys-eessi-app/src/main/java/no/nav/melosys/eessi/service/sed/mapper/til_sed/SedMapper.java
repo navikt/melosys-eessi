@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -75,15 +76,22 @@ public interface SedMapper {
         person.setFoedselsdato(formaterDato(sedData.getBruker().getFoedseldato()));
         person.setFoedested(null); //det antas at ikke trengs når NAV fyller ut.
         person.setKjoenn(Kjønn.valueOf(sedData.getBruker().getKjoenn()));
-
-        var statsborgerskap = new Statsborgerskap();
-        statsborgerskap.setLand(LandkodeMapper.getLandkodeIso2(sedData.getBruker().getStatsborgerskap()));
-
-        person.setStatsborgerskap(Collections.singletonList(statsborgerskap));
-
+        person.setStatsborgerskap(hentStatsborgerskap(sedData));
         person.setPin(hentPin(sedData));
 
         return person;
+    }
+
+    default List<Statsborgerskap> hentStatsborgerskap(SedDataDto sedDataDto) {
+        return sedDataDto.getBruker().getStatsborgerskap().stream()
+            .map(this::lagStatsborgerskap)
+            .collect(Collectors.toList());
+    }
+
+    private Statsborgerskap lagStatsborgerskap(String landkode) {
+        Statsborgerskap statsborgerskap = new Statsborgerskap();
+        statsborgerskap.setLand(LandkodeMapper.getLandkodeIso2(landkode));
+        return statsborgerskap;
     }
 
     default List<Pin> hentPin(SedDataDto sedData) {
