@@ -129,6 +129,7 @@ class SedMottakTestIT extends ComponentTestBase {
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto(oppgaveID, "AAPEN"));
+        mockHentIdenter(FNR, AKTOER_ID);
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
@@ -151,7 +152,6 @@ class SedMottakTestIT extends ComponentTestBase {
     @Test
     void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_flyttesTilIdOgFordeling() throws Exception {
         final var sedID = UUID.randomUUID().toString();
-        final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
         oppgaveDto.setStatus("OPPRETTET");

@@ -2,9 +2,8 @@ package no.nav.melosys.eessi.service.mottak;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
-import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -13,7 +12,6 @@ import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -25,10 +23,9 @@ public class SedMottakService {
     private final PersonIdentifisering personIdentifisering;
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final OppgaveService oppgaveService;
-    private final ApplicationEventPublisher applicationEventPublisher;
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
-    private final PersonFasade personFasade;
+    private final BucIdentifisertService bucIdentifisertService;
 
 
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
@@ -49,10 +46,8 @@ public class SedMottakService {
         log.info("Søker etter person for SED");
         personIdentifisering.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed)
                 .ifPresentOrElse(
-                        ident -> applicationEventPublisher.publishEvent(
-                                new BucIdentifisertEvent(sedMottattHendelse.getSedHendelse().getRinaSakId(), personFasade.hentAktoerId(ident))
-                        ),
-                        () -> opprettOppgaveIdentifisering(sedMottattHendelse)
+                    ident -> bucIdentifisertService.lagreIdentifisertPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), ident),
+                    () -> opprettOppgaveIdentifisering(sedMottattHendelse)
                 );
     }
 

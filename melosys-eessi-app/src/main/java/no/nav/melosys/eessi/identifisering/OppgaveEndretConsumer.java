@@ -5,11 +5,10 @@ import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +17,11 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class OppgaveEndretConsumer {
 
-    private final ApplicationEventPublisher eventPublisher;
+    private final BucIdentifisertService bucIdentifisertService;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final OppgaveService oppgaveService;
     private final IdentifiseringKontrollService identifiseringKontrollService;
+    private final PersonFasade personFasade;
 
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
@@ -54,7 +54,7 @@ public class OppgaveEndretConsumer {
         var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
-            eventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, oppgave.hentAktørID()));
+            bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgave.hentAktørID()));
             oppgaveService.ferdigstillOppgave(oppgave.getId().toString(), oppgave.getVersjon());
         } else {
             log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgave.getId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
