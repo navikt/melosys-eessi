@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Miljø'
+        description: 'Miljø (dev, q1 eller prod)'
         required: true
-        default: 'q2'
+        default: 'dev'
 
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
@@ -66,11 +66,11 @@ jobs:
         run: |
           docker push ${IMAGE}
 
-  # Deploy til Q2 manuelt eller ved push på master-branch
-  deploy_q2:
-    name: Deploy til Q2
+  # Deploy til dev (Q2) manuelt eller ved push på master-branch
+  deploy_dev:
+    name: Deploy til dev (Q2)
     needs: build
-    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && (github.event.inputs.environment == 'q2' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && (github.event.inputs.environment == 'dev' || (github.event_name == 'push' && github.ref == 'refs/heads/master'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -81,7 +81,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: NAMESPACE=q2,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q2.dev.adeo.no
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no
 
   # Deploy til Q1 manuelt
   deploy_q1:
@@ -98,13 +98,13 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: NAMESPACE=default,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.adeo.no
+          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no
 
   # Deploy til prod manuelt
   deploy_prod:
     name: Deploy til prod
     needs: build
-    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && github.event.inputs.environment == 'p'
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && github.event.inputs.environment == 'prod'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -115,7 +115,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: deploy/nais.yaml
-          VAR: NAMESPACE=default,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.nais.adeo.no
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
