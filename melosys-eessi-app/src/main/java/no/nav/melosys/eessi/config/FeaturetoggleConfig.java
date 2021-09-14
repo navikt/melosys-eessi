@@ -22,7 +22,7 @@ public class FeaturetoggleConfig {
 
         return new DefaultUnleash(
                 unleashConfig,
-                new IsTestStrategy(environment.getProperty("NAIS_NAMESPACE"))
+                new IsTestStrategy(environment.getProperty("APP_ENVIRONMENT"))
         );
     }
 
@@ -41,7 +41,7 @@ public class FeaturetoggleConfig {
 
         @Override
         public boolean isEnabled(Map<String, String> map) {
-            return "q2".equalsIgnoreCase(env);
+            return "dev".equalsIgnoreCase(env);
         }
     }
 }
