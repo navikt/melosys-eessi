@@ -20,6 +20,6 @@ public class BucIdentifisert {
     @Column(name = "rina_saksnummer", updatable = false)
     private String rinaSaksnummer;
 
-    @Column(name = "ident", updatable = false)
-    private String ident;
+    @Column(name = "folkeregisterident", updatable = false)
+    private String folkeregisterident;
 }

@@ -21,7 +21,7 @@ public class BucIdentifisertEventListener {
         log.info("Identifiserer alle SEDer for BUC {}", bucIdentifisertEvent.getBucId());
         behandleBucIdentifisertService.bucIdentifisert(
             bucIdentifisertEvent.getBucId(),
-            personFasade.hentAktoerId(bucIdentifisertEvent.getIdent())
+            personFasade.hentAktoerId(bucIdentifisertEvent.getFolkeregisterident())
         );
     }
 }

@@ -42,7 +42,7 @@ public class BucIdentifisertService {
         }
 
         return bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
-            .map(BucIdentifisert::getIdent);
+            .map(BucIdentifisert::getFolkeregisterident);
     }
 
     public void lagreIdentifisertPerson(String rinaSaksnummer, String ident) {
