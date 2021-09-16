@@ -13,7 +13,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import no.nav.melosys.eessi.service.sak.SakService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,7 +32,7 @@ class OpprettUtgaaendeJournalpostServiceTest {
     private static final String JOURNALPOST_ID = "123";
 
     @Mock
-    private SakService sakService;
+    private SaksrelasjonService saksrelasjonService;
     @Mock
     private JournalpostService journalpostService;
     @Mock
@@ -50,12 +50,12 @@ class OpprettUtgaaendeJournalpostServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-                sakService, journalpostService, euxService, personFasade, oppgaveService);
+            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService);
 
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
         Sak sak = enhancedRandom.nextObject(Sak.class);
-        when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));
+        when(saksrelasjonService.finnArkivsakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));
 
         sedSendt = enhancedRandom.nextObject(SedHendelse.class);
     }
@@ -80,7 +80,7 @@ class OpprettUtgaaendeJournalpostServiceTest {
 
         String result = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
 
-        verify(sakService).finnSakForRinaSaksnummer(anyString());
+        verify(saksrelasjonService).finnArkivsakForRinaSaksnummer(anyString());
         verify(journalpostService).opprettUtgaaendeJournalpost(any(), any(), any(), any());
         verify(oppgaveService).opprettUtgåendeJfrOppgave(anyString(), any(), anyString(), anyString());
 
@@ -92,12 +92,12 @@ class OpprettUtgaaendeJournalpostServiceTest {
         OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "ENDELIG", null);
         when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
         when(euxService.hentRinaUrl(anyString())).thenReturn("https://test.local");
-        when(sakService.finnSakForRinaSaksnummer(anyString())).thenReturn(Optional.empty());
+        when(saksrelasjonService.finnArkivsakForRinaSaksnummer(anyString())).thenReturn(Optional.empty());
         when(personFasade.hentAktoerId(anyString())).thenReturn("12345");
 
         String journalpostId = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
 
-        verify(sakService).finnSakForRinaSaksnummer(anyString());
+        verify(saksrelasjonService).finnArkivsakForRinaSaksnummer(anyString());
         verify(journalpostService).opprettUtgaaendeJournalpost(any(), any(), any(), any());
         verify(oppgaveService).opprettUtgåendeJfrOppgave(anyString(), any(), anyString(), anyString());
 

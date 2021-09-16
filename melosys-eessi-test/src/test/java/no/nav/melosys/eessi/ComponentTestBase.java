@@ -117,19 +117,25 @@ public abstract class ComponentTestBase {
         when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(mockData.dokumentTypeInfoDto());
     }
 
-    @SneakyThrows
     protected void mockPerson(String ident, String aktørID) {
         mockPerson(ident, aktørID, FØDSELSDATO, STATSBORGERSKAP);
     }
 
     protected void mockPerson(String ident, String aktørID, LocalDate fødselsdato, String statsborgerskap) {
-        var pdlIdentListe = mockData.lagPDLIdentListe(ident, aktørID);
-        when(pdlConsumer.hentIdenter(ident)).thenReturn(pdlIdentListe);
-        when(pdlConsumer.hentIdenter(aktørID)).thenReturn(pdlIdentListe);
+        mockHentPerson(ident, aktørID, fødselsdato, statsborgerskap);
+        mockHentIdenter(ident, aktørID);
+    }
 
+    private void mockHentPerson(String ident, String aktørID, LocalDate fødselsdato, String statsborgerskap) {
         var pdlPerson = mockData.pdlPerson(fødselsdato, statsborgerskap);
         when(pdlConsumer.hentPerson(ident)).thenReturn(pdlPerson);
         when(pdlConsumer.hentPerson(aktørID)).thenReturn(pdlPerson);
+    }
+
+    protected void mockHentIdenter(String ident, String aktørID) {
+        var pdlIdentListe = mockData.lagPDLIdentListe(ident, aktørID);
+        when(pdlConsumer.hentIdenter(ident)).thenReturn(pdlIdentListe);
+        when(pdlConsumer.hentIdenter(aktørID)).thenReturn(pdlIdentListe);
     }
 
     List<MelosysEessiMelding> hentMelosysEessiRecords() {

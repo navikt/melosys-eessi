@@ -3,14 +3,10 @@ package no.nav.melosys.eessi.identifisering;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
-import no.nav.melosys.eessi.service.sak.SakService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.stereotype.Service;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
@@ -20,30 +16,26 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 class SedIdentifiseringService implements PersonIdentifisering {
 
     private final PersonSok personSøk;
-    private final SaksrelasjonService saksrelasjonService;
-    private final SakService sakService;
-    private final PersonFasade personFasade;
     private final PersonSokMetrikker personSokMetrikker;
+    private final BucIdentifisertService bucIdentifisertService;
 
     SedIdentifiseringService(
-            PersonSok personSøk,
-            SaksrelasjonService saksrelasjonService,
-            SakService sakService,
-            PersonFasade personFasade,
-            PersonSokMetrikker personSokMetrikker) {
+        PersonSok personSøk,
+        PersonSokMetrikker personSokMetrikker,
+        BucIdentifisertService bucIdentifisertService) {
         this.personSøk = personSøk;
-        this.saksrelasjonService = saksrelasjonService;
-        this.sakService = sakService;
-        this.personFasade = personFasade;
         this.personSokMetrikker = personSokMetrikker;
+        this.bucIdentifisertService = bucIdentifisertService;
     }
 
-    public Optional<String> identifiserPerson(String rinaSaksnumer, SED sed) {
-        Optional<FagsakRinasakKobling> eksisterendeSak = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnumer);
+    /**
+     * Henter ident fra identifisert BUC, eller søker basert på personopplysninger i SED om dette ikke finnes
+     */
+    public Optional<String> identifiserPerson(String rinaSaksnummer, SED sed) {
 
-        if (eksisterendeSak.isPresent()) {
-            String aktoerID = sakService.hentsak(eksisterendeSak.get().getGsakSaksnummer()).getAktoerId();
-            return Optional.of(personFasade.hentNorskIdent(aktoerID));
+        var identifisertPersonTilhørendeBuc = bucIdentifisertService.finnIdentifisertPerson(rinaSaksnummer);
+        if (identifisertPersonTilhørendeBuc.isPresent()) {
+            return identifisertPersonTilhørendeBuc;
         }
 
         Optional<Person> personFraSed = sed.finnPerson();

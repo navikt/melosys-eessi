@@ -10,10 +10,8 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.sak.SakService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,8 +30,6 @@ class OpprettInngaaendeJournalpostServiceTest {
     @Mock
     private JournalpostService journalpostService;
     @Mock
-    private SakService sakService;
-    @Mock
     private SaksrelasjonService saksrelasjonService;
     @Mock
     private JournalpostSedKoblingService journalpostSedKoblingService;
@@ -49,7 +45,7 @@ class OpprettInngaaendeJournalpostServiceTest {
     @BeforeEach
     public void setup() throws Exception {
 
-        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(sakService, saksrelasjonService, journalpostService, journalpostSedKoblingService);
+        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(saksrelasjonService, journalpostService, journalpostSedKoblingService);
         sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
         sedMottatt.setBucType(BucType.LA_BUC_01.name());
 
@@ -60,13 +56,9 @@ class OpprettInngaaendeJournalpostServiceTest {
 
     @Test
     void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() {
-        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
-        fagsakRinasakKobling.setGsakSaksnummer(123L);
-        when(saksrelasjonService.finnVedRinaSaksnummer(anyString())).thenReturn(Optional.of(fagsakRinasakKobling));
-
         var sak = enhancedRandom.nextObject(Sak.class);
         sak.setId(GSAK_SAKSNUMMER);
-        when(sakService.hentsak(anyLong())).thenReturn(sak);
+        when(saksrelasjonService.finnArkivsakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));
 
         SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, sedMedVedlegg(new byte[0]), "123");
 
@@ -75,7 +67,6 @@ class OpprettInngaaendeJournalpostServiceTest {
         assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
 
         verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any(), anyString());
-        verify(saksrelasjonService, times(1)).finnVedRinaSaksnummer(any());
         verify(journalpostSedKoblingService).lagre(JOURNALPOST_ID, sedMottatt.getRinaSakId(),
                 sedMottatt.getRinaDokumentId(), sedMottatt.getRinaDokumentVersjon(),
                 sedMottatt.getBucType(), sedMottatt.getSedType());

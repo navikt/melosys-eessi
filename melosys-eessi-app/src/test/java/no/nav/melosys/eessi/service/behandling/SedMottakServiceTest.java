@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
-import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -27,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -38,27 +36,18 @@ class SedMottakServiceTest {
 
     @Mock
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-
     @Mock
     private EuxService euxService;
-
     @Mock
     private PersonIdentifisering personIdentifisering;
-
     @Mock
     private OppgaveService oppgaveService;
-
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-
     @Mock
     private SedMottattHendelseRepository sedMottattHendelseRepository;
-
     @Mock
     private BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
-
     @Mock
-    private PersonFasade personFasade;
+    private BucIdentifisertService bucIdentifisertService;
 
     private SedMottakService sedMottakService;
 
@@ -69,8 +58,8 @@ class SedMottakServiceTest {
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
                 euxService, personIdentifisering, opprettInngaaendeJournalpostService,
-                oppgaveService, applicationEventPublisher, sedMottattHendelseRepository,
-                bucIdentifiseringOppgRepository, personFasade
+                oppgaveService, sedMottattHendelseRepository,
+                bucIdentifiseringOppgRepository, bucIdentifisertService
         );
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
@@ -95,7 +84,7 @@ class SedMottakServiceTest {
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository, times(2)).save(any());
-        verify(applicationEventPublisher, never()).publishEvent(BucIdentifisertEvent.class);
+        verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
 
     @Test
@@ -110,7 +99,7 @@ class SedMottakServiceTest {
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(sedMottattHendelseRepository, times(2)).save(any());
-        verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
+        verify(bucIdentifisertService).lagreIdentifisertPerson(sedHendelse.getRinaSakId(), IDENT);
     }
 
     @Test
@@ -128,7 +117,7 @@ class SedMottakServiceTest {
 
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(applicationEventPublisher, never()).publishEvent(any(BucIdentifisertEvent.class));
+        verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
 
     @Test
