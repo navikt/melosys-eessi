@@ -161,8 +161,6 @@ class SedMottakTestIT extends ComponentTestBase {
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
-        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
 
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
