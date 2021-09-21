@@ -29,25 +29,25 @@ public class SedMottakService {
 
 
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
-        sedMottattHendelseRepository.save(sedMottattHendelse);
+        var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
 
-        var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(),
+        final var sed = euxService.hentSed(lagretHendelse.getSedHendelse().getRinaSakId(),
                 sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
-
         try {
-            opprettJournalpost(sedMottattHendelse);
+            opprettJournalpost(lagretHendelse);
         } catch (SedAlleredeJournalførtException e) {
             log.info("Inngående SED {} allerede journalført", e.getSedID());
+            sedMottattHendelseRepository.delete(lagretHendelse);
             return;
         }
 
-        sedMottattHendelseRepository.save(sedMottattHendelse);
+        sedMottattHendelseRepository.save(lagretHendelse);
         log.info("Søker etter person for SED");
-        personIdentifisering.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed)
+        personIdentifisering.identifiserPerson(lagretHendelse.getSedHendelse().getRinaSakId(), sed)
                 .ifPresentOrElse(
-                    ident -> bucIdentifisertService.lagreIdentifisertPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), ident),
-                    () -> opprettOppgaveIdentifisering(sedMottattHendelse)
+                    ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
+                    () -> opprettOppgaveIdentifisering(lagretHendelse)
                 );
     }
 
