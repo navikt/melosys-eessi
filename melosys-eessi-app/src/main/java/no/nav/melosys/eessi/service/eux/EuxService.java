@@ -21,6 +21,8 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -107,6 +109,12 @@ public class EuxService {
     }
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) {
+        return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
+    }
+
+    @Retryable(
+        value = RuntimeException.class)
+    public SED hentSedRetry(String rinaSaksnummer, String dokumentId) {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
     }
 
