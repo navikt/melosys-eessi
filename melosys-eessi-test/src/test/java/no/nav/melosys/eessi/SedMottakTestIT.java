@@ -105,8 +105,8 @@ class SedMottakTestIT extends ComponentTestBase {
         kafkaTestConsumer.doWait(5_000L);
 
         await().atMost(Duration.ofSeconds(4))
-                .pollInterval(Duration.ofSeconds(1))
-                .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
 
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentMelosysEessiRecords()).isEmpty();
@@ -147,6 +147,33 @@ class SedMottakTestIT extends ComponentTestBase {
         kafkaTestConsumer.doWait(5_000L);
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+    }
+
+    @Test
+    void toSedMottattIdentifisert_publisererPåKafka() throws Exception {
+        final var sedID = UUID.randomUUID().toString();
+        final var sedID2 = UUID.randomUUID().toString();
+        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        oppgaveDto.setStatus("OPPRETTET");
+
+        mockPerson(FNR, AKTOER_ID);
+
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+
+        kafkaTestConsumer.reset(2);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, FNR))).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        await().atMost(Duration.ofSeconds(4))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 2);
     }
 
     @Test
@@ -193,9 +220,9 @@ class SedMottakTestIT extends ComponentTestBase {
     private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID) {
         var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
         var oppgaveJsonString = Files.readString(path);
-        return new ObjectMapper().readTree( oppgaveJsonString.replaceAll("\\$id", oppgaveID)
-                                .replaceAll("\\$fnr", ident)
-                                .replaceAll("\\$aktoerid", aktørID)
-                                .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
+        return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
+            .replaceAll("\\$fnr", ident)
+            .replaceAll("\\$aktoerid", aktørID)
+            .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
 }
