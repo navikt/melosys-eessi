@@ -49,10 +49,9 @@ public class BucIdentifisertService {
         bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
             .ifPresentOrElse(
                 i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer),
-                () -> {
-                    bucIdentifisertRepository.save(new BucIdentifisert(null, rinaSaksnummer, ident));
-                    applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
-                }
+                () -> bucIdentifisertRepository.save(new BucIdentifisert(null, rinaSaksnummer, ident))
             );
+        applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
+
     }
 }
