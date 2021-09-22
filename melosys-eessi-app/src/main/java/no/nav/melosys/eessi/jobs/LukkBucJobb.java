@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.service.buc.LukkBucService;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,11 +14,9 @@ import org.springframework.stereotype.Component;
 public class LukkBucJobb {
 
     private final LukkBucService lukkBucService;
-    private final Unleash unleash;
 
-    public LukkBucJobb(LukkBucService lukkBucService, Unleash unleash) {
+    public LukkBucJobb(LukkBucService lukkBucService) {
         this.lukkBucService = lukkBucService;
-        this.unleash = unleash;
     }
 
     //00:00 hver dag
@@ -33,8 +30,6 @@ public class LukkBucJobb {
     }
 
     private boolean bucKanLukkes(BucType bucType) {
-        return unleash.isEnabled("melosys.eessi.lukk_la_buc_01_automatisk")
-                ? bucType.erLovvalgBuc()
-                : bucType.erLovvalgBuc() && bucType != BucType.LA_BUC_01;
+        return bucType.erLovvalgBuc();
     }
 }
