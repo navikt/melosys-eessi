@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed;
 
 import java.util.Collection;
+
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
 import org.springframework.stereotype.Service;
@@ -8,6 +9,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Deprecated(forRemoval = true)
 public class SedMottattService {
 
     private final SedMottattRepository sedMottattRepository;

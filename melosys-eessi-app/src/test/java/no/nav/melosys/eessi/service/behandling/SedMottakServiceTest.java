@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -64,10 +65,9 @@ class SedMottakServiceTest {
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
                 .thenReturn("9988776655");
-
         when(euxService.hentSed(anyString(), anyString()))
                 .thenReturn(opprettSED());
-
+        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
     }
 
     @Test
@@ -131,6 +131,7 @@ class SedMottakServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(sedMottattHendelseRepository).delete(any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
     }

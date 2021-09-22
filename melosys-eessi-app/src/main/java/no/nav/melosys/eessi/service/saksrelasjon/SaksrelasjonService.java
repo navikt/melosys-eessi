@@ -11,7 +11,6 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import no.nav.melosys.eessi.service.sak.ArkivsakService;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,7 +21,6 @@ public class SaksrelasjonService {
     private final FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     private final CaseStoreConsumer caseStoreConsumer;
     private final ArkivsakService arkivsakService;
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     @Transactional
     public FagsakRinasakKobling lagreKobling(Long gsakSaksnummer, String rinaSaksnummer, BucType bucType) {
@@ -36,7 +34,6 @@ public class SaksrelasjonService {
             oppdaterEllerLagreIEuxCaseStore(gsakSaksnummer, rinaSaksnummer);
         }
 
-        applicationEventPublisher.publishEvent(new SaksrelasjonOpprettetEvent(rinaSaksnummer, gsakSaksnummer));
         return fagsakRinasakKobling;
     }
 
