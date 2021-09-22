@@ -131,6 +131,7 @@ class SedMottakServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(sedMottattHendelseRepository).delete(any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
     }
