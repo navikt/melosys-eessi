@@ -35,7 +35,7 @@ public class SedMottakService {
                 sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
         try {
-            opprettJournalpost(lagretHendelse);
+            lagretHendelse.setJournalpostId(opprettJournalpost(lagretHendelse));
         } catch (SedAlleredeJournalførtException e) {
             log.info("Inngående SED {} allerede journalført", e.getSedID());
             sedMottattHendelseRepository.delete(lagretHendelse);
@@ -51,15 +51,14 @@ public class SedMottakService {
                 );
     }
 
-    private void opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
+    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
         log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         var sedMedVedlegg = euxService.hentSedMedVedlegg(
                 sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
-        var journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+        return opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
                 sedMottattHendelse.getSedHendelse(), sedMedVedlegg, null);
-        sedMottattHendelse.setJournalpostId(journalpostID);
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {
