@@ -5,9 +5,7 @@ import java.time.LocalDateTime;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +65,7 @@ class SedMottakAdminTjenesteTest {
         sedMottakAdminTjeneste.restartAlleSEDerUtenJournalpostId(apiKey);
 
         assertThat(valueCapture.getValue()).isEqualTo(sedMottattHendelse);
-        verify(sedMottakService,times(1)).behandleSed(any(SedMottattHendelse.class));
+        verify(sedMottakService, times(1)).behandleSed(any(SedMottattHendelse.class));
 
     }
 
