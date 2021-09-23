@@ -43,7 +43,7 @@ public class SedMottakAdminTjeneste implements AdminTjeneste {
         return ResponseEntity.ok(hentAlleSederUtenJournalpostID());
     }
 
-    @PostMapping("/feilede/omstart")
+    @PostMapping("/feilede/restart")
     public ResponseEntity<List<SedMottattHendelse>> restartAlleFeiledeProsessinstanser(
         @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
