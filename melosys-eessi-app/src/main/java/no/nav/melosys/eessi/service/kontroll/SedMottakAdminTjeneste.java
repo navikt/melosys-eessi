@@ -36,26 +36,26 @@ public class SedMottakAdminTjeneste implements AdminTjeneste {
     }
 
     @GetMapping("/feilede")
-    public ResponseEntity<List<SedMottattHendelse>> hentSederMottattUtenJournalpostId(
+    public ResponseEntity<List<SedMottattHendelse>> hentSEDerMottattUtenJournalpostId(
         @RequestHeader(API_KEY_HEADER) String apiKey) {
 
         validerApikey(apiKey);
-        return ResponseEntity.ok(hentAlleSederUtenJournalpostID());
+        return ResponseEntity.ok(hentAlleSEDerUtenJournalpostID());
     }
 
     @PostMapping("/feilede/restart")
-    public ResponseEntity<List<SedMottattHendelse>> restartAlleFeiledeProsessinstanser(
+    public ResponseEntity<List<SedMottattHendelse>> restartAlleSEDerUtenJournalpostId(
         @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
-        Collection<SedMottattHendelse> feildeSeder = hentAlleSederUtenJournalpostID();
+        Collection<SedMottattHendelse> SEDer = hentAlleSEDerUtenJournalpostID();
         log.info("Forsøker å restarte feilede SEDer ");
-        restartAlleFeiledeSeder(feildeSeder);
+        restartAlleFeiledeSEDer(SEDer);
         return ResponseEntity.ok(
-            new ArrayList<>(feildeSeder)
+            new ArrayList<>(SEDer)
         );
     }
 
-    private List<SedMottattHendelse> hentAlleSederUtenJournalpostID() {
+    private List<SedMottattHendelse> hentAlleSEDerUtenJournalpostID() {
         return sedMottattHendelseRepository
             .findAll()
             .stream()
@@ -63,7 +63,7 @@ public class SedMottakAdminTjeneste implements AdminTjeneste {
             .collect(Collectors.toList());
     }
 
-    private void restartAlleFeiledeSeder(Collection<SedMottattHendelse> sedmottattHendelser) {
+    private void restartAlleFeiledeSEDer(Collection<SedMottattHendelse> sedmottattHendelser) {
 
         sedmottattHendelser
             .forEach(sedMottakService::behandleSed);

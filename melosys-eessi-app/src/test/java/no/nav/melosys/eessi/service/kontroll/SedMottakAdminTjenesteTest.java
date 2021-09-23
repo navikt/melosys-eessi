@@ -5,18 +5,21 @@ import java.time.LocalDateTime;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
+import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class SedMottakAdminTjenesteTest {
@@ -34,10 +37,6 @@ class SedMottakAdminTjenesteTest {
     }
 
     @Test
-    void hentSederMottattUtenJournalpostId() {
-    }
-
-    @Test
     void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
         final var sisteFeilmelding = "siste feilmelding";
         SedMottattHendelse sedMottattHendelse = lagFeiledSedMottakHendelse();
@@ -45,7 +44,7 @@ class SedMottakAdminTjenesteTest {
         when(sedMottattHendelseRepository.findAll())
             .thenReturn(singletonList(sedMottattHendelse));
 
-        var response = sedMottakAdminTjeneste.hentSederMottattUtenJournalpostId(apiKey);
+        var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var body = response.getBody();
@@ -53,12 +52,23 @@ class SedMottakAdminTjenesteTest {
             .flatExtracting(SedMottattHendelse::getId, SedMottattHendelse::getMottattDato, SedMottattHendelse::getJournalpostId)
             .containsExactly(sedMottattHendelse.getId(), sedMottattHendelse.getMottattDato(), sedMottattHendelse.getJournalpostId());
 
-        assertThat(response.getBody().stream().findFirst().isPresent()).isTrue();
-        assertThat(response.getBody().stream().findFirst().get().getJournalpostId()).isNull();
+        assertThat(body.stream().findFirst().isPresent()).isTrue();
+        assertThat(body.stream().findFirst().get().getJournalpostId()).isNull();
     }
 
     @Test
-    void restartAlleFeiledeProsessinstanser() {
+    void restartAlleSEDerUtenJournalpostId_() {
+        final SedMottattHendelse sedMottattHendelse = lagFeiledSedMottakHendelse();
+        final ArgumentCaptor<SedMottattHendelse> valueCapture = ArgumentCaptor.forClass(SedMottattHendelse.class);
+
+        when(sedMottattHendelseRepository.findAll())
+            .thenReturn(singletonList(sedMottattHendelse));
+        doNothing().when(sedMottakService).behandleSed(valueCapture.capture());
+
+        sedMottakAdminTjeneste.restartAlleSEDerUtenJournalpostId(apiKey);
+
+        assertThat(valueCapture.getValue()).isEqualTo(sedMottattHendelse);
+        verify(sedMottakService,times(1)).behandleSed(any(SedMottattHendelse.class));
 
     }
 
