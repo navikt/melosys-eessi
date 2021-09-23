@@ -30,17 +30,17 @@ class SedMottakAdminTjenesteTest {
 
     private final String apiKey = "dummy";
     private SedMottakAdminTjeneste sedMottakAdminTjeneste;
+    private SedMottattHendelse sedMottattHendelse;
+
 
     @BeforeEach
     void setUp() {
         sedMottakAdminTjeneste = new SedMottakAdminTjeneste(sedMottakService, sedMottattHendelseRepository, apiKey);
+        sedMottattHendelse = lagFeiledSedMottakHendelse();
     }
 
     @Test
     void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
-        final var sisteFeilmelding = "siste feilmelding";
-        SedMottattHendelse sedMottattHendelse = lagFeiledSedMottakHendelse();
-
         when(sedMottattHendelseRepository.findAll())
             .thenReturn(singletonList(sedMottattHendelse));
 
@@ -58,7 +58,6 @@ class SedMottakAdminTjenesteTest {
 
     @Test
     void restartAlleSEDerUtenJournalpostId_() {
-        final SedMottattHendelse sedMottattHendelse = lagFeiledSedMottakHendelse();
         final ArgumentCaptor<SedMottattHendelse> valueCapture = ArgumentCaptor.forClass(SedMottattHendelse.class);
 
         when(sedMottattHendelseRepository.findAll())
