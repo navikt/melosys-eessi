@@ -29,36 +29,37 @@ public class SedMottakService {
 
 
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
-        sedMottattHendelseRepository.save(sedMottattHendelse);
+        var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
 
-        var sed = euxService.hentSedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
+        final var sed = euxService.hentSedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
+
                 sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
         try {
-            opprettJournalpost(sedMottattHendelse);
+            lagretHendelse.setJournalpostId(opprettJournalpost(lagretHendelse));
         } catch (SedAlleredeJournalførtException e) {
             log.info("Inngående SED {} allerede journalført", e.getSedID());
+            sedMottattHendelseRepository.delete(lagretHendelse);
             return;
         }
 
-        sedMottattHendelseRepository.save(sedMottattHendelse);
+        sedMottattHendelseRepository.save(lagretHendelse);
         log.info("Søker etter person for SED");
-        personIdentifisering.identifiserPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), sed)
+        personIdentifisering.identifiserPerson(lagretHendelse.getSedHendelse().getRinaSakId(), sed)
                 .ifPresentOrElse(
-                    ident -> bucIdentifisertService.lagreIdentifisertPerson(sedMottattHendelse.getSedHendelse().getRinaSakId(), ident),
-                    () -> opprettOppgaveIdentifisering(sedMottattHendelse)
+                    ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
+                    () -> opprettOppgaveIdentifisering(lagretHendelse)
                 );
     }
 
-    private void opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
+    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
         log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         var sedMedVedlegg = euxService.hentSedMedVedlegg(
                 sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
-        var journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+        return opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
                 sedMottattHendelse.getSedHendelse(), sedMedVedlegg, null);
-        sedMottattHendelse.setJournalpostId(journalpostID);
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {

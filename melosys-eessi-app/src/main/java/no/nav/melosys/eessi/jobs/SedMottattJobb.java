@@ -15,6 +15,7 @@ import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
 
 @Slf4j
 @Component
+@Deprecated(forRemoval = true)
 public class SedMottattJobb {
 
     private final SedMottattService sedMottattService;

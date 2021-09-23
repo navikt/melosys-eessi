@@ -16,11 +16,8 @@ import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
-import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,8 +37,6 @@ class SedMottakTestIT extends ComponentTestBase {
     BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     @Autowired
     SedMottattHendelseRepository sedMottattHendelseRepository;
-    @Autowired
-    SaksrelasjonService saksrelasjonService;
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
 
@@ -119,34 +114,6 @@ class SedMottakTestIT extends ComponentTestBase {
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 2);
-    }
-
-    @Test
-    void sedMottattIkkeIdentifisert_saksrelasjonBlirOppdatert_publisererPåKafka() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
-        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto(oppgaveID, "AAPEN"));
-        mockHentIdenter(FNR, AKTOER_ID);
-
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
-        kafkaTestConsumer.doWait(5_000L);
-
-        verify(oppgaveConsumer, timeout(6_000L)).opprettOppgave(any());
-
-        final var arkivsakID = 123L;
-        final var sak = new Sak();
-        sak.setAktoerId(AKTOER_ID);
-        when(sakConsumer.getSak(Long.toString(arkivsakID))).thenReturn(sak);
-
-        kafkaTestConsumer.reset(1);
-        saksrelasjonService.lagreKobling(arkivsakID, rinaSaksnummer, BucType.LA_BUC_04);
-        kafkaTestConsumer.doWait(5_000L);
-
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
     }
 
     @Test
