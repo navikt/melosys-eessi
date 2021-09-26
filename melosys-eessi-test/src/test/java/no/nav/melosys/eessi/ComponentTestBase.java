@@ -112,9 +112,10 @@ public abstract class ComponentTestBase {
     public void setup() {
         when(euxConsumer.hentBUC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
-        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean())).thenReturn(mockData.journalpostResponse());
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
         when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(mockData.dokumentTypeInfoDto());
+        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean()))
+            .thenAnswer(a -> mockData.journalpostResponse(a.getArgument(1, Boolean.class)));
     }
 
     protected void mockPerson(String ident, String aktørID) {
