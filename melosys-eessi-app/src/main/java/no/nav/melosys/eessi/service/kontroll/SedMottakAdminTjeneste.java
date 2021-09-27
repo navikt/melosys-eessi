@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.AdminTjeneste;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.slf4j.Logger;
@@ -19,9 +18,10 @@ import org.springframework.web.bind.annotation.*;
 @Unprotected
 @RestController
 @RequestMapping("/admin/sedmottak")
-public class SedMottakAdminTjeneste implements AdminTjeneste {
+public class SedMottakAdminTjeneste {
 
     private final Logger log = LoggerFactory.getLogger(SedMottakAdminTjeneste.class);
+    private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
 
     private final SedMottakService sedMottakService;
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
@@ -47,30 +47,29 @@ public class SedMottakAdminTjeneste implements AdminTjeneste {
     public ResponseEntity<List<SedMottattHendelse>> restartAlleSEDerUtenJournalpostId(
         @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
-        Collection<SedMottattHendelse> SEDer = hentAlleSEDerUtenJournalpostID();
+        Collection<SedMottattHendelse> sedUtenJournalpost = hentAlleSEDerUtenJournalpostID();
         log.info("Forsøker å restarte feilede SEDer ");
-        restartAlleFeiledeSEDer(SEDer);
+        restartAlleFeiledeSEDer(sedUtenJournalpost);
         return ResponseEntity.ok(
-            new ArrayList<>(SEDer)
+            new ArrayList<>(sedUtenJournalpost)
         );
     }
 
     private List<SedMottattHendelse> hentAlleSEDerUtenJournalpostID() {
-        return sedMottattHendelseRepository
-            .findAll()
-            .stream()
-            .filter(sedMottattHendelse -> sedMottattHendelse.getJournalpostId() == null)
-            .collect(Collectors.toList());
+        return new ArrayList<>(sedMottattHendelseRepository
+            .findAllByJournalPostId(null));
     }
 
     private void restartAlleFeiledeSEDer(Collection<SedMottattHendelse> sedmottattHendelser) {
-
         sedmottattHendelser
             .forEach(sedMottakService::behandleSed);
     }
 
-    @Override
-    public String getApiKey() {
-        return apiKey;
+    private void validerApikey(String value) {
+        if (!getApiKey().equals(value)) {
+            throw new SecurityException("Trenger gyldig apikey");
+        }
     }
+
+    private String getApiKey() { return apiKey; }
 }

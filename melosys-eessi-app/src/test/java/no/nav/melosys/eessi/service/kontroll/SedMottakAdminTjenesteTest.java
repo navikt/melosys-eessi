@@ -39,7 +39,7 @@ class SedMottakAdminTjenesteTest {
 
     @Test
     void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
-        when(sedMottattHendelseRepository.findAll())
+        when(sedMottattHendelseRepository.findAllByJournalPostId(any()))
             .thenReturn(singletonList(sedMottattHendelse));
 
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
@@ -58,7 +58,7 @@ class SedMottakAdminTjenesteTest {
     void restartAlleSEDerUtenJournalpostId_() {
         final ArgumentCaptor<SedMottattHendelse> valueCapture = ArgumentCaptor.forClass(SedMottattHendelse.class);
 
-        when(sedMottattHendelseRepository.findAll())
+        when(sedMottattHendelseRepository.findAllByJournalPostId(any()))
             .thenReturn(singletonList(sedMottattHendelse));
         doNothing().when(sedMottakService).behandleSed(valueCapture.capture());
 

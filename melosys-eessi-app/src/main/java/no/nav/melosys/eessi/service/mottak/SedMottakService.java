@@ -31,8 +31,7 @@ public class SedMottakService {
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
         var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
 
-        final var sed = euxService.hentSedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
-
+        final var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(),
                 sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
         try {
