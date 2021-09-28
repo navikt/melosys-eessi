@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
+import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +40,7 @@ class SedMottakAdminTjenesteTest {
 
     @Test
     void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
-        when(sedMottattHendelseRepository.findAllByJournalPostId(any()))
+        when(sedMottattHendelseRepository.findAllByJournalpostIdNullSortedByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
 
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
@@ -47,7 +48,7 @@ class SedMottakAdminTjenesteTest {
 
         var body = response.getBody();
         assertThat(body)
-            .flatExtracting(SedMottattHendelse::getId, SedMottattHendelse::getMottattDato, SedMottattHendelse::getJournalpostId)
+            .flatExtracting(SedMottattHendelseDto::getId, SedMottattHendelseDto::getMottattDato, SedMottattHendelseDto::getJournalpostId)
             .containsExactly(sedMottattHendelse.getId(), sedMottattHendelse.getMottattDato(), sedMottattHendelse.getJournalpostId());
 
         assertThat(body.stream().findFirst().isPresent()).isTrue();
@@ -58,7 +59,7 @@ class SedMottakAdminTjenesteTest {
     void restartAlleSEDerUtenJournalpostId_() {
         final ArgumentCaptor<SedMottattHendelse> valueCapture = ArgumentCaptor.forClass(SedMottattHendelse.class);
 
-        when(sedMottattHendelseRepository.findAllByJournalPostId(any()))
+        when(sedMottattHendelseRepository.findAllByJournalpostIdNullSortedByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
         doNothing().when(sedMottakService).behandleSed(valueCapture.capture());
 

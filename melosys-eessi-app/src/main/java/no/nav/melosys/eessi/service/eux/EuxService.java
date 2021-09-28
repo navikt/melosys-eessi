@@ -108,10 +108,10 @@ public class EuxService {
     }
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) {
-        return hentSedMedRetry(rinaSaksnummer, dokumentId);
+        return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
     }
 
-    @Retryable()
+    @Retryable
     public SED hentSedMedRetry(String rinaSaksnummer, String dokumentId) {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
     }

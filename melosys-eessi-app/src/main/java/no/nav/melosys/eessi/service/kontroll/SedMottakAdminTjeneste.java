@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
+import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.security.token.support.core.api.Unprotected;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @Unprotected
 @RestController
 @RequestMapping("/admin/sedmottak")
+@Slf4j
 public class SedMottakAdminTjeneste {
 
-    private final Logger log = LoggerFactory.getLogger(SedMottakAdminTjeneste.class);
     private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
 
     private final SedMottakService sedMottakService;
@@ -36,28 +36,45 @@ public class SedMottakAdminTjeneste {
     }
 
     @GetMapping("/feilede")
-    public ResponseEntity<List<SedMottattHendelse>> hentSEDerMottattUtenJournalpostId(
+    public ResponseEntity<Collection<SedMottattHendelseDto>> hentSEDerMottattUtenJournalpostId(
         @RequestHeader(API_KEY_HEADER) String apiKey) {
 
         validerApikey(apiKey);
-        return ResponseEntity.ok(hentAlleSEDerUtenJournalpostID());
+        return ResponseEntity.ok(lagSedMottattHendelseDtoer(hentAlleSEDerUtenJournalpostID()));
     }
 
     @PostMapping("/feilede/restart")
-    public ResponseEntity<List<SedMottattHendelse>> restartAlleSEDerUtenJournalpostId(
+    public ResponseEntity<Collection<SedMottattHendelseDto>> restartAlleSEDerUtenJournalpostId(
         @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
         Collection<SedMottattHendelse> sedUtenJournalpost = hentAlleSEDerUtenJournalpostID();
         log.info("Forsøker å restarte feilede SEDer ");
         restartAlleFeiledeSEDer(sedUtenJournalpost);
-        return ResponseEntity.ok(
-            new ArrayList<>(sedUtenJournalpost)
+        return ResponseEntity.ok(lagSedMottattHendelseDtoer(sedUtenJournalpost)
         );
     }
 
     private List<SedMottattHendelse> hentAlleSEDerUtenJournalpostID() {
         return new ArrayList<>(sedMottattHendelseRepository
-            .findAllByJournalPostId(null));
+            .findAllByJournalpostIdNullSortedByMottattDato());
+    }
+
+    private Collection<SedMottattHendelseDto> lagSedMottattHendelseDtoer(Collection<SedMottattHendelse> sedMottattHendelser) {
+        return sedMottattHendelser
+            .stream()
+            .map(this::lagSedMottattHendelseDto)
+            .collect(Collectors.toList());
+    }
+
+    private SedMottattHendelseDto lagSedMottattHendelseDto(SedMottattHendelse sedMottattHendelse) {
+        SedMottattHendelseDto sedMottattHendelseDto = new SedMottattHendelseDto();
+        sedMottattHendelseDto.setId(sedMottattHendelse.getId());
+        sedMottattHendelseDto.setSedHendelse(sedMottattHendelse.getSedHendelse());
+        sedMottattHendelseDto.setJournalpostId(sedMottattHendelse.getJournalpostId());
+        sedMottattHendelseDto.setPublisertKafka(sedMottattHendelse.isPublisertKafka());
+        sedMottattHendelseDto.setMottattDato(sedMottattHendelse.getMottattDato());
+        sedMottattHendelseDto.setSistEndretDato(sedMottattHendelse.getSistEndretDato());
+        return sedMottattHendelseDto;
     }
 
     private void restartAlleFeiledeSEDer(Collection<SedMottattHendelse> sedmottattHendelser) {
@@ -71,5 +88,7 @@ public class SedMottakAdminTjeneste {
         }
     }
 
-    private String getApiKey() { return apiKey; }
+    private String getApiKey() {
+        return apiKey;
+    }
 }
