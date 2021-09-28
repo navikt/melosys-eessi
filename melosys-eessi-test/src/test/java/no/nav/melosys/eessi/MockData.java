@@ -90,11 +90,11 @@ public class MockData {
         return sed;
     }
 
-    OpprettJournalpostResponse journalpostResponse() {
+    OpprettJournalpostResponse journalpostResponse(boolean ferdigstilt) {
         return OpprettJournalpostResponse.builder()
                 .journalpostId("1")
                 .dokumenter(Collections.singletonList(new OpprettJournalpostResponse.Dokument("1")))
-                .journalstatus("OK")
+                .journalstatus(ferdigstilt ? "ENDELIG" : "MIDLERTIDIG")
                 .melding("OK")
                 .build();
     }
