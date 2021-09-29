@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.service.kontroll;
 
 import java.time.LocalDateTime;
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
@@ -82,11 +81,5 @@ class SedMottakAdminTjenesteTest {
         sedMottattHendelse.setId(1L);
         sedMottattHendelse.setPublisertKafka(false);
         return sedMottattHendelse;
-    }
-
-    private SedHendelse lagSedHendelse() {
-        var sedHendelse = new SedHendelse();
-        sedHendelse.setId(1L);
-        return sedHendelse;
     }
 }
