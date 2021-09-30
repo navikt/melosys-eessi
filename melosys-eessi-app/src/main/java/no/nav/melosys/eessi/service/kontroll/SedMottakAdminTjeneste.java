@@ -56,7 +56,7 @@ public class SedMottakAdminTjeneste {
 
     private List<SedMottattHendelse> hentAlleSEDerUtenJournalpostID() {
         return new ArrayList<>(sedMottattHendelseRepository
-            .findAllByJournalpostIdNullSortedByMottattDato());
+            .findAllByJournalpostIdIsNullOrderByMottattDato());
     }
 
     private Collection<SedMottattHendelseDto> lagSedMottattHendelseDtoer(Collection<SedMottattHendelse> sedMottattHendelser) {
@@ -67,14 +67,13 @@ public class SedMottakAdminTjeneste {
     }
 
     private SedMottattHendelseDto lagSedMottattHendelseDto(SedMottattHendelse sedMottattHendelse) {
-        SedMottattHendelseDto sedMottattHendelseDto = new SedMottattHendelseDto();
-        sedMottattHendelseDto.setId(sedMottattHendelse.getId());
-        sedMottattHendelseDto.setSedHendelse(sedMottattHendelse.getSedHendelse());
-        sedMottattHendelseDto.setJournalpostId(sedMottattHendelse.getJournalpostId());
-        sedMottattHendelseDto.setPublisertKafka(sedMottattHendelse.isPublisertKafka());
-        sedMottattHendelseDto.setMottattDato(sedMottattHendelse.getMottattDato());
-        sedMottattHendelseDto.setSistEndretDato(sedMottattHendelse.getSistEndretDato());
-        return sedMottattHendelseDto;
+        return new SedMottattHendelseDto(
+            sedMottattHendelse.getId(),
+            sedMottattHendelse.getSedHendelse(),
+            sedMottattHendelse.getJournalpostId(),
+            sedMottattHendelse.isPublisertKafka(),
+            sedMottattHendelse.getMottattDato(),
+            sedMottattHendelse.getSistEndretDato());
     }
 
     private void restartAlleFeiledeSEDer(Collection<SedMottattHendelse> sedmottattHendelser) {

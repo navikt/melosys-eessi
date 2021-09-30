@@ -113,7 +113,7 @@ public class EuxService {
 
     @Retryable
     public SED hentSedMedRetry(String rinaSaksnummer, String dokumentId) {
-        return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
+        return hentSed(rinaSaksnummer, dokumentId);
     }
 
     public List<BucInfo> hentBucer(BucSearch bucSearch) {

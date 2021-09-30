@@ -39,7 +39,7 @@ class SedMottakAdminTjenesteTest {
 
     @Test
     void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
-        when(sedMottattHendelseRepository.findAllByJournalpostIdNullSortedByMottattDato())
+        when(sedMottattHendelseRepository.findAllByJournalpostIdIsNullOrderByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
 
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
@@ -47,18 +47,18 @@ class SedMottakAdminTjenesteTest {
 
         var body = response.getBody();
         assertThat(body)
-            .flatExtracting(SedMottattHendelseDto::getId, SedMottattHendelseDto::getMottattDato, SedMottattHendelseDto::getJournalpostId)
+            .flatExtracting(SedMottattHendelseDto::id, SedMottattHendelseDto::mottattDato, SedMottattHendelseDto::journalpostId)
             .containsExactly(sedMottattHendelse.getId(), sedMottattHendelse.getMottattDato(), sedMottattHendelse.getJournalpostId());
 
         assertThat(body.stream().findFirst().isPresent()).isTrue();
-        assertThat(body.stream().findFirst().get().getJournalpostId()).isNull();
+        assertThat(body.stream().findFirst().get().journalpostId()).isNull();
     }
 
     @Test
     void restartAlleSEDerUtenJournalpostId_() {
         final ArgumentCaptor<SedMottattHendelse> valueCapture = ArgumentCaptor.forClass(SedMottattHendelse.class);
 
-        when(sedMottattHendelseRepository.findAllByJournalpostIdNullSortedByMottattDato())
+        when(sedMottattHendelseRepository.findAllByJournalpostIdIsNullOrderByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
         doNothing().when(sedMottakService).behandleSed(valueCapture.capture());
 
