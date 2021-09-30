@@ -41,7 +41,7 @@ class SedSendtTestIT extends ComponentTestBase {
         kafkaTestConsumer.doWait(1000L);
 
         var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
-        verify(journalpostapiConsumer, timeout(5000L)).opprettJournalpost(captor.capture(), eq(true));
+        verify(journalpostapiConsumer, timeout(10000L)).opprettJournalpost(captor.capture(), eq(true));
 
         assertThat(captor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
@@ -64,7 +64,7 @@ class SedSendtTestIT extends ComponentTestBase {
             .thenAnswer(a -> mockData.journalpostResponse(a.getArgument(1, Boolean.class)));
 
         var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
-        verify(journalpostapiConsumer, timeout(15000L).times(2)).opprettJournalpost(captor.capture(), eq(true));
+        verify(journalpostapiConsumer, timeout(20000L).times(2)).opprettJournalpost(captor.capture(), eq(true));
 
         assertThat(captor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
