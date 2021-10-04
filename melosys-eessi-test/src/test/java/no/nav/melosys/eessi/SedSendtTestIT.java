@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -28,50 +29,52 @@ class SedSendtTestIT extends ComponentTestBase {
     private FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
+    final long arkivsakID = 11111119;
+
+    @Captor
+    ArgumentCaptor<OpprettJournalpostRequest> argumentCaptor;
 
     @Test
     void sedSendt_saksrelasjonFinnes_journalpostOpprettesOgFerdigstilles() throws Exception {
-        final long arkivsakID = 11111119;
         mockPerson(FNR, AKTOER_ID);
-        mockArkivsak(arkivsakID);
-        lagFagsakRinasakKobling(arkivsakID);
+        mockArkivsak();
+        lagFagsakRinasakKobling();
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
-        kafkaTestConsumer.doWait(1500L);
+        kafkaTestConsumer.doWait(1_500L);
 
-        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
-        verify(journalpostapiConsumer, timeout(15000L)).opprettJournalpost(captor.capture(), eq(true));
 
-        assertThat(captor.getValue()).extracting(OpprettJournalpostRequest::getSak)
+        verify(journalpostapiConsumer, timeout(15000L)).opprettJournalpost(argumentCaptor.capture(), eq(true));
+
+        assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
             .isEqualTo(Long.toString(arkivsakID));
     }
 
     @Test
     void sedSendt_feilerVedOpprettelseAvJournalpostFørsteGang_prøverIgjen() throws Exception {
-        final long arkivsakID = 11111119;
         mockPerson(FNR, AKTOER_ID);
-        mockArkivsak(arkivsakID);
-        lagFagsakRinasakKobling(arkivsakID);
-
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
-        kafkaTestConsumer.doWait(1000L);
+        mockArkivsak();
+        lagFagsakRinasakKobling();
 
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean()))
             .thenThrow(new HttpClientErrorException(HttpStatus.BAD_GATEWAY))
             .thenAnswer(a -> mockData.journalpostResponse(a.getArgument(1, Boolean.class)));
 
-        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
-        verify(journalpostapiConsumer, timeout(30000L).times(2)).opprettJournalpost(captor.capture(), eq(true));
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
+        kafkaTestConsumer.doWait(5_000L);
 
-        assertThat(captor.getValue()).extracting(OpprettJournalpostRequest::getSak)
+        //var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+        verify(journalpostapiConsumer, timeout(30_000L).times(2)).opprettJournalpost(argumentCaptor.capture(), eq(true));
+
+        assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
             .isEqualTo(Long.toString(arkivsakID));
     }
 
-    private void lagFagsakRinasakKobling(long arkivsakID) {
+    private void lagFagsakRinasakKobling() {
         var fagsakRinasakKobling = new FagsakRinasakKobling();
         fagsakRinasakKobling.setRinaSaksnummer(rinaSaksnummer);
         fagsakRinasakKobling.setGsakSaksnummer(arkivsakID);
@@ -79,7 +82,7 @@ class SedSendtTestIT extends ComponentTestBase {
         fagsakRinasakKoblingRepository.save(fagsakRinasakKobling);
     }
 
-    private void mockArkivsak(long arkivsakID) {
+    private void mockArkivsak() {
         String arkivsakIdString = Long.toString(arkivsakID);
         when(sakConsumer.getSak(arkivsakIdString)).thenReturn(
             Sak.builder()
