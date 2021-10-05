@@ -31,6 +31,9 @@ spring:
       max-file-size: 10485760 # 10MB
       max-request-size: 10485760 # 10MB
 
+melosys-admin:
+    apikey: ${MELOSYS_ADMIN_API_KEY}
+
 melosys:
   kafka:
     consumer:
@@ -61,8 +64,6 @@ melosys:
     gsak:
       sak-url: ${SAK_URL}
       oppgave-url: ${OPPGAVE_URL}
-  admin:
-    api-key: ${MELOSYS_ADMIN_API_KEY}
 
 rina:
   institusjon-id: ${RINA_INSTITUSJON_ID}
