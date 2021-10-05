@@ -65,7 +65,7 @@ class SedMottakServiceTest {
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
                 .thenReturn("9988776655");
-        when(euxService.hentSed(anyString(), anyString()))
+        when(euxService.hentSedMedRetry(anyString(), anyString()))
                 .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
     }
@@ -79,7 +79,7 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(sedMottattHendelse);
 
-        verify(euxService).hentSed(anyString(), anyString());
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
@@ -94,7 +94,7 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
-        verify(euxService).hentSed(anyString(), anyString());
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
@@ -128,7 +128,7 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
-        verify(euxService).hentSed(anyString(), anyString());
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(sedMottattHendelseRepository).delete(any());

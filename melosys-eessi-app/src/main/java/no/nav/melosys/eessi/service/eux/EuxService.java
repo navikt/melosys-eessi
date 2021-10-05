@@ -21,6 +21,7 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -77,19 +78,19 @@ public class EuxService {
     public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final Collection<String> landkoder) {
 
         return euxConsumer.hentInstitusjoner(bucType, null).stream()
-                .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
-                .filter(i -> filtrerPåLandkoder(i, landkoder))
-                .filter(i -> i.getTilegnetBucs().stream().filter(
-                        tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
-                                COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
-                        .anyMatch(TilegnetBuc::erEessiKlar))
-                .collect(Collectors.toList());
+            .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
+            .filter(i -> filtrerPåLandkoder(i, landkoder))
+            .filter(i -> i.getTilegnetBucs().stream().filter(
+                tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
+                    COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
+                .anyMatch(TilegnetBuc::erEessiKlar))
+            .collect(Collectors.toList());
     }
 
     private boolean filtrerPåLandkoder(Institusjon institusjon, Collection<String> landkoder) {
         return landkoder.isEmpty() || landkoder.stream()
-                .map(String::toLowerCase)
-                .anyMatch(landkode -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
+            .map(String::toLowerCase)
+            .anyMatch(landkode -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
@@ -102,12 +103,17 @@ public class EuxService {
         var buc = euxConsumer.hentBUC(rinaSaksnummer);
 
         return buc.getDocuments().stream()
-                .filter(document -> document.getId().equals(sedId)).findFirst()
-                .filter(document -> document.getConversations().size() > 1).isPresent();
+            .filter(document -> document.getId().equals(sedId)).findFirst()
+            .filter(document -> document.getConversations().size() > 1).isPresent();
     }
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
+    }
+
+    @Retryable
+    public SED hentSedMedRetry(String rinaSaksnummer, String dokumentId) {
+        return hentSed(rinaSaksnummer, dokumentId);
     }
 
     public List<BucInfo> hentBucer(BucSearch bucSearch) {
@@ -138,7 +144,7 @@ public class EuxService {
         return euxConsumer.genererPdfFraSed(sed);
     }
 
-    public String hentRinaUrl(String rinaCaseId){
+    public String hentRinaUrl(String rinaCaseId) {
         if (!StringUtils.hasText(rinaCaseId)) {
             throw new IllegalArgumentException("Trenger rina-saksnummer for å opprette url til rina");
         }
