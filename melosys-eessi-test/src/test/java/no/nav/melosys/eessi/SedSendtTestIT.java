@@ -44,7 +44,6 @@ class SedSendtTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
         kafkaTestConsumer.doWait(1_500L);
 
-
         verify(journalpostapiConsumer, timeout(15000L)).opprettJournalpost(argumentCaptor.capture(), eq(true));
 
         assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
@@ -66,7 +65,6 @@ class SedSendtTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        //var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
         verify(journalpostapiConsumer, timeout(30_000L).times(2)).opprettJournalpost(argumentCaptor.capture(), eq(true));
 
         assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
