@@ -61,6 +61,8 @@ melosys:
     gsak:
       sak-url: ${SAK_URL}
       oppgave-url: ${OPPGAVE_URL}
+  admin:
+    api-key: ${MELOSYS_ADMIN_API_KEY}
 
 rina:
   institusjon-id: ${RINA_INSTITUSJON_ID}
