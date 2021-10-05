@@ -29,7 +29,7 @@ public class SedMottakAdminTjeneste {
 
     public SedMottakAdminTjeneste(SedMottakService sedMottakService,
                                   SedMottattHendelseRepository sedMottattHendelseRepository,
-                                  @Value("${Melosys-admin.apikey}") String apiKey) {
+                                  @Value("${melosys.admin.api-key}") String apiKey) {
         this.sedMottakService = sedMottakService;
         this.sedMottattHendelseRepository = sedMottattHendelseRepository;
         this.apiKey = apiKey;

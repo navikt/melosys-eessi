@@ -60,8 +60,9 @@ spring:
       security.protocol: PLAINTEXT
 
 # Apikey til SedMottakAdminTjeneste
-Melosys-admin:
-  apikey: dummy
+melosys:
+  admin:
+    api-key: dummy
 
 no.nav.security.jwt.issuer:
           isso:
