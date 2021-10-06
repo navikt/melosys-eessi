@@ -2,6 +2,8 @@ package no.nav.melosys.eessi.service.kontroll;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
@@ -38,20 +40,25 @@ class SedMottakAdminTjenesteTest {
     }
 
     @Test
-    void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
+    void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() throws JsonProcessingException {
         when(sedMottattHendelseRepository.findAllByJournalpostIdIsNullOrderByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
 
+        ObjectMapper mapper = new ObjectMapper();
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var body = response.getBody();
+        assert body != null;
         assertThat(body)
             .flatExtracting(SedMottattHendelseDto::id, SedMottattHendelseDto::mottattDato, SedMottattHendelseDto::journalpostId)
             .containsExactly(sedMottattHendelse.getId(), sedMottattHendelse.getMottattDato(), sedMottattHendelse.getJournalpostId());
 
         assertThat(body.stream().findFirst().isPresent()).isTrue();
         assertThat(body.stream().findFirst().get().journalpostId()).isNull();
+
+        String serializedobject = mapper.writeValueAsString(body.stream().findFirst().get());
+        assertThat("{\"id\":1,\"sedHendelse\":null,\"journalpostId\":null,\"publisertKafka\":false,\"mottattDato\":\"2021-01-01T00:00:00\",\"sistEndretDato\":null}").isEqualTo(serializedobject);
     }
 
     @Test
@@ -71,7 +78,7 @@ class SedMottakAdminTjenesteTest {
 
 
     private SedMottattHendelse lagFeiledSedMottakHendelse() {
-        return lagFeiledSedMottakHendelse(LocalDateTime.now());
+        return lagFeiledSedMottakHendelse(LocalDateTime.of(2021, 1, 1, 0, 0));
     }
 
     private SedMottattHendelse lagFeiledSedMottakHendelse(LocalDateTime registrertDato) {

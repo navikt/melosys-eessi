@@ -29,6 +29,7 @@
         <logback-classic.version>1.2.3</logback-classic.version>
         <logstash-encoder.version>5.3</logstash-encoder.version>
         <lombok.version>1.18.20</lombok.version>
+        <jackson.version>2.12.3</jackson.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <micrometer-jvm-extras.version>0.2.1</micrometer-jvm-extras.version>
@@ -94,6 +95,13 @@
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-reflect</artifactId>
                 <version>${scala.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson</groupId>
+                <artifactId>jackson-bom</artifactId>
+                <version>${jackson.version}</version>
+                <scope>import</scope>
+                <type>pom</type>
             </dependency>
         </dependencies>
     </dependencyManagement>
