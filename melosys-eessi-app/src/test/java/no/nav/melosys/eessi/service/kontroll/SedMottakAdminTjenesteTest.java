@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.kontroll;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,6 +46,7 @@ class SedMottakAdminTjenesteTest {
             .thenReturn(singletonList(sedMottattHendelse));
 
         ObjectMapper mapper = new ObjectMapper();
+        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -78,7 +80,7 @@ class SedMottakAdminTjenesteTest {
 
 
     private SedMottattHendelse lagFeiledSedMottakHendelse() {
-        return lagFeiledSedMottakHendelse(LocalDateTime.of(2021, 1, 1, 0, 0));
+        return lagFeiledSedMottakHendelse(LocalDateTime.of(2021,1,1,0,0));
     }
 
     private SedMottattHendelse lagFeiledSedMottakHendelse(LocalDateTime registrertDato) {
