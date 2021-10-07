@@ -1,10 +1,11 @@
 package no.nav.melosys.eessi.service.kontroll;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
@@ -46,7 +47,9 @@ class SedMottakAdminTjenesteTest {
             .thenReturn(singletonList(sedMottattHendelse));
 
         ObjectMapper mapper = new ObjectMapper();
-        mapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
@@ -60,7 +63,7 @@ class SedMottakAdminTjenesteTest {
         assertThat(body.stream().findFirst().get().journalpostId()).isNull();
 
         String serializedobject = mapper.writeValueAsString(body.stream().findFirst().get());
-        assertThat("{\"id\":1,\"sedHendelse\":null,\"journalpostId\":null,\"publisertKafka\":false,\"mottattDato\":\"2021-01-01T00:00:00\",\"sistEndretDato\":null}").isEqualTo(serializedobject);
+        assertThat(serializedobject).isEqualTo("{\"id\":1,\"sedHendelse\":null,\"journalpostId\":null,\"publisertKafka\":false,\"mottattDato\":\"2021-01-01T00:00:00\",\"sistEndretDato\":null}");
     }
 
     @Test
@@ -80,7 +83,7 @@ class SedMottakAdminTjenesteTest {
 
 
     private SedMottattHendelse lagFeiledSedMottakHendelse() {
-        return lagFeiledSedMottakHendelse(LocalDateTime.of(2021,1,1,0,0));
+        return lagFeiledSedMottakHendelse(LocalDateTime.of(2021, 1, 1, 0, 0));
     }
 
     private SedMottattHendelse lagFeiledSedMottakHendelse(LocalDateTime registrertDato) {
