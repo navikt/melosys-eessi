@@ -36,7 +36,10 @@ public class OppgaveEndretConsumer {
         if (erIdentifisertOppgave(oppgave)) {
             log.info("Oppgave {} markert som identifisert av ID og Fordeling. Søker etter tilknyttet RINA-sak", oppgave.getId());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
-                    .ifPresent(b -> validerIdentifisertPerson(b.getRinaSaksnummer(), oppgave));
+                    .ifPresentOrElse(
+                        b -> validerIdentifisertPerson(b.getRinaSaksnummer(), oppgave),
+                        () -> log.info("Finner ikke RINA-sak tilknytning for oppgave {}",oppgave.getId())
+                    );
         }
     }
 
