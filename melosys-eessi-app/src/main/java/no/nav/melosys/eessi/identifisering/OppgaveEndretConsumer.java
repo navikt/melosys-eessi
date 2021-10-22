@@ -38,7 +38,7 @@ public class OppgaveEndretConsumer {
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                     .ifPresentOrElse(
                         b -> validerIdentifisertPerson(b.getRinaSaksnummer(), oppgave),
-                        () -> log.info("Finner ikke RINA-sak tilknytning for oppgave {}",oppgave.getId())
+                        () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}",oppgave.getId())
                     );
         }
     }
@@ -54,6 +54,7 @@ public class OppgaveEndretConsumer {
 
     private void validerIdentifisertPerson(String rinaSaksnummer,
                                            OppgaveEndretHendelse oppgave) {
+        log.debug("Kontrollerer identifisert person for rinasak {} og endret opppgave {}",rinaSaksnummer,oppgave.getId());
         var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
