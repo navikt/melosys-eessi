@@ -34,9 +34,13 @@ public class BUC {
     private Collection<Participant> participants = new ArrayList<>();
     private String internationalId;
 
+    private static final Comparator<Document> sistOppdatert = Comparator.comparing(Document::getLastUpdate);
+    private static final Comparator<Document> sorterEtterStatus = Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
+
     public String hentAvsenderLand() {
         return creator.getOrganisation().getCountryCode();
     }
+
     public boolean kanOppretteEllerOppdatereSed(SedType sedType) {
         return actions.stream()
                 .filter(a -> sedType.name().equalsIgnoreCase(a.getDocumentType()))
@@ -64,10 +68,6 @@ public class BUC {
         return documents.stream().filter(d -> sedType.equals(d.getType()));
     }
 
-    private static final Comparator<Document> sistOppdatert = Comparator.comparing(Document::getLastUpdate);
-
-    private static final Comparator<Document> sorterEtterStatus = Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
-
     public Optional<Document> finnDokumentVedTypeOgStatus(SedType sedType, SedStatus status) {
         return finnDokumenterVedSedType(sedType.name())
                 .filter(d -> status.getEngelskStatus().equals(d.getStatus()))
@@ -86,20 +86,36 @@ public class BUC {
                 .isPresent();
     }
 
+    public boolean harSendtSedTypeAntallDagerSiden(SedType sedType, long minstAntallDagerSidenMottatt) {
+        return finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT)
+            .filter(d -> d.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt))
+            .isPresent();
+    }
+
     public boolean kanLukkesAutomatisk() {
         var bucTypeEnum = BucType.valueOf(getBucType());
 
         if (bucTypeEnum == BucType.LA_BUC_06) {
             return harMottattSedTypeAntallDagerSiden(SedType.A006, 30)
-                    && kanOppretteEllerOppdatereSed(SedType.X001);
+                && kanOppretteEllerOppdatereSed(SedType.X001);
         } else if (bucTypeEnum == BucType.LA_BUC_01) {
             boolean harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60)
-                    || harMottattSedTypeAntallDagerSiden(SedType.A011, 60);
+                || harMottattSedTypeAntallDagerSiden(SedType.A011, 60);
 
             return harMottattA002EllerA011
-                    && kanOppretteEllerOppdatereSed(SedType.X001)
-                    && finnSistMottattSED(Document::erLovvalgSED)
-                        .map(d -> d.erAntallDagerSidenOppdatering(60)).orElse(false);
+                && kanOppretteEllerOppdatereSed(SedType.X001)
+                && finnSistMottattSED(Document::erLovvalgSED)
+                .map(d -> d.erAntallDagerSidenOppdatering(60)).orElse(false);
+        } else if (bucTypeEnum == BucType.LA_BUC_03) {
+            boolean harMottattX012EllerSendtX013EllerA008 = harMottattSedTypeAntallDagerSiden(SedType.X012, 30)
+                || harSendtSedTypeAntallDagerSiden(SedType.X013, 30)
+                || harSendtSedTypeAntallDagerSiden(SedType.A008, 30);
+
+            return harMottattX012EllerSendtX013EllerA008
+                && kanOppretteEllerOppdatereSed(SedType.X001)
+                && finnSistMottattSED(Document::erLovvalgSED)
+                .map(d -> d.erAntallDagerSidenOppdatering(30)).orElse(false);
+
         }
 
         return kanOppretteEllerOppdatereSed(SedType.X001);
