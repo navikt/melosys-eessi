@@ -4,6 +4,7 @@ package no.nav.melosys.eessi.models.buc;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
@@ -69,7 +70,7 @@ class BUCTest {
     }
 
     @Test
-    void kanLukkesAutomatisk_LABUC03_30dagerSidenX012() {
+    void kanIkkeLukkesAutomatisk_LABUC03_20dagerSidenX013() {
         BUC buc03 = new BUC();
         buc03.setBucType(BucType.LA_BUC_03.name());
         buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
@@ -79,11 +80,11 @@ class BUCTest {
             createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
         ));
 
-        assertThat(buc03.kanLukkesAutomatisk()).isTrue();
+        assertThat(buc03.kanLukkesAutomatisk()).isFalse();
     }
 
     @Test
-    void kanLukkesAutomatisk_LABUC03_30dagerSidenX013() {
+    void kanIkkeLukkesAutomatisk_LABUC03_20dagerSidenX012() {
         BUC buc03 = new BUC();
         buc03.setBucType(BucType.LA_BUC_03.name());
         buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
@@ -93,7 +94,7 @@ class BUCTest {
             createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
         ));
 
-        assertThat(buc03.kanLukkesAutomatisk()).isTrue();
+        assertThat(buc03.kanLukkesAutomatisk()).isFalse();
     }
 
     @Test
@@ -109,6 +110,68 @@ class BUCTest {
 
         assertThat(buc03.kanLukkesAutomatisk()).isFalse();
     }
+
+    @Test
+    void kanIkkeLukkesAutomatisk_LABUC03_30dagerSidenA008ogX01310dagerSidenX012() {
+        BUC buc03 = new BUC();
+        buc03.setBucType(BucType.LA_BUC_03.name());
+        buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
+        buc03.setDocuments(Arrays.asList(
+            createDocument(SedType.X012, SedStatus.MOTTATT, 10, ""),
+            createDocument(SedType.X013, SedStatus.SENDT, 30, ""),
+            createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
+        ));
+        assertThat(buc03.kanLukkesAutomatisk()).isFalse();
+    }
+
+    @Test
+    void kanIkkeLukkesAutomatisk_LABUC03_30dagerSidenA008ogX01210dagerSidenX013() {
+        BUC buc03 = new BUC();
+        buc03.setBucType(BucType.LA_BUC_03.name());
+        buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
+        buc03.setDocuments(Arrays.asList(
+            createDocument(SedType.X012, SedStatus.MOTTATT, 30, ""),
+            createDocument(SedType.X013, SedStatus.SENDT, 10, ""),
+            createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
+        ));
+        assertThat(buc03.kanLukkesAutomatisk()).isFalse();
+    }
+
+    @Test
+    void kanLukkesAutomatisk_LABUC03_30dagerSidenA008ogX012() {
+        BUC buc03 = new BUC();
+        buc03.setBucType(BucType.LA_BUC_03.name());
+        buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
+        buc03.setDocuments(Arrays.asList(
+            createDocument(SedType.X012, SedStatus.MOTTATT, 30, ""),
+            createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
+        ));
+        assertThat(buc03.kanLukkesAutomatisk()).isTrue();
+    }
+
+    @Test
+    void kanLukkesAutomatisk_LABUC03_30dagerSidenA008ogX013() {
+        BUC buc03 = new BUC();
+        buc03.setBucType(BucType.LA_BUC_03.name());
+        buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
+        buc03.setDocuments(Arrays.asList(
+            createDocument(SedType.X013, SedStatus.MOTTATT, 30, ""),
+            createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
+        ));
+        assertThat(buc03.kanLukkesAutomatisk()).isTrue();
+    }
+
+    @Test
+    void kanLukkesAutomatisk_LABUC03_30dagerSidenA008() {
+        BUC buc03 = new BUC();
+        buc03.setBucType(BucType.LA_BUC_03.name());
+        buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
+        buc03.setDocuments(List.of(
+            createDocument(SedType.A008, SedStatus.SENDT, 30, "IN")
+        ));
+        assertThat(buc03.kanLukkesAutomatisk()).isTrue();
+    }
+
 
     private Document createDocument(SedType sedType, SedStatus sedStatus, long days, String direction) {
         Document document = new Document();
