@@ -368,6 +368,66 @@ class LukkBucServiceTest {
         verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
     }
 
+    @Test
+    void lukkBucerAvType_LABUC03A008Sendt30DagerSiden_lukkes() throws IntegrationException {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
+
+        BUC buc = lagBuc(BucType.LA_BUC_03, SedType.A001);
+        buc.getDocuments().get(0).setLastUpdate(ZonedDateTime.now().minusDays(40));
+
+        Document a008 = new Document();
+        a008.setType(SedType.A008.name());
+        a008.setDirection("IN");
+        a008.setLastUpdate(ZonedDateTime.now().minusDays(30));
+        a008.setStatus(SedStatus.SENDT.getEngelskStatus());
+        buc.getDocuments().add(a008);
+
+        SED sed = new SED();
+        sed.setNav(enhancedRandom.nextObject(Nav.class));
+        sed.setMedlemskap(enhancedRandom.nextObject(MedlemskapA001.class));
+        when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
+
+        when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
+
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_03);
+
+        verify(euxService).hentBucer(any(BucSearch.class));
+        verify(euxService).finnBUC(bucInfo.getId());
+        verify(euxService).opprettOgSendSed(any(), eq(buc.getId()));
+    }
+
+    @Test
+    void lukkBucerAvType_LaBuc03X012Mottatt20DagerSiden_lukkesIkke() {
+        BucInfo bucInfo = new BucInfo();
+        bucInfo.setId("123jfpw");
+        bucInfo.setApplicationRoleId("PO");
+        bucInfo.setStatus("open");
+
+        BUC buc = lagBuc(BucType.LA_BUC_03, SedType.A001);
+        buc.getDocuments().get(0).setLastUpdate(ZonedDateTime.now().minusDays(40));
+
+        Document x012 = new Document();
+        x012.setType(SedType.X012.name());
+        x012.setDirection("IN");
+        x012.setLastUpdate(ZonedDateTime.now().minusDays(20));
+        x012.setStatus(SedStatus.MOTTATT.getEngelskStatus());
+        buc.getDocuments().add(x012);
+
+        when(euxService.hentBucer(any(BucSearch.class))).thenReturn(List.of(bucInfo));
+        when(euxService.finnBUC(bucInfo.getId())).thenReturn(Optional.of(buc));
+
+        lukkBucService.lukkBucerAvType(BucType.LA_BUC_03);
+
+        verify(euxService).hentBucer(any(BucSearch.class));
+        verify(euxService).finnBUC(bucInfo.getId());
+        verify(euxService, never()).hentSed(any(), any());
+        verify(euxService, never()).opprettOgSendSed(any(), eq(buc.getId()));
+    }
+
 
     @Test
     void forsøkLukkBucAsync_ingenActionForX001_lukkerIkkeBUC() {
