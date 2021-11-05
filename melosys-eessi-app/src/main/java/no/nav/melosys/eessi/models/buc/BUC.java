@@ -131,6 +131,7 @@ public class BUC {
         return documents.stream()
             .filter(Document::erInngående)
             .filter(Document::erOpprettet)
+            .filter(Document::erIkkeX100)
             .min(Comparator.comparing(Document::getCreationDate));
     }
 
