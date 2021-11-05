@@ -39,6 +39,10 @@ public class Document {
         return SedType.X001.name().equals(type);
     }
 
+    public boolean erIkkeX100() {
+        return !SedType.X100.name().equals(type);
+    }
+
     public boolean erLovvalgSED() {
         return SedType.erLovvalgSed(type);
     }
