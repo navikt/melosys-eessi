@@ -13,6 +13,7 @@ public class SedGrunnlagMapperFactory {
     private static final Map<SedType, SedGrunnlagMapper> MAPPERS =
             Maps.immutableEnumMap(ImmutableMap.<SedType, SedGrunnlagMapper>builder()
                     .put(SedType.A003, new SedGrunnlagMapperA003())
+                    .put(SedType.A001, new SedGrunnlagMapperA001())
                     .build());
 
     public static SedGrunnlagMapper getMapper(SedType sedType) {
