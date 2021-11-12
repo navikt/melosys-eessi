@@ -95,6 +95,11 @@ public class EuxService {
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
+        if (!sedHandlingErMulig(rinaSaksnummer, sedId, "Send")) {
+            log.warn("Ugyldig handling Send for Sed {}", sedId);
+            throw new IntegrationException("Ugyldig handling for Sed");
+        }
+
         euxConsumer.sendSed(rinaSaksnummer, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
@@ -134,6 +139,11 @@ public class EuxService {
             log.warn("Kan ikke hente BUC {}", rinaSaksnummer, e);
             return Optional.empty();
         }
+    }
+
+    public Boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, String handling) {
+        return euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId)
+            .stream().anyMatch(s -> s.equals(handling));
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
