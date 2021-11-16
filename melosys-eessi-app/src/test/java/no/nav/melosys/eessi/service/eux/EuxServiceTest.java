@@ -8,8 +8,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedVedlegg;
@@ -43,10 +45,11 @@ class EuxServiceTest {
 
     private final String opprettetBucID = "114433";
     private final String opprettetSedID = "12222";
+    FakeUnleash unleash = new FakeUnleash();
 
     @BeforeEach
     public void setup() throws IOException, IntegrationException {
-        euxService = new EuxService(euxConsumer, bucMetrikker);
+        euxService = new EuxService(euxConsumer, bucMetrikker, unleash);
     }
 
     @Test
@@ -58,8 +61,8 @@ class EuxServiceTest {
     @Test
     void hentBucer_forventKonsumentKall() {
         BucSearch bucSearch = BucSearch.builder()
-                .bucType(BucType.LA_BUC_01.name())
-                .build();
+            .bucType(BucType.LA_BUC_01.name())
+            .build();
 
         euxService.hentBucer(bucSearch);
 
@@ -115,6 +118,50 @@ class EuxServiceTest {
     }
 
     @Test
+    void opprettOgSendSedMedHandlingSjekk_medRinaSaksnummer_forventKonsumentKall() {
+        unleash.enable("melosys.eessi.handlingssjekk_sed");
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
+            .thenReturn(Collections.singleton(SedHandlinger.Send.hentHandling()));
+
+        SED sed = new SED();
+        euxService.opprettOgSendSed(sed, opprettetBucID);
+
+        verify(euxConsumer).sendSed(opprettetBucID, opprettetSedID);
+    }
+
+    @Test
+    void opprettOgSendSedMedHandlingSjekk_medUgyldigSedHandling_kasterIntegrationException() {
+        unleash.enable("melosys.eessi.handlingssjekk_sed");
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
+            .thenReturn(Collections.singleton(SedHandlinger.Read.hentHandling()));
+        SED sed = new SED();
+
+        assertThatExceptionOfType(IntegrationException.class)
+            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
+            .withMessageContaining("Kan ikke sende SED, ugyldig handling i Rina");
+
+    }
+
+    @Test
+    void opprettOgSendSedMedHandlingSjekk_medFlereHandlinger_forventKonsumentKall() {
+        unleash.enable("melosys.eessi.handlingssjekk_sed");
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
+            .thenReturn(List.of(SedHandlinger.Close.hentHandling(),
+                SedHandlinger.Send.hentHandling(),
+                SedHandlinger.Read.hentHandling())
+            );
+
+        SED sed = new SED();
+        euxService.opprettOgSendSed(sed, opprettetBucID);
+
+        verify(euxConsumer).sendSed(opprettetBucID, opprettetSedID);
+
+    }
+
+    @Test
     void hentRinaUrl_medSaksnummer_verifiserEuxConsumerKall() {
         euxService.hentRinaUrl("1234");
         verify(euxConsumer).hentRinaUrl("1234");
@@ -135,8 +182,8 @@ class EuxServiceTest {
     @Test
     void hentRinaUrl_utenRinaSaksnummer_forventException() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> euxService.hentRinaUrl(null))
-                .withMessageContaining("Trenger rina-saksnummer");
+            .isThrownBy(() -> euxService.hentRinaUrl(null))
+            .withMessageContaining("Trenger rina-saksnummer");
     }
 
     @Test
@@ -234,9 +281,10 @@ class EuxServiceTest {
     @SneakyThrows
     private void mockInstitusjoner() {
         URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
-        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<>(){});
+        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<>() {
+        });
         when(euxConsumer.hentInstitusjoner(anyString(), any()))
-                .thenReturn(institusjoner);
+            .thenReturn(institusjoner);
     }
 
     private BUC lagBucMedDocument(String rinaSaksnummer, String sedID) {

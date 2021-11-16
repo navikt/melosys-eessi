@@ -6,8 +6,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
@@ -35,13 +37,16 @@ public class EuxService {
 
     private final EuxConsumer euxConsumer;
     private final BucMetrikker bucMetrikker;
+    private final Unleash unleash;
 
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker) {
+                      BucMetrikker bucMetrikker,
+                      Unleash unleash) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
+        this.unleash = unleash;
     }
 
     public void slettBUC(String rinaSaksnummer) {
@@ -95,9 +100,11 @@ public class EuxService {
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
-        if (!sedHandlingErMulig(rinaSaksnummer, sedId, "Send")) {
-            log.warn("Ugyldig handling Send for Sed {}", sedId);
-            throw new IntegrationException("Ugyldig handling for Sed");
+        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.Send.hentHandling())) {
+                log.warn("Ugyldig handling {} for Sed {}", SedHandlinger.Send.hentHandling(), sedId);
+                throw new IntegrationException("Kan ikke sende SED, ugyldig handling i Rina");
+            }
         }
 
         euxConsumer.sendSed(rinaSaksnummer, sedId);
@@ -141,7 +148,7 @@ public class EuxService {
         }
     }
 
-    public Boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, String handling) {
+    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, String handling) {
         return euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId)
             .stream().anyMatch(s -> s.equals(handling));
     }
