@@ -101,8 +101,7 @@ public class EuxService {
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
         if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.Send.hentHandling())) {
-                log.warn("Ugyldig handling {} for Sed {}", SedHandlinger.Send.hentHandling(), sedId);
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.Send)) {
                 throw new IntegrationException("Kan ikke sende SED, ugyldig handling i Rina");
             }
         }
@@ -148,9 +147,9 @@ public class EuxService {
         }
     }
 
-    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, String handling) {
+    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, SedHandlinger handling) {
         return euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId)
-            .stream().anyMatch(s -> s.equals(handling));
+            .stream().anyMatch(s -> s.equals(handling.hentHandling()));
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
