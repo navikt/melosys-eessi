@@ -37,14 +37,14 @@ class SedControllerTest {
         mockMvc.perform(post("/api/sed/{sedType}/pdf", SedType.A003)
                 .content(objectMapper.writeValueAsString(sedDataDto)))
             .andExpect(status().isBadRequest())
-            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse ved PDF generering fra sedType=A003"))
+            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse ved PDF generering for sedType=A003"))
             .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
 
         verifyNoInteractions(sedService);
     }
 
     @Test
-    void genererPdfFraSed_manglerAdresse_ok() throws Exception {
+    void genererPdfFraSed_manglerAdresseOgSedKreverIkkeAdresse_ok() throws Exception {
         SedDataDto sedDataDto = SedDataStub.getStub();
         sedDataDto.setBostedsadresse(null);
         sedDataDto.setKontaktadresse(null);
@@ -54,6 +54,6 @@ class SedControllerTest {
                 .content(objectMapper.writeValueAsString(sedDataDto)))
             .andExpect(status().isOk());
 
-        verify(sedService, times(1)).genererPdfFraSed(eq(sedDataDto), eq(SedType.A005));
+        verify(sedService).genererPdfFraSed(sedDataDto, SedType.A005);
     }
 }

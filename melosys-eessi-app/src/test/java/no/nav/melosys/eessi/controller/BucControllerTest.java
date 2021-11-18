@@ -75,7 +75,7 @@ class BucControllerTest {
     }
 
     @Test
-    void opprettBucOgSed_manglerAdresse_ok() throws Exception {
+    void opprettBucOgSed_manglerAdresseOgSedKreverIkkeAdresse_ok() throws Exception {
         OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(false);
 
         BucOgSedOpprettetDto bucOgSedOpprettetDto = BucOgSedOpprettetDto.builder()
@@ -130,7 +130,7 @@ class BucControllerTest {
     }
 
     @Test
-    void sendPåEksisterendBuc_manglerAdresse_ok() throws Exception {
+    void sendPåEksisterendBuc_manglerAdresseOgSedKreverIkkeAdresse_ok() throws Exception {
         SedDataDto sedDataDto = SedDataStub.getStub();
         sedDataDto.setBostedsadresse(null);
         sedDataDto.setOppholdsadresse(null);
@@ -142,7 +142,7 @@ class BucControllerTest {
             .andExpect(status().isOk());
 
 
-        verify(sedService, times(1)).sendPåEksisterendeBuc(eq(sedDataDto), eq("1"), eq(SedType.A005));
+        verify(sedService).sendPåEksisterendeBuc(eq(sedDataDto), eq("1"), eq(SedType.A005));
     }
 
     @Test
