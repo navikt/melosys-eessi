@@ -37,7 +37,6 @@ public class ResponseBodyMatchers {
             });
             assertThat(errorMap.get(expectedFieldName))
                 .isNotNull()
-                .withFailMessage("Expecting one error with fieldname '%s' and message '%s'", expectedFieldName, expectedMessage)
                 .isEqualTo(expectedMessage);
         };
     }

@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.controller;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +16,13 @@ import no.nav.melosys.eessi.service.buc.LukkBucService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import no.nav.melosys.eessi.service.sed.SedService;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
@@ -48,13 +50,8 @@ class BucControllerTest {
     private LukkBucService lukkBucService;
 
     @Test
-    void opprettBucOgSed_happy() throws Exception {
-        OpprettBucOgSedDto opprettBucOgSedDto = new OpprettBucOgSedDto();
-        opprettBucOgSedDto.setSedDataDto(SedDataStub.getStub());
-        SedVedlegg sedVedlegg = new SedVedlegg();
-        sedVedlegg.setTittel("Søknad om medlemskap");
-        sedVedlegg.setInnhold("ny søknad om vedlegg".getBytes());
-        opprettBucOgSedDto.setVedlegg(List.of(sedVedlegg));
+    void opprettBucOgSed_ok() throws Exception {
+        OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(true);
 
         BucOgSedOpprettetDto bucOgSedOpprettetDto = BucOgSedOpprettetDto.builder()
             .rinaSaksnummer("123654")
@@ -75,6 +72,45 @@ class BucControllerTest {
                 .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
             .andExpect(status().isOk())
             .andExpect(responseBody(objectMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
+    }
+
+    @Test
+    void opprettBucOgSed_manglerAdresseOgSedKreverIkkeAdresse_ok() throws Exception {
+        OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(false);
+
+        BucOgSedOpprettetDto bucOgSedOpprettetDto = BucOgSedOpprettetDto.builder()
+            .rinaSaksnummer("123654")
+            .rinaUrl("/rina/123654")
+            .build();
+
+        when(sedService.opprettBucOgSed(
+            eq(opprettBucOgSedDto.getSedDataDto()),
+            eq(opprettBucOgSedDto.getVedlegg()),
+            eq(BucType.LA_BUC_03),
+            eq(true),
+            eq(false))).thenReturn(bucOgSedOpprettetDto);
+
+        mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_03)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("sendAutomatisk", "true")
+                .param("oppdaterEksisterende", "false")
+                .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
+            .andExpect(status().isOk())
+            .andExpect(responseBody(objectMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
+    }
+
+    @Test
+    void opprettBucOgSed_manglerAdresse_ValidationException() throws Exception {
+        OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(false);
+
+        mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_01)
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("sendAutomatisk", "true")
+                .param("oppdaterEksisterende", "false")
+                .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
+            .andExpect(status().isBadRequest())
+            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse ved opprettelse av Buc=LA_BUC_01 og Sed=A001"))
+            .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
 
     }
 
@@ -94,7 +130,7 @@ class BucControllerTest {
     }
 
     @Test
-    void sendPåEksisterendBuc_manglerAdresse_ok() throws Exception {
+    void sendPåEksisterendBuc_manglerAdresseOgSedKreverIkkeAdresse_ok() throws Exception {
         SedDataDto sedDataDto = SedDataStub.getStub();
         sedDataDto.setBostedsadresse(null);
         sedDataDto.setOppholdsadresse(null);
@@ -106,7 +142,7 @@ class BucControllerTest {
             .andExpect(status().isOk());
 
 
-        verify(sedService, times(1)).sendPåEksisterendeBuc(eq(sedDataDto), eq("1"), eq(SedType.A005));
+        verify(sedService).sendPåEksisterendeBuc(eq(sedDataDto), eq("1"), eq(SedType.A005));
     }
 
     @Test
@@ -120,5 +156,22 @@ class BucControllerTest {
             .andExpect(status().isBadRequest())
             .andExpect(responseBody(objectMapper).containsError("message", "Sed-type A009 støttes ikke"))
             .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
+    }
+
+    @NotNull
+    private OpprettBucOgSedDto lagOpprettBucOgSedDto(boolean medAdresser) throws IOException, URISyntaxException {
+        OpprettBucOgSedDto opprettBucOgSedDto = new OpprettBucOgSedDto();
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        if (!medAdresser) {
+            sedDataDto.setBostedsadresse(null);
+            sedDataDto.setKontaktadresse(null);
+            sedDataDto.setOppholdsadresse(null);
+        }
+        opprettBucOgSedDto.setSedDataDto(sedDataDto);
+        SedVedlegg sedVedlegg = new SedVedlegg();
+        sedVedlegg.setTittel("Søknad om medlemskap");
+        sedVedlegg.setInnhold("ny søknad om vedlegg".getBytes());
+        opprettBucOgSedDto.setVedlegg(List.of(sedVedlegg));
+        return opprettBucOgSedDto;
     }
 }

@@ -53,6 +53,9 @@ public class BucController {
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk,
             @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende
     ) throws ValidationException {
+        if (bucType.hentFørsteLovligeSed().kreverAdresse() && opprettBucOgSedDto.getSedDataDto().manglerAdresser()) {
+            throw new ValidationException(String.format("Personen mangler adresse ved opprettelse av Buc=%s og Sed=%s", bucType, bucType.hentFørsteLovligeSed()));
+        }
         return sedService.opprettBucOgSed(
                 opprettBucOgSedDto.getSedDataDto(),
                 ofNullable(opprettBucOgSedDto.getVedlegg()).orElse(emptySet()),
