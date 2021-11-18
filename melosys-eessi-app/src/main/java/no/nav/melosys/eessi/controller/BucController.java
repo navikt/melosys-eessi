@@ -68,7 +68,7 @@ public class BucController {
         @PathVariable String rinaSaksnummer,
         @PathVariable SedType sedType
     ) throws ValidationException {
-        if (SedType.kreverAdresse(sedType) && sedDataDto.harIkkeAdresser()) {
+        if (sedType.kreverAdresse() && sedDataDto.manglerAdresser()) {
             throw new ValidationException(String.format("Personen mangler adresse - rinaSaksnummer=%s og sedType=%s", rinaSaksnummer, sedType));
         }
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);

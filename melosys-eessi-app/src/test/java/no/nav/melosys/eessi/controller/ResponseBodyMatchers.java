@@ -14,7 +14,7 @@ public class ResponseBodyMatchers {
 
     private final ObjectMapper objectMapper;
 
-    public ResponseBodyMatchers(ObjectMapper objectMapper) {
+    private ResponseBodyMatchers(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

@@ -52,7 +52,7 @@ public class SedDataDto extends SedGrunnlagDto {
             .max(Comparator.comparing(Lovvalgsperiode::getFom));
     }
 
-    public boolean harIkkeAdresser() {
+    public boolean manglerAdresser() {
         return getBostedsadresse() == null
             && getKontaktadresse() == null
             && getOppholdsadresse() == null;
