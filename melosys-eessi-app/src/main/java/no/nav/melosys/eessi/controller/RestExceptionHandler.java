@@ -5,6 +5,7 @@ import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotAllowedException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,11 @@ public class RestExceptionHandler {
     @ExceptionHandler(value = IntegrationException.class)
     public ResponseEntity handle(IntegrationException e) {
         return handle(e, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = NotAllowedException.class)
+    public ResponseEntity handle(NotAllowedException e) {
+        return handle(e, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     @ExceptionHandler(value = Exception.class)

@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotAllowedException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
@@ -102,7 +103,7 @@ public class EuxService {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
         if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
             if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.Send)) {
-                throw new IntegrationException("Kan ikke sende SED, ugyldig handling i Rina");
+                throw new NotAllowedException("Kan ikke sende SED, ugyldig handling i Rina");
             }
         }
 

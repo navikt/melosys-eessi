@@ -19,6 +19,7 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotAllowedException;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,7 +139,7 @@ class EuxServiceTest {
             .thenReturn(Collections.singleton(SedHandlinger.Read.hentHandling()));
         SED sed = new SED();
 
-        assertThatExceptionOfType(IntegrationException.class)
+        assertThatExceptionOfType(NotAllowedException.class)
             .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
             .withMessageContaining("Kan ikke sende SED, ugyldig handling i Rina");
 
