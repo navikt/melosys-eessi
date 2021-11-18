@@ -39,16 +39,22 @@ public class SedDataDto extends SedGrunnlagDto {
 
     public Optional<String> finnLovvalgsland() {
         return getLovvalgsperioder().stream()
-                .map(Lovvalgsperiode::getLovvalgsland)
-                .findFirst();
+            .map(Lovvalgsperiode::getLovvalgsland)
+            .findFirst();
     }
 
     public String finnLovvalgslandDefaultNO() {
         return finnLovvalgsland().orElse("NO");
     }
 
-    public Optional<Lovvalgsperiode> finnLovvalgsperiode(){
+    public Optional<Lovvalgsperiode> finnLovvalgsperiode() {
         return getLovvalgsperioder().stream()
-                .max(Comparator.comparing(Lovvalgsperiode::getFom));
+            .max(Comparator.comparing(Lovvalgsperiode::getFom));
+    }
+
+    public boolean manglerAdresser() {
+        return getBostedsadresse() == null
+            && getKontaktadresse() == null
+            && getOppholdsadresse() == null;
     }
 }

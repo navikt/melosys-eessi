@@ -64,10 +64,13 @@ public class BucController {
     @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")
     @PostMapping("/{rinaSaksnummer}/sed/{sedType}")
     public void sendPåEksisterendeBuc(
-            @RequestBody SedDataDto sedDataDto,
-            @PathVariable String rinaSaksnummer,
-            @PathVariable SedType sedType
-    )  {
+        @RequestBody SedDataDto sedDataDto,
+        @PathVariable String rinaSaksnummer,
+        @PathVariable SedType sedType
+    ) throws ValidationException {
+        if (sedType.kreverAdresse() && sedDataDto.manglerAdresser()) {
+            throw new ValidationException(String.format("Personen mangler adresse - rinaSaksnummer=%s og sedType=%s", rinaSaksnummer, sedType));
+        }
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 
