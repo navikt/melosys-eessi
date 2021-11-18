@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.controller;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.TestSpringBootApplication;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -31,7 +30,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ContextConfiguration(classes = TestSpringBootApplication.class)
 @WebMvcTest(controllers = {BucController.class})
 class BucControllerTest {
 
