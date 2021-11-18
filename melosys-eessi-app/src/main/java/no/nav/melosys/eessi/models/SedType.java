@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.models;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public enum SedType {
@@ -53,8 +54,8 @@ public enum SedType {
     S041;
 
     private static final Collection<SedType> LOVVALG_SED_TYPER = Arrays.stream(SedType.values())
-            .filter(s -> s.name().startsWith("A"))
-            .collect(Collectors.toSet());
+        .filter(s -> s.name().startsWith("A"))
+        .collect(Collectors.toSet());
 
     public boolean erXSED() {
         return this.name().startsWith("X");
@@ -62,5 +63,11 @@ public enum SedType {
 
     public static boolean erLovvalgSed(String sedType) {
         return LOVVALG_SED_TYPER.stream().anyMatch(s -> s.name().equals(sedType));
+    }
+
+    public static final List<SedType> KREVER_ADRESSE = Arrays.asList(SedType.A001, SedType.A002, SedType.A003, SedType.A004, SedType.A007, SedType.A009, SedType.A010);
+
+    public static boolean kreverAdresse(SedType sedType){
+        return KREVER_ADRESSE.stream().anyMatch(s -> s.equals(sedType));
     }
 }
