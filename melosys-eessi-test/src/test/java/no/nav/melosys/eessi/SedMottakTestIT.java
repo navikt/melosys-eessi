@@ -84,7 +84,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID);
@@ -108,7 +108,7 @@ class SedMottakTestIT extends ComponentTestBase {
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
         kafkaTestConsumer.reset(3);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1")).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
@@ -121,7 +121,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID);
@@ -145,7 +145,7 @@ class SedMottakTestIT extends ComponentTestBase {
     void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_flyttesTilIdOgFordeling() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID, FØDSELSDATO.minusYears(1), "DK");
@@ -169,7 +169,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         //Forventer kun én melding, som er oppgave-endret record
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"1")).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
@@ -177,17 +177,90 @@ class SedMottakTestIT extends ComponentTestBase {
         assertThat(hentMelosysEessiRecords()).isEmpty();
     }
 
-    private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID) {
-        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, FNR, AKTOER_ID));
+    @Test
+    void oppgaveEndret_utenKorrektVersjonsnumerFraKafka_ikkeFerdigstill() throws Exception  {
+        final var sedID = UUID.randomUUID().toString();
+        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
+        oppgaveDto.setStatus("OPPRETTET");
+
+        mockPerson(FNR, AKTOER_ID);
+
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        await().atMost(Duration.ofSeconds(4))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
+
+        verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
+        assertThat(hentMelosysEessiRecords()).isEmpty();
+        assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
+        oppgaveDto.setVersjon(2);
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"1")).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(),any());
+        assertThat(hentMelosysEessiRecords()).isEmpty();
+    }
+
+    @Test
+    void oppgaveEndret_alleredFerdigStiltOppgave_ikkeFerdigstill() throws Exception  {
+        final var sedID = UUID.randomUUID().toString();
+        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
+        oppgaveDto.setStatus("OPPRETTET");
+
+        mockPerson(FNR, AKTOER_ID);
+
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        await().atMost(Duration.ofSeconds(4))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
+
+        verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
+        assertThat(hentMelosysEessiRecords()).isEmpty();
+        assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
+        oppgaveDto.setVersjon(2);
+        oppgaveDto.setStatus("FERDIGSTILT");
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"2")).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        //verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
+        verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(),any());
+        assertThat(hentMelosysEessiRecords()).isEmpty();
+    }
+
+    private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String fnr ,String versjon) {
+        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, fnr, AKTOER_ID, versjon));
     }
 
     @SneakyThrows
-    private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID) {
+    private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID, String versjonsNummer) {
         var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
         var oppgaveJsonString = Files.readString(path);
         return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
             .replaceAll("\\$fnr", ident)
             .replaceAll("\\$aktoerid", aktørID)
+            .replaceAll("\\$versjonsnummer", versjonsNummer)
             .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
 }

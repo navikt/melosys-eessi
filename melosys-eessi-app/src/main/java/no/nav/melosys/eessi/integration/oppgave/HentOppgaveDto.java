@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class HentOppgaveDto extends OppgaveDto {
     private String id;
     private String status;
+    private int versjon;
 
     public boolean erÅpen() {
         return !"FERDIGSTILT".equalsIgnoreCase(status) && !"FEILREGISTRERT".equalsIgnoreCase(status);

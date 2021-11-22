@@ -61,4 +61,9 @@ public class OppgaveEndretHendelse {
                 .map(Ident::getVerdi)
                 .orElseThrow(() -> new NoSuchElementException("Finner ikke aktørID"));
     }
+
+    @JsonIgnore
+    public boolean erRiktigVersjon(int versjon ) {
+        return this.versjon == versjon;
+    }
 }
