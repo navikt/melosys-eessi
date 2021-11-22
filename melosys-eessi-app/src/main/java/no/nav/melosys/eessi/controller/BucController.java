@@ -54,7 +54,7 @@ public class BucController {
             @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende
     ) throws ValidationException {
         if (bucType.hentFørsteLovligeSed().kreverAdresse() && opprettBucOgSedDto.getSedDataDto().manglerAdresser()) {
-            throw new ValidationException(String.format("Personen mangler adresse ved opprettelse av Buc=%s og Sed=%s", bucType, bucType.hentFørsteLovligeSed()));
+            throw new ValidationException("Personen mangler adresse");
         }
         return sedService.opprettBucOgSed(
                 opprettBucOgSedDto.getSedDataDto(),
@@ -72,7 +72,7 @@ public class BucController {
         @PathVariable SedType sedType
     ) throws ValidationException {
         if (sedType.kreverAdresse() && sedDataDto.manglerAdresser()) {
-            throw new ValidationException(String.format("Personen mangler adresse - rinaSaksnummer=%s og sedType=%s", rinaSaksnummer, sedType));
+            throw new ValidationException("Personen mangler adresse");
         }
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }

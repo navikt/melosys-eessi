@@ -109,7 +109,7 @@ class BucControllerTest {
                 .param("oppdaterEksisterende", "false")
                 .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
             .andExpect(status().isBadRequest())
-            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse ved opprettelse av Buc=LA_BUC_01 og Sed=A001"))
+            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse"))
             .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
 
     }
@@ -125,7 +125,7 @@ class BucControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(sedDataDto)))
             .andExpect(status().isBadRequest())
-            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse - rinaSaksnummer=1 og sedType=A002"))
+            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse"))
             .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
     }
 
