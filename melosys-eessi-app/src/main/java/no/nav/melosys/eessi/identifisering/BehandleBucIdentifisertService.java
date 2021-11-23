@@ -26,8 +26,10 @@ public class BehandleBucIdentifisertService {
 
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
-        sedMottattHendelseRepository.findAllByRinaSaksnummeerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
-                .forEach(sedMottattHendelse -> publiserMelding(sedMottattHendelse, aktoerId));
+        sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
+            .stream()
+            .filter(sedMottattHendelse -> sedMottattHendelse.getSedHendelse().erIkkeX100())
+            .forEach(sedMottattHendelse -> publiserMelding(sedMottattHendelse, aktoerId));
     }
 
     private void publiserMelding(SedMottattHendelse sedMottattHendelse, String aktørID) {

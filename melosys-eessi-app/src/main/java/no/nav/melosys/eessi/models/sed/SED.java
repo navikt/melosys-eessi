@@ -43,4 +43,6 @@ public class SED {
     public boolean erXSED() {
         return SedType.valueOf(sedType).erXSED();
     }
+
+    public boolean erX100SED() {return SedType.valueOf(sedType) == SedType.X100;}
 }

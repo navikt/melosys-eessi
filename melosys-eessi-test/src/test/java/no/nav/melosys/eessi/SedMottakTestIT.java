@@ -45,6 +45,7 @@ class SedMottakTestIT extends ComponentTestBase {
         ((FakeUnleash) unleash).enable("melosys.eessi.en_identifisering_oppg");
     }
 
+
     @Test
     void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {
         final var sedID = UUID.randomUUID().toString();

@@ -43,6 +43,12 @@ public class SedMottakService {
         }
 
         sedMottattHendelseRepository.save(lagretHendelse);
+
+        //Håndterer aldri X100 SEDer
+        if (sed.erX100SED()) {
+            return;
+        }
+
         log.info("Søker etter person for SED");
         personIdentifisering.identifiserPerson(lagretHendelse.getSedHendelse().getRinaSakId(), sed)
                 .ifPresentOrElse(

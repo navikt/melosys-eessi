@@ -90,6 +90,7 @@ public class MockData {
         return sed;
     }
 
+
     OpprettJournalpostResponse journalpostResponse(boolean ferdigstilt) {
         return OpprettJournalpostResponse.builder()
                 .journalpostId("1")
