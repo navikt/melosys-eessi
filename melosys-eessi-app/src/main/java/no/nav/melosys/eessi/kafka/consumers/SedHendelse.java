@@ -28,4 +28,8 @@ public class SedHendelse {
     public String getLandkode() {
         return avsenderId.substring(0, 2);
     }
+
+    @JsonIgnore
+    public boolean erIkkeX100() { return !sedType.equals("X100");}
+
 }
