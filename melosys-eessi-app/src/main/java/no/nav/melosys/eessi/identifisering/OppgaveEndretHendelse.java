@@ -63,7 +63,7 @@ public class OppgaveEndretHendelse {
     }
 
     @JsonIgnore
-    public boolean erRiktigVersjon(int versjon ) {
+    public boolean harSammeVersjon(int versjon ) {
         return this.versjon == versjon;
     }
 }

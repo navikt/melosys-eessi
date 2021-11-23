@@ -34,17 +34,17 @@ public class OppgaveEndretConsumer {
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);
 
-        if (erIdentifisertOppgave(oppgave)) {
+        if (erSisteVersjonAvOppgaveMedIdentifisering(oppgave)) {
             log.info("Oppgave {} markert som identifisert av ID og Fordeling. Søker etter tilknyttet RINA-sak", oppgave.getId());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                 .ifPresentOrElse(
-                    b -> kontrollerOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave),
+                    b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave),
                     () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
                 );
         }
     }
 
-    private boolean erIdentifisertOppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
+    private boolean erSisteVersjonAvOppgaveMedIdentifisering(OppgaveEndretHendelse oppgaveEndretHendelse) {
         HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveEndretHendelse.getId().toString());
         return "JFR".equals(oppgaveEndretHendelse.getOppgavetype())
             && "4530".equals(oppgaveEndretHendelse.getTildeltEnhetsnr())
@@ -52,10 +52,10 @@ public class OppgaveEndretConsumer {
             && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
             && oppgaveEndretHendelse.erÅpen()
             && oppgaveEndretHendelse.harMetadataRinasaksnummer()
-            && oppgaveEndretHendelse.erRiktigVersjon(oppgaveDto.getVersjon());
+            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon());
     }
 
-    private void kontrollerOgOppdaterOppgave(String rinaSaksnummer,
+    private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
                                            OppgaveEndretHendelse oppgave) {
         var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
         if (kontrollResultat.erIdentifisert()) {
