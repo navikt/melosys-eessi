@@ -1,8 +1,11 @@
 package no.nav.melosys.eessi;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -161,5 +164,20 @@ public abstract class ComponentTestBase {
                 && eessiMelding.getJournalpostId().equals("1")
                 && eessiMelding.getAktoerId().equals(AKTOER_ID)
             );
+    }
+
+    protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String fnr ,String versjon, String rinaSaksnummer) {
+        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, fnr, AKTOER_ID, versjon, rinaSaksnummer));
+    }
+
+    @SneakyThrows
+    private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID, String versjonsNummer, String rinaSaksnummer) {
+        var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
+        var oppgaveJsonString = Files.readString(path);
+        return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
+            .replaceAll("\\$fnr", ident)
+            .replaceAll("\\$aktoerid", aktørID)
+            .replaceAll("\\$versjonsnummer", versjonsNummer)
+            .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
 }

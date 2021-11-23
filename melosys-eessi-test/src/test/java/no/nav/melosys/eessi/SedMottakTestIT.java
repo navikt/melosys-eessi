@@ -85,7 +85,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID);
@@ -109,7 +109,7 @@ class SedMottakTestIT extends ComponentTestBase {
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
         kafkaTestConsumer.reset(3);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
@@ -122,7 +122,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID);
@@ -146,7 +146,7 @@ class SedMottakTestIT extends ComponentTestBase {
     void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_flyttesTilIdOgFordeling() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN");
+        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
         mockPerson(FNR, AKTOER_ID, FØDSELSDATO.minusYears(1), "DK");
@@ -170,25 +170,11 @@ class SedMottakTestIT extends ComponentTestBase {
 
         //Forventer kun én melding, som er oppgave-endret record
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
         assertThat(hentMelosysEessiRecords()).isEmpty();
-    }
-
-    private ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID) {
-        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, FNR, AKTOER_ID));
-    }
-
-    @SneakyThrows
-    private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID) {
-        var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
-        var oppgaveJsonString = Files.readString(path);
-        return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
-            .replaceAll("\\$fnr", ident)
-            .replaceAll("\\$aktoerid", aktørID)
-            .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
 }

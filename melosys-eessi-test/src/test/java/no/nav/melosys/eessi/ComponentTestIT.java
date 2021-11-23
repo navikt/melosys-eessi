@@ -74,7 +74,7 @@ class ComponentTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto("123", "AAPEN"));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto("123", "AAPEN",1));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();

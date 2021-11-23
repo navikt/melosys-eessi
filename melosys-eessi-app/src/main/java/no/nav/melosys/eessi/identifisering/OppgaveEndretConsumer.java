@@ -6,6 +6,7 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -26,35 +27,36 @@ public class OppgaveEndretConsumer {
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
     @KafkaListener(
-            clientIdPrefix = "melosys-eessi-oppgaveEndret",
-            topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
-            containerFactory = "oppgaveListenerContainerFactory")
+        clientIdPrefix = "melosys-eessi-oppgaveEndret",
+        topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
+        containerFactory = "oppgaveListenerContainerFactory")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);
 
-        if (erIdentifisertOppgave(oppgave)) {
+        if (erSisteVersjonAvOppgaveMedIdentifisering(oppgave)) {
             log.info("Oppgave {} markert som identifisert av ID og Fordeling. Søker etter tilknyttet RINA-sak", oppgave.getId());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
-                    .ifPresentOrElse(
-                        b -> validerIdentifisertPerson(b.getRinaSaksnummer(), oppgave),
-                        () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}",oppgave.getId())
-                    );
+                .ifPresentOrElse(
+                    b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave),
+                    () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
+                );
         }
     }
 
-    private boolean erIdentifisertOppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
+    private boolean erSisteVersjonAvOppgaveMedIdentifisering(OppgaveEndretHendelse oppgaveEndretHendelse) {
+        HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveEndretHendelse.getId().toString());
         return "JFR".equals(oppgaveEndretHendelse.getOppgavetype())
-                && "4530".equals(oppgaveEndretHendelse.getTildeltEnhetsnr())
-                && oppgaveEndretHendelse.harAktørID()
-                && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
-                && oppgaveEndretHendelse.erÅpen()
-                && oppgaveEndretHendelse.harMetadataRinasaksnummer();
+            && "4530".equals(oppgaveEndretHendelse.getTildeltEnhetsnr())
+            && oppgaveEndretHendelse.harAktørID()
+            && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
+            && oppgaveEndretHendelse.erÅpen()
+            && oppgaveEndretHendelse.harMetadataRinasaksnummer()
+            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon());
     }
 
-    private void validerIdentifisertPerson(String rinaSaksnummer,
+    private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
                                            OppgaveEndretHendelse oppgave) {
-        log.debug("Kontrollerer identifisert person for rinasak {} og endret opppgave {}",rinaSaksnummer,oppgave.getId());
         var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
@@ -63,9 +65,9 @@ public class OppgaveEndretConsumer {
         } else {
             log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgave.getId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
             oppgaveService.flyttOppgaveTilIdOgFordeling(
-                    oppgave.getId().toString(),
-                    oppgave.getVersjon(),
-                    kontrollResultat.hentFeilIOpplysningerTekst());
+                oppgave.getId().toString(),
+                oppgave.getVersjon(),
+                kontrollResultat.hentFeilIOpplysningerTekst());
         }
     }
 }
