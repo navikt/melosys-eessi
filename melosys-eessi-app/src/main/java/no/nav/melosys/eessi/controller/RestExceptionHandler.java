@@ -31,11 +31,6 @@ public class RestExceptionHandler {
         return handle(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = NotAllowedException.class)
-    public ResponseEntity handle(NotAllowedException e) {
-        return handle(e, HttpStatus.METHOD_NOT_ALLOWED);
-    }
-
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity handle(Exception e) {
         return handle(e, HttpStatus.INTERNAL_SERVER_ERROR);
