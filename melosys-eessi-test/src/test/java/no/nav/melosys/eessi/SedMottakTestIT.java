@@ -45,20 +45,6 @@ class SedMottakTestIT extends ComponentTestBase {
         ((FakeUnleash) unleash).enable("melosys.eessi.en_identifisering_oppg");
     }
 
-    @Test
-    void sedX100Mottat_return() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.x100Sed());
-
-        mockPerson(FNR, AKTOER_ID);
-
-        // Venter på en Kafka-melding: den vi selv legger på topic som input, skal ikke gjøre noe med X100
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(Integer.toString(new Random().nextInt(100000)), sedID, FNR))).get();
-        kafkaTestConsumer.doWait(5_000L);
-
-        assertThat(hentMelosysEessiRecords()).isEmpty();
-    }
 
     @Test
     void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {

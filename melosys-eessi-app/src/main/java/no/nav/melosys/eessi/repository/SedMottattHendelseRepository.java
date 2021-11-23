@@ -12,9 +12,9 @@ public interface SedMottattHendelseRepository extends JpaRepository<SedMottattHe
     List<SedMottattHendelse> findAllByJournalpostIdIsNullOrderByMottattDato();
 
     @Query(
-            value = "select * from sed_mottatt_hendelse where sed_hendelse ->> 'rinaSakId' = ?1 and publisert_kafka = ?2 order by mottatt_dato",
+            value = "select * from sed_mottatt_hendelse where sed_hendelse ->> 'rinaSakId' = ?1 and publisert_kafka = ?2 and sed_hendelse ->> 'sedType' <> ?3 order by mottatt_dato",
             nativeQuery = true)
-    List<SedMottattHendelse> findAllByRinaSaksnummeerAndPublisertKafkaSortedByMottattDato(String rinaSaksnummer, boolean publisertKafka);
+    List<SedMottattHendelse> findAllByRinaSaksnummerAndPublisertKafkaAndNotX100SortedByMottattDato(String rinaSaksnummer, boolean publisertKafka, String sedType);
 
     @Query(
             value = "select count(*) from sed_mottatt_hendelse where sed_hendelse ->> 'rinaSakId' = ?1",

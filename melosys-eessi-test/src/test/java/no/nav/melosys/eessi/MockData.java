@@ -22,7 +22,6 @@ import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.BucType.LA_BUC_02;
 import static no.nav.melosys.eessi.models.SedType.A003;
-import static no.nav.melosys.eessi.models.SedType.X100;
 
 public class MockData {
     public MockData() {
@@ -91,14 +90,6 @@ public class MockData {
         return sed;
     }
 
-    SED x100Sed() {
-        SED sed = new SED();
-        sed.setSedType(X100.name());
-        Nav nav = new Nav();
-        sed.setNav(nav);
-
-        return sed;
-    }
 
     OpprettJournalpostResponse journalpostResponse(boolean ferdigstilt) {
         return OpprettJournalpostResponse.builder()

@@ -26,7 +26,7 @@ public class BehandleBucIdentifisertService {
 
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
-        sedMottattHendelseRepository.findAllByRinaSaksnummeerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
+        sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaAndNotX100SortedByMottattDato(rinaSaksnummer, false, SedType.X100.name())
                 .forEach(sedMottattHendelse -> publiserMelding(sedMottattHendelse, aktoerId));
     }
 
