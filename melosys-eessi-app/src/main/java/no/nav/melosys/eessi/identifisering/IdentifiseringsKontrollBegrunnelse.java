@@ -4,7 +4,8 @@ public enum IdentifiseringsKontrollBegrunnelse {
     FØDSELSDATO("fødselsdato"),
     STATSBORGERSKAP("statsborgerskap"),
     KJØNN("kjønn"),
-    UTENLANDSK_ID("utenlandsk-id");
+    UTENLANDSK_ID("utenlandsk-id"),
+    EUX_RINA("Rina Integrasjon");
 
     private final String begrunnelse;
 

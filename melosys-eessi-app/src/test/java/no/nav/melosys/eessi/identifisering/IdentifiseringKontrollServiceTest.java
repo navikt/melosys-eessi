@@ -76,7 +76,6 @@ class IdentifiseringKontrollServiceTest {
         sed.setSedType(SedType.A009.name());
 
         when(euxService.finnBUC(rinaSaksnummer)).thenReturn(Optional.of(buc));
-        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
 
         personBuilder
             .kjønn(Kjønn.KVINNE)
@@ -104,6 +103,7 @@ class IdentifiseringKontrollServiceTest {
 
     @Test
     void kontrollerIdentifisertPerson_personSamstemmerMedSed_identifisert() {
+        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
@@ -112,6 +112,7 @@ class IdentifiseringKontrollServiceTest {
 
     @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigStatsborgerskap_ikkeIdentifisert() {
+        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
@@ -120,6 +121,7 @@ class IdentifiseringKontrollServiceTest {
 
     @Test
     void kontrollerIdentifisertPerson_personHarFeilKjønn_ikkeIdentifisert() {
+        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.kjønn(Kjønn.MANN).build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
@@ -128,6 +130,7 @@ class IdentifiseringKontrollServiceTest {
 
     @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigFødselsdato_ikkeIdentifisert() {
+        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.fødselsdato(LocalDate.now().minusYears(3)).build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
@@ -136,9 +139,18 @@ class IdentifiseringKontrollServiceTest {
 
     @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigUtenlandskId_ikkeIdentifisert() {
+        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.utenlandskId(Set.of(new UtenlandskId("feil-pin", avsenderLand))).build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID));
+    }
+
+    @Test
+    void kontrollerIdentifisertPerson_kallMotRinaFeiler_ikkeIdentifisert() {
+        when(euxService.finnBUC(rinaSaksnummer)).thenReturn(Optional.empty());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.EUX_RINA));
     }
 }

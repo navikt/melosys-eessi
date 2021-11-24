@@ -29,7 +29,7 @@ public class IdentifiseringKontrollService {
         Optional<BUC> buc = euxService.finnBUC(rinaSaksnummer);
 
         if (buc.isEmpty()) {
-            return new IdentifiseringsKontrollResultat(Collections.emptyList());
+            return new IdentifiseringsKontrollResultat(integrasjonsKontrollRina());
         }
 
         var dokumentID = buc.get().finnFørstMottatteSed()
@@ -65,6 +65,12 @@ public class IdentifiseringKontrollService {
         }
 
         begrunnelser.forEach(personSokMetrikker::counter);
+        return begrunnelser;
+    }
+
+    private Collection<IdentifiseringsKontrollBegrunnelse> integrasjonsKontrollRina() {
+        List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
+        begrunnelser.add(IdentifiseringsKontrollBegrunnelse.EUX_RINA);
         return begrunnelser;
     }
 }
