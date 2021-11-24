@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -74,7 +75,7 @@ class IdentifiseringKontrollServiceTest {
         sed.getNav().getBruker().setPerson(sedPerson);
         sed.setSedType(SedType.A009.name());
 
-        when(euxService.hentBuc(rinaSaksnummer)).thenReturn(buc);
+        when(euxService.finnBUC(rinaSaksnummer)).thenReturn(Optional.of(buc));
         when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
 
         personBuilder

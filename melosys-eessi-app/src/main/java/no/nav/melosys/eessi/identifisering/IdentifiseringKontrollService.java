@@ -1,11 +1,9 @@
 package no.nav.melosys.eessi.identifisering;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
+import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
 import no.nav.melosys.eessi.models.sed.nav.Person;
@@ -28,8 +26,13 @@ public class IdentifiseringKontrollService {
     }
 
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørID, String rinaSaksnummer) {
-        var buc = euxService.hentBuc(rinaSaksnummer);
-        var dokumentID = buc.finnFørstMottatteSed()
+        Optional<BUC> buc = euxService.finnBUC(rinaSaksnummer);
+
+        if (buc.isEmpty()) {
+            return new IdentifiseringsKontrollResultat(Collections.emptyList());
+        }
+
+        var dokumentID = buc.get().finnFørstMottatteSed()
             .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
             .getId();
 
@@ -39,7 +42,7 @@ public class IdentifiseringKontrollService {
         var identifisertPerson = personFasade.hentPerson(aktørID);
 
 
-        return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand()));
+        return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.get().hentAvsenderLand()));
     }
 
     private Collection<IdentifiseringsKontrollBegrunnelse> kontrollerIdentifisering(PersonModell identifisertPerson, Person sedPerson, String avsenderLand) {
