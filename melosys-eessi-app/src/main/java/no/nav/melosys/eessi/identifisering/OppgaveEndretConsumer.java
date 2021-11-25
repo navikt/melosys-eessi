@@ -27,9 +27,10 @@ public class OppgaveEndretConsumer {
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
     @KafkaListener(
-        clientIdPrefix = "melosys-eessi-oppgaveEndret",
-        topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
-        containerFactory = "oppgaveListenerContainerFactory")
+            clientIdPrefix = "melosys-eessi-oppgaveEndret",
+            topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
+            containerFactory = "oppgaveListenerContainerFactory",
+            groupId = "${melosys.kafka.consumer.oppgave-endret.groupid}")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);

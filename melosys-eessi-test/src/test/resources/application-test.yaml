@@ -23,6 +23,7 @@ DATABASE_NAME: postgres
 
 KAFKA_SEDHENDELSER_GROUPID: melosys-eessi-sedHendelser-local
 KAFKA_EESSIMELDING_TOPIC: privat-melosys-eessi-v1-local
+KAFKA_OPPGAVE_GROUPID: melosys-eessi-oppgaveHendelser-local
 
 spring.datasource:
   username: postgres

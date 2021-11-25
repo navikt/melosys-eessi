@@ -38,6 +38,7 @@ melosys:
     consumer:
       oppgave-endret:
         topic: ${KAFKA_OPPGAVE_ENDRET_TOPIC:oppgave-endret}
+        groupid: ${KAFKA_OPPGAVE_GROUPID}
       mottatt:
         topic: ${KAFKA_SEDMOTTATT_TOPIC:eessi-basis-sedMottatt-v1}
       sendt:
