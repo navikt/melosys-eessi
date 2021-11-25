@@ -10,8 +10,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedVedlegg;
@@ -19,7 +19,7 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
 import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.FunksjonellException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -139,7 +139,7 @@ class EuxServiceTest {
             .thenReturn(Collections.singleton(SedHandlinger.Read.hentHandling()));
         SED sed = new SED();
 
-        assertThatExceptionOfType(FunksjonellException.class)
+        assertThatExceptionOfType(ValidationException.class)
             .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
             .withMessageContaining("Kan ikke sende SED, ugyldig handling i Rina");
 

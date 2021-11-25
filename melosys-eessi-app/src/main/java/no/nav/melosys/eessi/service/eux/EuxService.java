@@ -17,8 +17,8 @@ import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.FunksjonellException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -103,7 +103,7 @@ public class EuxService {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
         if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
             if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.Send)) {
-                throw new FunksjonellException("Kan ikke sende SED, ugyldig handling i Rina");
+                throw new ValidationException("Kan ikke sende SED, ugyldig handling i Rina");
             }
         }
 

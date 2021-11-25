@@ -2,10 +2,10 @@ package no.nav.melosys.eessi.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.FunksjonellException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,11 +23,6 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(value = MappingException.class)
     public ResponseEntity handle(MappingException e) {
-        return handle(e, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(value = FunksjonellException.class)
-    public ResponseEntity handle(FunksjonellException e) {
         return handle(e, HttpStatus.BAD_REQUEST);
     }
 
