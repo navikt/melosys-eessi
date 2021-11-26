@@ -29,7 +29,8 @@ public class OppgaveEndretConsumer {
     @KafkaListener(
         clientIdPrefix = "melosys-eessi-oppgaveEndret",
         topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
-        containerFactory = "oppgaveListenerContainerFactory")
+        containerFactory = "oppgaveListenerContainerFactory",
+        groupId = "${melosys.kafka.consumer.oppgave-endret.groupid}")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);
@@ -52,7 +53,8 @@ public class OppgaveEndretConsumer {
             && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
             && oppgaveEndretHendelse.erÅpen()
             && oppgaveEndretHendelse.harMetadataRinasaksnummer()
-            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon());
+            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())
+            && oppgaveDto.erÅpen();
     }
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
