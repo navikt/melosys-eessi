@@ -53,7 +53,8 @@ public class OppgaveEndretConsumer {
             && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
             && oppgaveEndretHendelse.erÅpen()
             && oppgaveEndretHendelse.harMetadataRinasaksnummer()
-            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon());
+            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())
+            && oppgaveDto.erÅpen();
     }
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
