@@ -46,19 +46,32 @@ public class OppgaveEndretConsumer {
     }
 
     private boolean erSisteVersjonAvOppgaveMedIdentifisering(OppgaveEndretHendelse oppgaveEndretHendelse) {
-        HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveEndretHendelse.getId().toString());
+        final var oppgaveId = oppgaveEndretHendelse.getId().toString();
+        if (!erIdentifiseringsOppgave(oppgaveEndretHendelse)) {
+            log.info("Kan ikke behandle oppgave endret {}", oppgaveId);
+            return false;
+        }
+
+        HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveId);
+        if (!oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon()) || !oppgaveDto.erÅpen()) {
+            log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt eller er ikke åpen opppgave", oppgaveId);
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean erIdentifiseringsOppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
         return "JFR".equals(oppgaveEndretHendelse.getOppgavetype())
             && "4530".equals(oppgaveEndretHendelse.getTildeltEnhetsnr())
             && oppgaveEndretHendelse.harAktørID()
             && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
             && oppgaveEndretHendelse.erÅpen()
-            && oppgaveEndretHendelse.harMetadataRinasaksnummer()
-            && oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())
-            && oppgaveDto.erÅpen();
+            && oppgaveEndretHendelse.harMetadataRinasaksnummer();
     }
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
-                                           OppgaveEndretHendelse oppgave) {
+                                                           OppgaveEndretHendelse oppgave) {
         var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
