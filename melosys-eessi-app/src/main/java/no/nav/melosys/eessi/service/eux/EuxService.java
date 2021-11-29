@@ -6,7 +6,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
@@ -16,6 +18,7 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -35,13 +38,16 @@ public class EuxService {
 
     private final EuxConsumer euxConsumer;
     private final BucMetrikker bucMetrikker;
+    private final Unleash unleash;
 
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker) {
+                      BucMetrikker bucMetrikker,
+                      Unleash unleash) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
+        this.unleash = unleash;
     }
 
     public void slettBUC(String rinaSaksnummer) {
@@ -95,6 +101,12 @@ public class EuxService {
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
+        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.SEND)) {
+                throw new ValidationException("Kan ikke sende SED, ugyldig handling i Rina");
+            }
+        }
+
         euxConsumer.sendSed(rinaSaksnummer, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
@@ -134,6 +146,11 @@ public class EuxService {
             log.warn("Kan ikke hente BUC {}", rinaSaksnummer, e);
             return Optional.empty();
         }
+    }
+
+    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, SedHandlinger handling) {
+        return euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId)
+            .stream().anyMatch(s -> s.equals(handling.hentHandling()));
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
