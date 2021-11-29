@@ -123,7 +123,7 @@ class EuxServiceTest {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
-            .thenReturn(Collections.singleton(SedHandlinger.Send.hentHandling()));
+            .thenReturn(Collections.singleton(SedHandlinger.SEND.hentHandling()));
 
         SED sed = new SED();
         euxService.opprettOgSendSed(sed, opprettetBucID);
@@ -136,7 +136,7 @@ class EuxServiceTest {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
-            .thenReturn(Collections.singleton(SedHandlinger.Read.hentHandling()));
+            .thenReturn(Collections.singleton(SedHandlinger.READ.hentHandling()));
         SED sed = new SED();
 
         assertThatExceptionOfType(ValidationException.class)
@@ -150,9 +150,9 @@ class EuxServiceTest {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
-            .thenReturn(List.of(SedHandlinger.Close.hentHandling(),
-                SedHandlinger.Send.hentHandling(),
-                SedHandlinger.Read.hentHandling())
+            .thenReturn(List.of(SedHandlinger.CLOSE.hentHandling(),
+                SedHandlinger.SEND.hentHandling(),
+                SedHandlinger.SEND.hentHandling())
             );
 
         SED sed = new SED();

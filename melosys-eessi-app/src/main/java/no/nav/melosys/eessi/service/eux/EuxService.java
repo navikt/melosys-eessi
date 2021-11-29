@@ -102,7 +102,7 @@ public class EuxService {
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
         if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.Send)) {
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.SEND)) {
                 throw new ValidationException("Kan ikke sende SED, ugyldig handling i Rina");
             }
         }
