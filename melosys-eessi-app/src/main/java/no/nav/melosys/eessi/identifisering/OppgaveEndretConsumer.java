@@ -48,13 +48,17 @@ public class OppgaveEndretConsumer {
     private boolean erSisteVersjonAvOppgaveMedIdentifisering(OppgaveEndretHendelse oppgaveEndretHendelse) {
         final var oppgaveId = oppgaveEndretHendelse.getId().toString();
         if (!erIdentifiseringsOppgave(oppgaveEndretHendelse)) {
-            log.info("Kan ikke behandle oppgave endret {}", oppgaveId);
             return false;
         }
 
         HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveId);
-        if (!oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon()) || !oppgaveDto.erÅpen()) {
-            log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt eller er ikke åpen opppgave", oppgaveId);
+        if (!oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())) {
+            log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt mellom kafkamelding (versjon {}) og oppgave (versjon {}) ", oppgaveId, oppgaveEndretHendelse.getVersjon(),oppgaveDto.getVersjon());
+            return false;
+        }
+
+        if (!oppgaveDto.erÅpen()) {
+            log.info("Kan ikke behandle oppgave endret {}, oppgave er ikke åpen opppgave", oppgaveId);
             return false;
         }
 
