@@ -35,7 +35,7 @@ public class OppgaveEndretConsumer {
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);
 
-        if (erSisteVersjonAvOppgaveMedIdentifisering(oppgave)) {
+        if (erValidertIdentifiseringsoppgave(oppgave)) {
             log.info("Oppgave {} markert som identifisert av ID og Fordeling. Søker etter tilknyttet RINA-sak", oppgave.getId());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                 .ifPresentOrElse(
@@ -45,12 +45,12 @@ public class OppgaveEndretConsumer {
         }
     }
 
-    private boolean erSisteVersjonAvOppgaveMedIdentifisering(OppgaveEndretHendelse oppgaveEndretHendelse) {
-        final var oppgaveId = oppgaveEndretHendelse.getId().toString();
-        if (!erIdentifiseringsOppgave(oppgaveEndretHendelse)) {
-            return false;
-        }
+    private boolean erValidertIdentifiseringsoppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
+        return erIdentifiseringsOppgave(oppgaveEndretHendelse) && validerOppgaveStatusOgVersjon(oppgaveEndretHendelse);
+    }
 
+    private boolean validerOppgaveStatusOgVersjon(OppgaveEndretHendelse oppgaveEndretHendelse) {
+        final var oppgaveId = oppgaveEndretHendelse.getId().toString();
         HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveId);
         if (!oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())) {
             log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt mellom kafkamelding (versjon {}) og oppgave (versjon {}) ", oppgaveId, oppgaveEndretHendelse.getVersjon(),oppgaveDto.getVersjon());
