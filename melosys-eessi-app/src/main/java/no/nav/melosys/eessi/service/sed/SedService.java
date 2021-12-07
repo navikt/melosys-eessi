@@ -68,7 +68,7 @@ public class SedService {
         }
 
         if (sendAutomatisk) {
-            sendSed(response.getRinaSaksnummer(), response.getDokumentId());
+            sendSed(response.getRinaSaksnummer(), response.getDokumentId(), sed.getSedType());
         }
 
         return BucOgSedOpprettetDto.builder()
@@ -90,10 +90,10 @@ public class SedService {
     Ved opprettelse av SED og umiddelbar sending rett etter, *kan* Rina-saken bli "skadd" ved opprettelse.
     Det kan videre føre til at vi ikke kan se svar-SEDer vi mottar fra utlandet, som vil påvirke tiden det tar før vi får ut vedtak til bruker
      */
-    private void sendSed(String rinaSaksnummer, String dokumentId) {
+    private void sendSed(String rinaSaksnummer, String dokumentId, String sedType) {
         try {
             TimeUnit.SECONDS.sleep(10L);
-            euxService.sendSed(rinaSaksnummer, dokumentId);
+            euxService.sendSed(rinaSaksnummer, dokumentId, sedType);
         } catch (IntegrationException e) {
             log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
             slettBucOgSaksrelasjon(rinaSaksnummer);

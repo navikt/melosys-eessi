@@ -78,7 +78,7 @@ public class LukkBucService {
             finnEksisterendeX001Utkast(buc).ifPresentOrElse(
                     eksisterendeX001 -> {
                         euxService.oppdaterSed(buc.getId(), eksisterendeX001.getId(), x001);
-                        euxService.sendSed(buc.getId(), eksisterendeX001.getId());
+                        euxService.sendSed(buc.getId(), eksisterendeX001.getId(), x001.getSedType());
                     },
                     () -> euxService.opprettOgSendSed(x001, buc.getId())
             );

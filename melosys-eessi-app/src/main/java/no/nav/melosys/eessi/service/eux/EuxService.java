@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -73,8 +74,10 @@ public class EuxService {
         log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
     }
 
-    public void sendSed(String rinaSaksnummer, String dokumentId) {
+    public void sendSed(String rinaSaksnummer, String dokumentId, String sedType) {
+        validerSedHandling(rinaSaksnummer, dokumentId, SedHandlinger.SEND);
         euxConsumer.sendSed(rinaSaksnummer, dokumentId);
+        log.info("SED {} sendt i sak {}", sedType, rinaSaksnummer);
     }
 
     public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) {
@@ -101,14 +104,18 @@ public class EuxService {
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
-        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            if (!sedHandlingErMulig(rinaSaksnummer, sedId, SedHandlinger.SEND)) {
-                throw new ValidationException("Kan ikke sende SED, ugyldig handling i Rina");
-            }
-        }
+        validerSedHandling(rinaSaksnummer, sedId, SedHandlinger.SEND);
 
         euxConsumer.sendSed(rinaSaksnummer, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
+    }
+
+    public void validerSedHandling(String rinaSaksnummer, String sedId, SedHandlinger sedHandling ) {
+        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, sedHandling)) {
+                throw new ValidationException("Kan ikke sende SED, ugyldig handling i Rina");
+            }
+        }
     }
 
     public boolean sedErEndring(String sedId, String rinaSaksnummer) {
