@@ -72,7 +72,7 @@ class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
                 .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
-        doThrow(IntegrationException.class).when(euxService).sendSed(anyString(), anyString());
+        doThrow(IntegrationException.class).when(euxService).sendSed(anyString(), anyString(), anyString());
 
         Exception exception = null;
         try {
@@ -148,7 +148,7 @@ class SedServiceTest {
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
         verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
-        verify(euxService).sendSed(anyString(), anyString());
+        verify(euxService).sendSed(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -171,7 +171,7 @@ class SedServiceTest {
 
         verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
         verify(euxService).hentRinaUrl(RINA_ID);
-        verify(euxService, never()).sendSed(anyString(), anyString());
+        verify(euxService, never()).sendSed(anyString(), anyString(), anyString());
         assertThat(response.getRinaSaksnummer()).isEqualTo(RINA_ID);
         assertThat(response.getRinaUrl()).isEqualTo("URL");
     }

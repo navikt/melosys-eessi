@@ -14,6 +14,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Conversation;
@@ -191,7 +192,8 @@ class EuxServiceTest {
     void sendSed_forventKonsumentKall() {
         String rinaSaksnummer = "123";
         String dokumentId = "332211";
-        euxService.sendSed(rinaSaksnummer, dokumentId);
+        String sedtype = SedType.A003.name();
+        euxService.sendSed(rinaSaksnummer, dokumentId, sedtype);
         verify(euxConsumer).sendSed(rinaSaksnummer, dokumentId);
     }
 

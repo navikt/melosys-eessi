@@ -111,7 +111,7 @@ class LukkBucServiceTest {
         verify(euxService).finnBUC(bucInfo.getId());
         verify(euxService).hentSed(buc.getId(), buc.getDocuments().get(0).getId());
         verify(euxService).oppdaterSed(eq(buc.getId()), eq(x001Doc.getId()), any(SED.class));
-        verify(euxService).sendSed(buc.getId(), x001Doc.getId());
+        verify(euxService).sendSed(buc.getId(), x001Doc.getId(), x001Doc.getType());
     }
 
     @Test
@@ -438,7 +438,7 @@ class LukkBucServiceTest {
 
         lukkBucService.forsøkLukkBucAsync(rinaSaksnummer);
 
-        verify(euxService, never()).sendSed(any(), any());
+        verify(euxService, never()).sendSed(anyString(), anyString(), anyString());
     }
 
     @Test
