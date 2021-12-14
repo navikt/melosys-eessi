@@ -27,6 +27,7 @@ public class OppgaveEndretConsumer {
     private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
 
     @KafkaListener(
+        id = "oppgaveEndret",
         clientIdPrefix = "melosys-eessi-oppgaveEndret",
         topics = "${melosys.kafka.consumer.oppgave-endret.topic}",
         containerFactory = "oppgaveListenerContainerFactory",
