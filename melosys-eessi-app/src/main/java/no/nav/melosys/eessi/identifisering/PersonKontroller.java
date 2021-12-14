@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
+import no.nav.melosys.eessi.models.sed.nav.Kjønn;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 
@@ -33,6 +34,9 @@ class PersonKontroller {
     }
 
     public static boolean harSammeKjønn(PersonModell identifisertPerson, Person sedPerson) {
+        if (sedPerson.getKjoenn() == Kjønn.U) {
+            return true;
+        }
         return identifisertPerson.getKjønn() == sedPerson.getKjoenn().tilDomene();
     }
 }
