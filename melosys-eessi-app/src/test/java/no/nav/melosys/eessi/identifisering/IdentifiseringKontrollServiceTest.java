@@ -110,6 +110,15 @@ class IdentifiseringKontrollServiceTest {
     }
 
     @Test
+    void kontrollerIdentifiseringPerson_personMedUkjentKjonn_identifisert() {
+        sedPerson.setKjoenn(no.nav.melosys.eessi.models.sed.nav.Kjønn.U);
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID,rinaSaksnummer))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(true, Collections.emptyList());
+    }
+
+    @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigStatsborgerskap_ikkeIdentifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
