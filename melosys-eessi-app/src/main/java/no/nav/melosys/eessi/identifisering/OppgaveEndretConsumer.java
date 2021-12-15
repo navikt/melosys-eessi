@@ -76,7 +76,7 @@ public class OppgaveEndretConsumer {
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
                                                            OppgaveEndretHendelse oppgave) {
-        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
+        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer, oppgave.getVersjon());
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
             bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgave.hentAktørID()));

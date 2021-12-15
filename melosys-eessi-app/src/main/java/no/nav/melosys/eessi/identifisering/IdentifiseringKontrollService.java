@@ -20,6 +20,7 @@ public class IdentifiseringKontrollService {
     private final PersonFasade personFasade;
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
+    private final static int OVERSTYREKONTROLLVERSJON = 2;
 
     public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker) {
         this.personFasade = personFasade;
@@ -27,7 +28,7 @@ public class IdentifiseringKontrollService {
         this.personSokMetrikker = personSokMetrikker;
     }
 
-    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørID, String rinaSaksnummer) {
+    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int versjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);
         var dokumentID = buc.finnFørstMottatteSed()
             .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
@@ -36,14 +37,19 @@ public class IdentifiseringKontrollService {
         var sedPerson = euxService.hentSed(rinaSaksnummer, dokumentID).finnPerson()
             .orElseThrow(() -> new NoSuchElementException("Finner ingen person fra SED"));
 
-        var identifisertPerson = personFasade.hentPerson(aktørID);
+        var identifisertPerson = personFasade.hentPerson(aktørId);
 
 
-        return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand()));
+        return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand(), versjon));
     }
 
-    private Collection<IdentifiseringsKontrollBegrunnelse> kontrollerIdentifisering(PersonModell identifisertPerson, Person sedPerson, String avsenderLand) {
+    private Collection<IdentifiseringsKontrollBegrunnelse> kontrollerIdentifisering(PersonModell identifisertPerson, Person sedPerson, String avsenderLand, int oppgaveVersjon) {
         List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
+
+        if (oppgaveVersjon > OVERSTYREKONTROLLVERSJON) {
+            personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
+            return begrunnelser;
+        }
 
         if (!PersonKontroller.harSammeFoedselsdato(identifisertPerson, tilLocalDate(sedPerson.getFoedselsdato()))) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO);
