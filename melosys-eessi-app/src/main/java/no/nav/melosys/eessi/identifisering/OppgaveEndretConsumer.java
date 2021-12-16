@@ -11,12 +11,14 @@ import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.AbstractConsumerSeekAware;
+import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @AllArgsConstructor
-public class OppgaveEndretConsumer {
+public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
 
     private final BucIdentifisertService bucIdentifisertService;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
@@ -33,6 +35,7 @@ public class OppgaveEndretConsumer {
         containerFactory = "oppgaveListenerContainerFactory",
         groupId = "${melosys.kafka.consumer.oppgave-endret.groupid}")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
+        log.info("Mottatt melding om oppgave endret: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);
 
@@ -44,6 +47,10 @@ public class OppgaveEndretConsumer {
                     () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
                 );
         }
+    }
+
+    public void settSpesifiktOffsetPåConsumer(long offset){
+        getSeekCallbacks().forEach((tp, callback) -> callback.seek(tp.topic(), tp.partition(), offset));
     }
 
     private boolean erValidertIdentifiseringsoppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {

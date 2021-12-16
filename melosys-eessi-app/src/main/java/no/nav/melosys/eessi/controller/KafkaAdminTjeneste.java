@@ -2,12 +2,11 @@ package no.nav.melosys.eessi.controller;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretConsumer;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @Unprotected
 @RestController
-@RequestMapping("/admin/kafka")
+@RequestMapping("/admin/kafka/consumers")
 public class KafkaAdminTjeneste {
 
     private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
@@ -29,53 +28,69 @@ public class KafkaAdminTjeneste {
     @Autowired
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
+    private final OppgaveEndretConsumer oppgaveEndretConsumer;
     private final String apiKey;
 
-    public KafkaAdminTjeneste(@Value("${melosys.admin.api-key}") String apiKey) {
+    public KafkaAdminTjeneste(OppgaveEndretConsumer oppgaveEndretConsumer, @Value("${melosys.admin.api-key}") String apiKey) {
+        this.oppgaveEndretConsumer = oppgaveEndretConsumer;
         this.apiKey = apiKey;
     }
 
-    @GetMapping("/consumers")
-    public ResponseEntity<List<KafkaConsumerResponse>> getConsumerIds(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    @GetMapping()
+    public ResponseEntity<List<KafkaConsumerResponse>> hentConsumerIds(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
         return ResponseEntity.ok(kafkaListenerEndpointRegistry.getListenerContainerIds()
             .stream()
-            .map(this::createKafkaConsumerResponseById)
-            .collect(Collectors.toList()));
+            .map(this::lagKafkaConsumerResponseVedId)
+            .toList());
     }
 
-    @PostMapping("consumers/{consumerId}/stop")
-    public ResponseEntity<KafkaConsumerResponse> stopKafkaConsumer(@PathVariable String consumerId, @RequestHeader(API_KEY_HEADER) String apiKey){
+    @PostMapping("/{consumerId}/stop")
+    public ResponseEntity<KafkaConsumerResponse> stoppKafkaConsumer(@PathVariable String consumerId, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
         MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
 
-        if(listenerContainer == null){
+        if (listenerContainer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         listenerContainer.stop();
 
-        return ResponseEntity.ok(createKafkaConsumerResponse(listenerContainer));
+        return ResponseEntity.ok(lapKafkaConsumerResponse(listenerContainer));
     }
 
-    @PostMapping("consumers/{consumerId}/start")
+    @PostMapping("/{consumerId}/start")
     public ResponseEntity<KafkaConsumerResponse> startKafkaConsumer(@PathVariable String consumerId, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
         MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
 
-        if(listenerContainer == null){
+        if (listenerContainer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         listenerContainer.start();
 
-        return ResponseEntity.ok(createKafkaConsumerResponse(listenerContainer));
+        return ResponseEntity.ok(lapKafkaConsumerResponse(listenerContainer));
     }
 
-    private KafkaConsumerResponse createKafkaConsumerResponse(MessageListenerContainer listenerContainer){
+    @PostMapping("/{consumerId}/seek-to-offset/{offset}")
+    public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset, @RequestHeader(API_KEY_HEADER) String apiKey) {
+        validerApikey(apiKey);
+
+        if (!consumerId.equals("oppgaveEndret")) {
+            return ResponseEntity.badRequest().body("ConsumerId is not supported: " + consumerId);
+        }
+
+        log.info("Setter offset for oppgave-endret consumer til: {}", offset);
+        oppgaveEndretConsumer.settSpesifiktOffsetPåConsumer(offset);
+        return ResponseEntity.ok().build();
+    }
+
+
+    private KafkaConsumerResponse lapKafkaConsumerResponse(MessageListenerContainer listenerContainer) {
         return KafkaConsumerResponse.builder()
             .consumerId(listenerContainer.getListenerId())
             .groupId(listenerContainer.getGroupId())
@@ -83,19 +98,19 @@ public class KafkaAdminTjeneste {
             .active(listenerContainer.isRunning())
             .assignments(Optional.ofNullable(listenerContainer.getAssignedPartitions())
                 .map(topicPartitions -> topicPartitions.stream()
-                    .map(this::createKafkaConsumerAssignmentResponse)
-                    .collect(Collectors.toList()))
+                    .map(this::lagKafkaConsumerAssignmentResponse)
+                    .toList())
                 .orElse(null))
             .build();
     }
 
-    private KafkaConsumerResponse createKafkaConsumerResponseById(String consumerId) {
+    private KafkaConsumerResponse lagKafkaConsumerResponseVedId(String consumerId) {
         MessageListenerContainer listenerContainer =
             kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
-        return createKafkaConsumerResponse(listenerContainer);
+        return lapKafkaConsumerResponse(listenerContainer);
     }
 
-    private KafkaConsumerAssignmentResponse createKafkaConsumerAssignmentResponse(
+    private KafkaConsumerAssignmentResponse lagKafkaConsumerAssignmentResponse(
         TopicPartition topicPartition) {
         return KafkaConsumerAssignmentResponse.builder()
             .topic(topicPartition.topic())

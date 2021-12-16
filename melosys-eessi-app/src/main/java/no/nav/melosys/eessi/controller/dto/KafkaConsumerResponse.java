@@ -10,10 +10,10 @@ import java.util.List;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KafkaConsumerResponse {
-    private String consumerId;
-    private String groupId;
-    private String listenerId;
-    private Boolean active;
+    private final String consumerId;
+    private final String groupId;
+    private final String listenerId;
+    private final boolean active;
 
-    private List<KafkaConsumerAssignmentResponse> assignments;
+    private final List<KafkaConsumerAssignmentResponse> assignments;
 }

@@ -8,6 +8,6 @@ import lombok.Data;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class KafkaConsumerAssignmentResponse {
-    private String topic;
-    private Integer partition;
+    private final String topic;
+    private final Integer partition;
 }
