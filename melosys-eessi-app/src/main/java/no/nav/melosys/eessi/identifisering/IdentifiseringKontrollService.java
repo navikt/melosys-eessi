@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
@@ -20,12 +21,14 @@ public class IdentifiseringKontrollService {
     private final PersonFasade personFasade;
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
+    private final Unleash unleash;
     private final static int OVERSTYREKONTROLLVERSJON = 2;
 
-    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker) {
+    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker, Unleash unleash) {
         this.personFasade = personFasade;
         this.euxService = euxService;
         this.personSokMetrikker = personSokMetrikker;
+        this.unleash = unleash;
     }
 
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int versjon) {
@@ -46,9 +49,11 @@ public class IdentifiseringKontrollService {
     private Collection<IdentifiseringsKontrollBegrunnelse> kontrollerIdentifisering(PersonModell identifisertPerson, Person sedPerson, String avsenderLand, int oppgaveVersjon) {
         List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
 
-        if (oppgaveVersjon > OVERSTYREKONTROLLVERSJON) {
-            personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
-            return begrunnelser;
+        if (unleash.isEnabled("melosys.eessi.overstyrIdentifiseringsKontroll")) {
+            if (oppgaveVersjon > OVERSTYREKONTROLLVERSJON) {
+                personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
+                return begrunnelser;
+            }
         }
 
         if (!PersonKontroller.harSammeFoedselsdato(identifisertPerson, tilLocalDate(sedPerson.getFoedselsdato()))) {
