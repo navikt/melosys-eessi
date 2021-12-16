@@ -1,9 +1,6 @@
 package no.nav.melosys.eessi.identifisering;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -22,7 +19,7 @@ public class IdentifiseringKontrollService {
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
     private final Unleash unleash;
-    private final static int OVERSTYREKONTROLLVERSJON = 2;
+    private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 3;
 
     public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker, Unleash unleash) {
         this.personFasade = personFasade;
@@ -31,7 +28,7 @@ public class IdentifiseringKontrollService {
         this.unleash = unleash;
     }
 
-    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int versjon) {
+    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveVersjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);
         var dokumentID = buc.finnFørstMottatteSed()
             .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
@@ -42,19 +39,18 @@ public class IdentifiseringKontrollService {
 
         var identifisertPerson = personFasade.hentPerson(aktørId);
 
-
-        return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand(), versjon));
-    }
-
-    private Collection<IdentifiseringsKontrollBegrunnelse> kontrollerIdentifisering(PersonModell identifisertPerson, Person sedPerson, String avsenderLand, int oppgaveVersjon) {
-        List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
-
         if (unleash.isEnabled("melosys.eessi.overstyrIdentifiseringsKontroll")) {
-            if (oppgaveVersjon > OVERSTYREKONTROLLVERSJON) {
+            if (oppgaveVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
                 personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
-                return begrunnelser;
+                return new IdentifiseringsKontrollResultat(Collections.emptyList());
             }
         }
+
+        return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand()));
+    }
+
+    private Collection<IdentifiseringsKontrollBegrunnelse> kontrollerIdentifisering(PersonModell identifisertPerson, Person sedPerson, String avsenderLand) {
+        List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
 
         if (!PersonKontroller.harSammeFoedselsdato(identifisertPerson, tilLocalDate(sedPerson.getFoedselsdato()))) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO);
@@ -62,7 +58,7 @@ public class IdentifiseringKontrollService {
         if (sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand)) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
-        if (!PersonKontroller.harSammeKjønn(identifisertPerson, sedPerson)) {
+        if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.KJØNN);
         }
 

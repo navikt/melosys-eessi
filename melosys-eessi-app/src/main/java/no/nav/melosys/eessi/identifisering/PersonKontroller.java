@@ -33,10 +33,7 @@ class PersonKontroller {
         return personModell.getUtenlandskId().stream().anyMatch(utenlandskId::equals);
     }
 
-    public static boolean harSammeKjønn(PersonModell identifisertPerson, Person sedPerson) {
-        if (sedPerson.getKjoenn() == Kjønn.U) {
-            return true;
-        }
-        return identifisertPerson.getKjønn() == sedPerson.getKjoenn().tilDomene();
+    public static boolean harUkjentEllerSammeKjønn(PersonModell identifisertPerson, Person sedPerson) {
+        return sedPerson.getKjoenn() == Kjønn.U || identifisertPerson.getKjønn() == sedPerson.getKjoenn().tilDomene();
     }
 }
