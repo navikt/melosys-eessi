@@ -2,11 +2,13 @@ package no.nav.melosys.eessi;
 
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
@@ -15,6 +17,7 @@ import org.springframework.http.*;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 
 public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
@@ -88,7 +91,7 @@ public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, FNR, "1", rinaSaksnummer)).get();
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, FNR, "1", rinaSaksnummer)).get();
 
-        Thread.sleep(1_000);
+        verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString());
 
         ResponseEntity<String> responseEntity = testRestTemplate.exchange(
             "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveEndret/seek-to-offset/2",

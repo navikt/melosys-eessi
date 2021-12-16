@@ -58,7 +58,7 @@ public class KafkaAdminTjeneste {
 
         listenerContainer.stop();
 
-        return ResponseEntity.ok(lapKafkaConsumerResponse(listenerContainer));
+        return ResponseEntity.ok(lagKafkaConsumerResponse(listenerContainer));
     }
 
     @PostMapping("/{consumerId}/start")
@@ -73,7 +73,7 @@ public class KafkaAdminTjeneste {
 
         listenerContainer.start();
 
-        return ResponseEntity.ok(lapKafkaConsumerResponse(listenerContainer));
+        return ResponseEntity.ok(lagKafkaConsumerResponse(listenerContainer));
     }
 
     @PostMapping("/{consumerId}/seek-to-offset/{offset}")
@@ -90,7 +90,7 @@ public class KafkaAdminTjeneste {
     }
 
 
-    private KafkaConsumerResponse lapKafkaConsumerResponse(MessageListenerContainer listenerContainer) {
+    private KafkaConsumerResponse lagKafkaConsumerResponse(MessageListenerContainer listenerContainer) {
         return KafkaConsumerResponse.builder()
             .consumerId(listenerContainer.getListenerId())
             .groupId(listenerContainer.getGroupId())
@@ -107,7 +107,7 @@ public class KafkaAdminTjeneste {
     private KafkaConsumerResponse lagKafkaConsumerResponseVedId(String consumerId) {
         MessageListenerContainer listenerContainer =
             kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
-        return lapKafkaConsumerResponse(listenerContainer);
+        return lagKafkaConsumerResponse(listenerContainer);
     }
 
     private KafkaConsumerAssignmentResponse lagKafkaConsumerAssignmentResponse(
