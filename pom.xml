@@ -46,7 +46,7 @@
 
         <!-- Transitive avhengigheter -->
         <asm.version>7.3.1</asm.version>
-        <checker-qual.version>3.5.0</checker-qual.version>
+        <checker-qual.version>3.21.0</checker-qual.version>
         <javassist.version>3.27.0-GA</javassist.version>
         <jna.version>5.5.0</jna.version>
         <objenesis.version>3.2</objenesis.version>
