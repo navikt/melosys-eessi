@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.finn.unleash.Unleash;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -50,7 +51,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "test")
-@SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class })
+@SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/kafka-test.properties")
 public abstract class ComponentTestBase {
 
