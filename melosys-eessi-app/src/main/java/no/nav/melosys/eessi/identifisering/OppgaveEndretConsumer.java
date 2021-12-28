@@ -35,7 +35,6 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
         containerFactory = "oppgaveListenerContainerFactory",
         groupId = "${melosys.kafka.consumer.oppgave-endret.groupid}")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
-        log.info("Mottatt melding om oppgave endret: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
         final var oppgave = consumerRecord.value();
         log.debug("Oppgave endret: {}", oppgave);
 

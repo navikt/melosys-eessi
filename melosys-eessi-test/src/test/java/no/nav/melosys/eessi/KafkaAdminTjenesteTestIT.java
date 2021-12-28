@@ -94,7 +94,7 @@ public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
         verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString());
 
         ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveEndret/seek-to-offset/2",
+            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveEndret/seek/2",
             HttpMethod.POST,
             lagStringHttpEntity(),
             new ParameterizedTypeReference<>() {

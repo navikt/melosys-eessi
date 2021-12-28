@@ -76,7 +76,7 @@ public class KafkaAdminTjeneste {
         return ResponseEntity.ok(lagKafkaConsumerResponse(listenerContainer));
     }
 
-    @PostMapping("/{consumerId}/seek-to-offset/{offset}")
+    @PostMapping("/{consumerId}/seek/{offset}")
     public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
