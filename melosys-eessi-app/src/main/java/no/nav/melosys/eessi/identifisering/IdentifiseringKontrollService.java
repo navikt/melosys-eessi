@@ -28,7 +28,7 @@ public class IdentifiseringKontrollService {
         this.unleash = unleash;
     }
 
-    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveVersjon) {
+    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveEndretVersjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);
         var dokumentID = buc.finnFørstMottatteSed()
             .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
@@ -40,7 +40,7 @@ public class IdentifiseringKontrollService {
         var identifisertPerson = personFasade.hentPerson(aktørId);
 
         if (unleash.isEnabled("melosys.eessi.overstyrIdentifiseringsKontroll")) {
-            if (oppgaveVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
+            if (oppgaveEndretVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
                 personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
                 return new IdentifiseringsKontrollResultat(Collections.emptyList());
             }
