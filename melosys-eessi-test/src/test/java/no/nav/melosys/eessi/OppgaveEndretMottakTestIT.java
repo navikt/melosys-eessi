@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi;
 
+import java.time.Duration;
+import java.util.Random;
+import java.util.UUID;
+
 import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
@@ -9,16 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Duration;
-import java.util.Random;
-import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 public class OppgaveEndretMottakTestIT extends ComponentTestBase {
 
@@ -101,7 +100,6 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"2", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        //verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
         verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(),any());
         assertThat(hentMelosysEessiRecords()).isEmpty();
     }

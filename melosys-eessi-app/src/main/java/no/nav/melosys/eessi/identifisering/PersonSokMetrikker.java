@@ -33,6 +33,8 @@ class PersonSokMetrikker {
     private static final String STATSBORGERSKAP = "statsborgerskap";
     private static final String UTENLANDSK_ID = "utenlandskid";
 
+    private static final String OVERSTYREKONTROLL = "overstyreKontroll";
+
     private static final Map<SoekBegrunnelse, Counter> SØKBEGRUNNELSE_TELLERE = new EnumMap<>(SoekBegrunnelse.class);
     private static final Map<IdentifiseringsKontrollBegrunnelse, Counter> IDENTIFISERINGS_KONTROLL_BEGRUNNELSE_TELLERE = new EnumMap<>(IdentifiseringsKontrollBegrunnelse.class);
 
@@ -49,6 +51,7 @@ class PersonSokMetrikker {
         IDENTIFISERINGS_KONTROLL_BEGRUNNELSE_TELLERE.put(IdentifiseringsKontrollBegrunnelse.KJØNN, Metrics.counter(IDENTIFISERING_KONTROLL, KEY_BEGRUNNELSE, KJØNN));
         IDENTIFISERINGS_KONTROLL_BEGRUNNELSE_TELLERE.put(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP, Metrics.counter(IDENTIFISERING_KONTROLL, KEY_BEGRUNNELSE, STATSBORGERSKAP));
         IDENTIFISERINGS_KONTROLL_BEGRUNNELSE_TELLERE.put(IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID, Metrics.counter(IDENTIFISERING_KONTROLL, KEY_BEGRUNNELSE, UTENLANDSK_ID));
+        IDENTIFISERINGS_KONTROLL_BEGRUNNELSE_TELLERE.put(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL, Metrics.counter(IDENTIFISERING_KONTROLL, KEY_BEGRUNNELSE, OVERSTYREKONTROLL));
     }
 
     void counter(final SoekBegrunnelse soekBegrunnelse) {

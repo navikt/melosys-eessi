@@ -2,10 +2,12 @@ package no.nav.melosys.eessi.identifisering;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -53,13 +55,15 @@ class IdentifiseringKontrollServiceTest {
     private final String rinaSaksnummer = "432534";
     private final String dokumentId = "abcdefghijkl1";
 
+    private final FakeUnleash unleash = new FakeUnleash();
+
     private final PersonModell.PersonModellBuilder personBuilder = PersonModell.builder();
 
 
     @BeforeEach
     void setup() {
-        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker);
-
+        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker, unleash);
+        unleash.enable("melosys.eessi.overstyrIdentifiseringsKontroll");
         var utenlandskPin = new Pin(utenlandskId, avsenderLand, null);
 
         statsborgerskap.setLand(avsenderLand);
@@ -104,15 +108,45 @@ class IdentifiseringKontrollServiceTest {
     @Test
     void kontrollerIdentifisertPerson_personSamstemmerMedSed_identifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(true, Collections.emptyList());
     }
 
     @Test
+    void kontrollerIdentifiseringPerson_personMedUkjentKjonn_identifisert() {
+        sedPerson.setKjoenn(no.nav.melosys.eessi.models.sed.nav.Kjønn.U);
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(true, Collections.emptyList());
+    }
+
+    @Test
+    void kontrollerIdentifiseringsPerson_personOverstyrtAvIDogFordeling_identifisert() {
+        sedPerson.setFoedselsdato(LocalDate.now().minusMonths(3).toString());
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 3))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(true, Collections.emptyList());
+    }
+
+    @Test
+    void kontrollerIdentifiseringsPerson_personIkkeOverstyrtAvIDogFordeling_ikkeIdentifisert() {
+        final List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
+        begrunnelser.add(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO);
+        final var identifiseringsKontrollResultatData = new IdentifiseringsKontrollResultat(begrunnelser);
+        sedPerson.setFoedselsdato(LocalDate.now().minusMonths(3).toString());
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
+
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 2)
+            .hentFeilIOpplysningerTekst()).isEqualTo(identifiseringsKontrollResultatData.hentFeilIOpplysningerTekst());
+    }
+
+    @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigStatsborgerskap_ikkeIdentifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP));
     }
@@ -120,7 +154,7 @@ class IdentifiseringKontrollServiceTest {
     @Test
     void kontrollerIdentifisertPerson_personHarFeilKjønn_ikkeIdentifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.kjønn(Kjønn.MANN).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.KJØNN));
     }
@@ -128,7 +162,7 @@ class IdentifiseringKontrollServiceTest {
     @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigFødselsdato_ikkeIdentifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.fødselsdato(LocalDate.now().minusYears(3)).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO));
     }
@@ -136,7 +170,7 @@ class IdentifiseringKontrollServiceTest {
     @Test
     void kontrollerIdentifisertPerson_personHarIkkeRiktigUtenlandskId_ikkeIdentifisert() {
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.utenlandskId(Set.of(new UtenlandskId("feil-pin", avsenderLand))).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer))
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID));
     }

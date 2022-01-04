@@ -1,10 +1,8 @@
 package no.nav.melosys.eessi.identifisering;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
@@ -20,14 +18,17 @@ public class IdentifiseringKontrollService {
     private final PersonFasade personFasade;
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
+    private final Unleash unleash;
+    private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 3; // 3 versjon tilsvarer 2 gang hos id og fordeling
 
-    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker) {
+    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker, Unleash unleash) {
         this.personFasade = personFasade;
         this.euxService = euxService;
         this.personSokMetrikker = personSokMetrikker;
+        this.unleash = unleash;
     }
 
-    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørID, String rinaSaksnummer) {
+    public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveEndretVersjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);
         var dokumentID = buc.finnFørstMottatteSed()
             .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
@@ -36,8 +37,14 @@ public class IdentifiseringKontrollService {
         var sedPerson = euxService.hentSed(rinaSaksnummer, dokumentID).finnPerson()
             .orElseThrow(() -> new NoSuchElementException("Finner ingen person fra SED"));
 
-        var identifisertPerson = personFasade.hentPerson(aktørID);
+        var identifisertPerson = personFasade.hentPerson(aktørId);
 
+        if (unleash.isEnabled("melosys.eessi.overstyrIdentifiseringsKontroll")) {
+            if (oppgaveEndretVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
+                personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
+                return new IdentifiseringsKontrollResultat(Collections.emptyList());
+            }
+        }
 
         return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand()));
     }
@@ -51,7 +58,7 @@ public class IdentifiseringKontrollService {
         if (sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand)) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
-        if (!PersonKontroller.harSammeKjønn(identifisertPerson, sedPerson)) {
+        if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.KJØNN);
         }
 

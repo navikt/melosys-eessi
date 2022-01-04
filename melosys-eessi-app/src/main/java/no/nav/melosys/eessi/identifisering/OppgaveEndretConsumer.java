@@ -82,17 +82,17 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
     }
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
-                                                           OppgaveEndretHendelse oppgave) {
-        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgave.hentAktørID(), rinaSaksnummer);
+                                                           OppgaveEndretHendelse oppgaveEndretHendelse) {
+        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgaveEndretHendelse.hentAktørID(), rinaSaksnummer, oppgaveEndretHendelse.getVersjon());
         if (kontrollResultat.erIdentifisert()) {
-            log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgave.getId());
-            bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgave.hentAktørID()));
-            oppgaveService.ferdigstillOppgave(oppgave.getId().toString(), oppgave.getVersjon());
+            log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgaveEndretHendelse.getId());
+            bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgaveEndretHendelse.hentAktørID()));
+            oppgaveService.ferdigstillOppgave(oppgaveEndretHendelse.getId().toString(), oppgaveEndretHendelse.getVersjon());
         } else {
-            log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgave.getId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
+            log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgaveEndretHendelse.getId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
             oppgaveService.flyttOppgaveTilIdOgFordeling(
-                oppgave.getId().toString(),
-                oppgave.getVersjon(),
+                oppgaveEndretHendelse.getId().toString(),
+                oppgaveEndretHendelse.getVersjon(),
                 kontrollResultat.hentFeilIOpplysningerTekst());
         }
     }
