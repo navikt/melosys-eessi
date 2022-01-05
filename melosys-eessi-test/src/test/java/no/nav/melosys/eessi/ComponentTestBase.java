@@ -13,7 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.finn.unleash.Unleash;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -51,7 +50,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "test")
-@SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class }, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/kafka-test.properties")
 public abstract class ComponentTestBase {
 
@@ -153,7 +152,7 @@ public abstract class ComponentTestBase {
     }
 
     @SneakyThrows
-    private MelosysEessiMelding tilMelosysEessiMelding(String value) {
+    MelosysEessiMelding tilMelosysEessiMelding(String value) {
         return objectMapper.readValue(value, MelosysEessiMelding.class);
     }
 
@@ -162,12 +161,12 @@ public abstract class ComponentTestBase {
             .hasSize(forventetStørrelse)
             .allMatch(eessiMelding ->
                 eessiMelding.getPeriode().equals(new Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01")))
-                && eessiMelding.getJournalpostId().equals("1")
-                && eessiMelding.getAktoerId().equals(AKTOER_ID)
+                    && eessiMelding.getJournalpostId().equals("1")
+                    && eessiMelding.getAktoerId().equals(AKTOER_ID)
             );
     }
 
-    protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String fnr ,String versjon, String rinaSaksnummer) {
+    protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String fnr, String versjon, String rinaSaksnummer) {
         return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, fnr, AKTOER_ID, versjon, rinaSaksnummer));
     }
 

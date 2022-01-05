@@ -46,6 +46,13 @@ melosys:
       groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
     producer:
       topic-name: ${KAFKA_EESSIMELDING_TOPIC}
+    aiven:
+      brokers: ${KAFKA_BROKERS}
+      keystorePath: ${KAFKA_KEYSTORE_PATH:/dev/zero}
+      truststorePath: ${KAFKA_TRUSTSTORE_PATH:/dev/zero}
+      credstorePassword: ${KAFKA_CREDSTORE_PASSWORD:pwd}
+      producer:
+        aiven-topic-name: ${KAFKA_AIVEN_EESSIMELDING_TOPIC:teammelosys.eessi.v1}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}
