@@ -81,7 +81,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev
 
   # Deploy til Q1 manuelt
   deploy_q1:
@@ -98,7 +98,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no
+          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev
 
   # Deploy til prod manuelt
   deploy_prod:
@@ -115,7 +115,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)

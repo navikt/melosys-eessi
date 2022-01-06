@@ -40,4 +40,6 @@ spec:
       value: nais
   ingresses:
     - {{INGRESS}}
+  kafka:
+    pool: {{ KAFKA_POOL }}
 
