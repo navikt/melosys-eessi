@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.kafka.producers.config;
+package no.nav.melosys.eessi.config;
 
 import java.util.Arrays;
 import java.util.HashMap;

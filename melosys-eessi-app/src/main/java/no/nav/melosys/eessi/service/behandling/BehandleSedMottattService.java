@@ -139,7 +139,7 @@ public class BehandleSedMottattService {
             sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
             sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring, sedHendelse.getRinaDokumentVersjon());
 
-        if (unleash.isEnabled("melosys.eessi.producer-eessi")) {
+        if (unleash.isEnabled("melosys.eessi.aiven-producer")) {
             log.info("Publiserer eessiMelding melding på aiven");
             melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
         } else {

@@ -61,7 +61,7 @@ public class BehandleBucIdentifisertService {
             sedErEndring,
             sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon());
 
-        if (unleash.isEnabled("melosys.eessi.producer-eessi")) {
+        if (unleash.isEnabled("melosys.eessi.aiven-producer")) {
             log.info("Publiserer eessiMelding melding på aiven");
             melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
         } else {

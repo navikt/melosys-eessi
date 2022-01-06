@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class AivenProducerTestIT extends ComponentTestBase {
+class AivenProducerTestIT extends ComponentTestBase {
 
     @Autowired
     private MelosysEessiAivenProducer melosysEessiAivenProducer;
