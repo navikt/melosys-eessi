@@ -14,10 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MelosysEessiAivenProducer {
 
-    private final KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String topicName;
 
-    public MelosysEessiAivenProducer(@Qualifier("eessiMelding") KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate,
+    public MelosysEessiAivenProducer(@Qualifier("aivenTemplate") KafkaTemplate<String, Object> kafkaTemplate,
                                      @Value("${melosys.kafka.aiven.producer.aiven-topic-name}") String topicName) {
         this.kafkaTemplate = kafkaTemplate;
         this.topicName = topicName;

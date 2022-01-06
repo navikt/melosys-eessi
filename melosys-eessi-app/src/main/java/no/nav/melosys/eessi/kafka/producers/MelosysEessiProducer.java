@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MelosysEessiProducer {
 
-    private final KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     private final String topicName;
 
-    public MelosysEessiProducer(KafkaTemplate<String, MelosysEessiMelding> kafkaTemplate, @Value("${melosys.kafka.producer.topic-name}") String topicName) {
+    public MelosysEessiProducer(@Qualifier("onPremTemplate") KafkaTemplate<String, Object> kafkaTemplate, @Value("${melosys.kafka.producer.topic-name}") String topicName) {
         this.kafkaTemplate = kafkaTemplate;
         this.topicName = topicName;
     }
