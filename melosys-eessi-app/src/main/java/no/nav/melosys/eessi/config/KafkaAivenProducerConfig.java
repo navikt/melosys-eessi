@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
@@ -42,10 +41,10 @@ public class KafkaAivenProducerConfig {
     private String credstorePassword;
 
     @Bean
-    @Qualifier("eessiMelding")
-    public KafkaTemplate<String, MelosysEessiMelding> eessiMeldingKafkaTemplate(ObjectMapper objectMapper) {
+    @Qualifier("aivenTemplate")
+    public KafkaTemplate<String, Object> aivenKafkaTemplate(ObjectMapper objectMapper) {
         Map<String, Object> props = commonProps();
-        ProducerFactory<String, MelosysEessiMelding> producerFactory =
+        ProducerFactory<String, Object> producerFactory =
             new DefaultKafkaProducerFactory<>(props, new StringSerializer(), new JsonSerializer<>(objectMapper));
 
         return new KafkaTemplate<>(producerFactory);
