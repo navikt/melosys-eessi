@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -90,7 +89,7 @@ public interface SedMapper {
 
     private Statsborgerskap lagStatsborgerskap(String landkode) {
         Statsborgerskap statsborgerskap = new Statsborgerskap();
-        statsborgerskap.setLand(LandkodeMapper.getLandkodeIso2(landkode));
+        statsborgerskap.setLand(LandkodeMapper.mapTilLandkodeIso2(landkode));
         return statsborgerskap;
     }
 
@@ -104,7 +103,7 @@ public interface SedMapper {
         for (Ident utenlandskIdent : sedData.getUtenlandskIdent()) {
             pins.add(
                     new Pin(utenlandskIdent.getIdent(),
-                            LandkodeMapper.getLandkodeIso2(utenlandskIdent.getLandkode()), null)
+                            LandkodeMapper.mapTilLandkodeIso2(utenlandskIdent.getLandkode()), null)
             );
         }
 
@@ -145,7 +144,7 @@ public interface SedMapper {
         bostedsadresse.setBy(adresse.getPoststed());
         bostedsadresse.setPostnummer(adresse.getPostnr());
         bostedsadresse.setRegion(adresse.getRegion());
-        bostedsadresse.setLand(LandkodeMapper.getLandkodeIso2(adresse.getLand()));
+        bostedsadresse.setLand(LandkodeMapper.mapTilLandkodeIso2(adresse.getLand()));
         return bostedsadresse;
     }
 
@@ -253,7 +252,7 @@ public interface SedMapper {
         adresse.setGate(sAdresse.getGateadresse());
         adresse.setPostnummer(sAdresse.getPostnr());
         adresse.setBy(sAdresse.getPoststed());
-        adresse.setLand(LandkodeMapper.getLandkodeIso2(sAdresse.getLand()));
+        adresse.setLand(LandkodeMapper.mapTilLandkodeIso2(sAdresse.getLand()));
         adresse.setBygning(null);
         adresse.setRegion(sAdresse.getRegion());
 
@@ -302,7 +301,7 @@ public interface SedMapper {
         } else if (iso3.length() == 2) {
             return iso3;
         } else {
-            return LandkodeMapper.getLandkodeIso2(iso3);
+            return LandkodeMapper.mapTilLandkodeIso2(iso3);
         }
     }
 }

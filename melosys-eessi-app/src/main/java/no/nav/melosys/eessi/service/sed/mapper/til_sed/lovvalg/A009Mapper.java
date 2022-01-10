@@ -30,7 +30,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
         Periode gjelderperiode = new Periode();
 
         if (lovvalgsperiode.isPresent()) {
-            vedtak.setLand(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.get().getLovvalgsland()));
+            vedtak.setLand(LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.get().getLovvalgsland()));
 
             //Vil alltid være fast periode
             gjelderperiode.setFastperiode(lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode.get()));

@@ -64,7 +64,7 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
 
     private List<Land> getLovvalgsland(Lovvalgsperiode lovvalgsperiode) {
         Land land = new Land();
-        land.setLandkode(LandkodeMapper.getLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
+        land.setLandkode(LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
 
         return Collections.singletonList(land);
     }
