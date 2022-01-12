@@ -49,11 +49,11 @@ public class PDLService implements PersonFasade {
             .statsborgerskapLandkodeISO2(
                 pdlPerson.getStatsborgerskap().stream()
                 .map(PDLStatsborgerskap::getLand)
-                .map(LandkodeMapper::getLandkodeIso2)
+                .map(LandkodeMapper::mapTilLandkodeIso2)
                 .collect(Collectors.toSet()))
             .utenlandskId(pdlPerson.getUtenlandskIdentifikasjonsnummer()
                 .stream()
-                .map(p -> new UtenlandskId(p.getIdentifikasjonsnummer(), LandkodeMapper.getLandkodeIso2(p.getUtstederland())))
+                .map(p -> new UtenlandskId(p.getIdentifikasjonsnummer(), LandkodeMapper.mapTilLandkodeIso2(p.getUtstederland())))
                 .collect(Collectors.toSet()))
             .build();
     }
