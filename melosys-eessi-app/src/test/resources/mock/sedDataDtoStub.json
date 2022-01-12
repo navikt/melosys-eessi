@@ -63,7 +63,7 @@
     "foedseldato": "2020-01-01",
     "fornavn": "MrEtternavn",
     "kjoenn": "M",
-    "statsborgerskap": ["NO", "SWE"]
+    "statsborgerskap": ["NO", "SWE", "SCG"]
   },
   "egenAnsatt": false,
   "familieMedlem": [

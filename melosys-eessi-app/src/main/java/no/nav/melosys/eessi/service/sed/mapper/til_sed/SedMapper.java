@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -83,14 +82,13 @@ public interface SedMapper {
 
     default List<Statsborgerskap> hentStatsborgerskap(SedDataDto sedDataDto) {
         return sedDataDto.getBruker().getStatsborgerskap().stream()
+            .filter(landkodeIso3 -> LandkodeMapper.finnLandkodeIso2(landkodeIso3).isPresent())
             .map(this::lagStatsborgerskap)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private Statsborgerskap lagStatsborgerskap(String landkode) {
-        Statsborgerskap statsborgerskap = new Statsborgerskap();
-        statsborgerskap.setLand(LandkodeMapper.mapTilLandkodeIso2(landkode));
-        return statsborgerskap;
+        return new Statsborgerskap(LandkodeMapper.mapTilLandkodeIso2(landkode));
     }
 
     default List<Pin> hentPin(SedDataDto sedData) {
@@ -212,7 +210,7 @@ public interface SedMapper {
         return virksomheter.stream()
                 .filter(virksomhetPredicate)
                 .map(this::hentArbeidsgiver)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     default Arbeidsgiver hentArbeidsgiver(Virksomhet virksomhet) {
