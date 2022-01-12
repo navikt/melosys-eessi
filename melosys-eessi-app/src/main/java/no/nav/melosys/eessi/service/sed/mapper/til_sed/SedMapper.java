@@ -81,10 +81,14 @@ public interface SedMapper {
     }
 
     default List<Statsborgerskap> hentStatsborgerskap(SedDataDto sedDataDto) {
-        return sedDataDto.getBruker().getStatsborgerskap().stream()
+        final List<Statsborgerskap> statsborgerskapList = sedDataDto.getBruker().getStatsborgerskap().stream()
             .filter(landkodeIso3 -> LandkodeMapper.finnLandkodeIso2(landkodeIso3).isPresent())
             .map(this::lagStatsborgerskap)
             .toList();
+        if (statsborgerskapList.isEmpty()) {
+            throw new MappingException("Statsborgerskap er påkrevd.");
+        }
+        return statsborgerskapList;
     }
 
     private Statsborgerskap lagStatsborgerskap(String landkode) {
