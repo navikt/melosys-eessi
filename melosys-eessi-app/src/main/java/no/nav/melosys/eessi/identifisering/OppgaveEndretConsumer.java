@@ -39,7 +39,7 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
         log.debug("Oppgave endret: {}", oppgave);
 
         if (erValidertIdentifiseringsoppgave(oppgave)) {
-            log.info("Oppgave {} markert som identifisert av ID og Fordeling. Søker etter tilknyttet RINA-sak", oppgave.getId());
+            log.info("Oppgave {} markert som identifisert av ID og Fordeling. Versjon {}. Søker etter tilknyttet RINA-sak", oppgave.getId(), oppgave.getVersjon());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                 .ifPresentOrElse(
                     b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave),
