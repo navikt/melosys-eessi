@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -34,12 +35,15 @@ public class SedService {
 
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
+    private final Unleash unleash;
 
     @Autowired
     public SedService(@Qualifier("tokenContext") EuxService euxService,
-                      SaksrelasjonService saksrelasjonService) {
+                      SaksrelasjonService saksrelasjonService,
+                      Unleash unleash) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
+        this.unleash = unleash;
     }
 
     public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto,
@@ -120,7 +124,7 @@ public class SedService {
 
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
         var buc = euxService.hentBuc(rinaSaksnummer);
-        if (!buc.kanOppretteEllerOppdatereSed(sedType)) {
+        if (!buc.kanOppretteEllerOppdatereSed(sedType) && !unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc " + rinaSaksnummer + " med type " + buc.getBucType());
         }
 
