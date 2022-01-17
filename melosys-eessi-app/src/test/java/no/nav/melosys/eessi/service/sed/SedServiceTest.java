@@ -20,7 +20,6 @@ import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -47,13 +46,11 @@ class SedServiceTest {
 
     private SedService sendSedService;
 
-    private final FakeUnleash fakeUnleash = new FakeUnleash();
-
     private final String RINA_ID = "aabbcc";
 
     @BeforeEach
     public void setup() {
-        sendSedService = new SedService(euxService, saksrelasjonService, fakeUnleash);
+        sendSedService = new SedService(euxService, saksrelasjonService, new FakeUnleash());
     }
 
     @Test

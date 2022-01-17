@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
-public enum SedHandlinger {
+public enum Aksjoner {
     ADD_SUBDOCUMENT("Add_Subdocument"),
     ARCHIVECASE("ArchiveCase"),
     ATTACHMENT_ADDED("Attachment_Added"),
@@ -29,7 +29,7 @@ public enum SedHandlinger {
 
     private final String handling;
 
-    SedHandlinger(String handling) {
+    Aksjoner(String handling) {
         this.handling = handling;
     }
 
