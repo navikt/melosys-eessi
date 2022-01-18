@@ -26,7 +26,7 @@
         <guava.version>29.0-jre</guava.version>
         <hibernate-types.version>2.10.1</hibernate-types.version>
         <java.version>16</java.version>
-        <logback-classic.version>1.2.3</logback-classic.version>
+        <logback-classic.version>1.2.10</logback-classic.version>
         <logstash-encoder.version>5.3</logstash-encoder.version>
         <lombok.version>1.18.20</lombok.version>
         <jackson.version>2.12.3</jackson.version>
