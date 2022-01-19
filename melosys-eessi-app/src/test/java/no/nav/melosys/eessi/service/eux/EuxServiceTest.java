@@ -125,7 +125,7 @@ class EuxServiceTest {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
         when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
-            .thenReturn(List.of("test test " + Aksjoner.CREATE.hentHandling()
+            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
             ));
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
             .thenReturn(Collections.singleton(Aksjoner.SEND.hentHandling()));
@@ -140,7 +140,7 @@ class EuxServiceTest {
     void opprettOgSendSedMedHandlingSjekk_medIngenMuligBucHandlingCreate_forventKasterException() {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
-            .thenReturn(List.of("test test " + Aksjoner.READ.hentHandling()
+            .thenReturn(List.of("SedId SedType " + Aksjoner.READ.hentHandling()
             ));
 
         SED sed = new SED();
@@ -156,7 +156,7 @@ class EuxServiceTest {
     void opprettOgSendSedMedHandlingSjekk_medTomListeBucHandling_forventKasterException() {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
-            .thenReturn(List.of("test test " + Aksjoner.READ.hentHandling()
+            .thenReturn(List.of("SedId SedType " + Aksjoner.READ.hentHandling()
             ));
 
         SED sed = new SED();
@@ -173,7 +173,7 @@ class EuxServiceTest {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
         when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
-            .thenReturn(List.of("test test " + Aksjoner.CREATE.hentHandling()
+            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
             ));
 
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
@@ -194,7 +194,7 @@ class EuxServiceTest {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
         when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
-            .thenReturn(List.of("test test " + Aksjoner.CREATE.hentHandling()
+            .thenReturn(List.of("SedID Sedtype " + Aksjoner.CREATE.hentHandling()
             ));
 
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
