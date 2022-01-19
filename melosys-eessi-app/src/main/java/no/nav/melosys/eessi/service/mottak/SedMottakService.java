@@ -94,6 +94,7 @@ public class SedMottakService {
         bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
                 .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
                 .oppgaveId(oppgaveID)
+                .versjon(1)
                 .build());
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }

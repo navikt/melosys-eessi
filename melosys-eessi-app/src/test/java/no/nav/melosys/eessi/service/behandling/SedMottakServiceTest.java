@@ -105,7 +105,7 @@ class SedMottakServiceTest {
     @Test
     void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgave() {
         final var oppgaveID = "5555";
-        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID);
+        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID,1);
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
 
         final var oppgave = new HentOppgaveDto();

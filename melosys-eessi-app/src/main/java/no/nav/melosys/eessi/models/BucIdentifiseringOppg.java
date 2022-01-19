@@ -22,4 +22,7 @@ public class BucIdentifiseringOppg {
 
     @Column(name = "oppgave_id")
     private String oppgaveId;
+
+    @Column(name = "versjon")
+    private int versjon;
 }
