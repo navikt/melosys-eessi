@@ -7,12 +7,12 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
+import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
-import org.springframework.kafka.listener.ConsumerSeekAware;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -42,13 +42,13 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
             log.info("Oppgave {} markert som identifisert av ID og Fordeling. Versjon {}. Søker etter tilknyttet RINA-sak", oppgave.getId(), oppgave.getVersjon());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                 .ifPresentOrElse(
-                    b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave),
+                    b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave, b.getVersjon()),
                     () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
                 );
         }
     }
 
-    public void settSpesifiktOffsetPåConsumer(long offset){
+    public void settSpesifiktOffsetPåConsumer(long offset) {
         getSeekCallbacks().forEach((tp, callback) -> callback.seek(tp.topic(), tp.partition(), offset));
     }
 
@@ -60,7 +60,7 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
         final var oppgaveId = oppgaveEndretHendelse.getId().toString();
         HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveId);
         if (!oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())) {
-            log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt mellom kafkamelding (versjon {}) og oppgave (versjon {}) ", oppgaveId, oppgaveEndretHendelse.getVersjon(),oppgaveDto.getVersjon());
+            log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt mellom kafkamelding (versjon {}) og oppgave (versjon {}) ", oppgaveId, oppgaveEndretHendelse.getVersjon(), oppgaveDto.getVersjon());
             return false;
         }
 
@@ -82,8 +82,9 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
     }
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
-                                                           OppgaveEndretHendelse oppgaveEndretHendelse) {
-        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgaveEndretHendelse.hentAktørID(), rinaSaksnummer, oppgaveEndretHendelse.getVersjon());
+                                                           OppgaveEndretHendelse oppgaveEndretHendelse,
+                                                           int versjon) {
+        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgaveEndretHendelse.hentAktørID(), rinaSaksnummer, versjon);
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgaveEndretHendelse.getId());
             bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgaveEndretHendelse.hentAktørID()));
@@ -94,6 +95,11 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
                 oppgaveEndretHendelse.getId().toString(),
                 oppgaveEndretHendelse.getVersjon(),
                 kontrollResultat.hentFeilIOpplysningerTekst());
+            bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
+                .rinaSaksnummer(rinaSaksnummer)
+                .oppgaveId(oppgaveEndretHendelse.getId().toString())
+                .versjon(versjon + 1)
+                .build());
         }
     }
 }
