@@ -126,7 +126,7 @@ class IdentifiseringKontrollServiceTest {
     void kontrollerIdentifiseringsPerson_personOverstyrtAvIDogFordeling_identifisert() {
         sedPerson.setFoedselsdato(LocalDate.now().minusMonths(3).toString());
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 3))
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 2))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(true, Collections.emptyList());
     }
@@ -139,7 +139,7 @@ class IdentifiseringKontrollServiceTest {
         sedPerson.setFoedselsdato(LocalDate.now().minusMonths(3).toString());
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
 
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 2)
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
             .hentFeilIOpplysningerTekst()).isEqualTo(identifiseringsKontrollResultatData.hentFeilIOpplysningerTekst());
     }
 
