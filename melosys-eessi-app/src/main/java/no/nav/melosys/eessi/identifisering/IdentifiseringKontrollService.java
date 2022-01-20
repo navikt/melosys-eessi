@@ -19,7 +19,7 @@ public class IdentifiseringKontrollService {
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
     private final Unleash unleash;
-    private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 3; // 3 versjon tilsvarer 2 gang hos id og fordeling
+    private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 2; // 2 versjon tilsvarer 2 gang hos id og fordeling
 
     public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker, Unleash unleash) {
         this.personFasade = personFasade;
