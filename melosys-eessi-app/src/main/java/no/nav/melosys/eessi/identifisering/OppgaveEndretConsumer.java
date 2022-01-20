@@ -95,11 +95,9 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
                 oppgaveEndretHendelse.getId().toString(),
                 oppgaveEndretHendelse.getVersjon(),
                 kontrollResultat.hentFeilIOpplysningerTekst());
-            bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
-                .rinaSaksnummer(rinaSaksnummer)
-                .oppgaveId(oppgaveEndretHendelse.getId().toString())
-                .versjon(versjon + 1)
-                .build());
+            bucIdentifiseringOppgRepository.updateVersjonNumberBy1(
+                oppgaveEndretHendelse.getId().toString(),
+                rinaSaksnummer);
         }
     }
 }
