@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.finn.unleash.FakeUnleash;
+import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
@@ -22,6 +22,7 @@ import no.nav.melosys.eessi.models.buc.Document;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -123,8 +124,11 @@ class EuxServiceTest {
     void opprettOgSendSedMedHandlingSjekk_medRinaSaksnummer_forventKonsumentKall() {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
+            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
+            ));
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
-            .thenReturn(Collections.singleton(SedHandlinger.SEND.hentHandling()));
+            .thenReturn(Collections.singleton(Aksjoner.SEND.hentHandling()));
 
         SED sed = new SED();
         euxService.opprettOgSendSed(sed, opprettetBucID);
@@ -133,16 +137,75 @@ class EuxServiceTest {
     }
 
     @Test
-    void opprettOgSendSedMedHandlingSjekk_medUgyldigSedHandling_kasterIntegrationException() {
+    void opprettOgSendSedMedHandlingSjekk_medIngenMuligBucHandlingCreate_forventKasterException() {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-        when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
-            .thenReturn(Collections.singleton(SedHandlinger.READ.hentHandling()));
+        when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
+            .thenReturn(List.of("SedId SedType " + Aksjoner.READ.hentHandling()
+            ));
+
         SED sed = new SED();
 
         assertThatExceptionOfType(ValidationException.class)
             .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
-            .withMessageContaining("Kan ikke sende SED, ugyldig handling i Rina");
+            .withMessageContaining(String.format("Kan ikke gjøre handling %s på BUC %s, ugyldig handling i Rina",
+                Aksjoner.CREATE.hentHandling()
+                ,opprettetBucID));
+    }
+
+    @Test
+    void opprettOgSendSedMedHandlingSjekk_medTomListeBucHandling_forventKasterException() {
+        unleash.enable("melosys.eessi.handlingssjekk_sed");
+        when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
+            .thenReturn(List.of("SedId SedType " + Aksjoner.READ.hentHandling()
+            ));
+
+        SED sed = new SED();
+
+        assertThatExceptionOfType(ValidationException.class)
+            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
+            .withMessageContaining(String.format("Kan ikke gjøre handling %s på BUC %s, ugyldig handling i Rina",
+                Aksjoner.CREATE.hentHandling()
+                ,opprettetBucID));
+    }
+
+    @Test
+    void opprettOgSendSedMedHandlingSjekk_medTomtSedHandling_forventKasterException() {
+        unleash.enable("melosys.eessi.handlingssjekk_sed");
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
+            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
+            ));
+
+        when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
+            .thenReturn(Lists.emptyList());
+
+        SED sed = new SED();
+
+        assertThatExceptionOfType(ValidationException.class)
+            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
+            .withMessageContaining(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
+                opprettetBucID,
+                Aksjoner.SEND.hentHandling()));
+    }
+
+
+    @Test
+    void opprettOgSendSedMedHandlingSjekk_medUgyldigSedHandling_kasterIntegrationException() {
+        unleash.enable("melosys.eessi.handlingssjekk_sed");
+        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
+            .thenReturn(List.of("SedID Sedtype " + Aksjoner.CREATE.hentHandling()
+            ));
+
+        when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
+            .thenReturn(Collections.singleton(Aksjoner.READ.hentHandling()));
+        SED sed = new SED();
+
+        assertThatExceptionOfType(ValidationException.class)
+            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
+            .withMessageContaining(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
+                opprettetBucID,
+                Aksjoner.SEND.hentHandling()));
 
     }
 
@@ -150,10 +213,13 @@ class EuxServiceTest {
     void opprettOgSendSedMedHandlingSjekk_medFlereHandlinger_forventKonsumentKall() {
         unleash.enable("melosys.eessi.handlingssjekk_sed");
         when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+        when(euxConsumer.hentBucHandlinger(eq(opprettetBucID)))
+            .thenReturn(List.of("test test " + Aksjoner.CREATE.hentHandling()
+            ));
         when(euxConsumer.hentSedHandlinger(eq(opprettetBucID), eq(opprettetSedID)))
-            .thenReturn(List.of(SedHandlinger.CLOSE.hentHandling(),
-                SedHandlinger.SEND.hentHandling(),
-                SedHandlinger.SEND.hentHandling())
+            .thenReturn(List.of(Aksjoner.CLOSE.hentHandling(),
+                Aksjoner.SEND.hentHandling(),
+                Aksjoner.SEND.hentHandling())
             );
 
         SED sed = new SED();

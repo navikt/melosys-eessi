@@ -49,6 +49,7 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     private static final String SED_MED_VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/filer";
     private static final String VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/vedlegg";
     private static final String SED_HANDLINGER = "/buc/{rinaSaksnummer}/sed/{sedId}/handlinger";
+    private static final String BUC_HANDLINGER = "/buc/{rinaSaksnummer}/muligeaksjoner";
     private static final String RINA_LENKE_PATH = "/url/buc/{rinaSaksnummer}";
 
     public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
@@ -274,6 +275,16 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
             new ParameterizedTypeReference<>() {
             },
             rinaSaksnummer, sedId);
+    }
+
+    public Collection<String> hentBucHandlinger(String rinaSaksnummer) {
+        log.info("Henter handlinger for BUC {}", rinaSaksnummer);
+
+        return exchange(BUC_HANDLINGER, HttpMethod.GET,
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            rinaSaksnummer);
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,

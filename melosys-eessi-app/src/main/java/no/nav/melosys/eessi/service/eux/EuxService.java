@@ -7,13 +7,12 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
+import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.SedHandlinger;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -75,7 +74,7 @@ public class EuxService {
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId, String sedType) {
-        validerSedHandling(rinaSaksnummer, dokumentId, SedHandlinger.SEND);
+        validerSedHandling(rinaSaksnummer, dokumentId, Aksjoner.SEND);
         euxConsumer.sendSed(rinaSaksnummer, dokumentId);
         log.info("SED {} sendt i sak {}", sedType, rinaSaksnummer);
     }
@@ -103,17 +102,28 @@ public class EuxService {
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
+        validerBucHandling(rinaSaksnummer, Aksjoner.CREATE);
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
-        validerSedHandling(rinaSaksnummer, sedId, SedHandlinger.SEND);
+        validerSedHandling(rinaSaksnummer, sedId, Aksjoner.SEND);
 
         euxConsumer.sendSed(rinaSaksnummer, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
 
-    public void validerSedHandling(String rinaSaksnummer, String sedId, SedHandlinger sedHandling ) {
+    public void validerBucHandling(String rinaSaksnummer, Aksjoner aksjon) {
         if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            if (!sedHandlingErMulig(rinaSaksnummer, sedId, sedHandling)) {
-                throw new ValidationException("Kan ikke sende SED, ugyldig handling i Rina");
+            if (!bucHandlingErMulig(rinaSaksnummer, aksjon)) {
+                throw new ValidationException(String.format("Kan ikke gjøre handling %s på BUC %s" +
+                    ", ugyldig handling i Rina", aksjon.hentHandling(), rinaSaksnummer));
+            }
+        }
+    }
+
+    public void validerSedHandling(String rinaSaksnummer, String sedId, Aksjoner aksjon) {
+        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, aksjon)) {
+                throw new ValidationException(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
+                    rinaSaksnummer,aksjon.hentHandling()));
             }
         }
     }
@@ -155,7 +165,12 @@ public class EuxService {
         }
     }
 
-    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, SedHandlinger handling) {
+    public boolean bucHandlingErMulig(String rinaSaksnummer, Aksjoner aksjon) {
+        return euxConsumer.hentBucHandlinger(rinaSaksnummer)
+            .stream().anyMatch(s -> s.split(" ")[2].equals(aksjon.hentHandling()));
+    }
+
+    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, Aksjoner handling) {
         return euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId)
             .stream().anyMatch(s -> s.equals(handling.hentHandling()));
     }
