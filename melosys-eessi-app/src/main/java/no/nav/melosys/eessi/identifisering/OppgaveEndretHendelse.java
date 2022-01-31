@@ -40,6 +40,7 @@ public class OppgaveEndretHendelse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Ident {
         private String identType;
+        @ToString.Exclude
         private String verdi;
         @ToString.Exclude
         private String folkeregisterident;
