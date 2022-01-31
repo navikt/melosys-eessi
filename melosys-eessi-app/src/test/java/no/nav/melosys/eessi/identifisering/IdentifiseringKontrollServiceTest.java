@@ -20,6 +20,7 @@ import no.nav.melosys.eessi.models.person.UtenlandskId;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -149,6 +150,24 @@ class IdentifiseringKontrollServiceTest {
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP));
+    }
+
+    @Test
+    void kontrollerIdentifisertPerson_personOgSedHarIkkeSammeStatsborgerskap_ikkeIdentifisert() {
+        sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK"), new Statsborgerskap("NO")));
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP));
+    }
+
+    @Test
+    void kontrollerIdentifisertPerson_personOgSedHarSammeStatsborgerskap_identifisert() {
+        sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK")));
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(true, Lists.emptyList());
     }
 
     @Test

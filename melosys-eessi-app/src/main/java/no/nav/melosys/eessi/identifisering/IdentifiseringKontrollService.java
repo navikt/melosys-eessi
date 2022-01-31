@@ -55,7 +55,8 @@ public class IdentifiseringKontrollService {
         if (!PersonKontroller.harSammeFoedselsdato(identifisertPerson, tilLocalDate(sedPerson.getFoedselsdato()))) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO);
         }
-        if (sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand)) {
+        if ((sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand))
+            || (!PersonKontroller.harStatsborgerskapIListe(identifisertPerson, sedPerson.hentStatsborgerksapsliste()))) {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
         if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {

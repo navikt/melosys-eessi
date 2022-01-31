@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.identifisering;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import lombok.experimental.UtilityClass;
 import no.nav.melosys.eessi.models.person.PersonModell;
@@ -19,6 +20,11 @@ class PersonKontroller {
 
     static boolean harStatsborgerskap(PersonModell personModell, String statsborgerskap) {
         return personModell.getStatsborgerskapLandkodeISO2().stream().anyMatch(statsborgerskap::equals);
+    }
+
+    static boolean harStatsborgerskapIListe(PersonModell personModell, Collection<String> statsborgerskapsListe) {
+        return personModell.getStatsborgerskapLandkodeISO2().stream()
+            .anyMatch(statsborgerskapsListe::contains);
     }
 
     static boolean harSammeFoedselsdato(PersonModell personModell, PersonsokKriterier personsokKriterier) {
