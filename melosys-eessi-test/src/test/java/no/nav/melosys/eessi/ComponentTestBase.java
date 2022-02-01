@@ -145,7 +145,7 @@ public abstract class ComponentTestBase {
     List<MelosysEessiMelding> hentMelosysEessiRecords() {
         return kafkaTestConsumer.getRecords()
             .stream()
-            .filter(ConsumerRecordPredicates.topic("privat-melosys-eessi-v1-local"))
+            .filter(ConsumerRecordPredicates.topic("teammelosys.eessi.v1-local"))
             .map(ConsumerRecord::value)
             .map(this::tilMelosysEessiMelding)
             .collect(Collectors.toList());

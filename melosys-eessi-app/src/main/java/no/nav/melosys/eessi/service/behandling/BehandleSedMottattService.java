@@ -1,13 +1,11 @@
 package no.nav.melosys.eessi.service.behandling;
 
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedKontekst;
 import no.nav.melosys.eessi.models.SedMottatt;
@@ -31,32 +29,26 @@ public class BehandleSedMottattService {
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final EuxService euxService;
     private final PersonFasade personFasade;
-    private final MelosysEessiProducer melosysEessiProducer;
     private final PersonIdentifisering personIdentifisering;
     private final OppgaveService oppgaveService;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
     private final MelosysEessiAivenProducer melosysEessiAivenProducer;
-    private final Unleash unleash;
 
     @Autowired
     public BehandleSedMottattService(
         OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService,
         EuxService euxService,
         PersonFasade personFasade,
-        MelosysEessiProducer melosysEessiProducer,
         PersonIdentifisering personIdentifisering,
         OppgaveService oppgaveService, MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory,
-        MelosysEessiAivenProducer melosysEessiAivenProducer,
-        Unleash unleash) {
+        MelosysEessiAivenProducer melosysEessiAivenProducer) {
         this.opprettInngaaendeJournalpostService = opprettInngaaendeJournalpostService;
         this.euxService = euxService;
         this.personFasade = personFasade;
-        this.melosysEessiProducer = melosysEessiProducer;
         this.personIdentifisering = personIdentifisering;
         this.oppgaveService = oppgaveService;
         this.melosysEessiMeldingMapperFactory = melosysEessiMeldingMapperFactory;
         this.melosysEessiAivenProducer = melosysEessiAivenProducer;
-        this.unleash = unleash;
     }
 
     public void behandleSed(SedMottatt sedMottatt) {
@@ -139,12 +131,8 @@ public class BehandleSedMottattService {
             sedMottatt.getSedKontekst().getJournalpostID(), sedMottatt.getSedKontekst().getDokumentID(),
             sedMottatt.getSedKontekst().getGsakSaksnummer(), sedErEndring, sedHendelse.getRinaDokumentVersjon());
 
-        if (unleash.isEnabled("melosys.eessi.aiven-producer")) {
-            log.info("Publiserer eessiMelding melding på aiven");
-            melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
-        } else {
-            melosysEessiProducer.publiserMelding(melosysEessiMelding);
-        }
+        log.info("Publiserer eessiMelding melding på aiven");
+        melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
 
         sedMottatt.getSedKontekst().setPublisertKafka(Boolean.TRUE);
     }

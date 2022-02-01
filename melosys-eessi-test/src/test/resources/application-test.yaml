@@ -22,7 +22,6 @@ PG_HOST: localhost
 DATABASE_NAME: postgres
 
 KAFKA_SEDHENDELSER_GROUPID: melosys-eessi-sedHendelser-local
-KAFKA_EESSIMELDING_TOPIC: privat-melosys-eessi-v1-local
 KAFKA_AIVEN_EESSIMELDING_TOPIC: teammelosys.eessi.v1-local
 KAFKA_OPPGAVE_GROUPID: melosys-eessi-oppgaveHendelser-local
 KAFKA_BROKERS: localhost:${kafkaPort}
