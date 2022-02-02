@@ -2,9 +2,7 @@ package no.nav.melosys.eessi.identifisering;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -24,10 +22,8 @@ public class BehandleBucIdentifisertService {
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final SaksrelasjonService saksrelasjonService;
     private final EuxService euxService;
-    private final MelosysEessiProducer melosysEessiProducer;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
     private final MelosysEessiAivenProducer melosysEessiAivenProducer;
-    private final Unleash unleash;
 
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
@@ -61,12 +57,8 @@ public class BehandleBucIdentifisertService {
             sedErEndring,
             sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon());
 
-        if (unleash.isEnabled("melosys.eessi.aiven-producer")) {
-            log.info("Publiserer eessiMelding melding på aiven");
-            melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
-        } else {
-            melosysEessiProducer.publiserMelding(melosysEessiMelding);
-        }
+        log.info("Publiserer eessiMelding melding på aiven");
+        melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
 
         sedMottattHendelse.setPublisertKafka(true);
     }

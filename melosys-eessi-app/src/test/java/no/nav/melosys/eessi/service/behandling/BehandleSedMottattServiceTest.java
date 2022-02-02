@@ -4,14 +4,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import no.finn.unleash.FakeUnleash;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
-import no.nav.melosys.eessi.kafka.producers.MelosysEessiProducer;
 import no.nav.melosys.eessi.models.SedMottatt;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
@@ -44,13 +41,9 @@ public class BehandleSedMottattServiceTest {
     @Mock
     private PersonIdentifisering personIdentifisering;
     @Mock
-    private MelosysEessiProducer melosysEessiProducer;
-    @Mock
     private OppgaveService oppgaveService;
     @Mock
     MelosysEessiAivenProducer melosysEessiAivenProducer;
-
-    private final Unleash unleash = new FakeUnleash();
 
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
@@ -62,13 +55,11 @@ public class BehandleSedMottattServiceTest {
     public void setup() throws Exception {
         behandleSedMottattService = new BehandleSedMottattService(
             opprettInngaaendeJournalpostService, euxService, personFasade,
-            melosysEessiProducer, personIdentifisering, oppgaveService,
-            melosysEessiMeldingMapperFactory, melosysEessiAivenProducer, unleash);
-
+            personIdentifisering, oppgaveService,
+            melosysEessiMeldingMapperFactory, melosysEessiAivenProducer);
 
         when(euxService.hentSed(anyString(), anyString()))
             .thenReturn(opprettSED());
-
     }
 
     @Test
@@ -83,7 +74,7 @@ public class BehandleSedMottattServiceTest {
         verify(euxService).hentSed(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(melosysEessiProducer, never()).publiserMelding(any());
+        verify(melosysEessiAivenProducer, never()).publiserMelding(any());
     }
 
     @Test
@@ -101,7 +92,7 @@ public class BehandleSedMottattServiceTest {
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(melosysEessiProducer, never()).publiserMelding(any());
+        verify(melosysEessiAivenProducer, never()).publiserMelding(any());
     }
 
     @Test
@@ -118,7 +109,7 @@ public class BehandleSedMottattServiceTest {
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(melosysEessiProducer, never()).publiserMelding(any());
+        verify(melosysEessiAivenProducer, never()).publiserMelding(any());
     }
 
     @Test
@@ -136,7 +127,7 @@ public class BehandleSedMottattServiceTest {
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(personFasade).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
-        verify(melosysEessiProducer).publiserMelding(any());
+        verify(melosysEessiAivenProducer).publiserMelding(any());
     }
 
     @Test
@@ -157,7 +148,7 @@ public class BehandleSedMottattServiceTest {
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(personFasade).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
-        verify(melosysEessiProducer).publiserMelding(any());
+        verify(melosysEessiAivenProducer).publiserMelding(any());
     }
 
     @Test
@@ -178,7 +169,7 @@ public class BehandleSedMottattServiceTest {
         verify(personFasade).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(melosysEessiProducer).publiserMelding(any());
+        verify(melosysEessiAivenProducer).publiserMelding(any());
     }
 
     @Test
@@ -197,7 +188,7 @@ public class BehandleSedMottattServiceTest {
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
-        verify(melosysEessiProducer, never()).publiserMelding(any());
+        verify(melosysEessiAivenProducer, never()).publiserMelding(any());
 
         assertThat(sedMottatt.isFerdig()).isTrue();
     }
@@ -218,7 +209,7 @@ public class BehandleSedMottattServiceTest {
         verify(personFasade, never()).hentAktoerId(anyString());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(melosysEessiProducer, never()).publiserMelding(any());
+        verify(melosysEessiAivenProducer, never()).publiserMelding(any());
     }
 
     private SED opprettSED() {
