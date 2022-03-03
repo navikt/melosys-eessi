@@ -3,6 +3,8 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -440,5 +442,19 @@ class EuxConsumerTest {
                 .andRespond(withSuccess());
 
         euxConsumer.setSakSensitiv(id);
+    }
+
+    @Test
+    void hentBucHandlinger_handlingerSomResponse() {
+        String rinaSaksnummer = "123456";
+        String handlinger = "[ \"Close\", \"Create\"]";
+
+        server.expect(requestTo("/buc/" + rinaSaksnummer + "/muligeaksjoner?format=enkelt"))
+            .andRespond(withSuccess(handlinger, MediaType.APPLICATION_JSON));
+
+        Collection<String> resultat = euxConsumer.hentBucHandlinger(rinaSaksnummer);
+        assertThat(resultat)
+            .hasSize(2)
+            .containsExactlyInAnyOrder("Close", "Create");
     }
 }
