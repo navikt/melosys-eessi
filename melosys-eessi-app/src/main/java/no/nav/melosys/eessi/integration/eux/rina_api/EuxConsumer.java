@@ -280,11 +280,11 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public Collection<String> hentBucHandlinger(String rinaSaksnummer) {
         log.info("Henter handlinger for BUC {}", rinaSaksnummer);
 
-        return exchange(BUC_HANDLINGER, HttpMethod.GET,
+        return exchange(BUC_HANDLINGER + "?format={format}", HttpMethod.GET,
             new HttpEntity<>(defaultHeaders()),
             new ParameterizedTypeReference<>() {
             },
-            rinaSaksnummer);
+            rinaSaksnummer, "enkelt");
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
