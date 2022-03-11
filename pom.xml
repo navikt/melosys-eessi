@@ -24,7 +24,7 @@
         <bekk-nocommons.version>0.12.0</bekk-nocommons.version>
         <commons-io.version>2.11.0</commons-io.version>
         <guava.version>29.0-jre</guava.version>
-        <hibernate-types.version>2.10.1</hibernate-types.version>
+        <hibernate-types.version>2.14.0</hibernate-types.version>
         <java.version>16</java.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <logstash-encoder.version>5.3</logstash-encoder.version>
@@ -46,7 +46,7 @@
 
         <!-- Transitive avhengigheter -->
         <asm.version>7.3.1</asm.version>
-        <checker-qual.version>3.5.0</checker-qual.version>
+        <checker-qual.version>3.21.3</checker-qual.version>
         <javassist.version>3.27.0-GA</javassist.version>
         <jna.version>5.5.0</jna.version>
         <objenesis.version>3.2</objenesis.version>
