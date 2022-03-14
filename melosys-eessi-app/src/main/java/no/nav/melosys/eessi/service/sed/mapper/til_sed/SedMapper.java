@@ -128,7 +128,6 @@ public interface SedMapper {
 
     private Adresse mapBostedsadresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
         var bostedsadresse = mapAdresse(adresse);
-        // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
         if (adresse.getAdressetype() == Adressetype.BOSTEDSADRESSE) {
             bostedsadresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
         }
