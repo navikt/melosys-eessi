@@ -1,0 +1,65 @@
+name: deploy-dev
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+      - "LICENCE"
+      - "CODEOWNERS"
+    branches:
+      - master
+env:
+  docker_image: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
+jobs:
+  build:
+    name: Build, deploy to dev, and draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v1
+      - name: Set up JDK 16
+        uses: actions/setup-java@v1
+        with:
+          java-version: 16
+          distribution: 'adopt-openj9'
+      - name: Setup Maven
+        uses: actions/cache@preview
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Build and Run tests
+        run: mvn clean package -B -e -U
+      - name: pre-deploy
+        uses: navikt/digihot-deploy/actions/pre-deploy@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish Docker image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          docker build --tag ${docker_image} .
+          docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
+          docker push ${docker_image}
+      - name: Deploy til dev (Q2)
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-fss
+          RESOURCE: deploy/nais.yaml
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,image=${{ env.docker_image }}
+      - name: post-deploy
+        uses: navikt/digihot-deploy/actions/post-deploy@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: draft release
+        uses: actions/create-release@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION_TAG }}
+          release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
+          body: ${{ env.CHANGE_LOG }}
+          draft: true
+          prerelease: false

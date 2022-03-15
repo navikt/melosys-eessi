@@ -1,0 +1,49 @@
+name: deploy-prod
+on:
+  release:
+    types: [published]
+jobs:
+  deploy-prod:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: get release tag
+        run: |
+          APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)
+          IMAGE=docker.pkg.github.com/$GITHUB_REPOSITORY/$APPLICATION:$GITHUB_SHA
+          echo "IMAGE=${IMAGE}" >> $GITHUB_ENV
+          echo $IMAGE
+      - name: Deploy
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: deploy/nais.yaml
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod
+      - name: post-production
+        uses: navikt/digihot-deploy/actions/post-production@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - run: |
+          echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
+      - name: Slack Notification (deploy success)
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: good
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':clap: melosys-eessi ble deployet til prod :rocket:'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
+      - name: Slack Notification (deploy failure)
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: danger
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke deployes til prod!'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
+
