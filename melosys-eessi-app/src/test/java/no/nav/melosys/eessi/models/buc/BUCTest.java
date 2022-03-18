@@ -112,7 +112,7 @@ class BUCTest {
     }
 
     @Test
-    void kanIkkeLukkesAutomatisk_LABUC03_30dagerSidenA008ogX01310dagerSidenX012() {
+    void kanIkkeLukkesAutomatisk_LABUC03_30dagerSidenA008ogX01300dagerSidenX012() {
         BUC buc03 = new BUC();
         buc03.setBucType(BucType.LA_BUC_03.name());
         buc03.setActions(Collections.singletonList(new Action("name", SedType.X001.name(), "1", "UPDATE")));
@@ -177,7 +177,7 @@ class BUCTest {
         Document document = new Document();
         document.setType(sedType.name());
         document.setStatus(sedStatus.getEngelskStatus());
-        document.setLastUpdate(ZonedDateTime.now().minusDays(days));
+        document.setLastUpdate(ZonedDateTime.now().minusDays(days).minusSeconds(1));
         document.setDirection(direction);
 
         return document;

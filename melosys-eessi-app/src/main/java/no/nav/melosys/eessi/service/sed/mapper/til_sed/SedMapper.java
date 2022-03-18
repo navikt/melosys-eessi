@@ -99,13 +99,13 @@ public interface SedMapper {
         List<Pin> pins = Lists.newArrayList();
 
         pins.add(new Pin(
-                sedData.getBruker().getFnr(), "NO",
-                null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
+            sedData.getBruker().getFnr(), "NO",
+            null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
 
         for (Ident utenlandskIdent : sedData.getUtenlandskIdent()) {
             pins.add(
-                    new Pin(utenlandskIdent.getIdent(),
-                            LandkodeMapper.mapTilLandkodeIso2(utenlandskIdent.getLandkode()), null)
+                new Pin(utenlandskIdent.getIdent(),
+                    LandkodeMapper.mapTilLandkodeIso2(utenlandskIdent.getLandkode()), null)
             );
         }
 
@@ -128,13 +128,8 @@ public interface SedMapper {
 
     private Adresse mapBostedsadresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
         var bostedsadresse = mapAdresse(adresse);
-        // ref: punkt 2.1.1 (A001) https://confluence.adeo.no/display/TEESSI/Mapping+av+lovvalgs+SED+til+Melosys+domenemodell
         if (adresse.getAdressetype() == Adressetype.BOSTEDSADRESSE) {
-            if ("NO".equalsIgnoreCase(bostedsadresse.getLand())) {
-                bostedsadresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
-            } else {
-                bostedsadresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
-            }
+            bostedsadresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
         }
         return bostedsadresse;
     }
@@ -154,7 +149,7 @@ public interface SedMapper {
 
         //Splitter per nå navnet etter første mellomrom
         Optional<FamilieMedlem> optionalFar = sedData.getFamilieMedlem().stream()
-                .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
+            .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
 
         if (optionalFar.isPresent()) {
             var far = new Far();
@@ -167,7 +162,7 @@ public interface SedMapper {
         }
 
         Optional<FamilieMedlem> optionalMor = sedData.getFamilieMedlem().stream()
-                .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
+            .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
 
         if (optionalMor.isPresent()) {
             var mor = new Mor();
@@ -212,9 +207,9 @@ public interface SedMapper {
 
     default List<Arbeidsgiver> hentArbeidsgiver(List<Virksomhet> virksomheter, Predicate<Virksomhet> virksomhetPredicate) {
         return virksomheter.stream()
-                .filter(virksomhetPredicate)
-                .map(this::hentArbeidsgiver)
-                .toList();
+            .filter(virksomhetPredicate)
+            .map(this::hentArbeidsgiver)
+            .toList();
     }
 
     default Arbeidsgiver hentArbeidsgiver(Virksomhet virksomhet) {
