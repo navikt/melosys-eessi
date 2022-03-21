@@ -3,10 +3,10 @@ package no.nav.melosys.eessi.service.behandling;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
-import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -26,8 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
+import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -37,27 +37,18 @@ class SedMottakServiceTest {
 
     @Mock
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-
     @Mock
     private EuxService euxService;
-
     @Mock
     private PersonIdentifisering personIdentifisering;
-
     @Mock
     private OppgaveService oppgaveService;
-
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
-
     @Mock
     private SedMottattHendelseRepository sedMottattHendelseRepository;
-
     @Mock
     private BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
-
     @Mock
-    private PersonFasade personFasade;
+    private BucIdentifisertService bucIdentifisertService;
 
     private SedMottakService sedMottakService;
 
@@ -68,16 +59,15 @@ class SedMottakServiceTest {
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
                 euxService, personIdentifisering, opprettInngaaendeJournalpostService,
-                oppgaveService, applicationEventPublisher, sedMottattHendelseRepository,
-                bucIdentifiseringOppgRepository, personFasade
+                oppgaveService, sedMottattHendelseRepository,
+                bucIdentifiseringOppgRepository, bucIdentifisertService
         );
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
                 .thenReturn("9988776655");
-
-        when(euxService.hentSed(anyString(), anyString()))
+        when(euxService.hentSedMedRetry(anyString(), anyString()))
                 .thenReturn(opprettSED());
-
+        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
     }
 
     @Test
@@ -89,12 +79,12 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(sedMottattHendelse);
 
-        verify(euxService).hentSed(anyString(), anyString());
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository).save(any());
-        verify(applicationEventPublisher, never()).publishEvent(BucIdentifisertEvent.class);
+        verify(sedMottattHendelseRepository, times(2)).save(any());
+        verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
 
     @Test
@@ -104,22 +94,22 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
-        verify(euxService).hentSed(anyString(), anyString());
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository).save(any());
-        verify(applicationEventPublisher).publishEvent(any(BucIdentifisertEvent.class));
+        verify(sedMottattHendelseRepository, times(2)).save(any());
+        verify(bucIdentifisertService).lagreIdentifisertPerson(sedHendelse.getRinaSakId(), IDENT);
     }
 
     @Test
     void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgave() {
         final var oppgaveID = "5555";
-        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID);
-        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.of(bucIdentifiseringOppg));
+        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID,1);
+        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
 
         final var oppgave = new HentOppgaveDto();
-        oppgave.setStatuskategori("AAPEN");
+        oppgave.setStatus("OPPRETTET");
         when(oppgaveService.hentOppgave(oppgaveID)).thenReturn(oppgave);
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
@@ -127,7 +117,7 @@ class SedMottakServiceTest {
 
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(applicationEventPublisher, never()).publishEvent(any(BucIdentifisertEvent.class));
+        verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
 
     @Test
@@ -138,9 +128,10 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
-        verify(euxService).hentSed(anyString(), anyString());
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(sedMottattHendelseRepository).delete(any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
     }

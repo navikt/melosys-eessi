@@ -41,6 +41,20 @@ final class PDLQuery {
                          }
                      }
                  }
+                 utenlandskIdentifikasjonsnummer {
+                    identifikasjonsnummer
+                    utstederland
+                 }
+                 kjoenn {
+                    kjoenn
+                    metadata {
+                         master
+                         endringer {
+                             registrert
+                             type
+                         }
+                     }
+                 }
                }
              }
             """;

@@ -42,7 +42,7 @@ public class LukkBucService {
                     .filter(BucInfo::bucErÅpen)
                     .filter(BucInfo::norgeErCaseOwner)
                     .map(BucInfo::getId)
-                    .map(this::finnBuc)
+                    .map(euxService::finnBUC)
                     .flatMap(Optional::stream)
                     .filter(Objects::nonNull)
                     .filter(BUC::kanLukkesAutomatisk)
@@ -59,7 +59,7 @@ public class LukkBucService {
      */
     public void forsøkLukkBucAsync(final String rinaSaksnummer) {
         try {
-            finnBuc(rinaSaksnummer)
+            euxService.finnBUC(rinaSaksnummer)
                     .filter(b -> b.kanOppretteEllerOppdatereSed(SedType.X001))
                     .ifPresentOrElse(
                             this::lukkBuc,
@@ -78,7 +78,7 @@ public class LukkBucService {
             finnEksisterendeX001Utkast(buc).ifPresentOrElse(
                     eksisterendeX001 -> {
                         euxService.oppdaterSed(buc.getId(), eksisterendeX001.getId(), x001);
-                        euxService.sendSed(buc.getId(), eksisterendeX001.getId());
+                        euxService.sendSed(buc.getId(), eksisterendeX001.getId(), x001.getSedType());
                     },
                     () -> euxService.opprettOgSendSed(x001, buc.getId())
             );
@@ -107,14 +107,6 @@ public class LukkBucService {
                 .min(documentComparator)
                 .map(d -> euxService.hentSed(buc.getId(), d.getId()))
                 .orElseThrow(() -> new IllegalStateException("Finner ingen lovvalgs-SED på buc" + buc.getId()));
-    }
-
-    private Optional<BUC> finnBuc(String rinaSaksnummer) {
-        try {
-            return Optional.of(euxService.hentBuc(rinaSaksnummer));
-        } catch (IntegrationException ex) {
-            return Optional.empty();
-        }
     }
 
     private static final Comparator<Document> documentComparator = Comparator.comparing(Document::getCreationDate);

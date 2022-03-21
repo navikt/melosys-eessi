@@ -6,11 +6,11 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
-import no.nav.melosys.eessi.integration.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
-import org.springframework.context.ApplicationEventPublisher;
+import no.nav.melosys.eessi.service.sak.ArkivsakService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,12 +20,11 @@ public class SaksrelasjonService {
 
     private final FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     private final CaseStoreConsumer caseStoreConsumer;
-    private final SakConsumer sakConsumer;
-    private final ApplicationEventPublisher applicationEventPublisher;
+    private final ArkivsakService arkivsakService;
 
     @Transactional
     public FagsakRinasakKobling lagreKobling(Long gsakSaksnummer, String rinaSaksnummer, BucType bucType) {
-        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
+        var fagsakRinasakKobling = new FagsakRinasakKobling();
         fagsakRinasakKobling.setRinaSaksnummer(rinaSaksnummer);
         fagsakRinasakKobling.setGsakSaksnummer(gsakSaksnummer);
         fagsakRinasakKobling.setBucType(bucType);
@@ -35,22 +34,22 @@ public class SaksrelasjonService {
             oppdaterEllerLagreIEuxCaseStore(gsakSaksnummer, rinaSaksnummer);
         }
 
-        applicationEventPublisher.publishEvent(new SaksrelasjonOpprettetEvent(rinaSaksnummer, gsakSaksnummer));
         return fagsakRinasakKobling;
     }
 
     private void oppdaterEllerLagreIEuxCaseStore(Long gsakSaksnummer, String rinaSaksnummer) {
-        Optional<CaseStoreDto> caseStoreDto = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer)
-                .stream().findFirst();
-        if (caseStoreDto.isPresent()) {
-            String tema = sakConsumer.getSak(gsakSaksnummer.toString()).getTema();
-            CaseStoreDto dto = caseStoreDto.get();
-            dto.setTema(tema);
-            dto.setFagsaknummer(gsakSaksnummer.toString());
-            caseStoreConsumer.lagre(dto);
-        } else {
-            caseStoreConsumer.lagre(gsakSaksnummer.toString(), rinaSaksnummer);
-        }
+        caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer)
+            .stream()
+            .findFirst()
+            .ifPresentOrElse(
+                dto -> {
+                    String tema = arkivsakService.hentsak(gsakSaksnummer).getTema();
+                    dto.setTema(tema);
+                    dto.setFagsaknummer(gsakSaksnummer.toString());
+                    caseStoreConsumer.lagre(dto);
+                },
+                () -> caseStoreConsumer.lagre(gsakSaksnummer.toString(), rinaSaksnummer)
+            );
     }
 
     @Transactional
@@ -69,7 +68,6 @@ public class SaksrelasjonService {
     /**
      * Finner melosys-sak tilknyttet rina-sak lagret i egen DB
      */
-    @Transactional(readOnly = true)
     public Optional<FagsakRinasakKobling> finnVedRinaSaksnummer(String rinaSaksnummer) {
         return fagsakRinasakKoblingRepository.findByRinaSaksnummer(rinaSaksnummer);
     }
@@ -78,16 +76,26 @@ public class SaksrelasjonService {
      * Søker etter saksnummer i både egen DB og eux-case-store
      * For også å fange opp evt. lovvalgs-sed'er som er opprettet fra nEESSI
      */
-    @Transactional(readOnly = true)
     public Optional<Long> søkEtterSaksnummerFraRinaSaksnummer(String rinaSaksnummer) {
         Optional<Long> saksnummer = fagsakRinasakKoblingRepository.findByRinaSaksnummer(rinaSaksnummer)
-                .map(FagsakRinasakKobling::getGsakSaksnummer);
+            .map(FagsakRinasakKobling::getGsakSaksnummer);
 
-        if (!saksnummer.isPresent()) {
+        if (saksnummer.isEmpty()) {
             saksnummer = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer).stream()
-                    .findFirst().map(CaseStoreDto::getFagsaknummer).map(Long::parseLong);
+                .findFirst().map(CaseStoreDto::getFagsaknummer).map(Long::parseLong);
         }
 
         return saksnummer;
+    }
+
+    public Optional<String> finnAktørIDTilhørendeRinasak(String rinaSaksnummer) {
+        return finnArkivsakForRinaSaksnummer(rinaSaksnummer)
+            .map(Sak::getAktoerId);
+    }
+
+    public Optional<Sak> finnArkivsakForRinaSaksnummer(String rinaSaksnummer) {
+        return finnVedRinaSaksnummer(rinaSaksnummer)
+            .map(FagsakRinasakKobling::getGsakSaksnummer)
+            .map(arkivsakService::hentsak);
     }
 }

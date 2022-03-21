@@ -6,20 +6,18 @@ import java.util.Optional;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
+import no.nav.melosys.eessi.service.sak.ArkivsakService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationEventPublisher;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,15 +29,13 @@ class SaksrelasjonServiceTest {
     @Mock
     private CaseStoreConsumer caseStoreConsumer;
     @Mock
-    private SakConsumer sakConsumer;
-    @Mock
-    private ApplicationEventPublisher applicationEventPublisher;
+    private ArkivsakService arkivsakService;
 
     private SaksrelasjonService saksrelasjonService;
 
     @BeforeEach
     public void setup() {
-        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, sakConsumer, applicationEventPublisher);
+        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, arkivsakService);
     }
 
     private final String RINA_ID = "321";
@@ -60,7 +56,7 @@ class SaksrelasjonServiceTest {
     @Test
     void lagreKobling_ikkeLovvalgBucSakEksistererICaseStore_oppdaterCaseStore() {
         CaseStoreDto caseStoreDto = new CaseStoreDto(1L, "bucid", "saksnummer", "rinasaksnummer", "journalpostid", "tema");
-        when(sakConsumer.getSak(anyString())).thenReturn(new Sak());
+        when(arkivsakService.hentsak(anyLong())).thenReturn(new Sak());
         when(caseStoreConsumer.finnVedRinaSaksnummer(anyString())).thenReturn(Collections.singletonList(caseStoreDto));
         saksrelasjonService.lagreKobling(123L, "321", BucType.H_BUC_01);
         verify(caseStoreConsumer).lagre(any(CaseStoreDto.class));
@@ -91,5 +87,43 @@ class SaksrelasjonServiceTest {
                 .thenReturn(Collections.singletonList(new CaseStoreDto("123", rinaSaksnummer)));
         Optional<Long> saksnummer = saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer);
         assertThat(saksnummer).contains(123L);
+    }
+
+    @Test
+    void finnArkivsakForRinaSaksnummer_finnesIkke_tomReturverdi() {
+        assertThat(saksrelasjonService.finnAktørIDTilhørendeRinasak("123")).isEmpty();
+    }
+
+    @Test
+    void finnArkivsakForRinaSaksnummer_saksrelasjonFinnes_returnererArkivsak() {
+        final var fagsakRinasakKobling = new FagsakRinasakKobling();
+        fagsakRinasakKobling.setGsakSaksnummer(321L);
+        when(fagsakRinasakKoblingRepository.findByRinaSaksnummer("123")).thenReturn(Optional.of(fagsakRinasakKobling));
+
+        final var arkivsak = new Sak();
+        arkivsak.setId("3333333");
+        when(arkivsakService.hentsak(fagsakRinasakKobling.getGsakSaksnummer())).thenReturn(arkivsak);
+
+        assertThat(saksrelasjonService.finnArkivsakForRinaSaksnummer("123")).contains(arkivsak);
+    }
+
+    @Test
+    void finnAktørIDTilhørendeRinasak_finnesIkke_tomReturverdi() {
+        assertThat(saksrelasjonService.finnAktørIDTilhørendeRinasak("123")).isEmpty();
+    }
+
+    @Test
+    void finnAktørIDTilhørendeRinasak_saksrelasjonFinnes_returnererAktørID() {
+        final var aktørID = "1111";
+        final var fagsakRinasakKobling = new FagsakRinasakKobling();
+        fagsakRinasakKobling.setGsakSaksnummer(321L);
+        when(fagsakRinasakKoblingRepository.findByRinaSaksnummer("123")).thenReturn(Optional.of(fagsakRinasakKobling));
+
+        final var arkivsak = new Sak();
+        arkivsak.setAktoerId(aktørID);
+        when(arkivsakService.hentsak(fagsakRinasakKobling.getGsakSaksnummer())).thenReturn(arkivsak);
+
+
+        assertThat(saksrelasjonService.finnAktørIDTilhørendeRinasak("123")).contains(aktørID);
     }
 }

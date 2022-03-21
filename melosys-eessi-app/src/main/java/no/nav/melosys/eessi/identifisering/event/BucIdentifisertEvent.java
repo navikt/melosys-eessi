@@ -7,11 +7,11 @@ import org.springframework.context.ApplicationEvent;
 public class BucIdentifisertEvent extends ApplicationEvent {
 
     private final String bucId;
-    private final String aktørId;
+    private final String folkeregisterident;
 
-    public BucIdentifisertEvent(String bucId, String aktørId) {
+    public BucIdentifisertEvent(String bucId, String folkeregisterident) {
         super(bucId);
         this.bucId = bucId;
-        this.aktørId = aktørId;
+        this.folkeregisterident = folkeregisterident;
     }
 }

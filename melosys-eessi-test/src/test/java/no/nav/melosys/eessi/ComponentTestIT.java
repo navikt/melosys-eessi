@@ -43,10 +43,7 @@ class ComponentTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        assertThat(hentRecords()).hasSize(1)
-                .extracting(Object::toString)
-                .singleElement()
-                .matches(e -> e.contains("2019-06-01") && e.contains("2019-12-01"));
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
     }
 
     @Test
@@ -66,7 +63,9 @@ class ComponentTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        assertThat(hentRecords()).hasSize(1);
+
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+
     }
 
     @Test
@@ -75,14 +74,14 @@ class ComponentTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto("123", "AAPEN"));
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto("123", "AAPEN",1));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(RINA_SAKSNUMMER, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(2000)).opprettOppgave(any());
-        assertThat(hentRecords()).isEmpty();
+        assertThat(hentMelosysEessiRecords()).isEmpty();
     }
 
     @Test
@@ -117,6 +116,6 @@ class ComponentTestIT extends ComponentTestBase {
                 false,
                 false
         );
-        assertThat(hentRecords()).isEmpty();
+        assertThat(hentMelosysEessiRecords()).isEmpty();
     }
 }

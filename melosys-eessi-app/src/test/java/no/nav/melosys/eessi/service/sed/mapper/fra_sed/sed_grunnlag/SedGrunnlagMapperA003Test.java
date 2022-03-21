@@ -22,6 +22,7 @@ class SedGrunnlagMapperA003Test {
         SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagMapperA003().map(hentSed());
 
         assertThat(sedGrunnlagDto).isNotNull();
+        assertThat(sedGrunnlagDto.getSedType()).isEqualTo("A003");
         assertThat(sedGrunnlagDto.getUtenlandskIdent())
                 .as("Utenlandsk ident har rett felt")
                 .extracting(Ident::getIdent, Ident::getLandkode, Ident::erUtenlandsk)

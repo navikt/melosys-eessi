@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.*;
 
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -49,7 +50,7 @@ class SedServiceTest {
 
     @BeforeEach
     public void setup() {
-        sendSedService = new SedService(euxService, saksrelasjonService);
+        sendSedService = new SedService(euxService, saksrelasjonService, new FakeUnleash());
     }
 
     @Test
@@ -72,7 +73,7 @@ class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
                 .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
-        doThrow(IntegrationException.class).when(euxService).sendSed(anyString(), anyString());
+        doThrow(IntegrationException.class).when(euxService).sendSed(anyString(), anyString(), anyString());
 
         Exception exception = null;
         try {
@@ -82,7 +83,7 @@ class SedServiceTest {
         }
 
         assertThat(exception).isNotNull().isInstanceOf(IntegrationException.class);
-        verify(euxService).slettBuC(RINA_ID);
+        verify(euxService).slettBUC(RINA_ID);
         verify(saksrelasjonService).slettVedRinaId(RINA_ID);
     }
 
@@ -142,14 +143,13 @@ class SedServiceTest {
 
         buc.setActions(List.of(emptyDocAction, sentDocAction));
 
-        when(euxService.hentBuc(RINA_ID))
-                .thenReturn(buc);
+        when(euxService.finnBUC(RINA_ID)).thenReturn(Optional.of(buc));
 
         sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_02, true, true);
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
         verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
-        verify(euxService).sendSed(anyString(), anyString());
+        verify(euxService).sendSed(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -172,7 +172,7 @@ class SedServiceTest {
 
         verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
         verify(euxService).hentRinaUrl(RINA_ID);
-        verify(euxService, never()).sendSed(anyString(), anyString());
+        verify(euxService, never()).sendSed(anyString(), anyString(), anyString());
         assertThat(response.getRinaSaksnummer()).isEqualTo(RINA_ID);
         assertThat(response.getRinaUrl()).isEqualTo("URL");
     }

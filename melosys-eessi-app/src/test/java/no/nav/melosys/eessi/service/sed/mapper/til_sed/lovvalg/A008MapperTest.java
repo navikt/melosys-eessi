@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
+import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,11 +28,14 @@ class A008MapperTest {
 
     @Test
     void mapTilSed() throws MappingException, NotFoundException {
+        sedData.setAvklartBostedsland("SE");
         SED sed = a008Mapper.mapTilSed(sedData);
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA008.class);
 
         MedlemskapA008 medlemskap = (MedlemskapA008) sed.getMedlemskap();
-        assertThat(medlemskap).isNotNull();
+        ArbeidIFlereLand arbeidIFlereLand = medlemskap.getBruker().getArbeidiflereland();
+        assertThat(arbeidIFlereLand.getYrkesaktivitet().getStartdato()).isEqualTo("2020-01-01");
+        assertThat(arbeidIFlereLand.getBosted().getLand()).isEqualTo("SE");
     }
 
 }

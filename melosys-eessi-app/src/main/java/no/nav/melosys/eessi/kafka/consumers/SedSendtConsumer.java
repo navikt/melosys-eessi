@@ -37,14 +37,11 @@ public class SedSendtConsumer {
         try {
             String journalpostId = opprettUtgaaendeJournalpostService.arkiverUtgaaendeSed(sedSendt);
             log.info("Journalpost opprettet med id: {}", journalpostId);
+            sedMetrikker.sedSendt(sedSendt.getSedType());
         } catch (SedAlleredeJournalførtException e) {
             log.info("SED {} allerede journalført", e.getSedID());
-        } catch (Exception e) {
-            //todo: legg inn metrikk/alarm
-            log.error("Sed ikke journalført: {}, melding: {}", sedSendt, e.getMessage(), e);
         } finally {
             slettSedIDLogging();
-            sedMetrikker.sedSendt(sedSendt.getSedType());
         }
 
     }

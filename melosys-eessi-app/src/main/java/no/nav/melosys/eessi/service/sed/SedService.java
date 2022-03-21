@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -22,7 +23,6 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory;
-import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -35,12 +35,15 @@ public class SedService {
 
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
+    private final Unleash unleash;
 
     @Autowired
     public SedService(@Qualifier("tokenContext") EuxService euxService,
-                      SaksrelasjonService saksrelasjonService) {
+                      SaksrelasjonService saksrelasjonService,
+                      Unleash unleash) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
+        this.unleash = unleash;
     }
 
     public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto,
@@ -54,9 +57,9 @@ public class SedService {
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
 
         Collection<String> mottakere = sedDataDto.getMottakerIder();
-        SedType sedType = bucType.hentFørsteLovligeSed();
-        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
-        SED sed = sedMapper.mapTilSed(sedDataDto);
+        var sedType = bucType.hentFørsteLovligeSed();
+        var sedMapper = SedMapperFactory.sedMapper(sedType);
+        var sed = sedMapper.mapTilSed(sedDataDto);
 
         validerMottakerInstitusjoner(bucType, mottakere);
 
@@ -69,7 +72,7 @@ public class SedService {
         }
 
         if (sendAutomatisk) {
-            sendSed(response.getRinaSaksnummer(), response.getDokumentId());
+            sendSed(response.getRinaSaksnummer(), response.getDokumentId(), sed.getSedType());
         }
 
         return BucOgSedOpprettetDto.builder()
@@ -91,10 +94,10 @@ public class SedService {
     Ved opprettelse av SED og umiddelbar sending rett etter, *kan* Rina-saken bli "skadd" ved opprettelse.
     Det kan videre føre til at vi ikke kan se svar-SEDer vi mottar fra utlandet, som vil påvirke tiden det tar før vi får ut vedtak til bruker
      */
-    private void sendSed(String rinaSaksnummer, String dokumentId) {
+    private void sendSed(String rinaSaksnummer, String dokumentId, String sedType) {
         try {
             TimeUnit.SECONDS.sleep(10L);
-            euxService.sendSed(rinaSaksnummer, dokumentId);
+            euxService.sendSed(rinaSaksnummer, dokumentId, sedType);
         } catch (IntegrationException e) {
             log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.");
             slettBucOgSaksrelasjon(rinaSaksnummer);
@@ -108,24 +111,24 @@ public class SedService {
     }
 
     private void slettBucOgSaksrelasjon(String rinaSaksnummer) {
-        euxService.slettBuC(rinaSaksnummer);
+        euxService.slettBUC(rinaSaksnummer);
         saksrelasjonService.slettVedRinaId(rinaSaksnummer);
     }
 
     public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) {
-        SedMapper sedMapper = SedMapperFactory.sedMapper(sedType);
-        SED sed = sedMapper.mapTilSed(sedDataDto);
+        var sedMapper = SedMapperFactory.sedMapper(sedType);
+        var sed = sedMapper.mapTilSed(sedDataDto);
 
         return euxService.genererPdfFraSed(sed);
     }
 
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
-        BUC buc = euxService.hentBuc(rinaSaksnummer);
-        if (!buc.kanOppretteEllerOppdatereSed(sedType)) {
+        var buc = euxService.hentBuc(rinaSaksnummer);
+        if (!buc.kanOppretteEllerOppdatereSed(sedType) && !unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
             throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc " + rinaSaksnummer + " med type " + buc.getBucType());
         }
 
-        SED sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
+        var sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
         verifiserSedVersjonErBucVersjon(buc, sed);
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }
@@ -142,7 +145,7 @@ public class SedService {
             );
 
             if (eksisterendeSak.isPresent() && eksisterendeSak.get().erÅpen()) {
-                BUC buc = eksisterendeSak.get();
+                var buc = eksisterendeSak.get();
                 Optional<Document> document = buc.finnDokumentVedSedType(sed.getSedType());
 
                 if (document.isPresent() && buc.sedKanOppdateres(document.get().getId())) {
@@ -161,9 +164,9 @@ public class SedService {
 
     private Optional<BUC> finnAapenEksisterendeSak(List<FagsakRinasakKobling> eksisterendeSaker) {
         for (FagsakRinasakKobling fagsakRinasakKobling : eksisterendeSaker) {
-            BUC buc = euxService.hentBuc(fagsakRinasakKobling.getRinaSaksnummer());
-            if ("open".equals(buc.getStatus())) {
-                return Optional.of(buc);
+            var buc = euxService.finnBUC(fagsakRinasakKobling.getRinaSaksnummer());
+            if (buc.isPresent() && buc.get().erÅpen()) {
+                return buc;
             }
         }
 
@@ -171,7 +174,7 @@ public class SedService {
     }
 
     private OpprettBucOgSedResponse opprettOgLagreSaksrelasjon(SED sed, Collection<SedVedlegg> vedlegg, BucType bucType, Long gsakSaksnummer, List<String> mottakerIder) {
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
+        var opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakerIder, sed, vedlegg);
         saksrelasjonService.lagreKobling(gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer(), bucType);
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.getRinaSaksnummer());
         return opprettBucOgSedResponse;

@@ -60,4 +60,4 @@ Spørsmål knyttet til koden eller prosjektet kan rettes mot:
 
 ## For NAV-ansatte
 
-Interne henvendelser kan sendes via Slack i kanalen [#melosys-utvikling](https://nav-it.slack.com/messages/C92481HSP/)         
+Interne henvendelser kan sendes via Slack i kanalen [#team-melosys](https://nav-it.slack.com/messages/C92481HSP/)

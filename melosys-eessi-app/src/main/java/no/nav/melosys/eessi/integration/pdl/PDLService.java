@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
+import no.nav.melosys.eessi.models.person.UtenlandskId;
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
@@ -41,14 +42,20 @@ public class PDLService implements PersonFasade {
                 .ifPresent(fødsel -> personModellBuilder.fødselsdato(fødsel.getFoedselsdato()));
         hentSisteOpplysning(pdlPerson.getFolkeregisterpersonstatus())
                 .ifPresent(status -> personModellBuilder.erOpphørt(status.statusErOpphørt()));
-        personModellBuilder.statsborgerskapLandkodeISO2(
+        hentSisteOpplysning(pdlPerson.getKjoenn())
+                .ifPresent(kjønn -> personModellBuilder.kjønn(kjønn.getKjoenn().tilDomene()));
+
+        return personModellBuilder
+            .statsborgerskapLandkodeISO2(
                 pdlPerson.getStatsborgerskap().stream()
                 .map(PDLStatsborgerskap::getLand)
-                .map(LandkodeMapper::getLandkodeIso2)
-                .collect(Collectors.toSet())
-        );
-
-        return personModellBuilder.build();
+                .map(LandkodeMapper::mapTilLandkodeIso2)
+                .collect(Collectors.toSet()))
+            .utenlandskId(pdlPerson.getUtenlandskIdentifikasjonsnummer()
+                .stream()
+                .map(p -> new UtenlandskId(p.getIdentifikasjonsnummer(), LandkodeMapper.mapTilLandkodeIso2(p.getUtstederland())))
+                .collect(Collectors.toSet()))
+            .build();
     }
 
     @Override

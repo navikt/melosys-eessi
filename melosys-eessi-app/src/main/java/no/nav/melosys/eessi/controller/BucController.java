@@ -53,6 +53,9 @@ public class BucController {
             @RequestParam(value = "sendAutomatisk") boolean sendAutomatisk,
             @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende
     ) throws ValidationException {
+        if (bucType.hentFørsteLovligeSed().kreverAdresse() && opprettBucOgSedDto.getSedDataDto().manglerAdresser()) {
+            throw new ValidationException("Personen mangler adresse");
+        }
         return sedService.opprettBucOgSed(
                 opprettBucOgSedDto.getSedDataDto(),
                 ofNullable(opprettBucOgSedDto.getVedlegg()).orElse(emptySet()),
@@ -64,10 +67,13 @@ public class BucController {
     @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")
     @PostMapping("/{rinaSaksnummer}/sed/{sedType}")
     public void sendPåEksisterendeBuc(
-            @RequestBody SedDataDto sedDataDto,
-            @PathVariable String rinaSaksnummer,
-            @PathVariable SedType sedType
-    )  {
+        @RequestBody SedDataDto sedDataDto,
+        @PathVariable String rinaSaksnummer,
+        @PathVariable SedType sedType
+    ) throws ValidationException {
+        if (sedType.kreverAdresse() && sedDataDto.manglerAdresser()) {
+            throw new ValidationException("Personen mangler adresse");
+        }
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 

@@ -2,9 +2,12 @@ package no.nav.melosys.eessi.service.eux;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
+import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
@@ -13,15 +16,17 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
+import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Service
@@ -33,17 +38,20 @@ public class EuxService {
 
     private final EuxConsumer euxConsumer;
     private final BucMetrikker bucMetrikker;
+    private final Unleash unleash;
 
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker) {
+                      BucMetrikker bucMetrikker,
+                      Unleash unleash) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
+        this.unleash = unleash;
     }
 
-    public void slettBuC(String rinaSaksnummer) {
-        euxConsumer.slettBuC(rinaSaksnummer);
+    public void slettBUC(String rinaSaksnummer) {
+        euxConsumer.slettBUC(rinaSaksnummer);
     }
 
     public OpprettBucOgSedResponse opprettBucOgSed(BucType bucType,
@@ -51,7 +59,7 @@ public class EuxService {
                                                    SED sed,
                                                    Collection<SedVedlegg> vedlegg) {
 
-        String rinaSaksnummer = euxConsumer.opprettBuC(bucType.name());
+        String rinaSaksnummer = euxConsumer.opprettBUC(bucType.name());
         euxConsumer.settMottakere(rinaSaksnummer, mottakere);
         String dokumentID = euxConsumer.opprettSed(rinaSaksnummer, sed);
         vedlegg.forEach(v -> leggTilVedlegg(rinaSaksnummer, dokumentID, v));
@@ -65,8 +73,10 @@ public class EuxService {
         log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer);
     }
 
-    public void sendSed(String rinaSaksnummer, String dokumentId) {
+    public void sendSed(String rinaSaksnummer, String dokumentId, String sedType) {
+        validerSedHandling(rinaSaksnummer, dokumentId, Aksjoner.SEND);
         euxConsumer.sendSed(rinaSaksnummer, dokumentId);
+        log.info("SED {} sendt i sak {}", sedType, rinaSaksnummer);
     }
 
     public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) {
@@ -76,45 +86,93 @@ public class EuxService {
     public List<Institusjon> hentMottakerinstitusjoner(final String bucType, final Collection<String> landkoder) {
 
         return euxConsumer.hentInstitusjoner(bucType, null).stream()
-                .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
-                .filter(i -> filtrerPåLandkoder(i, landkoder))
-                .filter(i -> i.getTilegnetBucs().stream().filter(
-                        tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
-                                COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
-                        .anyMatch(TilegnetBuc::erEessiKlar))
-                .collect(Collectors.toList());
+            .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
+            .filter(i -> filtrerPåLandkoder(i, landkoder))
+            .filter(i -> i.getTilegnetBucs().stream().filter(
+                tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
+                    COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
+                .anyMatch(TilegnetBuc::erEessiKlar))
+            .collect(Collectors.toList());
     }
 
     private boolean filtrerPåLandkoder(Institusjon institusjon, Collection<String> landkoder) {
         return landkoder.isEmpty() || landkoder.stream()
-                .map(String::toLowerCase)
-                .anyMatch(landkode -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
+            .map(String::toLowerCase)
+            .anyMatch(landkode -> landkode.equalsIgnoreCase(institusjon.getLandkode()));
     }
 
     public void opprettOgSendSed(SED sed, String rinaSaksnummer) {
+        validerBucHandling(rinaSaksnummer, Aksjoner.CREATE);
         String sedId = euxConsumer.opprettSed(rinaSaksnummer, sed);
+        validerSedHandling(rinaSaksnummer, sedId, Aksjoner.SEND);
+
         euxConsumer.sendSed(rinaSaksnummer, sedId);
         log.info("SED {} sendt i sak {}", sed.getSedType(), rinaSaksnummer);
     }
 
+    public void validerBucHandling(String rinaSaksnummer, Aksjoner aksjon) {
+        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
+            if (!bucHandlingErMulig(rinaSaksnummer, aksjon)) {
+                throw new ValidationException(String.format("Kan ikke gjøre handling %s på BUC %s" +
+                    ", ugyldig handling i Rina", aksjon.hentHandling(), rinaSaksnummer));
+            }
+        }
+    }
+
+    public void validerSedHandling(String rinaSaksnummer, String sedId, Aksjoner aksjon) {
+        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
+            if (!sedHandlingErMulig(rinaSaksnummer, sedId, aksjon)) {
+                throw new ValidationException(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
+                    rinaSaksnummer,aksjon.hentHandling()));
+            }
+        }
+    }
+
     public boolean sedErEndring(String sedId, String rinaSaksnummer) {
-        var buc = euxConsumer.hentBuC(rinaSaksnummer);
+        var buc = euxConsumer.hentBUC(rinaSaksnummer);
 
         return buc.getDocuments().stream()
-                .filter(document -> document.getId().equals(sedId)).findFirst()
-                .filter(document -> document.getConversations().size() > 1).isPresent();
+            .filter(document -> document.getId().equals(sedId)).findFirst()
+            .filter(document -> document.getConversations().size() > 1).isPresent();
     }
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) {
         return euxConsumer.hentSed(rinaSaksnummer, dokumentId);
     }
 
+    @Retryable
+    public SED hentSedMedRetry(String rinaSaksnummer, String dokumentId) {
+        return hentSed(rinaSaksnummer, dokumentId);
+    }
+
     public List<BucInfo> hentBucer(BucSearch bucSearch) {
         return euxConsumer.finnRinaSaker(bucSearch.getBucType(), bucSearch.getStatus());
     }
 
-    public BUC hentBuc(String rinaSakid) {
-        return euxConsumer.hentBuC(rinaSakid);
+    public BUC hentBuc(String rinaSaksnummer) {
+        return euxConsumer.hentBUC(rinaSaksnummer);
+    }
+
+    /**
+     * Kaster ikke exception om en BUC er arkivert eller ikke finnes
+     */
+    public Optional<BUC> finnBUC(String rinaSaksnummer) {
+        try {
+            return Optional.of(euxConsumer.hentBUC(rinaSaksnummer));
+        } catch (IntegrationException | NotFoundException e) {
+            log.warn("Kan ikke hente BUC {}", rinaSaksnummer, e);
+            return Optional.empty();
+        }
+    }
+
+    public boolean bucHandlingErMulig(String rinaSaksnummer, Aksjoner aksjon) {
+        return euxConsumer.hentBucHandlinger(rinaSaksnummer)
+            .stream().anyMatch(s -> s.split(" ")[2].equals(aksjon.hentHandling()));
+    }
+
+    public boolean sedHandlingErMulig(String rinaSaksnummer, String dokumentId, Aksjoner handling) {
+        return euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId)
+            .stream().anyMatch(s -> s.equals(handling.hentHandling()));
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
@@ -125,7 +183,7 @@ public class EuxService {
         return euxConsumer.genererPdfFraSed(sed);
     }
 
-    public String hentRinaUrl(String rinaCaseId){
+    public String hentRinaUrl(String rinaCaseId) {
         if (!StringUtils.hasText(rinaCaseId)) {
             throw new IllegalArgumentException("Trenger rina-saksnummer for å opprette url til rina");
         }

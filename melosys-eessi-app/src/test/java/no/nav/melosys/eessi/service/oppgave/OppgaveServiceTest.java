@@ -60,10 +60,10 @@ class OppgaveServiceTest {
         String aktørID = "321";
         String rinaUrl = "https://test.local";
         SedHendelse sedHendelse = SedHendelse.builder()
-                .sedType("A009")
-                .rinaSakId("12345")
-                .rinaDokumentId("deadbeef")
-                .build();
+            .sedType("A009")
+            .rinaSakId("12345")
+            .rinaDokumentId("deadbeef")
+            .build();
 
         oppgaveService.opprettUtgåendeJfrOppgave(journalpostID, sedHendelse, aktørID, rinaUrl);
 
@@ -87,7 +87,39 @@ class OppgaveServiceTest {
 
         verify(oppgaveConsumer).oppdaterOppgave(eq(oppgaveID), captor.capture());
         assertThat(captor.getValue())
-                .extracting(OppgaveOppdateringDto::getId, OppgaveOppdateringDto::getVersjon, OppgaveOppdateringDto::getStatus, OppgaveOppdateringDto::getBeskrivelse)
-                .containsExactly(Integer.parseInt(oppgaveID), oppgaveVersjon, "FERDIGSTILT", null);
+            .extracting(OppgaveOppdateringDto::getId, OppgaveOppdateringDto::getVersjon, OppgaveOppdateringDto::getStatus, OppgaveOppdateringDto::getBeskrivelse)
+            .containsExactly(Integer.parseInt(oppgaveID), oppgaveVersjon, "FERDIGSTILT", null);
+    }
+
+    @Test
+    void flyttOppgaveTilIdOgFordeling_validerFelterSettes() {
+        final var oppgaveID = "666";
+        final var oppgaveVersjon = 2;
+        final var nyBeskrivelse = "Ny beskrivelse!";
+
+        final var eksisterendeOppgave = new HentOppgaveDto();
+        eksisterendeOppgave.setId(oppgaveID);
+        eksisterendeOppgave.setBeskrivelse("eksisterendeBeskrivelse");
+
+        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(eksisterendeOppgave);
+
+        oppgaveService.flyttOppgaveTilIdOgFordeling(oppgaveID, oppgaveVersjon, nyBeskrivelse);
+
+        final var captor = ArgumentCaptor.forClass(OppgaveOppdateringDto.class);
+        verify(oppgaveConsumer).oppdaterOppgave(eq(oppgaveID), captor.capture());
+        assertThat(captor.getValue())
+            .extracting(
+                OppgaveOppdateringDto::getId,
+                OppgaveOppdateringDto::getVersjon,
+                OppgaveOppdateringDto::getBeskrivelse,
+                OppgaveOppdateringDto::getTildeltEnhetsnr,
+                OppgaveOppdateringDto::getTilordnetRessurs
+            ).containsExactly(
+                Integer.parseInt(oppgaveID),
+                oppgaveVersjon,
+                nyBeskrivelse + "\n\n" + eksisterendeOppgave.getBeskrivelse(),
+                "4303",
+                ""
+        );
     }
 }

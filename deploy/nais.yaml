@@ -1,8 +1,8 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: melosys-eessi
-  namespace: {{NAMESPACE}}
+  name: {{APP_NAME}}
+  namespace: teammelosys
   labels:
     team: teammelosys
 spec:
@@ -40,4 +40,6 @@ spec:
       value: nais
   ingresses:
     - {{INGRESS}}
+  kafka:
+    pool: {{ KAFKA_POOL }}
 

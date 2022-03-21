@@ -40,6 +40,7 @@ public class OppgaveEndretHendelse {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Ident {
         private String identType;
+        @ToString.Exclude
         private String verdi;
         @ToString.Exclude
         private String folkeregisterident;
@@ -60,5 +61,10 @@ public class OppgaveEndretHendelse {
         return Optional.ofNullable(ident)
                 .map(Ident::getVerdi)
                 .orElseThrow(() -> new NoSuchElementException("Finner ikke aktørID"));
+    }
+
+    @JsonIgnore
+    public boolean harSammeVersjon(int versjon ) {
+        return this.versjon == versjon;
     }
 }

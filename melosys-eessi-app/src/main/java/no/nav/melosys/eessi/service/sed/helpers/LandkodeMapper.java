@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.sed.helpers;
 
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Optional;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -13,30 +14,28 @@ public final class LandkodeMapper {
 
     private LandkodeMapper() {}
 
-    private static BiMap<String, String> map = HashBiMap.create();
+    private static final BiMap<String, String> ISO3_ISO2_LANDKODER_MAP = HashBiMap.create();
 
     static {
-        Arrays.stream(Locale.getISOCountries()).forEach(c -> map.put(new Locale("", c).getISO3Country(), c));
-        map.put("XXX", "XS"); //Statsløs
-        map.put("???", "???"); //Ukjent
+        Arrays.stream(Locale.getISOCountries()).forEach(c -> ISO3_ISO2_LANDKODER_MAP.put(new Locale("", c).getISO3Country(), c));
+        ISO3_ISO2_LANDKODER_MAP.put("XXX", "XS"); //Statsløs
+        ISO3_ISO2_LANDKODER_MAP.put("???", "???"); //Ukjent
     }
 
-    public static String getLandkodeIso2(String landkodeIso3) {
+    public static String mapTilLandkodeIso2(String landkodeIso3) {
+        return finnLandkodeIso2(landkodeIso3).orElseThrow(() -> new NotFoundException("Landkode " + landkodeIso3 + " ble ikke funnet."));
+    }
+
+    public static Optional<String> finnLandkodeIso2(String landkodeIso3) {
         if (landkodeIso3 == null) {
-            return null;
+            return Optional.empty();
         }
 
         if (landkodeIso3.length() == 2) {
-            return landkodeIso3;
+            return Optional.of(landkodeIso3);
         }
 
-        String landkodeIso2 = map.get(landkodeIso3);
-
-        if (landkodeIso2 == null) {
-            throw new NotFoundException("Landkode " + landkodeIso3 + " ble ikke funnet.");
-        }
-
-        return landkodeIso2;
+        return Optional.ofNullable(ISO3_ISO2_LANDKODER_MAP.get(landkodeIso3));
     }
 
     public static String mapTilNavLandkode(String landkode) {

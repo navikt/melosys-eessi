@@ -1,5 +1,13 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -23,12 +31,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -57,7 +59,7 @@ class EuxConsumerTest {
     }
 
     @Test
-    void hentBuC_returnerObjekt() throws Exception {
+    void hentBUC_returnerObjekt() throws Exception {
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/buc.json");
         assertThat(jsonUrl).isNotNull();
@@ -68,7 +70,7 @@ class EuxConsumerTest {
         server.expect(requestTo("/buc/" + id))
                 .andRespond(withSuccess(buc, MediaType.APPLICATION_JSON));
 
-        BUC response = euxConsumer.hentBuC(id);
+        BUC response = euxConsumer.hentBUC(id);
         assertThat(response).isNotNull();
         assertThat(response.getDocuments()).isNotEmpty();
         assertThat(response.getDocuments().get(0).getId()).isEqualTo("93f022ea50e54c08bbdb85290a5fb23d");
@@ -84,24 +86,24 @@ class EuxConsumerTest {
     }
 
     @Test
-    void opprettBuC_returnererId() {
+    void opprettBUC_returnererId() {
         String id = "1234";
         String buc = "LA_BUC_04";
         server.expect(requestTo("/buc?BuCType=" + buc))
                 .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
-        String response = euxConsumer.opprettBuC(buc);
+        String response = euxConsumer.opprettBUC(buc);
         assertThat(response).isEqualTo(id);
     }
 
     @Test
-    void slettBuC_ingenRetur() {
+    void slettBUC_ingenRetur() {
         String id = "1234";
         server.expect(requestTo("/buc/" + id))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());
 
-        euxConsumer.slettBuC(id);
+        euxConsumer.slettBUC(id);
     }
 
     @Test
@@ -131,7 +133,7 @@ class EuxConsumerTest {
     }
 
     @Test
-    public void hentRinaSak_forventUrlSomTekst() {
+    void hentRinaSak_forventUrlSomTekst() {
         String rinaSaksnummer = "1111";
         String domene = "https://rina-ss1-q.adeo.no/portal/#/caseManagement/";
 
@@ -143,7 +145,7 @@ class EuxConsumerTest {
     }
 
     @Test
-    public void hentInstitusjoner_forventListe() throws Exception {
+    void hentInstitusjoner_forventListe() throws Exception {
 
         URL jsonUrl = getClass().getClassLoader().getResource("mock/institusjon_liste.json");
         assertThat(jsonUrl).isNotNull();
@@ -440,5 +442,19 @@ class EuxConsumerTest {
                 .andRespond(withSuccess());
 
         euxConsumer.setSakSensitiv(id);
+    }
+
+    @Test
+    void hentBucHandlinger_handlingerSomResponse() {
+        String rinaSaksnummer = "123456";
+        String handlinger = "[ \"Close\", \"Create\"]";
+
+        server.expect(requestTo("/buc/" + rinaSaksnummer + "/muligeaksjoner?format=enkelt"))
+            .andRespond(withSuccess(handlinger, MediaType.APPLICATION_JSON));
+
+        Collection<String> resultat = euxConsumer.hentBucHandlinger(rinaSaksnummer);
+        assertThat(resultat)
+            .hasSize(2)
+            .containsExactlyInAnyOrder("Close", "Create");
     }
 }

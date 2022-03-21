@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.metrikker;
 
 import javax.annotation.PostConstruct;
+
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@Deprecated(forRemoval = true) //TODO: må erstattes med nye metrikker
 public class FeilSedMottakMetrikker {
 
     private final MeterRegistry meterRegistry;

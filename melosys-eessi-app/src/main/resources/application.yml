@@ -32,17 +32,25 @@ spring:
       max-request-size: 10485760 # 10MB
 
 melosys:
+  admin:
+    api-key: ${MELOSYS_ADMIN_API_KEY}
   kafka:
     consumer:
       oppgave-endret:
         topic: ${KAFKA_OPPGAVE_ENDRET_TOPIC:oppgave-endret}
+        groupid: ${KAFKA_OPPGAVE_GROUPID:melosys-eessi-oppgaveHendelser}
       mottatt:
         topic: ${KAFKA_SEDMOTTATT_TOPIC:eessi-basis-sedMottatt-v1}
       sendt:
         topic: ${KAFKA_SEDSENDT_TOPIC:eessi-basis-sedSendt-v1}
       groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
-    producer:
-      topic-name: ${KAFKA_EESSIMELDING_TOPIC}
+    aiven:
+      brokers: ${KAFKA_BROKERS}
+      keystorePath: ${KAFKA_KEYSTORE_PATH:/dev/zero}
+      truststorePath: ${KAFKA_TRUSTSTORE_PATH:/dev/zero}
+      credstorePassword: ${KAFKA_CREDSTORE_PASSWORD:pwd}
+      producer:
+        aiven-topic-name: ${KAFKA_AIVEN_EESSIMELDING_TOPIC:teammelosys.eessi.v1}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}
@@ -80,7 +88,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,prometheus
+        include: health,prometheus,logging
       base-path: /internal
 
 #Token-validering
