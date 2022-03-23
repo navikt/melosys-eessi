@@ -54,12 +54,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: draft release
-        uses: actions/create-release@latest
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.VERSION_TAG }}
-          release_name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
+          name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
           body: ${{ env.CHANGE_LOG }}
           draft: true
           prerelease: false
