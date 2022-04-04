@@ -29,12 +29,12 @@
         <logback-classic.version>1.2.3</logback-classic.version>
         <logstash-encoder.version>5.3</logstash-encoder.version>
         <lombok.version>1.18.22</lombok.version>
-        <jackson.version>2.12.3</jackson.version>
+        <jackson.version>2.13.2.20220328</jackson.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <micrometer-jvm-extras.version>0.2.1</micrometer-jvm-extras.version>
         <nimbus-jose-jwt.version>8.23</nimbus-jose-jwt.version>
-        <okhttp3.version>4.9.1</okhttp3.version>
+        <okhttp3.version>4.9.3</okhttp3.version>
         <person-utils.version>1.35.0</person-utils.version>
         <random-benas.version>3.9.0</random-benas.version>
         <shedlock-version>4.33.0</shedlock-version>
