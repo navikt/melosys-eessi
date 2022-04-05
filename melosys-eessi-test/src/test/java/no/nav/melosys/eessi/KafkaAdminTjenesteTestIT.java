@@ -99,7 +99,7 @@ public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         // Vi sender 4 meldinger, resetter til offset 2, melding med offset 2 og 3 leses på nytt, totalt hentes oppgave 6 ganger.
-        verify(oppgaveConsumer, timeout(5_000).times(6)).hentOppgave(anyString());
+        verify(oppgaveConsumer, timeout(6_000).times(6)).hentOppgave(anyString());
     }
 
     @NotNull
