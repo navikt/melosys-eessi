@@ -95,7 +95,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev
+          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,ENVIRONMENT=q1
 
   # Deploy til prod manuelt
   deploy_prod:
