@@ -20,6 +20,7 @@ public final class LandkodeMapper {
         Arrays.stream(Locale.getISOCountries()).forEach(c -> ISO3_ISO2_LANDKODER_MAP.put(new Locale("", c).getISO3Country(), c));
         ISO3_ISO2_LANDKODER_MAP.put("XXX", "XS"); //Statsløs
         ISO3_ISO2_LANDKODER_MAP.put("???", "???"); //Ukjent
+        ISO3_ISO2_LANDKODER_MAP.put("XUK", "XUK"); //Ukjent
     }
 
     public static String mapTilLandkodeIso2(String landkodeIso3) {
