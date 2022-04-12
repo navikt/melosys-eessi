@@ -24,6 +24,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -159,6 +160,15 @@ class IdentifiseringKontrollServiceTest {
         assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
             .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
             .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP));
+    }
+
+    @Test
+    void name() {
+        sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK"), new Statsborgerskap("NO")));
+        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(List.of("NO")).build());
+        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
+            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
+            .containsExactly(true, List.of());
     }
 
     @Test
