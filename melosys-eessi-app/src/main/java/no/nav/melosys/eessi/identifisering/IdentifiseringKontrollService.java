@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.identifisering;
 
 import java.util.*;
 
+import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.person.PersonModell;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
+@Slf4j
 @Service
 public class IdentifiseringKontrollService {
 
@@ -57,6 +59,9 @@ public class IdentifiseringKontrollService {
         }
         if ((sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand))
             || (!PersonKontroller.harStatsborgerskapIListe(identifisertPerson, sedPerson.hentStatsborgerksapsliste()))) {
+            String statsborgerskapFraPDL = String.join(",", identifisertPerson.getStatsborgerskapLandkodeISO2());
+            String statsborgerskapFraSED = String.join(",", sedPerson.hentStatsborgerksapsliste());
+            log.error("PDL, SED eller Buc har forskjellig statsborgerskap, PDL: {}, SED: {}, Buc: {}", statsborgerskapFraPDL, statsborgerskapFraSED, avsenderLand);
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
         if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {
