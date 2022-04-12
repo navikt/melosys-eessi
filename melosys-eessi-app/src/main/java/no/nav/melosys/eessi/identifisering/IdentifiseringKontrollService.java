@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.identifisering;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
@@ -62,7 +61,7 @@ public class IdentifiseringKontrollService {
             || (!PersonKontroller.harStatsborgerskapIListe(identifisertPerson, sedPerson.hentStatsborgerksapsliste()))) {
             String statsborgerskapFraPDL = String.join(",", identifisertPerson.getStatsborgerskapLandkodeISO2());
             String statsborgerskapFraSED = String.join(",", sedPerson.hentStatsborgerksapsliste());
-            log.error("PDL, SED eller Buc har forskjellig statsborgerskap, PDL: {}, SED: {}, Buc: {}", statsborgerskapFraPDL, statsborgerskapFraSED,  avsenderLand);
+            log.error("PDL, SED eller Buc har forskjellig statsborgerskap, PDL: {}, SED: {}, Buc: {}", statsborgerskapFraPDL, statsborgerskapFraSED, avsenderLand);
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
         if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {
