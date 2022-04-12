@@ -162,15 +162,6 @@ class IdentifiseringKontrollServiceTest {
     }
 
     @Test
-    void name() {
-        sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK"), new Statsborgerskap("NO")));
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(List.of("NO")).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(true, List.of());
-    }
-
-    @Test
     void kontrollerIdentifisertPerson_personOgSedHarSammeStatsborgerskap_identifisert() {
         sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK")));
         when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
