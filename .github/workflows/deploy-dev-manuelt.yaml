@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Miljø (dev, q1)'
+        description: 'Miljø (dev, q1 eller prod)'
         required: true
         default: 'dev'
 
@@ -95,4 +95,43 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev
+          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,ENVIRONMENT=q1
+
+  # Deploy til prod manuelt
+  deploy_prod:
+    name: Deploy til prod
+    needs: build
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && github.event.inputs.environment == 'prod'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+      - name: Deploy
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: prod-fss
+          RESOURCE: deploy/nais.yaml
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod
+      - run: |
+          echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
+      - name: Slack Notification (deploy success)
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: good
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':clap: melosys-eessi ble deployet til prod :rocket:'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
+      - name: Slack Notification (deploy failure)
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: danger
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke deployes til prod!'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
