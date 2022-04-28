@@ -4,12 +4,10 @@ import java.time.Duration;
 import java.util.Random;
 import java.util.UUID;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -28,13 +26,8 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
 
-    @BeforeEach
-    void initierFeaturetoggle() {
-        ((FakeUnleash) unleash).enable("melosys.eessi.en_identifisering_oppg");
-    }
-
     @Test
-    void oppgaveEndret_utenKorrektVersjonsnumerFraKafka_ikkeFerdigstill() throws Exception  {
+    void oppgaveEndret_utenKorrektVersjonsnumerFraKafka_ikkeFerdigstill() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
@@ -61,15 +54,15 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         oppgaveDto.setVersjon(2);
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(),any());
+        verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(), any());
         assertThat(hentMelosysEessiRecords()).isEmpty();
     }
 
     @Test
-    void oppgaveEndret_alleredFerdigStiltOppgave_ikkeFerdigstill() throws Exception  {
+    void oppgaveEndret_alleredFerdigStiltOppgave_ikkeFerdigstill() throws Exception {
         final var sedID = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
@@ -97,10 +90,10 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         oppgaveDto.setStatus("FERDIGSTILT");
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"2", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "2", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(),any());
+        verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(), any());
         assertThat(hentMelosysEessiRecords()).isEmpty();
     }
 }

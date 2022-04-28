@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.behandling;
+package no.nav.melosys.eessi.service.mottak;
 
 import java.util.Arrays;
 import java.util.List;
