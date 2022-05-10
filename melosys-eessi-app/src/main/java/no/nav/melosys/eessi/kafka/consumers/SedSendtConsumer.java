@@ -30,6 +30,16 @@ public class SedSendtConsumer {
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
             topics = "${melosys.kafka.consumer.sendt.topic}", containerFactory = "sedSendtListenerContainerFactory")
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
+        utførSedSendt(consumerRecord);
+    }
+
+    @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
+        topics = "${melosys.kafka.aiven.consumer.sendt.topic}", containerFactory = "aivenSedHendelseListenerContainerFactory")
+    public void sedSendtAiven(ConsumerRecord<String, SedHendelse> consumerRecord) {
+        utførSedSendt(consumerRecord);
+    }
+
+    private void utførSedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendt = consumerRecord.value();
         loggSedID(sedSendt.getSedId());
         log.info("Mottatt melding om sed sendt: {}, offset: {}", sedSendt, consumerRecord.offset());
@@ -43,6 +53,5 @@ public class SedSendtConsumer {
         } finally {
             slettSedIDLogging();
         }
-
     }
 }

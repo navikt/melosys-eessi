@@ -51,6 +51,12 @@ melosys:
       credstorePassword: ${KAFKA_CREDSTORE_PASSWORD:pwd}
       producer:
         aiven-topic-name: ${KAFKA_AIVEN_EESSIMELDING_TOPIC:teammelosys.eessi.v1}
+      consumer:
+        mottatt:
+          topic: ${KAFKA_AIVEN_SEDMOTTATT_TOPIC:eessibasis-sedmottatt-v1}
+        sendt:
+          topic: ${KAFKA_AIVEN_SEDSENDT_TOPIC:eessibasis-sedsendt-v1}
+        groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}
