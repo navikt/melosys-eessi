@@ -37,7 +37,7 @@
         <okhttp3.version>4.9.3</okhttp3.version>
         <person-utils.version>1.35.0</person-utils.version>
         <random-benas.version>3.9.0</random-benas.version>
-        <shedlock-version>4.33.0</shedlock-version>
+        <shedlock-version>4.34.0</shedlock-version>
         <springfox-swagger2.version>3.0.0</springfox-swagger2.version>
         <testcontainers.version>1.16.3</testcontainers.version>
         <token-support.version>1.3.8</token-support.version>
@@ -54,7 +54,7 @@
         <org-jboss-logging.version>2.2.1.Final</org-jboss-logging.version>
         <org-osgi-core.version>4.3.1</org-osgi-core.version>
         <commons-cli.version>1.4</commons-cli.version>
-        <snappy-java.version>1.1.8.1</snappy-java.version>
+        <snappy-java.version>1.1.8.4</snappy-java.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <jetbrains-annotations.version>21.0.1</jetbrains-annotations.version>
         <findbugs.version>3.0.2</findbugs.version>
