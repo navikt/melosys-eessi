@@ -59,7 +59,7 @@
         <jetbrains-annotations.version>21.0.1</jetbrains-annotations.version>
         <findbugs.version>3.0.2</findbugs.version>
         <classgraph.version>4.8.141</classgraph.version>
-        <oauth2-oidc-sdk.version>9.4</oauth2-oidc-sdk.version>
+        <oauth2-oidc-sdk.version>9.35</oauth2-oidc-sdk.version>
     </properties>
 
     <dependencyManagement>
