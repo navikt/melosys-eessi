@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.identifisering;
 
 import java.util.*;
 
-import no.finn.unleash.Unleash;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
@@ -12,20 +12,19 @@ import org.springframework.stereotype.Service;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
+@Slf4j
 @Service
 public class IdentifiseringKontrollService {
 
     private final PersonFasade personFasade;
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
-    private final Unleash unleash;
     private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 2; // 2 versjon tilsvarer 2 gang hos id og fordeling
 
-    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker, Unleash unleash) {
+    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker) {
         this.personFasade = personFasade;
         this.euxService = euxService;
         this.personSokMetrikker = personSokMetrikker;
-        this.unleash = unleash;
     }
 
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveEndretVersjon) {
@@ -39,11 +38,10 @@ public class IdentifiseringKontrollService {
 
         var identifisertPerson = personFasade.hentPerson(aktørId);
 
-        if (unleash.isEnabled("melosys.eessi.overstyrIdentifiseringsKontroll")) {
-            if (oppgaveEndretVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
-                personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
-                return new IdentifiseringsKontrollResultat(Collections.emptyList());
-            }
+
+        if (oppgaveEndretVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
+            personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
+            return new IdentifiseringsKontrollResultat(Collections.emptyList());
         }
 
         return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand()));
@@ -57,6 +55,9 @@ public class IdentifiseringKontrollService {
         }
         if ((sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand))
             || (!PersonKontroller.harStatsborgerskapIListe(identifisertPerson, sedPerson.hentStatsborgerksapsliste()))) {
+            String statsborgerskapFraPDL = String.join(",", identifisertPerson.getStatsborgerskapLandkodeISO2());
+            String statsborgerskapFraSED = String.join(",", sedPerson.hentStatsborgerksapsliste());
+            log.error("PDL, SED eller Buc har forskjellig statsborgerskap, PDL: {}, SED: {}, Buc: {}", statsborgerskapFraPDL, statsborgerskapFraSED, avsenderLand);
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
         if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {

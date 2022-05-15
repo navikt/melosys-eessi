@@ -35,5 +35,6 @@ class LandkodeMapperTest {
     void getIso2_medIkkeISOStandardKoder_forventSammeKodeTilbake() {
         assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("???");
         assertThat(LandkodeMapper.mapTilLandkodeIso2("XXX")).isEqualTo("XS");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("XUK");
     }
 }

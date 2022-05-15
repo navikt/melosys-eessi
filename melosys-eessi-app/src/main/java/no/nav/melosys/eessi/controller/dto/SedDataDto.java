@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.controller.dto;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -12,6 +13,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SedDataDto extends SedGrunnlagDto {
+
     private Bruker bruker;
     private Adresse kontaktadresse;
     private Adresse oppholdsadresse;
@@ -40,6 +42,7 @@ public class SedDataDto extends SedGrunnlagDto {
     public Optional<String> finnLovvalgsland() {
         return getLovvalgsperioder().stream()
             .map(Lovvalgsperiode::getLovvalgsland)
+            .filter(Objects::nonNull)
             .findFirst();
     }
 

@@ -26,7 +26,7 @@ docker run -p 5432:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=su -d --r
 ```
 
 For å aksessere postgres-databasen i preprod må man først koble seg mot og logge inn i vault gjennom kommandolinjen.
-Dokumentasjon hvordan det gjøres finnes her: https://github.com/navikt/utvikling/blob/master/Vault.md
+Dokumentasjon hvordan det gjøres finnes her: https://github.com/navikt/utvikling/blob/main/docs/teknisk/Vault.md
 
 ## Kjøre applikasjonen lokalt
 ### Skaff deg en fungerende versjon av NAVs SSL-truststore 

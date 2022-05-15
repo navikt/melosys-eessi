@@ -1,25 +1,17 @@
 package no.nav.melosys.eessi;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import org.apache.kafka.clients.producer.ProducerRecord;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,12 +31,6 @@ class SedMottakTestIT extends ComponentTestBase {
     SedMottattHendelseRepository sedMottattHendelseRepository;
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
-
-    @BeforeEach
-    void initierFeaturetoggle() {
-        ((FakeUnleash) unleash).enable("melosys.eessi.en_identifisering_oppg");
-    }
-
 
     @Test
     void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {
@@ -170,7 +156,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         //Forventer kun én melding, som er oppgave-endret record
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR ,"1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());

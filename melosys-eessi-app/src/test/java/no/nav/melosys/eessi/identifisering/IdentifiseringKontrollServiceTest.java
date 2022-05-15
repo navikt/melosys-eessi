@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -56,15 +55,12 @@ class IdentifiseringKontrollServiceTest {
     private final String rinaSaksnummer = "432534";
     private final String dokumentId = "abcdefghijkl1";
 
-    private final FakeUnleash unleash = new FakeUnleash();
-
     private final PersonModell.PersonModellBuilder personBuilder = PersonModell.builder();
 
 
     @BeforeEach
     void setup() {
-        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker, unleash);
-        unleash.enable("melosys.eessi.overstyrIdentifiseringsKontroll");
+        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker);
         var utenlandskPin = new Pin(utenlandskId, avsenderLand, null);
 
         statsborgerskap.setLand(avsenderLand);

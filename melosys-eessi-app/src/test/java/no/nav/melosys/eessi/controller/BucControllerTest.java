@@ -2,12 +2,14 @@ package no.nav.melosys.eessi.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
@@ -26,8 +28,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -48,6 +50,8 @@ class BucControllerTest {
     private SedService sedService;
     @MockBean
     private LukkBucService lukkBucService;
+    @MockBean
+    private EuxConsumer euxConsumer;
 
     @Test
     void opprettBucOgSed_ok() throws Exception {
@@ -59,11 +63,11 @@ class BucControllerTest {
             .build();
 
         when(sedService.opprettBucOgSed(
-            eq(opprettBucOgSedDto.getSedDataDto()),
-            eq(opprettBucOgSedDto.getVedlegg()),
-            eq(BucType.LA_BUC_01),
-            eq(true),
-            eq(false))).thenReturn(bucOgSedOpprettetDto);
+            opprettBucOgSedDto.getSedDataDto(),
+            opprettBucOgSedDto.getVedlegg(),
+            BucType.LA_BUC_01,
+            true,
+            false)).thenReturn(bucOgSedOpprettetDto);
 
         mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_01)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -84,11 +88,11 @@ class BucControllerTest {
             .build();
 
         when(sedService.opprettBucOgSed(
-            eq(opprettBucOgSedDto.getSedDataDto()),
-            eq(opprettBucOgSedDto.getVedlegg()),
-            eq(BucType.LA_BUC_03),
-            eq(true),
-            eq(false))).thenReturn(bucOgSedOpprettetDto);
+            opprettBucOgSedDto.getSedDataDto(),
+            opprettBucOgSedDto.getVedlegg(),
+            BucType.LA_BUC_03,
+            true,
+            false)).thenReturn(bucOgSedOpprettetDto);
 
         mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_03)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -142,20 +146,30 @@ class BucControllerTest {
             .andExpect(status().isOk());
 
 
-        verify(sedService).sendPåEksisterendeBuc(eq(sedDataDto), eq("1"), eq(SedType.A005));
+        verify(sedService).sendPåEksisterendeBuc(sedDataDto, "1", SedType.A005);
     }
 
     @Test
     void hentSedGrunnlag_mapperForSedFinnesIkke_validationException() throws Exception {
         SED sed = new SED();
         sed.setSedType("A009");
-        when(euxService.hentSed(eq("23"), eq("44"))).thenReturn(sed);
+        when(euxService.hentSed("23", "44")).thenReturn(sed);
 
         mockMvc.perform(get("/api/buc/{rinsSaksnummer}/sed/{rinaDokumentId}/grunnlag", 23, 44)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
             .andExpect(responseBody(objectMapper).containsError("message", "Sed-type A009 støttes ikke"))
             .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
+    }
+
+    @Test
+    void hentMuligeBucHandlinger_euxConsumerReturnererListe_ok() throws Exception {
+        when(euxConsumer.hentBucHandlinger("33")).thenReturn(List.of("CLOSE", "CREATE", "REOPEN"));
+
+        mockMvc.perform(get("/api/buc/{rinaSaksnummer}/aksjoner", 33)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(responseBody(objectMapper).containsObjectAsJson(List.of("CLOSE", "CREATE", "REOPEN"), Collection.class));
     }
 
     @NotNull
