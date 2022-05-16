@@ -56,7 +56,7 @@
         <commons-cli.version>1.4</commons-cli.version>
         <snappy-java.version>1.1.8.4</snappy-java.version>
         <logback-classic.version>1.2.3</logback-classic.version>
-        <jetbrains-annotations.version>21.0.1</jetbrains-annotations.version>
+        <jetbrains-annotations.version>23.0.0</jetbrains-annotations.version>
         <findbugs.version>3.0.2</findbugs.version>
         <classgraph.version>4.8.141</classgraph.version>
         <oauth2-oidc-sdk.version>9.35</oauth2-oidc-sdk.version>
