@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.security;
 
-import no.nav.melosys.eessi.service.sts.RestStsService;
+import no.nav.melosys.eessi.service.sts.RestSts;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 class SystemContextClientRequestInterceptorTest {
 
     @Mock
-    private RestStsService restStsService;
+    private RestSts restSts;
 
     private SystemContextClientRequestInterceptor systemContextClientRequestInterceptor;
 
@@ -31,8 +31,8 @@ class SystemContextClientRequestInterceptorTest {
 
     @BeforeEach
     public void setup() {
-        systemContextClientRequestInterceptor = new SystemContextClientRequestInterceptor(restStsService);
-        when(restStsService.collectToken()).thenReturn(oidcKey);
+        systemContextClientRequestInterceptor = new SystemContextClientRequestInterceptor(restSts);
+        when(restSts.collectToken()).thenReturn(oidcKey);
     }
 
     @Test
@@ -41,7 +41,7 @@ class SystemContextClientRequestInterceptorTest {
         systemContextClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
 
         verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
-        verify(restStsService).collectToken();
+        verify(restSts).collectToken();
 
         assertThat(httpRequest.getHeaders()).containsKey(HttpHeaders.AUTHORIZATION);
         assertThat(httpRequest.getHeaders().get(HttpHeaders.AUTHORIZATION)).contains("Bearer " + oidcKey);

@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.sts;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -11,17 +12,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 @Service
-@Profile("!local-mock")
-public class RestStsService implements RestSts {
+@Profile("local-mock")
+public class RestStsServiceMock implements RestSts {
 
     private static final Long EXPIRE_TIME_TO_REFRESH = 60L;
 
@@ -35,7 +35,7 @@ public class RestStsService implements RestSts {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public RestStsService(@Qualifier("restStsRestTemplate") RestTemplate restTemplate,
+    public RestStsServiceMock(@Qualifier("restStsRestTemplate") RestTemplate restTemplate,
                           BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
         this.restTemplate = restTemplate;
         restTemplate.getInterceptors().add(basicAuthClientRequestInterceptor);
@@ -55,11 +55,20 @@ public class RestStsService implements RestSts {
 
     private String generateToken() {
         log.info("Henter oidc-token fra security-token-service");
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+        params.add("grant_type", "client_credentials");
+        params.add("scope", "openid");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
         try {
             ResponseEntity<Map<String, Object>> response = restTemplate
-                    .exchange(createUriString(), HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                            new ParameterizedTypeReference<Map<String, Object>>() {
-                            });
+                .exchange("/token", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<Map<String, Object>>() {
+                    });
 
             Map<String, Object> responseBody = response.getBody();
             setExpiryTime(Long.parseLong(responseBody.get(EXPIRES_IN_KEY).toString()));
@@ -77,12 +86,6 @@ public class RestStsService implements RestSts {
 
     private void setExpiryTime(long expiryTime) {
         this.expiryTime = LocalDateTime.now()
-                .plus(Duration.ofSeconds(expiryTime - EXPIRE_TIME_TO_REFRESH));
-    }
-
-    private String createUriString() {
-        return UriComponentsBuilder.fromPath("/token")
-                .queryParam("grant_type", "client_credentials")
-                .queryParam("scope", "openid").toUriString();
+            .plus(Duration.ofSeconds(expiryTime - EXPIRE_TIME_TO_REFRESH));
     }
 }
