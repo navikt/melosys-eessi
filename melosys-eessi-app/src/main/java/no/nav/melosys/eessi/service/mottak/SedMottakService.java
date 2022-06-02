@@ -14,6 +14,8 @@ import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -28,6 +30,7 @@ public class SedMottakService {
     private final BucIdentifisertService bucIdentifisertService;
 
 
+    @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
         var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
 
