@@ -14,8 +14,8 @@ import java.time.Duration;
 public class JournalpostapiConsumerProducer {
 
     private final String url;
-    private static final int JOARK_CONNECT_TIMEOUT_SECONDS = 60;
-    private static final int JOARK_READ_TIMEOUT_SECONDS = 60;
+    private static final int CONNECT_TIMEOUT_SECONDS = 60;
+    private static final int READ_TIMEOUT_SECONDS = 60;
 
     public JournalpostapiConsumerProducer(@Value("${melosys.integrations.journalpostapi-url}") String url) {
         this.url = url;
@@ -27,8 +27,8 @@ public class JournalpostapiConsumerProducer {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
                 .interceptors(systemContextClientRequestInterceptor)
-                .setConnectTimeout(Duration.ofSeconds(JOARK_CONNECT_TIMEOUT_SECONDS))
-                .setReadTimeout(Duration.ofSeconds(JOARK_READ_TIMEOUT_SECONDS))
+                .setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+                .setReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
                 .build();
 
         return new JournalpostapiConsumer(restTemplate);
