@@ -36,6 +36,7 @@ public class SedMottakService {
 
         try {
             lagretHendelse.setJournalpostId(opprettJournalpost(lagretHendelse));
+            sedMottattHendelseRepository.save(lagretHendelse);
         } catch (SedAlleredeJournalførtException e) {
             log.info("Inngående SED {} allerede journalført", e.getSedID());
             sedMottattHendelseRepository.delete(lagretHendelse);
@@ -44,8 +45,6 @@ public class SedMottakService {
 
         final var sed = euxService.hentSedMedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
             sedMottattHendelse.getSedHendelse().getRinaDokumentId());
-        sedMottattHendelseRepository.save(lagretHendelse);
-
         //Håndterer aldri X100 SEDer
         if (sed.erX100SED()) {
             return;
