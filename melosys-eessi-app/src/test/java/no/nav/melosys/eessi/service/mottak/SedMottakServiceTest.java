@@ -65,14 +65,13 @@ class SedMottakServiceTest {
 
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
                 .thenReturn("9988776655");
-        when(euxService.hentSedMedRetry(anyString(), anyString()))
-                .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
     }
 
     @Test
     void behandleSed_finnerIkkePerson_journalpostOgOppgaveOpprettes() {
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
+        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
@@ -90,6 +89,7 @@ class SedMottakServiceTest {
     @Test
     void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
@@ -107,6 +107,7 @@ class SedMottakServiceTest {
         final var oppgaveID = "5555";
         var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID,1);
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
+        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
 
         final var oppgave = new HentOppgaveDto();
         oppgave.setStatus("OPPRETTET");
@@ -128,7 +129,6 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
-        verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(sedMottattHendelseRepository).delete(any());
