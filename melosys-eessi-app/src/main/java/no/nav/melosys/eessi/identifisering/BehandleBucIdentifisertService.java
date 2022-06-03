@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
+import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class BehandleBucIdentifisertService {
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final SaksrelasjonService saksrelasjonService;
     private final EuxService euxService;
+    private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
     private final MelosysEessiAivenProducer melosysEessiAivenProducer;
 
@@ -30,7 +32,28 @@ public class BehandleBucIdentifisertService {
         sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
             .stream()
             .filter(sedMottattHendelse -> sedMottattHendelse.getSedHendelse().erIkkeX100())
-            .forEach(sedMottattHendelse -> publiserMelding(sedMottattHendelse, aktoerId));
+            .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, aktoerId));
+    }
+
+    private void sedIdentifisert(SedMottattHendelse sedMottattHendelse, String aktoerID) {
+        if (sedMottattHendelse.getJournalpostId() == null) {
+            sedMottattHendelse.setJournalpostId(opprettJournalpost(sedMottattHendelse, aktoerID));
+        }
+        publiserMelding(sedMottattHendelse, aktoerID);
+    }
+
+    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String aktoerID) {
+        log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
+        var sedMedVedlegg = euxService.hentSedMedVedlegg(
+            sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
+        );
+
+        String jpid = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+            sedMottattHendelse.getSedHendelse(), sedMedVedlegg, aktoerID);
+
+        sedMottattHendelse.setJournalpostId(jpid);
+        sedMottattHendelseRepository.save(sedMottattHendelse);
+        return jpid;
     }
 
     private void publiserMelding(SedMottattHendelse sedMottattHendelse, String aktørID) {
@@ -52,10 +75,12 @@ public class BehandleBucIdentifisertService {
             sedMottattHendelse.getSedHendelse().getBucType(),
             sedMottattHendelse.getSedHendelse().getAvsenderId(),
             sedMottattHendelse.getSedHendelse().getLandkode(),
-            sedMottattHendelse.getJournalpostId(), null,
+            sedMottattHendelse.getJournalpostId(),
+            null,
             arkivsakID,
             sedErEndring,
-            sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon());
+            sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon()
+        );
 
         log.info("Publiserer eessiMelding melding på aiven");
         melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
