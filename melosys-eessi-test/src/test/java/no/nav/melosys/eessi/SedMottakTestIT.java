@@ -130,7 +130,8 @@ class SedMottakTestIT extends ComponentTestBase {
 
     @Test
     void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_flyttesTilIdOgFordeling() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
+        final var sedID1 = UUID.randomUUID().toString();
+        final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
@@ -143,12 +144,13 @@ class SedMottakTestIT extends ComponentTestBase {
         when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID1, null))).get();
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
         await().atMost(Duration.ofSeconds(4))
             .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
 
         verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
         assertThat(hentMelosysEessiRecords()).isEmpty();
