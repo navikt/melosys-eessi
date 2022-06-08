@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.security;
 
 import javax.annotation.Nonnull;
 
-import no.nav.melosys.eessi.service.sts.RestSts;
+import no.nav.melosys.eessi.service.sts.RestStsClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -14,10 +14,10 @@ import reactor.core.publisher.Mono;
 @Component
 public class SystemContextRequestFilter implements ExchangeFilterFunction {
 
-    private final RestSts restSts;
+    private final RestStsClient restStsClient;
 
-    public SystemContextRequestFilter(RestSts restSts) {
-        this.restSts = restSts;
+    public SystemContextRequestFilter(RestStsClient restStsClient) {
+        this.restStsClient = restStsClient;
     }
 
     @Nonnull
@@ -26,7 +26,7 @@ public class SystemContextRequestFilter implements ExchangeFilterFunction {
                                        @Nonnull ExchangeFunction exchangeFunction) {
         return exchangeFunction.exchange(
             ClientRequest.from(clientRequest)
-                .header(HttpHeaders.AUTHORIZATION, restSts.bearerToken())
+                .header(HttpHeaders.AUTHORIZATION, restStsClient.bearerToken())
                 .build()
         );
     }

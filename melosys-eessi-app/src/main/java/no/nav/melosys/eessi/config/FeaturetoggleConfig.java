@@ -18,7 +18,7 @@ public class FeaturetoggleConfig {
 
     @Bean
     public Unleash unleash(Environment environment) {
-        if (!Collections.disjoint(List.of(environment.getActiveProfiles()), List.of("local", "local-mock", "test"))) {
+        if (erTestMiljø(environment)) {
             var fakeUnleash = new FakeUnleash();
             fakeUnleash.enableAll();
             return fakeUnleash;
@@ -33,6 +33,10 @@ public class FeaturetoggleConfig {
                 new IsTestStrategy(environment.getProperty("APP_ENVIRONMENT"))
             );
         }
+    }
+
+    private boolean erTestMiljø(Environment environment) {
+        return !Collections.disjoint(List.of(environment.getActiveProfiles()), List.of("local", "local-mock", "test"));
     }
 
     static class IsTestStrategy implements Strategy {

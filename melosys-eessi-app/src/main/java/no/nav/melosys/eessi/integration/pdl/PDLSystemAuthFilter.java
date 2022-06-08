@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import javax.annotation.Nonnull;
 
-import no.nav.melosys.eessi.service.sts.RestSts;
+import no.nav.melosys.eessi.service.sts.RestStsClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -14,18 +14,18 @@ import reactor.core.publisher.Mono;
 @Component
 public class PDLSystemAuthFilter implements ExchangeFilterFunction {
 
-    private final RestSts restSts;
+    private final RestStsClient restStsClient;
     private static final String NAV_CONSUMER_TOKEN = "Nav-Consumer-Token";
 
-    public PDLSystemAuthFilter(RestSts restSts) {
-        this.restSts = restSts;
+    public PDLSystemAuthFilter(RestStsClient restStsClient) {
+        this.restStsClient = restStsClient;
     }
 
     @Nonnull
     @Override
     public Mono<ClientResponse> filter(@Nonnull ClientRequest clientRequest,
                                        @Nonnull ExchangeFunction exchangeFunction) {
-        final String bearerToken = restSts.bearerToken();
+        final String bearerToken = restStsClient.bearerToken();
         return exchangeFunction.exchange(
             ClientRequest.from(clientRequest)
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)

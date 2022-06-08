@@ -22,9 +22,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RestStsServiceTest {
+class RestStsServiceClientTest {
 
-    private RestStsService restStsService;
+    private RestStsClientServiceClient restStsServiceClient;
 
     @Mock
     private RestTemplate restTemplate;
@@ -34,7 +34,7 @@ class RestStsServiceTest {
 
     @BeforeEach
     public void setUp() {
-        restStsService = spy(new RestStsService(restTemplate, basicAuthClientRequestInterceptor));
+        restStsServiceClient = spy(new RestStsClientServiceClient(restTemplate, basicAuthClientRequestInterceptor));
     }
 
     //Tester at token blir hentet på nytt ved kort expires_in, og ikke ved lengre expires_in
@@ -52,7 +52,7 @@ class RestStsServiceTest {
                 ParameterizedTypeReference.class)))
                 .thenReturn(responseEntity);
 
-        String token = restStsService.collectToken();
+        String token = restStsServiceClient.collectToken();
         verify(restTemplate, times(1))
                 .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
         assertThat(token).isNotEmpty();
@@ -60,14 +60,14 @@ class RestStsServiceTest {
         body.put("access_token", "cba321");
         body.put("expires_in", 3600L);
 
-        String secondToken = restStsService.collectToken();
+        String secondToken = restStsServiceClient.collectToken();
         verify(restTemplate, times(2))
                 .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
         assertThat(token).isNotEqualTo(secondToken);
 
         body.put("access_token", "abccba");
 
-        String thirdToken = restStsService.collectToken();
+        String thirdToken = restStsServiceClient.collectToken();
         verify(restTemplate, times(2))
                 .exchange(anyString(), any(), any(), any(ParameterizedTypeReference.class));
         assertThat(secondToken).isEqualTo(thirdToken);
