@@ -28,7 +28,6 @@ digraph SEDMottak {
     finnesIdOppgaveAllerede -> opprettJP [label="finnes ikke"]
     opprettJP -> opprettOppgaveIdFordeling
 
-
     subgraph BucIdentifisert {
         erX100 [shape=diamond];
         harJpId [shape=diamond];
