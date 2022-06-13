@@ -129,7 +129,7 @@ class SedMottakTestIT extends ComponentTestBase {
     }
 
     @Test
-    void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_flyttesTilIdOgFordeling() throws Exception {
+    void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_førsteSedFlyttesTilIdOgFordeling() throws Exception {
         final var sedID1 = UUID.randomUUID().toString();
         final var sedID2 = UUID.randomUUID().toString();
         final var oppgaveID = Integer.toString(new Random().nextInt(100000));
