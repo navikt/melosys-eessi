@@ -1,8 +1,11 @@
 package no.nav.melosys.eessi.config;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import no.finn.unleash.DefaultUnleash;
+import no.finn.unleash.FakeUnleash;
 import no.finn.unleash.Unleash;
 import no.finn.unleash.strategy.Strategy;
 import no.finn.unleash.util.UnleashConfig;
@@ -15,15 +18,25 @@ public class FeaturetoggleConfig {
 
     @Bean
     public Unleash unleash(Environment environment) {
-        var unleashConfig = UnleashConfig.builder()
+        if (erTestMiljø(environment)) {
+            var fakeUnleash = new FakeUnleash();
+            fakeUnleash.enableAll();
+            return fakeUnleash;
+        } else {
+            var unleashConfig = UnleashConfig.builder()
                 .appName("melosys")
                 .unleashAPI("https://unleash.nais.io/api/")
                 .build();
 
-        return new DefaultUnleash(
+            return new DefaultUnleash(
                 unleashConfig,
                 new IsTestStrategy(environment.getProperty("APP_ENVIRONMENT"))
-        );
+            );
+        }
+    }
+
+    private boolean erTestMiljø(Environment environment) {
+        return !Collections.disjoint(List.of(environment.getActiveProfiles()), List.of("local", "local-mock", "test"));
     }
 
     static class IsTestStrategy implements Strategy {

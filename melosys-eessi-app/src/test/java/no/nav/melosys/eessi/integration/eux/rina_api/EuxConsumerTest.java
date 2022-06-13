@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
-import no.nav.melosys.eessi.service.sts.RestStsService;
+import no.nav.melosys.eessi.service.sts.RestStsClientServiceClient;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ class EuxConsumerTest {
     @BeforeEach
     void setup() {
         EuxConsumerProducer consumerConfig = new EuxConsumerProducer(null);
-        SystemContextClientRequestInterceptor interceptor = new SystemContextClientRequestInterceptor(mock(RestStsService.class));
+        SystemContextClientRequestInterceptor interceptor = new SystemContextClientRequestInterceptor(mock(RestStsClientServiceClient.class));
 
         RestTemplate restTemplate = consumerConfig.euxRestTemplate(new RestTemplateBuilder(), interceptor);
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
