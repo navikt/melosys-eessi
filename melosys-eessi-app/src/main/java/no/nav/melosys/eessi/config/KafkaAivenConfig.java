@@ -67,7 +67,7 @@ public class KafkaAivenConfig {
         return kafkaListenerContainerFactory(SedHendelse.class, kafkaProperties, groupId);
     }
 
-    public <T> ConcurrentKafkaListenerContainerFactory<String, T> kafkaListenerContainerFactory(
+    private <T> ConcurrentKafkaListenerContainerFactory<String, T> kafkaListenerContainerFactory(
         Class<T> containerType, KafkaProperties kafkaProperties, String groupId) {
 
         Map<String, Object> props = kafkaProperties.buildConsumerProperties();
@@ -88,7 +88,7 @@ public class KafkaAivenConfig {
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokersUrl);
 
         if (isNotLocal()) {
-            props.putAll(nonLocalSecurityConfig());
+            props.putAll(securityConfig());
         }
         return props;
     }
@@ -105,13 +105,13 @@ public class KafkaAivenConfig {
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
 
         if (isNotLocal()) {
-            props.putAll(nonLocalSecurityConfig());
+            props.putAll(securityConfig());
         }
 
         return props;
     }
 
-    private Map<String, Object> nonLocalSecurityConfig() {
+    private Map<String, Object> securityConfig() {
         Map<String, Object> props = new HashMap<>();
         props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL");
 
