@@ -48,12 +48,12 @@ public class BehandleBucIdentifisertService {
             sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
-        String jpid = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
             sedMottattHendelse.getSedHendelse(), sedMedVedlegg, aktoerID);
 
-        sedMottattHendelse.setJournalpostId(jpid);
+        sedMottattHendelse.setJournalpostId(journalpostID);
         sedMottattHendelseRepository.save(sedMottattHendelse);
-        return jpid;
+        return journalpostID;
     }
 
     private void publiserMelding(SedMottattHendelse sedMottattHendelse, String aktørID) {

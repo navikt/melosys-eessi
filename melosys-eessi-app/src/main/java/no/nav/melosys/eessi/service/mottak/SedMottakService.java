@@ -70,10 +70,10 @@ public class SedMottakService {
     }
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse) {
-        String jpid = opprettJournalpost(sedMottattHendelse, null);
+        String journalpostID = opprettJournalpost(sedMottattHendelse, null);
 
         var oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-            jpid,
+            journalpostID,
             sedMottattHendelse.getSedHendelse().getSedType(),
             sedMottattHendelse.getSedHendelse().getRinaSakId()
         );
@@ -92,11 +92,11 @@ public class SedMottakService {
             sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
-        String jpid = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
             sedMottattHendelse.getSedHendelse(), sedMedVedlegg, navIdent);
 
-        sedMottattHendelse.setJournalpostId(jpid);
+        sedMottattHendelse.setJournalpostId(journalpostID);
         sedMottattHendelseRepository.save(sedMottattHendelse);
-        return jpid;
+        return journalpostID;
     }
 }
