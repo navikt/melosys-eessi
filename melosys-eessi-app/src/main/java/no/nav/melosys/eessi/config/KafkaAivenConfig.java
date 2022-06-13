@@ -133,7 +133,9 @@ public class KafkaAivenConfig {
 
     private boolean isNotLocal() {
         return Arrays.stream(env.getActiveProfiles()).noneMatch(
-            profile -> (profile.equalsIgnoreCase("local") || profile.equalsIgnoreCase("test"))
+            profile -> (profile.equalsIgnoreCase("local")
+                || profile.equalsIgnoreCase("test")
+                || profile.equalsIgnoreCase("local-mock"))
         );
     }
 }
