@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
@@ -19,11 +20,13 @@ public class JournalpostapiConsumerProducer {
 
     @Bean
     public JournalpostapiConsumer journalpostapiConsumer(
-            SystemContextClientRequestInterceptor systemContextClientRequestInterceptor) {
+        SystemContextClientRequestInterceptor systemContextClientRequestInterceptor) {
+
         RestTemplate restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-                .interceptors(systemContextClientRequestInterceptor)
-                .build();
+            .uriTemplateHandler(new DefaultUriBuilderFactory(url))
+            .interceptors(systemContextClientRequestInterceptor)
+            .setBufferRequestBody(false)
+            .build();
 
         return new JournalpostapiConsumer(restTemplate);
     }
