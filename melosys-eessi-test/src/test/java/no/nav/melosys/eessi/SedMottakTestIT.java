@@ -10,7 +10,6 @@ import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
-import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import org.junit.jupiter.api.Test;
@@ -165,29 +164,5 @@ class SedMottakTestIT extends ComponentTestBase {
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
         assertThat(hentMelosysEessiRecords()).isEmpty();
-    }
-
-    @Test
-    void sedMottatt_x100_oppretterOgFerdigstillerJournalpost() {
-        final var sedID = UUID.randomUUID().toString();
-        final var oppgaveDto = new HentOppgaveDto(Integer.toString(new Random().nextInt(100000)), "AAPEN", 1);
-        oppgaveDto.setStatus("OPPRETTET");
-
-        mockPerson(FNR, AKTOER_ID);
-
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR, SedType.X100));
-        when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
-        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR, SedType.X100)));
-        kafkaTestConsumer.doWait(5_000L);
-
-        await().atMost(Duration.ofSeconds(4))
-            .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
-
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 0);
-        verify(journalpostapiConsumer).opprettJournalpost(any(), eq(true));
     }
 }

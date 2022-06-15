@@ -4,10 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
-import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -40,9 +38,8 @@ public class SedMottakService {
         final var sed = euxService.hentSedMedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
             sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
-        //Håndterer aldri X100 SEDer, bare journalfører mottak
+        //Håndterer aldri X100 SEDer
         if (sed.erX100SED()) {
-            opprettJournalpost(sedMottattHendelse);
             return;
         }
 
@@ -73,7 +70,7 @@ public class SedMottakService {
     }
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse) {
-        String journalpostID = opprettJournalpost(sedMottattHendelse);
+        String journalpostID = opprettJournalpost(sedMottattHendelse, null);
 
         var oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
             journalpostID,
@@ -89,27 +86,17 @@ public class SedMottakService {
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }
 
-    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
+    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String navIdent) {
         log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         var sedMedVedlegg = euxService.hentSedMedVedlegg(
             sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
-        String journalpostID = arkiverInngaaendeSed(sedMottattHendelse.getSedHendelse(), sedMedVedlegg);
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+            sedMottattHendelse.getSedHendelse(), sedMedVedlegg, navIdent);
 
         sedMottattHendelse.setJournalpostId(journalpostID);
         sedMottattHendelseRepository.save(sedMottattHendelse);
-        return journalpostID;
-    }
-
-    private String arkiverInngaaendeSed(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg) {
-        String journalpostID;
-        if (sedHendelse.erIkkeX100()) {
-            journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedHendelse, sedMedVedlegg, null);
-        } else {
-            // X100 SED behandles ikke videre av melosys. Ferdigstiller derfor med en gang
-            journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeX100Sed(sedHendelse, sedMedVedlegg);
-        }
         return journalpostID;
     }
 }
