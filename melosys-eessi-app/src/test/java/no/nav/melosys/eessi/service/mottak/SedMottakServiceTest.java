@@ -53,6 +53,7 @@ class SedMottakServiceTest {
     private SedMottakService sedMottakService;
 
     private static final String IDENT = "1122334455";
+    private static final String SED_ID = "555554444";
     private static final String RINA_SAKSNUMMER = "12313213";
 
     @BeforeEach
@@ -62,16 +63,15 @@ class SedMottakServiceTest {
                 oppgaveService, sedMottattHendelseRepository,
                 bucIdentifiseringOppgRepository, bucIdentifisertService
         );
-
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
-                .thenReturn("9988776655");
-        when(euxService.hentSedMedRetry(anyString(), anyString()))
-                .thenReturn(opprettSED());
-        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
     }
 
     @Test
-    void behandleSed_finnerIkkePerson_journalpostOgOppgaveOpprettes() {
+    void behandleSed_finnerIkkePerson_OppgaveOpprettes() {
+        when(euxService.hentSedMedRetry(anyString(), anyString()))
+            .thenReturn(opprettSED());
+        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
+                .thenReturn("9988776655");
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
@@ -90,23 +90,29 @@ class SedMottakServiceTest {
     @Test
     void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
+        when(euxService.hentSedMedRetry(anyString(), anyString()))
+            .thenReturn(opprettSED());
+        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
         verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository, times(2)).save(any());
+        verify(sedMottattHendelseRepository).save(any());
         verify(bucIdentifisertService).lagreIdentifisertPerson(sedHendelse.getRinaSakId(), IDENT);
     }
 
     @Test
-    void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgave() {
+    void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgaveEllerJournalpost() {
         final var oppgaveID = "5555";
         var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID,1);
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
+        when(euxService.hentSedMedRetry(anyString(), anyString()))
+            .thenReturn(opprettSED());
+        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
 
         final var oppgave = new HentOppgaveDto();
         oppgave.setStatus("OPPRETTET");
@@ -115,23 +121,21 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
         verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
 
     @Test
-    void behandleSed_sedAlleredeJournalført_behandlerIkkeVidere() {
-        SedHendelse sedHendelse = sedHendelseMedBruker();
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
-                .thenThrow(new SedAlleredeJournalførtException("Allerede journalført", "123"));
+    void behandleSed_sedAlleredeBehandlet_behandlerIkkeVidere() {
+        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build();
+        when(sedMottattHendelseRepository.findBySedID(SED_ID)).thenReturn(Optional.of(sedMottattHendelse));
 
-        sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+        sedMottakService.behandleSed(sedMottattHendelse);
 
-        verify(euxService).hentSedMedRetry(anyString(), anyString());
+        verify(euxService, never()).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(sedMottattHendelseRepository).delete(any());
+        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
     }
@@ -175,6 +179,7 @@ class SedMottakServiceTest {
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         sedHendelse.setAvsenderId("SE:12345");
         sedHendelse.setNavBruker(IDENT);
+        sedHendelse.setSedId(SED_ID);
         sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
         return sedHendelse;
     }
@@ -184,6 +189,7 @@ class SedMottakServiceTest {
         sedHendelse.setNavBruker("ukjent");
         sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
         sedHendelse.setRinaDokumentId("456");
+        sedHendelse.setSedId(SED_ID);
         sedHendelse.setSedType("A009");
         return sedHendelse;
     }
