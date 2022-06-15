@@ -41,8 +41,7 @@ public class SedMottakService {
             sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
         if (!unleash.isEnabled("melosys.eessi.x100") && sed.erX100SED()) {
-            log.info("SED {} er av typen X100, så fjerner hendelsen og stopper behandling", sedMottattHendelse.getSedHendelse().getSedId());
-            sedMottattHendelseRepository.delete(lagretHendelse);
+            log.info("SED {} er av typen X100, så stopper behandling", sedMottattHendelse.getSedHendelse().getSedId());
             return;
         }
 
