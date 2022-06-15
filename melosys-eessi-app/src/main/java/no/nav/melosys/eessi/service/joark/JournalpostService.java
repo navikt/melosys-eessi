@@ -25,6 +25,13 @@ public class JournalpostService {
         return opprettJournalpost(request, false);
     }
 
+    OpprettJournalpostResponse opprettOgFerdigstillInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
+            SedMedVedlegg sedMedVedlegg) {
+        OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
+                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), null);
+        return opprettJournalpost(request, true);
+    }
+
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
             SedMedVedlegg sedMedVedlegg, String navIdent) {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(

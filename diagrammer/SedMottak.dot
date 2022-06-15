@@ -1,6 +1,5 @@
 digraph SEDMottak {
     X_sedAlleredeBehandlet [label="X"];
-    X_x100 [label="X"];
     X_lagreIdentifisertPerson [label="X"];
     X_opprettOppgaveIdentifisering [label="X"];
     sedAlleredeBehandlet [shape=diamond];
@@ -16,7 +15,7 @@ digraph SEDMottak {
     lagreHendelse -> hentSED;
 
     hentSED -> sedType;
-    sedType -> X_x100 [label="X100"];
+    sedType -> opprettOgFerdigstillJP [label="X100"];
     sedType -> identifiserPerson [label="annet"];
 
     identifiserPerson -> erRinasakIdentifisert [label="identifisert"];

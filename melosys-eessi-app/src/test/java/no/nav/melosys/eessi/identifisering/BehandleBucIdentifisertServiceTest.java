@@ -54,7 +54,9 @@ public class BehandleBucIdentifisertServiceTest {
 
     @BeforeEach
     void setup() {
-        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer);
+        behandleBucIdentifisertService = new BehandleBucIdentifisertService(
+            sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer
+        );
     }
 
     @Test

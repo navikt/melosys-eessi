@@ -7,7 +7,7 @@ flowchart
 
     lagreHendelse --> hentSED
     hentSED --> sedType{Er X100?}
-    sedType --X100--> sedErX100(X)
+    sedType --X100--> sedErX100[Opprett og ferdigstill JP]
     sedType --andre typer--> identifiserPerson{Er person identifisert?}
 
     identifiserPerson -- identifisert --> erRinasakIdentifisert{Er rinasak identifisert?}

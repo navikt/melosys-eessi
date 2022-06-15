@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
@@ -38,6 +39,10 @@ public class MockData {
     }
 
     SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident) {
+        return sedHendelse(rinaSaksnummer, sedID, ident, A003);
+    }
+
+    SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident, SedType sedType) {
         return SedHendelse.builder()
                 .avsenderId("avsenderId")
                 .avsenderNavn("avsender")
@@ -49,15 +54,19 @@ public class MockData {
                 .rinaDokumentId("1")
                 .rinaSakId(rinaSaksnummer)
                 .rinaDokumentVersjon("1")
-                .sedType(A003.name())
+                .sedType(sedType.name())
                 .sedId(sedID)
                 .sektorKode("LA")
                 .build();
     }
 
     SED sed(LocalDate fødselsdato, String statsborgerskap, String ident) {
+        return sed(fødselsdato, statsborgerskap, ident, A003);
+    }
+
+    SED sed(LocalDate fødselsdato, String statsborgerskap, String ident, SedType sedType) {
         SED sed = new SED();
-        sed.setSedType(A003.name());
+        sed.setSedType(sedType.name());
 
         MedlemskapA003 medlemskap = new MedlemskapA003();
         medlemskap.setRelevantartikkelfor8832004eller9872009("13_1_a");

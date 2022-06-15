@@ -52,9 +52,20 @@ public class OpprettInngaaendeJournalpostService {
         return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg, navIdent).getJournalpostId();
     }
 
+    public String arkiverInngaaendeX100Sed(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg) {
+        return opprettOgFerdigstillJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg).getJournalpostId();
+    }
+
     private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
             SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg, String navIdent) {
         OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg, navIdent);
+        lagreJournalpostRelasjon(sedMottatt, response);
+        return response;
+    }
+
+    private OpprettJournalpostResponse opprettOgFerdigstillJournalpostLagreRelasjon(
+            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg) {
+        OpprettJournalpostResponse response = journalpostService.opprettOgFerdigstillInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg);
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;
     }
