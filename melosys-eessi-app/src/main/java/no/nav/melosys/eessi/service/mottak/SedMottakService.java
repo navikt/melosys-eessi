@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.mottak;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -25,6 +26,7 @@ public class SedMottakService {
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final BucIdentifisertService bucIdentifisertService;
+    private final Unleash unleash;
 
 
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
@@ -38,8 +40,9 @@ public class SedMottakService {
         final var sed = euxService.hentSedMedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
             sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
-        //Håndterer aldri X100 SEDer
-        if (sed.erX100SED()) {
+        if (!unleash.isEnabled("melosys.eessi.x100") && sed.erX100SED()) {
+            log.info("SED {} er av typen X100, så fjerner hendelsen og stopper behandling", sedMottattHendelse.getSedHendelse().getSedId());
+            sedMottattHendelseRepository.delete(lagretHendelse);
             return;
         }
 

@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -19,7 +19,6 @@ import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
-import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +60,7 @@ class SedMottakServiceTest {
         sedMottakService = new SedMottakService(
                 euxService, personIdentifisering, opprettInngaaendeJournalpostService,
                 oppgaveService, sedMottattHendelseRepository,
-                bucIdentifiseringOppgRepository, bucIdentifisertService
+                bucIdentifiseringOppgRepository, bucIdentifisertService, new FakeUnleash()
         );
     }
 
