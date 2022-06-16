@@ -27,6 +27,7 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -50,6 +51,8 @@ public class KafkaAivenConfig {
     @Value("${melosys.kafka.aiven.credstorePassword}")
     private String credstorePassword;
 
+    private static final String LEGISLATION_APPLICABLE_CODE = "LA";
+
     @Bean
     @Qualifier("aivenTemplate")
     public KafkaTemplate<String, Object> aivenKafkaTemplate(ObjectMapper objectMapper) {
@@ -64,18 +67,17 @@ public class KafkaAivenConfig {
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>>
     aivenSedHendelseListenerContainerFactory(
         KafkaProperties kafkaProperties, @Value("${melosys.kafka.aiven.consumer.groupid}") String groupId) {
-        return kafkaListenerContainerFactory(SedHendelse.class, kafkaProperties, groupId);
+        return sedListenerContainerFactory(kafkaProperties, groupId);
     }
 
-    private <T> ConcurrentKafkaListenerContainerFactory<String, T> kafkaListenerContainerFactory(
-        Class<T> containerType, KafkaProperties kafkaProperties, String groupId) {
-
+    private ConcurrentKafkaListenerContainerFactory<String, SedHendelse> sedListenerContainerFactory(KafkaProperties kafkaProperties, String groupId) {
         Map<String, Object> props = kafkaProperties.buildConsumerProperties();
         props.putAll(consumerConfig(groupId));
-        DefaultKafkaConsumerFactory<String, T> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-            props, new StringDeserializer(), valueDeserializer(containerType));
-        ConcurrentKafkaListenerContainerFactory<String, T> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+            props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
+        ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.setRecordFilterStrategy(recordFilterStrategySedListener());
 
         return factory;
     }
@@ -137,5 +139,10 @@ public class KafkaAivenConfig {
                 || profile.equalsIgnoreCase("test")
                 || profile.equalsIgnoreCase("local-mock"))
         );
+    }
+
+    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
+        // Return false to be dismissed
+        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
     }
 }
