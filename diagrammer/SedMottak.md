@@ -6,9 +6,7 @@ flowchart
     sedAlleredeBehandlet --nei--> lagreHendelse
 
     lagreHendelse --> hentSED
-    hentSED --> sedType{Er X100?}
-    sedType --X100--> sedErX100(X)
-    sedType --andre typer--> identifiserPerson{Er person identifisert?}
+    hentSED --> identifiserPerson{Er person identifisert?}
 
     identifiserPerson -- identifisert --> erRinasakIdentifisert{Er rinasak identifisert?}
     erRinasakIdentifisert --allerede identifisert--> rinasakIdentifisert(X)

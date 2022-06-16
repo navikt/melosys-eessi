@@ -131,6 +131,14 @@ public class BUC {
         return documents.stream()
             .filter(Document::erInngående)
             .filter(Document::erOpprettet)
+            .min(Comparator.comparing(Document::getCreationDate));
+    }
+
+    // Fjernes sammen med toggle melosys.eessi.x100
+    public Optional<Document> finnFørstMottatteSedIkkeX100() {
+        return documents.stream()
+            .filter(Document::erInngående)
+            .filter(Document::erOpprettet)
             .filter(Document::erIkkeX100)
             .min(Comparator.comparing(Document::getCreationDate));
     }

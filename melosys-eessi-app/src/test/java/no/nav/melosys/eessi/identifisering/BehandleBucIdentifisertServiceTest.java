@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.identifisering;
 import java.util.List;
 import java.util.Optional;
 
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -54,21 +55,19 @@ public class BehandleBucIdentifisertServiceTest {
 
     @BeforeEach
     void setup() {
-        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer);
+        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer, new FakeUnleash());
     }
 
     @Test
-    void bucIdentifisert_3SEDerOg1X100_oppretter2JournalposterOgPubliserer3Meldinger() {
+    void bucIdentifisert_3SEDer_oppretter2JournalposterOgPubliserer3Meldinger() {
         // Første SED som må identifiseres journalføres sammen med opprettelse av oppgave til ID fordeling
         var sedAlleredeJournalført = lagSedMottattHendelse("1", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, JOURNALPOST_ID, false);
         // De påfølgende SEDene journalføres først når BUC blir identifisert
         var sed2 = lagSedMottattHendelse("2", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
         var sed3 = lagSedMottattHendelse("3", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
-        // X100 SEDer ignoreres
-        var sedX100 = lagX100SedMottattHendelse(RINA_SAKSNUMMER);
 
         when(sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(RINA_SAKSNUMMER, false))
-            .thenReturn(List.of(sedAlleredeJournalført, sed2, sed3, sedX100));
+            .thenReturn(List.of(sedAlleredeJournalført, sed2, sed3));
         when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
         when(euxService.hentSedMedVedlegg(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(new SedMedVedlegg(null, null));
         when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
@@ -92,8 +91,6 @@ public class BehandleBucIdentifisertServiceTest {
 
         assertThat(sed3.isPublisertKafka()).isTrue();
         assertThat(sed3.getJournalpostId()).isEqualTo(JOURNALPOST_ID_3);
-
-        assertThat(sedX100.isPublisertKafka()).isFalse();
     }
 
     private SedMottattHendelse lagSedMottattHendelse(String sedID, String rinaSaksnummer, String rinaDokumentID, String journalpostID, boolean publisertKafka) {
@@ -107,16 +104,6 @@ public class BehandleBucIdentifisertServiceTest {
                 .build())
             .journalpostId(journalpostID)
             .publisertKafka(publisertKafka)
-            .build();
-    }
-
-    private SedMottattHendelse lagX100SedMottattHendelse(String rinaSaksnummer) {
-        return SedMottattHendelse.builder()
-            .sedHendelse(SedHendelse.builder()
-                .sedType("X100")
-                .rinaSakId(rinaSaksnummer)
-                .build())
-            .publisertKafka(false)
             .build();
     }
 

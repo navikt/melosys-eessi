@@ -1,10 +1,8 @@
 digraph SEDMottak {
     X_sedAlleredeBehandlet [label="X"];
-    X_x100 [label="X"];
     X_lagreIdentifisertPerson [label="X"];
     X_opprettOppgaveIdentifisering [label="X"];
     sedAlleredeBehandlet [shape=diamond];
-    sedType [shape=diamond];
     identifiserPerson [shape=diamond];
     erRinasakIdentifisert [shape=diamond];
     finnesIdOppgaveAllerede [shape=diamond];
@@ -14,10 +12,7 @@ digraph SEDMottak {
 
     sedAlleredeBehandlet -> lagreHendelse [label="ny"];
     lagreHendelse -> hentSED;
-
-    hentSED -> sedType;
-    sedType -> X_x100 [label="X100"];
-    sedType -> identifiserPerson [label="annet"];
+    hentSED -> identifiserPerson;
 
     identifiserPerson -> erRinasakIdentifisert [label="identifisert"];
     erRinasakIdentifisert -> X_lagreIdentifisertPerson [label="allerede identifisert"];
@@ -29,19 +24,13 @@ digraph SEDMottak {
     opprettJP -> opprettOppgaveIdFordeling
 
     subgraph BucIdentifisert {
-        erX100 [shape=diamond];
         harJpId [shape=diamond];
-        X_BucIdentifisert_x100 [label="X"];
         opprettJP_BucIdentifisert [label="opprettJP"];
         hentAlleSEDMottatt [shape=rectangle, label="for hentAlleSEDMottatt"];
 
-        eventBucIdentifisert;
         eventBucIdentifisert -> hentAlleSEDMottatt;
         hentAlleSEDMottatt -> hentAlleSEDMottatt;
-        hentAlleSEDMottatt -> erX100;
-        erX100 -> X_BucIdentifisert_x100 [label="ja"];
-
-        erX100 -> harJpId [label="nei"];
+        hentAlleSEDMottatt -> harJpId [label="nei"];
         harJpId -> publiserSedMottatt [label="allerede JP"];
         harJpId -> opprettJP_BucIdentifisert [label="ingen jp"];
         opprettJP_BucIdentifisert -> publiserSedMottatt;
