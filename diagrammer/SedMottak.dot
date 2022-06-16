@@ -12,8 +12,7 @@ digraph SEDMottak {
 
     sedAlleredeBehandlet -> lagreHendelse [label="ny"];
     lagreHendelse -> hentSED;
-
-    hentSED -> identifiserPerson [label="annet"];
+    hentSED -> identifiserPerson;
 
     identifiserPerson -> erRinasakIdentifisert [label="identifisert"];
     erRinasakIdentifisert -> X_lagreIdentifisertPerson [label="allerede identifisert"];
