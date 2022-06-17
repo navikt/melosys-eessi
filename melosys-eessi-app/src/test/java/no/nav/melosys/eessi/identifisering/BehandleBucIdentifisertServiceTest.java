@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import no.finn.unleash.FakeUnleash;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -33,7 +34,8 @@ public class BehandleBucIdentifisertServiceTest {
 
     private final String RINA_SAKSNUMMER = "123456";
     private final String RINA_DOKUMENT_ID = "7890";
-    private final String AKTOER_ID = "11223344550";
+    private final String AKTOER_ID = "1122334455660";
+    private final String FNR = "11223344550";
     private final String JOURNALPOST_ID = "11";
     private final String JOURNALPOST_ID_2 = "22";
     private final String JOURNALPOST_ID_3 = "33";
@@ -47,6 +49,8 @@ public class BehandleBucIdentifisertServiceTest {
     @Mock
     private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
     @Mock
+    private PersonFasade personFasade;
+    @Mock
     private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
     @Mock
     private MelosysEessiAivenProducer melosysEessiAivenProducer;
@@ -55,7 +59,7 @@ public class BehandleBucIdentifisertServiceTest {
 
     @BeforeEach
     void setup() {
-        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer, new FakeUnleash());
+        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, personFasade, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer, new FakeUnleash());
     }
 
     @Test
@@ -69,15 +73,16 @@ public class BehandleBucIdentifisertServiceTest {
         when(sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(RINA_SAKSNUMMER, false))
             .thenReturn(List.of(sedAlleredeJournalført, sed2, sed3));
         when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
+        when(personFasade.hentAktoerId(FNR)).thenReturn(AKTOER_ID);
         when(euxService.hentSedMedVedlegg(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(new SedMedVedlegg(null, null));
         when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
         when(euxService.sedErEndring(RINA_DOKUMENT_ID, RINA_SAKSNUMMER)).thenReturn(false);
         when(saksrelasjonService.finnVedRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.empty());
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(eq(sed2.getSedHendelse()), any(), eq(AKTOER_ID))).thenReturn(JOURNALPOST_ID_2);
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(eq(sed3.getSedHendelse()), any(), eq(AKTOER_ID))).thenReturn(JOURNALPOST_ID_3);
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(eq(sed2.getSedHendelse()), any(), eq(FNR))).thenReturn(JOURNALPOST_ID_2);
+        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(eq(sed3.getSedHendelse()), any(), eq(FNR))).thenReturn(JOURNALPOST_ID_3);
 
 
-        behandleBucIdentifisertService.bucIdentifisert(RINA_SAKSNUMMER, AKTOER_ID);
+        behandleBucIdentifisertService.bucIdentifisert(RINA_SAKSNUMMER, FNR);
 
 
         verify(sedMottattHendelseRepository, times(2)).save(any());

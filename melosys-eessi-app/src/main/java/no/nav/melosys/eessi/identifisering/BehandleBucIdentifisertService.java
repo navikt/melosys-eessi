@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.identifisering;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -25,48 +26,50 @@ public class BehandleBucIdentifisertService {
     private final SaksrelasjonService saksrelasjonService;
     private final EuxService euxService;
     private final OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
+    private final PersonFasade personFasade;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
     private final MelosysEessiAivenProducer melosysEessiAivenProducer;
     private final Unleash unleash;
 
     @Transactional
-    public void bucIdentifisert(String rinaSaksnummer, String aktoerId) {
+    public void bucIdentifisert(String rinaSaksnummer, String personIdent) {
         if (unleash.isEnabled("melosys.eessi.x100")) {
             sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
                 .stream()
-                .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, aktoerId));
+                .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, personIdent));
         } else {
             sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
                 .stream()
                 .filter(sedMottattHendelse -> sedMottattHendelse.getSedHendelse().erIkkeX100())
-                .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, aktoerId));
+                .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, personIdent));
         }
     }
 
-    private void sedIdentifisert(SedMottattHendelse sedMottattHendelse, String aktoerID) {
+    private void sedIdentifisert(SedMottattHendelse sedMottattHendelse, String personIdent) {
         if (sedMottattHendelse.getJournalpostId() == null) {
-            sedMottattHendelse.setJournalpostId(opprettJournalpost(sedMottattHendelse, aktoerID));
+            sedMottattHendelse.setJournalpostId(opprettJournalpost(sedMottattHendelse, personIdent));
         }
-        publiserMelding(sedMottattHendelse, aktoerID);
+        publiserMelding(sedMottattHendelse, personIdent);
     }
 
-    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String aktoerID) {
+    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String personIdent) {
         log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         var sedMedVedlegg = euxService.hentSedMedVedlegg(
             sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
         String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-            sedMottattHendelse.getSedHendelse(), sedMedVedlegg, aktoerID);
+            sedMottattHendelse.getSedHendelse(), sedMedVedlegg, personIdent);
 
         sedMottattHendelse.setJournalpostId(journalpostID);
         sedMottattHendelseRepository.save(sedMottattHendelse);
         return journalpostID;
     }
 
-    private void publiserMelding(SedMottattHendelse sedMottattHendelse, String aktørID) {
+    private void publiserMelding(SedMottattHendelse sedMottattHendelse, String personIdent) {
         final var mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedMottattHendelse.getSedHendelse().getSedType()));
         final var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId());
+        final var aktørID = personFasade.hentAktoerId(personIdent);
         final var sedErEndring = euxService.sedErEndring(sedMottattHendelse.getSedHendelse().getRinaDokumentId(), sedMottattHendelse.getSedHendelse().getRinaSakId());
         final var arkivsakID = saksrelasjonService.finnVedRinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
             .map(FagsakRinasakKobling::getGsakSaksnummer)
