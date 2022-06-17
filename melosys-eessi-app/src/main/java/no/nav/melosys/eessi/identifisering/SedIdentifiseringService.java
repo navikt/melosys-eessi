@@ -62,6 +62,7 @@ class SedIdentifiseringService implements PersonIdentifisering {
         log.info("Norsk ident: {}",norskIdent);
         if (norskIdent.isPresent()) {
             PersonSokResultat resultat = personSøk.vurderPerson(norskIdent.get(), søkeKriterier);
+            log.info("PersonSokResultat vurderPerson: {}", resultat);
             if (resultat.personIdentifisert()) {
                 personSokMetrikker.counter(resultat.getBegrunnelse());
                 return norskIdent;
