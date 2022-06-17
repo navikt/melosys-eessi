@@ -36,14 +36,14 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
         groupId = "${melosys.kafka.consumer.oppgave-endret.groupid}")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
         final var oppgave = consumerRecord.value();
-        log.debug("Oppgave endret: {}", oppgave);
+        log.info("Oppgave endret: {}", oppgave);
 
         if (erValidertIdentifiseringsoppgave(oppgave)) {
             log.info("Oppgave {} markert som identifisert av ID og Fordeling. Versjon {}. Søker etter tilknyttet RINA-sak", oppgave.getId(), oppgave.getVersjon());
             bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
                 .ifPresentOrElse(
                     b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave, b.getVersjon()),
-                    () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
+                    () -> log.info("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
                 );
         }
     }

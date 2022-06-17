@@ -32,7 +32,7 @@ class SedIdentifiseringService implements PersonIdentifisering {
      * Henter ident fra identifisert BUC, eller søker basert på personopplysninger i SED om dette ikke finnes
      */
     public Optional<String> identifiserPerson(String rinaSaksnummer, SED sed) {
-        log.debug("Forsøker å identifisere SED {}", sed);
+        log.info("Forsøker å identifisere SED {}", sed);
 
         var identifisertPersonTilhørendeBuc = bucIdentifisertService.finnIdentifisertPerson(rinaSaksnummer);
         if (identifisertPersonTilhørendeBuc.isPresent()) {
@@ -55,11 +55,11 @@ class SedIdentifiseringService implements PersonIdentifisering {
                 .foedselsdato(tilLocalDate(sedPerson.getFoedselsdato()))
                 .statsborgerskapISO2(sedPerson.hentStatsborgerksapsliste())
                 .build();
-        log.debug("Søkekriterier: {}", søkeKriterier);
+        log.info("Søkekriterier: {}", søkeKriterier);
         Optional<String> norskIdent = sedPerson.finnNorskPin()
                 .map(Pin::getIdentifikator)
                 .flatMap(FnrUtils::filtrerUtGyldigNorskIdent);
-        log.debug("Norsk ident: {}",norskIdent);
+        log.info("Norsk ident: {}",norskIdent);
         if (norskIdent.isPresent()) {
             PersonSokResultat resultat = personSøk.vurderPerson(norskIdent.get(), søkeKriterier);
             if (resultat.personIdentifisert()) {
@@ -70,7 +70,7 @@ class SedIdentifiseringService implements PersonIdentifisering {
 
         PersonSokResultat resultat = personSøk.søkEtterPerson(søkeKriterier);
         personSokMetrikker.counter(resultat.getBegrunnelse());
-        log.debug("PersonSokResultat: {}", resultat);
+        log.info("PersonSokResultat: {}", resultat);
         log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
         return Optional.ofNullable(resultat.getIdent());
     }

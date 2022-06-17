@@ -20,7 +20,7 @@ public class JournalpostapiConsumer {
     public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request, boolean forsokEndeligJfr) {
         log.info("Oppretter journalpost av type {} for arkivsakid {}",
                 request.getJournalpostType().name(), request.getSak() != null ? request.getSak().getArkivsaksnummer() : "ukjent");
-        log.debug("OpprettJournalpostRequest: {}", request);
+        log.info("OpprettJournalpostRequest: {}", request);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);

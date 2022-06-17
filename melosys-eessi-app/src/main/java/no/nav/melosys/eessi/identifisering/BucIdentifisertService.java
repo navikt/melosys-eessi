@@ -36,7 +36,7 @@ public class BucIdentifisertService {
     public Optional<String> finnIdentifisertPerson(String rinaSaksnummer) {
         var ident = saksrelasjonService.finnAktørIDTilhørendeRinasak(rinaSaksnummer)
             .map(personFasade::hentNorskIdent);
-        log.debug("ident: {}", ident);
+        log.info("ident: {}", ident);
         if (ident.isPresent()) {
             return ident;
         }
@@ -46,7 +46,7 @@ public class BucIdentifisertService {
     }
 
     public void lagreIdentifisertPerson(String rinaSaksnummer, String ident) {
-        log.debug("Lagre identifisert person: {}; {}", rinaSaksnummer, ident);
+        log.info("Lagre identifisert person: {}; {}", rinaSaksnummer, ident);
         bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
             .ifPresentOrElse(
                 i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer),

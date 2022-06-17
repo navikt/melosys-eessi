@@ -39,7 +39,7 @@ public class SedMottattConsumer {
     }
 
     private void utførSedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        log.debug("conumerRecord: {}", consumerRecord);
+        log.info("conumerRecord: {}", consumerRecord);
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
         loggSedID(consumerRecord.value().getSedId());
 

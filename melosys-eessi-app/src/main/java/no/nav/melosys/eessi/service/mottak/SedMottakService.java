@@ -33,7 +33,7 @@ public class SedMottakService {
 
     @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
-        log.debug("sedMottattHendelse: {}", sedMottattHendelse);
+        log.info("sedMottattHendelse: {}", sedMottattHendelse);
         if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.getSedHendelse().getSedId()).isPresent()) {
             log.info("Mottatt SED {} er allerede behandlet", sedMottattHendelse.getSedHendelse().getSedId());
             return;

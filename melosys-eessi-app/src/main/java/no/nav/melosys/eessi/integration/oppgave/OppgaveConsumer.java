@@ -23,7 +23,7 @@ public class OppgaveConsumer implements RestConsumer, UUIDGenerator {
 
     public HentOppgaveDto hentOppgave(String oppgaveID) {
         var correlationID = generateUUID();
-        log.debug("hentOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
+        log.info("hentOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
         return webClient.get()
                 .uri("/oppgaver/{oppgaveID}", oppgaveID)
                 .header(X_CORRELATION_ID, correlationID)
