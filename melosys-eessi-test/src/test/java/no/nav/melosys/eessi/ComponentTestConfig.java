@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import no.finn.unleash.FakeUnleash;
 import no.finn.unleash.Unleash;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
@@ -9,13 +11,12 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.util.SocketUtils;
 
 @EnableMockOAuth2Server
 @ComponentScan(basePackageClasses = MelosysEessiApplication.class)
 public class ComponentTestConfig {
     static {
-        System.setProperty("kafkaPort", String.valueOf(SocketUtils.findAvailableTcpPort(60000, 65535)));
+        System.setProperty("kafkaPort", String.valueOf(ThreadLocalRandom.current().nextInt(60000, 65535)));
     }
 
     @Bean

@@ -161,7 +161,7 @@ public abstract class ComponentTestBase {
             .hasSize(forventetStørrelse)
             .allMatch(eessiMelding ->
                 eessiMelding.getPeriode().equals(new Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01")))
-                    && eessiMelding.getJournalpostId().equals("1")
+                    && (eessiMelding.getJournalpostId() == null || eessiMelding.getJournalpostId().equals("1"))
                     && eessiMelding.getAktoerId().equals(AKTOER_ID)
             );
     }
