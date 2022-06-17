@@ -29,16 +29,16 @@ public final class OpprettJournalpostRequestMapper {
                                                                          final SedMedVedlegg sedMedVedlegg,
                                                                          final Sak sak,
                                                                          final DokkatSedInfo dokkatSedInfo,
-                                                                         final String navIdent) {
-        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo, navIdent);
+                                                                         final String personIdent) {
+        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo, personIdent);
     }
 
     public static OpprettJournalpostRequest opprettUtgaaendeJournalpost(final SedHendelse sedHendelse,
                                                                         final SedMedVedlegg sedMedVedlegg,
                                                                         final Sak sak,
                                                                         final DokkatSedInfo dokkatSedInfo,
-                                                                        final String navIdent) {
-        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo, navIdent);
+                                                                        final String personIdent) {
+        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokkatSedInfo, personIdent);
     }
 
 
@@ -47,12 +47,12 @@ public final class OpprettJournalpostRequestMapper {
                                                                        final SedMedVedlegg sedMedVedlegg,
                                                                        final Sak sak,
                                                                        final DokkatSedInfo dokkatSedInfo,
-                                                                       final String navIdent) {
+                                                                       final String personIdent) {
 
         return OpprettJournalpostRequest.builder()
                 .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
                 .behandlingstema(dokkatSedInfo.getBehandlingstema())
-                .bruker(isNotEmpty(navIdent) ? lagBruker(navIdent) : null)
+                .bruker(isNotEmpty(personIdent) ? lagBruker(personIdent) : null)
                 .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokkatSedInfo))
                 .eksternReferanseId(sedHendelse.getSedId())
                 .journalfoerendeEnhet("4530")
@@ -68,9 +68,9 @@ public final class OpprettJournalpostRequestMapper {
                 .build();
     }
 
-    private static Bruker lagBruker(final String fnr) {
+    private static Bruker lagBruker(final String personIdent) {
         return Bruker.builder()
-                .id(fnr)
+                .id(personIdent)
                 .idType(BrukerIdType.FNR)
                 .build();
     }

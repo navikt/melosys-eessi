@@ -30,13 +30,13 @@ public class OpprettInngaaendeJournalpostService {
     }
 
     public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
-            SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg, String navIdent) {
+            SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg, String personIdent) {
 
         Optional<Sak> arkivsak = saksrelasjonService.finnArkivsakForRinaSaksnummer(sedMottatt.getRinaSakId());
 
         log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
         OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(
-            sedMottatt, arkivsak.orElse(null), sedMedVedlegg, navIdent);
+            sedMottatt, arkivsak.orElse(null), sedMedVedlegg, personIdent);
         log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
 
         String dokumentId = response.getDokumenter() == null
@@ -48,13 +48,13 @@ public class OpprettInngaaendeJournalpostService {
                 .build();
     }
 
-    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg, String navIdent) {
-        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg, navIdent).getJournalpostId();
+    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg, String personIdent) {
+        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg, personIdent).getJournalpostId();
     }
 
     private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
-            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg, String navIdent) {
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg, navIdent);
+            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg, String personIdent) {
+        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg, personIdent);
         lagreJournalpostRelasjon(sedMottatt, response);
         return response;
     }
