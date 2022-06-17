@@ -19,16 +19,16 @@ public class JournalpostService {
     }
 
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
-            SedMedVedlegg sedMedVedlegg, String navIdent) {
+            SedMedVedlegg sedMedVedlegg, String personIdent) {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
-                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), navIdent);
+                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), personIdent);
         return opprettJournalpost(request, false);
     }
 
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
-            SedMedVedlegg sedMedVedlegg, String navIdent) {
+            SedMedVedlegg sedMedVedlegg, String personIdent) {
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
-                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), navIdent);
+                sedHendelse, sedMedVedlegg, sak, dokkatService.hentMetadataFraDokkat(sedHendelse.getSedType()), personIdent);
         return opprettJournalpost(request, true);
     }
 
