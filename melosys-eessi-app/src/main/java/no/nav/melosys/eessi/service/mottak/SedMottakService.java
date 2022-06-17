@@ -14,6 +14,8 @@ import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -29,6 +31,7 @@ public class SedMottakService {
     private final Unleash unleash;
 
 
+    @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
         if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.getSedHendelse().getSedId()).isPresent()) {
             log.info("Mottatt SED {} er allerede behandlet", sedMottattHendelse.getSedHendelse().getSedId());

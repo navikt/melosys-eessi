@@ -58,9 +58,9 @@ class SedMottakServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
-                euxService, personIdentifisering, opprettInngaaendeJournalpostService,
-                oppgaveService, sedMottattHendelseRepository,
-                bucIdentifiseringOppgRepository, bucIdentifisertService, new FakeUnleash()
+            euxService, personIdentifisering, opprettInngaaendeJournalpostService,
+            oppgaveService, sedMottattHendelseRepository,
+            bucIdentifiseringOppgRepository, bucIdentifisertService, new FakeUnleash()
         );
     }
 
@@ -70,13 +70,16 @@ class SedMottakServiceTest {
             .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
-                .thenReturn("9988776655");
+            .thenReturn("9988776655");
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
+        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
 
+
         sedMottakService.behandleSed(sedMottattHendelse);
+
 
         verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
@@ -94,7 +97,9 @@ class SedMottakServiceTest {
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
+
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+
 
         verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
@@ -107,7 +112,7 @@ class SedMottakServiceTest {
     @Test
     void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgaveEllerJournalpost() {
         final var oppgaveID = "5555";
-        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID,1);
+        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID, 1);
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
         when(euxService.hentSedMedRetry(anyString(), anyString()))
             .thenReturn(opprettSED());
@@ -118,7 +123,9 @@ class SedMottakServiceTest {
         when(oppgaveService.hentOppgave(oppgaveID)).thenReturn(oppgave);
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
+
         sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+
 
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
@@ -130,7 +137,9 @@ class SedMottakServiceTest {
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build();
         when(sedMottattHendelseRepository.findBySedID(SED_ID)).thenReturn(Optional.of(sedMottattHendelse));
 
+
         sedMottakService.behandleSed(sedMottattHendelse);
+
 
         verify(euxService, never()).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering, never()).identifiserPerson(any(), any());
