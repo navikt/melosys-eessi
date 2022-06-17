@@ -68,10 +68,10 @@ public final class OpprettJournalpostRequestMapper {
                 .build();
     }
 
-    private static Bruker lagBruker(final String fnr) {
+    private static Bruker lagBruker(final String aktoerID) {
         return Bruker.builder()
-                .id(fnr)
-                .idType(BrukerIdType.FNR)
+                .id(aktoerID)
+                .idType(BrukerIdType.AKTOERID)
                 .build();
     }
 

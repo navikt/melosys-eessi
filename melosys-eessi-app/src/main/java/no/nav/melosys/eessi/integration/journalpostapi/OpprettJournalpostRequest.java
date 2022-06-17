@@ -69,7 +69,8 @@ public class OpprettJournalpostRequest {
 
   public enum BrukerIdType {
     FNR,
-    ORGNR
+    ORGNR,
+  AKTOERID
   }
 
   @Builder
