@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.mottak;
 
+import javax.transaction.Transactional;
+
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
@@ -13,8 +15,6 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 
 @Slf4j
 @Service
@@ -33,6 +33,7 @@ public class SedMottakService {
 
     @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
+        log.debug("sedMottattHendelse: {}", sedMottattHendelse);
         if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.getSedHendelse().getSedId()).isPresent()) {
             log.info("Mottatt SED {} er allerede behandlet", sedMottattHendelse.getSedHendelse().getSedId());
             return;
