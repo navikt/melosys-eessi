@@ -153,8 +153,6 @@ public class EuxConsumer implements RestConsumer, UUIDGenerator {
     public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType,
                                  SedVedlegg vedlegg) {
         log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
-        log.info("Tittel på vedlegg: {}", vedlegg.getTittel());
-
 
         var headers = defaultHeaders();
         String base64Content = Base64.getEncoder().encodeToString(vedlegg.getInnhold());
