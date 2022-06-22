@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.identifisering;
 
 import java.util.*;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -15,37 +16,38 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class IdentifiseringKontrollService {
+
+    private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 2; // 2 versjon tilsvarer 2 gang hos id og fordeling
 
     private final PersonFasade personFasade;
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
     private final Unleash unleash;
-    private static final int MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING = 2; // 2 versjon tilsvarer 2 gang hos id og fordeling
-
-    public IdentifiseringKontrollService(PersonFasade personFasade, EuxService euxService, PersonSokMetrikker personSokMetrikker, Unleash unleash) {
-        this.personFasade = personFasade;
-        this.euxService = euxService;
-        this.personSokMetrikker = personSokMetrikker;
-        this.unleash = unleash;
-    }
 
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveEndretVersjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);
-        var dokumentID = buc.finnFørstMottatteSed()
-            .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
-            .getId();
+        String dokumentID;
+        if (unleash.isEnabled("melosys.eessi.x100")) {
+            dokumentID = buc.finnFørstMottatteSed()
+                .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
+                .getId();
+        } else {
+            dokumentID = buc.finnFørstMottatteSedIkkeX100()
+                .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
+                .getId();
+        }
 
         var sedPerson = euxService.hentSed(rinaSaksnummer, dokumentID).finnPerson()
             .orElseThrow(() -> new NoSuchElementException("Finner ingen person fra SED"));
 
         var identifisertPerson = personFasade.hentPerson(aktørId);
 
-        if (unleash.isEnabled("melosys.eessi.overstyrIdentifiseringsKontroll")) {
-            if (oppgaveEndretVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
-                personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
-                return new IdentifiseringsKontrollResultat(Collections.emptyList());
-            }
+
+        if (oppgaveEndretVersjon >= MAKS_OPPGAVEVERSJON_UTEN_OVERSTYRING) {
+            personSokMetrikker.counter(IdentifiseringsKontrollBegrunnelse.OVERSTYREKONTROLL);
+            return new IdentifiseringsKontrollResultat(Collections.emptyList());
         }
 
         return new IdentifiseringsKontrollResultat(kontrollerIdentifisering(identifisertPerson, sedPerson, buc.hentAvsenderLand()));

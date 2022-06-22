@@ -4,6 +4,8 @@ version: 2
 updates:
   - package-ecosystem: "maven"
     directory: "/"
+    # Disable all pull requests for Maven (Snyk will create fixes for vulnerabilites)
+    open-pull-requests-limit: 0
     schedule:
       interval: "weekly"
 

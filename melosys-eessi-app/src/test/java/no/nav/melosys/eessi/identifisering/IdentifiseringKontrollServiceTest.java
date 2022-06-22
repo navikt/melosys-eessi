@@ -56,15 +56,12 @@ class IdentifiseringKontrollServiceTest {
     private final String rinaSaksnummer = "432534";
     private final String dokumentId = "abcdefghijkl1";
 
-    private final FakeUnleash unleash = new FakeUnleash();
-
     private final PersonModell.PersonModellBuilder personBuilder = PersonModell.builder();
 
 
     @BeforeEach
     void setup() {
-        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker, unleash);
-        unleash.enable("melosys.eessi.overstyrIdentifiseringsKontroll");
+        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker, new FakeUnleash());
         var utenlandskPin = new Pin(utenlandskId, avsenderLand, null);
 
         statsborgerskap.setLand(avsenderLand);

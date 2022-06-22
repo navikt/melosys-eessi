@@ -2,9 +2,9 @@ package no.nav.melosys.eessi.service.mottak;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
@@ -13,6 +13,8 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 
 @Slf4j
 @Service
@@ -26,45 +28,32 @@ public class SedMottakService {
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final BucIdentifisertService bucIdentifisertService;
+    private final Unleash unleash;
 
 
+    @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
-        var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
-
-        final var sed = euxService.hentSedMedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
-                sedMottattHendelse.getSedHendelse().getRinaDokumentId());
-
-        try {
-            lagretHendelse.setJournalpostId(opprettJournalpost(lagretHendelse));
-        } catch (SedAlleredeJournalførtException e) {
-            log.info("Inngående SED {} allerede journalført", e.getSedID());
-            sedMottattHendelseRepository.delete(lagretHendelse);
+        if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.getSedHendelse().getSedId()).isPresent()) {
+            log.info("Mottatt SED {} er allerede behandlet", sedMottattHendelse.getSedHendelse().getSedId());
             return;
         }
 
-        sedMottattHendelseRepository.save(lagretHendelse);
+        var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
 
-        //Håndterer aldri X100 SEDer
-        if (sed.erX100SED()) {
+        final var sed = euxService.hentSedMedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
+            sedMottattHendelse.getSedHendelse().getRinaDokumentId());
+
+        if (!unleash.isEnabled("melosys.eessi.x100") && sed.erX100SED()) {
+            log.info("SED {} er av typen X100, så stopper behandling", sedMottattHendelse.getSedHendelse().getSedId());
             return;
         }
 
         log.info("Søker etter person for SED");
         personIdentifisering.identifiserPerson(lagretHendelse.getSedHendelse().getRinaSakId(), sed)
-                .ifPresentOrElse(
-                    ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
-                    () -> opprettOppgaveIdentifisering(lagretHendelse)
-                );
-    }
-
-    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse) {
-        log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
-        var sedMedVedlegg = euxService.hentSedMedVedlegg(
-                sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
-        );
-
-        return opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-                sedMottattHendelse.getSedHendelse(), sedMedVedlegg, null);
+            .ifPresentOrElse(
+                ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
+                () -> opprettOppgaveIdentifisering(lagretHendelse)
+            );
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {
@@ -72,13 +61,13 @@ public class SedMottakService {
 
         final var rinaSaksnummer = sedMottatt.getSedHendelse().getRinaSakId();
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
-                .stream()
-                .filter(this::oppgaveErÅpen)
-                .findFirst()
-                .ifPresentOrElse(
-                        b -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", b.getOppgaveId(), rinaSaksnummer),
-                        () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt)
-                );
+            .stream()
+            .filter(this::oppgaveErÅpen)
+            .findFirst()
+            .ifPresentOrElse(
+                bucIdentifiseringOppg -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", bucIdentifiseringOppg.getOppgaveId(), rinaSaksnummer),
+                () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt)
+            );
     }
 
     private boolean oppgaveErÅpen(BucIdentifiseringOppg bucIdentifiseringOppg) {
@@ -86,16 +75,33 @@ public class SedMottakService {
     }
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse) {
+        String journalpostID = opprettJournalpost(sedMottattHendelse, null);
+
         var oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                sedMottattHendelse.getJournalpostId(),
-                sedMottattHendelse.getSedHendelse().getSedType(),
-                sedMottattHendelse.getSedHendelse().getRinaSakId()
+            journalpostID,
+            sedMottattHendelse.getSedHendelse().getSedType(),
+            sedMottattHendelse.getSedHendelse().getRinaSakId()
         );
         bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
-                .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
-                .oppgaveId(oppgaveID)
-                .versjon(1)
-                .build());
+            .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
+            .oppgaveId(oppgaveID)
+            .versjon(1)
+            .build());
+
         log.info("Opprettet oppgave med id {}", oppgaveID);
+    }
+
+    private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String navIdent) {
+        log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
+        var sedMedVedlegg = euxService.hentSedMedVedlegg(
+            sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
+        );
+
+        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+            sedMottattHendelse.getSedHendelse(), sedMedVedlegg, navIdent);
+
+        sedMottattHendelse.setJournalpostId(journalpostID);
+        sedMottattHendelseRepository.save(sedMottattHendelse);
+        return journalpostID;
     }
 }

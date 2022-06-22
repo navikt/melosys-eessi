@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.time.Duration;
+
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -12,6 +14,8 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 public class JournalpostapiConsumerProducer {
 
     private final String url;
+    private static final int CONNECT_TIMEOUT_SECONDS = 60;
+    private static final int READ_TIMEOUT_SECONDS = 60;
 
     public JournalpostapiConsumerProducer(@Value("${melosys.integrations.journalpostapi-url}") String url) {
         this.url = url;
@@ -19,11 +23,14 @@ public class JournalpostapiConsumerProducer {
 
     @Bean
     public JournalpostapiConsumer journalpostapiConsumer(
-            SystemContextClientRequestInterceptor systemContextClientRequestInterceptor) {
+        SystemContextClientRequestInterceptor systemContextClientRequestInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-                .interceptors(systemContextClientRequestInterceptor)
-                .build();
+            .uriTemplateHandler(new DefaultUriBuilderFactory(url))
+            .interceptors(systemContextClientRequestInterceptor)
+            .setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+            .setReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
+            .setBufferRequestBody(false)
+            .build();
 
         return new JournalpostapiConsumer(restTemplate);
     }

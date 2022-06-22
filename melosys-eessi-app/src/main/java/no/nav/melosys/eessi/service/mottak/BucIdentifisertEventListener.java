@@ -14,14 +14,13 @@ import org.springframework.stereotype.Component;
 public class BucIdentifisertEventListener {
 
     private final BehandleBucIdentifisertService behandleBucIdentifisertService;
-    private final PersonFasade personFasade;
 
     @EventListener
     public void personIdentifisertForBuc(BucIdentifisertEvent bucIdentifisertEvent) {
         log.info("Identifiserer alle SEDer for BUC {}", bucIdentifisertEvent.getBucId());
         behandleBucIdentifisertService.bucIdentifisert(
             bucIdentifisertEvent.getBucId(),
-            personFasade.hentAktoerId(bucIdentifisertEvent.getFolkeregisterident())
+            bucIdentifisertEvent.getFolkeregisterident()
         );
     }
 }
