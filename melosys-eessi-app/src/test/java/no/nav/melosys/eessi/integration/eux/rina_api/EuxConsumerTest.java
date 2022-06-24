@@ -425,8 +425,7 @@ class EuxConsumerTest {
 
         final String forventetRetur = "546327ghrjek";
 
-        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedlegg?Filtype=" + filtype
-                + "&Filnavn=" + filNavn + "&synkron=true"))
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedleggJson"))
                 .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, new SedVedlegg(filNavn, "vedlegg".getBytes()));
