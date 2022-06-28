@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.identifisering;
 import java.util.List;
 import java.util.Optional;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
@@ -59,7 +58,7 @@ public class BehandleBucIdentifisertServiceTest {
 
     @BeforeEach
     void setup() {
-        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, personFasade, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer, new FakeUnleash());
+        behandleBucIdentifisertService = new BehandleBucIdentifisertService(sedMottattHendelseRepository, saksrelasjonService, euxService, opprettInngaaendeJournalpostService, personFasade, melosysEessiMeldingMapperFactory, melosysEessiAivenProducer);
     }
 
     @Test
