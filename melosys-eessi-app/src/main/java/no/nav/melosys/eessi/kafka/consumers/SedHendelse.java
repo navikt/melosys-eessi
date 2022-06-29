@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.kafka.consumers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import no.nav.melosys.eessi.models.SedType;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,6 +31,8 @@ public class SedHendelse {
     }
 
     @JsonIgnore
-    public boolean erIkkeX100() { return !sedType.equals("X100");}
+    public boolean erX100() {
+        return sedType.equals(SedType.X100.name());
+    }
 
 }

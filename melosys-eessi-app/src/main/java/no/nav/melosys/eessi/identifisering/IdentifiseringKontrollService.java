@@ -29,15 +29,9 @@ public class IdentifiseringKontrollService {
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveEndretVersjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);
         String dokumentID;
-        if (unleash.isEnabled("melosys.eessi.x100")) {
-            dokumentID = buc.finnFørstMottatteSed()
-                .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
-                .getId();
-        } else {
-            dokumentID = buc.finnFørstMottatteSedIkkeX100()
-                .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
-                .getId();
-        }
+        dokumentID = buc.finnFørstMottatteSed()
+            .orElseThrow(() -> new NoSuchElementException("Finner ikke første mottatte SED"))
+            .getId();
 
         var sedPerson = euxService.hentSed(rinaSaksnummer, dokumentID).finnPerson()
             .orElseThrow(() -> new NoSuchElementException("Finner ingen person fra SED"));

@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.identifisering;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
@@ -29,20 +28,12 @@ public class BehandleBucIdentifisertService {
     private final PersonFasade personFasade;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
     private final MelosysEessiAivenProducer melosysEessiAivenProducer;
-    private final Unleash unleash;
 
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String personIdent) {
-        if (unleash.isEnabled("melosys.eessi.x100")) {
-            sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
-                .stream()
-                .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, personIdent));
-        } else {
-            sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
-                .stream()
-                .filter(sedMottattHendelse -> sedMottattHendelse.getSedHendelse().erIkkeX100())
-                .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, personIdent));
-        }
+        sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
+            .stream()
+            .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, personIdent));
     }
 
     private void sedIdentifisert(SedMottattHendelse sedMottattHendelse, String personIdent) {
