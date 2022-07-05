@@ -61,17 +61,6 @@ public class KafkaConsumerConfig {
         return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
     }
 
-    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedMottatt() {
-        // Return false to be dismissed
-        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
-    }
-
-    @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedMottattListenerContainerFactory(
-            KafkaProperties properties) {
-        return sedListenerContainerFactory(properties, recordFilterStrategySedMottatt(), new SeekToCurrentErrorHandler());
-    }
-
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedSendtListenerContainerFactory(
             KafkaProperties properties

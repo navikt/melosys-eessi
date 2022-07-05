@@ -26,19 +26,9 @@ public class SedMottattConsumer {
     }
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
-        topics = "${melosys.kafka.consumer.mottatt.topic}", containerFactory = "sedMottattListenerContainerFactory")
-    public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        utførSedMottatt(consumerRecord);
-    }
-
-    @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
         containerFactory = "aivenSedHendelseListenerContainerFactory")
     public void sedMottattAiven(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        utførSedMottatt(consumerRecord);
-    }
-
-    private void utførSedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
         loggSedID(consumerRecord.value().getSedId());
 
