@@ -66,7 +66,7 @@ public class KafkaAivenConfig {
 
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>>
-    aivenSedHendelseListenerContainerFactory(
+    sedHendelseListenerContainerFactory(
         KafkaProperties kafkaProperties, @Value("${melosys.kafka.aiven.consumer.groupid}") String groupId) {
         return sedListenerContainerFactory(kafkaProperties, groupId);
     }
