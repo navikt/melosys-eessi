@@ -39,9 +39,6 @@ melosys:
       oppgave-endret:
         topic: ${KAFKA_OPPGAVE_ENDRET_TOPIC:oppgave-endret}
         groupid: ${KAFKA_OPPGAVE_GROUPID:melosys-eessi-oppgaveHendelser}
-      sendt:
-        topic: ${KAFKA_SEDSENDT_TOPIC:eessi-basis-sedSendt-v1}
-      groupid: ${KAFKA_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser}
     aiven:
       brokers: ${KAFKA_BROKERS}
       keystorePath: ${KAFKA_KEYSTORE_PATH:/dev/zero}
