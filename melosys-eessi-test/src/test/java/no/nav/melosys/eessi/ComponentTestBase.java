@@ -104,7 +104,7 @@ public abstract class ComponentTestBase {
     SedMottattRepository sedMottattRepository;
 
     protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
-        return new ProducerRecord<>("eessi-basis-sedMottatt-v1", "key", sedHendelse);
+        return new ProducerRecord<>("eessibasis-sedmottatt-v1", "key", sedHendelse);
     }
 
     @Container

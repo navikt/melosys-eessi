@@ -36,7 +36,7 @@ public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
             }).getBody();
 
         assertThat(kafkaConsumerResponses)
-            .hasSize(6);
+            .hasSize(4);
     }
 
     @Test
