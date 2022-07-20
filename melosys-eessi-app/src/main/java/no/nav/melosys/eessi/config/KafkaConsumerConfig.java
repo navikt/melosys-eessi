@@ -29,7 +29,7 @@ public class KafkaConsumerConfig {
 
     private final String groupId;
 
-    public KafkaConsumerConfig(@Value("${melosys.kafka.consumer.groupid}") String groupId) {
+    public KafkaConsumerConfig(@Value("${melosys.kafka.consumer.oppgave-endret.groupid}") String groupId) {
         this.groupId = groupId;
     }
 
