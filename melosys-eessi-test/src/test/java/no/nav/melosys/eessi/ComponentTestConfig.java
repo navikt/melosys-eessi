@@ -23,7 +23,7 @@ public class ComponentTestConfig {
     @Order(1)
     EmbeddedKafkaBroker kafkaEmbedded(Environment env) {
         EmbeddedKafkaBroker kafka = new EmbeddedKafkaBroker(1, true, 1,
-            "eessibasis-sedmttatt-v1",
+            "eessibasis-sedmottatt-v1",
             "eessibasis-sedsendt-v1",
             "oppgave-endret",
             "teammelosys.eessi.v1-local");
