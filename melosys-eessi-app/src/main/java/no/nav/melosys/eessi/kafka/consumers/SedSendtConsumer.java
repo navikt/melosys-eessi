@@ -22,24 +22,15 @@ public class SedSendtConsumer {
 
     @Autowired
     public SedSendtConsumer(OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService,
-            SedMetrikker sedMetrikker) {
+                            SedMetrikker sedMetrikker) {
         this.opprettUtgaaendeJournalpostService = opprettUtgaaendeJournalpostService;
         this.sedMetrikker = sedMetrikker;
     }
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
-            topics = "${melosys.kafka.consumer.sendt.topic}", containerFactory = "sedSendtListenerContainerFactory")
+        topics = "${melosys.kafka.aiven.consumer.sendt.topic}", containerFactory = "sedHendelseListenerContainerFactory")
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        utførSedSendt(consumerRecord);
-    }
 
-    @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
-        topics = "${melosys.kafka.aiven.consumer.sendt.topic}", containerFactory = "aivenSedHendelseListenerContainerFactory")
-    public void sedSendtAiven(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        utførSedSendt(consumerRecord);
-    }
-
-    private void utførSedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendt = consumerRecord.value();
         loggSedID(sedSendt.getSedId());
         log.info("Mottatt melding om sed sendt: {}, offset: {}", sedSendt, consumerRecord.offset());

@@ -92,7 +92,7 @@ class SedSendtTestIT extends ComponentTestBase {
     }
 
     protected ProducerRecord<String, Object> lagSedSendtRecord(SedHendelse sedHendelse) {
-        return new ProducerRecord<>("eessi-basis-sedSendt-v1", "key", sedHendelse);
+        return new ProducerRecord<>("eessibasis-sedsendt-v1", "key", sedHendelse);
     }
 
 }
