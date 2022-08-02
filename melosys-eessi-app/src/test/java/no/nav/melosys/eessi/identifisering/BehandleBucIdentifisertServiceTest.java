@@ -101,12 +101,11 @@ class BehandleBucIdentifisertServiceTest {
     void bucIdentifisert_SEDErX100_ignoreres() {
         // Første SED som må identifiseres journalføres sammen med opprettelse av oppgave til ID fordeling
         var sedAlleredeJournalført = lagSedMottattHendelse("1", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, JOURNALPOST_ID, false);
-        // Den påfølgende SEDen blir ignorert siden den er X100
-        var sed2 = lagSedMottattHendelse("2", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
-        sed2.getSedHendelse().setSedType(SedType.X100.name());
+        var sedSomSkalIgnoreres = lagSedMottattHendelse("2", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
+        sedSomSkalIgnoreres.getSedHendelse().setSedType(SedType.X100.name());
 
         when(sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(RINA_SAKSNUMMER, false))
-            .thenReturn(List.of(sedAlleredeJournalført, sed2));
+            .thenReturn(List.of(sedAlleredeJournalført, sedSomSkalIgnoreres));
         when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
         when(personFasade.hentAktoerId(FNR)).thenReturn(AKTOER_ID);
         when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
@@ -123,7 +122,7 @@ class BehandleBucIdentifisertServiceTest {
         assertThat(sedAlleredeJournalført.isPublisertKafka()).isTrue();
         assertThat(sedAlleredeJournalført.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
 
-        assertThat(sed2.isPublisertKafka()).isFalse();
+        assertThat(sedSomSkalIgnoreres.isPublisertKafka()).isFalse();
     }
 
 
