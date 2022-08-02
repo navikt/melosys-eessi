@@ -7,6 +7,7 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
@@ -22,14 +23,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static no.nav.melosys.eessi.models.SedType.A003;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BehandleBucIdentifisertServiceTest {
+class BehandleBucIdentifisertServiceTest {
 
     private final String RINA_SAKSNUMMER = "123456";
     private final String RINA_DOKUMENT_ID = "7890";
@@ -97,13 +97,42 @@ public class BehandleBucIdentifisertServiceTest {
         assertThat(sed3.getJournalpostId()).isEqualTo(JOURNALPOST_ID_3);
     }
 
+    @Test
+    void bucIdentifisert_SEDErX100_ignoreres() {
+        // Første SED som må identifiseres journalføres sammen med opprettelse av oppgave til ID fordeling
+        var sedAlleredeJournalført = lagSedMottattHendelse("1", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, JOURNALPOST_ID, false);
+        var sedSomSkalIgnoreres = lagSedMottattHendelse("2", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
+        sedSomSkalIgnoreres.getSedHendelse().setSedType(SedType.X100.name());
+
+        when(sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(RINA_SAKSNUMMER, false))
+            .thenReturn(List.of(sedAlleredeJournalført, sedSomSkalIgnoreres));
+        when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
+        when(personFasade.hentAktoerId(FNR)).thenReturn(AKTOER_ID);
+        when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
+        when(euxService.sedErEndring(RINA_DOKUMENT_ID, RINA_SAKSNUMMER)).thenReturn(false);
+        when(saksrelasjonService.finnVedRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.empty());
+
+
+        behandleBucIdentifisertService.bucIdentifisert(RINA_SAKSNUMMER, FNR);
+
+
+        verify(sedMottattHendelseRepository, never()).save(any());
+        verify(melosysEessiAivenProducer).publiserMelding(any());
+
+        assertThat(sedAlleredeJournalført.isPublisertKafka()).isTrue();
+        assertThat(sedAlleredeJournalført.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
+
+        assertThat(sedSomSkalIgnoreres.isPublisertKafka()).isFalse();
+    }
+
+
     private SedMottattHendelse lagSedMottattHendelse(String sedID, String rinaSaksnummer, String rinaDokumentID, String journalpostID, boolean publisertKafka) {
         return SedMottattHendelse.builder()
             .sedHendelse(SedHendelse.builder()
                 .sedId(sedID)
                 .rinaSakId(rinaSaksnummer)
                 .rinaDokumentId(rinaDokumentID)
-                .sedType(A003.name())
+                .sedType(SedType.A003.name())
                 .avsenderId("DK:88855")
                 .build())
             .journalpostId(journalpostID)

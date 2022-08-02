@@ -32,11 +32,14 @@ public class BehandleBucIdentifisertService {
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String personIdent) {
         sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
-            .stream()
             .forEach(sedMottattHendelse -> sedIdentifisert(sedMottattHendelse, personIdent));
     }
 
     private void sedIdentifisert(SedMottattHendelse sedMottattHendelse, String personIdent) {
+        if (sedMottattHendelse.getSedHendelse().erX100()) {
+            log.info("Ignorerer identifisert SED {} av typen X100", sedMottattHendelse.getSedHendelse().getSedId());
+            return;
+        }
         if (sedMottattHendelse.getJournalpostId() == null) {
             sedMottattHendelse.setJournalpostId(opprettJournalpost(sedMottattHendelse, personIdent));
         }
