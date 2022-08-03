@@ -18,7 +18,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.Mockito.*;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
+class KafkaAdminTjenesteTestIT extends ComponentTestBase {
 
     @LocalServerPort
     private int port;
@@ -82,10 +82,11 @@ public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
         when(oppgaveConsumer.hentOppgave(oppgaveID2)).thenReturn(oppgaveDto2);
         when(oppgaveConsumer.hentOppgave(oppgaveID3)).thenReturn(oppgaveDto3);
 
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID1, FNR, "1", rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, FNR, "1", rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, FNR, "1", rinaSaksnummer)).get();
+        String VERSJON = "1";
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, VERSJON, rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID1, VERSJON, rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, VERSJON, rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, VERSJON, rinaSaksnummer)).get();
 
         verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString());
 

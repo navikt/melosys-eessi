@@ -9,16 +9,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.kafka.ConcurrentKafkaListenerContainerFactoryConfigurer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 
 @Slf4j
-@Configuration
+@TestConfiguration
 @ComponentScan
 @ConditionalOnClass({
         KafkaListener.class,
@@ -27,7 +27,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 })
 @EnableConfigurationProperties(KafkaTestProperties.class)
 public class KafkaTestConfig {
-    
+
     @Bean("testKafkaListenerContainerFactory")
     ConcurrentKafkaListenerContainerFactory<Object, Object> testKafkaListenerContainerFactory(
             ConcurrentKafkaListenerContainerFactoryConfigurer configurer,
