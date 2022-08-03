@@ -33,7 +33,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -54,7 +54,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         oppgaveDto.setVersjon(2);
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(), any());
@@ -68,7 +68,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -90,7 +90,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         oppgaveDto.setStatus("FERDIGSTILT");
 
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "2", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "2", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, never()).oppdaterOppgave(anyString(), any());

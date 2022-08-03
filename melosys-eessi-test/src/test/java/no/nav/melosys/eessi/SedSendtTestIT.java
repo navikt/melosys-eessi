@@ -36,7 +36,7 @@ class SedSendtTestIT extends ComponentTestBase {
 
     @Test
     void sedSendt_saksrelasjonFinnes_journalpostOpprettesOgFerdigstilles() throws Exception {
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
         mockArkivsak();
         lagFagsakRinasakKobling();
 
@@ -53,7 +53,7 @@ class SedSendtTestIT extends ComponentTestBase {
 
     @Test
     void sedSendt_feilerVedOpprettelseAvJournalpostFørsteGang_prøverIgjen() throws Exception {
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
         mockArkivsak();
         lagFagsakRinasakKobling();
 

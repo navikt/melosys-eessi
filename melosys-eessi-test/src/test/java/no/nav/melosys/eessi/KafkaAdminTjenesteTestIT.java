@@ -82,10 +82,10 @@ public class KafkaAdminTjenesteTestIT extends ComponentTestBase {
         when(oppgaveConsumer.hentOppgave(oppgaveID2)).thenReturn(oppgaveDto2);
         when(oppgaveConsumer.hentOppgave(oppgaveID3)).thenReturn(oppgaveDto3);
 
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID1, FNR, "1", rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, FNR, "1", rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, FNR, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID1, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, "1", rinaSaksnummer)).get();
 
         verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString());
 

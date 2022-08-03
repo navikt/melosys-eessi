@@ -37,7 +37,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
 
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
 
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
         kafkaTestConsumer.reset(2);
@@ -57,7 +57,7 @@ class SedMottakTestIT extends ComponentTestBase {
         søkHits.setIdenter(Collections.singleton(new PDLIdent(FOLKEREGISTERIDENT, FNR)));
         pdlSøkPerson.setHits(Collections.singleton(søkHits));
         when(pdlConsumer.søkPerson(any())).thenReturn(pdlSøkPerson);
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
 
         kafkaTestConsumer.reset(2);
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
@@ -74,7 +74,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -95,7 +95,7 @@ class SedMottakTestIT extends ComponentTestBase {
         assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
 
         kafkaTestConsumer.reset(3);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
@@ -111,7 +111,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
-        mockPerson(FNR, AKTOER_ID);
+        mockPerson();
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -136,7 +136,7 @@ class SedMottakTestIT extends ComponentTestBase {
         final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
         oppgaveDto.setStatus("OPPRETTET");
 
-        mockPerson(FNR, AKTOER_ID, FØDSELSDATO.minusYears(1), "DK");
+        mockPerson(FØDSELSDATO.minusYears(1), "DK");
 
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
         when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
@@ -158,7 +158,7 @@ class SedMottakTestIT extends ComponentTestBase {
 
         //Forventer kun én melding, som er oppgave-endret record
         kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, FNR, "1", rinaSaksnummer)).get();
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get();
         kafkaTestConsumer.doWait(5_000L);
 
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());

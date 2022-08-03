@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,11 +25,11 @@ import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
-import no.nav.melosys.eessi.repository.SedMottattRepository;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
 import no.nav.melosys.utils.PostgresContainer;
+import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -52,13 +52,17 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/kafka-test.properties")
+@EmbeddedKafka(controlledShutdown = true, partitions = 1, topics = {"eessibasis-sedmottatt-v1", "eessibasis-sedsendt-v1",
+    "oppgave-endret", "teammelosys.eessi.v1-local"}, brokerProperties = {"offsets.topic.replication.factor=1",
+    "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"}
+)
+@EnableMockOAuth2Server
 public abstract class ComponentTestBase {
 
     static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     static final String STATSBORGERSKAP = "NO";
     static final String FNR = "25068420779";
     static final String AKTOER_ID = "1234567890123";
-    static final String RINA_SAKSNUMMER = Integer.toString(new Random().nextInt(100000));
     static final ObjectMapper objectMapper = new ObjectMapper();
 
     static {
@@ -100,9 +104,6 @@ public abstract class ComponentTestBase {
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
 
-    @Autowired
-    SedMottattRepository sedMottattRepository;
-
     protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
         return new ProducerRecord<>("eessibasis-sedmottatt-v1", "key", sedHendelse);
     }
@@ -121,25 +122,25 @@ public abstract class ComponentTestBase {
             .thenAnswer(a -> mockData.journalpostResponse(a.getArgument(1, Boolean.class)));
     }
 
-    protected void mockPerson(String ident, String aktørID) {
-        mockPerson(ident, aktørID, FØDSELSDATO, STATSBORGERSKAP);
+    protected void mockPerson() {
+        mockPerson(FØDSELSDATO, STATSBORGERSKAP);
     }
 
-    protected void mockPerson(String ident, String aktørID, LocalDate fødselsdato, String statsborgerskap) {
-        mockHentPerson(ident, aktørID, fødselsdato, statsborgerskap);
-        mockHentIdenter(ident, aktørID);
+    protected void mockPerson(LocalDate fødselsdato, String statsborgerskap) {
+        mockHentPerson(fødselsdato, statsborgerskap);
+        mockHentIdenter();
     }
 
-    private void mockHentPerson(String ident, String aktørID, LocalDate fødselsdato, String statsborgerskap) {
+    private void mockHentPerson(LocalDate fødselsdato, String statsborgerskap) {
         var pdlPerson = mockData.pdlPerson(fødselsdato, statsborgerskap);
-        when(pdlConsumer.hentPerson(ident)).thenReturn(pdlPerson);
-        when(pdlConsumer.hentPerson(aktørID)).thenReturn(pdlPerson);
+        when(pdlConsumer.hentPerson(ComponentTestBase.FNR)).thenReturn(pdlPerson);
+        when(pdlConsumer.hentPerson(ComponentTestBase.AKTOER_ID)).thenReturn(pdlPerson);
     }
 
-    protected void mockHentIdenter(String ident, String aktørID) {
-        var pdlIdentListe = mockData.lagPDLIdentListe(ident, aktørID);
-        when(pdlConsumer.hentIdenter(ident)).thenReturn(pdlIdentListe);
-        when(pdlConsumer.hentIdenter(aktørID)).thenReturn(pdlIdentListe);
+    protected void mockHentIdenter() {
+        var pdlIdentListe = mockData.lagPDLIdentListe(ComponentTestBase.FNR, ComponentTestBase.AKTOER_ID);
+        when(pdlConsumer.hentIdenter(ComponentTestBase.FNR)).thenReturn(pdlIdentListe);
+        when(pdlConsumer.hentIdenter(ComponentTestBase.AKTOER_ID)).thenReturn(pdlIdentListe);
     }
 
     List<MelosysEessiMelding> hentMelosysEessiRecords() {
@@ -166,17 +167,17 @@ public abstract class ComponentTestBase {
             );
     }
 
-    protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String fnr, String versjon, String rinaSaksnummer) {
-        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, fnr, AKTOER_ID, versjon, rinaSaksnummer));
+    protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String versjon, String rinaSaksnummer) {
+        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, versjon, rinaSaksnummer));
     }
 
     @SneakyThrows
-    private Object oppgaveEksempel(String oppgaveID, String ident, String aktørID, String versjonsNummer, String rinaSaksnummer) {
+    private Object oppgaveEksempel(String oppgaveID, String versjonsNummer, String rinaSaksnummer) {
         var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
         var oppgaveJsonString = Files.readString(path);
         return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
-            .replaceAll("\\$fnr", ident)
-            .replaceAll("\\$aktoerid", aktørID)
+            .replaceAll("\\$fnr", ComponentTestBase.FNR)
+            .replaceAll("\\$aktoerid", ComponentTestBase.AKTOER_ID)
             .replaceAll("\\$versjonsnummer", versjonsNummer)
             .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
