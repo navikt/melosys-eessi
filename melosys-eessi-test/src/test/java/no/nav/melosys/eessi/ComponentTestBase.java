@@ -44,6 +44,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.junit.jupiter.Container;
 
+import static no.nav.melosys.eessi.ComponentTestBase.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
@@ -52,12 +53,15 @@ import static org.mockito.Mockito.when;
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/kafka-test.properties")
-@EmbeddedKafka(controlledShutdown = true, partitions = 1, topics = {"eessibasis-sedmottatt-v1", "eessibasis-sedsendt-v1",
-    "oppgave-endret", "teammelosys.eessi.v1-local"}, brokerProperties = {"offsets.topic.replication.factor=1",
-    "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"}
-)
+@EmbeddedKafka(controlledShutdown = true, partitions = 1,
+    topics = {EESSIBASIS_SEDMOTTATT_V_1, EESSIBASIS_SEDSENDT_V_1, OPPGAVE_ENDRET, TEAMMELOSYS_EESSI_V_1_LOCAL},
+    brokerProperties = {"offsets.topic.replication.factor=1", "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"})
 @EnableMockOAuth2Server
 public abstract class ComponentTestBase {
+    public static final String EESSIBASIS_SEDMOTTATT_V_1 = "eessibasis-sedmottatt-v1";
+    public static final String EESSIBASIS_SEDSENDT_V_1 = "eessibasis-sedsendt-v1";
+    public static final String OPPGAVE_ENDRET = "oppgave-endret";
+    public static final String TEAMMELOSYS_EESSI_V_1_LOCAL = "teammelosys.eessi.v1-local";
 
     static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
     static final String STATSBORGERSKAP = "NO";
@@ -105,7 +109,7 @@ public abstract class ComponentTestBase {
     KafkaTemplate<String, Object> kafkaTemplate;
 
     protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
-        return new ProducerRecord<>("eessibasis-sedmottatt-v1", "key", sedHendelse);
+        return new ProducerRecord<>(EESSIBASIS_SEDMOTTATT_V_1, "key", sedHendelse);
     }
 
     @Container
@@ -133,20 +137,20 @@ public abstract class ComponentTestBase {
 
     private void mockHentPerson(LocalDate fødselsdato, String statsborgerskap) {
         var pdlPerson = mockData.pdlPerson(fødselsdato, statsborgerskap);
-        when(pdlConsumer.hentPerson(ComponentTestBase.FNR)).thenReturn(pdlPerson);
-        when(pdlConsumer.hentPerson(ComponentTestBase.AKTOER_ID)).thenReturn(pdlPerson);
+        when(pdlConsumer.hentPerson(FNR)).thenReturn(pdlPerson);
+        when(pdlConsumer.hentPerson(AKTOER_ID)).thenReturn(pdlPerson);
     }
 
     protected void mockHentIdenter() {
-        var pdlIdentListe = mockData.lagPDLIdentListe(ComponentTestBase.FNR, ComponentTestBase.AKTOER_ID);
-        when(pdlConsumer.hentIdenter(ComponentTestBase.FNR)).thenReturn(pdlIdentListe);
-        when(pdlConsumer.hentIdenter(ComponentTestBase.AKTOER_ID)).thenReturn(pdlIdentListe);
+        var pdlIdentListe = mockData.lagPDLIdentListe(FNR, AKTOER_ID);
+        when(pdlConsumer.hentIdenter(FNR)).thenReturn(pdlIdentListe);
+        when(pdlConsumer.hentIdenter(AKTOER_ID)).thenReturn(pdlIdentListe);
     }
 
     List<MelosysEessiMelding> hentMelosysEessiRecords() {
         return kafkaTestConsumer.getRecords()
             .stream()
-            .filter(ConsumerRecordPredicates.topic("teammelosys.eessi.v1-local"))
+            .filter(ConsumerRecordPredicates.topic(TEAMMELOSYS_EESSI_V_1_LOCAL))
             .map(ConsumerRecord::value)
             .map(this::tilMelosysEessiMelding)
             .collect(Collectors.toList());
@@ -168,7 +172,7 @@ public abstract class ComponentTestBase {
     }
 
     protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String versjon, String rinaSaksnummer) {
-        return new ProducerRecord<>("oppgave-endret", "key", oppgaveEksempel(oppgaveID, versjon, rinaSaksnummer));
+        return new ProducerRecord<>(OPPGAVE_ENDRET, "key", oppgaveEksempel(oppgaveID, versjon, rinaSaksnummer));
     }
 
     @SneakyThrows
@@ -176,8 +180,8 @@ public abstract class ComponentTestBase {
         var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
         var oppgaveJsonString = Files.readString(path);
         return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
-            .replaceAll("\\$fnr", ComponentTestBase.FNR)
-            .replaceAll("\\$aktoerid", ComponentTestBase.AKTOER_ID)
+            .replaceAll("\\$fnr", FNR)
+            .replaceAll("\\$aktoerid", AKTOER_ID)
             .replaceAll("\\$versjonsnummer", versjonsNummer)
             .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
     }
