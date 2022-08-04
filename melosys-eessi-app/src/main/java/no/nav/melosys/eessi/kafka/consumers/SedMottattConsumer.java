@@ -9,8 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.config.MDCLogging.loggSedID;
-import static no.nav.melosys.eessi.config.MDCLogging.slettSedIDLogging;
+import static no.nav.melosys.eessi.config.MDCLogging.*;
 
 @Slf4j
 @Component
@@ -29,14 +28,18 @@ public class SedMottattConsumer {
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
         containerFactory = "sedHendelseListenerContainerFactory")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
         loggSedID(consumerRecord.value().getSedId());
+        loggCorrelationId();
+
+        log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
 
         sedMottakService.behandleSed(SedMottattHendelse.builder()
             .sedHendelse(consumerRecord.value())
             .build());
 
         sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
+
         slettSedIDLogging();
+        slettCorrelationId();
     }
 }
