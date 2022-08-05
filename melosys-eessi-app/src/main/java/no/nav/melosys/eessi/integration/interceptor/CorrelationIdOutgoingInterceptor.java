@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.controller.interceptor;
+package no.nav.melosys.eessi.integration.interceptor;
 
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;

@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.integration;
 
 import no.nav.melosys.eessi.config.AppCredentials;
-import no.nav.melosys.eessi.controller.interceptor.CorrelationIdOutgoingInterceptor;
+import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
