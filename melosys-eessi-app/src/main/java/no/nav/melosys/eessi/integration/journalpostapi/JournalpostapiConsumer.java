@@ -8,9 +8,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import static no.nav.melosys.eessi.config.MDCLogging.X_CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCLogging.getCorrelationId;
-
 @Slf4j
 public class JournalpostapiConsumer {
 
@@ -22,15 +19,14 @@ public class JournalpostapiConsumer {
 
     public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request, boolean forsokEndeligJfr) {
         log.info("Oppretter journalpost av type {} for arkivsakid {}",
-                request.getJournalpostType().name(), request.getSak() != null ? request.getSak().getArkivsaksnummer() : "ukjent");
+            request.getJournalpostType().name(), request.getSak() != null ? request.getSak().getArkivsaksnummer() : "ukjent");
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         headers.add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
-        headers.add(X_CORRELATION_ID, getCorrelationId());
 
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromPath("")
-                .queryParam("forsoekFerdigstill", forsokEndeligJfr);
+            .queryParam("forsoekFerdigstill", forsokEndeligJfr);
 
         try {
             return restTemplate.postForObject(uriBuilder.toUriString(), new HttpEntity<>(request, headers), OpprettJournalpostResponse.class);

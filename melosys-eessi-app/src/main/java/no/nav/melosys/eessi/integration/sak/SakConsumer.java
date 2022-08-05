@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.integration.sak;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
-import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,7 +10,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Slf4j
-public class SakConsumer implements RestConsumer, UUIDGenerator {
+public class SakConsumer implements RestConsumer {
 
     private static final String X_CORRELATION_ID = "X-Correlation-ID";
 
@@ -39,7 +38,6 @@ public class SakConsumer implements RestConsumer, UUIDGenerator {
 
     private HttpHeaders headers() {
         HttpHeaders headers = defaultHeaders();
-        headers.add(X_CORRELATION_ID, generateUUID());
         return headers;
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.sak;
 
+import no.nav.melosys.eessi.controller.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,10 +19,11 @@ public class SakConsumerProducer {
     }
 
     @Bean
-    public SakConsumer sakRestClient(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
+    public SakConsumer sakRestClient(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor,
+                                     CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-                .interceptors(basicAuthClientRequestInterceptor)
+                .interceptors(basicAuthClientRequestInterceptor, correlationIdOutgoingInterceptor)
                 .build();
         return new SakConsumer(restTemplate);
     }

@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.dokkat;
 
+import no.nav.melosys.eessi.controller.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -22,24 +23,26 @@ public class DokkatConsumerProducer {
 
     @Bean
     public DokumenttypeIdConsumer dokumenttypeIdRestClient(
-            BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
+        BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor,
+        CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
 
         RestTemplate restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeIdUrl))
-                .interceptors(basicAuthClientRequestInterceptor)
-                .build();
+            .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeIdUrl))
+            .interceptors(basicAuthClientRequestInterceptor, correlationIdOutgoingInterceptor)
+            .build();
 
         return new DokumenttypeIdConsumer(restTemplate);
     }
 
     @Bean
     public DokumenttypeInfoConsumer dokumenttypeInfoRestClient(
-            BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor) {
+        BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor,
+        CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
 
         RestTemplate restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeInfoUrl))
-                .interceptors(basicAuthClientRequestInterceptor)
-                .build();
+            .uriTemplateHandler(new DefaultUriBuilderFactory(dokTypeInfoUrl))
+            .interceptors(basicAuthClientRequestInterceptor, correlationIdOutgoingInterceptor)
+            .build();
 
         return new DokumenttypeInfoConsumer(restTemplate);
     }

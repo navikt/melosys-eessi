@@ -24,6 +24,6 @@ public class ApiConfig implements WebMvcConfigurer {
 
     private static boolean erApiTjeneste(Class clazz) {
         return clazz.getPackageName().startsWith(Konstanter.CONTROLLER_PAKKE)
-                && clazz.isAnnotationPresent(RestController.class);
+            && clazz.isAnnotationPresent(RestController.class);
     }
 }

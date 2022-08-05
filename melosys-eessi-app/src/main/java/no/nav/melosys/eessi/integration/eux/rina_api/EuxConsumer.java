@@ -1,14 +1,11 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
-import no.nav.melosys.eessi.integration.UUIDGenerator;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxVedlegg;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedVedlegg;
@@ -36,7 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 @Slf4j
-public class EuxConsumer implements RestConsumer, UUIDGenerator {
+public class EuxConsumer implements RestConsumer {
 
     private final RestTemplate euxRestTemplate;
     private final ObjectMapper objectMapper;

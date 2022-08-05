@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.eux.case_store;
 
+import no.nav.melosys.eessi.controller.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -18,11 +19,12 @@ public class CaseStoreConfig {
 
     @Bean("caseStoreResttemplate")
     public RestTemplate caseStoreResttemplate(RestTemplateBuilder restTemplateBuilder,
-                                              SystemContextClientRequestInterceptor requestInterceptor) {
+                                              SystemContextClientRequestInterceptor requestInterceptor,
+                                              CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
         return restTemplateBuilder
                 .defaultMessageConverters()
                 .rootUri(url)
-                .interceptors(requestInterceptor)
+                .interceptors(requestInterceptor, correlationIdOutgoingInterceptor)
                 .build();
     }
 }
