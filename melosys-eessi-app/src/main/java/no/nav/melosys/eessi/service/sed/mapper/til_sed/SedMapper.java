@@ -86,7 +86,7 @@ public interface SedMapper {
             .map(this::lagStatsborgerskap)
             .toList();
         if (statsborgerskapList.isEmpty()) {
-            throw new MappingException("Statsborgerskap er påkrevd.");
+            throw new MappingException("Statsborgerskap mangler eller er ugyldig.");
         }
         return statsborgerskapList;
     }
