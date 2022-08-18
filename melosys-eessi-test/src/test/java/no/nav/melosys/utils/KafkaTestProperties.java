@@ -11,4 +11,5 @@ public class KafkaTestProperties {
     private String keyDeserializer;
     private String valueDeserializer;
     private String isolationLevel;
+    private String autoOffset;
 }
