@@ -13,6 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import static no.nav.melosys.eessi.config.MDCLogging.CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCLogging.getCorrelationId;
 
 @Slf4j
 @Service
@@ -30,7 +31,7 @@ public class MelosysEessiAivenProducer {
     public void publiserMelding(MelosysEessiMelding melding) {
         try {
             ProducerRecord<String, Object> melosysEessiRecord = new ProducerRecord<>(topicName, melding);
-            melosysEessiRecord.headers().add(CORRELATION_ID, MDC.get(CORRELATION_ID).getBytes());
+            melosysEessiRecord.headers().add(CORRELATION_ID, getCorrelationId().getBytes());
             kafkaTemplate.send(melosysEessiRecord).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
