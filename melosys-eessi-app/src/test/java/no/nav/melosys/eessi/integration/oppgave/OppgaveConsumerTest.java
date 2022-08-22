@@ -19,7 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static no.nav.melosys.eessi.config.MDCLogging.X_CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OppgaveConsumerTest {

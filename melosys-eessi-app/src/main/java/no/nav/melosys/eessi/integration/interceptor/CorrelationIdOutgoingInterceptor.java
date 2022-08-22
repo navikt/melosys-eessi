@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-import static no.nav.melosys.eessi.config.MDCLogging.X_CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCLogging.getCorrelationId;
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
 
 @Component
 public class CorrelationIdOutgoingInterceptor implements ClientHttpRequestInterceptor {

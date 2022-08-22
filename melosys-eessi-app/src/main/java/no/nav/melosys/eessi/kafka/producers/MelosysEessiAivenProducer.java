@@ -6,14 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import static no.nav.melosys.eessi.config.MDCLogging.CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCLogging.getCorrelationId;
+import static no.nav.melosys.eessi.config.MDCOperations.CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
 
 @Slf4j
 @Service

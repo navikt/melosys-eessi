@@ -9,8 +9,8 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import static no.nav.melosys.eessi.config.MDCLogging.X_CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCLogging.getCorrelationId;
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
 
 @Slf4j
 public class OppgaveConsumer implements RestConsumer {

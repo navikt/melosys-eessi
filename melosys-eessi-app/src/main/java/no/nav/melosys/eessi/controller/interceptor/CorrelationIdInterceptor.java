@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import static no.nav.melosys.eessi.config.MDCLogging.CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCLogging.X_CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 
 public class CorrelationIdInterceptor implements HandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(CorrelationIdInterceptor.class);

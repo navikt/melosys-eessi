@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
+import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -9,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.config.MDCLogging.*;
+import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Slf4j
 @Component
@@ -28,18 +30,20 @@ public class SedMottattConsumer {
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
         containerFactory = "sedHendelseListenerContainerFactory")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        loggSedID(consumerRecord.value().getSedId());
-        loggCorrelationId();
+        putToMDC(SED_ID, consumerRecord.value().getSedId());
+        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
 
-        sedMottakService.behandleSed(SedMottattHendelse.builder()
-            .sedHendelse(consumerRecord.value())
-            .build());
+        try {
+            sedMottakService.behandleSed(SedMottattHendelse.builder()
+                .sedHendelse(consumerRecord.value())
+                .build());
 
-        sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
-
-        slettSedIDLogging();
-        slettCorrelationId();
+            sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
+        } finally {
+            remove(SED_ID);
+            remove(CORRELATION_ID);
+        }
     }
 }
