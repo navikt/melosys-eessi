@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.integration;
 
 import java.util.Collections;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 

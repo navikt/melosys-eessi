@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.security.UserContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,7 +51,7 @@ public class EuxConsumerProducer {
         RestTemplate restTemplate =  restTemplateBuilder
                 .defaultMessageConverters()
                 .rootUri(uri)
-                .interceptors(interceptor)
+                .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
                 .build();
 
         return configureJacksonMapper(restTemplate);

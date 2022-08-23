@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OppgaveConsumerTest {
@@ -56,7 +57,7 @@ class OppgaveConsumerTest {
         assertThat(request)
                 .extracting(RecordedRequest::getPath, RecordedRequest::getMethod)
                 .containsExactly("/oppgaver/" + OPPGAVE_ID, "GET");
-        assertThat(request.getHeaders().names()).contains(OppgaveConsumer.X_CORRELATION_ID);
+        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
     }
 
     @Test
@@ -73,7 +74,7 @@ class OppgaveConsumerTest {
         assertThat(request)
                 .extracting(RecordedRequest::getPath, RecordedRequest::getMethod)
                 .containsExactly("/oppgaver", "POST");
-        assertThat(request.getHeaders().names()).contains(OppgaveConsumer.X_CORRELATION_ID);
+        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
     }
 
     @Test
@@ -100,7 +101,7 @@ class OppgaveConsumerTest {
         assertThat(request)
                 .extracting(RecordedRequest::getPath, RecordedRequest::getMethod)
                 .containsExactly("/oppgaver/" + OPPGAVE_ID, "PATCH");
-        assertThat(request.getHeaders().names()).contains(OppgaveConsumer.X_CORRELATION_ID);
+        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
 
         var objectMapper = new ObjectMapper();
         assertThat(objectMapper.readTree(requestBody))

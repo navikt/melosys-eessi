@@ -49,6 +49,7 @@ public class KafkaTestConfig {
         merged.put("key.deserializer", Class.forName(testProperties.getKeyDeserializer()));
         merged.put("value.deserializer", Class.forName(testProperties.getValueDeserializer()));
         merged.put("isolation.level", testProperties.getIsolationLevel());
+        merged.put("auto.offset.reset", testProperties.getAutoOffset());
 
         return new DefaultKafkaConsumerFactory<>(merged);
     }
