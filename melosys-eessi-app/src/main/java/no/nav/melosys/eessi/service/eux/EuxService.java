@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -38,16 +37,13 @@ public class EuxService {
 
     private final EuxConsumer euxConsumer;
     private final BucMetrikker bucMetrikker;
-    private final Unleash unleash;
 
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker,
-                      Unleash unleash) {
+                      BucMetrikker bucMetrikker) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
-        this.unleash = unleash;
     }
 
     public void slettBUC(String rinaSaksnummer) {
@@ -89,8 +85,8 @@ public class EuxService {
             .peek(i -> i.setLandkode(LandkodeMapper.mapTilNavLandkode(i.getLandkode())))
             .filter(i -> filtrerPåLandkoder(i, landkoder))
             .filter(i -> i.getTilegnetBucs().stream().filter(
-                tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
-                    COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
+                    tilegnetBuc -> bucType.equals(tilegnetBuc.getBucType()) &&
+                        COUNTERPARTY.equals(tilegnetBuc.getInstitusjonsrolle()))
                 .anyMatch(TilegnetBuc::erEessiKlar))
             .collect(Collectors.toList());
     }
@@ -111,20 +107,16 @@ public class EuxService {
     }
 
     public void validerBucHandling(String rinaSaksnummer, Aksjoner aksjon) {
-        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            if (!bucHandlingErMulig(rinaSaksnummer, aksjon)) {
-                throw new ValidationException(String.format("Kan ikke gjøre handling %s på BUC %s" +
-                    ", ugyldig handling i Rina", aksjon.hentHandling(), rinaSaksnummer));
-            }
+        if (!bucHandlingErMulig(rinaSaksnummer, aksjon)) {
+            throw new ValidationException(String.format("Kan ikke gjøre handling %s på BUC %s" +
+                ", ugyldig handling i Rina", aksjon.hentHandling(), rinaSaksnummer));
         }
     }
 
     public void validerSedHandling(String rinaSaksnummer, String sedId, Aksjoner aksjon) {
-        if (unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            if (!sedHandlingErMulig(rinaSaksnummer, sedId, aksjon)) {
-                throw new ValidationException(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
-                    rinaSaksnummer,aksjon.hentHandling()));
-            }
+        if (!sedHandlingErMulig(rinaSaksnummer, sedId, aksjon)) {
+            throw new ValidationException(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
+                rinaSaksnummer, aksjon.hentHandling()));
         }
     }
 
