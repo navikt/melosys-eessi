@@ -110,7 +110,7 @@
         <dependency>
             <groupId>no.nav.security</groupId>
             <artifactId>token-validation-test-support</artifactId>
-            <version>${token-support.version}</version>
+            <version>${token-validation-test-support.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
