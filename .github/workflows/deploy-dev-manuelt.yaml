@@ -50,7 +50,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Test and build
-        run: mvn clean package -B -e -U
+        run: mvn clean package -B -e -U -DskipTests
       - name: Build docker image
         run: |
           docker build -t ${IMAGE} .
