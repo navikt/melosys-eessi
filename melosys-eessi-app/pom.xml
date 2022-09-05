@@ -109,8 +109,8 @@
         </dependency>
         <dependency>
             <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-test-support</artifactId>
-            <version>${token-validation-test-support.version}</version>
+            <artifactId>token-validation-spring-test</artifactId>
+            <version>${token-support.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
