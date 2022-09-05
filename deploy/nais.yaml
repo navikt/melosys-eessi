@@ -27,6 +27,20 @@ spec:
     requests:
       cpu: 200m
       memory: 1024Mi
+  azure:
+    application:
+      enabled: true
+      tenant: {{TENANT_URL}}
+      claims:
+        extra:
+          - "NAVident"
+        groups:
+          - id: {{GROUP_MELOSYS_INNLOGGING}}
+        allowAllUsers: false
+  accessPolicy:
+    inbound:
+      rules:
+        - application: {{APP_NAME_MELOSYS_API}}
   vault:
     enabled: true
     paths:

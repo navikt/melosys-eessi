@@ -19,7 +19,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod,APP_NAME_MELOSYS_API=melosys,TENANT_URL=nav.no,GROUP_MELOSYS_INNLOGGING={LEGG INN DETTE NÅR VI HAR EN APP}
       - name: post-production
         uses: navikt/digihot-deploy/actions/post-production@v2
         env:

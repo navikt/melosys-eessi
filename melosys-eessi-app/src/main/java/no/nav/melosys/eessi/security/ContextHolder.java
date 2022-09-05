@@ -13,7 +13,7 @@ final class ContextHolder {
 
     private static ContextHolder instans;
 
-    private static final String ISSO = "isso";
+    private static final String AAD = "aad";
     private static final String REST_STS = "reststs";
 
     private ContextHolder(SpringTokenValidationContextHolder context) {
@@ -33,15 +33,15 @@ final class ContextHolder {
         }
 
         String restStsToken = restStsToken();
-        return restStsToken != null ? Optional.of(restStsToken) : Optional.ofNullable(issoToken());
+        return restStsToken != null ? Optional.of(restStsToken) : Optional.ofNullable(azureToken());
     }
 
     private String restStsToken() {
         return jwtTokenAsString(REST_STS);
     }
 
-    private String issoToken() {
-        return jwtTokenAsString(ISSO);
+    private String azureToken() {
+        return jwtTokenAsString(AAD);
     }
 
     private String jwtTokenAsString(String issuer) {

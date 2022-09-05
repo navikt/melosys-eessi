@@ -97,7 +97,6 @@ no.nav.security.jwt.issuer:
   reststs:
     discovery-url: ${RESTSTS_URL}/.well-known/openid-configuration
     accepted-audience: srvmelosys
-  isso:
-    discovery-url: ${ISSO_URL}/.well-known/openid-configuration
-    accepted-audience: ${ISSO_ACCEPTED_AUDIENCE}
-    cookie-name: ID_token
+  aad:
+    discovery-url: ${AZURE_APP_WELL_KNOWN_URL}
+    accepted-audience: ${AZURE_APP_CLIENT_ID}
