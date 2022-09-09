@@ -194,21 +194,6 @@ class SedServiceTest {
     }
 
     @Test
-    void sendPåEksisterendeBuc_kanIkkeOpprettesPåBuc_forventException() throws Exception {
-        BUC buc = new BUC();
-        buc.setBucVersjon("v4.1");
-        buc.setActions(Collections.singletonList(new Action("A001", "A001", "111", "Read")));
-        when(euxService.hentBuc(anyString())).thenReturn(buc);
-
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        sedDataDto.setSvarAnmodningUnntak(lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning.INNVILGELSE));
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A011))
-            .withMessageContaining("Kan ikke opprette sed med type");
-    }
-
-    @Test
     void genererPdfFraSed_forventKall() throws Exception {
         SedDataDto sedDataDto = SedDataStub.getStub();
         final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
