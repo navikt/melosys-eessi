@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.security.UserContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.UserContextEuxClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -32,7 +33,7 @@ public class EuxConsumerProducer {
 
     @Bean
     @Qualifier("tokenContext")
-    public EuxConsumer euxTokenContextConsumer(RestTemplateBuilder builder, UserContextClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
+    public EuxConsumer euxTokenContextConsumer(RestTemplateBuilder builder, UserContextEuxClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
         return new EuxConsumer(euxTokenContextRestTemplate(builder, interceptor), objectMapper);
     }
 
@@ -42,7 +43,7 @@ public class EuxConsumerProducer {
     }
 
     private RestTemplate euxTokenContextRestTemplate(RestTemplateBuilder restTemplateBuilder,
-                                                    UserContextClientRequestInterceptor interceptor) {
+                                                     UserContextEuxClientRequestInterceptor interceptor) {
         return lagRestTemplate(restTemplateBuilder, interceptor);
     }
 

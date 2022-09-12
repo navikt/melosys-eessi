@@ -114,6 +114,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>no.nav.security</groupId>
+            <artifactId>token-client-spring</artifactId>
+            <version>${token-support.version}</version>
+        </dependency>
+        <dependency>
             <groupId>no.bekk.bekkopen</groupId>
             <artifactId>nocommons</artifactId>
             <version>${bekk-nocommons.version}</version>
