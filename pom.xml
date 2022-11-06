@@ -24,7 +24,7 @@
         <bekk-nocommons.version>0.12.0</bekk-nocommons.version>
         <commons-io.version>2.11.0</commons-io.version>
         <guava.version>31.1-jre</guava.version>
-        <hibernate-types.version>2.14.0</hibernate-types.version>
+        <hibernate-types.version>2.17.1</hibernate-types.version>
         <java.version>16</java.version>
         <logback-classic.version>1.2.3</logback-classic.version>
         <logstash-encoder.version>5.3</logstash-encoder.version>
