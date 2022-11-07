@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -35,15 +34,12 @@ public class SedService {
 
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
-    private final Unleash unleash;
 
     @Autowired
     public SedService(@Qualifier("tokenContext") EuxService euxService,
-                      SaksrelasjonService saksrelasjonService,
-                      Unleash unleash) {
+                      SaksrelasjonService saksrelasjonService) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
-        this.unleash = unleash;
     }
 
     public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto,
@@ -51,7 +47,7 @@ public class SedService {
                                                 BucType bucType,
                                                 boolean sendAutomatisk,
                                                 boolean forsøkOppdaterEksisterende)
-            throws ValidationException {
+        throws ValidationException {
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
@@ -64,7 +60,7 @@ public class SedService {
         validerMottakerInstitusjoner(bucType, mottakere);
 
         OpprettBucOgSedResponse response = opprettEllerOppdaterBucOgSed(
-                sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerIder(), forsøkOppdaterEksisterende
+            sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.getMottakerIder(), forsøkOppdaterEksisterende
         );
 
         if (sedDataDto.getBruker().isHarSensitiveOpplysninger()) {
@@ -76,9 +72,9 @@ public class SedService {
         }
 
         return BucOgSedOpprettetDto.builder()
-                .rinaSaksnummer(response.getRinaSaksnummer())
-                .rinaUrl(euxService.hentRinaUrl(response.getRinaSaksnummer()))
-                .build();
+            .rinaSaksnummer(response.getRinaSaksnummer())
+            .rinaUrl(euxService.hentRinaUrl(response.getRinaSaksnummer()))
+            .build();
     }
 
     private void validerMottakerInstitusjoner(BucType bucType, Collection<String> mottakere) throws ValidationException {
@@ -124,9 +120,6 @@ public class SedService {
 
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
         var buc = euxService.hentBuc(rinaSaksnummer);
-        if (!buc.kanOppretteEllerOppdatereSed(sedType) && !unleash.isEnabled("melosys.eessi.handlingssjekk_sed")) {
-            throw new IllegalArgumentException("Kan ikke opprette sed med type " + sedType + " på buc " + rinaSaksnummer + " med type " + buc.getBucType());
-        }
 
         var sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
         verifiserSedVersjonErBucVersjon(buc, sed);
@@ -141,7 +134,7 @@ public class SedService {
                                                                  boolean forsøkOppdaterEksisterende) {
         if (forsøkOppdaterEksisterende && bucType.meddelerLovvalg()) {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(
-                    saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType)
+                saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType)
             );
 
             if (eksisterendeSak.isPresent() && eksisterendeSak.get().erÅpen()) {
