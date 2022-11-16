@@ -39,7 +39,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
             accessToken = response.getAccessToken();
         } else {
-            accessToken = restStsClient.bearerToken();
+            accessToken = restStsClient.collectToken();
         }
 
         request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
