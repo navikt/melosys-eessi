@@ -17,14 +17,15 @@ import org.springframework.http.client.ClientHttpResponse;
 public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsClient restStsClient;
-    private OAuth2AccessTokenService oAuth2AccessTokenService;
+    private final OAuth2AccessTokenService oAuth2AccessTokenService;
 
-    private ClientProperties clientProperties;
+    private final ClientProperties clientProperties;
 
     public UserContextClientRequestInterceptor(RestStsClient restStsClient,
                                                ClientConfigurationProperties clientConfigurationProperties,
                                                OAuth2AccessTokenService oAuth2AccessTokenService,
                                                String clientName) {
+        this.oAuth2AccessTokenService = oAuth2AccessTokenService;
         this.restStsClient = restStsClient;
         this.clientProperties = Optional.ofNullable(clientConfigurationProperties.getRegistration().get(clientName))
             .orElseThrow(() -> new RuntimeException("Fant ikke OAuth2-config for " + clientName));
