@@ -36,6 +36,10 @@ final class ContextHolder {
         return restStsToken != null ? Optional.of(restStsToken) : Optional.ofNullable(azureToken());
     }
 
+    boolean canExchangeOBOToken() {
+        return getTokenContext().getJwtToken(AAD) != null;
+    }
+
     private String restStsToken() {
         return jwtTokenAsString(REST_STS);
     }

@@ -35,7 +35,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String accessToken = "";
-        if (ContextHolder.getInstance().getOidcToken().isPresent()) {
+        if (ContextHolder.getInstance().canExchangeOBOToken()) {
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
             accessToken = response.getAccessToken();
         } else {
