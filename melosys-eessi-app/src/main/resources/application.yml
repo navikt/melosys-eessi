@@ -100,3 +100,13 @@ no.nav.security.jwt.issuer:
   aad:
     discovery-url: ${AZURE_APP_WELL_KNOWN_URL}
     accepted-audience: ${AZURE_APP_CLIENT_ID}
+
+no.nav.security.jwt.client.registration:
+  eux-rina-api:
+    token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+    grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+    scope: ${EUX_RINA_API_SCOPE}
+    authentication:
+      client-id: ${AZURE_APP_CLIENT_ID}
+      client-secret: ${AZURE_APP_CLIENT_SECRET}
+      client-auth-method: client_secret_basic
