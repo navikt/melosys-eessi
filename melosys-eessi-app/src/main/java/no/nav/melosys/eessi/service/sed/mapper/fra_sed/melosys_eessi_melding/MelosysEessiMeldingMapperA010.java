@@ -3,6 +3,9 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
+import no.nav.melosys.eessi.service.sed.helpers.ErOpprinneligVedtakMapper;
+
+import java.util.Optional;
 
 class MelosysEessiMeldingMapperA010 implements NyttLovvalgEessiMeldingMapper<MedlemskapA010> {
 
@@ -25,6 +28,13 @@ class MelosysEessiMeldingMapperA010 implements NyttLovvalgEessiMeldingMapper<Med
     @Override
     public Boolean sedErEndring(MedlemskapA010 medlemskap) {
         return "nei".equalsIgnoreCase(medlemskap.getVedtak().getEropprinneligvedtak());
+    }
+
+    @Override
+    public Optional<Boolean> mapErOpprinneligVedtak(MedlemskapA010 medlemskap) {
+        var vedtak = medlemskap.getVedtak();
+        var erOpprinneligVedtak = vedtak.getEropprinneligvedtak();
+        return ErOpprinneligVedtakMapper.map(erOpprinneligVedtak);
     }
 
     public MedlemskapA010 hentMedlemskap(SED sed) {

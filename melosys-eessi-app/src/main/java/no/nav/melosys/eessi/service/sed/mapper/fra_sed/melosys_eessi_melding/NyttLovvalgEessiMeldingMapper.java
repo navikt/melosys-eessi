@@ -6,6 +6,8 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper;
 
+import java.util.Optional;
+
 public interface NyttLovvalgEessiMeldingMapper<T extends Medlemskap> extends NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
     @Override
     default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
@@ -25,9 +27,11 @@ public interface NyttLovvalgEessiMeldingMapper<T extends Medlemskap> extends Nyt
         melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(medlemskap));
         melosysEessiMelding.setMidlertidigBestemmelse(erMidlertidigBestemmelse(medlemskap));
         melosysEessiMelding.setAnmodningUnntak(hentAnmodningUnntak(medlemskap));
-
+        melosysEessiMelding.setErOpprinneligVedtak(mapErOpprinneligVedtak(medlemskap).orElse(null));
         return melosysEessiMelding;
     }
 
     Periode mapPeriode(T medlemskap);
+
+    Optional<Boolean> mapErOpprinneligVedtak(T medlemskap);
 }
