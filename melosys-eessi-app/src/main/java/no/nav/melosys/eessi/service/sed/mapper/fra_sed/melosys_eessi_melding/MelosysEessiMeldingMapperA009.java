@@ -1,12 +1,15 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.service.sed.helpers.ErOpprinneligVedtakMapper;
 
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
@@ -50,5 +53,12 @@ class MelosysEessiMeldingMapperA009 implements NyttLovvalgEessiMeldingMapper<Med
         }
 
         return new no.nav.melosys.eessi.kafka.producers.model.Periode(fom, tom);
+    }
+
+    @Override
+    public Optional<Boolean> mapErOpprinneligVedtak(MedlemskapA009 medlemskap) {
+        var vedtak = medlemskap.getVedtak();
+        var erOpprinneligVedtak = vedtak.getEropprinneligvedtak();
+        return ErOpprinneligVedtakMapper.map(erOpprinneligVedtak);
     }
 }
