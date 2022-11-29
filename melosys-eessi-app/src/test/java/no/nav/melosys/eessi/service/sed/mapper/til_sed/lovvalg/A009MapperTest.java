@@ -70,7 +70,7 @@ public class A009MapperTest {
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
         assertThat(medlemskapA009).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isNull();
         assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
 

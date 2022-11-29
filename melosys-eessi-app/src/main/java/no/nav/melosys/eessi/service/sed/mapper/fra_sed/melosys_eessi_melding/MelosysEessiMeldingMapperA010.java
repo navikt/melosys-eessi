@@ -24,7 +24,7 @@ class MelosysEessiMeldingMapperA010 implements NyttLovvalgEessiMeldingMapper<Med
 
     @Override
     public Boolean sedErEndring(MedlemskapA010 medlemskap) {
-        return "nei".equalsIgnoreCase(medlemskap.getVedtak().getEropprinneligvedtak());
+        return !"ja".equalsIgnoreCase(medlemskap.getVedtak().getEropprinneligvedtak());
     }
 
     public MedlemskapA010 hentMedlemskap(SED sed) {

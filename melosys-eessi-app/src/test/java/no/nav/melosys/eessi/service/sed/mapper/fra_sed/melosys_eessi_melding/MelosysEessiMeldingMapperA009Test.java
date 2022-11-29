@@ -15,7 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class MelosysEessiMeldingMapperA009Test {
+class MelosysEessiMeldingMapperA009Test {
 
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
@@ -27,7 +27,7 @@ public class MelosysEessiMeldingMapperA009Test {
     }
 
     @Test
-    public void mapA009_fastPeriode_verifiserPeriode() {
+    void mapA009_fastPeriode_verifiserPeriode() {
         MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA009();
 
         SED sed = createSed(hentMedlemskap(true));
@@ -51,7 +51,7 @@ public class MelosysEessiMeldingMapperA009Test {
     }
 
     @Test
-    public void mapA009_aapenPeriode_verifiserPeriode() {
+    void mapA009_aapenPeriode_verifiserPeriode() {
         MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA009();
 
         SED sed = createSed(hentMedlemskap(false));
@@ -75,12 +75,12 @@ public class MelosysEessiMeldingMapperA009Test {
     }
 
     @Test
-    public void mapA009_medErendringsvedtak_forventAtSpesifikkRegelOverskriver() {
+    void mapA009_medTomErendringsvedtak_forventAtSpesifikkRegelOverskriver() {
         MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA009();
 
         SED sed = createSed(hentMedlemskap(false));
         sed.setSedType("A009");
-        ((MedlemskapA009) sed.getMedlemskap()).getVedtak().setErendringsvedtak("ja");
+        ((MedlemskapA009) sed.getMedlemskap()).getVedtak().setErendringsvedtak(null);
         MelosysEessiMelding melding = mapper.map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                 sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                 sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
@@ -90,7 +90,7 @@ public class MelosysEessiMeldingMapperA009Test {
     }
 
     @Test
-    public void mapA009_utenErendringsvedtak_forventAtResultatFraEuxOverskriver() {
+    void mapA009_utenErendringsvedtak_forventAtResultatFraEuxOverskriver() {
         MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA009();
 
         SED sed = createSed(hentMedlemskap(false));
