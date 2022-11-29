@@ -95,7 +95,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,ENVIRONMENT=q1,APP_NAME_MELOSYS_API=melosys-q1,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,EUX_RINA_API_NAME=eux-rina-api-q1,CLUSTER=dev-fss
+          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys-q1,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,EUX_RINA_API_NAME=eux-rina-api-q1,CLUSTER=dev-fss
 
   # Deploy til prod manuelt
   deploy_prod:
@@ -112,7 +112,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod,APP_NAME_MELOSYS_API=melosys,,TENANT_URL=nav.no,GROUP_MELOSYS_INNLOGGING={LEGG INN DETTE NÅR VI HAR EN APP},EUX_RINA_API_NAME=eux-rina-api,CLUSTER=prod-fss
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod,APP_NAME_MELOSYS_API=melosys,TENANT_URL=nav.no,GROUP_MELOSYS_INNLOGGING=0d7c7755-fd5d-46ee-bbb9-975484cfb5b1,EUX_RINA_API_NAME=eux-rina-api,CLUSTER=prod-fss
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
