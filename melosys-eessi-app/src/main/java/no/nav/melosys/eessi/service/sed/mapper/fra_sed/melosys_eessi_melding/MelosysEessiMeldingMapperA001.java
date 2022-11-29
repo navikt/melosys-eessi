@@ -5,8 +5,6 @@ import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
 
-import java.util.Optional;
-
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 class MelosysEessiMeldingMapperA001 implements NyttLovvalgEessiMeldingMapper<MedlemskapA001> {
@@ -58,10 +56,5 @@ class MelosysEessiMeldingMapperA001 implements NyttLovvalgEessiMeldingMapper<Med
     @Override
     public MedlemskapA001 hentMedlemskap(SED sed) {
         return (MedlemskapA001) sed.getMedlemskap();
-    }
-
-    @Override
-    public Optional<Boolean> mapErOpprinneligVedtak(MedlemskapA001 medlemskap) {
-        return Optional.empty();
     }
 }
