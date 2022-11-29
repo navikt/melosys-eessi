@@ -17,7 +17,7 @@ public abstract class FraSedA003Mapper implements NyttLovvalgSedMapper<Medlemska
 
     @Override
     public Boolean sedErEndring(MedlemskapA003 medlemskap) {
-        return "ja".equals(medlemskap.getVedtak().getErendringsvedtak());
+        return !"nei".equalsIgnoreCase(medlemskap.getVedtak().getErendringsvedtak());
     }
 
     @Override
