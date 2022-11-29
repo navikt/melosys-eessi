@@ -67,6 +67,6 @@ melosys:
     api-key: dummy
 
 no.nav.security.jwt.issuer:
-          isso:
+          aad:
             discoveryurl: http://localhost:${mock-oauth2-server.port}/issuer1/.well-known/openid-configuration
             acceptedaudience: dumbdumb
