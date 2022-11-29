@@ -5,10 +5,13 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import no.nav.melosys.eessi.service.sed.SedService;
+import no.nav.security.token.support.client.core.http.OAuth2HttpClient;
+import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
@@ -17,6 +20,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(SedController.class)
+@ActiveProfiles("test")
 class SedControllerTest {
 
     @Autowired
@@ -26,6 +30,11 @@ class SedControllerTest {
 
     @MockBean
     private SedService sedService;
+
+    @MockBean
+    private TokenValidationContextHolder tokenValidationContextHolder;
+    @MockBean
+    private OAuth2HttpClient oAuth2HttpClient;
 
     @Test
     void genererPdfFraSed_manglerAdresse_ValidationException() throws Exception {
