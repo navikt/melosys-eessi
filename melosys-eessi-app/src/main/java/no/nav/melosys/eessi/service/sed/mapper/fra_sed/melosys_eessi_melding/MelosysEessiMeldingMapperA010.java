@@ -1,9 +1,11 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 
+@Slf4j
 class MelosysEessiMeldingMapperA010 implements NyttLovvalgEessiMeldingMapper<MedlemskapA010> {
 
     @Override
@@ -24,7 +26,10 @@ class MelosysEessiMeldingMapperA010 implements NyttLovvalgEessiMeldingMapper<Med
 
     @Override
     public Boolean sedErEndring(MedlemskapA010 medlemskap) {
-        return "nei".equalsIgnoreCase(medlemskap.getVedtak().getEropprinneligvedtak());
+        var erEndring = "nei".equalsIgnoreCase(medlemskap.getVedtak().getEropprinneligvedtak());
+        log.info("sedErEndring i A010 er {}, med erendringsvedtak: {} og eropprinneligvedtak: {}", erEndring,
+            medlemskap.getVedtak().getErendringsvedtak(), medlemskap.getVedtak().getEropprinneligvedtak());
+        return erEndring;
     }
 
     public MedlemskapA010 hentMedlemskap(SED sed) {
