@@ -54,8 +54,8 @@ class A003MapperTest {
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
 
         assertThat(medlemskapA003).isNotNull();
-        assertThat(medlemskapA003.getVedtak().getEropprinneligvedtak()).isNull(); // null = nei
-        assertThat(medlemskapA003.getVedtak().getErendringsvedtak()).isNull(); // null = ja
+        assertThat(medlemskapA003.getVedtak().getEropprinneligvedtak()).isNull(); // null betyr Nei
+        assertThat(medlemskapA003.getVedtak().getErendringsvedtak()).isNull(); // null betyr Ja
         assertThat(medlemskapA003.getVedtak().getDatoforrigevedtak()).isNotNull();
         assertThat(medlemskapA003.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
