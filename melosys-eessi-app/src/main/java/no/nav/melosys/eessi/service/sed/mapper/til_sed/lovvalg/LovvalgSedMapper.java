@@ -12,9 +12,6 @@ import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
  * å plukke ut nødvendig informasjon for en angitt SED
  */
 public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
-
-    // Hvis det skulle trenges noen spesifikke endringer av NAV-objektet for enkelte SED'er,
-    // bør denne metoden overrides.
     @Override
     default SED mapTilSed(SedDataDto sedData) {
         var sed = SedMapper.super.mapTilSed(sedData);
@@ -25,14 +22,14 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
 
     default void setVedtaksdata(Vedtak vedtak, VedtakDto vedtakDto) {
         if (vedtakDto != null && !vedtakDto.isErFørstegangsvedtak()) {
-            vedtak.setEropprinneligvedtak("nei");
-            vedtak.setErendringsvedtak("nei");
+            vedtak.setEropprinneligvedtak(null); // nei
+            vedtak.setErendringsvedtak(null); // ja
             vedtak.setDatoforrigevedtak(
                     vedtakDto.getDatoForrigeVedtak() != null ? vedtakDto.getDatoForrigeVedtak().toString() : null
             );
         } else {
             vedtak.setEropprinneligvedtak("ja");
-            vedtak.setErendringsvedtak("ja");
+            vedtak.setErendringsvedtak("nei");
         }
     }
 
