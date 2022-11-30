@@ -47,7 +47,7 @@
 
         <dependency>
             <groupId>no.nav.security</groupId>
-            <artifactId>token-validation-test-support</artifactId>
+            <artifactId>token-validation-spring-test</artifactId>
             <version>${token-support.version}</version>
             <scope>test</scope>
         </dependency>

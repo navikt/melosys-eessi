@@ -18,6 +18,8 @@ import no.nav.melosys.eessi.service.buc.LukkBucService;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import no.nav.melosys.eessi.service.sed.SedService;
+import no.nav.security.token.support.client.core.http.OAuth2HttpClient;
+import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {BucController.class})
+@ActiveProfiles("test")
 class BucControllerTest {
 
     @Autowired
@@ -50,6 +54,11 @@ class BucControllerTest {
     private SedService sedService;
     @MockBean
     private LukkBucService lukkBucService;
+
+    @MockBean
+    private TokenValidationContextHolder tokenValidationContextHolder;
+    @MockBean
+    private OAuth2HttpClient oAuth2HttpClient;
     @MockBean
     private EuxConsumer euxConsumer;
 
