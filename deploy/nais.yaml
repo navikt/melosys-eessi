@@ -46,7 +46,7 @@ spec:
         - application: {{APP_NAME_MELOSYS_API}}
     outbound:
       rules:
-        - application: {{EUX_RINA_API_NAME}}
+        - application: {{APP_NAME_EUX_RINA_API}}
   webproxy: true
   vault:
     enabled: true
@@ -60,7 +60,7 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: nais
     - name: EUX_RINA_API_SCOPE
-      value: api://{{CLUSTER}}.eessibasis.{{EUX_RINA_API_NAME}}/.default
+      value: api://{{CLUSTER_NAME_EUX_RINA_API}}.eessibasis.{{APP_NAME_EUX_RINA_API}}/.default
   ingresses:
     - {{INGRESS}}
   kafka:
