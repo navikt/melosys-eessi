@@ -19,7 +19,7 @@ public abstract class FraSedA003Mapper implements NyttLovvalgSedMapper<Medlemska
 
     @Override
     public Boolean sedErEndring(MedlemskapA003 medlemskap) {
-        var erEndring = !"nei".equalsIgnoreCase(medlemskap.getVedtak().getErendringsvedtak());
+        var erEndring = !"ja".equalsIgnoreCase(medlemskap.getVedtak().getEropprinneligvedtak());
         log.info("sedErEndring i A003 er {}, med erendringsvedtak: {} og eropprinneligvedtak: {}", erEndring,
             medlemskap.getVedtak().getErendringsvedtak(), medlemskap.getVedtak().getEropprinneligvedtak());
         return erEndring;

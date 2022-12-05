@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 
-public class A010MapperTest {
+class A010MapperTest {
 
     private final A010Mapper a010Mapper = new A010Mapper();
 
@@ -36,7 +36,7 @@ public class A010MapperTest {
     }
 
     @Test
-    public void mapTilSed_medTilleggsbestemmelse_bestemmelseErLovligBlirMappetTilSed() {
+    void mapTilSed_medTilleggsbestemmelse_bestemmelseErLovligBlirMappetTilSed() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_b);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_c);
 
@@ -56,7 +56,7 @@ public class A010MapperTest {
     }
 
     @Test
-    public void mapTilSed_medTilleggsbestemmelseBestemmelseIkkeGyld_tilleggsBestemmelseBrukes() {
+    void mapTilSed_medTilleggsbestemmelseBestemmelseIkkeGyld_tilleggsBestemmelseBrukes() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
 
@@ -71,26 +71,30 @@ public class A010MapperTest {
     }
 
     @Test
-    public void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
+    void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
         VedtakDto vedtakDto = new VedtakDto();
         vedtakDto.setErFørstegangsvedtak(false);
         vedtakDto.setDatoForrigeVedtak(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
+
+
         SED sed = a010Mapper.mapTilSed(sedData);
+
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
 
         MedlemskapA010 medlemskapA010 = (MedlemskapA010) sed.getMedlemskap();
 
         assertThat(medlemskapA010).isNotNull();
-        assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isNull(); // null betyr Nei
+        assertThat(medlemskapA010.getVedtak().getErendringsvedtak()).isNull(); // null betyr Ja
         assertThat(medlemskapA010.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
 
     @Test
-    public void mapTilSed_medTilleggsbestemmelse_bestemmelseOgTilleggsbestemmelseErUlovligKasterException() {
+    void mapTilSed_medTilleggsbestemmelse_bestemmelseOgTilleggsbestemmelseErUlovligKasterException() {
         final Bestemmelse bestemmelse = Bestemmelse.ART_11_3_a;
         lovvalgsperiode.setBestemmelse(bestemmelse);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_12_1);

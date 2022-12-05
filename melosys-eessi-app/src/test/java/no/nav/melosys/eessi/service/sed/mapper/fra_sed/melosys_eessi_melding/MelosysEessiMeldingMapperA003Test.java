@@ -15,8 +15,9 @@ import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_meld
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class MelosysEessiMeldingMapperA003Test {
+class MelosysEessiMeldingMapperA003Test {
 
+    private static final String IKKE_OPPRINNELIG_VEDTAK = null;
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
@@ -45,7 +46,7 @@ public class MelosysEessiMeldingMapperA003Test {
     private MedlemskapA003 hentMedlemskap() {
         MedlemskapA003 medlemskap = new MedlemskapA003();
         medlemskap.setVedtak(new VedtakA003());
-        medlemskap.getVedtak().setErendringsvedtak("ja");
+        medlemskap.getVedtak().setEropprinneligvedtak(IKKE_OPPRINNELIG_VEDTAK);
 
         PeriodeA010 periodeA010 = new PeriodeA010();
         periodeA010.setStartdato("2000-12-12");

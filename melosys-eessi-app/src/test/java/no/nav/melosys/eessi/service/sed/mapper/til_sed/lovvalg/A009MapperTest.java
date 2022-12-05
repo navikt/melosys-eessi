@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class A009MapperTest {
+class A009MapperTest {
 
     private final A009Mapper a009Mapper = new A009Mapper();
 
@@ -39,7 +39,7 @@ public class A009MapperTest {
     }
 
     @Test
-    public void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
+    void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
         SED sed = a009Mapper.mapTilSed(sedData);
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
@@ -58,24 +58,28 @@ public class A009MapperTest {
     }
 
     @Test
-    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
+    void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
         VedtakDto vedtakDto = new VedtakDto();
         vedtakDto.setErFørstegangsvedtak(false);
         vedtakDto.setDatoForrigeVedtak(LocalDate.now());
         sedData.setVedtakDto(vedtakDto);
+
+
         SED sed = a009Mapper.mapTilSed(sedData);
+
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
         assertThat(medlemskapA009).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isNull(); // null betyr Nei
+        assertThat(medlemskapA009.getVedtak().getErendringsvedtak()).isNull(); // null betyr Ja
         assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }
 
     @Test
-    public void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() {
+    void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
         SED sed = a009Mapper.mapTilSed(sedData);
 
@@ -92,7 +96,7 @@ public class A009MapperTest {
     }
 
     @Test
-    public void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
+    void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
         assertThatExceptionOfType(MappingException.class)
                 .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
@@ -100,14 +104,14 @@ public class A009MapperTest {
     }
 
     @Test
-    public void ingenLovvalgsperioder_expectNullPointerException() {
+    void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
         assertThatExceptionOfType(NullPointerException.class)
                 .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
     }
 
     @Test
-    public void erIkkeFysisk_forventErIkkeFastadresse() {
+    void erIkkeFysisk_forventErIkkeFastadresse() {
         sedData.getArbeidssteder().get(0).setFysisk(false);
         SED sed = a009Mapper.mapTilSed(sedData);
         assertThat(sed.getNav().getArbeidssted().get(0).getErikkefastadresse()).isEqualTo("ja");

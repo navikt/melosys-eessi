@@ -11,15 +11,25 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
+import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SedGrunnlagMapperA003Test {
+
+    private static final String IKKE_OPPRINNELIG_VEDTAK = null;
+    private static final String OPPRINNELIG_VEDTAK = "ja";
+    private final SedGrunnlagMapperA003 sedGrunnlagMapper = new SedGrunnlagMapperA003();
+
     @Test
     void map_medUtfyltNav_forventVerdier() throws IOException {
-        SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagMapperA003().map(hentSed());
+        SedGrunnlagDto sedGrunnlagDto = sedGrunnlagMapper.map(hentSed());
+
 
         assertThat(sedGrunnlagDto).isNotNull();
         assertThat(sedGrunnlagDto.getSedType()).isEqualTo("A003");
@@ -90,7 +100,9 @@ class SedGrunnlagMapperA003Test {
         adresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse())
+        Adresse bostedsadresse = sedGrunnlagMapper.map(sed).getBostedsadresse();
+
+        assertThat(bostedsadresse)
                 .extracting(Adresse::getAdressetype, Adresse::getLand, Adresse::getGateadresse)
                 .containsExactlyInAnyOrder(Adressetype.POSTADRESSE, "BE", "Testgate Testbyggnavn");
     }
@@ -100,7 +112,9 @@ class SedGrunnlagMapperA003Test {
         SED sed = hentSed();
         sed.getNav().getBruker().setAdresse(List.of());
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse()).isEqualTo(new Adresse());
+        Adresse bostedsadresse = sedGrunnlagMapper.map(sed).getBostedsadresse();
+
+        assertThat(bostedsadresse).isEqualTo(new Adresse());
     }
 
     @Test
@@ -110,7 +124,9 @@ class SedGrunnlagMapperA003Test {
         pin.setLand("NO");
         sed.getNav().getBruker().getPerson().setPin(List.of(pin));
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getUtenlandskIdent()).isEmpty();
+        List<Ident> utenlandskIdent = sedGrunnlagMapper.map(sed).getUtenlandskIdent();
+
+        assertThat(utenlandskIdent).isEmpty();
     }
 
     @Test
@@ -120,7 +136,9 @@ class SedGrunnlagMapperA003Test {
         adresse.setGate(null);
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse().getGateadresse()).isEqualTo("Testbyggnavn");
+        String gateadresse = sedGrunnlagMapper.map(sed).getBostedsadresse().getGateadresse();
+
+        assertThat(gateadresse).isEqualTo("Testbyggnavn");
     }
 
     @Test
@@ -130,7 +148,9 @@ class SedGrunnlagMapperA003Test {
         adresse.setBygning(null);
         sed.getNav().getBruker().setAdresse(List.of(adresse));
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getBostedsadresse().getGateadresse()).isEqualTo("Testgate");
+        String gateadresse = sedGrunnlagMapper.map(sed).getBostedsadresse().getGateadresse();
+
+        assertThat(gateadresse).isEqualTo("Testgate");
     }
 
     @Test
@@ -141,7 +161,11 @@ class SedGrunnlagMapperA003Test {
         sed.getNav().getArbeidsgiver().forEach(settTomAdresse);
         ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().forEach(settTomAdresse);
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getNorskeArbeidsgivendeVirksomheter()).isEmpty();
+
+        List<Virksomhet> norskeArbeidsgivendeVirksomheter = sedGrunnlagMapper.map(sed).getNorskeArbeidsgivendeVirksomheter();
+
+
+        assertThat(norskeArbeidsgivendeVirksomheter).isEmpty();
     }
 
     @Test
@@ -149,7 +173,36 @@ class SedGrunnlagMapperA003Test {
         SED sed = hentSed();
         ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().iterator().next().setIdentifikator(null);
 
-        assertThat(new SedGrunnlagMapperA003().map(sed).getNorskeArbeidsgivendeVirksomheter().iterator().next().getOrgnr()).isNull();
+        String orgnr = sedGrunnlagMapper.map(sed).getNorskeArbeidsgivendeVirksomheter().iterator().next().getOrgnr();
+
+        assertThat(orgnr).isNull();
+    }
+
+    @Test
+    void sedErEndring_ikkeOpprinneligVedtak_forventerErEndring_true() {
+        var medlemskapA003 = lagA003MedlemskapForSedErEndringTest(IKKE_OPPRINNELIG_VEDTAK);
+
+        var erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003);
+
+        assertTrue(erEndring);
+    }
+
+    @Test
+    void sedErEndring_opprinneligVedtak_forventerErEndring_true() {
+        var medlemskapA003 = lagA003MedlemskapForSedErEndringTest(OPPRINNELIG_VEDTAK);
+
+        var erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003);
+
+        assertFalse(erEndring);
+    }
+
+    @NotNull
+    private static MedlemskapA003 lagA003MedlemskapForSedErEndringTest(String opprinneligVedtak) {
+        var vedtakA003 = new VedtakA003();
+        vedtakA003.setEropprinneligvedtak(opprinneligVedtak);
+        var medlemskapA003 = new MedlemskapA003();
+        medlemskapA003.setVedtak(vedtakA003);
+        return medlemskapA003;
     }
 
     private static SED hentSed() throws IOException {

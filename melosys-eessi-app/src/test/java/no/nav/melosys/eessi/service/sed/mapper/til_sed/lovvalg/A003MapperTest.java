@@ -17,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class A003MapperTest {
+class A003MapperTest {
 
     private final LovvalgSedMapper<MedlemskapA003> sedMapper = new A003Mapper();
     private SedDataDto sedData;
@@ -30,7 +30,7 @@ public class A003MapperTest {
     }
 
     @Test
-    public void mapTilSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
+    void mapTilSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
         SED sed = sedMapper.mapTilSed(sedData);
 
         assertThat(sed).isNotNull();
@@ -42,7 +42,7 @@ public class A003MapperTest {
     }
 
     @Test
-    public void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
+    void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
         VedtakDto vedtakDto = new VedtakDto();
         vedtakDto.setErFørstegangsvedtak(false);
         vedtakDto.setDatoForrigeVedtak(LocalDate.now());
@@ -54,7 +54,8 @@ public class A003MapperTest {
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
 
         assertThat(medlemskapA003).isNotNull();
-        assertThat(medlemskapA003.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA003.getVedtak().getEropprinneligvedtak()).isNull(); // null betyr Nei
+        assertThat(medlemskapA003.getVedtak().getErendringsvedtak()).isNull(); // null betyr Ja
         assertThat(medlemskapA003.getVedtak().getDatoforrigevedtak()).isNotNull();
         assertThat(medlemskapA003.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
     }

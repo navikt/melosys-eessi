@@ -70,7 +70,7 @@ public class MockData {
         VedtakA003 vedtak = new VedtakA003();
         vedtak.setLand("SE");
         vedtak.setGjelderperiode(periode);
-        vedtak.setErendringsvedtak("nei");
+        vedtak.setEropprinneligvedtak("ja");
         medlemskap.setVedtak(vedtak);
         sed.setMedlemskap(medlemskap);
 
