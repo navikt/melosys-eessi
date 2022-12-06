@@ -16,4 +16,5 @@ public class SedGrunnlagDto {
     private List<Arbeidssted> arbeidssteder;
     private List<Lovvalgsperiode> lovvalgsperioder;
     private String ytterligereInformasjon;
+    private String gjeldenderegler;
 }
