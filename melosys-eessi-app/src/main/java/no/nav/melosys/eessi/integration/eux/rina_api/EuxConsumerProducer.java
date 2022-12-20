@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import no.nav.melosys.eessi.security.UserContextClientRequestInterceptor;
@@ -66,6 +67,7 @@ public class EuxConsumerProducer {
                 .findFirst().ifPresent(jacksonConverer ->
                         jacksonConverer.getObjectMapper()
                                 .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
+                                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
                 );
 
         return restTemplate;
