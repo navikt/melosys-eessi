@@ -19,9 +19,7 @@ import no.nav.melosys.eessi.models.SedType;
 public class BUC {
 
     private String id;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime lastUpdate;
     private String status;
     private Creator creator;
