@@ -15,9 +15,7 @@ import no.nav.melosys.eessi.models.SedType;
 public class Document {
 
     private String id;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime creationDate;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime lastUpdate;
     private Creator creator;
     private String type;
