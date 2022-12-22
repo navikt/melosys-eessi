@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.kafka.consumers;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
@@ -41,6 +42,12 @@ public class SedMottattConsumer {
                 .build());
 
             sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
+        } catch (SedAlleredeJournalførtException e) {
+            log.info("SED {} allerede journalført", e.getSedID());
+        } catch (Exception e) {
+            // TODO: lag metrikker på feilet exception
+            log.error("sedMottatt feilet med: {}", e.getMessage());
+            throw e;
         } finally {
             remove(SED_ID);
             remove(CORRELATION_ID);
