@@ -278,7 +278,9 @@ public class EuxConsumer implements RestConsumer {
         } catch (HttpClientErrorException.NotFound e) {
             throw new NotFoundException("404 fra eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
-            throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
+            String message = hentFeilmeldingForEux(e);
+            if (message == null) message = e.getClass().getSimpleName();
+            throw new IntegrationException("Feil i integrasjon mot eux: " + message, e);
         }
     }
 }
