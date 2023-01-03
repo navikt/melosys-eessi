@@ -48,7 +48,7 @@ melosys:
         aiven-topic-name: ${KAFKA_AIVEN_EESSIMELDING_TOPIC:teammelosys.eessi.v1}
       consumer:
         mottatt:
-          groupid: ${KAFKA_AIVEN_SEDHENDELSER_MOTTATT_GROUPID:melosys-eessi-mottatt-sedHendelser-aiven}
+          groupid: ${KAFKA_AIVEN_SEDHENDELSER_MOTTATT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDMOTTATT_TOPIC:eessibasis-sedmottatt-v1}
         sendt:
           groupid: ${KAFKA_AIVEN_SEDHENDELSER_SENT_GROUPID:melosys-eessi-sedHendelser-aiven}
