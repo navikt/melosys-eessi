@@ -51,7 +51,7 @@ melosys:
           groupid: ${KAFKA_AIVEN_SEDHENDELSER_MOTTATT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDMOTTATT_TOPIC:eessibasis-sedmottatt-v1}
         sendt:
-          groupid: ${KAFKA_AIVEN_SEDHENDELSER_SENT_GROUPID:melosys-eessi-sedHendelser-aiven}
+          groupid: ${KAFKA_AIVEN_SEDHENDELSER_SENDT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDSENDT_TOPIC:eessibasis-sedsendt-v1}
   systemuser:
     username: ${SRV_USERNAME}
