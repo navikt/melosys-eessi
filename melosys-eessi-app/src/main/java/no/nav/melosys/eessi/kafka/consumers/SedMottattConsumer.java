@@ -29,7 +29,9 @@ public class SedMottattConsumer {
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
-        containerFactory = "sedHendelseListenerContainerFactory")
+        containerFactory = "sedHendelseListenerContainerFactory",
+        groupId = "${melosys.kafka.aiven.consumer.motatt.groupid}"
+    )
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         putToMDC(SED_ID, consumerRecord.value().getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
