@@ -29,7 +29,7 @@ public class SedSendtConsumer {
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
         topics = "${melosys.kafka.aiven.consumer.sendt.topic}",
         containerFactory = "sedHendelseListenerContainerFactory",
-        groupId = "${melosys.kafka.aiven.consumer.sent.groupid}"
+        groupId = "${melosys.kafka.aiven.consumer.sendt.groupid}"
     )
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendt = consumerRecord.value();
