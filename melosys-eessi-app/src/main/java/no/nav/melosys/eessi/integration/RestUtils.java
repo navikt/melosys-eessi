@@ -17,21 +17,24 @@ public class RestUtils {
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String EUX_FEIL_KEY = "messages";
+    private static final String EUX_STATUS_KEY = "status";
     private static final String OPPGAVE_FEIL_KEY = "feilmelding";
 
     public static String hentFeilmeldingForEux(RestClientException e) {
-        if(e instanceof RestClientResponseException) {
-            RestClientResponseException clientErrorException = (RestClientResponseException) e;
+        if (e instanceof RestClientResponseException clientErrorException) {
             var feilmelding = clientErrorException.getResponseBodyAsString();
             if (!StringUtils.hasText(feilmelding)) return e.getMessage();
             return hentFeilmelding(feilmelding, EUX_FEIL_KEY);
         }
-
         return e.getMessage();
     }
 
     public static String hentFeilmeldingForOppgave(String feilmelding) {
-        return hentFeilmelding(feilmelding, OPPGAVE_FEIL_KEY);
+        String message = hentFeilmelding(feilmelding, OPPGAVE_FEIL_KEY);
+        if (message == null) {
+            message = hentFeilmelding(feilmelding, EUX_STATUS_KEY);
+        }
+        return message;
     }
 
     private static String hentFeilmelding(String feilmelding, String nøkkel) {
