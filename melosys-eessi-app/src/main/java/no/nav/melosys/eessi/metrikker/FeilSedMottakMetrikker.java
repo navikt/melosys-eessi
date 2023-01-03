@@ -24,7 +24,7 @@ public class FeilSedMottakMetrikker {
 
     @PostConstruct
     public void initGauge() {
-        Gauge.builder(MetrikkerNavn.SED_MOTTATT_FEILET, this, v -> sedMottattRepository.countByFeiletIsTrue())
+        Gauge.builder(MetrikkerNavn.SED_MOTTATT_FEILET_DEPRICATED, this, v -> sedMottattRepository.countByFeiletIsTrue())
                 .register(meterRegistry);
     }
 }

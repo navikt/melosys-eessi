@@ -1,10 +1,12 @@
 package no.nav.melosys.eessi.metrikker;
 
 import java.util.Arrays;
+
 import io.micrometer.core.instrument.Metrics;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.SedType;
 import org.springframework.stereotype.Component;
+
 import static no.nav.melosys.eessi.metrikker.MetrikkerNavn.*;
 
 @Slf4j
@@ -31,6 +33,12 @@ public class SedMetrikker {
 
     public void sedMottatt(String sedType) {
         sedHendelse(SED_MOTTATT, sedType);
+    }
+
+    public void sedMottattFeilet(String sedType, Exception e) {
+        Metrics.counter(SED_MOTTATT_FEILET,
+            KEY_SEDTYPE, sedType,
+            KEY_FEILTYPE, e.getClass().getSimpleName()).increment();
     }
 
     public void sedSendt(String sedType) {
