@@ -48,10 +48,11 @@ melosys:
         aiven-topic-name: ${KAFKA_AIVEN_EESSIMELDING_TOPIC:teammelosys.eessi.v1}
       consumer:
         mottatt:
+          groupid: ${KAFKA_AIVEN_SEDHENDELSER_MOTTATT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDMOTTATT_TOPIC:eessibasis-sedmottatt-v1}
         sendt:
+          groupid: ${KAFKA_AIVEN_SEDHENDELSER_SENDT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDSENDT_TOPIC:eessibasis-sedsendt-v1}
-        groupid: ${KAFKA_AIVEN_SEDHENDELSER_GROUPID:melosys-eessi-sedHendelser-aiven}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}

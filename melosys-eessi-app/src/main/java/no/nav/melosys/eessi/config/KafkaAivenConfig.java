@@ -67,13 +67,13 @@ public class KafkaAivenConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>>
     sedHendelseListenerContainerFactory(
-        KafkaProperties kafkaProperties, @Value("${melosys.kafka.aiven.consumer.groupid}") String groupId) {
-        return sedListenerContainerFactory(kafkaProperties, groupId);
+        KafkaProperties kafkaProperties) {
+        return sedListenerContainerFactory(kafkaProperties);
     }
 
-    private ConcurrentKafkaListenerContainerFactory<String, SedHendelse> sedListenerContainerFactory(KafkaProperties kafkaProperties, String groupId) {
+    private ConcurrentKafkaListenerContainerFactory<String, SedHendelse> sedListenerContainerFactory(KafkaProperties kafkaProperties) {
         Map<String, Object> props = kafkaProperties.buildConsumerProperties();
-        props.putAll(consumerConfig(groupId));
+        props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
             props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -97,9 +97,8 @@ public class KafkaAivenConfig {
         return props;
     }
 
-    private Map<String, Object> consumerConfig(String groupId) {
+    private Map<String, Object> consumerConfig() {
         Map<String, Object> props = new HashMap<>();
-        props.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokersUrl);
         props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
