@@ -34,7 +34,8 @@ public class SedMottattConsumer {
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
         containerFactory = "sedHendelseListenerContainerFactory",
-        groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}"
+        groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}",
+        errorHandler = "sedMottattErrorHandler"
     )
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedHendelse = consumerRecord.value();

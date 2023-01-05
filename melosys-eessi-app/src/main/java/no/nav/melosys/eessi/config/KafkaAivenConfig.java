@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -28,6 +29,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
+import org.springframework.kafka.listener.KafkaListenerErrorHandler;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
@@ -35,6 +37,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 
 @Configuration
 @EnableKafka
+@Slf4j
 public class KafkaAivenConfig {
 
     @Autowired
@@ -53,6 +56,14 @@ public class KafkaAivenConfig {
     private String credstorePassword;
 
     private static final String LEGISLATION_APPLICABLE_CODE = "LA";
+
+    @Bean
+    public KafkaListenerErrorHandler sedMottattErrorHandler() {
+        return (m, e) -> {
+            log.error("Feil ved prosessering av sed mottatt: {}\n{}", e.getCause().getMessage(), m, e);
+            return null;
+        };
+    }
 
     @Bean
     @Qualifier("aivenTemplate")
