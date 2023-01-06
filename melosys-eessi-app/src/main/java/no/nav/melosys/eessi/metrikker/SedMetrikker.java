@@ -30,6 +30,7 @@ public class SedMetrikker {
         Metrics.counter(SED_MOTTATT, KEY_SEDTYPE, sedType.name());
         Metrics.counter(SED_SENDT, KEY_SEDTYPE, sedType.name());
         Metrics.counter(SED_MOTTATT_FEILET, KEY_SEDTYPE, sedType.name());
+        Metrics.counter(SED_MOTTATT_ALLEREDEJOURNALFOERT, KEY_SEDTYPE, sedType.name());
     }
 
     public void sedMottatt(String sedType) {
@@ -38,6 +39,10 @@ public class SedMetrikker {
 
     public void sedMottattFeilet(String sedType) {
         Metrics.counter(SED_MOTTATT_FEILET, KEY_SEDTYPE, sedType).increment();
+    }
+
+    public void sedMottattAlleredejournalfoert(String sedType) {
+        Metrics.counter(SED_MOTTATT_ALLEREDEJOURNALFOERT, KEY_SEDTYPE, sedType).increment();
     }
 
     public void sedSendt(String sedType) {
