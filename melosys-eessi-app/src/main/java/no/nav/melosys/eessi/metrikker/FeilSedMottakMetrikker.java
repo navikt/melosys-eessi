@@ -24,7 +24,7 @@ public class FeilSedMottakMetrikker {
 
     @PostConstruct
     public void initGauge() {
-        Gauge.builder(MetrikkerNavn.SED_MOTTO_FEILET_DEPRECATED, this, v -> sedMottattRepository.countByFeiletIsTrue())
+        Gauge.builder(MetrikkerNavn.SED_MOTTATT_FEILET_DEPRECATED, this, v -> sedMottattRepository.countByFeiletIsTrue())
                 .register(meterRegistry);
     }
 }
