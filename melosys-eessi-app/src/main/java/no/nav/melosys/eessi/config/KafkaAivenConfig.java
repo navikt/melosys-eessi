@@ -59,8 +59,8 @@ public class KafkaAivenConfig {
 
     @Bean
     public KafkaListenerErrorHandler sedMottattErrorHandler() {
-        return (m, e) -> {
-            log.error("Feil ved prosessering av sed mottatt: {}\n{}", e.getCause().getMessage(), m, e);
+        return (message, exception) -> {
+            log.error("Feil ved prosessering av sed mottatt: {}\n{}", exception.getCause().getMessage(), message, exception);
             return null;
         };
     }
