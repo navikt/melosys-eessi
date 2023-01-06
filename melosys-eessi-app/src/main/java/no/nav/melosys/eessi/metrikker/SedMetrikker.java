@@ -29,6 +29,7 @@ public class SedMetrikker {
     private static void initialiserSedTypeTeller(SedType sedType) {
         Metrics.counter(SED_MOTTATT, KEY_SEDTYPE, sedType.name());
         Metrics.counter(SED_SENDT, KEY_SEDTYPE, sedType.name());
+        Metrics.counter(SED_MOTTATT_FEILET, KEY_SEDTYPE, sedType.name());
     }
 
     public void sedMottatt(String sedType) {
