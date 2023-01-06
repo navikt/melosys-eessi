@@ -52,9 +52,9 @@ public class SedMottattConsumer {
             sedMetrikker.sedMottatt(sedHendelse.getSedType());
         } catch (SedAlleredeJournalførtException e) {
             log.info("SED {} allerede journalført", e.getSedID());
-            logMetrikker(consumerRecord.offset(), sedHendelse.getSedType(), e);
+            logMetrikker(consumerRecord.offset(), sedHendelse.getSedType());
         } catch (Exception e) {
-            logMetrikker(consumerRecord.offset(), sedHendelse.getSedType(), e);
+            logMetrikker(consumerRecord.offset(), sedHendelse.getSedType());
             log.error("sedMottatt av {} feilet med feilet med: {}", sedHendelse.getSedType(), e.getMessage());
             throw e;
         } finally {
@@ -63,10 +63,10 @@ public class SedMottattConsumer {
         }
     }
 
-    private void logMetrikker(long offset, String sedType, Exception e) {
+    private void logMetrikker(long offset, String sedType) {
         if (alreadyAddedMetrics.add(offset)) {
             // Unngå å skrive metrikker for 10 retry som kjøres av kafka
-            sedMetrikker.sedMottattFeilet(sedType, e);
+            sedMetrikker.sedMottattFeilet(sedType);
         }
     }
 }

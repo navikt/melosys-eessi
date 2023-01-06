@@ -36,10 +36,8 @@ public class SedMetrikker {
         sedHendelse(SED_MOTTATT, sedType);
     }
 
-    public void sedMottattFeilet(String sedType, Exception e) {
-        Metrics.counter(SED_MOTTATT_FEILET,
-            KEY_SEDTYPE, sedType,
-            KEY_FEILTYPE, e.getClass().getSimpleName()).increment();
+    public void sedMottattFeilet(String sedType) {
+        Metrics.counter(SED_MOTTATT_FEILET, KEY_SEDTYPE, sedType).increment();
     }
 
     public void sedSendt(String sedType) {
