@@ -30,25 +30,28 @@ public class SedMottattConsumer {
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
         containerFactory = "sedHendelseListenerContainerFactory",
-        groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}"
+        groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}",
+        errorHandler = "sedMottattErrorHandler"
     )
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
-        putToMDC(SED_ID, consumerRecord.value().getSedId());
+        SedHendelse sedHendelse = consumerRecord.value();
+        putToMDC(SED_ID, sedHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
-        log.info("Mottatt melding om sed mottatt: {}, offset: {}", consumerRecord.value(), consumerRecord.offset());
+        log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedHendelse, consumerRecord.offset());
 
         try {
             sedMottakService.behandleSed(SedMottattHendelse.builder()
-                .sedHendelse(consumerRecord.value())
+                .sedHendelse(sedHendelse)
                 .build());
 
-            sedMetrikker.sedMottatt(consumerRecord.value().getSedType());
+            sedMetrikker.sedMottatt(sedHendelse.getSedType());
         } catch (SedAlleredeJournalførtException e) {
             log.info("SED {} allerede journalført", e.getSedID());
+            sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
         } catch (Exception e) {
-            // TODO: lag metrikker på feilet exception
-            log.error("sedMottatt feilet med: {}", e.getMessage());
+            sedMetrikker.sedMottattFeilet(sedHendelse.getSedType());
+            log.error("sedMottatt av {} feilet med feilet med: {}", sedHendelse.getSedType(), e.getMessage());
             throw e;
         } finally {
             remove(SED_ID);

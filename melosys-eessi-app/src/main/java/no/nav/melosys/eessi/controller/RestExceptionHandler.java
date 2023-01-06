@@ -43,10 +43,11 @@ public class RestExceptionHandler {
     }
 
     private ResponseEntity handle(Exception e, HttpStatus httpStatus) {
-        log.error("Feil oppstått: ", e);
+        String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+        log.error("Feil oppstått: {}", message, e);
         Map<String, String> entity = new HashMap<>();
         entity.put("error", httpStatus.getReasonPhrase());
-        entity.put("message", e.getMessage());
+        entity.put("message", message);
         return new ResponseEntity<>(entity, httpStatus);
     }
 }
