@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -30,10 +31,12 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.KafkaListenerErrorHandler;
+import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.messaging.Message;
 
 @Configuration
 @EnableKafka
@@ -59,10 +62,23 @@ public class KafkaAivenConfig {
 
     @Bean
     public KafkaListenerErrorHandler sedMottattErrorHandler() {
-        return (message, exception) -> {
-            log.error("Feil ved prosessering av sed mottatt: {}\n{}", exception.getCause().getMessage(), message, exception);
+        return (Message<?> message, ListenerExecutionFailedException exception) -> {
+            String consumerRecordLogMessage = "";
+            if (message.getPayload() instanceof ConsumerRecord<?, ?> consumerRecord) {
+                consumerRecordLogMessage = getConsumerRecordWithOutValue(consumerRecord);
+            }
+            log.error("Feil ved prosessering av sed mottatt: {}\n{}", exception.getCause().getMessage(), consumerRecordLogMessage, exception);
             return null;
         };
+    }
+
+    String getConsumerRecordWithOutValue(ConsumerRecord<?, ?> consumerRecord) {
+        return "ConsumerRecord(topic = " + consumerRecord.topic()
+            + ", partition = " + consumerRecord.partition()
+            + ", offset = " + consumerRecord.offset()
+            + ", serialized key size = " + consumerRecord.serializedKeySize()
+            + ", serialized value size = " + consumerRecord.serializedValueSize()
+            + ", headers = " + consumerRecord.headers() + ", key = " + consumerRecord.key();
     }
 
     @Bean
