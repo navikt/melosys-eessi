@@ -52,7 +52,7 @@ public class SedMottattConsumer {
         } catch (Exception e) {
             sedMetrikker.sedMottattFeilet(sedHendelse.getSedType());
             String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            log.error("sedMottatt av sed feilet: {}\nsedHendelse: {}", message, sedHendelse, e);
+            log.error("sedMottatt feilet: {}\nsedHendelse: {}", message, sedHendelse, e);
         } finally {
             remove(SED_ID);
             remove(CORRELATION_ID);
