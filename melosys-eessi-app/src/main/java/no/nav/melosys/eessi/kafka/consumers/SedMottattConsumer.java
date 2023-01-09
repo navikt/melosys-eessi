@@ -47,11 +47,11 @@ public class SedMottattConsumer {
 
             sedMetrikker.sedMottatt(sedHendelse.getSedType());
         } catch (SedAlleredeJournalførtException e) {
-            log.info("SED {} allerede journalført", e.getSedID());
+            log.warn("SED {} allerede journalført", e.getSedID());
             sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
         } catch (Exception e) {
             sedMetrikker.sedMottattFeilet(sedHendelse.getSedType());
-            log.error("sedMottatt av {} feilet med feilet med: {}", sedHendelse.getSedType(), e.getMessage());
+            log.error("sedMottatt av {}\nFeilet med: {}", sedHendelse, e.getMessage());
             throw e;
         } finally {
             remove(SED_ID);
