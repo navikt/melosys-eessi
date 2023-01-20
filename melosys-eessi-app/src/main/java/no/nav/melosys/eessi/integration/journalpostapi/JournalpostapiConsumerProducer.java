@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.time.Duration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +27,8 @@ public class JournalpostapiConsumerProducer {
     public JournalpostapiConsumer journalpostapiConsumer(
         RestTemplateBuilder restTemplateBuilder,
         SystemContextClientRequestInterceptor systemContextClientRequestInterceptor,
-        CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
+        CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor,
+        ObjectMapper objectMapper) {
         RestTemplate restTemplate = restTemplateBuilder
             .uriTemplateHandler(new DefaultUriBuilderFactory(url))
             .interceptors(systemContextClientRequestInterceptor, correlationIdOutgoingInterceptor)
@@ -35,7 +37,7 @@ public class JournalpostapiConsumerProducer {
             .setBufferRequestBody(false)
             .build();
 
-        return new JournalpostapiConsumer(restTemplate);
+        return new JournalpostapiConsumer(restTemplate, objectMapper);
     }
 
 }

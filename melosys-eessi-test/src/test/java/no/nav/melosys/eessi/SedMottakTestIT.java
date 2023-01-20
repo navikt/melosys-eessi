@@ -6,6 +6,8 @@ import java.util.Random;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
@@ -164,5 +166,22 @@ class SedMottakTestIT extends ComponentTestBase {
         verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
 
         assertThat(hentMelosysEessiRecords()).isEmpty();
+    }
+
+    @Test
+    void sedMottak_alleredeJournalført_kasterException() throws Exception{
+        final var sedID = UUID.randomUUID().toString();
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+
+        mockPerson();
+        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean()))
+            .thenThrow(new SedAlleredeJournalførtException("Sed allerede journalført", sedID));
+
+        // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
+        kafkaTestConsumer.reset(2);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
     }
 }
