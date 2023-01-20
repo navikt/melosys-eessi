@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.benas.randombeans.api.EnhancedRandom;
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,11 +34,13 @@ class JournalpostapiConsumerTest {
 
     private final EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
     private OpprettJournalpostRequest request;
+    private FakeUnleash unleash = new FakeUnleash();
 
     @BeforeEach
     public void setUp() {
-        journalpostapiConsumer = new JournalpostapiConsumer(restTemplate, objectMapper);
+        journalpostapiConsumer = new JournalpostapiConsumer(restTemplate, objectMapper, unleash);
         request = random.nextObject(OpprettJournalpostRequest.class);
+        unleash.enableAll();
     }
 
     @Test
