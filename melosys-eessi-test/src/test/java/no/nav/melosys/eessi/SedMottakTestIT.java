@@ -169,18 +169,22 @@ class SedMottakTestIT extends ComponentTestBase {
     }
 
     @Test
-    void sedMottak_alleredeJournalført_kasterException() throws Exception{
+    void sedMottak_alleredeBehandlet_kunFørsteMeldingBehandles() throws Exception{
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
 
         mockPerson();
-        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean()))
-            .thenThrow(new SedAlleredeJournalførtException("Sed allerede journalført", sedID));
 
         // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
-        kafkaTestConsumer.reset(2);
+        kafkaTestConsumer.reset(3);
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
         kafkaTestConsumer.doWait(5_000L);
+
+        await().atMost(Duration.ofSeconds(4))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
+
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
     }
