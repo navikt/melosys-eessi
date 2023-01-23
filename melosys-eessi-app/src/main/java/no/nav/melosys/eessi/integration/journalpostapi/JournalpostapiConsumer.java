@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -16,12 +15,10 @@ public class JournalpostapiConsumer {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
-    private final Unleash unleash;
 
-    public JournalpostapiConsumer(RestTemplate restTemplate, ObjectMapper objectMapper, Unleash unleash) {
+    public JournalpostapiConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
-        this.unleash = unleash;
     }
 
     public OpprettJournalpostResponse opprettJournalpost(OpprettJournalpostRequest request, boolean forsokEndeligJfr) {
@@ -38,15 +35,11 @@ public class JournalpostapiConsumer {
         try {
             return restTemplate.postForObject(uriBuilder.toUriString(), new HttpEntity<>(request, headers), OpprettJournalpostResponse.class);
         } catch (HttpClientErrorException.Conflict e) {
-            if (unleash.isEnabled("melosys.eessi.opprettjournalpost")) {
-                return getOpprettJournalpostResponse(e);
-            } else {
-                throw new SedAlleredeJournalførtException("SED allerede journalført", request.getEksternReferanseId());
-            }
+            throw new SedAlleredeJournalførtException("SED allerede journalført", request.getEksternReferanseId(), e);
         }
     }
 
-    private OpprettJournalpostResponse getOpprettJournalpostResponse(HttpClientErrorException.Conflict e) {
+    public OpprettJournalpostResponse henterJournalpostResponseFra409Exception(HttpClientErrorException e) {
         try {
             return objectMapper.readValue(e.getResponseBodyAsString(), OpprettJournalpostResponse.class);
         } catch (JsonProcessingException ex) {

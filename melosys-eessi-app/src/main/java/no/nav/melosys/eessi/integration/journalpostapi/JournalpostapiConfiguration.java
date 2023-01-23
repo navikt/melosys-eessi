@@ -46,7 +46,7 @@ public class JournalpostapiConfiguration {
         ObjectMapper objectMapper,
         Unleash unleash) {
 
-        return new JournalpostapiConsumer(journalpostapiRestTemplate, objectMapper, unleash);
+        return new JournalpostapiConsumer(journalpostapiRestTemplate, objectMapper);
     }
 
 }

@@ -12,8 +12,10 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -34,13 +36,11 @@ class JournalpostapiConsumerTest {
 
     private final EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
     private OpprettJournalpostRequest request;
-    private FakeUnleash unleash = new FakeUnleash();
 
     @BeforeEach
     public void setUp() {
-        journalpostapiConsumer = new JournalpostapiConsumer(restTemplate, objectMapper, unleash);
+        journalpostapiConsumer = new JournalpostapiConsumer(restTemplate, objectMapper);
         request = random.nextObject(OpprettJournalpostRequest.class);
-        unleash.enableAll();
     }
 
     @Test
@@ -59,12 +59,28 @@ class JournalpostapiConsumerTest {
     }
 
     @Test
-    void opprettJournalpost_eksternReferanseIdFinnesAlleredeHttp409_returnererResponse() {
+    void opprettJournalpost_eksternReferanseIdFinnesAlleredeHttp409_kasterException() {
         server.expect(requestTo("?forsoekFerdigstill=false")).andRespond(
             withStatus(HttpStatus.CONFLICT).body(JOURNALPOST_RESPONSE)
         );
 
-        journalpostapiConsumer.opprettJournalpost(request, false);
+        assertThatExceptionOfType(SedAlleredeJournalførtException.class)
+            .isThrownBy(() -> journalpostapiConsumer.opprettJournalpost(request, false))
+            .withMessageContaining("allerede journalført");
     }
 
+    @Test
+    void henterJournalpostResponseFra409Exception_ok() {
+        server.expect(requestTo("?forsoekFerdigstill=false")).andRespond(
+            withStatus(HttpStatus.CONFLICT).body(JOURNALPOST_RESPONSE)
+        );
+
+        try {
+            journalpostapiConsumer.opprettJournalpost(request, false);
+            fail("Skal kaste SedAlleredeJournalførtException");
+        } catch (SedAlleredeJournalførtException sedAlleredeJournalførtException) {
+            OpprettJournalpostResponse opprettJournalpostResponse = journalpostapiConsumer.henterJournalpostResponseFra409Exception(sedAlleredeJournalførtException.getEx());
+            assertThat(opprettJournalpostResponse.getJournalpostId()).isEqualTo("498371665");
+        }
+    }
 }
