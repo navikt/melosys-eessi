@@ -43,8 +43,7 @@ public class JournalpostapiConfiguration {
     @Bean
     public JournalpostapiConsumer journalpostapiConsumer(
         RestTemplate journalpostapiRestTemplate,
-        ObjectMapper objectMapper,
-        Unleash unleash) {
+        ObjectMapper objectMapper) {
 
         return new JournalpostapiConsumer(journalpostapiRestTemplate, objectMapper);
     }

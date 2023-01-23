@@ -28,7 +28,7 @@ public class JournalpostService {
         try {
             return opprettJournalpost(request, false);
         } catch (SedAlleredeJournalførtException e) {
-            if (unleash.isEnabled("melosys.eessi.opprettjournalpost")) {
+            if (unleash.isEnabled("melosys.eessi.opprettjournalpost.konflikt")) {
                 return journalpostapiConsumer.henterJournalpostResponseFra409Exception(e.getEx());
             } else {
                 throw e;

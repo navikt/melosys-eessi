@@ -169,7 +169,7 @@ class SedMottakTestIT extends ComponentTestBase {
     }
 
     @Test
-    void sedMottak_alleredeBehandlet_kunFørsteMeldingBehandles() throws Exception{
+    void sedMottak_identiskeMeldinger_kunFørsteMeldingBehandles() throws Exception{
         final var sedID = UUID.randomUUID().toString();
         when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
 
