@@ -10,13 +10,14 @@ import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Slf4j
 @Component
-public class SedMottattConsumer {
+public class SedMottattConsumer extends AbstractConsumerSeekAware {
 
     private final SedMottakService sedMottakService;
     private final SedMetrikker sedMetrikker;
@@ -27,7 +28,9 @@ public class SedMottattConsumer {
         this.sedMetrikker = sedMetrikker;
     }
 
-    @KafkaListener(clientIdPrefix = "melosys-eessi-sedMottatt",
+    @KafkaListener(
+        id = "sedMottatt",
+        clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
         containerFactory = "sedHendelseListenerContainerFactory",
         groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}",
@@ -57,5 +60,9 @@ public class SedMottattConsumer {
             remove(SED_ID);
             remove(CORRELATION_ID);
         }
+    }
+
+    public void settSpesifiktOffsetPåConsumer(long offset) {
+        getSeekCallbacks().forEach((tp, callback) -> callback.seek(tp.topic(), tp.partition(), offset));
     }
 }

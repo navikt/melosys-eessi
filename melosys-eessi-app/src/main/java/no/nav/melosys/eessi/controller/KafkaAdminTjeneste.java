@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
 import no.nav.melosys.eessi.identifisering.OppgaveEndretConsumer;
+import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,14 @@ public class KafkaAdminTjeneste {
     private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     private final OppgaveEndretConsumer oppgaveEndretConsumer;
+    private final SedMottattConsumer sedMottattConsumer;
     private final String apiKey;
 
-    public KafkaAdminTjeneste(OppgaveEndretConsumer oppgaveEndretConsumer, @Value("${melosys.admin.api-key}") String apiKey) {
+    public KafkaAdminTjeneste(OppgaveEndretConsumer oppgaveEndretConsumer,
+                              SedMottattConsumer sedMottattConsumer,
+                              @Value("${melosys.admin.api-key}") String apiKey) {
         this.oppgaveEndretConsumer = oppgaveEndretConsumer;
+        this.sedMottattConsumer = sedMottattConsumer;
         this.apiKey = apiKey;
     }
 
@@ -80,12 +85,16 @@ public class KafkaAdminTjeneste {
     public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
-        if (!consumerId.equals("oppgaveEndret")) {
+        if (!List.of("oppgaveEndret", "sedMottatt").contains(consumerId)) {
             return ResponseEntity.badRequest().body("ConsumerId is not supported: " + consumerId);
         }
 
-        log.info("Setter offset for oppgave-endret consumer til: {}", offset);
-        oppgaveEndretConsumer.settSpesifiktOffsetPåConsumer(offset);
+        log.info("Setter offset for " + consumerId + " til: {}", offset);
+        switch (consumerId) {
+            case "oppgaveEndret" -> oppgaveEndretConsumer.settSpesifiktOffsetPåConsumer(offset);
+            case "sedMottatt" -> sedMottattConsumer.settSpesifiktOffsetPåConsumer(offset);
+        }
+
         return ResponseEntity.ok().build();
     }
 
@@ -105,13 +114,11 @@ public class KafkaAdminTjeneste {
     }
 
     private KafkaConsumerResponse lagKafkaConsumerResponseVedId(String consumerId) {
-        MessageListenerContainer listenerContainer =
-            kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
+        MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
         return lagKafkaConsumerResponse(listenerContainer);
     }
 
-    private KafkaConsumerAssignmentResponse lagKafkaConsumerAssignmentResponse(
-        TopicPartition topicPartition) {
+    private KafkaConsumerAssignmentResponse lagKafkaConsumerAssignmentResponse(TopicPartition topicPartition) {
         return KafkaConsumerAssignmentResponse.builder()
             .topic(topicPartition.topic())
             .partition(topicPartition.partition())
