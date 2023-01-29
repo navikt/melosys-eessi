@@ -4,6 +4,7 @@ import javax.transaction.Transactional;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -12,6 +13,7 @@ import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ public class SedMottakService {
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final BucIdentifisertService bucIdentifisertService;
+    private final JournalpostSedKoblingService journalpostSedKoblingService;
+    private final Unleash unleash;
 
 
     @Transactional
@@ -39,6 +43,10 @@ public class SedMottakService {
         if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.getSedHendelse().getSedId()).isPresent()) {
             log.info("Mottatt SED {} er allerede behandlet", sedMottattHendelse.getSedHendelse().getSedId());
             return;
+        }
+
+        if (unleash.isEnabled("melosys.eessi.sed.rekkefølge") && sedMottattHendelse.getSedHendelse().erXSed() && !journalpostSedKoblingService.erASedAlleredeBehandlet(sedMottattHendelse.getSedHendelse().getRinaSakId())) {
+            throw new IllegalStateException(String.format("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet", sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
         }
 
         var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);

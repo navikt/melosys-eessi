@@ -35,4 +35,9 @@ public class SedHendelse {
         return sedType.equals(SedType.X100.name());
     }
 
+    @JsonIgnore
+    public boolean erXSed(){
+        return sedType.toUpperCase().startsWith("X");
+    }
+
 }

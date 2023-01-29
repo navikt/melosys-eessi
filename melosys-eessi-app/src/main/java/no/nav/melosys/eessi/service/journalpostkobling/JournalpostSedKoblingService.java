@@ -66,6 +66,11 @@ public class JournalpostSedKoblingService {
         return Optional.empty();
     }
 
+    public boolean erASedAlleredeBehandlet(String rinaSaksnummer){
+        return journalpostSedKoblingRepository.findByRinaSaksnummer(rinaSaksnummer).stream()
+            .anyMatch(JournalpostSedKobling::erASed);
+    }
+
     private Optional<String> søkEtterRinaSaksnummerForJournalpost(String journalpostID) {
         Optional<String> rinaSaksnummer = safConsumer.hentRinasakForJournalpost(journalpostID);
 
