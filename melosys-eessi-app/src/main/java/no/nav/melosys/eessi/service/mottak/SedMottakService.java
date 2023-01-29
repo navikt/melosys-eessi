@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
@@ -45,7 +46,7 @@ public class SedMottakService {
             return;
         }
 
-        if (unleash.isEnabled("melosys.eessi.sed.rekkefølge") && sedMottattHendelse.getSedHendelse().erXSed() && !journalpostSedKoblingService.erASedAlleredeBehandlet(sedMottattHendelse.getSedHendelse().getRinaSakId())) {
+        if (unleash.isEnabled("melosys.eessi.sed.rekkefølge") && erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
             throw new IllegalStateException(String.format("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet", sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
         }
 
@@ -60,6 +61,10 @@ public class SedMottakService {
                 ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
                 () -> opprettOppgaveIdentifisering(lagretHendelse)
             );
+    }
+
+    private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {
+        return sedHendelse.erXSed() && !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId();
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {

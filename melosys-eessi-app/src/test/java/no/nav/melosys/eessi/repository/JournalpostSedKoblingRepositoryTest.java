@@ -26,13 +26,14 @@ class JournalpostSedKoblingRepositoryTest {
     @Test
     void findByRinaSaksnummer_toInnslagIDB_ok() {
         JournalpostSedKobling a009Kobling = lagJournalpostSedKobling("1", "A009");
-
         JournalpostSedKobling a010Kobling = lagJournalpostSedKobling("2", "A010");
-
         journalpostSedKoblingRepository.save(a009Kobling);
         journalpostSedKoblingRepository.save(a010Kobling);
 
+
         List<JournalpostSedKobling> byRinaSaksnummer = journalpostSedKoblingRepository.findByRinaSaksnummer("123456");
+
+
         assertThat(byRinaSaksnummer).hasSize(2);
     }
 
