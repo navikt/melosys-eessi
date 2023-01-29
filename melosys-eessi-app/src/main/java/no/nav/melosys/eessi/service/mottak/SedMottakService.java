@@ -46,7 +46,7 @@ public class SedMottakService {
             return;
         }
 
-        if (unleash.isEnabled("melosys.eessi.sed.rekkefølge") && erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
+        if (unleash.isEnabled("melosys.eessi.sed.rekkefolge") && erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
             throw new IllegalStateException(String.format("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet", sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
         }
 
