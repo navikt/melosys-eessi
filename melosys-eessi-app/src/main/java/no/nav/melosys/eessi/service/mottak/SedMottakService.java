@@ -64,7 +64,7 @@ public class SedMottakService {
     }
 
     private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {
-        return sedHendelse.erXSed() && !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId();
+        return sedHendelse.erXSed() && !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId());
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {
