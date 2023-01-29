@@ -156,7 +156,7 @@ class SedMottakServiceTest {
 
     @Test
     void behandleSed_xSedUtenTilhørendeASed_kasterException() {
-        unleash.enable("melosys.eessi.sed.rekkefølge");
+        unleash.enable("melosys.eessi.sed.rekkefolge");
         SedHendelse sedHendelse = sedHendelseMedBruker();
         sedHendelse.setSedType("X008");
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
