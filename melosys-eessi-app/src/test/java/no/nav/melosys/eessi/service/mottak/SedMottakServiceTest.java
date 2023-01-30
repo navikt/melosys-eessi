@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
@@ -18,6 +19,7 @@ import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -47,6 +50,8 @@ class SedMottakServiceTest {
     private BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     @Mock
     private BucIdentifisertService bucIdentifisertService;
+    @Mock
+    private JournalpostSedKoblingService journalpostSedKoblingService;
 
     private SedMottakService sedMottakService;
 
@@ -54,12 +59,14 @@ class SedMottakServiceTest {
     private static final String SED_ID = "555554444";
     private static final String RINA_SAKSNUMMER = "12313213";
 
+    private FakeUnleash unleash = new FakeUnleash();
+
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
             euxService, personIdentifisering, opprettInngaaendeJournalpostService,
             oppgaveService, sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository, bucIdentifisertService
+            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService, unleash
         );
     }
 
@@ -145,6 +152,20 @@ class SedMottakServiceTest {
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
         verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
+    }
+
+    @Test
+    void behandleSed_xSedUtenTilhørendeASed_kasterException() {
+        unleash.enable("melosys.eessi.sed.rekkefolge");
+        SedHendelse sedHendelse = sedHendelseMedBruker();
+        sedHendelse.setSedType("X008");
+        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
+        when(journalpostSedKoblingService.erASedAlleredeBehandlet(anyString())).thenReturn(false);
+
+
+        assertThatThrownBy(() -> sedMottakService.behandleSed(sedMottattHendelse))
+            .isInstanceOf(IllegalStateException.class)
+            .hasMessage("Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet");
     }
 
     private SED opprettSED() {

@@ -1,0 +1,72 @@
+server:
+  port: 8081
+
+# Integrations
+EUXAPP_URL: dummy
+RESTSTS_URL: http://localhost:${mock-oauth2-server.port}/rest-sts
+DOKKATTYPEINFO_URL: dummy
+DOKKATTYPEID_URL: dummy
+SAK_URL: dummy
+JOURNALPOSTAPI_URL: dummy
+OPPGAVE_URL: dummy
+RINA_HOST_URL: dummy
+SRV_USERNAME: dummy
+SRV_PASSWORD: dummy
+EUXCASESTORE_URL: dummy
+SAF_URL: dummy
+PDL_URL: dummy
+RINA_INSTITUSJON_ID: dummy
+
+# Database
+PG_HOST: localhost
+DATABASE_NAME: postgres
+
+KAFKA_SEDHENDELSER_GROUPID: melosys-eessi-sedHendelser-local
+KAFKA_AIVEN_EESSIMELDING_TOPIC: teammelosys.eessi.v1-local
+KAFKA_OPPGAVE_GROUPID: melosys-eessi-oppgaveHendelser-local
+KAFKA_BOOTSTRAP_SERVERS: ${spring.embedded.kafka.brokers}
+KAFKA_BROKERS: ${spring.embedded.kafka.brokers}
+
+spring.datasource:
+  username: postgres
+  password: su
+
+spring.jpa:
+  hibernate:
+    ddl-auto: none
+    use-new-id-generator-mappings: true
+  database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+  show-sql: false
+  properties:
+    hibernate:
+      default_schema: PUBLIC
+      format_sql: true
+      jdbc.lob.non_contextual_creation: true
+    jadira.usertype.autoRegisterUserTypes: true
+
+spring:
+  application:
+    name: melosys-eessi
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    properties:
+      schema.registry.url: dummy
+      reconnect.backoff.ms: 1000
+      ssl:
+        truststore.location:
+        truststore.password:
+        protocol: PLAINTEXT
+      security.protocol: PLAINTEXT
+
+# Apikey til SedMottakAdminTjeneste
+melosys:
+  admin:
+    api-key: dummy
+
+no.nav.security.jwt.issuer:
+          aad:
+            discoveryurl: http://localhost:${mock-oauth2-server.port}/issuer1/.well-known/openid-configuration
+            acceptedaudience: dumbdumb

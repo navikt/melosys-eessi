@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.models;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,4 +32,8 @@ public class JournalpostSedKobling {
 
     @Column(name = "sed_type")
     private String sedType;
+
+    public boolean erASed() {
+        return sedType.toUpperCase().startsWith("A");
+    }
 }
