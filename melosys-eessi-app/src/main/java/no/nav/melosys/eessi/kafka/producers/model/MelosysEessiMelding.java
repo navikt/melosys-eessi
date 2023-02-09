@@ -11,6 +11,7 @@ public class MelosysEessiMelding {
 
     private String sedId;
     private String sedVersjon;
+    private Integer sequenceId;
     private String rinaSaksnummer;
     private Avsender avsender;
     private String journalpostId;
@@ -28,7 +29,6 @@ public class MelosysEessiMelding {
     private String ytterligereInformasjon;
     private String bucType;
     private String sedType;
-
     private SvarAnmodningUnntak svarAnmodningUnntak;
     private AnmodningUnntak anmodningUnntak;
 }
