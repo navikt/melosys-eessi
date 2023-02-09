@@ -6,6 +6,7 @@ import java.util.Optional;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.MelosysEessiAivenProducer;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -20,6 +21,8 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.Mel
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -54,7 +57,11 @@ class BehandleBucIdentifisertServiceTest {
     @Mock
     private MelosysEessiAivenProducer melosysEessiAivenProducer;
 
+    @Captor
+    private ArgumentCaptor<MelosysEessiMelding> melosysEessiMeldingCaptor;
+
     private BehandleBucIdentifisertService behandleBucIdentifisertService;
+
 
     @BeforeEach
     void setup() {
@@ -96,6 +103,29 @@ class BehandleBucIdentifisertServiceTest {
         assertThat(sed3.isPublisertKafka()).isTrue();
         assertThat(sed3.getJournalpostId()).isEqualTo(JOURNALPOST_ID_3);
     }
+
+    @Test
+    void bucIdentifisert_3SEDer_harSattSequenceIdIRettRekkefølge() {
+        var sedAlleredeJournalført = lagSedMottattHendelse("1", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, JOURNALPOST_ID, false);
+        var sed2 = lagSedMottattHendelse("2", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
+        var sed3 = lagSedMottattHendelse("3", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
+
+        when(sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(RINA_SAKSNUMMER, false))
+            .thenReturn(List.of(sedAlleredeJournalført, sed2, sed3));
+        when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
+        when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
+
+
+        behandleBucIdentifisertService.bucIdentifisert(RINA_SAKSNUMMER, FNR);
+
+
+        verify(melosysEessiAivenProducer, times(3)).publiserMelding(melosysEessiMeldingCaptor.capture());
+
+        assertThat(melosysEessiMeldingCaptor.getAllValues())
+            .map(MelosysEessiMelding::getSequenceId)
+            .containsExactly(0, 1, 2);
+    }
+
 
     @Test
     void bucIdentifisert_SEDErX100_ignoreres() {
