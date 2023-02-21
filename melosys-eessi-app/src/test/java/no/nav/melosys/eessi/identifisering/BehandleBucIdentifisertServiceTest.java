@@ -105,29 +105,6 @@ class BehandleBucIdentifisertServiceTest {
     }
 
     @Test
-    void bucIdentifisert_3SEDer_harSattSequenceIdIRettRekkefølge() {
-        var sedAlleredeJournalført = lagSedMottattHendelse("1", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, JOURNALPOST_ID, false);
-        var sed2 = lagSedMottattHendelse("2", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
-        var sed3 = lagSedMottattHendelse("3", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, null, false);
-
-        when(sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(RINA_SAKSNUMMER, false))
-            .thenReturn(List.of(sedAlleredeJournalført, sed2, sed3));
-        when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
-        when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
-
-
-        behandleBucIdentifisertService.bucIdentifisert(RINA_SAKSNUMMER, FNR);
-
-
-        verify(melosysEessiAivenProducer, times(3)).publiserMelding(melosysEessiMeldingCaptor.capture());
-
-        assertThat(melosysEessiMeldingCaptor.getAllValues())
-            .map(MelosysEessiMelding::getSequenceId)
-            .containsExactly(0, 1, 2);
-    }
-
-
-    @Test
     void bucIdentifisert_SEDErX100_ignoreres() {
         // Første SED som må identifiseres journalføres sammen med opprettelse av oppgave til ID fordeling
         var sedAlleredeJournalført = lagSedMottattHendelse("1", RINA_SAKSNUMMER, RINA_DOKUMENT_ID, JOURNALPOST_ID, false);

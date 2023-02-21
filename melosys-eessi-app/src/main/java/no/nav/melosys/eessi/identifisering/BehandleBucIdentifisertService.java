@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.Mel
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 @Slf4j
@@ -34,11 +35,12 @@ public class BehandleBucIdentifisertService {
     @Transactional
     public void bucIdentifisert(String rinaSaksnummer, String personIdent) {
         var identifiserteSeder = sedMottattHendelseRepository.findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false);
+        var batchID = UUID.randomUUID();
         IntStream.range(0, identifiserteSeder.size())
-            .forEach(i -> behandleSed(identifiserteSeder.get(i), personIdent, i));
+            .forEach(i -> behandleSed(identifiserteSeder.get(i), personIdent, batchID));
     }
 
-    private void behandleSed(SedMottattHendelse sedMottattHendelse, String personIdent, int sequenceId) {
+    private void behandleSed(SedMottattHendelse sedMottattHendelse, String personIdent, UUID batchID) {
         if (sedMottattHendelse.getSedHendelse().erX100()) {
             log.info("Ignorerer identifisert SED {} av typen X100", sedMottattHendelse.getSedHendelse().getSedId());
             return;
@@ -46,7 +48,7 @@ public class BehandleBucIdentifisertService {
         if (sedMottattHendelse.getJournalpostId() == null) {
             sedMottattHendelse.setJournalpostId(opprettJournalpost(sedMottattHendelse, personIdent));
         }
-        publiserMelding(sedMottattHendelse, personIdent, sequenceId);
+        publiserMelding(sedMottattHendelse, personIdent, batchID);
     }
 
     private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String personIdent) {
@@ -63,7 +65,7 @@ public class BehandleBucIdentifisertService {
         return journalpostID;
     }
 
-    private void publiserMelding(SedMottattHendelse sedMottattHendelse, String personIdent, Integer sequenceId) {
+    private void publiserMelding(SedMottattHendelse sedMottattHendelse, String personIdent, UUID batchID) {
         final var mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedMottattHendelse.getSedHendelse().getSedType()));
         final var sed = euxService.hentSed(sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         final var aktørID = personFasade.hentAktoerId(personIdent);
@@ -77,7 +79,7 @@ public class BehandleBucIdentifisertService {
         MelosysEessiMelding melosysEessiMelding = mapper.map(
             aktørID,
             sed,
-            sequenceId,
+            batchID,
             sedMottattHendelse.getSedHendelse().getRinaDokumentId(),
             sedMottattHendelse.getSedHendelse().getRinaSakId(),
             sedMottattHendelse.getSedHendelse().getSedType(),

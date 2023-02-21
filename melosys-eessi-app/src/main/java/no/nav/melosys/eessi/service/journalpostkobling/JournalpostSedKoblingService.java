@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.journalpostkobling;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
@@ -130,9 +131,9 @@ public class JournalpostSedKoblingService {
     private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String rinaDokumentID, String rinaSaksnummer,
                                                            String sedType, String bucType, String avsenderID, String landkode,
                                                            String journalpostID, String saksnummer, boolean erEndring, String sedVersjon) {
-        Integer ingenSequenceId = null;
+        UUID ingenBatchID = null;
         return melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
-                .map(null, sed, ingenSequenceId, rinaDokumentID, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID,
+                .map(null, sed, ingenBatchID, rinaDokumentID, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID,
                         null, saksnummer, erEndring, sedVersjon);
     }
 }

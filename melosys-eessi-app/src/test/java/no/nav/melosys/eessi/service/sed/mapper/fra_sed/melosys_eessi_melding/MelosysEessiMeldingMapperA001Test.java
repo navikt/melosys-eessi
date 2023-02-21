@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
@@ -18,7 +19,7 @@ import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_meld
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA001Test {
-    public static final Integer SEQUENCE_ID = null;
+    public static final UUID BATCH_ID = null;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
     @Test
@@ -29,7 +30,7 @@ public class MelosysEessiMeldingMapperA001Test {
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001)
             .map("123",
                 sed,
-                SEQUENCE_ID,
+                BATCH_ID,
                 sedHendelse.getRinaDokumentId(),
                 sedHendelse.getRinaSakId(),
                 sedHendelse.getSedType(),

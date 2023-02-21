@@ -6,14 +6,16 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper;
 
+import java.util.UUID;
+
 public interface NyttLovvalgEessiMeldingMapper<T extends Medlemskap> extends NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
     @Override
-    default MelosysEessiMelding map(String aktoerId, SED sed, Integer sequenceId, String rinaDokumentID, String rinaSaksnummer,
+    default MelosysEessiMelding map(String aktoerId, SED sed, UUID batchID, String rinaDokumentID, String rinaSaksnummer,
                                     String sedType, String bucType, String avsenderID,
                                     String landkode, String journalpostID, String dokumentID, String gsakSaksnummer,
                                     boolean sedErEndring, String sedVersjon) {
 
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, sequenceId, rinaDokumentID,
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, batchID, rinaDokumentID,
                 rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
                 sedErEndring, sedVersjon);
 

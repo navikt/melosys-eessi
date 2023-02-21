@@ -11,6 +11,8 @@ import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
+import java.util.UUID;
+
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MelosysEessiMeldingMapperA003Test {
 
     private static final String IKKE_OPPRINNELIG_VEDTAK = null;
-    public static final Integer SEQUENCE_ID = null;
+    private static final UUID BATCH_ID = null;
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
@@ -33,7 +35,7 @@ class MelosysEessiMeldingMapperA003Test {
     public void mapA003_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap());
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A003)
-                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, BATCH_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );

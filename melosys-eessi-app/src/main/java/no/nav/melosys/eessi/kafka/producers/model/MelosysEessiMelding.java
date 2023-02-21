@@ -2,16 +2,16 @@ package no.nav.melosys.eessi.kafka.producers.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import lombok.Data;
-import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 
 @Data
 public class MelosysEessiMelding {
 
     private String sedId;
     private String sedVersjon;
-    private Integer sequenceId;
+    private UUID batchID;
     private String rinaSaksnummer;
     private Avsender avsender;
     private String journalpostId;

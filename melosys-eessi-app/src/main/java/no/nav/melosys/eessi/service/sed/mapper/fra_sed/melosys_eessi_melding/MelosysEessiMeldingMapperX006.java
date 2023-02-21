@@ -3,6 +3,8 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.sed.SED;
 
+import java.util.UUID;
+
 public class MelosysEessiMeldingMapperX006 implements MelosysEessiMeldingMapper {
 
     private final String rinaInstitusjonId;
@@ -12,11 +14,11 @@ public class MelosysEessiMeldingMapperX006 implements MelosysEessiMeldingMapper 
     }
 
     @Override
-    public MelosysEessiMelding map(String aktoerId, SED sed, Integer sequenceId, String rinaDokumentID, String rinaSaksnummer,
+    public MelosysEessiMelding map(String aktoerId, SED sed, UUID batchID, String rinaDokumentID, String rinaSaksnummer,
                                    String sedType, String bucType, String avsenderID,
                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer,
                                    boolean sedErEndring, String sedVersjon) {
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, sequenceId, rinaDokumentID,
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, batchID, rinaDokumentID,
                 rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
                 sedErEndring, sedVersjon);
 

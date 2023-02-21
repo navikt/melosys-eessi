@@ -9,17 +9,18 @@ import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public interface MelosysEessiMeldingMapper {
 
-    default MelosysEessiMelding map(String aktoerId, SED sed, Integer sequenceID, String rinaDokumentID, String rinaSaksnummer,
+    default MelosysEessiMelding map(String aktoerId, SED sed, UUID batchID, String rinaDokumentID, String rinaSaksnummer,
                                     String sedType, String bucType, String avsenderID, String landkode,
                                     String journalpostID, String dokumentID, String gsakSaksnummer,
                                     boolean sedErEndring, String sedVersjon) {
         var melosysEessiMelding = new MelosysEessiMelding();
         melosysEessiMelding.setAktoerId(aktoerId);
-        melosysEessiMelding.setSequenceId(sequenceID);
+        melosysEessiMelding.setBatchID(batchID);
         melosysEessiMelding.setSedId(rinaDokumentID);
         melosysEessiMelding.setRinaSaksnummer(rinaSaksnummer);
         melosysEessiMelding.setSedType(sedType);
