@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperA002Test {
 
+    public static final Integer SEQUENCE_ID = null;
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapper mapper;
@@ -39,7 +40,7 @@ public class MelosysEessiMeldingMapperA002Test {
 
 
         MelosysEessiMelding melosysEessiMelding = mapper
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
 
@@ -58,7 +59,7 @@ public class MelosysEessiMeldingMapperA002Test {
         SED sed = createSed(hentMedlemskap(true));
 
         MelosysEessiMelding melosysEessiMelding = mapper
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
 

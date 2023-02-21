@@ -80,7 +80,7 @@ public class JournalpostSedKoblingService {
 
     private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling) {
         BUC buc = euxService.hentBuc(journalpostSedKobling.getRinaSaksnummer());
-        final var organisation = buc.hentDokument(journalpostSedKobling.getSedId()).getCreator().getOrganisation();
+        var organisation = buc.hentDokument(journalpostSedKobling.getSedId()).getCreator().getOrganisation();
         SED sed = euxService.hentSed(journalpostSedKobling.getRinaSaksnummer(), journalpostSedKobling.getSedId());
 
         Long gsakSaksnummer = saksrelasjonService.finnVedRinaSaksnummer(journalpostSedKobling.getRinaSaksnummer())
@@ -127,11 +127,12 @@ public class JournalpostSedKoblingService {
         );
     }
 
-    private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String sedId, String rinaSaksnummer,
+    private MelosysEessiMelding opprettMelosysEessiMelding(SED sed, String rinaDokumentID, String rinaSaksnummer,
                                                            String sedType, String bucType, String avsenderID, String landkode,
                                                            String journalpostID, String saksnummer, boolean erEndring, String sedVersjon) {
+        Integer ingenSequenceId = null;
         return melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
-                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID,
+                .map(null, sed, ingenSequenceId, rinaDokumentID, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID,
                         null, saksnummer, erEndring, sedVersjon);
     }
 }

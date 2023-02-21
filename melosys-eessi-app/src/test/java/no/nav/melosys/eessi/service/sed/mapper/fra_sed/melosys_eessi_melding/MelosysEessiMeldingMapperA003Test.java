@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MelosysEessiMeldingMapperA003Test {
 
     private static final String IKKE_OPPRINNELIG_VEDTAK = null;
+    public static final Integer SEQUENCE_ID = null;
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
@@ -32,7 +33,7 @@ class MelosysEessiMeldingMapperA003Test {
     public void mapA003_verifiserDataSatt() {
         SED sed = createSed(hentMedlemskap());
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A003)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );

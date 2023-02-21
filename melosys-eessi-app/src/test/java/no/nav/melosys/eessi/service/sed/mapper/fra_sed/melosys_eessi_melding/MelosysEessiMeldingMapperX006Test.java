@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MelosysEessiMeldingMapperX006Test {
 
+    public static final Integer SEQUENCE_ID = null;
     private SedHendelse sedHendelse;
     private SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
@@ -40,7 +41,7 @@ public class MelosysEessiMeldingMapperX006Test {
         fjernInstitusjon.setInstitusjon(institusjon);
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
@@ -61,7 +62,7 @@ public class MelosysEessiMeldingMapperX006Test {
 
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
@@ -82,7 +83,7 @@ public class MelosysEessiMeldingMapperX006Test {
 
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );
@@ -103,7 +104,7 @@ public class MelosysEessiMeldingMapperX006Test {
 
         sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
+                .map("123", sed, SEQUENCE_ID, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
                         sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
                         sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
                 );

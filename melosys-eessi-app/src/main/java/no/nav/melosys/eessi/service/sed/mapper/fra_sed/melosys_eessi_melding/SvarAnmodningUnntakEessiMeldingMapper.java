@@ -10,11 +10,11 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslut
 public abstract class SvarAnmodningUnntakEessiMeldingMapper<T extends Medlemskap> implements MelosysEessiMeldingMapper {
 
     @Override
-    public MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
+    public MelosysEessiMelding map(String aktoerId, SED sed, Integer sequenceId, String rinaDokumentID, String rinaSaksnummer,
                                    String sedType, String bucType, String avsenderID,
                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer,
                                    boolean sedErEndring, String sedVersjon) {
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
+        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, sequenceId, rinaDokumentID,
                 rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
                 sedErEndring, sedVersjon);
 
