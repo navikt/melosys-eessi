@@ -44,9 +44,11 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedHendelse, consumerRecord.offset());
 
         try {
-            sedMottakService.behandleSed(SedMottattHendelse.builder()
-                .sedHendelse(sedHendelse)
-                .build());
+            sedMottakService.behandleSed(
+                SedMottattHendelse.builder()
+                    .sedHendelse(sedHendelse)
+                    .build()
+            );
 
             sedMetrikker.sedMottatt(sedHendelse.getSedType());
         } catch (SedAlleredeJournalførtException e) {
