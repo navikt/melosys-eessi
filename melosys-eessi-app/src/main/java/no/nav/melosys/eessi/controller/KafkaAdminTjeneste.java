@@ -63,6 +63,8 @@ public class KafkaAdminTjeneste {
 
         listenerContainer.stop();
 
+        log.info("[KafkaAdminTjeneste] Stoppet consumerId {}", consumerId);
+
         return ResponseEntity.ok(lagKafkaConsumerResponse(listenerContainer));
     }
 
@@ -78,6 +80,8 @@ public class KafkaAdminTjeneste {
 
         listenerContainer.start();
 
+        log.info("[KafkaAdminTjeneste] Startet consumerId {}", consumerId);
+
         return ResponseEntity.ok(lagKafkaConsumerResponse(listenerContainer));
     }
 
@@ -89,10 +93,11 @@ public class KafkaAdminTjeneste {
             return ResponseEntity.badRequest().body("ConsumerId is not supported: " + consumerId);
         }
 
-        log.info("Setter offset for " + consumerId + " til: {}", offset);
+        log.info("[KafkaAdminTjeneste] Setter offset for " + consumerId + " til: {}", offset);
         switch (consumerId) {
             case "oppgaveEndret" -> oppgaveEndretConsumer.settSpesifiktOffsetPåConsumer(offset);
             case "sedMottatt" -> sedMottattConsumer.settSpesifiktOffsetPåConsumer(offset);
+            default -> log.warn("Vi støtter ikke {}, gjør ingenting.", consumerId);
         }
 
         return ResponseEntity.ok().build();
