@@ -26,6 +26,9 @@ public class SedDataDto extends SedGrunnlagDto {
     //A010, A009, A003 spesifikt
     private VedtakDto vedtakDto;
 
+    //X008 spesifikt
+    private InvalideringSedDto invalideringSedDto;
+
     //Lovvalg
     private List<Lovvalgsperiode> tidligereLovvalgsperioder;
 
