@@ -13,12 +13,9 @@ public class JournalpostService {
 
     private final DokkatService dokkatService;
     private final JournalpostapiConsumer journalpostapiConsumer;
-    private final Unleash unleash;
-
-    public JournalpostService(DokkatService dokkatService, JournalpostapiConsumer journalpostapiConsumer, Unleash unleash) {
+    public JournalpostService(DokkatService dokkatService, JournalpostapiConsumer journalpostapiConsumer) {
         this.dokkatService = dokkatService;
         this.journalpostapiConsumer = journalpostapiConsumer;
-        this.unleash = unleash;
     }
 
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
@@ -28,11 +25,7 @@ public class JournalpostService {
         try {
             return opprettJournalpost(request, false);
         } catch (SedAlleredeJournalførtException e) {
-            if (unleash.isEnabled("melosys.eessi.opprettjournalpost.konflikt")) {
-                return journalpostapiConsumer.henterJournalpostResponseFra409Exception(e.getEx());
-            } else {
-                throw e;
-            }
+            return journalpostapiConsumer.henterJournalpostResponseFra409Exception(e.getEx());
         }
     }
 
