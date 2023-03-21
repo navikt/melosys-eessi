@@ -46,8 +46,9 @@ public class SedMottakService {
             return;
         }
 
-        if (unleash.isEnabled("melosys.eessi.sed.rekkefolge") && erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
-            throw new IllegalStateException("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet".formatted(sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
+        if (erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
+            throw new IllegalStateException("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet"
+                .formatted(sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
         }
 
         var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
@@ -64,7 +65,10 @@ public class SedMottakService {
     }
 
     private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {
-        return sedHendelse.erXSed() && !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId());
+        if (!unleash.isEnabled("melosys.eessi.sed.rekkefolge")) return false;
+        if (!sedHendelse.erXSedSomTrengerKontroll()) return false;
+
+        return !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId());
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt) {
