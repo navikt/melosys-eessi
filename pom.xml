@@ -33,7 +33,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <micrometer-jvm-extras.version>0.2.2</micrometer-jvm-extras.version>
-        <nimbus-jose-jwt.version>8.23</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>9.0</nimbus-jose-jwt.version>
         <okhttp3.version>4.9.3</okhttp3.version>
         <person-utils.version>1.35.0</person-utils.version>
         <random-benas.version>3.9.0</random-benas.version>
