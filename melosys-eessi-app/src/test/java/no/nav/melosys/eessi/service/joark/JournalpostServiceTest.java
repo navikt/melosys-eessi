@@ -46,12 +46,11 @@ class JournalpostServiceTest {
     private Sak sak;
     private DokkatSedInfo dokkatSedInfo;
     private ObjectMapper objectMapper;
-    private FakeUnleash unleash = new FakeUnleash();
     private static final String JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}";
 
     @BeforeEach
     public void setUp() throws Exception {
-        journalpostService = new JournalpostService(dokkatService, journalpostapiConsumer, unleash);
+        journalpostService = new JournalpostService(dokkatService, journalpostapiConsumer);
 
         sedHendelse = random.nextObject(SedHendelse.class);
         sak = random.nextObject(Sak.class);
@@ -75,7 +74,6 @@ class JournalpostServiceTest {
 
     @Test
     void opprettInngaaendeJournalpos_sedAlleredeJournalførtException_returnererOpprettJournalpostResponse() throws Exception{
-        unleash.enableAll();
         HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.CONFLICT, "", JOURNALPOST_RESPONSE.getBytes(), Charset.defaultCharset());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false)))
             .thenThrow(new SedAlleredeJournalførtException("Sed allerede journalført", "123", httpClientErrorException));

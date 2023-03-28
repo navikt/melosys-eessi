@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.nav.melosys.eessi.models.SedType;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
 public class SedHendelse {
+    private static final List<String> TRENGER_KONTROLL = Stream.of(SedType.X001, SedType.X006, SedType.X007, SedType.X008).map(Enum::name).toList();
     private long id;
     private String sedId;
     private String sektorKode;
@@ -36,8 +40,8 @@ public class SedHendelse {
     }
 
     @JsonIgnore
-    public boolean erXSed(){
-        return sedType.toUpperCase().startsWith("X");
+    public boolean erXSedSomTrengerKontroll() {
+        return TRENGER_KONTROLL.contains(sedType.toUpperCase());
     }
 
 }
