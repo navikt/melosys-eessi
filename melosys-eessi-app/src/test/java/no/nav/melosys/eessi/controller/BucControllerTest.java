@@ -2,13 +2,12 @@ package no.nav.melosys.eessi.controller;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
-import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDto;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
@@ -156,6 +155,25 @@ class BucControllerTest {
 
 
         verify(sedService).sendPåEksisterendeBuc(sedDataDto, "1", SedType.A005);
+    }
+
+    @Test
+    void sendPåEksisterendBuc_invaliderSed_ok() throws Exception {
+        InvalideringSedDto invalideringSedDto = new InvalideringSedDto();
+        invalideringSedDto.setUtstedelsedato(LocalDate.now().toString());
+        invalideringSedDto.setSedTypeSomSkalInvalideres("A003");
+
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        sedDataDto.setInvalideringSedDto(invalideringSedDto);
+        sedDataDto.setBostedsadresse(new Adresse());
+
+        mockMvc.perform(post("/api/buc/{rinaSaksnummer}/sed/{sedType}", 1, SedType.A003)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(sedDataDto)))
+            .andExpect(status().isOk());
+
+
+        verify(sedService).sendPåEksisterendeBuc(sedDataDto, "1", SedType.A003);
     }
 
     @Test
