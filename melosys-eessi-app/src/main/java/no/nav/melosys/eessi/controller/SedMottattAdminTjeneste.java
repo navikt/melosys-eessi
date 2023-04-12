@@ -43,7 +43,7 @@ public class SedMottattAdminTjeneste {
         return ResponseEntity.status(200).build();
     }
 
-    public void sedMottatt(SedHendelse sedHendelse) {
+    private void sedMottatt(SedHendelse sedHendelse) {
         putToMDC(SED_ID, sedHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
