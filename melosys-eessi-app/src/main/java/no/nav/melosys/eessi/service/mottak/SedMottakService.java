@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.mottak;
 import javax.transaction.Transactional;
 
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SedMottakService {
 
     private final EuxService euxService;
@@ -39,7 +40,7 @@ public class SedMottakService {
     private final Unleash unleash;
 
     @Value("${rina.institusjon-id}")
-    private final String rinaInstitusjonsId;
+    private String rinaInstitusjonsId;
 
     @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
