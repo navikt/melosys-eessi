@@ -66,7 +66,7 @@ class SedMottakServiceTest {
         sedMottakService = new SedMottakService(
             euxService, personIdentifisering, opprettInngaaendeJournalpostService,
             oppgaveService, sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService, unleash
+            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService, unleash, "NO:NAVAT07"
         );
     }
 
