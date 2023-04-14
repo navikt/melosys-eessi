@@ -10,6 +10,10 @@ import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
+import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.buc.Organisation;
+import no.nav.melosys.eessi.models.buc.Participant;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -67,6 +71,18 @@ public class SedMottakService {
     private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {
         if (!unleash.isEnabled("melosys.eessi.sed.rekkefolge")) return false;
         if (!sedHendelse.erXSedSomTrengerKontroll()) return false;
+
+        if (sedHendelse.getSedType().equals(SedType.X007.name())) {
+            BUC buc = euxService.hentBuc(sedHendelse.getRinaSakId());
+
+            boolean sedTypeErX007OgNorgeErSakseier = buc.getParticipants().stream().anyMatch(p ->
+                p.getRole().equals(Participant.ParticipantRole.SAKSEIER) && p.getOrganisation().getName().equals("NO"));
+
+            if (sedTypeErX007OgNorgeErSakseier) {
+                return false;
+            }
+
+        }
 
         return !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId());
     }
