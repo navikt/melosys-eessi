@@ -78,10 +78,7 @@ public class SedMottakService {
             boolean sedTypeErX007OgNorgeErSakseier = buc.getParticipants().stream().anyMatch(p ->
                 p.getRole().equals(Participant.ParticipantRole.SAKSEIER) && p.getOrganisation().getName().equals("NO"));
 
-            if (sedTypeErX007OgNorgeErSakseier) {
-                return false;
-            }
-
+            if (sedTypeErX007OgNorgeErSakseier) return false;
         }
 
         return !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.getRinaSakId());
