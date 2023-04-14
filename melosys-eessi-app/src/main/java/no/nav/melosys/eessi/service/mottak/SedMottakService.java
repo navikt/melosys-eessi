@@ -20,6 +20,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -37,6 +38,8 @@ public class SedMottakService {
     private final JournalpostSedKoblingService journalpostSedKoblingService;
     private final Unleash unleash;
 
+    @Value("${rina.institusjon-id}")
+    private final String rinaInstitusjonsId;
 
     @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
@@ -75,8 +78,9 @@ public class SedMottakService {
         if (sedHendelse.getSedType().equals(SedType.X007.name())) {
             BUC buc = euxService.hentBuc(sedHendelse.getRinaSakId());
 
-            boolean sedTypeErX007OgNorgeErSakseier = buc.getParticipants().stream().anyMatch(p ->
-                p.getRole().equals(Participant.ParticipantRole.SAKSEIER) && p.getOrganisation().getName().equals("NO"));
+            boolean sedTypeErX007OgNorgeErSakseier = buc.getParticipants().stream()
+                .anyMatch(p -> p.getRole().equals(Participant.ParticipantRole.SAKSEIER)
+                    && p.getOrganisation().getId().equals(rinaInstitusjonsId));
 
             if (sedTypeErX007OgNorgeErSakseier) return false;
         }
