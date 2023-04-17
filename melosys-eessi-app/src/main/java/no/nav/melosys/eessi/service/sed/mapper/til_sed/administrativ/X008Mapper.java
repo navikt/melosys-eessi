@@ -3,10 +3,7 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.Grunn;
-import no.nav.melosys.eessi.models.sed.nav.InvalideringSed;
-import no.nav.melosys.eessi.models.sed.nav.Sak;
-import no.nav.melosys.eessi.models.sed.nav.Ugyldiggjoere;
+import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 
 public class X008Mapper implements SedMapper {
@@ -15,12 +12,13 @@ public class X008Mapper implements SedMapper {
     public SED mapTilSed(SedDataDto sedData) {
         var sed = SedMapper.super.mapTilSed(sedData);
 
-        sed.getNav().setSak(mapSak(sedData));
+        Sak sakForSed = mapSak(sedData, sed);
+        sed.getNav().setSak(sakForSed);
 
         return sed;
     }
 
-    public Sak mapSak(SedDataDto sedData) {
+    public Sak mapSak(SedDataDto sedData, SED sed) {
         var sak = new Sak();
         var invalideringSed = new InvalideringSed();
 
@@ -30,6 +28,7 @@ public class X008Mapper implements SedMapper {
         invalideringSed.setGrunn(new Grunn("04", ""));
 
         sak.setUgyldiggjoere(new Ugyldiggjoere(invalideringSed));
+        sak.setKontekst(mapKontekst(sed));
 
         return sak;
     }
@@ -37,5 +36,11 @@ public class X008Mapper implements SedMapper {
     @Override
     public SedType getSedType() {
         return SedType.X008;
+    }
+
+    private Kontekst mapKontekst(SED sed) {
+        Kontekst kontekst = new Kontekst();
+        kontekst.setBruker(sed.getNav().getBruker());
+        return kontekst;
     }
 }
