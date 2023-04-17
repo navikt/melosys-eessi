@@ -12,4 +12,6 @@ public class Sak {
     private Kontekst kontekst;
 
     private X006FjernInstitusjon fjerninstitusjon;
+
+    private Ugyldiggjoere ugyldiggjoere;
 }
