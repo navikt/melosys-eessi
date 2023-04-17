@@ -8,6 +8,9 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class Grunn {
+
     private String type;
+
+    //Annet settes kun dersom type = 99
     private String annet;
 }

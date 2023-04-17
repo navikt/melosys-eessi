@@ -26,6 +26,7 @@ public class X008Mapper implements SedMapper {
 
         invalideringSed.setType(sedData.getInvalideringSedDto().getSedTypeSomSkalInvalideres());
         invalideringSed.setUtstedelsesdato(sedData.getInvalideringSedDto().getUtstedelsedato());
+        // 04  = The case was reconsidered and the grounds for the invalidated SED are no longer valid
         invalideringSed.setGrunn(new Grunn("04", ""));
 
         sak.setUgyldiggjoere(new Ugyldiggjoere(invalideringSed));
