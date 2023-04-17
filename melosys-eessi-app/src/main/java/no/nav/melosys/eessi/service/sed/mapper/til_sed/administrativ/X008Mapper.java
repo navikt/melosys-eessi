@@ -25,7 +25,7 @@ public class X008Mapper implements SedMapper {
         var invalideringSed = new InvalideringSed();
 
         invalideringSed.setType(sedData.getInvalideringSedDto().getSedTypeSomSkalInvalideres());
-        invalideringSed.setUtstedelsedato(sedData.getInvalideringSedDto().getUtstedelsedato());
+        invalideringSed.setUtstedelsesdato(sedData.getInvalideringSedDto().getUtstedelsedato());
         invalideringSed.setGrunn(new Grunn("04", ""));
 
         sak.setUgyldiggjoere(new Ugyldiggjoere(invalideringSed));

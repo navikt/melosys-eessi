@@ -7,7 +7,7 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class InvalideringSed {
 
-    private String utstedelsedato;
+    private String utstedelsesdato;
     private String type;
     private Grunn grunn;
 }
