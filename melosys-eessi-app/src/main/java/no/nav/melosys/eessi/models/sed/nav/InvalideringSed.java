@@ -1,14 +1,14 @@
 package no.nav.melosys.eessi.models.sed.nav;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class InvalideringSed {
 
     private String utstedelsesdato;
