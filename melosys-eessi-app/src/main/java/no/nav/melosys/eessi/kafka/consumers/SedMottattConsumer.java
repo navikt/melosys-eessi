@@ -9,8 +9,11 @@ import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
@@ -28,6 +31,11 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         this.sedMetrikker = sedMetrikker;
     }
 
+    @Retryable(
+        value = {Exception.class},
+        maxAttemptsExpression = "${melosys.kafka.aiven.consumer.mottatt.maxAttempts}",
+        backoff = @Backoff(delayExpression = "${melosys.kafka.aiven.consumer.mottatt.interval}", multiplier = 1.5)
+    )
     @KafkaListener(
         id = "sedMottatt",
         clientIdPrefix = "melosys-eessi-sedMottatt",
@@ -56,6 +64,7 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
             sedMetrikker.sedMottattFeilet(sedHendelse.getSedType());
             String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             log.error("sedMottatt feilet: {}\n{}", message, consumerRecord, e);
+            throw e;
         } finally {
             remove(SED_ID);
             remove(CORRELATION_ID);

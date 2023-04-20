@@ -27,6 +27,7 @@ KAFKA_OPPGAVE_GROUPID: melosys-eessi-oppgaveHendelser-local
 KAFKA_BOOTSTRAP_SERVERS: ${spring.embedded.kafka.brokers}
 KAFKA_BROKERS: ${spring.embedded.kafka.brokers}
 
+
 spring.datasource:
   username: postgres
   password: su
@@ -62,6 +63,7 @@ spring:
       security.protocol: PLAINTEXT
 
 # Apikey til SedMottakAdminTjeneste
+
 melosys:
   admin:
     api-key: dummy
