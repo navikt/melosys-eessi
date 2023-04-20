@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "sak": {
+      "ugyldiggjoere": {
+        "sed": {
+          "utstedelsesdato": "2018-09-08",
+          "grunn": {
+            "annet": "dasd asdasdasda",
+            "type": "annet"
+          },
+          "type": "X008"
+        }
+      },
+      "kontekst": {
+        "bruker": {
+          "person": {
+            "kjoenn": "M",
+            "fornavn": "asdsdjoiuo",
+            "etternavn": "asd asdsd",
+            "foedselsdato": "2000-01-01"
+          }
+        }
+      }
+    }
+  },
+  "sed": "X008",
+  "sedGVer": "4",
+  "sedVer": "1"
+}

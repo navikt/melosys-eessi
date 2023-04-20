@@ -355,6 +355,25 @@ class EuxConsumerTest {
     }
 
     @Test
+    void hentSedX008_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedX008.json");
+        assertThat(jsonUrl).isNotNull();
+        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav().getSak().getUgyldiggjoere()).isNotNull();
+        assertThat(resultat.getSedType()).isEqualTo(SedType.X008.name());
+        assertThat(resultat.getMedlemskap()).isNull();
+    }
+
+    @Test
     void hentSedPdf_forventPdf() {
         String id = "123", dokumentId = "123321";
 
