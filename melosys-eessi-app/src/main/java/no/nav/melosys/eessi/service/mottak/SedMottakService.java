@@ -37,7 +37,6 @@ public class SedMottakService {
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final BucIdentifisertService bucIdentifisertService;
     private final JournalpostSedKoblingService journalpostSedKoblingService;
-    private final Unleash unleash;
 
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
@@ -73,7 +72,6 @@ public class SedMottakService {
     }
 
     private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {
-        if (!unleash.isEnabled("melosys.eessi.sed.rekkefolge")) return false;
         if (!sedHendelse.erXSedSomTrengerKontroll()) return false;
 
         if (sedHendelse.getSedType().equals(SedType.X007.name())) {

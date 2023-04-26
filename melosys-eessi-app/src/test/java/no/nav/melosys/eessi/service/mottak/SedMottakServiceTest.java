@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
@@ -59,14 +58,12 @@ class SedMottakServiceTest {
     private static final String SED_ID = "555554444";
     private static final String RINA_SAKSNUMMER = "12313213";
 
-    private FakeUnleash unleash = new FakeUnleash();
-
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
             euxService, personIdentifisering, opprettInngaaendeJournalpostService,
             oppgaveService, sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService, unleash
+            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService
         );
     }
 
@@ -156,7 +153,6 @@ class SedMottakServiceTest {
 
     @Test
     void behandleSed_xSedUtenTilhørendeASed_kasterException() {
-        unleash.enable("melosys.eessi.sed.rekkefolge");
         SedHendelse sedHendelse = sedHendelseMedBruker();
         sedHendelse.setSedType("X008");
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
