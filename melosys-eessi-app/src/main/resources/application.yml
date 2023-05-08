@@ -49,7 +49,7 @@ melosys:
       consumer:
         mottatt:
           interval: ${KAFKA_RETRYABLE_INTERVAL}
-          maxAttempts: ${KAFTA_RETRYABLE_MAX_ATTEMPTS}
+          maxAttempts: ${KAFKA_RETRYABLE_MAX_ATTEMPTS}
           groupid: ${KAFKA_AIVEN_SEDHENDELSER_MOTTATT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDMOTTATT_TOPIC:eessibasis-sedmottatt-v1}
         sendt:

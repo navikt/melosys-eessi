@@ -27,7 +27,7 @@ KAFKA_OPPGAVE_GROUPID: melosys-eessi-oppgaveHendelser-local
 KAFKA_BOOTSTRAP_SERVERS: ${spring.embedded.kafka.brokers}
 KAFKA_BROKERS: ${spring.embedded.kafka.brokers}
 KAFKA_RETRYABLE_INTERVAL: 2000
-KAFTA_RETRYABLE_MAX_ATTEMPTS: 5
+KAFKA_RETRYABLE_MAX_ATTEMPTS: 5
 
 spring.datasource:
   username: postgres
@@ -70,7 +70,7 @@ melosys:
       consumer:
         mottatt:
           interval: ${KAFKA_RETRYABLE_INTERVAL}
-          maxAttemps: ${KAFTA_RETRYABLE_MAX_ATTEMPTS}
+          maxAttemps: ${KAFKA_RETRYABLE_MAX_ATTEMPTS}
   admin:
     api-key: dummy
 
