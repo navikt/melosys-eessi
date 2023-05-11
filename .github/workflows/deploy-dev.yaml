@@ -50,7 +50,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          ENVIRONMENT: dev-fss:teammelosys
+          ENVIRONMENT: dev-fss-q2:teammelosys
           VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,image=${{ env.docker_image }},APP_NAME_MELOSYS_API=melosys,APP_NAME_EUX_RINA_API=eux-rina-api-q2,CLUSTER_NAME_EUX_RINA_API=dev-fss,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57
       - name: post-deploy
         uses: navikt/digihot-deploy/actions/post-deploy@v2
