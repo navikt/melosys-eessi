@@ -1,22 +1,25 @@
 package no.nav.melosys.eessi.service.joark;
 
-import java.util.Optional;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class OpprettUtgaaendeJournalpostService {
 
     private final SaksrelasjonService saksrelasjonService;
@@ -24,19 +27,17 @@ public class OpprettUtgaaendeJournalpostService {
     private final EuxService euxService;
     private final PersonFasade personFasade;
     private final OppgaveService oppgaveService;
+    private final SedMetrikker sedMetrikker;
 
-    @Autowired
-    public OpprettUtgaaendeJournalpostService(
-            SaksrelasjonService saksrelasjonService,
-            JournalpostService journalpostService,
-            EuxService euxService,
-            PersonFasade personFasade,
-            OppgaveService oppgaveService) {
-        this.saksrelasjonService = saksrelasjonService;
-        this.journalpostService = journalpostService;
-        this.euxService = euxService;
-        this.personFasade = personFasade;
-        this.oppgaveService = oppgaveService;
+
+    public void behandleSedSendtHendelse(SedHendelse sedSendt) {
+        try {
+            String journalpostId = arkiverUtgaaendeSed(sedSendt);
+            log.info("Journalpost opprettet med id: {}", journalpostId);
+            sedMetrikker.sedSendt(sedSendt.getSedType());
+        } catch (SedAlleredeJournalførtException e) {
+            log.info("SED {} allerede journalført", e.getSedID());
+        }
     }
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) {

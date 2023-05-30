@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
@@ -41,6 +42,8 @@ class OpprettUtgaaendeJournalpostServiceTest {
     private PersonFasade personFasade;
     @Mock
     private OppgaveService oppgaveService;
+    @Mock
+    private SedMetrikker sedMetrikker;
 
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
@@ -50,7 +53,7 @@ class OpprettUtgaaendeJournalpostServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService);
+            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker);
 
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 

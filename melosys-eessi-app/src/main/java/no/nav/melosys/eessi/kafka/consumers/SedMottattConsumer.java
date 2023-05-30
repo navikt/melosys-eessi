@@ -2,13 +2,12 @@ package no.nav.melosys.eessi.kafka.consumers;
 
 import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
-import no.nav.melosys.eessi.models.SedMottattHendelse;
+import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
@@ -16,17 +15,13 @@ import org.springframework.stereotype.Component;
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Slf4j
+@RequiredArgsConstructor
 @Component
 public class SedMottattConsumer extends AbstractConsumerSeekAware {
 
     private final SedMottakService sedMottakService;
     private final SedMetrikker sedMetrikker;
-
-    @Autowired
-    public SedMottattConsumer(SedMottakService sedMottakService, SedMetrikker sedMetrikker) {
-        this.sedMottakService = sedMottakService;
-        this.sedMetrikker = sedMetrikker;
-    }
+    private final KafkaDLQService kafkaDLQService;
 
     @KafkaListener(
         id = "sedMottatt",
@@ -44,18 +39,13 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedHendelse, consumerRecord.offset());
 
         try {
-            sedMottakService.behandleSed(SedMottattHendelse.builder()
-                .sedHendelse(sedHendelse)
-                .build());
-
-            sedMetrikker.sedMottatt(sedHendelse.getSedType());
-        } catch (SedAlleredeJournalførtException e) {
-            log.warn("SED {} allerede journalført", e.getSedID());
-            sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
+            sedMottakService.behandleSedMottakHendelse(sedHendelse);
         } catch (Exception e) {
-            sedMetrikker.sedMottattFeilet(sedHendelse.getSedType());
             String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            log.error("sedMottatt feilet: {}\n{}", message, consumerRecord, e);
+            log.error("Klarte ikke å konsumere melding om sed mottatt: {}\n{}", message, consumerRecord, e);
+
+            sedMetrikker.sedMottattFeilet(sedHendelse.getSedType());
+            kafkaDLQService.lagreNySedMottattHendelse(sedHendelse, e.getMessage());
         } finally {
             remove(SED_ID);
             remove(CORRELATION_ID);
