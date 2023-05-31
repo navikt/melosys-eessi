@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.controller;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/kafka/dlq")
 public class KafkaDLQAdminTjeneste {
 
-    private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
+    private static final String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
 
     private final KafkaDLQService kafkaDLQService;
 
@@ -47,6 +46,16 @@ public class KafkaDLQAdminTjeneste {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{uuid}/rekjor/alle")
+    public ResponseEntity rekjørAlleKafkaMelding(@RequestHeader(API_KEY_HEADER) String apiKey) {
+        validerApikey(apiKey);
+
+        kafkaDLQService.rekjorAlleKafkaMeldinger();
+
+        return ResponseEntity.ok().build();
+    }
+
 
     @SneakyThrows
     private KafkaDLQDto mapEntitetTilDto(KafkaDLQ entitet) {

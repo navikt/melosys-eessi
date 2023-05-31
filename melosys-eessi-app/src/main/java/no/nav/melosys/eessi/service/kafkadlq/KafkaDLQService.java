@@ -73,6 +73,18 @@ public class KafkaDLQService {
         kafkaDLQRepository.save(oppgaveEndretHendelseDLQ);
     }
 
+    public void rekjorAlleKafkaMeldinger() {
+        kafkaDLQRepository.findAll().forEach(
+            kafkaMelding -> {
+                try {
+                    rekjorKafkaMelding(kafkaMelding.getId());
+                } catch (Exception e) {
+                    log.error("Rekjøring av melding feilet, uuid="+kafkaMelding.getId().toString(), e);
+                }
+            }
+        );
+    }
+
     @Transactional
     public void rekjorKafkaMelding(UUID uuid) {
         KafkaDLQ kafkaDLQMelding = kafkaDLQRepository.findById(uuid).orElseThrow(
