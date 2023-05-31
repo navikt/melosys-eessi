@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,8 @@ public class KafkaDLQAdminTjeneste {
     @PostMapping("/{uuid}/rekjor")
     public ResponseEntity rekjørKafkaMelding(@PathVariable String uuid, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
+
+        kafkaDLQService.rekjorKafkaMelding(UUID.fromString(uuid));
 
         return ResponseEntity.ok().build();
     }
