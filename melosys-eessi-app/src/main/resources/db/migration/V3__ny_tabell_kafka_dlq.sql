@@ -1,6 +1,6 @@
 CREATE TABLE kafka_dlq
 (
-    id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+    id uuid PRIMARY KEY,
     melding jsonb NOT NULL,
     ko_type varchar(50),
     tid_registrert timestamp DEFAULT CURRENT_TIMESTAMP,

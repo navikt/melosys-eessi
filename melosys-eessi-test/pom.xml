@@ -26,6 +26,13 @@
         </dependency>
 
         <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>${awaitility.version}</version>  <!-- Check for the latest version -->
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>melosys-eessi-app</artifactId>
             <version>${project.version}</version>
