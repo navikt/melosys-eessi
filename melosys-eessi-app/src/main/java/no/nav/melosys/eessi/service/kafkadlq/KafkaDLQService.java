@@ -38,7 +38,7 @@ public class KafkaDLQService {
 
         SedMottattHendelseKafkaDLQ sedMottattHendelseDLQ = new SedMottattHendelseKafkaDLQ();
         sedMottattHendelseDLQ.setSedMottattHendelse(sedHendelse);
-        sedMottattHendelseDLQ.setKoType(KoType.SED_MOTTATT_HENDELSE);
+        sedMottattHendelseDLQ.setQueueType(QueueType.SED_MOTTATT_HENDELSE);
         sedMottattHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         sedMottattHendelseDLQ.setSisteFeilmelding(feilmelding);
         sedMottattHendelseDLQ.setId(UUID.randomUUID());
@@ -52,7 +52,7 @@ public class KafkaDLQService {
 
         SedSendtHendelseKafkaDLQ sedSendtHendelseDLQ = new SedSendtHendelseKafkaDLQ();
         sedSendtHendelseDLQ.setSedSendtHendelse(sedHendelse);
-        sedSendtHendelseDLQ.setKoType(KoType.SED_SENDT_HENDELSE);
+        sedSendtHendelseDLQ.setQueueType(QueueType.SED_SENDT_HENDELSE);
         sedSendtHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         sedSendtHendelseDLQ.setSisteFeilmelding(feilmelding);
         sedSendtHendelseDLQ.setId(randomUuid);
@@ -66,7 +66,7 @@ public class KafkaDLQService {
 
         OppgaveEndretHendelseKafkaDLQ oppgaveEndretHendelseDLQ = new OppgaveEndretHendelseKafkaDLQ();
         oppgaveEndretHendelseDLQ.setOppgaveEndretHendelse(oppgaveEndretHendelse);
-        oppgaveEndretHendelseDLQ.setKoType(KoType.OPPGAVE_ENDRET_HENDELSE);
+        oppgaveEndretHendelseDLQ.setQueueType(QueueType.OPPGAVE_ENDRET_HENDELSE);
         oppgaveEndretHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         oppgaveEndretHendelseDLQ.setSisteFeilmelding(feilmelding);
         oppgaveEndretHendelseDLQ.setId(randomUuid);

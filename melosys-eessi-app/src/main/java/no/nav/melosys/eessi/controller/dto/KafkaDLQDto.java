@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import no.nav.melosys.eessi.models.kafkadlq.KoType;
+import no.nav.melosys.eessi.models.kafkadlq.QueueType;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +15,7 @@ import no.nav.melosys.eessi.models.kafkadlq.KoType;
 public class KafkaDLQDto {
 
     private String id;
-    private KoType koType;
+    private QueueType queueType;
     private LocalDateTime tidRegistrert;
     private LocalDateTime tidSistRekjort;
     private String sisteFeilmelding;

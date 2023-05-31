@@ -21,8 +21,8 @@ public abstract class KafkaDLQ {
     private UUID id;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "ko_type", insertable = false, updatable = false)
-    private KoType koType;
+    @Column(name = "queue_type", insertable = false, updatable = false)
+    private QueueType queueType;
 
     @Column(name = "tid_registrert")
     private LocalDateTime tidRegistrert;

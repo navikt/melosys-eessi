@@ -61,7 +61,7 @@ public class KafkaDLQAdminTjeneste {
     private KafkaDLQDto mapEntitetTilDto(KafkaDLQ entitet) {
         return KafkaDLQDto.builder()
             .id(entitet.getId().toString())
-            .koType(entitet.getKoType())
+            .queueType(entitet.getQueueType())
             .sisteFeilmelding(entitet.getSisteFeilmelding())
             .tidRegistrert(entitet.getTidRegistrert())
             .tidSistRekjort(entitet.getTidSistRekjort())

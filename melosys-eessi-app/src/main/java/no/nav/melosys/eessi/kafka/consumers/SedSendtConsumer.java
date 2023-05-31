@@ -1,17 +1,14 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
-import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
