@@ -91,12 +91,12 @@ public class KafkaDLQService {
             () -> new NotFoundException("Kunne ikke finne KafkaDLQ-melding basert, uuid=" + uuid)
         );
 
-        if (kafkaDLQMelding instanceof SedMottattHendelseKafkaDLQ) {
-            rekjorSedMottattHendelse((SedMottattHendelseKafkaDLQ) kafkaDLQMelding);
-        } else if (kafkaDLQMelding instanceof SedSendtHendelseKafkaDLQ) {
-            rekjorSedSendtHendelse((SedSendtHendelseKafkaDLQ) kafkaDLQMelding);
-        } else if (kafkaDLQMelding instanceof OppgaveEndretHendelseKafkaDLQ) {
-            rekjorOppgaveEndretHendelse((OppgaveEndretHendelseKafkaDLQ) kafkaDLQMelding);
+        if (kafkaDLQMelding instanceof SedMottattHendelseKafkaDLQ sedMottattHendelse) {
+            rekjorSedMottattHendelse(sedMottattHendelse);
+        } else if (kafkaDLQMelding instanceof SedSendtHendelseKafkaDLQ sedSendtHendelse) {
+            rekjorSedSendtHendelse(sedSendtHendelse);
+        } else if (kafkaDLQMelding instanceof OppgaveEndretHendelseKafkaDLQ oppgaveEndretHendelse) {
+            rekjorOppgaveEndretHendelse(oppgaveEndretHendelse);
         }
     }
 
