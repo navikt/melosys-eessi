@@ -3,6 +3,9 @@ package no.nav.melosys.eessi.models.kafkadlq;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.hibernate.annotations.Type;
 
@@ -11,7 +14,9 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @DiscriminatorValue("SED_SENDT_HENDELSE")
 public class SedSendtHendelseKafkaDLQ extends KafkaDLQ {
 
