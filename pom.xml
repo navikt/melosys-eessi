@@ -61,6 +61,7 @@
         <classgraph.version>4.8.141</classgraph.version>
         <oauth2-oidc-sdk.version>9.35</oauth2-oidc-sdk.version>
         <google-errorprone.version>2.11.0</google-errorprone.version>
+        <awaitility.version>4.2.0</awaitility.version>
     </properties>
 
     <dependencyManagement>
@@ -172,6 +173,12 @@
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${google-errorprone.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.awaitility</groupId>
+                <artifactId>awaitility</artifactId>
+                <version>${awaitility.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

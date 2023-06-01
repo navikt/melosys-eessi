@@ -5,10 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -51,6 +53,8 @@ class SedMottakServiceTest {
     private BucIdentifisertService bucIdentifisertService;
     @Mock
     private JournalpostSedKoblingService journalpostSedKoblingService;
+    @Mock
+    private SedMetrikker sedMetrikker;
 
     private SedMottakService sedMottakService;
 
@@ -58,12 +62,15 @@ class SedMottakServiceTest {
     private static final String SED_ID = "555554444";
     private static final String RINA_SAKSNUMMER = "12313213";
 
+    private FakeUnleash unleash = new FakeUnleash();
+
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
             euxService, personIdentifisering, opprettInngaaendeJournalpostService,
             oppgaveService, sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService
+            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService,
+            unleash, sedMetrikker
         );
     }
 

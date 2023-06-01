@@ -1,32 +1,25 @@
 package no.nav.melosys.eessi.identifisering;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.UUID;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
-import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
-import no.nav.melosys.eessi.service.oppgave.OppgaveService;
+import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
+import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
+
+import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Slf4j
 @Component
 @AllArgsConstructor
 public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
 
-    private final BucIdentifisertService bucIdentifisertService;
-    private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
-    private final OppgaveService oppgaveService;
-    private final IdentifiseringKontrollService identifiseringKontrollService;
-    private final PersonFasade personFasade;
-
-    private static final Collection<String> GYLDIGE_TEMA = Set.of("MED", "UFM");
+    private final OppgaveEndretService oppgaveEndretService;
+    private final KafkaDLQService kafkaDLQService;
 
     @KafkaListener(
         id = "oppgaveEndret",
@@ -35,69 +28,25 @@ public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
         containerFactory = "oppgaveListenerContainerFactory",
         groupId = "${melosys.kafka.consumer.oppgave-endret.groupid}")
     public void oppgaveEndret(ConsumerRecord<String, OppgaveEndretHendelse> consumerRecord) {
-        final var oppgave = consumerRecord.value();
-        log.debug("Oppgave endret: {}", oppgave);
+        final var oppgaveEndretHendelse = consumerRecord.value();
 
-        if (erValidertIdentifiseringsoppgave(oppgave)) {
-            log.info("Oppgave {} markert som identifisert av ID og Fordeling. Versjon {}. Søker etter tilknyttet RINA-sak", oppgave.getId(), oppgave.getVersjon());
-            bucIdentifiseringOppgRepository.findByOppgaveId(oppgave.getId().toString())
-                .ifPresentOrElse(
-                    b -> kontrollerIdentifiseringOgOppdaterOppgave(b.getRinaSaksnummer(), oppgave, b.getVersjon()),
-                    () -> log.debug("Finner ikke RINA-sak tilknytning for oppgave {}", oppgave.getId())
-                );
+        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
+
+        log.debug("Mottatt melding om oppgave endret: {}", oppgaveEndretHendelse);
+
+        try {
+            oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);
+        } catch (Exception e) {
+            String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, consumerRecord, e);
+
+            kafkaDLQService.lagreOppgaveEndretHendelse(oppgaveEndretHendelse, e.getMessage());
+        } finally {
+            remove(CORRELATION_ID);
         }
     }
 
     public void settSpesifiktOffsetPåConsumer(long offset) {
         getSeekCallbacks().forEach((tp, callback) -> callback.seek(tp.topic(), tp.partition(), offset));
-    }
-
-    private boolean erValidertIdentifiseringsoppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
-        return erIdentifiseringsOppgave(oppgaveEndretHendelse) && validerOppgaveStatusOgVersjon(oppgaveEndretHendelse);
-    }
-
-    private boolean validerOppgaveStatusOgVersjon(OppgaveEndretHendelse oppgaveEndretHendelse) {
-        final var oppgaveId = oppgaveEndretHendelse.getId().toString();
-        HentOppgaveDto oppgaveDto = oppgaveService.hentOppgave(oppgaveId);
-        if (!oppgaveEndretHendelse.harSammeVersjon(oppgaveDto.getVersjon())) {
-            log.info("Kan ikke behandle oppgave endret {}, versjonskonflikt mellom kafkamelding (versjon {}) og oppgave (versjon {}) ", oppgaveId, oppgaveEndretHendelse.getVersjon(), oppgaveDto.getVersjon());
-            return false;
-        }
-
-        if (!oppgaveDto.erÅpen()) {
-            log.info("Kan ikke behandle oppgave endret {}, oppgave er ikke åpen opppgave", oppgaveId);
-            return false;
-        }
-
-        return true;
-    }
-
-    private boolean erIdentifiseringsOppgave(OppgaveEndretHendelse oppgaveEndretHendelse) {
-        return "JFR".equals(oppgaveEndretHendelse.getOppgavetype())
-            && "4530".equals(oppgaveEndretHendelse.getTildeltEnhetsnr())
-            && oppgaveEndretHendelse.harAktørID()
-            && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.getTema())
-            && oppgaveEndretHendelse.erÅpen()
-            && oppgaveEndretHendelse.harMetadataRinasaksnummer();
-    }
-
-    private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
-                                                           OppgaveEndretHendelse oppgaveEndretHendelse,
-                                                           int versjon) {
-        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgaveEndretHendelse.hentAktørID(), rinaSaksnummer, versjon);
-        if (kontrollResultat.erIdentifisert()) {
-            log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgaveEndretHendelse.getId());
-            bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgaveEndretHendelse.hentAktørID()));
-            oppgaveService.ferdigstillOppgave(oppgaveEndretHendelse.getId().toString(), oppgaveEndretHendelse.getVersjon());
-        } else {
-            log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgaveEndretHendelse.getId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
-            oppgaveService.flyttOppgaveTilIdOgFordeling(
-                oppgaveEndretHendelse.getId().toString(),
-                oppgaveEndretHendelse.getVersjon(),
-                kontrollResultat.hentFeilIOpplysningerTekst());
-            bucIdentifiseringOppgRepository.updateVersjonNumberBy1(
-                oppgaveEndretHendelse.getId().toString(),
-                rinaSaksnummer);
-        }
     }
 }

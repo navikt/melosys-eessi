@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedType;
@@ -37,9 +39,24 @@ public class SedMottakService {
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final BucIdentifisertService bucIdentifisertService;
     private final JournalpostSedKoblingService journalpostSedKoblingService;
+    private final Unleash unleash;
+    private final SedMetrikker sedMetrikker;
 
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
+
+    public void behandleSedMottakHendelse(SedHendelse sedHendelse) {
+        try {
+            behandleSed(SedMottattHendelse.builder()
+                .sedHendelse(sedHendelse)
+                .build());
+
+            sedMetrikker.sedMottatt(sedHendelse.getSedType());
+        } catch (SedAlleredeJournalførtException e) {
+            log.warn("SED {} allerede journalført", e.getSedID());
+            sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
+        }
+    }
 
     @Transactional
     public void behandleSed(SedMottattHendelse sedMottattHendelse) {
