@@ -13,7 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "ko_type", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "queue_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "kafka_dlq")
 public abstract class KafkaDLQ {
 
