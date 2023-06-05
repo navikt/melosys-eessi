@@ -39,7 +39,7 @@ public class KafkaDLQAdminTjeneste {
     }
 
     @PostMapping("/{uuid}/restart")
-    public ResponseEntity rekjørKafkaMelding(@PathVariable String uuid, @RequestHeader(API_KEY_HEADER) String apiKey) {
+    public ResponseEntity<Void> rekjørKafkaMelding(@PathVariable String uuid, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
         kafkaDLQService.rekjørKafkaMelding(UUID.fromString(uuid));
@@ -47,8 +47,8 @@ public class KafkaDLQAdminTjeneste {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/rekjor/alle")
-    public ResponseEntity rekjørAlleKafkaMelding(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    @PostMapping("/restart/alle")
+    public ResponseEntity<Void> rekjørAlleKafkaMelding(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
         kafkaDLQService.rekjørAlleKafkaMeldinger();
