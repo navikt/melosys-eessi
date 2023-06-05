@@ -23,7 +23,7 @@ public class DLQMetrikkerCache {
 
     @Scheduled(fixedRate = 15000)
     public void oppfriskDLQTypeOgAntall() {
-        log.debug("Oppfrisker antalle DLQ per type");
+        log.debug("Oppfrisker antall DLQ per type");
         List<KafkaDLQAntall> kafkaDLQTypeOgAntall = kafkaDLQRepositoy.countDLQByQueueType();
         for (KafkaDLQAntall count : kafkaDLQTypeOgAntall) {
             queueSizeMap.put(count.getQueueType(), count.getAntall());
