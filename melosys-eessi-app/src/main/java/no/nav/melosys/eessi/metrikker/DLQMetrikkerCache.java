@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.metrikker;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DLQMetrikkerCache {
 
-    private final Map<QueueType, Long> queueSizeMap = new HashMap<>();
+    private final Map<QueueType, Long> queueSizeMap = new EnumMap<>(QueueType.class);
 
     private final KafkaDLQRepository kafkaDLQRepositoy;
 
