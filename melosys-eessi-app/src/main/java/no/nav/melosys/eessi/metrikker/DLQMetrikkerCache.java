@@ -21,7 +21,7 @@ public class DLQMetrikkerCache {
 
     private final KafkaDLQRepository kafkaDLQRepositoy;
 
-    @Scheduled(fixedRate = 15000)
+    @Scheduled(fixedRate = 30000)
     public void oppfriskDLQTypeOgAntall() {
         log.debug("Oppfrisker antall DLQ per type");
         List<KafkaDLQAntall> kafkaDLQTypeOgAntall = kafkaDLQRepositoy.countDLQByQueueType();
