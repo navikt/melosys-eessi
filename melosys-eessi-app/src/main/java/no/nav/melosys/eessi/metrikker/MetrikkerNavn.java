@@ -4,6 +4,7 @@ public final class MetrikkerNavn {
 
     public static final String METRIKKER_NAMESPACE = "melosys-eessi.";
 
+    static final String KAFKA_DLQ_ANTALL = METRIKKER_NAMESPACE + "kafka.dlq.antall";
     static final String SED_MOTTATT_FEILET_DEPRECATED = METRIKKER_NAMESPACE + "sed.feilet.antall";
     static final String SED_MOTTATT = METRIKKER_NAMESPACE + "sed.mottatt";
     static final String SED_MOTTATT_FEILET = SED_MOTTATT + ".feilet";
