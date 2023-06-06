@@ -73,11 +73,11 @@ public class KafkaDLQService {
         kafkaDLQRepository.save(oppgaveEndretHendelseDLQ);
     }
 
-    public void rekjorAlleKafkaMeldinger() {
+    public void rekjørAlleKafkaMeldinger() {
         kafkaDLQRepository.findAll().forEach(
             kafkaMelding -> {
                 try {
-                    rekjorKafkaMelding(kafkaMelding.getId());
+                    rekjørKafkaMelding(kafkaMelding.getId());
                 } catch (Exception e) {
                     log.error("Rekjøring av melding feilet, uuid="+kafkaMelding.getId().toString(), e);
                 }
@@ -86,7 +86,7 @@ public class KafkaDLQService {
     }
 
     @Transactional
-    public void rekjorKafkaMelding(UUID uuid) {
+    public void rekjørKafkaMelding(UUID uuid) {
         KafkaDLQ kafkaDLQMelding = kafkaDLQRepository.findById(uuid).orElseThrow(
             () -> new NotFoundException("Kunne ikke finne KafkaDLQ-melding basert, uuid=" + uuid)
         );
