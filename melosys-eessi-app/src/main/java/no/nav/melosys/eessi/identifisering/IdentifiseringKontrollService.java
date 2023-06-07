@@ -51,6 +51,7 @@ public class IdentifiseringKontrollService {
         List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
 
         if (!PersonKontroller.harSammeFoedselsdato(identifisertPerson, tilLocalDate(sedPerson.getFoedselsdato()))) {
+            log.info("PDL og SED har forskjellig fødselsdato for personen");
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO);
         }
         if ((sedPerson.harStatsborgerskap(avsenderLand) && !PersonKontroller.harStatsborgerskap(identifisertPerson, avsenderLand))
@@ -61,12 +62,14 @@ public class IdentifiseringKontrollService {
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP);
         }
         if (!PersonKontroller.harUkjentEllerSammeKjønn(identifisertPerson, sedPerson)) {
+            log.info("PDL og SED har forskjellig kjønn for personen");
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.KJØNN);
         }
 
         var utenlandskIdFraAvsenderISed = sedPerson.finnUtenlandskIdFraLand(avsenderLand)
             .map(pin -> new UtenlandskId(pin.getIdentifikator(), pin.getLand()));
         if (utenlandskIdFraAvsenderISed.isPresent() && !PersonKontroller.harUtenlandskID(identifisertPerson, utenlandskIdFraAvsenderISed.get())) {
+            log.info("PDL og SED har forskjellig utenlandsk ID for personen");
             begrunnelser.add(IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID);
         }
 
