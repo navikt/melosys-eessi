@@ -39,6 +39,7 @@ class PersonSokTest {
 
     @BeforeEach
     public void setup() throws Exception {
+        unleash.enableAll();
         personSok = new PersonSok(personFasade, unleash);
     }
 
