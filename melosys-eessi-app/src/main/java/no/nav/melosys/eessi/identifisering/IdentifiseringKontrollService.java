@@ -4,7 +4,6 @@ import java.util.*;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
@@ -24,7 +23,6 @@ public class IdentifiseringKontrollService {
     private final PersonFasade personFasade;
     private final EuxService euxService;
     private final PersonSokMetrikker personSokMetrikker;
-    private final Unleash unleash;
 
     public IdentifiseringsKontrollResultat kontrollerIdentifisertPerson(String aktørId, String rinaSaksnummer, int oppgaveEndretVersjon) {
         var buc = euxService.hentBuc(rinaSaksnummer);

@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.eux;
 
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import org.springframework.beans.factory.annotation.Qualifier;

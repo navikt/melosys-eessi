@@ -2,10 +2,8 @@ package no.nav.melosys.eessi.service.mottak;
 
 import javax.transaction.Transactional;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
@@ -15,7 +13,6 @@ import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Organisation;
 import no.nav.melosys.eessi.models.buc.Participant;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
@@ -39,7 +36,6 @@ public class SedMottakService {
     private final BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
     private final BucIdentifisertService bucIdentifisertService;
     private final JournalpostSedKoblingService journalpostSedKoblingService;
-    private final Unleash unleash;
     private final SedMetrikker sedMetrikker;
 
     @Value("${rina.institusjon-id}")

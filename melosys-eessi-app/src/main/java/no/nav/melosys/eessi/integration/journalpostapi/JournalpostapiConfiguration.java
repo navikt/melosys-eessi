@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 import java.time.Duration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
