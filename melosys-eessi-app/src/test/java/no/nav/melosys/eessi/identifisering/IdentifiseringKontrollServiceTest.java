@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
@@ -61,7 +60,7 @@ class IdentifiseringKontrollServiceTest {
 
     @BeforeEach
     void setup() {
-        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker, new FakeUnleash());
+        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker);
         var utenlandskPin = new Pin(utenlandskId, avsenderLand, null);
 
         statsborgerskap.setLand(avsenderLand);

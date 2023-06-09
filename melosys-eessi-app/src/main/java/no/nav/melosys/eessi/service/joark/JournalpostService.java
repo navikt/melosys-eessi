@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.joark;
 
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.journalpostapi.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
