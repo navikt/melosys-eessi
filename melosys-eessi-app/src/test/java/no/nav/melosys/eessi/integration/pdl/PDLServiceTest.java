@@ -1,11 +1,5 @@
 package no.nav.melosys.eessi.integration.pdl;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.Kjønn;
@@ -19,6 +13,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,25 +48,25 @@ class PDLServiceTest {
 
         when(pdlConsumer.hentPerson(ident)).thenReturn(lagPersonMedFlereEndringer());
         assertThat(pdlService.hentPerson(ident))
-                .extracting(
-                        PersonModell::getIdent,
-                        PersonModell::getFornavn,
-                        PersonModell::getEtternavn,
-                        PersonModell::getFødselsdato,
-                        PersonModell::getStatsborgerskapLandkodeISO2,
-                        PersonModell::isErOpphørt,
-                        PersonModell::getUtenlandskId,
-                        PersonModell::getKjønn)
-                .containsExactly(
-                        ident,
-                        "NyttFornavn",
-                        "NyttEtternavn",
-                        LocalDate.of(1990, 1, 1),
-                        Set.of("NO", "SE", "PL"),
-                        false,
-                        Set.of(new UtenlandskId("2222-1111", "SE")),
-                        Kjønn.KVINNE
-                    );
+            .extracting(
+                PersonModell::getIdent,
+                PersonModell::getFornavn,
+                PersonModell::getEtternavn,
+                PersonModell::getFødselsdato,
+                PersonModell::getStatsborgerskapLandkodeISO2,
+                PersonModell::isErOpphørt,
+                PersonModell::getUtenlandskId,
+                PersonModell::getKjønn)
+            .containsExactly(
+                ident,
+                "NyttFornavn",
+                "NyttEtternavn",
+                LocalDate.of(1990, 1, 1),
+                Set.of("NO", "SE", "PL"),
+                false,
+                Set.of(new UtenlandskId("2222-1111", "SE")),
+                Kjønn.KVINNE
+            );
     }
 
     private PDLPerson lagPersonMedFlereEndringer() {
@@ -76,7 +77,7 @@ class PDLServiceTest {
         gammeltPdlNavn.setEtternavn("GammeltEtternavn");
         gammeltPdlNavn.setMetadata(new PDLMetadata());
         gammeltPdlNavn.getMetadata().setEndringer(Set.of(
-                new PDLEndring("OPPRETT", LocalDateTime.of(2015, 1, 1, 0, 0))
+            new PDLEndring("OPPRETT", LocalDateTime.of(2015, 1, 1, 0, 0))
         ));
 
         var nyttPdlNavn = new PDLNavn();
@@ -84,15 +85,15 @@ class PDLServiceTest {
         nyttPdlNavn.setEtternavn("NyttEtternavn");
         nyttPdlNavn.setMetadata(new PDLMetadata());
         nyttPdlNavn.getMetadata().setEndringer(Set.of(
-                new PDLEndring("OPPRETT", LocalDateTime.of(2010, 1, 1, 0, 0)),
-                new PDLEndring("KORRIGER", LocalDateTime.of(2020, 1, 1, 0, 0))
+            new PDLEndring("OPPRETT", LocalDateTime.of(2010, 1, 1, 0, 0)),
+            new PDLEndring("KORRIGER", LocalDateTime.of(2020, 1, 1, 0, 0))
         ));
 
         var pdlFødsel = new PDLFoedsel();
         pdlFødsel.setFoedselsdato(LocalDate.of(1990, 1, 1));
         pdlFødsel.setMetadata(new PDLMetadata());
         pdlFødsel.getMetadata().setEndringer(Set.of(
-                new PDLEndring("OPPRETT", LocalDateTime.of(1990, 1, 1, 0, 0))
+            new PDLEndring("OPPRETT", LocalDateTime.of(1990, 1, 1, 0, 0))
         ));
 
         var norskStatsborgerskap = new PDLStatsborgerskap();
@@ -108,7 +109,7 @@ class PDLServiceTest {
         pdlPersonstatus.setStatus("bosatt");
         pdlPersonstatus.setMetadata(new PDLMetadata());
         pdlPersonstatus.getMetadata().setEndringer(Set.of(
-                new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
+            new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0))
         ));
 
         var pdlUtenlandskIdentifikator = new PDLUtenlandskIdentifikator();
@@ -132,34 +133,73 @@ class PDLServiceTest {
     }
 
     @Test
+    void soekEtterPersonGammel_finnerIkkeFolkeregisterIdent_kasterFeil() {
+        when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponseUtenFolkeregisterIdent());
+        var personsokKriterier = PersonsokKriterier.builder()
+            .fornavn("fornavn")
+            .etternavn("etternavn")
+            .foedselsdato(LocalDate.of(2000, 1, 1))
+            .build();
+
+
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> pdlService.soekEtterPersonGammel(personsokKriterier));
+    }
+
+    @Test
+    void soekEtterPerson_finnerIkkeFolkeregisterIdent_returnererTomListe() {
+        when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponseUtenFolkeregisterIdent());
+        var personsokKriterier = PersonsokKriterier.builder()
+            .fornavn("fornavn")
+            .etternavn("etternavn")
+            .foedselsdato(LocalDate.of(2000, 1, 1))
+            .build();
+
+
+        var response = pdlService.soekEtterPerson(personsokKriterier);
+
+
+        assertThat(response).isEmpty();
+    }
+
+    PDLSokPerson lagSøkPersonResponseUtenFolkeregisterIdent() {
+        PDLSokPerson pdlSokPerson = new PDLSokPerson();
+
+        PDLSokHit treff = new PDLSokHit();
+        treff.setIdenter(Set.of(new PDLIdent(NPID, "1"), new PDLIdent(AKTORID, "2")));
+
+        pdlSokPerson.setHits(Set.of(treff));
+        return pdlSokPerson;
+    }
+
+    @Test
     void soekEtterPerson_finnerToPersoner_mapperToIdenter() {
         ArgumentCaptor<PDLSokRequestVars> captor = ArgumentCaptor.forClass(PDLSokRequestVars.class);
         when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponse());
 
         PersonsokKriterier personsokKriterier = PersonsokKriterier.builder()
-                .fornavn("fornavn")
-                .etternavn("etternavn")
-                .foedselsdato(LocalDate.of(2000, 1, 1))
-                .build();
+            .fornavn("fornavn")
+            .etternavn("etternavn")
+            .foedselsdato(LocalDate.of(2000, 1, 1))
+            .build();
 
         var response = pdlService.soekEtterPerson(personsokKriterier);
         assertThat(response).hasSize(2)
-                .flatExtracting(PersonSokResponse::getIdent)
-                .containsExactlyInAnyOrder("1", "2");
+            .flatExtracting(PersonSokResponse::getIdent)
+            .containsExactlyInAnyOrder("1", "2");
 
         verify(pdlConsumer).søkPerson(captor.capture());
         var pdlRequestDto = captor.getValue();
         assertThat(pdlRequestDto.getPaging())
-                .extracting(PDLPaging::getPageNumber, PDLPaging::getResultsPerPage)
-                .containsExactly(1, 20);
+            .extracting(PDLPaging::getPageNumber, PDLPaging::getResultsPerPage)
+            .containsExactly(1, 20);
         assertThat(pdlRequestDto.getCriteria())
-                .hasSize(3)
-                .flatExtracting(PDLSokCriterion::getFieldName)
-                .containsExactlyInAnyOrder(
-                        "person.navn.fornavn",
-                        "person.navn.etternavn",
-                        "person.foedsel.foedselsdato"
-                );
+            .hasSize(3)
+            .flatExtracting(PDLSokCriterion::getFieldName)
+            .containsExactlyInAnyOrder(
+                "person.navn.fornavn",
+                "person.navn.etternavn",
+                "person.foedsel.foedselsdato"
+            );
     }
 
     PDLSokPerson lagSøkPersonResponse() {
@@ -167,12 +207,12 @@ class PDLServiceTest {
 
         PDLSokHit treff1 = new PDLSokHit();
         treff1.setIdenter(
-                Set.of(new PDLIdent(FOLKEREGISTERIDENT, "1"), new PDLIdent(AKTORID, "00"))
+            Set.of(new PDLIdent(FOLKEREGISTERIDENT, "1"), new PDLIdent(AKTORID, "00"))
         );
 
         PDLSokHit treff2 = new PDLSokHit();
         treff2.setIdenter(
-                Set.of(new PDLIdent(FOLKEREGISTERIDENT, "2"), new PDLIdent(NPID, "99"))
+            Set.of(new PDLIdent(FOLKEREGISTERIDENT, "2"), new PDLIdent(NPID, "99"))
         );
 
         pdlSokPerson.setHits(Set.of(treff1, treff2));
@@ -189,8 +229,8 @@ class PDLServiceTest {
     void hentAktørID_finnesIkke_kasterFeil() {
         when(pdlConsumer.hentIdenter(anyString())).thenReturn(lagTomIdentliste());
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> pdlService.hentAktoerId("123"))
-                .withMessageContaining("Finner ikke aktørID");
+            .isThrownBy(() -> pdlService.hentAktoerId("123"))
+            .withMessageContaining("Finner ikke aktørID");
     }
 
     @Test
@@ -203,8 +243,8 @@ class PDLServiceTest {
     void hentNorskIdent_finnesIkke_kasterFeil() {
         when(pdlConsumer.hentIdenter(anyString())).thenReturn(lagTomIdentliste());
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> pdlService.hentNorskIdent("123"))
-                .withMessageContaining("Finner ikke folkeregisterident");
+            .isThrownBy(() -> pdlService.hentNorskIdent("123"))
+            .withMessageContaining("Finner ikke folkeregisterident");
     }
 
     private PDLIdentliste lagIdentliste() {

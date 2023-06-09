@@ -1,14 +1,15 @@
 package no.nav.melosys.eessi.identifisering;
 
-import java.util.Collection;
-
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.springframework.stereotype.Component;
+
+import java.util.Collection;
 
 import static no.nav.melosys.eessi.identifisering.PersonKontroller.harOverlappendeStatsborgerskap;
 import static no.nav.melosys.eessi.identifisering.PersonKontroller.harSammeFoedselsdato;
@@ -18,13 +19,17 @@ import static no.nav.melosys.eessi.identifisering.PersonKontroller.harSammeFoeds
 class PersonSok {
 
     private final PersonFasade personFasade;
+    private final Unleash unleash;
 
-    PersonSok(PersonFasade personFasade) {
+    PersonSok(PersonFasade personFasade, Unleash unleash) {
         this.personFasade = personFasade;
+        this.unleash = unleash;
     }
 
     PersonSokResultat søkEtterPerson(PersonsokKriterier personsokKriterier) {
-        Collection<PersonSokResponse> personSøk = personFasade.soekEtterPerson(personsokKriterier);
+        Collection<PersonSokResponse> personSøk = unleash.isEnabled("melosys.send_til_id_og_fordeling_dersom_ingen_folkeregisterident")
+            ? personFasade.soekEtterPerson(personsokKriterier)
+            : personFasade.soekEtterPersonGammel(personsokKriterier);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);
         } else if (personSøk.size() > 1) {
@@ -47,8 +52,8 @@ class PersonSok {
 
         SoekBegrunnelse begrunnelse = vurderPerson(person, personsokKriterier);
         return begrunnelse == SoekBegrunnelse.IDENTIFISERT
-                ? PersonSokResultat.identifisert(ident)
-                : PersonSokResultat.ikkeIdentifisert(begrunnelse);
+            ? PersonSokResultat.identifisert(ident)
+            : PersonSokResultat.ikkeIdentifisert(begrunnelse);
     }
 
     private SoekBegrunnelse vurderPerson(PersonModell person, PersonsokKriterier personsokKriterier) {
