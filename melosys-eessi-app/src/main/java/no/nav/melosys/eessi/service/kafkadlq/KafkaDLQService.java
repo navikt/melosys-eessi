@@ -112,6 +112,7 @@ public class KafkaDLQService {
             kafkaDLQRepository.delete(sedMottattHendelseKafkaDLQ);
         }
         catch (Exception e) {
+            sedMottattHendelseKafkaDLQ.setTidSistRekjort(LocalDateTime.now());
             sedMottattHendelseKafkaDLQ.setSisteFeilmelding(e.getMessage());
             sedMottattHendelseKafkaDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(sedMottattHendelseKafkaDLQ);
@@ -133,6 +134,7 @@ public class KafkaDLQService {
             opprettUtgaaendeJournalpostService.behandleSedSendtHendelse(sedHendelse);
             kafkaDLQRepository.delete(sedSendtHendelseDLQ);
         } catch (Exception e) {
+            sedSendtHendelseDLQ.setTidSistRekjort(LocalDateTime.now());
             sedSendtHendelseDLQ.setSisteFeilmelding(e.getMessage());
             sedSendtHendelseDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(sedSendtHendelseDLQ);
@@ -155,6 +157,7 @@ public class KafkaDLQService {
             kafkaDLQRepository.delete(oppgaveEndretHendelseKafkaDLQ);
         }
         catch (Exception e) {
+            oppgaveEndretHendelseKafkaDLQ.setTidSistRekjort(LocalDateTime.now());
             oppgaveEndretHendelseKafkaDLQ.setSisteFeilmelding(e.getMessage());
             oppgaveEndretHendelseKafkaDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(oppgaveEndretHendelseKafkaDLQ);
