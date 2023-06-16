@@ -73,6 +73,7 @@ public class KafkaDLQService {
         kafkaDLQRepository.save(oppgaveEndretHendelseDLQ);
     }
 
+    @Transactional
     public void rekjørAlleKafkaMeldinger() {
         kafkaDLQRepository.findAll().forEach(
             kafkaMelding -> {
@@ -85,7 +86,6 @@ public class KafkaDLQService {
         );
     }
 
-    @Transactional
     public void rekjørKafkaMelding(UUID uuid) {
         KafkaDLQ kafkaDLQMelding = kafkaDLQRepository.findById(uuid).orElseThrow(
             () -> new NotFoundException("Kunne ikke finne KafkaDLQ-melding basert, uuid=" + uuid)
