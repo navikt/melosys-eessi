@@ -9,6 +9,8 @@ import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtEx
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
+import no.nav.melosys.eessi.models.SedSendtHendelse;
+import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
@@ -32,6 +34,7 @@ public class OpprettUtgaaendeJournalpostService {
     private final SedMetrikker sedMetrikker;
     private final PersonIdentifisering personIdentifisering;
     private final SedSendtService sedSendtService;
+    private final SedSendtHendelseRepository sedSendtHendelseRepository;
 
 
     public void behandleSedSendtHendelse(SedHendelse sedSendt) {
@@ -39,10 +42,12 @@ public class OpprettUtgaaendeJournalpostService {
             if (sedInneholderPersonId(sedSendt)) {
                 String journalpostId = arkiverUtgaaendeSed(sedSendt);
                 log.info("Journalpost opprettet med id: {}", journalpostId);
+                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt.getSedId(), sedSendt.getRinaSakId(), true));
             } else {
                 log.info("SED {} inneholder ikke personId, journalfører ikke. " +
                     "Sjekker for eksisterende behandlingsoppgave", sedSendt.getRinaDokumentId());
                 sedSendtService.opprettOppgaveIdentifisering(sedSendt);
+                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt.getSedId(), sedSendt.getRinaSakId(), false));
             }
 
             sedMetrikker.sedSendt(sedSendt.getSedType());
@@ -59,7 +64,9 @@ public class OpprettUtgaaendeJournalpostService {
             sedHendelse.getRinaDokumentId());
 
         log.info("Søker etter person for SED");
-        return personIdentifisering.identifiserPerson(sedHendelse.getRinaSakId(), sed).isPresent();
+        //Optional<String> person = personIdentifisering.identifiserPerson(rinaSaksId, sed);
+        Optional<String> person = Optional.empty();
+        return person.isPresent();
     }
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) {

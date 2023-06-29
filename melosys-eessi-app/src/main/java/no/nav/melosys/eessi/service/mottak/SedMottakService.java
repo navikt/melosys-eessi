@@ -78,7 +78,7 @@ public class SedMottakService {
 
         log.info("Søker etter person for SED");
         personIdentifisering.identifiserPerson(lagretHendelse.getSedHendelse().getRinaSakId(), sed)
-            .ifPresentOrElse( //TODO implementering av automatisk journaløføring
+            .ifPresentOrElse(
                 ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
                 () -> opprettOppgaveIdentifisering(lagretHendelse)
             );
