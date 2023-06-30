@@ -6,15 +6,18 @@ import java.util.Optional;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
+import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
+import no.nav.melosys.eessi.service.sending.SedSendtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,6 +47,13 @@ class OpprettUtgaaendeJournalpostServiceTest {
     private OppgaveService oppgaveService;
     @Mock
     private SedMetrikker sedMetrikker;
+    @Mock
+    private PersonIdentifisering personIdentifisering;
+    @Mock
+    private SedSendtService sedSendtService;
+    @Mock
+    private SedSendtHendelseRepository sedSendtHendelseRepository;
+
 
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
@@ -53,7 +63,7 @@ class OpprettUtgaaendeJournalpostServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker);
+            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtService, sedSendtHendelseRepository);
 
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
