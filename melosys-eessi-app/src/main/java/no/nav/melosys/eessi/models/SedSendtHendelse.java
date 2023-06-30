@@ -2,6 +2,8 @@ package no.nav.melosys.eessi.models;
 
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.*;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -19,12 +21,10 @@ public class SedSendtHendelse {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "sed_id")
-    private String sedId;
+    @Type(type = "jsonb")
+    @Column(name = "sed_hendelse")
+    private SedHendelse sedHendelse;
 
-    @Column(name = "rina_sak_id")
-    private String rinaSakId;
-
-    @Column(name = "journalfoert")
-    private boolean journalfoert;
+    @Column(name = "journalpost_id")
+    private String journalpostId;
 }

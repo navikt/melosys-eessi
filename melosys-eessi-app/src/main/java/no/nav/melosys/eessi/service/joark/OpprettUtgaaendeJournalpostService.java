@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sending.SedSendtService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -42,18 +43,26 @@ public class OpprettUtgaaendeJournalpostService {
             if (sedInneholderPersonId(sedSendt)) {
                 String journalpostId = arkiverUtgaaendeSed(sedSendt);
                 log.info("Journalpost opprettet med id: {}", journalpostId);
-                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt.getSedId(), sedSendt.getRinaSakId(), true));
+                journalfoerTidligereSedDersomEksisterer(sedSendt.getRinaSakId());
+                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, journalpostId));
             } else {
                 log.info("SED {} inneholder ikke personId, journalfører ikke. " +
                     "Sjekker for eksisterende behandlingsoppgave", sedSendt.getRinaDokumentId());
                 sedSendtService.opprettOppgaveIdentifisering(sedSendt);
-                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt.getSedId(), sedSendt.getRinaSakId(), false));
+                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, null));
             }
 
             sedMetrikker.sedSendt(sedSendt.getSedType());
 
         } catch (SedAlleredeJournalførtException e) {
             log.info("SED {} allerede journalført", e.getSedID());
+        }
+    }
+
+    private void journalfoerTidligereSedDersomEksisterer(String rinaSakId) {
+        List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
+        for ( SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
+            arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
         }
     }
 
@@ -71,7 +80,6 @@ public class OpprettUtgaaendeJournalpostService {
 
     public String arkiverUtgaaendeSed(SedHendelse sedSendt) {
         Optional<Sak> sak = saksrelasjonService.finnArkivsakForRinaSaksnummer(sedSendt.getRinaSakId());
-
         if (sak.isEmpty()) {
             return arkiverUtenSak(sedSendt);
         }
