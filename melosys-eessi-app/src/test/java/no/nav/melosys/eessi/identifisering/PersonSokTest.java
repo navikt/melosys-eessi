@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
@@ -33,14 +32,11 @@ class PersonSokTest {
     @Mock
     private PDLService personFasade;
 
-    private final FakeUnleash unleash = new FakeUnleash();
-
     private PersonSok personSok;
 
     @BeforeEach
     public void setup() throws Exception {
-        unleash.enableAll();
-        personSok = new PersonSok(personFasade, unleash);
+        personSok = new PersonSok(personFasade);
     }
 
     private PersonSokResponse lagPersonSøkResponse() {

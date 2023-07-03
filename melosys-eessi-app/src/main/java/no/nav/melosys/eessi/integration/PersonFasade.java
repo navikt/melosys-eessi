@@ -11,5 +11,4 @@ public interface PersonFasade {
     String hentAktoerId(String ident);
     String hentNorskIdent(String aktoerID);
     List<PersonSokResponse> soekEtterPerson(PersonsokKriterier personsokKriterier);
-    List<PersonSokResponse> soekEtterPersonGammel(PersonsokKriterier personsokKriterier);
 }

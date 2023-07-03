@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.*;
@@ -130,19 +129,6 @@ class PDLServiceTest {
         pdlPerson.setUtenlandskIdentifikasjonsnummer(Set.of(pdlUtenlandskIdentifikator));
         pdlPerson.setKjoenn(Set.of(pdlKjønn));
         return pdlPerson;
-    }
-
-    @Test
-    void soekEtterPersonGammel_finnerIkkeFolkeregisterIdent_kasterFeil() {
-        when(pdlConsumer.søkPerson(any())).thenReturn(lagSøkPersonResponseUtenFolkeregisterIdent());
-        var personsokKriterier = PersonsokKriterier.builder()
-            .fornavn("fornavn")
-            .etternavn("etternavn")
-            .foedselsdato(LocalDate.of(2000, 1, 1))
-            .build();
-
-
-        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> pdlService.soekEtterPersonGammel(personsokKriterier));
     }
 
     @Test
