@@ -107,9 +107,6 @@ public abstract class ComponentTestBase {
     @MockBean
     PDLConsumer pdlConsumer;
 
-    @MockBean
-    EuxService euxService;
-
     @Autowired
     Unleash unleash;
 
