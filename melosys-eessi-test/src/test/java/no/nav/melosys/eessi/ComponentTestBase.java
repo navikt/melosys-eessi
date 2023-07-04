@@ -3,6 +3,7 @@ package no.nav.melosys.eessi;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +26,10 @@ import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.kafka.producers.model.Periode;
+import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
+import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
@@ -101,6 +106,9 @@ public abstract class ComponentTestBase {
 
     @MockBean
     PDLConsumer pdlConsumer;
+
+    @MockBean
+    EuxService euxService;
 
     @Autowired
     Unleash unleash;

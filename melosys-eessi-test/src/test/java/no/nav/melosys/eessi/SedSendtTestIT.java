@@ -9,6 +9,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -23,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -61,6 +63,21 @@ class SedSendtTestIT extends ComponentTestBase {
         assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
             .isEqualTo(Long.toString(arkivsakID));
+    }
+
+    @Test
+    void sedSendt_uidentifisertPerson_journalpostOpprettesIkke() throws Exception {
+        mockPerson();
+        mockArkivsak();
+        lagFagsakRinasakKobling();
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+
+        kafkaTestConsumer.reset(1);
+        kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
+        kafkaTestConsumer.doWait(1_500L);
+
+        //Assert that no journalpost is created and that teh sed is stored in db
+
     }
 
     @Test

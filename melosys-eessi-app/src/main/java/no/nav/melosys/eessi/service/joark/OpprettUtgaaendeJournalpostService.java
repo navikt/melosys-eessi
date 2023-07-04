@@ -48,7 +48,6 @@ public class OpprettUtgaaendeJournalpostService {
             } else {
                 log.info("SED {} inneholder ikke personId, journalfører ikke. " +
                     "Sjekker for eksisterende behandlingsoppgave", sedSendt.getRinaDokumentId());
-                sedSendtService.opprettOppgaveIdentifisering(sedSendt);
                 sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, null));
             }
 
@@ -69,12 +68,14 @@ public class OpprettUtgaaendeJournalpostService {
     private boolean sedInneholderPersonId(SedHendelse sedHendelse) {
         final var rinaSaksId = sedHendelse.getRinaSakId();
 
-        final var sed = euxService.hentSedMedRetry(rinaSaksId,
+        System.out.println(euxService.hentSedMedRetry(rinaSaksId,
+            sedHendelse.getRinaDokumentId()));
+
+         var sed = euxService.hentSedMedRetry(rinaSaksId,
             sedHendelse.getRinaDokumentId());
 
         log.info("Søker etter person for SED");
-        //Optional<String> person = personIdentifisering.identifiserPerson(rinaSaksId, sed);
-        Optional<String> person = Optional.empty();
+        Optional<String> person = personIdentifisering.identifiserPerson(rinaSaksId, sed);
         return person.isPresent();
     }
 
