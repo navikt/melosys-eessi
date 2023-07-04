@@ -44,7 +44,6 @@ public class OpprettUtgaaendeJournalpostService {
                 String journalpostId = arkiverUtgaaendeSed(sedSendt);
                 log.info("Journalpost opprettet med id: {}", journalpostId);
                 journalfoerTidligereSedDersomEksisterer(sedSendt.getRinaSakId());
-                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, journalpostId));
             } else {
                 log.info("SED {} inneholder ikke personId, journalfører ikke. " +
                     "Sjekker for eksisterende behandlingsoppgave", sedSendt.getRinaDokumentId());
@@ -62,6 +61,7 @@ public class OpprettUtgaaendeJournalpostService {
         List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
         for ( SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
             arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
+            sedSendtHendelseRepository.delete(sedSendtHendelse);
         }
     }
 
