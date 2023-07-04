@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.joark;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
@@ -36,18 +37,23 @@ public class OpprettUtgaaendeJournalpostService {
     private final PersonIdentifisering personIdentifisering;
     private final SedSendtService sedSendtService;
     private final SedSendtHendelseRepository sedSendtHendelseRepository;
+    private final Unleash unleash;
 
 
     public void behandleSedSendtHendelse(SedHendelse sedSendt) {
         try {
-            if (sedInneholderPersonId(sedSendt)) {
+            if (unleash.isEnabled("melosys.eessi.ikkeJournalfoer.uten.personid")) {
+                if (sedInneholderPersonId(sedSendt) && unleash.isEnabled("melosys.eessi.joark.ikkeJournalfoer.uten.personid")) {
+                    String journalpostId = arkiverUtgaaendeSed(sedSendt);
+                    log.info("Journalpost opprettet med id: {}", journalpostId);
+                    journalfoerTidligereSedDersomEksisterer(sedSendt.getRinaSakId());
+                } else {
+                    log.info("SED {} inneholder ikke personId, journalfører ikke.", sedSendt.getRinaDokumentId());
+                    sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, null));
+                }
+            } else {
                 String journalpostId = arkiverUtgaaendeSed(sedSendt);
                 log.info("Journalpost opprettet med id: {}", journalpostId);
-                journalfoerTidligereSedDersomEksisterer(sedSendt.getRinaSakId());
-            } else {
-                log.info("SED {} inneholder ikke personId, journalfører ikke. " +
-                    "Sjekker for eksisterende behandlingsoppgave", sedSendt.getRinaDokumentId());
-                sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, null));
             }
 
             sedMetrikker.sedSendt(sedSendt.getSedType());
