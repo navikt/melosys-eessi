@@ -70,7 +70,7 @@ class SedSendtTestIT extends ComponentTestBase {
         mockPerson();
         mockArkivsak();
         lagFagsakRinasakKobling();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();

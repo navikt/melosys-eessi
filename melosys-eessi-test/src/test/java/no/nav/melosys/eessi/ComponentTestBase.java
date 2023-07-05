@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
+import no.finn.unleash.FakeUnleash;
 import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
@@ -108,7 +109,7 @@ public abstract class ComponentTestBase {
     PDLConsumer pdlConsumer;
 
     @Autowired
-    Unleash unleash;
+    FakeUnleash unleash = new FakeUnleash();
 
     @Autowired
     KafkaTemplate<String, Object> kafkaTemplate;
@@ -123,6 +124,7 @@ public abstract class ComponentTestBase {
 
     @BeforeEach
     public void setup() {
+        unleash.enableAll();
         when(euxConsumer.hentBUC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
         when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
