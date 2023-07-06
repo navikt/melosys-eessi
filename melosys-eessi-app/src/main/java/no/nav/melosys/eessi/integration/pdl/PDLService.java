@@ -80,31 +80,6 @@ public class PDLService implements PersonFasade {
     }
 
     @Override
-    public List<PersonSokResponse> soekEtterPersonGammel(PersonsokKriterier personsokKriterier) {
-        return pdlConsumer.søkPerson(new PDLSokRequestVars(
-                        new PDLPaging(1, 20),
-                        Set.of(
-                                fornavn().inneholder(personsokKriterier.getFornavn()),
-                                etternavn().inneholder(personsokKriterier.getEtternavn()),
-                                fødselsdato().erLik(personsokKriterier.getFoedselsdato())
-                        )))
-                .getHits()
-                .stream()
-                .map(PDLSokHit::getIdenter)
-                .map(this::hentFolkeregisterIdentGammel)
-                .map(PersonSokResponse::new)
-                .collect(Collectors.toList());
-    }
-
-    private String hentFolkeregisterIdentGammel(Collection<PDLIdent> pdlIdenter) {
-        return pdlIdenter.stream()
-                .filter(PDLIdent::erFolkeregisterIdent)
-                .findFirst()
-                .map(PDLIdent::getIdent)
-                .orElseThrow();
-    }
-
-    @Override
     public List<PersonSokResponse> soekEtterPerson(PersonsokKriterier personsokKriterier) {
         return pdlConsumer.søkPerson(new PDLSokRequestVars(
                 new PDLPaging(1, 20),

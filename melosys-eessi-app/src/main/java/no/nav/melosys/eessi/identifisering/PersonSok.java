@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.identifisering;
 
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
@@ -19,17 +18,13 @@ import static no.nav.melosys.eessi.identifisering.PersonKontroller.harSammeFoeds
 class PersonSok {
 
     private final PersonFasade personFasade;
-    private final Unleash unleash;
 
-    PersonSok(PersonFasade personFasade, Unleash unleash) {
+    PersonSok(PersonFasade personFasade) {
         this.personFasade = personFasade;
-        this.unleash = unleash;
     }
 
     PersonSokResultat søkEtterPerson(PersonsokKriterier personsokKriterier) {
-        Collection<PersonSokResponse> personSøk = unleash.isEnabled("melosys.send_til_id_og_fordeling_dersom_ingen_folkeregisterident")
-            ? personFasade.soekEtterPerson(personsokKriterier)
-            : personFasade.soekEtterPersonGammel(personsokKriterier);
+        Collection<PersonSokResponse> personSøk = personFasade.soekEtterPerson(personsokKriterier);
         if (personSøk.isEmpty()) {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.INGEN_TREFF);
         } else if (personSøk.size() > 1) {
