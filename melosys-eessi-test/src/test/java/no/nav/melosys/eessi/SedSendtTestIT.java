@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -9,16 +11,22 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
+import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
+import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
+import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
+import no.nav.melosys.eessi.models.SedSendtHendelse;
 import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ;
 import no.nav.melosys.eessi.models.kafkadlq.SedSendtHendelseKafkaDLQ;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import no.nav.melosys.eessi.repository.KafkaDLQRepository;
+import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -28,6 +36,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
+import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.eq;
@@ -40,7 +49,13 @@ class SedSendtTestIT extends ComponentTestBase {
     private FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
 
     @Autowired
+    private SedSendtHendelseRepository sedSendtHendelseRepository;
+
+    @Autowired
     private KafkaDLQRepository kafkaDLQRepository;
+
+    @MockBean
+    private PersonFasade personFasade;
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
     final long arkivsakID = 11111119;
@@ -66,18 +81,22 @@ class SedSendtTestIT extends ComponentTestBase {
     }
 
     @Test
-    void sedSendt_uidentifisertPerson_journalpostOpprettesIkke() throws Exception {
-        mockPerson();
+    void sedSendt_uidentifisertPerson_lagresForFremtidigJournalfoering() throws Exception {
         mockArkivsak();
         lagFagsakRinasakKobling();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+        PDLSokPerson pdlSokPerson = new PDLSokPerson();
+        pdlSokPerson.setHits(Collections.singletonList(new PDLSokHit()));
+        when(personFasade.soekEtterPerson(any())).thenReturn(List.of());
+
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sedUkjentPin( LocalDate.of(2000, 1, 1), "DK", null));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
-        kafkaTestConsumer.doWait(1_500L);
+        kafkaTestConsumer.doWait(1500L);
+        List<SedSendtHendelse> test = sedSendtHendelseRepository.findAll();
 
+        System.out.println(test);
         //Assert that no journalpost is created and that teh sed is stored in db
-
     }
 
     @Test

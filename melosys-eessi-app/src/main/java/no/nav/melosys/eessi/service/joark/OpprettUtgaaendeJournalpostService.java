@@ -43,7 +43,7 @@ public class OpprettUtgaaendeJournalpostService {
     public void behandleSedSendtHendelse(SedHendelse sedSendt) {
         try {
             if (unleash.isEnabled("melosys.eessi.ikkeJournalfoer.uten.personid")) {
-                if (sedInneholderPersonId(sedSendt) && unleash.isEnabled("melosys.eessi.joark.ikkeJournalfoer.uten.personid")) {
+                if (sedInneholderPersonId(sedSendt)) {
                     String journalpostId = arkiverUtgaaendeSed(sedSendt);
                     log.info("Journalpost opprettet med id: {}", journalpostId);
                     journalfoerTidligereSedDersomEksisterer(sedSendt.getRinaSakId());
