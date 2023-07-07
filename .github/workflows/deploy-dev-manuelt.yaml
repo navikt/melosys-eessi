@@ -80,6 +80,28 @@ jobs:
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
           VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,APP_NAME_EUX_RINA_API=eux-rina-api-q2,CLUSTER_NAME_EUX_RINA_API=dev-fss
+      - run: |
+          echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
+      - name: Slack Notification (deploy success)
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: good
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':clap: melosys-eessi ble manuelt deployet til dev :rocket:'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
+      - name: Slack Notification (deploy failure)
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: danger
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke manuelt deployes til dev!'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
 
   # Deploy til Q1 manuelt
   deploy_q1:
@@ -98,6 +120,28 @@ jobs:
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
           VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys-q1,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,APP_NAME_EUX_RINA_API=eux-rina-api-q1,CLUSTER_NAME_EUX_RINA_API=dev-fss
+      - run: |
+          echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
+      - name: Slack Notification (deploy success)
+        if: success()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: good
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':clap: melosys-eessi ble manuelt deployet til q1 :rocket:'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
+      - name: Slack Notification (deploy failure)
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2.2.0
+        env:
+          SLACK_COLOR: danger
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke manuelt deployes til q1!'
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
 
   # Deploy til prod manuelt
   deploy_prod:
@@ -125,7 +169,7 @@ jobs:
           SLACK_COLOR: good
           SLACK_USERNAME: Github Actions
           SLACK_ICON: https://github.com/github.png?size=48
-          SLACK_TITLE: ':clap: melosys-eessi ble deployet til prod :rocket:'
+          SLACK_TITLE: ':clap: melosys-eessi ble manuelt deployet til prod :rocket:'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
       - name: Slack Notification (deploy failure)
@@ -135,6 +179,6 @@ jobs:
           SLACK_COLOR: danger
           SLACK_USERNAME: Github Actions
           SLACK_ICON: https://github.com/github.png?size=48
-          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke deployes til prod!'
+          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke manuelt deployes til prod!'
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
