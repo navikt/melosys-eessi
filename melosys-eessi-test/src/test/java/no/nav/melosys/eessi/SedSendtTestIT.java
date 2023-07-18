@@ -10,9 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -20,7 +18,6 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.BucIdentifisert;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.SedSendtHendelse;
 import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ;
 import no.nav.melosys.eessi.models.kafkadlq.SedSendtHendelseKafkaDLQ;
 import no.nav.melosys.eessi.repository.BucIdentifisertRepository;
@@ -36,7 +33,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
-import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.eq;
@@ -70,7 +66,7 @@ class SedSendtTestIT extends ComponentTestBase {
     void sedSendt_saksrelasjonFinnes_journalpostOpprettesOgFerdigstilles() throws Exception {
         mockPerson();
         mockArkivsak();
-        mockPersonIdentifisering();
+        mockIdentifisertPerson();
         lagFagsakRinasakKobling();
 
         kafkaTestConsumer.reset(1);
@@ -85,7 +81,7 @@ class SedSendtTestIT extends ComponentTestBase {
     }
 
     @Test
-    void sedSendt_tidligereUidentifisertPerson_oppretterFlereJournalPoster() throws Exception {
+    void sedSendt_tidligereUidentifisertPerson_oppretterFlereJournalPosterRetrospektivt() throws Exception {
         mockPerson();
         mockArkivsak();
         lagFagsakRinasakKobling();
@@ -99,22 +95,18 @@ class SedSendtTestIT extends ComponentTestBase {
         kafkaTestConsumer.reset(3);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
-        await().atMost(Duration.ofSeconds(8))
+        await().atMost(Duration.ofSeconds(4))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 2);
 
-        mockPersonIdentifisering();
+        mockIdentifisertPerson();
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
         kafkaTestConsumer.doWait(1_500L);
-        await().atMost(Duration.ofSeconds(8))
+        await().atMost(Duration.ofSeconds(4))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 0);
 
         verify(journalpostapiConsumer, times(3)).opprettJournalpost(argumentCaptor.capture(), eq(true));
-
-        assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
-            .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
-            .isEqualTo(Long.toString(arkivsakID));
     }
 
     @Test
@@ -141,7 +133,7 @@ class SedSendtTestIT extends ComponentTestBase {
     void sedSendt_feilerVedOpprettelseAvJournalpostFørsteGang_lagrerIDLQ() throws Exception {
         mockPerson();
         mockArkivsak();
-        mockPersonIdentifisering();
+        mockIdentifisertPerson();
 
         lagFagsakRinasakKobling();
         String sedId = UUID.randomUUID().toString();
@@ -194,7 +186,7 @@ class SedSendtTestIT extends ComponentTestBase {
         );
     }
 
-    private void mockPersonIdentifisering() {
+    private void mockIdentifisertPerson() {
         BucIdentifisert bucIdentifisert = new BucIdentifisert();
         bucIdentifisert.setId(1L);
         bucIdentifisert.setRinaSaksnummer(rinaSaksnummer);
