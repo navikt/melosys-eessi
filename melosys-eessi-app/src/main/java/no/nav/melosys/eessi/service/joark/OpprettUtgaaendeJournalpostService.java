@@ -74,9 +74,6 @@ public class OpprettUtgaaendeJournalpostService {
     private boolean sedInneholderPersonId(SedHendelse sedHendelse) {
         final var rinaSaksId = sedHendelse.getRinaSakId();
 
-        System.out.println(euxService.hentSedMedRetry(rinaSaksId,
-            sedHendelse.getRinaDokumentId()));
-
          var sed = euxService.hentSedMedRetry(rinaSaksId,
             sedHendelse.getRinaDokumentId());
 
