@@ -1,10 +1,8 @@
 package no.nav.melosys.eessi;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -19,11 +17,13 @@ import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.BucIdentifisert;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedSendtHendelse;
 import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ;
 import no.nav.melosys.eessi.models.kafkadlq.SedSendtHendelseKafkaDLQ;
+import no.nav.melosys.eessi.repository.BucIdentifisertRepository;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import no.nav.melosys.eessi.repository.KafkaDLQRepository;
 import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
@@ -57,6 +57,9 @@ class SedSendtTestIT extends ComponentTestBase {
     @MockBean
     private PersonFasade personFasade;
 
+    @MockBean
+    private BucIdentifisertRepository bucIdentifisertRepository;
+
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
     final long arkivsakID = 11111119;
 
@@ -67,6 +70,7 @@ class SedSendtTestIT extends ComponentTestBase {
     void sedSendt_saksrelasjonFinnes_journalpostOpprettesOgFerdigstilles() throws Exception {
         mockPerson();
         mockArkivsak();
+        mockPersonIdentifisering();
         lagFagsakRinasakKobling();
 
         kafkaTestConsumer.reset(1);
@@ -92,17 +96,22 @@ class SedSendtTestIT extends ComponentTestBase {
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
-        kafkaTestConsumer.doWait(1500L);
-        List<SedSendtHendelse> test = sedSendtHendelseRepository.findAll();
+        kafkaTestConsumer.doWait(3500L);
 
-        System.out.println(test);
-        //Assert that no journalpost is created and that teh sed is stored in db
+        await().atMost(Duration.ofSeconds(4))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 1);
+
+        verify(journalpostapiConsumer, never()).opprettJournalpost(any(), anyBoolean());
+        assertThat(sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size()).isEqualTo(1);
     }
 
     @Test
     void sedSendt_feilerVedOpprettelseAvJournalpostFørsteGang_lagrerIDLQ() throws Exception {
         mockPerson();
         mockArkivsak();
+        mockPersonIdentifisering();
+
         lagFagsakRinasakKobling();
         String sedId = UUID.randomUUID().toString();
 
@@ -154,8 +163,16 @@ class SedSendtTestIT extends ComponentTestBase {
         );
     }
 
+    private void mockPersonIdentifisering() {
+        BucIdentifisert bucIdentifisert = new BucIdentifisert();
+        bucIdentifisert.setId(1L);
+        bucIdentifisert.setRinaSaksnummer(rinaSaksnummer);
+        bucIdentifisert.setFolkeregisterident(FNR);
+
+        when(bucIdentifisertRepository.findByRinaSaksnummer(anyString())).thenReturn(Optional.of(bucIdentifisert));
+    }
+
     protected ProducerRecord<String, Object> lagSedSendtRecord(SedHendelse sedHendelse) {
         return new ProducerRecord<>(EESSIBASIS_SEDSENDT_V_1, "key", sedHendelse);
     }
-
 }
