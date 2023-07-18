@@ -85,6 +85,39 @@ class SedSendtTestIT extends ComponentTestBase {
     }
 
     @Test
+    void sedSendt_tidligereUidentifisertPerson_oppretterFlereJournalPoster() throws Exception {
+        mockPerson();
+        mockArkivsak();
+        lagFagsakRinasakKobling();
+
+        PDLSokPerson pdlSokPerson = new PDLSokPerson();
+        pdlSokPerson.setHits(Collections.singletonList(new PDLSokHit()));
+        when(personFasade.soekEtterPerson(any())).thenReturn(List.of());
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sedUkjentPin( LocalDate.of(2000, 1, 1), "DK", null));
+
+
+        kafkaTestConsumer.reset(3);
+        kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
+        kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
+        await().atMost(Duration.ofSeconds(8))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 2);
+
+        mockPersonIdentifisering();
+        kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
+        kafkaTestConsumer.doWait(1_500L);
+        await().atMost(Duration.ofSeconds(8))
+            .pollInterval(Duration.ofSeconds(1))
+            .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 0);
+
+        verify(journalpostapiConsumer, times(3)).opprettJournalpost(argumentCaptor.capture(), eq(true));
+
+        assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
+            .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
+            .isEqualTo(Long.toString(arkivsakID));
+    }
+
+    @Test
     void sedSendt_uidentifisertPerson_lagresForFremtidigJournalfoering() throws Exception {
         mockArkivsak();
         lagFagsakRinasakKobling();
@@ -101,9 +134,7 @@ class SedSendtTestIT extends ComponentTestBase {
         await().atMost(Duration.ofSeconds(4))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 1);
-
         verify(journalpostapiConsumer, never()).opprettJournalpost(any(), anyBoolean());
-        assertThat(sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size()).isEqualTo(1);
     }
 
     @Test
