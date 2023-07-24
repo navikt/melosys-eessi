@@ -19,7 +19,6 @@ import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.sending.SedSendtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,8 +52,6 @@ class OpprettUtgaaendeJournalpostServiceTest {
     @Mock
     private PersonIdentifisering personIdentifisering;
     @Mock
-    private SedSendtService sedSendtService;
-    @Mock
     private SedSendtHendelseRepository sedSendtHendelseRepository;
 
     private final FakeUnleash fakeUnleash = new FakeUnleash();
@@ -69,7 +66,7 @@ class OpprettUtgaaendeJournalpostServiceTest {
     public void setup() throws Exception {
         fakeUnleash.enableAll();
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtService, sedSendtHendelseRepository, fakeUnleash);
+            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtHendelseRepository, fakeUnleash);
 
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 

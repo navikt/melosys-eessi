@@ -15,7 +15,6 @@ import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.sending.SedSendtService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,7 +34,6 @@ public class OpprettUtgaaendeJournalpostService {
     private final OppgaveService oppgaveService;
     private final SedMetrikker sedMetrikker;
     private final PersonIdentifisering personIdentifisering;
-    private final SedSendtService sedSendtService;
     private final SedSendtHendelseRepository sedSendtHendelseRepository;
     private final Unleash unleash;
 

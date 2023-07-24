@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
-import no.nav.melosys.eessi.service.sending.SedSendtService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
