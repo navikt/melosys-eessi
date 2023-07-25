@@ -5,13 +5,17 @@ import java.util.Collections;
 import java.util.Optional;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
+import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
+import no.nav.melosys.eessi.models.SedSendtHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
+import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
@@ -20,12 +24,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OpprettUtgaaendeJournalpostServiceTest {
@@ -44,6 +49,13 @@ class OpprettUtgaaendeJournalpostServiceTest {
     private OppgaveService oppgaveService;
     @Mock
     private SedMetrikker sedMetrikker;
+    @Mock
+    private PersonIdentifisering personIdentifisering;
+    @Mock
+    private SedSendtHendelseRepository sedSendtHendelseRepository;
+
+    private final FakeUnleash fakeUnleash = new FakeUnleash();
+
 
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
@@ -52,8 +64,9 @@ class OpprettUtgaaendeJournalpostServiceTest {
 
     @BeforeEach
     public void setup() throws Exception {
+        fakeUnleash.enableAll();
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker);
+            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtHendelseRepository, fakeUnleash);
 
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
@@ -105,6 +118,32 @@ class OpprettUtgaaendeJournalpostServiceTest {
         verify(oppgaveService).opprettUtgåendeJfrOppgave(anyString(), any(), anyString(), anyString());
 
         assertThat(journalpostId).isEqualTo(JOURNALPOST_ID);
+    }
+
+    //TODO sjekk for tidligere jfr oppgave
+    @Test
+    void behandleSedHendelse_harPid_forventOpprettJfrOppgave() {
+        OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, new ArrayList<>(), "ENDELIG", null);
+        when(journalpostService.opprettUtgaaendeJournalpost(any(SedHendelse.class), any(), any(), any())).thenReturn(response);
+        when(personIdentifisering.identifiserPerson(anyString(), any())).thenReturn(Optional.of("12345"));
+        when(personFasade.hentAktoerId(anyString())).thenReturn("12345");
+        when(euxService.hentRinaUrl(anyString())).thenReturn("https://test.local");
+        when(saksrelasjonService.finnArkivsakForRinaSaksnummer(anyString())).thenReturn(Optional.empty());
+
+        opprettUtgaaendeJournalpostService.behandleSedSendtHendelse(sedSendt);
+
+        verify(oppgaveService).opprettUtgåendeJfrOppgave(anyString(), any(), anyString(), anyString());
+    }
+
+    @Test
+    @MockitoSettings(strictness = Strictness.LENIENT)
+    void behandleSedHendelse_harIkkePid_forventIkkeOpprettJfrOppgave() {
+        when(personIdentifisering.identifiserPerson(anyString(), any())).thenReturn(Optional.empty());
+
+        opprettUtgaaendeJournalpostService.behandleSedSendtHendelse(sedSendt);
+
+        verifyNoInteractions(oppgaveService);
+        verify(sedSendtHendelseRepository).save(any(SedSendtHendelse.class));
     }
 
     private SedMedVedlegg sedMedVedlegg(byte[] innhold) {

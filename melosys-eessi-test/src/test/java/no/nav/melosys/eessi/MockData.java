@@ -90,6 +90,41 @@ public class MockData {
         return sed;
     }
 
+    SED sedUkjentPin(LocalDate fødselsdato, String statsborgerskap, String ident) {
+        SED sed = new SED();
+        sed.setSedType(A003.name());
+
+        MedlemskapA003 medlemskap = new MedlemskapA003();
+        medlemskap.setRelevantartikkelfor8832004eller9872009("13_1_a");
+        medlemskap.setIsDeterminationProvisional("nei");
+
+        PeriodeA010 periode = new PeriodeA010();
+        periode.setStartdato("2019-06-01");
+        periode.setSluttdato("2019-12-01");
+
+        VedtakA003 vedtak = new VedtakA003();
+        vedtak.setLand("SE");
+        vedtak.setGjelderperiode(periode);
+        vedtak.setEropprinneligvedtak("ja");
+        medlemskap.setVedtak(vedtak);
+        sed.setMedlemskap(medlemskap);
+
+        Nav nav = new Nav();
+        Person person = new Person();
+        person.setFoedselsdato(fødselsdato.toString());
+        person.setKjoenn(Kjønn.M);
+        Statsborgerskap statsborgerskap1 = new Statsborgerskap();
+        statsborgerskap1.setLand(statsborgerskap);
+        person.setStatsborgerskap(Collections.singletonList(statsborgerskap1));
+        person.setPin(StringUtils.hasText(ident) ? List.of(new Pin(ident, "NO", null)) : Collections.emptyList());
+        Bruker bruker = new Bruker();
+        bruker.setPerson(person);
+        nav.setBruker(bruker);
+        sed.setNav(nav);
+
+        return sed;
+    }
+
 
     OpprettJournalpostResponse journalpostResponse(boolean ferdigstilt) {
         return OpprettJournalpostResponse.builder()
