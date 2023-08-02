@@ -31,22 +31,33 @@ public class OppgaveService {
         return oppgaveConsumer.hentOppgave(oppgaveID);
     }
 
+    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer, String preutfylltLenkeForRekvirering) {
+        var oppgaveDto = lagOppgaveDto(journalpostID,sedType,rinaSaksnummer, preutfylltLenkeForRekvirering).metadata(Map.of(OppgaveMetadataKey.LENKE, preutfylltLenkeForRekvirering == null ? "" : preutfylltLenkeForRekvirering)).build();
+        log.info("[EESSI TEST] Oppretter oppgave til ID og fordeling", oppgaveDto);
+        HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
+        log.info("Oppgave til ID og fordeling opprettet med id {}, rekvirering uuid {}", response.getId(), preutfylltLenkeForRekvirering);
+        return response.getId();
+    }
+
     public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer) {
-        var oppgaveDto = OppgaveDto.builder()
-                .aktivDato(LocalDate.now())
-                .fristFerdigstillelse(LocalDate.now().plusDays(1))
-                .journalpostId(journalpostID)
-                .oppgavetype(JFR)
-                .prioritet(PRIORITET_NORMAL)
-                .tema(temaForSedType(sedType))
-                .tildeltEnhetsnr(ENHET_ID_FORDELING)
-                .beskrivelse(String.format(BESKRIVELSE, sedType, rinaSaksnummer))
-                .metadata(Map.of(OppgaveMetadataKey.RINA_SAKID, rinaSaksnummer))
-                .build();
+        var oppgaveDto = lagOppgaveDto(journalpostID, sedType, rinaSaksnummer, "").build();
 
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Oppgave til ID og fordeling opprettet med id {}", response.getId());
         return response.getId();
+    }
+
+    private OppgaveDto.OppgaveDtoBuilder lagOppgaveDto(String journalpostID, String sedType, String rinaSaksnummer, String preutfylltLenkeForRekvirering){
+        return OppgaveDto.builder()
+            .aktivDato(LocalDate.now())
+            .fristFerdigstillelse(LocalDate.now().plusDays(1))
+            .journalpostId(journalpostID)
+            .oppgavetype(JFR)
+            .prioritet(PRIORITET_NORMAL)
+            .tema(temaForSedType(sedType))
+            .tildeltEnhetsnr(ENHET_ID_FORDELING)
+            .beskrivelse(String.format(BESKRIVELSE, sedType, rinaSaksnummer, preutfylltLenkeForRekvirering))
+            .metadata(Map.of(OppgaveMetadataKey.RINA_SAKID, rinaSaksnummer));
     }
 
     public String opprettUtgåendeJfrOppgave(String journalpostID, SedHendelse sedHendelse, String aktørId, String rinaUrl) {

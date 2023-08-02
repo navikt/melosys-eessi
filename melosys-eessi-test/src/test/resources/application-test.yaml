@@ -15,6 +15,7 @@ SRV_PASSWORD: dummy
 EUXCASESTORE_URL: dummy
 SAF_URL: dummy
 PDL_URL: dummy
+PDL_WEB_URL: dummy
 RINA_INSTITUSJON_ID: dummy
 
 # Database

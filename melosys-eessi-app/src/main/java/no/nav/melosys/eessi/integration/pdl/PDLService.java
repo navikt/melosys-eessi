@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSed;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
@@ -24,8 +25,16 @@ public class PDLService implements PersonFasade {
 
     private final PDLConsumer pdlConsumer;
 
-    public PDLService(PDLConsumer pdlConsumer) {
+    private final PDLRestConsumer pdlRestConsumer;
+
+    public PDLService(PDLConsumer pdlConsumer, PDLRestConsumer pdlRestConsumer) {
         this.pdlConsumer = pdlConsumer;
+        this.pdlRestConsumer = pdlRestConsumer;
+    }
+
+    @Override
+    public String hentPreutfylltLenkeForRekvirering(PDLSed pdlSed) {
+        return pdlRestConsumer.hentPreutfylltLenkeForRekvirering(pdlSed);
     }
 
     @Override

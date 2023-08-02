@@ -35,8 +35,18 @@ public class SedHendelse {
     }
 
     @JsonIgnore
+    public String getInstitusjon() {
+        return avsenderId;
+    }
+
+    @JsonIgnore
     public boolean erX100() {
         return sedType.equals(SedType.X100.name());
+    }
+
+    @JsonIgnore
+    public boolean erASED() {
+        return SedType.valueOf(sedType).erASED();
     }
 
     @JsonIgnore

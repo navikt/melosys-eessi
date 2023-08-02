@@ -8,6 +8,7 @@ import java.util.Set;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
+import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -43,6 +44,8 @@ class SedMottakServiceTest {
     @Mock
     private PersonIdentifisering personIdentifisering;
     @Mock
+    private PDLService pdlService;
+    @Mock
     private OppgaveService oppgaveService;
     @Mock
     private SedMottattHendelseRepository sedMottattHendelseRepository;
@@ -64,10 +67,16 @@ class SedMottakServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
-            euxService, personIdentifisering, opprettInngaaendeJournalpostService,
-            oppgaveService, sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository, bucIdentifisertService, journalpostSedKoblingService,
-            sedMetrikker
+            euxService,
+            pdlService,
+            opprettInngaaendeJournalpostService,
+            oppgaveService,
+            sedMottattHendelseRepository,
+            bucIdentifiseringOppgRepository,
+            journalpostSedKoblingService,
+            sedMetrikker,
+            personIdentifisering,
+            bucIdentifisertService
         );
     }
 
@@ -91,7 +100,7 @@ class SedMottakServiceTest {
         verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
+        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString(), any());
         verify(sedMottattHendelseRepository, times(2)).save(any());
         verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }

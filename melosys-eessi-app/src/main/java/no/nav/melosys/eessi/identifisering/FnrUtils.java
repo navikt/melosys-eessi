@@ -4,13 +4,13 @@ import java.util.Optional;
 
 import no.bekk.bekkopen.person.FodselsnummerValidator;
 
-final class FnrUtils {
+public final class FnrUtils {
     private FnrUtils() {}
 
     /**
      * Tar hensyn til ikke-numeriske tegn oppgitt som ident
      */
-    static Optional<String> filtrerUtGyldigNorskIdent(String ident) {
+    public static Optional<String> filtrerUtGyldigNorskIdent(String ident) {
         return Optional.ofNullable(ident)
                 .map(FnrUtils::fjernIkkeNumeriskeTegn)
                 .filter(FnrUtils::erGyldigIdent);

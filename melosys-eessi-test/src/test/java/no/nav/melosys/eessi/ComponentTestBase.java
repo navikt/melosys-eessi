@@ -23,6 +23,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
 import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
+import no.nav.melosys.eessi.integration.pdl.PDLRestConsumer;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
@@ -110,6 +111,9 @@ public abstract class ComponentTestBase {
 
     @MockBean
     PDLConsumer pdlConsumer;
+
+    @MockBean
+    PDLRestConsumer pdlRestConsumer;
 
     @Autowired
     FakeUnleash unleash = new FakeUnleash();
