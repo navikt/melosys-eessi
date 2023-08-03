@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -62,10 +63,19 @@ public class KafkaAivenConfig {
     @Bean
     public KafkaListenerErrorHandler sedMottattErrorHandler() {
         return (Message<?> message, ListenerExecutionFailedException exception) -> {
-            log.error("Feil ved prosessering av sed mottatt: {}\n{}", exception.getCause().getMessage(), message, exception);
+            log.error("Feil ved prosessering av Kafka-melding: sed_mottatt: {}\n{}", exception.getCause().getMessage(), message, exception);
             return null;
         };
     }
+
+    @Bean
+    public KafkaListenerErrorHandler oppgaveEndretErrorHandler() {
+        return (Message<?> message, ListenerExecutionFailedException exception) -> {
+            log.error("Feil ved prosessering av Kafka-melding: oppgave_endret: {}\n{}", exception.getCause().getMessage(), message, exception);
+            return null;
+        };
+    }
+
 
     @Bean
     @Qualifier("aivenTemplate")
@@ -78,10 +88,13 @@ public class KafkaAivenConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>>
-    sedHendelseListenerContainerFactory(
-        KafkaProperties kafkaProperties) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
         return sedListenerContainerFactory(kafkaProperties);
+    }
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretHendelse>> oppgaveEndretListenerContainerFactory(KafkaProperties kafkaProperties) {
+        return oppgaveListenerContainerFactory(kafkaProperties);
     }
 
     private ConcurrentKafkaListenerContainerFactory<String, SedHendelse> sedListenerContainerFactory(KafkaProperties kafkaProperties) {
@@ -92,6 +105,19 @@ public class KafkaAivenConfig {
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
         factory.setRecordFilterStrategy(recordFilterStrategySedListener());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+
+        return factory;
+    }
+
+    private ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> oppgaveListenerContainerFactory(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+        props.putAll(consumerConfig());
+
+        DefaultKafkaConsumerFactory<String, OppgaveEndretHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+            props, new StringDeserializer(), valueDeserializer(OppgaveEndretHendelse.class));
+        ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(defaultKafkaConsumerFactory);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;

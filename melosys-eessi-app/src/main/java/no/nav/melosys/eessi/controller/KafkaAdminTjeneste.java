@@ -6,7 +6,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretConsumer;
+import no.nav.melosys.eessi.kafka.consumers.OppgaveEndretConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.apache.kafka.common.TopicPartition;
