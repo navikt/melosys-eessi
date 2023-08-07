@@ -19,7 +19,7 @@ public class OppgaveService {
     private static final String ENHET_ID_FORDELING = "4303";
     private static final String ENHET_MEDLEMSKAP_OG_AVGIFT = "4530";
     private static final String PRIORITET_NORMAL = "NORM";
-    private static final String BESKRIVELSE = "EØS - %s\n\rRina-sak - %s";
+    private static final String BESKRIVELSE = "EØS - %s\n\rRina-sak - %s\n\rPreutfyllt url for rekvirrering: %s";
 
     private final OppgaveConsumer oppgaveConsumer;
 
@@ -32,8 +32,8 @@ public class OppgaveService {
     }
 
     public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer, String preutfylltLenkeForRekvirering) {
-        var oppgaveDto = lagOppgaveDto(journalpostID,sedType,rinaSaksnummer, preutfylltLenkeForRekvirering).metadata(Map.of(OppgaveMetadataKey.LENKE, preutfylltLenkeForRekvirering == null ? "" : preutfylltLenkeForRekvirering)).build();
-        log.info("[EESSI TEST] Oppretter oppgave til ID og fordeling", oppgaveDto);
+        var oppgaveDto = lagOppgaveDto(journalpostID,sedType,rinaSaksnummer, preutfylltLenkeForRekvirering).build();
+        log.info("[EESSI TEST] Oppretter oppgave til ID og fordeling", oppgaveDto, preutfylltLenkeForRekvirering);
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Oppgave til ID og fordeling opprettet med id {}, rekvirering uuid {}", response.getId(), preutfylltLenkeForRekvirering);
         return response.getId();

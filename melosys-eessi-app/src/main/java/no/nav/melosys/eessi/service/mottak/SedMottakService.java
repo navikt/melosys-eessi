@@ -4,6 +4,7 @@ import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
@@ -21,6 +22,7 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.buc.Participant;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
@@ -47,6 +49,9 @@ public class SedMottakService {
     private final SedMetrikker sedMetrikker;
     private final PersonIdentifisering personIdentifisering;
     private final BucIdentifisertService bucIdentifisertService;
+
+    private final Unleash unleash;
+
 
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
@@ -131,6 +136,7 @@ public class SedMottakService {
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed) {
         String journalpostID = opprettJournalpost(sedMottattHendelse, null);
+        boolean preutfyllingEnabled = unleash.isEnabled("melosys.eessi.preutfylling.av.sed");
 
         var oppgaveID = "";
         var harNorskPersonnummer = true;
@@ -143,41 +149,24 @@ public class SedMottakService {
                 .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
         }
 
-        if(sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer){
+        if(sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer && preutfyllingEnabled){
             var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
 
-            var pdlSed = new PDLSed.Builder()
-                .medKilde(new PDLSedKilde.Builder()
-                    .medInstitusjon(hentInstitusjon(sed))
-                    .medLandkode(sedMottattHendelse.getSedHendelse().getAvsenderId() != null ? sedMottattHendelse.getSedHendelse().getLandkode() : "")
-                    .build())
-                .medPersonopplysninger(new PDLSedPersonopplysninger.Builder()
-                    .medEtternavn(personFraSed.getEtternavn())
-                    .medFornavn(personFraSed.getFornavn())
-                    .medFoedselsdato(personFraSed.getFoedselsdato())
-                    .medKjoenn(personFraSed.getKjoenn() != null ? personFraSed.getKjoenn().name() : "")
-                    .medStatsborgerskap(personFraSed.getStatsborgerskap().toString())
-                    .medFoedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : "")
-                    .build());
-
-            if(pinSEDErFraLandSedKommerFra){
-                pdlSed.medUtenlandskIdentifikasjon(new PDLSedUtenlandskIdentifikasjon.Builder()
-                    .medUtstederland(sedMottattHendelse.getSedHendelse().getLandkode()).build());
-            } else {
-                pdlSed.medUtenlandskIdentifikasjon(new PDLSedUtenlandskIdentifikasjon.Builder()
-                    .medUtenlandskId("").build());
-            }
+            var pdlSed = byggPDLSed(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
             log.info("[EESSI TEST] Prøver å rekvirere", pdlSed);
 
-            String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(pdlSed.build());
+            try {
+                String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(pdlSed);
+                log.info("[EESSI TEST] Rekvirering OK: " + preutfylltLenkeForRekvirering);
+            } catch (Exception e) {
+                log.error("[EESSI TEST] Feil under rekvirering: " + e.getMessage());
+            }
 
-            log.info("[EESSI TEST] Rekvirering OK", preutfylltLenkeForRekvirering);
 
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,
                 sedMottattHendelse.getSedHendelse().getSedType(),
-                sedMottattHendelse.getSedHendelse().getRinaSakId(),
-                preutfylltLenkeForRekvirering
+                sedMottattHendelse.getSedHendelse().getRinaSakId()
             );
         } else {
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
@@ -194,6 +183,32 @@ public class SedMottakService {
             .build());
 
         log.info("Opprettet oppgave med id {}", oppgaveID);
+    }
+
+    private PDLSed byggPDLSed(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra){
+        var pdlSed = new PDLSed.Builder()
+            .medKilde(new PDLSedKilde.Builder()
+                .medInstitusjon(hentInstitusjon(sed))
+                .medLandkode(sedMottattHendelse.getSedHendelse().getAvsenderId() != null ? sedMottattHendelse.getSedHendelse().getLandkode() : "")
+                .build())
+            .medPersonopplysninger(new PDLSedPersonopplysninger.Builder()
+                .medEtternavn(personFraSed.getEtternavn())
+                .medFornavn(personFraSed.getFornavn())
+                .medFoedselsdato(personFraSed.getFoedselsdato())
+                .medKjoenn(personFraSed.getKjoenn() != null ? personFraSed.getKjoenn().name() : "")
+                .medStatsborgerskap(personFraSed.getStatsborgerskap().toString())
+                .medFoedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : "")
+                .build());
+
+        if(pinSEDErFraLandSedKommerFra){
+            pdlSed.medUtenlandskIdentifikasjon(new PDLSedUtenlandskIdentifikasjon.Builder()
+                .medUtstederland(sedMottattHendelse.getSedHendelse().getLandkode()).build());
+        } else {
+            pdlSed.medUtenlandskIdentifikasjon(new PDLSedUtenlandskIdentifikasjon.Builder()
+                .medUtenlandskId("").build());
+        }
+
+        return pdlSed.build();
     }
     private String hentInstitusjon(SED sed) {
         if(sed.getNav() != null

@@ -10,5 +10,5 @@ public enum OppgaveMetadataKey {
     SKANNET_DATO,
     RINA_SAKID,
     HJEMMEL,
-    LENKE,
+    PREUTFYLLT_REKVIRERING_LENKE,
 }

@@ -50,7 +50,7 @@ class OppgaveServiceTest {
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
         assertThat(oppgaveDto.getTema()).isEqualTo("UFM");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR");
-        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009\n\rRina-sak - " + rinaSaksnummer);
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009\n\rRina-sak - " + rinaSaksnummer+ "\n\rPreutfyllt url for rekvirrering: ");
     }
 
     @Test

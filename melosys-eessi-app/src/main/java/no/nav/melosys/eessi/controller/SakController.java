@@ -16,13 +16,12 @@ import no.nav.melosys.eessi.models.exception.ValidationException;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.security.token.support.core.api.Protected;
-import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-@Unprotected
+@Protected
 @Slf4j
 @RestController
 @RequestMapping("/sak")

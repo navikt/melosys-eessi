@@ -27,13 +27,23 @@ public class PDLRestConsumer implements RestConsumer {
 
     public String hentPreutfylltLenkeForRekvirering(PDLSed pdlSed) {
         log.info("[EESSI TEST] Prøver å kommunisere med PDL WEB");
-        return webClient.post()
+
+        var res = webClient.post()
             .uri("/api/sed")
             .bodyValue(pdlSed)
             .retrieve()
-            .onStatus(HttpStatus::isError, this::håndterFeil)
             .bodyToMono(String.class)
             .block();
+
+        log.info("[EESSI TEST] Feilmelding fra PDL: {}", res);
+        log.info("[EESSI TEST] Feilmelding fra PDLSed: {}", pdlSed);
+
+
+//        HttpHeaders httpHeaders = res.headers().asHttpHeaders();
+//        String locationHeader = httpHeaders.getFirst(HttpHeaders.LOCATION);
+//        log.info("[EESSI TEST] Lenken fra pdl: {}", locationHeader);
+
+        return "";
     }
 
     private Mono<? extends Throwable> håndterFeil(ClientResponse clientResponse) {
