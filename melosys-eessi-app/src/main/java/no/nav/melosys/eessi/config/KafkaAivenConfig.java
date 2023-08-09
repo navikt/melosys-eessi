@@ -6,7 +6,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
+import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -37,6 +37,8 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.Message;
+
+import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendelse.Hendelsestype.OPPGAVE_ENDRET;
 
 @Configuration
 @EnableKafka
@@ -93,7 +95,7 @@ public class KafkaAivenConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretHendelse>> oppgaveEndretListenerContainerFactory(KafkaProperties kafkaProperties) {
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveKafkaAivenRecord>> oppgaveEndretListenerContainerFactory(KafkaProperties kafkaProperties) {
         return oppgaveListenerContainerFactory(kafkaProperties);
     }
 
@@ -110,14 +112,14 @@ public class KafkaAivenConfig {
         return factory;
     }
 
-    private ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> oppgaveListenerContainerFactory(KafkaProperties kafkaProperties) {
+    private ConcurrentKafkaListenerContainerFactory<String, OppgaveKafkaAivenRecord> oppgaveListenerContainerFactory(KafkaProperties kafkaProperties) {
         Map<String, Object> props = kafkaProperties.buildConsumerProperties();
         props.putAll(consumerConfig());
-
-        DefaultKafkaConsumerFactory<String, OppgaveEndretHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-            props, new StringDeserializer(), valueDeserializer(OppgaveEndretHendelse.class));
-        ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        DefaultKafkaConsumerFactory<String, OppgaveKafkaAivenRecord> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+            props, new StringDeserializer(), valueDeserializer(OppgaveKafkaAivenRecord.class));
+        ConcurrentKafkaListenerContainerFactory<String, OppgaveKafkaAivenRecord> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.setRecordFilterStrategy(recordFilterStrategyOppgaveHendelserListener());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
@@ -183,6 +185,18 @@ public class KafkaAivenConfig {
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
         // Return false to be dismissed
-        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
+        return consumerRecord -> {
+            System.out.println("HALLO! = " + LEGISLATION_APPLICABLE_CODE);
+
+            return !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
+        };
+    }
+
+    private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
+
+        return consumerRecord -> {
+            System.out.println("HALLO OPPGAVE! = " + OPPGAVE_ENDRET);
+            return !OPPGAVE_ENDRET.equals(consumerRecord.value().hendelse().hendelsestype());
+        };
     }
 }

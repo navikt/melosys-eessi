@@ -14,6 +14,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.finn.unleash.FakeUnleash;
 import no.finn.unleash.Unleash;
+import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
 import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
 import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
@@ -68,7 +69,7 @@ import static org.mockito.Mockito.when;
 public abstract class ComponentTestBase {
     public static final String EESSIBASIS_SEDMOTTATT_V_1 = "eessibasis-sedmottatt-v1";
     public static final String EESSIBASIS_SEDSENDT_V_1 = "eessibasis-sedsendt-v1";
-    public static final String OPPGAVE_ENDRET = "oppgave-endret";
+    public static final String OPPGAVE_ENDRET = "oppgavehandtering.oppgavehendelse-v1";
     public static final String TEAMMELOSYS_EESSI_V_1_LOCAL = "teammelosys.eessi.v1-local";
 
     static final LocalDate FØDSELSDATO = LocalDate.of(2000, 1, 1);
@@ -185,13 +186,17 @@ public abstract class ComponentTestBase {
     }
 
     @SneakyThrows
-    private Object oppgaveEksempel(String oppgaveID, String versjonsNummer, String rinaSaksnummer) {
+    private OppgaveKafkaAivenRecord oppgaveEksempel(String oppgaveID, String versjonsNummer, String rinaSaksnummer) {
         var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
         var oppgaveJsonString = Files.readString(path);
-        return new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
+        var treeNode = new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
             .replaceAll("\\$fnr", FNR)
-            .replaceAll("\\$aktoerid", AKTOER_ID)
             .replaceAll("\\$versjonsnummer", versjonsNummer)
-            .replaceAll("\\$rinasaksnummer", rinaSaksnummer));
+            .replaceAll("\\$rinasaksnummer", rinaSaksnummer)); //TODO: WHAT TO DO?
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        return objectMapper.treeToValue(treeNode, OppgaveKafkaAivenRecord.class);
     }
 }

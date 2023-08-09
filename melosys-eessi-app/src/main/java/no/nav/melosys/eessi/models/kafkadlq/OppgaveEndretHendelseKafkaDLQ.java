@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
@@ -18,12 +17,12 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @NoArgsConstructor
-@DiscriminatorValue("OPPGAVE_ENDRET_HENDELSE")
+@DiscriminatorValue("OPPGAVE_ENDRET_HENDELSE_AIVEN")
 public class OppgaveEndretHendelseKafkaDLQ extends KafkaDLQ {
 
     @Type(type = "jsonb")
     @Column(name = "melding", columnDefinition = "jsonb")
-    private OppgaveEndretHendelse oppgaveEndretHendelse;
+    private OppgaveKafkaAivenRecord oppgaveEndretHendelse;
 
     @Override
     public String hentMeldingSomStreng() throws JsonProcessingException {

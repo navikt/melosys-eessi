@@ -1,41 +1,34 @@
 {
-  "id": $id,
-  "tildeltEnhetsnr": "4530",
-  "endretAvEnhetsnr": "4303",
-  "opprettetAvEnhetsnr": "4530",
-  "tilordnetRessurs": null,
-  "tema": "MED",
-  "behandlingstema": "ab0061",
-  "oppgavetype": "JFR",
-  "versjon": "$versjonsnummer",
-  "beskrivelse": "blabla",
-  "fristFerdigstillelse": "2021-03-15",
-  "aktivDato": "2021-03-11",
-  "opprettetTidspunkt": "2021-03-11T12:58:54.9+01:00",
-  "opprettetAv": "srvmelosys-eessi",
-  "endretAv": "Z111111",
-  "endretTidspunkt": "2021-03-11T12:59:30.785+01:00",
-  "prioritet": "NORM",
-  "status": "AAPNET",
-  "statuskategori": "AAPEN",
-  "ident": {
-    "identType": "AKTOERID",
-    "verdi": "$aktoerid",
-    "folkeregisterident": "$fnr",
-    "registrert_dato": {
-      "year": 2020,
-      "month": "JULY",
-      "monthValue": 7,
-      "dayOfMonth": 7,
-      "chronology": {
-        "calendarType": "iso8601",
-        "id": "ISO"
-      },
-      "era": "CE",
-      "dayOfWeek": "TUESDAY",
-      "leapYear": true,
-      "dayOfYear": 189
+    "hendelse": {
+        "hendelsestype": "OPPGAVE_ENDRET",
+        "tidspunkt": "2023-02-23T08:58:23.832"
+    },
+    "utfortAv": {
+        "navIdent": "Z123456",
+        "enhetsnr": "4530"
+    },
+    "oppgave": {
+        "oppgaveId": $id,
+        "versjon": $versjonsnummer,
+        "tilordning": {
+            "enhetsnr": "4530",
+            "enhetsmappeId": null,
+            "navIdent": "Z123456"
+        },
+        "kategorisering": {
+            "tema": "MED",
+            "oppgavetype": "JFR",
+            "behandlingstema": null,
+            "behandlingstype": "ae0160",
+            "prioritet": "NORMAL"
+        },
+        "behandlingsperiode": {
+            "aktiv": "2023-02-23",
+            "frist": "2023-02-23"
+        },
+        "bruker": {
+            "ident": "$fnr",
+            "identType": "FOLKEREGISTERIDENT"
+        }
     }
-  },
-  "metadata": {"RINA_SAKID": "$rinasaksnummer"}
 }

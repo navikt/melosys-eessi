@@ -56,7 +56,7 @@ melosys:
         oppgave:
           endret:
             groupid: ${KAFKA_AIVEN_OPPGAVE_ENDRET_GROUPID:melosys-eessi-oppgaveHendelser-aiven}
-            topic: ${KAFKA_AIVEN_OPPGAVE_ENDRET_TOPIC:oppgave-endret}
+            topic: ${KAFKA_AIVEN_OPPGAVE_ENDRET_TOPIC:oppgavehandtering.oppgavehendelse-v1}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}
