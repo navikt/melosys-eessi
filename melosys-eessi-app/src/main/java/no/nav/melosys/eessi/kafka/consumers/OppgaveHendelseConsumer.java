@@ -17,20 +17,20 @@ import static no.nav.melosys.eessi.config.MDCOperations.*;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class OppgaveEndretConsumer extends AbstractConsumerSeekAware {
+public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
 
     private final OppgaveEndretService oppgaveEndretService;
     private final KafkaDLQService kafkaDLQService;
 
     @KafkaListener(
-        id = "oppgaveEndret",
-        clientIdPrefix = "melosys-eessi-oppgaveEndret",
-        topics = "${melosys.kafka.aiven.consumer.oppgave.endret.topic}",
+        id = "oppgaveHendelse",
+        clientIdPrefix = "melosys-eessi-oppgaveHendelse",
+        topics = "${melosys.kafka.aiven.consumer.oppgave.hendelse.topic}",
         containerFactory = "oppgaveEndretListenerContainerFactory",
-        groupId = "${melosys.kafka.aiven.consumer.oppgave.endret.groupid}",
+        groupId = "${melosys.kafka.aiven.consumer.oppgave.hendelse.groupid}",
         errorHandler = "oppgaveEndretErrorHandler"
     )
-    public void oppgaveEndret(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
+    public void oppgaveHendelse(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
         final var oppgaveEndretHendelse = consumerRecord.value();
         log.info("Mottatt melding om oppgave endret: {}", oppgaveEndretHendelse);
 

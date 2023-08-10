@@ -54,9 +54,9 @@ melosys:
           groupid: ${KAFKA_AIVEN_SEDHENDELSER_SENDT_GROUPID:melosys-eessi-sedHendelser-aiven}
           topic: ${KAFKA_AIVEN_SEDSENDT_TOPIC:eessibasis-sedsendt-v1}
         oppgave:
-          endret:
-            groupid: ${KAFKA_AIVEN_OPPGAVE_ENDRET_GROUPID:melosys-eessi-oppgaveHendelser-aiven}
-            topic: ${KAFKA_AIVEN_OPPGAVE_ENDRET_TOPIC:oppgavehandtering.oppgavehendelse-v1}
+          hendelse:
+            groupid: ${KAFKA_AIVEN_OPPGAVE_HENDELSE_GROUPID:melosys-eessi-oppgaveHendelser-aiven}
+            topic: ${KAFKA_AIVEN_OPPGAVE_HENDELSE_TOPIC:oppgavehandtering.oppgavehendelse-v1}
   systemuser:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}

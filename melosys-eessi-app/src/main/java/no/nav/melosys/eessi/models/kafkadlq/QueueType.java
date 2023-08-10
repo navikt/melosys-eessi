@@ -17,5 +17,6 @@ package no.nav.melosys.eessi.models.kafkadlq;
 public enum QueueType {
     SED_MOTTATT_HENDELSE,
     SED_SENDT_HENDELSE,
-    OPPGAVE_ENDRET_HENDELSE_AIVEN
+    OPPGAVE_HENDELSE_AIVEN,
+    OPPGAVE_ENDRET_HENDELSE_GAMMEL
 }
