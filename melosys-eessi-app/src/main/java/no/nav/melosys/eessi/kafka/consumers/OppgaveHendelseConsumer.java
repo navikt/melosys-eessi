@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
@@ -21,6 +22,7 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
 
     private final OppgaveEndretService oppgaveEndretService;
     private final KafkaDLQService kafkaDLQService;
+    private final Unleash unleash;
 
     @KafkaListener(
         id = "oppgaveHendelse",
@@ -31,20 +33,25 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
         errorHandler = "oppgaveEndretErrorHandler"
     )
     public void oppgaveHendelse(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
-        final var oppgaveEndretHendelse = consumerRecord.value();
-        log.info("Mottatt melding om oppgave endret: {}", oppgaveEndretHendelse);
+        if (!unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven")) {
+            final var oppgaveEndretHendelse = consumerRecord.value();
+            log.info("Mottatt melding om oppgaveHendelse: {}", oppgaveEndretHendelse.oppgave().oppgaveId());
 
-        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
+            putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
-        try {
-            oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);
-        } catch (Exception e) {
-            String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, consumerRecord, e);
+            try {
+                oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);
+            } catch (Exception e) {
+                String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+                log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, consumerRecord, e);
 
-            kafkaDLQService.lagreOppgaveEndretHendelse(oppgaveEndretHendelse, e.getMessage());
-        } finally {
-            remove(CORRELATION_ID);
+                kafkaDLQService.lagreOppgaveEndretHendelse(oppgaveEndretHendelse, e.getMessage());
+            } finally {
+                remove(CORRELATION_ID);
+            }
+        }
+        else if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
+            log.info("Toggle for oppgavehendelse er slått av, konsumerer ikke mottatt melding om oppgavehendelse: {}", consumerRecord.value().oppgave().oppgaveId());
         }
     }
 
