@@ -46,7 +46,7 @@ public class OppgaveEndretConsumerGammel extends AbstractConsumerSeekAware {
                 remove(CORRELATION_ID);
             }
         }
-        if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
+        else if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
             log.info("Toggle for oppgavehendelse er slått på, konsumerer ikke mottatt melding om oppgave endret: {}", consumerRecord.value().getId());
         }
     }
