@@ -93,7 +93,7 @@ public class KafkaAdminTjeneste {
     public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
-        if (!List.of("oppgaveEndret", "sedMottatt").contains(consumerId)) {
+        if (!List.of("oppgaveEndret", "sedMottatt", "oppgaveHendelse").contains(consumerId)) {
             return ResponseEntity.badRequest().body("ConsumerId is not supported: " + consumerId);
         }
 
