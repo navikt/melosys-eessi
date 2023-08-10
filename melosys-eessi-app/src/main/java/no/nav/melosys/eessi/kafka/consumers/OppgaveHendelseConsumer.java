@@ -33,7 +33,7 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
         errorHandler = "oppgaveEndretErrorHandler"
     )
     public void oppgaveHendelse(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
-        if (!unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven")) {
+        if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven")) {
             final var oppgaveEndretHendelse = consumerRecord.value();
             log.info("Mottatt melding om oppgaveHendelse: {}", oppgaveEndretHendelse.oppgave().oppgaveId());
 
