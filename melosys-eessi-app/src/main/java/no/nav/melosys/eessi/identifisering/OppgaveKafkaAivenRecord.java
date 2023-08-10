@@ -47,7 +47,7 @@ public record OppgaveKafkaAivenRecord(Hendelse hendelse, UtfortAv utfortAv, Oppg
     @JsonIgnore
     public String hentFolkeregisterIdent() {
         return Optional.ofNullable(oppgave.bruker != null && oppgave.bruker.identType == Bruker.IdentType.FOLKEREGISTERIDENT ? oppgave.bruker.ident : null)
-            .orElseThrow(() -> new NoSuchElementException("Finner ikke aktørID"));
+            .orElseThrow(() -> new NoSuchElementException("Finner ikke folkeregisterident"));
     }
 
     @JsonIgnore
