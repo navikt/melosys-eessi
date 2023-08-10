@@ -185,18 +185,10 @@ public class KafkaAivenConfig {
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
         // Return false to be dismissed
-        return consumerRecord -> {
-            System.out.println("HALLO! = " + LEGISLATION_APPLICABLE_CODE);
-
-            return !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
-        };
+        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
-
-        return consumerRecord -> {
-            System.out.println("HALLO OPPGAVE! = " + OPPGAVE_ENDRET);
-            return !OPPGAVE_ENDRET.equals(consumerRecord.value().hendelse().hendelsestype());
-        };
+        return consumerRecord -> !OPPGAVE_ENDRET.equals(consumerRecord.value().hendelse().hendelsestype());
     }
 }
