@@ -37,8 +37,7 @@ public record OppgaveKafkaAivenRecord(Hendelse hendelse, UtfortAv utfortAv, Oppg
     }
 
     @JsonIgnore
-    public boolean harAktørID() {
-        //TODO: AktørID? Hva skal vi gjøre her?
+    public boolean harFolkeregisterIdent() {
         return oppgave() != null
             && oppgave().bruker != null
             && oppgave().bruker.identType() == Bruker.IdentType.FOLKEREGISTERIDENT
@@ -46,8 +45,8 @@ public record OppgaveKafkaAivenRecord(Hendelse hendelse, UtfortAv utfortAv, Oppg
     }
 
     @JsonIgnore
-    public String hentAktørID() {
-        return Optional.ofNullable(oppgave.bruker != null ? oppgave.bruker.ident : null)
+    public String hentFolkeregisterIdent() {
+        return Optional.ofNullable(oppgave.bruker != null && oppgave.bruker.identType == Bruker.IdentType.FOLKEREGISTERIDENT ? oppgave.bruker.ident : null)
             .orElseThrow(() -> new NoSuchElementException("Finner ikke aktørID"));
     }
 

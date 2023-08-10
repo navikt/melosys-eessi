@@ -61,18 +61,17 @@ public class OppgaveEndretService {
     private boolean erIdentifiseringsOppgave(OppgaveKafkaAivenRecord oppgaveEndretHendelse) {
         return "JFR".equals(oppgaveEndretHendelse.oppgave().kategorisering().oppgavetype())
             && "4530".equals(oppgaveEndretHendelse.oppgave().tilordning().enhetsnr())
-            && oppgaveEndretHendelse.harAktørID()
+            && oppgaveEndretHendelse.harFolkeregisterIdent()
             && GYLDIGE_TEMA.contains(oppgaveEndretHendelse.oppgave().kategorisering().tema());
-        // && oppgaveEndretHendelse.harMetadataRinasaksnummer(); // TODO: Hva gjør vi med harMetadataRinasaksnummer?
     }
 
     private void kontrollerIdentifiseringOgOppdaterOppgave(String rinaSaksnummer,
                                                            OppgaveKafkaAivenRecord oppgaveEndretHendelse,
                                                            int versjon) {
-        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgaveEndretHendelse.hentAktørID(), rinaSaksnummer, versjon);
+        var kontrollResultat = identifiseringKontrollService.kontrollerIdentifisertPerson(oppgaveEndretHendelse.hentFolkeregisterIdent(), rinaSaksnummer, versjon);
         if (kontrollResultat.erIdentifisert()) {
             log.info("BUC {} identifisert av oppgave {}", rinaSaksnummer, oppgaveEndretHendelse.oppgave().oppgaveId());
-            bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, personFasade.hentNorskIdent(oppgaveEndretHendelse.hentAktørID()));
+            bucIdentifisertService.lagreIdentifisertPerson(rinaSaksnummer, oppgaveEndretHendelse.hentFolkeregisterIdent());
             oppgaveService.ferdigstillOppgave(oppgaveEndretHendelse.oppgave().oppgaveId().toString(), oppgaveEndretHendelse.oppgave().versjon());
         } else {
             log.info("Oppgave {} tilhørende rina-sak {} ikke identifisert. Feilet på: {}", oppgaveEndretHendelse.oppgave().oppgaveId(), rinaSaksnummer, kontrollResultat.getBegrunnelser());
