@@ -6,11 +6,11 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretConsumer;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretConsumerGammel;
+import no.nav.melosys.eessi.kafka.consumers.OppgaveHendelseConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.apache.kafka.common.TopicPartition;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,19 +26,23 @@ public class KafkaAdminTjeneste {
 
     private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
 
-    @Autowired
-    private KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
+    private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
-    private final OppgaveEndretConsumer oppgaveEndretConsumer;
+    private final OppgaveHendelseConsumer oppgaveHendelseConsumer;
+    private final OppgaveEndretConsumerGammel oppgaveEndretConsumerGammel;
     private final SedMottattConsumer sedMottattConsumer;
     private final String apiKey;
 
-    public KafkaAdminTjeneste(OppgaveEndretConsumer oppgaveEndretConsumer,
+    public KafkaAdminTjeneste(OppgaveHendelseConsumer oppgaveHendelseConsumer,
+                              OppgaveEndretConsumerGammel oppgaveEndretConsumerGammel,
                               SedMottattConsumer sedMottattConsumer,
-                              @Value("${melosys.admin.api-key}") String apiKey) {
-        this.oppgaveEndretConsumer = oppgaveEndretConsumer;
+                              @Value("${melosys.admin.api-key}") String apiKey,
+                              KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
+        this.oppgaveHendelseConsumer = oppgaveHendelseConsumer;
+        this.oppgaveEndretConsumerGammel = oppgaveEndretConsumerGammel;
         this.sedMottattConsumer = sedMottattConsumer;
         this.apiKey = apiKey;
+        this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
     }
 
     @GetMapping()
@@ -89,13 +93,14 @@ public class KafkaAdminTjeneste {
     public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset, @RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
 
-        if (!List.of("oppgaveEndret", "sedMottatt").contains(consumerId)) {
+        if (!List.of("oppgaveEndret", "sedMottatt", "oppgaveHendelse").contains(consumerId)) {
             return ResponseEntity.badRequest().body("ConsumerId is not supported: " + consumerId);
         }
 
         log.info("[KafkaAdminTjeneste] Setter offset for " + consumerId + " til: {}", offset);
         switch (consumerId) {
-            case "oppgaveEndret" -> oppgaveEndretConsumer.settSpesifiktOffsetPåConsumer(offset);
+            case "oppgaveHendelse" -> oppgaveHendelseConsumer.settSpesifiktOffsetPåConsumer(offset);
+            case "oppgaveEndret" -> oppgaveEndretConsumerGammel.settSpesifiktOffsetPåConsumer(offset);
             case "sedMottatt" -> sedMottattConsumer.settSpesifiktOffsetPåConsumer(offset);
             default -> log.warn("Vi støtter ikke {}, gjør ingenting.", consumerId);
         }

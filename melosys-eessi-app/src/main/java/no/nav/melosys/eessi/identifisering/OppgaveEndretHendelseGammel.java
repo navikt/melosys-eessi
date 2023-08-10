@@ -15,7 +15,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class OppgaveEndretHendelse {
+public class OppgaveEndretHendelseGammel {
     private Long id;
     private String tildeltEnhetsnr;
     private String journalpostId;

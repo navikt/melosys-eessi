@@ -3,10 +3,7 @@ package no.nav.melosys.eessi.config;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Metrics;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
-import no.nav.melosys.eessi.metrikker.MetrikkerNavn;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelseGammel;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,11 +22,11 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
 @EnableKafka
-public class KafkaConsumerConfig {
+public class KafkaConsumerGammelConfig {
 
     private final String groupId;
 
-    public KafkaConsumerConfig(@Value("${melosys.kafka.consumer.oppgave-endret.groupid}") String groupId) {
+    public KafkaConsumerGammelConfig(@Value("${melosys.kafka.consumer.oppgave-endret.groupid}") String groupId) {
         this.groupId = groupId;
     }
 
@@ -47,13 +44,13 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretHendelse>> oppgaveListenerContainerFactory(
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveEndretHendelseGammel>> oppgaveListenerContainerFactory(
             KafkaProperties properties) {
         Map<String, Object> props = properties.buildConsumerProperties();
         props.putAll(consumerProperties("earliest"));
-        DefaultKafkaConsumerFactory<String, OppgaveEndretHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-                props, new StringDeserializer(), valueDeserializer(OppgaveEndretHendelse.class));
-        ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        DefaultKafkaConsumerFactory<String, OppgaveEndretHendelseGammel> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+                props, new StringDeserializer(), valueDeserializer(OppgaveEndretHendelseGammel.class));
+        ConcurrentKafkaListenerContainerFactory<String, OppgaveEndretHendelseGammel> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
         factory.setErrorHandler(new SeekToCurrentErrorHandler());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);

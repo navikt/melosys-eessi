@@ -3,7 +3,8 @@ package no.nav.melosys.eessi.service.kafkadlq;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelse;
+import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelseGammel;
+import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.kafkadlq.*;
@@ -11,6 +12,7 @@ import no.nav.melosys.eessi.repository.KafkaDLQRepository;
 import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
+import no.nav.melosys.eessi.service.oppgave.OppgaveEndretServiceGammel;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -30,6 +32,7 @@ public class KafkaDLQService {
     private final SedMottakService sedMottakService;
     private final OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
     private final OppgaveEndretService oppgaveEndretService;
+    private final OppgaveEndretServiceGammel oppgaveEndretServiceGammel;
 
     @Transactional
     public void lagreNySedMottattHendelse(SedHendelse sedHendelse, String feilmelding) {
@@ -60,13 +63,27 @@ public class KafkaDLQService {
     }
 
     @Transactional
-    public void lagreOppgaveEndretHendelse(OppgaveEndretHendelse oppgaveEndretHendelse, String feilmelding) {
+    public void lagreOppgaveEndretHendelse(OppgaveKafkaAivenRecord oppgaveHendelse, String feilmelding) {
         UUID randomUuid = UUID.randomUUID();
-        log.info("Lagrer oppgaveEndretHendelse på DLQ, oppgave={}, uuid={}", oppgaveEndretHendelse.getId(), randomUuid);
+        log.info("Lagrer oppgaveHendelse på DLQ, oppgave={}, uuid={}", oppgaveHendelse.oppgave().oppgaveId(), randomUuid);
 
-        OppgaveEndretHendelseKafkaDLQ oppgaveEndretHendelseDLQ = new OppgaveEndretHendelseKafkaDLQ();
-        oppgaveEndretHendelseDLQ.setOppgaveEndretHendelse(oppgaveEndretHendelse);
-        oppgaveEndretHendelseDLQ.setQueueType(QueueType.OPPGAVE_ENDRET_HENDELSE);
+        OppgaveHendelseAivenKafkaDLQ oppgaveHendelseDLQ = new OppgaveHendelseAivenKafkaDLQ();
+        oppgaveHendelseDLQ.setOppgaveEndretHendelse(oppgaveHendelse);
+        oppgaveHendelseDLQ.setQueueType(QueueType.OPPGAVE_HENDELSE_AIVEN);
+        oppgaveHendelseDLQ.setTidRegistrert(LocalDateTime.now());
+        oppgaveHendelseDLQ.setSisteFeilmelding(feilmelding);
+        oppgaveHendelseDLQ.setId(randomUuid);
+        kafkaDLQRepository.save(oppgaveHendelseDLQ);
+    }
+
+    @Transactional
+    public void lagreOppgaveEndretHendelseGammel(OppgaveEndretHendelseGammel oppgaveEndretHendelseGammel, String feilmelding) {
+        UUID randomUuid = UUID.randomUUID();
+        log.info("Lagrer oppgaveEndretHendelse på DLQ, oppgave={}, uuid={}", oppgaveEndretHendelseGammel.getId(), randomUuid);
+
+        OppgaveEndretHendelseGammelKafkaDLQ oppgaveEndretHendelseDLQ = new OppgaveEndretHendelseGammelKafkaDLQ();
+        oppgaveEndretHendelseDLQ.setOppgaveEndretHendelseGammel(oppgaveEndretHendelseGammel);
+        oppgaveEndretHendelseDLQ.setQueueType(QueueType.OPPGAVE_ENDRET_HENDELSE_GAMMEL);
         oppgaveEndretHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         oppgaveEndretHendelseDLQ.setSisteFeilmelding(feilmelding);
         oppgaveEndretHendelseDLQ.setId(randomUuid);
@@ -80,7 +97,7 @@ public class KafkaDLQService {
                 try {
                     rekjørKafkaMelding(kafkaMelding.getId());
                 } catch (Exception e) {
-                    log.error("Rekjøring av melding feilet, uuid="+kafkaMelding.getId().toString(), e);
+                    log.error("Rekjøring av melding feilet, uuid=" + kafkaMelding.getId().toString(), e);
                 }
             }
         );
@@ -95,8 +112,10 @@ public class KafkaDLQService {
             rekjorSedMottattHendelse(sedMottattHendelse);
         } else if (kafkaDLQMelding instanceof SedSendtHendelseKafkaDLQ sedSendtHendelse) {
             rekjorSedSendtHendelse(sedSendtHendelse);
-        } else if (kafkaDLQMelding instanceof OppgaveEndretHendelseKafkaDLQ oppgaveEndretHendelse) {
-            rekjorOppgaveEndretHendelse(oppgaveEndretHendelse);
+        } else if (kafkaDLQMelding instanceof OppgaveHendelseAivenKafkaDLQ oppgaveHendelse) {
+            rekjorOppgaveHendelse(oppgaveHendelse);
+        } else if (kafkaDLQMelding instanceof OppgaveEndretHendelseGammelKafkaDLQ oppgaveEndretHendelse) {
+            rekjorOppgaveEndretHendelseGammel(oppgaveEndretHendelse);
         }
     }
 
@@ -110,15 +129,13 @@ public class KafkaDLQService {
         try {
             sedMottakService.behandleSedMottakHendelse(sedHendelse);
             kafkaDLQRepository.delete(sedMottattHendelseKafkaDLQ);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             sedMottattHendelseKafkaDLQ.setTidSistRekjort(LocalDateTime.now());
             sedMottattHendelseKafkaDLQ.setSisteFeilmelding(e.getMessage());
             sedMottattHendelseKafkaDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(sedMottattHendelseKafkaDLQ);
             throw e;
-        }
-        finally {
+        } finally {
             remove(SED_ID);
             remove(CORRELATION_ID);
         }
@@ -139,34 +156,52 @@ public class KafkaDLQService {
             sedSendtHendelseDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(sedSendtHendelseDLQ);
             throw e;
-        }
-        finally {
+        } finally {
             remove(SED_ID);
         }
     }
 
-    private void rekjorOppgaveEndretHendelse(OppgaveEndretHendelseKafkaDLQ oppgaveEndretHendelseKafkaDLQ) {
+    private void rekjorOppgaveHendelse(OppgaveHendelseAivenKafkaDLQ oppgaveHendelseAivenKafkaDLQ) {
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
         log.info("Rekjører melding om oppgave endret: {}, uuid: {}",
-            oppgaveEndretHendelseKafkaDLQ.getOppgaveEndretHendelse(),
-            oppgaveEndretHendelseKafkaDLQ.getId());
+            oppgaveHendelseAivenKafkaDLQ.getOppgaveEndretHendelse(),
+            oppgaveHendelseAivenKafkaDLQ.getId());
 
         try {
-            oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelseKafkaDLQ.getOppgaveEndretHendelse());
-            kafkaDLQRepository.delete(oppgaveEndretHendelseKafkaDLQ);
-        }
-        catch (Exception e) {
-            oppgaveEndretHendelseKafkaDLQ.setTidSistRekjort(LocalDateTime.now());
-            oppgaveEndretHendelseKafkaDLQ.setSisteFeilmelding(e.getMessage());
-            oppgaveEndretHendelseKafkaDLQ.økAntallRekjøringerMed1();
-            kafkaDLQRepository.save(oppgaveEndretHendelseKafkaDLQ);
+            oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveHendelseAivenKafkaDLQ.getOppgaveEndretHendelse());
+            kafkaDLQRepository.delete(oppgaveHendelseAivenKafkaDLQ);
+        } catch (Exception e) {
+            oppgaveHendelseAivenKafkaDLQ.setTidSistRekjort(LocalDateTime.now());
+            oppgaveHendelseAivenKafkaDLQ.setSisteFeilmelding(e.getMessage());
+            oppgaveHendelseAivenKafkaDLQ.økAntallRekjøringerMed1();
+            kafkaDLQRepository.save(oppgaveHendelseAivenKafkaDLQ);
             throw e;
-        }finally {
+        } finally {
             remove(CORRELATION_ID);
         }
     }
 
+    private void rekjorOppgaveEndretHendelseGammel(OppgaveEndretHendelseGammelKafkaDLQ oppgaveEndretHendelseGammelKafkaDLQ) {
+        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
+
+        log.info("Rekjører melding om oppgave endret: {}, uuid: {}",
+            oppgaveEndretHendelseGammelKafkaDLQ.getOppgaveEndretHendelseGammel(),
+            oppgaveEndretHendelseGammelKafkaDLQ.getId());
+
+        try {
+            oppgaveEndretServiceGammel.behandleOppgaveEndretHendelse(oppgaveEndretHendelseGammelKafkaDLQ.getOppgaveEndretHendelseGammel());
+            kafkaDLQRepository.delete(oppgaveEndretHendelseGammelKafkaDLQ);
+        } catch (Exception e) {
+            oppgaveEndretHendelseGammelKafkaDLQ.setTidSistRekjort(LocalDateTime.now());
+            oppgaveEndretHendelseGammelKafkaDLQ.setSisteFeilmelding(e.getMessage());
+            oppgaveEndretHendelseGammelKafkaDLQ.økAntallRekjøringerMed1();
+            kafkaDLQRepository.save(oppgaveEndretHendelseGammelKafkaDLQ);
+            throw e;
+        } finally {
+            remove(CORRELATION_ID);
+        }
+    }
 
     public List<KafkaDLQ> hentFeiledeKafkaMeldinger() {
         return kafkaDLQRepository.findAll();

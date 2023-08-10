@@ -36,13 +36,13 @@ class KafkaAdminTjenesteTestIT extends ComponentTestBase {
             }).getBody();
 
         assertThat(kafkaConsumerResponses)
-            .hasSize(4);
+            .hasSize(5);
     }
 
     @Test
     void stoppOgStartConsumer_consumerStoppedOgStartes() {
         KafkaConsumerResponse kafkaConsumerResponseStop = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveEndret/stop",
+            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveHendelse/stop",
             HttpMethod.POST,
             lagStringHttpEntity(),
             new ParameterizedTypeReference<KafkaConsumerResponse>() {
@@ -53,7 +53,7 @@ class KafkaAdminTjenesteTestIT extends ComponentTestBase {
             .isFalse();
 
         KafkaConsumerResponse kafkaConsumerResponseStart = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveEndret/start",
+            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveHendelse/start",
             HttpMethod.POST,
             lagStringHttpEntity(),
             new ParameterizedTypeReference<KafkaConsumerResponse>() {
@@ -91,7 +91,7 @@ class KafkaAdminTjenesteTestIT extends ComponentTestBase {
         verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString());
 
         ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveEndret/seek/2",
+            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveHendelse/seek/2",
             HttpMethod.POST,
             lagStringHttpEntity(),
             new ParameterizedTypeReference<>() {
