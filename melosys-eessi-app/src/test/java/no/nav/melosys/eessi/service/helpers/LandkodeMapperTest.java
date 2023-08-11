@@ -25,16 +25,14 @@ class LandkodeMapperTest {
     }
 
     @Test
-    void getIso3_expectNotFoundException() {
-        assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> LandkodeMapper.mapTilLandkodeIso2("ABC"))
-                .withMessageContaining("ikke funnet");
+    void getIso3_ikkeFunnet_girUkjent() {
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("ABC")).isEqualTo("???");
     }
 
     @Test
     void getIso2_medIkkeISOStandardKoder_forventSammeKodeTilbake() {
         assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("???");
         assertThat(LandkodeMapper.mapTilLandkodeIso2("XXX")).isEqualTo("XS");
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("XUK");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("???");
     }
 }
