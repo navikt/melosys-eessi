@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,14 +59,21 @@ public class OpprettUtgaaendeJournalpostService {
 
         } catch (SedAlleredeJournalførtException e) {
             log.info("SED {} allerede journalført", e.getSedID());
+        } catch (Exception e) {
+            log.error("Feil ved journalføring av SED", e);
         }
     }
 
-    private void journalfoerTidligereSedDersomEksisterer(String rinaSakId) {
-        List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
-        for ( SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
-            arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
-            sedSendtHendelseRepository.delete(sedSendtHendelse);
+    public void journalfoerTidligereSedDersomEksisterer(String rinaSakId) throws Exception {
+        try {
+            List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
+            for (SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
+                arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
+                sedSendtHendelseRepository.delete(sedSendtHendelse);
+            }
+        } catch (Exception e) {
+            log.error("Feil ved henting av SED sendt hendelser", e);
+            throw new Exception("Feil ved henting av SED sendt hendelser", e);
         }
     }
 
