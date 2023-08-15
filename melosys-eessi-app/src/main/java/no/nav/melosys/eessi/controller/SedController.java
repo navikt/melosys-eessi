@@ -35,7 +35,7 @@ public class SedController {
     }
 
     @GetMapping("/journalfoerTidligereSendteSedFor/{rinaSaksnummer}")
-    public ResponseEntity<String> hentSed(@PathVariable String rinaSaksnummer) {
+    public ResponseEntity<String> journalfoerTidligereSendteSed(@PathVariable String rinaSaksnummer) {
             try {
                 opprettUtgaaendeJournalpostService.journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
                 return ResponseEntity.status(200).build();
