@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
+import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient;
@@ -16,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -30,6 +32,9 @@ class SedControllerTest {
 
     @MockBean
     private SedService sedService;
+
+    @MockBean
+    private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
     @MockBean
     private TokenValidationContextHolder tokenValidationContextHolder;
@@ -65,4 +70,29 @@ class SedControllerTest {
 
         verify(sedService).genererPdfFraSed(sedDataDto, SedType.A005);
     }
+
+    @Test
+    void journalfoerTidligereSendteSed_existingSed_Success() throws Exception {
+        String rinaSaksnummer = "12345";
+
+        mockMvc.perform(get("/api/journalfoerTidligereSendteSedFor/{rinaSaksnummer}", rinaSaksnummer))
+            .andExpect(status().isOk());
+
+        verify(opprettUtgaaendeJournalpostService).journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
+    }
+
+    @Test
+    void journalfoerTidligereSendteSed_nonExistingSed_InternalServerError() throws Exception {
+        String rinaSaksnummer = "54321";
+
+        doThrow(new Exception("Feil ved henting av SED sendt hendelser")).when(opprettUtgaaendeJournalpostService)
+            .journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
+
+        mockMvc.perform(get("/api/journalfoerTidligereSendteSedFor/{rinaSaksnummer}", rinaSaksnummer))
+            .andExpect(status().isInternalServerError());
+
+        verify(opprettUtgaaendeJournalpostService).journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
+    }
+
+
 }
