@@ -50,11 +50,9 @@ public class SedMottattAdminTjeneste {
         log.info("Sed mottatt fra SedMottattAdminTjeneste : {}", sedHendelse);
 
         try {
-            sedMottakService.behandleSed(SedMottattHendelse.builder()
+            sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder()
                 .sedHendelse(sedHendelse)
                 .build());
-
-            sedMetrikker.sedMottatt(sedHendelse.getSedType());
         } catch (SedAlleredeJournalførtException e) {
             log.warn("SED {} allerede journalført", e.getSedID());
             sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());

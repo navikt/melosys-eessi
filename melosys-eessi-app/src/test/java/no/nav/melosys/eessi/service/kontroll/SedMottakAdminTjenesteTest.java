@@ -72,12 +72,12 @@ class SedMottakAdminTjenesteTest {
 
         when(sedMottattHendelseRepository.findAllByJournalpostIdIsNullOrderByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
-        doNothing().when(sedMottakService).behandleSed(valueCapture.capture());
+        doNothing().when(sedMottakService).behandleSedMottakHendelse(valueCapture.capture());
 
         sedMottakAdminTjeneste.restartAlleSEDerUtenJournalpostId(apiKey);
 
         assertThat(valueCapture.getValue()).isEqualTo(sedMottattHendelse);
-        verify(sedMottakService, times(1)).behandleSed(any(SedMottattHendelse.class));
+        verify(sedMottakService, times(1)).behandleSedMottakHendelse(any(SedMottattHendelse.class));
 
     }
 

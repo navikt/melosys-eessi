@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -41,21 +40,8 @@ public class SedMottakService {
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
 
-    public void behandleSedMottakHendelse(SedHendelse sedHendelse) {
-        try {
-            behandleSed(SedMottattHendelse.builder()
-                .sedHendelse(sedHendelse)
-                .build());
-
-            sedMetrikker.sedMottatt(sedHendelse.getSedType());
-        } catch (SedAlleredeJournalførtException e) {
-            log.warn("SED {} allerede journalført", e.getSedID());
-            sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
-        }
-    }
-
     @Transactional
-    public void behandleSed(SedMottattHendelse sedMottattHendelse) {
+    public void behandleSedMottakHendelse(SedMottattHendelse sedMottattHendelse) {
         if (sedMottattHendelse.getSedHendelse().erX100()) {
             log.info("Ignorerer mottatt SED {} av typen X100", sedMottattHendelse.getSedHendelse().getSedId());
             return;
@@ -82,6 +68,8 @@ public class SedMottakService {
                 ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
                 () -> opprettOppgaveIdentifisering(lagretHendelse)
             );
+
+        sedMetrikker.sedMottatt(sedMottattHendelse.getSedHendelse().getSedType());
     }
 
     private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {
