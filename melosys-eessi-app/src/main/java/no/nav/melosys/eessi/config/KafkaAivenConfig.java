@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -47,6 +48,9 @@ public class KafkaAivenConfig {
 
     @Autowired
     private Environment env;
+
+    @Autowired
+    OppgaveEndretService oppgaveEndretService;
 
     @Value("${melosys.kafka.aiven.brokers}")
     private String brokersUrl;
@@ -189,6 +193,9 @@ public class KafkaAivenConfig {
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
-        return consumerRecord -> !OPPGAVE_ENDRET.equals(consumerRecord.value().hendelse().hendelsestype());
+        return consumerRecord -> (
+            !OPPGAVE_ENDRET.equals(consumerRecord.value().hendelse().hendelsestype())
+                && !oppgaveEndretService.erValidertIdentifiseringsoppgave(consumerRecord.value()))
+            ;
     }
 }

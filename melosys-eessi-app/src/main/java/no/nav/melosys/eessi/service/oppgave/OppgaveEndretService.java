@@ -38,7 +38,7 @@ public class OppgaveEndretService {
     }
 
 
-    private boolean erValidertIdentifiseringsoppgave(OppgaveKafkaAivenRecord oppgaveEndretHendelse) {
+    public boolean erValidertIdentifiseringsoppgave(OppgaveKafkaAivenRecord oppgaveEndretHendelse) {
         return erIdentifiseringsOppgave(oppgaveEndretHendelse) && validerOppgaveStatusOgVersjon(oppgaveEndretHendelse);
     }
 
