@@ -195,7 +195,7 @@ public class KafkaAivenConfig {
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
         return consumerRecord -> (
             !OPPGAVE_ENDRET.equals(consumerRecord.value().hendelse().hendelsestype())
-                && !oppgaveEndretService.erIdentifiseringsOppgave(consumerRecord.value()))
+                || !oppgaveEndretService.erIdentifiseringsOppgave(consumerRecord.value()))
             ;
     }
 }
