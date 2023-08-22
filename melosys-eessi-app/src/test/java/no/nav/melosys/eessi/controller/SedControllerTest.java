@@ -75,24 +75,9 @@ class SedControllerTest {
     void journalfoerTidligereSendteSed_existingSed_Success() throws Exception {
         String rinaSaksnummer = "12345";
 
-        mockMvc.perform(get("/api/journalfoerTidligereSendteSedFor/{rinaSaksnummer}", rinaSaksnummer))
+        mockMvc.perform(post("/api/journalfoerTidligereSendteSedFor/{rinaSaksnummer}", rinaSaksnummer))
             .andExpect(status().isOk());
 
         verify(opprettUtgaaendeJournalpostService).journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
     }
-
-    @Test
-    void journalfoerTidligereSendteSed_nonExistingSed_InternalServerError() throws Exception {
-        String rinaSaksnummer = "54321";
-
-        doThrow(new Exception("Feil ved henting av SED sendt hendelser")).when(opprettUtgaaendeJournalpostService)
-            .journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
-
-        mockMvc.perform(get("/api/journalfoerTidligereSendteSedFor/{rinaSaksnummer}", rinaSaksnummer))
-            .andExpect(status().isInternalServerError());
-
-        verify(opprettUtgaaendeJournalpostService).journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
-    }
-
-
 }

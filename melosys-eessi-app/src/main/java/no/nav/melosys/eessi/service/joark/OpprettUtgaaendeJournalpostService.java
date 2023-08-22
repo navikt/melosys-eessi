@@ -68,6 +68,7 @@ public class OpprettUtgaaendeJournalpostService {
                 arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
                 sedSendtHendelseRepository.delete(sedSendtHendelse);
             }
+        log.info("Journalført {} tidligere utgående SEDer", sedSendtHendelser.size());
     }
 
     private boolean sedInneholderPersonId(SedHendelse sedHendelse) {

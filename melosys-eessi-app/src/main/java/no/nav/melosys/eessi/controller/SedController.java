@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,13 +35,9 @@ public class SedController {
         return sedService.genererPdfFraSed(sedDataDto, sedType);
     }
 
-    @GetMapping("/journalfoerTidligereSendteSedFor/{rinaSaksnummer}")
-    public ResponseEntity<String> journalfoerTidligereSendteSed(@PathVariable String rinaSaksnummer) {
-            try {
+    @PostMapping("/journalfoerTidligereSendteSedFor/{rinaSaksnummer}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void journalfoerTidligereSendteSed(@PathVariable String rinaSaksnummer) {
                 opprettUtgaaendeJournalpostService.journalfoerTidligereSedDersomEksisterer(rinaSaksnummer);
-                return ResponseEntity.status(200).build();
-            } catch (Exception e) {
-                return ResponseEntity.status(500).build();
-            }
     }
 }
