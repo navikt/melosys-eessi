@@ -59,22 +59,15 @@ public class OpprettUtgaaendeJournalpostService {
 
         } catch (SedAlleredeJournalførtException e) {
             log.info("SED {} allerede journalført", e.getSedID());
-        } catch (Exception e) {
-            log.error("Feil ved journalføring av SED", e);
         }
     }
 
-    public void journalfoerTidligereSedDersomEksisterer(String rinaSakId) throws Exception {
-        try {
+    public void journalfoerTidligereSedDersomEksisterer(String rinaSakId) {
             List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
             for (SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
                 arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
                 sedSendtHendelseRepository.delete(sedSendtHendelse);
             }
-        } catch (Exception e) {
-            log.error("Feil ved henting av SED sendt hendelser", e);
-            throw new Exception("Feil ved henting av SED sendt hendelser", e);
-        }
     }
 
     private boolean sedInneholderPersonId(SedHendelse sedHendelse) {
