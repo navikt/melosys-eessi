@@ -35,7 +35,7 @@ jobs:
       - name: Build and Run tests
         run: mvn clean package -B -e -U
       - name: pre-deploy
-        uses: navikt/digihot-deploy/actions/pre-deploy@v2
+        uses: navikt/digihot-deploy/actions/pre-deploy@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish Docker image
@@ -53,7 +53,7 @@ jobs:
           RESOURCE: deploy/nais.yaml
           VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,image=${{ env.docker_image }},APP_NAME_MELOSYS_API=melosys,APP_NAME_EUX_RINA_API=eux-rina-api-q2,CLUSTER_NAME_EUX_RINA_API=dev-fss,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57
       - name: post-deploy
-        uses: navikt/digihot-deploy/actions/post-deploy@v2
+        uses: navikt/digihot-deploy/actions/post-deploy@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: draft release
