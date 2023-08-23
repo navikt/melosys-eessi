@@ -16,7 +16,7 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 @NoArgsConstructor
-@DiscriminatorValue("OPPGAVE_ENDRET_HENDELSE_AIVEN")
+@DiscriminatorValue("OPPGAVE_HENDELSE_AIVEN")
 public class OppgaveHendelseAivenKafkaDLQ extends KafkaDLQ {
 
     @Type(type = "jsonb")
