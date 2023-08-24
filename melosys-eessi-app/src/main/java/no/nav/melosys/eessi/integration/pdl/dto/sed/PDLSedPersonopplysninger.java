@@ -1,5 +1,8 @@
 package no.nav.melosys.eessi.integration.pdl.dto.sed;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +17,7 @@ public class PDLSedPersonopplysninger {
     private String kjoenn = "";
     private String foedested = "";
     private String foedeland = "";
-    private String statsborgerskap = "";
+    private List<String> statsborgerskap = Lists.newArrayList();
 
     public static class Builder {
         private PDLSedPersonopplysninger pdlSedPersonopplysninger = new PDLSedPersonopplysninger();
@@ -49,7 +52,7 @@ public class PDLSedPersonopplysninger {
             return this;
         }
 
-        public Builder medStatsborgerskap(String statsborgerskap) {
+        public Builder medStatsborgerskap(List<String> statsborgerskap) {
             pdlSedPersonopplysninger.statsborgerskap = statsborgerskap;
             return this;
         }

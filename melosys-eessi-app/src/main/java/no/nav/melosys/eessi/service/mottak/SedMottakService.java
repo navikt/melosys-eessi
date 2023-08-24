@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.mottak;
 
-import javax.transaction.Transactional;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.finn.unleash.Unleash;
@@ -9,7 +7,6 @@ import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoenn;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSed;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedKilde;
@@ -26,6 +23,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Kjønn;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Pin;
+import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -34,6 +32,9 @@ import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingServ
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -188,7 +189,7 @@ public class SedMottakService {
                         .medFornavn(personFraSed.getFornavn())
                         .medFoedselsdato(personFraSed.getFoedselsdato())
                         .medKjoenn(hentPDLKjønn(personFraSed).name())
-                        .medStatsborgerskap(personFraSed.getStatsborgerskap().toString())
+                        .medStatsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
                         .medFoedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : "")
                         .build());
 
