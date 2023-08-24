@@ -25,16 +25,16 @@ public class PDLService implements PersonFasade {
 
     private final PDLConsumer pdlConsumer;
 
-    private final PDLRestConsumer pdlRestConsumer;
+    private final PdlWebConsumer pdlWebConsumer;
 
-    public PDLService(PDLConsumer pdlConsumer, PDLRestConsumer pdlRestConsumer) {
+    public PDLService(PDLConsumer pdlConsumer, PdlWebConsumer pdlWebConsumer) {
         this.pdlConsumer = pdlConsumer;
-        this.pdlRestConsumer = pdlRestConsumer;
+        this.pdlWebConsumer = pdlWebConsumer;
     }
 
     @Override
     public String hentPreutfylltLenkeForRekvirering(PDLSed pdlSed) {
-        return pdlRestConsumer.hentPreutfylltLenkeForRekvirering(pdlSed);
+        return pdlWebConsumer.hentPreutfylltLenkeForRekvirering(pdlSed);
     }
 
     @Override

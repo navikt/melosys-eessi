@@ -35,13 +35,13 @@ class PDLServiceTest {
     private PDLConsumer pdlConsumer;
 
     @Mock
-    private PDLRestConsumer pdlRestConsumer;
+    private PdlWebConsumer pdlWebConsumer;
 
     private PDLService pdlService;
 
     @BeforeEach
     public void setup() {
-        pdlService = new PDLService(pdlConsumer, pdlRestConsumer);
+        pdlService = new PDLService(pdlConsumer, pdlWebConsumer);
     }
 
     @Test

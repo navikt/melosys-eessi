@@ -31,7 +31,6 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
             .orElseThrow(() -> new RuntimeException("Fant ikke OAuth2-config for " + clientName));
     }
 
-    // ASd
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String accessToken = "";

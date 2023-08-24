@@ -168,6 +168,7 @@ public class SedMottakService {
                 journalpostID,
                 sedMottattHendelse.getSedHendelse().getSedType(),
                 sedMottattHendelse.getSedHendelse().getRinaSakId()
+                    //Todo: Fyll ut her.
             );
         } else {
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
