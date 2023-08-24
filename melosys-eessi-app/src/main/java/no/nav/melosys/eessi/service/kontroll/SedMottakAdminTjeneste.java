@@ -78,7 +78,7 @@ public class SedMottakAdminTjeneste {
 
     private void restartAlleFeiledeSEDer(Collection<SedMottattHendelse> sedmottattHendelser) {
         sedmottattHendelser
-            .forEach(sedMottakService::behandleSed);
+            .forEach(sedMottakService::behandleSedMottakHendelse);
     }
 
     private void validerApikey(String value) {

@@ -9,7 +9,6 @@ import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSed;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedKilde;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedPersonopplysninger;
@@ -56,22 +55,8 @@ public class SedMottakService {
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
 
-    public void behandleSedMottakHendelse(SedHendelse sedHendelse) {
-
-        try {
-            behandleSed(SedMottattHendelse.builder()
-                .sedHendelse(sedHendelse)
-                .build());
-
-            sedMetrikker.sedMottatt(sedHendelse.getSedType());
-        } catch (SedAlleredeJournalførtException e) {
-            log.warn("SED {} allerede journalført", e.getSedID());
-            sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
-        }
-    }
-
     @Transactional
-    public void behandleSed(SedMottattHendelse sedMottattHendelse) {
+    public void behandleSedMottakHendelse(SedMottattHendelse sedMottattHendelse) {
         if (sedMottattHendelse.getSedHendelse().erX100()) {
             log.info("Ignorerer mottatt SED {} av typen X100", sedMottattHendelse.getSedHendelse().getSedId());
             return;
@@ -98,6 +83,8 @@ public class SedMottakService {
                 ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
                 () -> opprettOppgaveIdentifisering(lagretHendelse, sed)
             );
+
+        sedMetrikker.sedMottatt(sedMottattHendelse.getSedHendelse().getSedType());
     }
 
     private boolean erXSedBehandletUtenASed(SedHendelse sedHendelse) {

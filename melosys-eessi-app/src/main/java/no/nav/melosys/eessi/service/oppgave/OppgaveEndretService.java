@@ -58,7 +58,7 @@ public class OppgaveEndretService {
         return true;
     }
 
-    private boolean erIdentifiseringsOppgave(OppgaveKafkaAivenRecord oppgaveEndretHendelse) {
+    public boolean erIdentifiseringsOppgave(OppgaveKafkaAivenRecord oppgaveEndretHendelse) {
         return "JFR".equals(oppgaveEndretHendelse.oppgave().kategorisering().oppgavetype())
             && "4530".equals(oppgaveEndretHendelse.oppgave().tilordning().enhetsnr())
             && oppgaveEndretHendelse.harFolkeregisterIdent()

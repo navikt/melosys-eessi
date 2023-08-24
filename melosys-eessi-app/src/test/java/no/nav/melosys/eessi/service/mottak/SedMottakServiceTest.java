@@ -100,7 +100,7 @@ class SedMottakServiceTest {
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
 
 
-        sedMottakService.behandleSed(sedMottattHendelse);
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse);
 
 
         verify(euxService).hentSedMedRetry(anyString(), anyString());
@@ -120,7 +120,7 @@ class SedMottakServiceTest {
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
 
-        sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
 
         verify(euxService).hentSedMedRetry(anyString(), anyString());
@@ -146,7 +146,7 @@ class SedMottakServiceTest {
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
 
-        sedMottakService.behandleSed(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
+        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
 
 
         verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
@@ -160,7 +160,7 @@ class SedMottakServiceTest {
         when(sedMottattHendelseRepository.findBySedID(SED_ID)).thenReturn(Optional.of(sedMottattHendelse));
 
 
-        sedMottakService.behandleSed(sedMottattHendelse);
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse);
 
 
         verify(euxService, never()).hentSedMedRetry(anyString(), anyString());
@@ -178,7 +178,7 @@ class SedMottakServiceTest {
         when(journalpostSedKoblingService.erASedAlleredeBehandlet(anyString())).thenReturn(false);
 
 
-        assertThatThrownBy(() -> sedMottakService.behandleSed(sedMottattHendelse))
+        assertThatThrownBy(() -> sedMottakService.behandleSedMottakHendelse(sedMottattHendelse))
             .isInstanceOf(IllegalStateException.class)
             .hasMessage("Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet");
     }

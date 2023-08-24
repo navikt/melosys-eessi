@@ -33,7 +33,9 @@ public class OppgaveEndretConsumerGammel extends AbstractConsumerSeekAware {
         if (!unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven")) {
             final var oppgaveEndretHendelse = consumerRecord.value();
             putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
-            log.info("Mottatt melding om oppgave endret: {}", oppgaveEndretHendelse.getId());
+            if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
+                log.info("Mottatt melding om oppgave endret: {}", oppgaveEndretHendelse.getId());
+            }
 
             try {
                 oppgaveEndretServiceGammel.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.OppgaveEndretHendelseGammel;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.kafkadlq.*;
 import no.nav.melosys.eessi.repository.KafkaDLQRepository;
@@ -125,9 +126,10 @@ public class KafkaDLQService {
         putToMDC(SED_ID, sedHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
         log.info("Mottatt melding om sed mottatt: {}, uuid: {}", sedHendelse, sedMottattHendelseKafkaDLQ.getId());
-
         try {
-            sedMottakService.behandleSedMottakHendelse(sedHendelse);
+            sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder()
+                .sedHendelse(sedHendelse)
+                .build());
             kafkaDLQRepository.delete(sedMottattHendelseKafkaDLQ);
         } catch (Exception e) {
             sedMottattHendelseKafkaDLQ.setTidSistRekjort(LocalDateTime.now());

@@ -4,7 +4,9 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
+import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -39,7 +41,12 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedHendelse, consumerRecord.offset());
 
         try {
-            sedMottakService.behandleSedMottakHendelse(sedHendelse);
+            sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder()
+                .sedHendelse(sedHendelse)
+                .build());
+        } catch (SedAlleredeJournalførtException e) {
+            log.warn("SED {} allerede journalført", e.getSedID());
+            sedMetrikker.sedMottattAlleredejournalfoert(sedHendelse.getSedType());
         } catch (Exception e) {
             String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
             log.error("Klarte ikke å konsumere melding om sed mottatt: {}\n{}", message, consumerRecord, e);

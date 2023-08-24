@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,12 +62,13 @@ public class OpprettUtgaaendeJournalpostService {
         }
     }
 
-    private void journalfoerTidligereSedDersomEksisterer(String rinaSakId) {
-        List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
-        for ( SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
-            arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
-            sedSendtHendelseRepository.delete(sedSendtHendelse);
-        }
+    public void journalfoerTidligereSedDersomEksisterer(String rinaSakId) {
+            List<SedSendtHendelse> sedSendtHendelser = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSakId);
+            for (SedSendtHendelse sedSendtHendelse : sedSendtHendelser) {
+                arkiverUtgaaendeSed(sedSendtHendelse.getSedHendelse());
+                sedSendtHendelseRepository.delete(sedSendtHendelse);
+            }
+        log.info("Journalført {} tidligere utgående SEDer", sedSendtHendelser.size());
     }
 
     private boolean sedInneholderPersonId(SedHendelse sedHendelse) {
