@@ -160,6 +160,7 @@ public class SedMottakService {
                 log.info("[EESSI TEST] Rekvirering OK: " + preutfylltLenkeForRekvirering);
             } catch (Exception e) {
                 log.error("[EESSI TEST] Feil under rekvirering: " + e.getMessage());
+                throw e;
             }
 
 
