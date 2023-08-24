@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.integration.pdl;
 
+import no.nav.melosys.eessi.config.MDCOperations;
 import no.nav.melosys.eessi.integration.WebClientConfig;
 import no.nav.melosys.eessi.security.PDLWebContextExchangeFilter;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
@@ -8,6 +9,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
@@ -30,8 +32,16 @@ public class PdlWebConsumerProducer implements WebClientConfig {
             webClientBuilder
                 .baseUrl(uri)
                 .filter(pdlWebContextExchangeFilter)
+                .defaultHeaders(this::defaultHeaders)
                 .filter(errorFilter("Feil ved kall til PDL Web"))
                 .build()
         );
     }
+
+    private void defaultHeaders(HttpHeaders httpHeaders) {
+        if (MDCOperations.getCorrelationId() != null) {
+            httpHeaders.add(MDCOperations.CORRELATION_ID, MDCOperations.getCorrelationId());
+        }
+    }
+
 }
