@@ -118,8 +118,8 @@ no.nav.security.jwt.client.registration:
       client-auth-method: client_secret_basic
   pdl-web:
     token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
-    grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
-    scope: ${EUX_RINA_API_SCOPE}
+    grant-type: client_credentials
+    scope: ${PDL_WEB_SCOPE}
     authentication:
       client-id: ${AZURE_APP_CLIENT_ID}
       client-secret: ${AZURE_APP_CLIENT_SECRET}

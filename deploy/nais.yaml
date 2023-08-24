@@ -61,6 +61,8 @@ spec:
       value: nais
     - name: EUX_RINA_API_SCOPE
       value: api://{{CLUSTER_NAME_EUX_RINA_API}}.eessibasis.{{APP_NAME_EUX_RINA_API}}/.default
+    - name: PDL_WEB_SCOPE
+      value: api://{{CLUSTER_NAME_PDL_WEB}}.pdl.{{APP_NAME_PDL_WEB}}/.default
   ingresses:
     - {{INGRESS}}
   kafka:
