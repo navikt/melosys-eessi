@@ -19,6 +19,15 @@ public class RestUtils {
         return getMessageOrExceptionType(e);
     }
 
+    public static String hentFeilmeldingForPDLWeb(RestClientException e) {
+        if (e instanceof RestClientResponseException clientErrorException) {
+            var feilmelding = clientErrorException.getResponseBodyAsString();
+            if (!StringUtils.hasText(feilmelding)) return getMessageOrExceptionType(e);
+            return feilmelding;
+        }
+        return getMessageOrExceptionType(e);
+    }
+
     static String getMessageOrExceptionType(Exception e) {
         if (e.getMessage() != null) return e.getMessage();
         return e.getClass().getSimpleName();

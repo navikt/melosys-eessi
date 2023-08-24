@@ -34,8 +34,6 @@ public class PDLSystemAuthFilter implements ExchangeFilterFunction {
         final String bearerToken = restStsClient.bearerToken();
         var correlationID = getCorrelationId();
 
-        log.info("[EESSI TEST] bearerToken: {}", bearerToken);
-
         return exchangeFunction.exchange(
             ClientRequest.from(clientRequest)
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
