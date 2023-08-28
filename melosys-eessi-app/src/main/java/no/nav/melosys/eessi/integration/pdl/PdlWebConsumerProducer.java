@@ -40,7 +40,7 @@ public class PdlWebConsumerProducer implements WebClientConfig {
 
     private void defaultHeaders(HttpHeaders httpHeaders) {
         if (MDCOperations.getCorrelationId() != null) {
-            httpHeaders.add(MDCOperations.CORRELATION_ID, MDCOperations.getCorrelationId());
+            httpHeaders.add(MDCOperations.X_CORRELATION_ID, MDCOperations.getCorrelationId());
         }
     }
 
