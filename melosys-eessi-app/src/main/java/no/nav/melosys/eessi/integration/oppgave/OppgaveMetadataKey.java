@@ -9,6 +9,5 @@ public enum OppgaveMetadataKey {
     EKSTERN_HENVENDELSE_ID,
     SKANNET_DATO,
     RINA_SAKID,
-    HJEMMEL,
-    PREUTFYLLT_REKVIRERING_LENKE,
+    HJEMMEL
 }
