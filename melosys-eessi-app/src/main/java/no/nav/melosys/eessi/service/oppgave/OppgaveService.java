@@ -33,7 +33,6 @@ public class OppgaveService {
 
     public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer, String preutfylltLenkeForRekvirering) {
         var oppgaveDto = lagOppgaveDto(journalpostID,sedType,rinaSaksnummer, preutfylltLenkeForRekvirering).build();
-        log.info("[EESSI TEST] Oppretter oppgave til ID og fordeling", oppgaveDto, preutfylltLenkeForRekvirering);
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Oppgave til ID og fordeling opprettet med id {}, rekvirering uuid {}", response.getId(), preutfylltLenkeForRekvirering);
         return response.getId();

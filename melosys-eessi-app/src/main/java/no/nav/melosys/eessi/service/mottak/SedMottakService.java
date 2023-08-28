@@ -132,7 +132,6 @@ public class SedMottakService {
         var harNorskPersonnummer = true;
         var personFraSed = sed.finnPerson().orElse(null);
 
-        log.info("[EESSI TEST] person fra sed: {}", personFraSed);
         if (personFraSed != null) {
             harNorskPersonnummer = personFraSed.finnNorskPin()
                 .map(Pin::getIdentifikator)
