@@ -8,10 +8,7 @@ import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisjonTilMellomlagring;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonKilde;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonPersonopplysninger;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonUtenlandskIdentifikasjon;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.*;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -34,6 +31,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -73,20 +72,20 @@ public class SedMottakService {
 
         if (erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
             throw new IllegalStateException("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet"
-                    .formatted(sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
+                .formatted(sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
         }
 
         var lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse);
 
         final var sed = euxService.hentSedMedRetry(sedMottattHendelse.getSedHendelse().getRinaSakId(),
-                sedMottattHendelse.getSedHendelse().getRinaDokumentId());
+            sedMottattHendelse.getSedHendelse().getRinaDokumentId());
 
         log.info("Søker etter person for SED");
         personIdentifisering.identifiserPerson(lagretHendelse.getSedHendelse().getRinaSakId(), sed)
-                .ifPresentOrElse(
-                        ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
-                        () -> opprettOppgaveIdentifisering(lagretHendelse, sed)
-                );
+            .ifPresentOrElse(
+                ident -> bucIdentifisertService.lagreIdentifisertPerson(lagretHendelse.getSedHendelse().getRinaSakId(), ident),
+                () -> opprettOppgaveIdentifisering(lagretHendelse, sed)
+            );
 
         sedMetrikker.sedMottatt(sedMottattHendelse.getSedHendelse().getSedType());
     }
@@ -98,8 +97,8 @@ public class SedMottakService {
             BUC buc = euxService.hentBuc(sedHendelse.getRinaSakId());
 
             boolean sedTypeErX007OgNorgeErSakseier = buc.getParticipants().stream()
-                    .anyMatch(p -> p.getRole().equals(Participant.ParticipantRole.SAKSEIER)
-                            && p.getOrganisation().getId().equals(rinaInstitusjonsId));
+                .anyMatch(p -> p.getRole().equals(Participant.ParticipantRole.SAKSEIER)
+                    && p.getOrganisation().getId().equals(rinaInstitusjonsId));
 
             if (sedTypeErX007OgNorgeErSakseier) return false;
         }
@@ -112,13 +111,13 @@ public class SedMottakService {
 
         final var rinaSaksnummer = sedMottatt.getSedHendelse().getRinaSakId();
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
-                .stream()
-                .filter(this::oppgaveErÅpen)
-                .findFirst()
-                .ifPresentOrElse(
-                        bucIdentifiseringOppg -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", bucIdentifiseringOppg.getOppgaveId(), rinaSaksnummer),
-                        () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
-                );
+            .stream()
+            .filter(this::oppgaveErÅpen)
+            .findFirst()
+            .ifPresentOrElse(
+                bucIdentifiseringOppg -> log.info("Identifiseringsoppgave {} finnes allerede for rinasak {}", bucIdentifiseringOppg.getOppgaveId(), rinaSaksnummer),
+                () -> opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
+            );
     }
 
     private boolean oppgaveErÅpen(BucIdentifiseringOppg bucIdentifiseringOppg) {
@@ -136,18 +135,18 @@ public class SedMottakService {
         log.info("[EESSI TEST] person fra sed: {}", personFraSed);
         if (personFraSed != null) {
             harNorskPersonnummer = personFraSed.finnNorskPin()
-                    .map(Pin::getIdentifikator)
-                    .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
+                .map(Pin::getIdentifikator)
+                .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
         }
 
         if (sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer && preutfyllingEnabled) {
             var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
 
-            var pdlSed = byggPDLSed(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
-            log.info("[EESSI TEST] Prøver å rekvirere", pdlSed);
+            var dnummerRekvisjonTilMellomlagring = byggDnummerRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
+            log.info("[EESSI TEST] Prøver å rekvirere", dnummerRekvisjonTilMellomlagring);
 
             try {
-                String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(pdlSed);
+                String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(dnummerRekvisjonTilMellomlagring);
                 log.info("[EESSI TEST] Rekvirering OK: " + preutfylltLenkeForRekvirering);
             } catch (Exception e) {
                 log.error("[EESSI TEST] Feil under rekvirering: " + e.getMessage());
@@ -156,52 +155,57 @@ public class SedMottakService {
 
 
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                    journalpostID,
-                    sedMottattHendelse.getSedHendelse().getSedType(),
-                    sedMottattHendelse.getSedHendelse().getRinaSakId()
-                    //Todo: Fyll ut her.
+                journalpostID,
+                sedMottattHendelse.getSedHendelse().getSedType(),
+                sedMottattHendelse.getSedHendelse().getRinaSakId()
+                //Todo: Fyll ut her.
             );
         } else {
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                    journalpostID,
-                    sedMottattHendelse.getSedHendelse().getSedType(),
-                    sedMottattHendelse.getSedHendelse().getRinaSakId()
+                journalpostID,
+                sedMottattHendelse.getSedHendelse().getSedType(),
+                sedMottattHendelse.getSedHendelse().getRinaSakId()
             );
         }
 
         bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
-                .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
-                .oppgaveId(oppgaveID)
-                .versjon(1)
-                .build());
+            .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
+            .oppgaveId(oppgaveID)
+            .versjon(1)
+            .build());
 
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }
 
-    private DnummerRekvisjonTilMellomlagring byggPDLSed(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
-        var pdlSed = new DnummerRekvisjonTilMellomlagring.Builder()
-                .medKilde(new DnummerRekvisisjonKilde.Builder()
-                        .medInstitusjon(hentInstitusjon(sed))
-                        .medLandkode(sedMottattHendelse.getSedHendelse().getAvsenderId() != null ? sedMottattHendelse.getSedHendelse().getLandkode() : "")
-                        .build())
-                .medPersonopplysninger(new DnummerRekvisisjonPersonopplysninger.Builder()
-                        .medEtternavn(personFraSed.getEtternavn())
-                        .medFornavn(personFraSed.getFornavn())
-                        .medFoedselsdato(personFraSed.getFoedselsdato())
-                        .medKjoenn(hentPDLKjønn(personFraSed).name())
-                        .medStatsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
-                        .medFoedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : "")
-                        .build());
+    private DnummerRekvisjonTilMellomlagring byggDnummerRekvisisjonTilMellomlagring(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
+        var dnummerRekvisjonTilMellomlagringBuilder = DnummerRekvisjonTilMellomlagring.builder()
+            .kilde(DnummerRekvisisjonKilde.builder()
+                .institusjon(hentInstitusjon(sed))
+                .landkode(Objects.requireNonNull(sedMottattHendelse.getSedHendelse().getLandkode(), "Landkode kan ikke være null fra SED"))
+                .build())
+            .personopplysninger(DnummerRekvisisjonPersonopplysninger.builder()
+                .fornavn(personFraSed.getFornavn())
+                .etternavn(personFraSed.getEtternavn())
+                .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
+                .kjoenn(hentPDLKjønn(personFraSed))
+                .foedeland(personFraSed.getFoedested().getLand())
+                .statsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
+                .build())
+            .kontaktadresse(DnummerRekvisisjonKontaktadresse.builder()
+                .utenlandskPostboksadresse(DnummerRekvisisjonUtenlandskPostboksadresse.builder()
+                    .postkode(sed.getNav().getBruker().getAdresse().get(0).getPostnummer())
+                    .bySted(sed.getNav().getBruker().getAdresse().get(0).getBy())
+                    .landkode(sed.getNav().getBruker().getAdresse().get(0).getLand())
+                    .regionDistriktOmraade(sed.getNav().getBruker().getAdresse().get(0).getRegion())
+                    .build())
+                .build());
 
         if (pinSEDErFraLandSedKommerFra) {
-            pdlSed.medUtenlandskIdentifikasjon(new DnummerRekvisisjonUtenlandskIdentifikasjon.Builder()
-                    .medUtstederland(sedMottattHendelse.getSedHendelse().getLandkode()).build());
-        } else {
-            pdlSed.medUtenlandskIdentifikasjon(new DnummerRekvisisjonUtenlandskIdentifikasjon.Builder()
-                    .medUtenlandskId("").build());
+            dnummerRekvisjonTilMellomlagringBuilder.utenlandskIdentifikasjon(DnummerRekvisisjonUtenlandskIdentifikasjon.builder()
+                .utstederland(sedMottattHendelse.getSedHendelse().getLandkode()).build());
         }
 
-        return pdlSed.build();
+        return dnummerRekvisjonTilMellomlagringBuilder.build();
     }
 
     private PDLKjoennType hentPDLKjønn(Person personFraSed) {
@@ -216,9 +220,9 @@ public class SedMottakService {
 
     private String hentInstitusjon(SED sed) {
         if (sed.getNav() != null
-                && sed.getNav().getSak() != null
-                && sed.getNav().getSak().getFjerninstitusjon() != null
-                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null) {
+            && sed.getNav().getSak() != null
+            && sed.getNav().getSak().getFjerninstitusjon() != null
+            && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null) {
             return sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getNavn();
         }
 
@@ -228,11 +232,11 @@ public class SedMottakService {
     private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String navIdent) {
         log.info("Oppretter journalpost for SED {}", sedMottattHendelse.getSedHendelse().getRinaDokumentId());
         var sedMedVedlegg = euxService.hentSedMedVedlegg(
-                sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
+            sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getRinaDokumentId()
         );
 
         String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-                sedMottattHendelse.getSedHendelse(), sedMedVedlegg, navIdent);
+            sedMottattHendelse.getSedHendelse(), sedMedVedlegg, navIdent);
 
         sedMottattHendelse.setJournalpostId(journalpostID);
         sedMottattHendelseRepository.save(sedMottattHendelse);

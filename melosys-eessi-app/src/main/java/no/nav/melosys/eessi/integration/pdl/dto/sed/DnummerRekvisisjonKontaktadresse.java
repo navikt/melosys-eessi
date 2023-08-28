@@ -1,43 +1,15 @@
 package no.nav.melosys.eessi.integration.pdl.dto.sed;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DnummerRekvisisjonKontaktadresse {
-    private PDLSedNorskAddresse norskVegadresse = new PDLSedNorskAddresse();
-    private PDLSedNorskPostboksadresse norskPostboksadresse = new PDLSedNorskPostboksadresse();
-    private PDLSedUtenlandskVegadresse utenlandskVegadresse = new PDLSedUtenlandskVegadresse();
-    private PDLSedUtenlandskPostboksadresse utenlandskPostboksadresse = new PDLSedUtenlandskPostboksadresse();
 
-    public static class Builder {
-        private DnummerRekvisisjonKontaktadresse pdlSedKontaktadresse = new DnummerRekvisisjonKontaktadresse();
-
-        public Builder medNorskVegadresse(PDLSedNorskAddresse norskVegadresse) {
-            pdlSedKontaktadresse.norskVegadresse = norskVegadresse;
-            return this;
-        }
-
-        public Builder medNorskPostboksadresse(PDLSedNorskPostboksadresse norskPostboksadresse) {
-            pdlSedKontaktadresse.norskPostboksadresse = norskPostboksadresse;
-            return this;
-        }
-
-        public Builder medUtenlandskVegadresse(PDLSedUtenlandskVegadresse utenlandskVegadresse) {
-            pdlSedKontaktadresse.utenlandskVegadresse = utenlandskVegadresse;
-            return this;
-        }
-
-        public Builder medUtenlandskPostboksadresse(PDLSedUtenlandskPostboksadresse utenlandskPostboksadresse) {
-            pdlSedKontaktadresse.utenlandskPostboksadresse = utenlandskPostboksadresse;
-            return this;
-        }
-
-        public DnummerRekvisisjonKontaktadresse build() {
-            return pdlSedKontaktadresse;
-        }
-    }
+    private DnummerRekvisisjonNorskVegadresse norskVegadresse;
+    private DnummerRekvisisjonNorskPostboksadresse norskPostboksadresse;
+    private DnummerRekvisisjonUtenlandskVegadresse utenlandskVegadresse;
+    private DnummerRekvisisjonUtenlandskPostboksadresse utenlandskPostboksadresse;
 }
