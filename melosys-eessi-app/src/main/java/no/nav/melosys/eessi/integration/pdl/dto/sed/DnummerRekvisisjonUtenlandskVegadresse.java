@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.integration.pdl.dto.sed;
 
 import lombok.*;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.adresse.DnummerRekvisisjonAdresse;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.adresse.Vegadresse;
 
 @Data
