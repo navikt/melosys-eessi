@@ -2,17 +2,8 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSed;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisjonTilMellomlagring;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForPDLWeb;
 
 @Slf4j
 public class PdlWebConsumer implements RestConsumer {
@@ -26,11 +17,11 @@ public class PdlWebConsumer implements RestConsumer {
         this.webClient = webClient;
     }
 
-    public String hentPreutfylltLenkeForRekvirering(PDLSed pdlSed) {
+    public String hentPreutfylltLenkeForRekvirering(DnummerRekvisjonTilMellomlagring dnummerRekvisjonTilMellomlagring) {
         return webClient
             .post()
             .uri(PDL_SED_PATH)
-            .bodyValue(pdlSed)
+            .bodyValue(dnummerRekvisjonTilMellomlagring)
             .retrieve()
             .bodyToMono(String.class)
             .block();

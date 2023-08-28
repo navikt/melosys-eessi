@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSed;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisjonTilMellomlagring;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedKilde;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedPersonopplysninger;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedUtenlandskIdentifikasjon;
@@ -178,8 +178,8 @@ public class SedMottakService {
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }
 
-    private PDLSed byggPDLSed(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
-        var pdlSed = new PDLSed.Builder()
+    private DnummerRekvisjonTilMellomlagring byggPDLSed(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
+        var pdlSed = new DnummerRekvisjonTilMellomlagring.Builder()
                 .medKilde(new PDLSedKilde.Builder()
                         .medInstitusjon(hentInstitusjon(sed))
                         .medLandkode(sedMottattHendelse.getSedHendelse().getAvsenderId() != null ? sedMottattHendelse.getSedHendelse().getLandkode() : "")

@@ -9,7 +9,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSed {
+public class DnummerRekvisjonTilMellomlagring {
+
     private PDLSedKilde kilde = new PDLSedKilde();
     private PDLSedPersonopplysninger personopplysninger = new PDLSedPersonopplysninger();
     private PDLSedUtenlandskIdentifikasjon utenlandskIdentifikasjon = new PDLSedUtenlandskIdentifikasjon();
@@ -21,55 +22,55 @@ public class PDLSed {
     private PDLSedSivilstand sivilstand = new PDLSedSivilstand();
 
     public static class Builder {
-        private PDLSed pdlSed = new PDLSed();
+        private DnummerRekvisjonTilMellomlagring dnummerRekvisjonTilMellomlagring = new DnummerRekvisjonTilMellomlagring();
 
         public Builder medKilde(PDLSedKilde kilde) {
-            pdlSed.kilde = kilde;
+            dnummerRekvisjonTilMellomlagring.kilde = kilde;
             return this;
         }
 
         public Builder medPersonopplysninger(PDLSedPersonopplysninger personopplysninger) {
-            pdlSed.personopplysninger = personopplysninger;
+            dnummerRekvisjonTilMellomlagring.personopplysninger = personopplysninger;
             return this;
         }
 
         public Builder medUtenlandskIdentifikasjon(PDLSedUtenlandskIdentifikasjon utenlandskIdentifikasjon) {
-            pdlSed.utenlandskIdentifikasjon = utenlandskIdentifikasjon;
+            dnummerRekvisjonTilMellomlagring.utenlandskIdentifikasjon = utenlandskIdentifikasjon;
             return this;
         }
 
         public Builder medBostedsadresse(PDLSedBostedsadresse bostedsadresse) {
-            pdlSed.bostedsadresse = bostedsadresse;
+            dnummerRekvisjonTilMellomlagring.bostedsadresse = bostedsadresse;
             return this;
         }
 
         public Builder medOppholdsadresse(PDLSedOppholdsadresse oppholdsadresse) {
-            pdlSed.oppholdsadresse = oppholdsadresse;
+            dnummerRekvisjonTilMellomlagring.oppholdsadresse = oppholdsadresse;
             return this;
         }
 
         public Builder medKontaktadresse(PDLSedKontaktadresse kontaktadresse) {
-            pdlSed.kontaktadresse = kontaktadresse;
+            dnummerRekvisjonTilMellomlagring.kontaktadresse = kontaktadresse;
             return this;
         }
 
         public Builder medDokumentasjon(PDLSedDokumentasjon dokumentasjon) {
-            pdlSed.dokumentasjon = dokumentasjon;
+            dnummerRekvisjonTilMellomlagring.dokumentasjon = dokumentasjon;
             return this;
         }
 
         public Builder medRelasjoner(List<PDLSedRelasjon> relasjoner) {
-            pdlSed.relasjoner = relasjoner;
+            dnummerRekvisjonTilMellomlagring.relasjoner = relasjoner;
             return this;
         }
 
         public Builder medSivilstand(PDLSedSivilstand sivilstand) {
-            pdlSed.sivilstand = sivilstand;
+            dnummerRekvisjonTilMellomlagring.sivilstand = sivilstand;
             return this;
         }
 
-        public PDLSed build() {
-            return pdlSed;
+        public DnummerRekvisjonTilMellomlagring build() {
+            return dnummerRekvisjonTilMellomlagring;
         }
     }
 }
