@@ -173,8 +173,8 @@ public class SedMottakService {
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }
 
-    private DnummerRekvisjonTilMellomlagring byggDnummerRekvisisjonTilMellomlagring(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
-        var dnummerRekvisjonTilMellomlagringBuilder = DnummerRekvisjonTilMellomlagring.builder()
+    private DnummerRekvisisjonTilMellomlagring byggDnummerRekvisisjonTilMellomlagring(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
+        var dnummerRekvisjonTilMellomlagringBuilder = DnummerRekvisisjonTilMellomlagring.builder()
             .kilde(DnummerRekvisisjonKilde.builder()
                 .institusjon(hentInstitusjon(sed))
                 .landkode(Objects.requireNonNull(sedMottattHendelse.getSedHendelse().getLandkode(), "Landkode kan ikke være null fra SED"))

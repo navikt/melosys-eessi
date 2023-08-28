@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisjonTilMellomlagring;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonTilMellomlagring;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
@@ -14,11 +14,11 @@ public class PdlWebConsumer implements RestConsumer {
         this.webClient = webClient;
     }
 
-    public String hentPreutfylltLenkeForRekvirering(DnummerRekvisjonTilMellomlagring dnummerRekvisjonTilMellomlagring) {
+    public String hentPreutfylltLenkeForRekvirering(DnummerRekvisisjonTilMellomlagring dnummerRekvisisjonTilMellomlagring) {
         return webClient
             .post()
             .uri("/api/sed")
-            .bodyValue(dnummerRekvisjonTilMellomlagring)
+            .bodyValue(dnummerRekvisisjonTilMellomlagring)
             .retrieve()
             .toEntity(String.class)
             .mapNotNull(response -> response.getHeaders().getFirst("Location"))

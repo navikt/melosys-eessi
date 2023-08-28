@@ -8,7 +8,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisjonTilMellomlagring {
+public class DnummerRekvisisjonTilMellomlagring {
 
     private DnummerRekvisisjonKilde kilde;
     private DnummerRekvisisjonPersonopplysninger personopplysninger;
