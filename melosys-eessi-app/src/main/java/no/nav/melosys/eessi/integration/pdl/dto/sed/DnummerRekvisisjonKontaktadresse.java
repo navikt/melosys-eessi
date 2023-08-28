@@ -7,14 +7,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedKontaktadresse {
+public class DnummerRekvisisjonKontaktadresse {
     private PDLSedNorskAddresse norskVegadresse = new PDLSedNorskAddresse();
     private PDLSedNorskPostboksadresse norskPostboksadresse = new PDLSedNorskPostboksadresse();
     private PDLSedUtenlandskVegadresse utenlandskVegadresse = new PDLSedUtenlandskVegadresse();
     private PDLSedUtenlandskPostboksadresse utenlandskPostboksadresse = new PDLSedUtenlandskPostboksadresse();
 
     public static class Builder {
-        private PDLSedKontaktadresse pdlSedKontaktadresse = new PDLSedKontaktadresse();
+        private DnummerRekvisisjonKontaktadresse pdlSedKontaktadresse = new DnummerRekvisisjonKontaktadresse();
 
         public Builder medNorskVegadresse(PDLSedNorskAddresse norskVegadresse) {
             pdlSedKontaktadresse.norskVegadresse = norskVegadresse;
@@ -36,7 +36,7 @@ public class PDLSedKontaktadresse {
             return this;
         }
 
-        public PDLSedKontaktadresse build() {
+        public DnummerRekvisisjonKontaktadresse build() {
             return pdlSedKontaktadresse;
         }
     }

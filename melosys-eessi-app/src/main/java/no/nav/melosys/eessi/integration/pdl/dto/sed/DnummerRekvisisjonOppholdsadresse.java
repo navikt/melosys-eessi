@@ -7,31 +7,31 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedOppholdsadresse {
+public class DnummerRekvisisjonOppholdsadresse {
     private String gyldigFraOgMed = "";
     private PDLSedNorskAddresse norskVegadresse = new PDLSedNorskAddresse();
     private PDLSedUtenlandskVegadresse utenlandskVegadresse = new PDLSedUtenlandskVegadresse();
 
     public static class Builder {
-        private PDLSedOppholdsadresse pdlSedOppholdsadresse = new PDLSedOppholdsadresse();
+        private DnummerRekvisisjonOppholdsadresse dnummerRekvisjonOppholdsadresse = new DnummerRekvisisjonOppholdsadresse();
 
         public Builder medGyldigFraOgMed(String gyldigFraOgMed) {
-            pdlSedOppholdsadresse.gyldigFraOgMed = gyldigFraOgMed;
+            dnummerRekvisjonOppholdsadresse.gyldigFraOgMed = gyldigFraOgMed;
             return this;
         }
 
         public Builder medNorskVegadresse(PDLSedNorskAddresse norskVegadresse) {
-            pdlSedOppholdsadresse.norskVegadresse = norskVegadresse;
+            dnummerRekvisjonOppholdsadresse.norskVegadresse = norskVegadresse;
             return this;
         }
 
         public Builder medUtenlandskVegadresse(PDLSedUtenlandskVegadresse utenlandskVegadresse) {
-            pdlSedOppholdsadresse.utenlandskVegadresse = utenlandskVegadresse;
+            dnummerRekvisjonOppholdsadresse.utenlandskVegadresse = utenlandskVegadresse;
             return this;
         }
 
-        public PDLSedOppholdsadresse build() {
-            return pdlSedOppholdsadresse;
+        public DnummerRekvisisjonOppholdsadresse build() {
+            return dnummerRekvisjonOppholdsadresse;
         }
     }
 }

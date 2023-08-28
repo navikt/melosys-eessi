@@ -7,37 +7,37 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedSivilstand {
+public class DnummerRekvisisjonSivilstand {
     private String sivilstand = "";
     private String sivilstandsdato = "";
     private String bekreftelsesdato = "";
     private String relatertVedSivilstand = "";
 
     public static class Builder {
-        private PDLSedSivilstand pdlSedSivilstand = new PDLSedSivilstand();
+        private final DnummerRekvisisjonSivilstand dnummerRekvisisjonSivilstand = new DnummerRekvisisjonSivilstand();
 
         public Builder medSivilstand(String sivilstand) {
-            pdlSedSivilstand.sivilstand = sivilstand;
+            dnummerRekvisisjonSivilstand.sivilstand = sivilstand;
             return this;
         }
 
         public Builder medSivilstandsdato(String sivilstandsdato) {
-            pdlSedSivilstand.sivilstandsdato = sivilstandsdato;
+            dnummerRekvisisjonSivilstand.sivilstandsdato = sivilstandsdato;
             return this;
         }
 
         public Builder medBekreftelsesdato(String bekreftelsesdato) {
-            pdlSedSivilstand.bekreftelsesdato = bekreftelsesdato;
+            dnummerRekvisisjonSivilstand.bekreftelsesdato = bekreftelsesdato;
             return this;
         }
 
         public Builder medRelatertVedSivilstand(String relatertVedSivilstand) {
-            pdlSedSivilstand.relatertVedSivilstand = relatertVedSivilstand;
+            dnummerRekvisisjonSivilstand.relatertVedSivilstand = relatertVedSivilstand;
             return this;
         }
 
-        public PDLSedSivilstand build() {
-            return pdlSedSivilstand;
+        public DnummerRekvisisjonSivilstand build() {
+            return dnummerRekvisisjonSivilstand;
         }
     }
 }

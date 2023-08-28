@@ -7,31 +7,31 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedRelasjon {
+public class DnummerRekvisisjonRelasjon {
     private String minRolleForPerson = "";
     private String relatertPersonsRolle = "";
     private String relatertPersonsIdent = "";
 
     public static class Builder {
-        private PDLSedRelasjon pdlSedRelasjon = new PDLSedRelasjon();
+        private DnummerRekvisisjonRelasjon dnummerRekvisisjonRelasjon = new DnummerRekvisisjonRelasjon();
 
         public Builder medMinRolleForPerson(String minRolleForPerson) {
-            pdlSedRelasjon.minRolleForPerson = minRolleForPerson;
+            dnummerRekvisisjonRelasjon.minRolleForPerson = minRolleForPerson;
             return this;
         }
 
         public Builder medRelatertPersonsRolle(String relatertPersonsRolle) {
-            pdlSedRelasjon.relatertPersonsRolle = relatertPersonsRolle;
+            dnummerRekvisisjonRelasjon.relatertPersonsRolle = relatertPersonsRolle;
             return this;
         }
 
         public Builder medRelatertPersonsIdent(String relatertPersonsIdent) {
-            pdlSedRelasjon.relatertPersonsIdent = relatertPersonsIdent;
+            dnummerRekvisisjonRelasjon.relatertPersonsIdent = relatertPersonsIdent;
             return this;
         }
 
-        public PDLSedRelasjon build() {
-            return pdlSedRelasjon;
+        public DnummerRekvisisjonRelasjon build() {
+            return dnummerRekvisisjonRelasjon;
         }
     }
 }

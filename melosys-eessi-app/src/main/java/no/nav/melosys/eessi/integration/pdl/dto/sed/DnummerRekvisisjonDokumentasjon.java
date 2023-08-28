@@ -7,25 +7,25 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedDokumentasjon {
+public class DnummerRekvisisjonDokumentasjon {
     private String dokumentasjonstype = "";
     private String ident = "";
 
     public static class Builder {
-        private PDLSedDokumentasjon pdlSedDokumentasjon = new PDLSedDokumentasjon();
+        private DnummerRekvisisjonDokumentasjon dnummerRekvisisjonDokumentasjon = new DnummerRekvisisjonDokumentasjon();
 
         public Builder medDokumentasjonstype(String dokumentasjonstype) {
-            pdlSedDokumentasjon.dokumentasjonstype = dokumentasjonstype;
+            dnummerRekvisisjonDokumentasjon.dokumentasjonstype = dokumentasjonstype;
             return this;
         }
 
         public Builder medIdent(String ident) {
-            pdlSedDokumentasjon.ident = ident;
+            dnummerRekvisisjonDokumentasjon.ident = ident;
             return this;
         }
 
-        public PDLSedDokumentasjon build() {
-            return pdlSedDokumentasjon;
+        public DnummerRekvisisjonDokumentasjon build() {
+            return dnummerRekvisisjonDokumentasjon;
         }
     }
 }

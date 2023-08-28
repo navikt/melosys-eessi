@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedPersonopplysninger {
+public class DnummerRekvisisjonPersonopplysninger {
     private String fornavn = "";
     private String etternavn = "";
     private String foedselsdato = "";
@@ -20,7 +20,7 @@ public class PDLSedPersonopplysninger {
     private List<String> statsborgerskap = Lists.newArrayList();
 
     public static class Builder {
-        private PDLSedPersonopplysninger pdlSedPersonopplysninger = new PDLSedPersonopplysninger();
+        private DnummerRekvisisjonPersonopplysninger pdlSedPersonopplysninger = new DnummerRekvisisjonPersonopplysninger();
 
         public Builder medFornavn(String fornavn) {
             pdlSedPersonopplysninger.fornavn = fornavn;
@@ -57,7 +57,7 @@ public class PDLSedPersonopplysninger {
             return this;
         }
 
-        public PDLSedPersonopplysninger build() {
+        public DnummerRekvisisjonPersonopplysninger build() {
             return pdlSedPersonopplysninger;
         }
     }

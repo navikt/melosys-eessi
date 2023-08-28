@@ -7,25 +7,25 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class PDLSedUtenlandskIdentifikasjon {
+public class DnummerRekvisisjonUtenlandskIdentifikasjon {
     private String utstederland = "";
     private String utenlandskId = "";
 
     public static class Builder {
-        private PDLSedUtenlandskIdentifikasjon pdlSedUtenlandskIdentifikasjon = new PDLSedUtenlandskIdentifikasjon();
+        private DnummerRekvisisjonUtenlandskIdentifikasjon dnummerRekvisisjonUtenlandskIdentifikasjon = new DnummerRekvisisjonUtenlandskIdentifikasjon();
 
         public Builder medUtstederland(String utstederland) {
-            pdlSedUtenlandskIdentifikasjon.utstederland = utstederland;
+            dnummerRekvisisjonUtenlandskIdentifikasjon.utstederland = utstederland;
             return this;
         }
 
         public Builder medUtenlandskId(String utenlandskId) {
-            pdlSedUtenlandskIdentifikasjon.utenlandskId = utenlandskId;
+            dnummerRekvisisjonUtenlandskIdentifikasjon.utenlandskId = utenlandskId;
             return this;
         }
 
-        public PDLSedUtenlandskIdentifikasjon build() {
-            return pdlSedUtenlandskIdentifikasjon;
+        public DnummerRekvisisjonUtenlandskIdentifikasjon build() {
+            return dnummerRekvisisjonUtenlandskIdentifikasjon;
         }
     }
 }

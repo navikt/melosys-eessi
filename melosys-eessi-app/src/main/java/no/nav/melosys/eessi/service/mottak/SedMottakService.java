@@ -9,9 +9,9 @@ import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisjonTilMellomlagring;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedKilde;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedPersonopplysninger;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.PDLSedUtenlandskIdentifikasjon;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonKilde;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonPersonopplysninger;
+import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonUtenlandskIdentifikasjon;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
@@ -180,11 +180,11 @@ public class SedMottakService {
 
     private DnummerRekvisjonTilMellomlagring byggPDLSed(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
         var pdlSed = new DnummerRekvisjonTilMellomlagring.Builder()
-                .medKilde(new PDLSedKilde.Builder()
+                .medKilde(new DnummerRekvisisjonKilde.Builder()
                         .medInstitusjon(hentInstitusjon(sed))
                         .medLandkode(sedMottattHendelse.getSedHendelse().getAvsenderId() != null ? sedMottattHendelse.getSedHendelse().getLandkode() : "")
                         .build())
-                .medPersonopplysninger(new PDLSedPersonopplysninger.Builder()
+                .medPersonopplysninger(new DnummerRekvisisjonPersonopplysninger.Builder()
                         .medEtternavn(personFraSed.getEtternavn())
                         .medFornavn(personFraSed.getFornavn())
                         .medFoedselsdato(personFraSed.getFoedselsdato())
@@ -194,10 +194,10 @@ public class SedMottakService {
                         .build());
 
         if (pinSEDErFraLandSedKommerFra) {
-            pdlSed.medUtenlandskIdentifikasjon(new PDLSedUtenlandskIdentifikasjon.Builder()
+            pdlSed.medUtenlandskIdentifikasjon(new DnummerRekvisisjonUtenlandskIdentifikasjon.Builder()
                     .medUtstederland(sedMottattHendelse.getSedHendelse().getLandkode()).build());
         } else {
-            pdlSed.medUtenlandskIdentifikasjon(new PDLSedUtenlandskIdentifikasjon.Builder()
+            pdlSed.medUtenlandskIdentifikasjon(new DnummerRekvisisjonUtenlandskIdentifikasjon.Builder()
                     .medUtenlandskId("").build());
         }
 

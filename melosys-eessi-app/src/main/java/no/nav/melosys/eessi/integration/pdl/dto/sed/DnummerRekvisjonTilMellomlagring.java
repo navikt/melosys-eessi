@@ -11,60 +11,60 @@ import java.util.List;
 @AllArgsConstructor
 public class DnummerRekvisjonTilMellomlagring {
 
-    private PDLSedKilde kilde = new PDLSedKilde();
-    private PDLSedPersonopplysninger personopplysninger = new PDLSedPersonopplysninger();
-    private PDLSedUtenlandskIdentifikasjon utenlandskIdentifikasjon = new PDLSedUtenlandskIdentifikasjon();
-    private PDLSedBostedsadresse bostedsadresse = new PDLSedBostedsadresse();
-    private PDLSedOppholdsadresse oppholdsadresse = new PDLSedOppholdsadresse();
-    private PDLSedKontaktadresse kontaktadresse = new PDLSedKontaktadresse();
-    private PDLSedDokumentasjon dokumentasjon = new PDLSedDokumentasjon();
-    private List<PDLSedRelasjon> relasjoner = List.of();
-    private PDLSedSivilstand sivilstand = new PDLSedSivilstand();
+    private DnummerRekvisisjonKilde kilde = new DnummerRekvisisjonKilde();
+    private DnummerRekvisisjonPersonopplysninger personopplysninger = new DnummerRekvisisjonPersonopplysninger();
+    private DnummerRekvisisjonUtenlandskIdentifikasjon utenlandskIdentifikasjon = new DnummerRekvisisjonUtenlandskIdentifikasjon();
+    private DnummerRekvisisjonBostedsadresse bostedsadresse = new DnummerRekvisisjonBostedsadresse();
+    private DnummerRekvisisjonOppholdsadresse oppholdsadresse = new DnummerRekvisisjonOppholdsadresse();
+    private DnummerRekvisisjonKontaktadresse kontaktadresse = new DnummerRekvisisjonKontaktadresse();
+    private DnummerRekvisisjonDokumentasjon dokumentasjon = new DnummerRekvisisjonDokumentasjon();
+    private List<DnummerRekvisisjonRelasjon> relasjoner = List.of();
+    private DnummerRekvisisjonSivilstand sivilstand = new DnummerRekvisisjonSivilstand();
 
     public static class Builder {
-        private DnummerRekvisjonTilMellomlagring dnummerRekvisjonTilMellomlagring = new DnummerRekvisjonTilMellomlagring();
+        private final DnummerRekvisjonTilMellomlagring dnummerRekvisjonTilMellomlagring = new DnummerRekvisjonTilMellomlagring();
 
-        public Builder medKilde(PDLSedKilde kilde) {
+        public Builder medKilde(DnummerRekvisisjonKilde kilde) {
             dnummerRekvisjonTilMellomlagring.kilde = kilde;
             return this;
         }
 
-        public Builder medPersonopplysninger(PDLSedPersonopplysninger personopplysninger) {
+        public Builder medPersonopplysninger(DnummerRekvisisjonPersonopplysninger personopplysninger) {
             dnummerRekvisjonTilMellomlagring.personopplysninger = personopplysninger;
             return this;
         }
 
-        public Builder medUtenlandskIdentifikasjon(PDLSedUtenlandskIdentifikasjon utenlandskIdentifikasjon) {
+        public Builder medUtenlandskIdentifikasjon(DnummerRekvisisjonUtenlandskIdentifikasjon utenlandskIdentifikasjon) {
             dnummerRekvisjonTilMellomlagring.utenlandskIdentifikasjon = utenlandskIdentifikasjon;
             return this;
         }
 
-        public Builder medBostedsadresse(PDLSedBostedsadresse bostedsadresse) {
+        public Builder medBostedsadresse(DnummerRekvisisjonBostedsadresse bostedsadresse) {
             dnummerRekvisjonTilMellomlagring.bostedsadresse = bostedsadresse;
             return this;
         }
 
-        public Builder medOppholdsadresse(PDLSedOppholdsadresse oppholdsadresse) {
+        public Builder medOppholdsadresse(DnummerRekvisisjonOppholdsadresse oppholdsadresse) {
             dnummerRekvisjonTilMellomlagring.oppholdsadresse = oppholdsadresse;
             return this;
         }
 
-        public Builder medKontaktadresse(PDLSedKontaktadresse kontaktadresse) {
+        public Builder medKontaktadresse(DnummerRekvisisjonKontaktadresse kontaktadresse) {
             dnummerRekvisjonTilMellomlagring.kontaktadresse = kontaktadresse;
             return this;
         }
 
-        public Builder medDokumentasjon(PDLSedDokumentasjon dokumentasjon) {
+        public Builder medDokumentasjon(DnummerRekvisisjonDokumentasjon dokumentasjon) {
             dnummerRekvisjonTilMellomlagring.dokumentasjon = dokumentasjon;
             return this;
         }
 
-        public Builder medRelasjoner(List<PDLSedRelasjon> relasjoner) {
+        public Builder medRelasjoner(List<DnummerRekvisisjonRelasjon> relasjoner) {
             dnummerRekvisjonTilMellomlagring.relasjoner = relasjoner;
             return this;
         }
 
-        public Builder medSivilstand(PDLSedSivilstand sivilstand) {
+        public Builder medSivilstand(DnummerRekvisisjonSivilstand sivilstand) {
             dnummerRekvisjonTilMellomlagring.sivilstand = sivilstand;
             return this;
         }
