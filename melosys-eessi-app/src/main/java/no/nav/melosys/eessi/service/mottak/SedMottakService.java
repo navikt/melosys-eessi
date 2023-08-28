@@ -188,7 +188,7 @@ public class SedMottakService {
                 .etternavn(personFraSed.getEtternavn())
                 .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
                 .kjoenn(hentPDLKjønn(personFraSed))
-                .foedeland(personFraSed.getFoedested().getLand())
+                .foedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : null)
                 .statsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
                 .build())
             .kontaktadresse(DnummerRekvisisjonKontaktadresse.builder()
