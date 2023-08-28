@@ -147,19 +147,19 @@ public class SedMottakService {
 
             try {
                 String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(dnummerRekvisjonTilMellomlagring);
+
                 log.info("[EESSI TEST] Rekvirering OK: " + preutfylltLenkeForRekvirering);
+
+                oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
+                    journalpostID,
+                    sedMottattHendelse.getSedHendelse().getSedType(),
+                    sedMottattHendelse.getSedHendelse().getRinaSakId(),
+                    preutfylltLenkeForRekvirering
+                );
             } catch (Exception e) {
                 log.error("[EESSI TEST] Feil under rekvirering: " + e.getMessage());
                 throw e;
             }
-
-
-            oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                journalpostID,
-                sedMottattHendelse.getSedHendelse().getSedType(),
-                sedMottattHendelse.getSedHendelse().getRinaSakId()
-                //Todo: Fyll ut her.
-            );
         } else {
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,

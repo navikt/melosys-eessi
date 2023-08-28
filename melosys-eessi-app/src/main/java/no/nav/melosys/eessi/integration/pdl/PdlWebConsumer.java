@@ -3,7 +3,9 @@ package no.nav.melosys.eessi.integration.pdl;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisjonTilMellomlagring;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 public class PdlWebConsumer implements RestConsumer {
@@ -23,7 +25,8 @@ public class PdlWebConsumer implements RestConsumer {
             .uri(PDL_SED_PATH)
             .bodyValue(dnummerRekvisjonTilMellomlagring)
             .retrieve()
-            .bodyToMono(String.class)
+            .toEntity(String.class)
+            .mapNotNull(response -> response.getHeaders().getFirst("Location"))
             .block();
     }
 }
