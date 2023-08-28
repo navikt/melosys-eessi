@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class Matrikkelnummer {
+
     String kommunenummer;
     int gaardsnummer;
     int bruksnummer;

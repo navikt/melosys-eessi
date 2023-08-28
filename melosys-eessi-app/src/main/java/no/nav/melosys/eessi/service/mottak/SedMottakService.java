@@ -128,7 +128,7 @@ public class SedMottakService {
         String journalpostID = opprettJournalpost(sedMottattHendelse, null);
         boolean preutfyllingEnabled = unleash.isEnabled("melosys.eessi.preutfylling.av.sed");
 
-        var oppgaveID = "";
+        String oppgaveID = null;
         var harNorskPersonnummer = true;
         var personFraSed = sed.finnPerson().orElse(null);
 
@@ -140,22 +140,17 @@ public class SedMottakService {
 
         if (sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer && preutfyllingEnabled) {
             var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
-
             var dnummerRekvisjonTilMellomlagring = byggDnummerRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
 
-            try {
-                String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(dnummerRekvisjonTilMellomlagring);
+            String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(dnummerRekvisjonTilMellomlagring);
 
-                oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                    journalpostID,
-                    sedMottattHendelse.getSedHendelse().getSedType(),
-                    sedMottattHendelse.getSedHendelse().getRinaSakId(),
-                    preutfylltLenkeForRekvirering
-                );
-            } catch (Exception e) {
-                log.error("Feil under rekvirering: " + e.getMessage());
-                throw e;
-            }
+            oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
+                journalpostID,
+                sedMottattHendelse.getSedHendelse().getSedType(),
+                sedMottattHendelse.getSedHendelse().getRinaSakId(),
+                preutfylltLenkeForRekvirering
+            );
+
         } else {
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,
@@ -175,20 +170,27 @@ public class SedMottakService {
 
     private DnummerRekvisisjonTilMellomlagring byggDnummerRekvisisjonTilMellomlagring(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
         var dnummerRekvisjonTilMellomlagringBuilder = DnummerRekvisisjonTilMellomlagring.builder()
-            .kilde(DnummerRekvisisjonKilde.builder()
-                .institusjon(hentInstitusjon(sed))
-                .landkode(Objects.requireNonNull(sedMottattHendelse.getSedHendelse().getLandkode(), "Landkode kan ikke være null fra SED"))
-                .build())
-            .personopplysninger(DnummerRekvisisjonPersonopplysninger.builder()
-                .fornavn(personFraSed.getFornavn())
-                .etternavn(personFraSed.getEtternavn())
-                .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
-                .kjoenn(hentPDLKjønn(personFraSed))
-                .foedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : null)
-                .statsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
-                .build())
-            .kontaktadresse(DnummerRekvisisjonKontaktadresse.builder()
-                .utenlandskPostboksadresse(hentUtenlandskPostAdresse(sed)).build());
+            .kilde(
+                DnummerRekvisisjonKilde.builder()
+                    .institusjon(hentInstitusjon(sed))
+                    .landkode(Objects.requireNonNull(sedMottattHendelse.getSedHendelse().getLandkode(), "Landkode kan ikke være null fra SED"))
+                    .build()
+            )
+            .personopplysninger(
+                DnummerRekvisisjonPersonopplysninger.builder()
+                    .fornavn(personFraSed.getFornavn())
+                    .etternavn(personFraSed.getEtternavn())
+                    .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
+                    .kjoenn(hentPDLKjønn(personFraSed))
+                    .foedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : null)
+                    .statsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
+                    .build()
+            )
+            .kontaktadresse(
+                DnummerRekvisisjonKontaktadresse.builder()
+                    .utenlandskPostboksadresse(hentUtenlandskPostAdresse(sed))
+                    .build()
+            );
 
         if (pinSEDErFraLandSedKommerFra) {
             dnummerRekvisjonTilMellomlagringBuilder.utenlandskIdentifikasjon(DnummerRekvisisjonUtenlandskIdentifikasjon.builder()

@@ -6,5 +6,6 @@ import lombok.Value;
 @Value
 @Builder
 public class UkjentBosted {
+
     String bostedskommune;
 }

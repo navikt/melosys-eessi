@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class UtenlandskAdresse {
+
     String adressenavnNummer;
     String bygningEtasjeLeilighet;
     String bygning;

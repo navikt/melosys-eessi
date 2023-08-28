@@ -9,5 +9,5 @@ import lombok.*;
 public class DnummerRekvisisjonBostedsadresse {
 
     private String gyldigFraOgMed;
-    private DnummerRekvisisjonUtenlandskVegadresse utenlandskVegadresse = new DnummerRekvisisjonUtenlandskVegadresse();
+    private DnummerRekvisisjonUtenlandskVegadresse utenlandskVegadresse;
 }

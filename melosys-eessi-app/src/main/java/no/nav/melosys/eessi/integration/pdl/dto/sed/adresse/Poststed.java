@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class Poststed {
+
     String poststedsnavn;
     String postnummer;
 }

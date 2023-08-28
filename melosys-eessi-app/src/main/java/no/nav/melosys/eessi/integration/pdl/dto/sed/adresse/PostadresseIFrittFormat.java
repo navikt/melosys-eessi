@@ -8,6 +8,7 @@ import java.util.List;
 @Value
 @Builder
 public class PostadresseIFrittFormat {
+
     List<String> adresselinje;
     Poststed poststed;
 }

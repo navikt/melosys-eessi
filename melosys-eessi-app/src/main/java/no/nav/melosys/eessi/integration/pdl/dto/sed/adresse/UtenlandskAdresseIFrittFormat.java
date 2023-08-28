@@ -8,6 +8,7 @@ import java.util.List;
 @Value
 @Builder
 public class UtenlandskAdresseIFrittFormat {
+
     List<String> adresselinje;
     String postkode;
     String byEllerStedsnavn;

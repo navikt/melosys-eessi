@@ -6,6 +6,7 @@ import lombok.Value;
 @Value
 @Builder
 public class VegadresseForPost {
+
     String adressenavn;
     Adressenummer adressenummer;
     String adressekode;

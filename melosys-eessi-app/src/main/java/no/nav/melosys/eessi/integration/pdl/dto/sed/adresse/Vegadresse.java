@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class Vegadresse {
+
     String kommunenummer;
     String bydelsnummer;
     String brukesenhetstype;
