@@ -10,8 +10,6 @@ public class PdlWebConsumer implements RestConsumer {
 
     private final WebClient webClient;
 
-    private static final String PDL_SED_PATH = "/api/sed";
-
     public PdlWebConsumer(WebClient webClient) {
         this.webClient = webClient;
     }
@@ -19,7 +17,7 @@ public class PdlWebConsumer implements RestConsumer {
     public String hentPreutfylltLenkeForRekvirering(DnummerRekvisjonTilMellomlagring dnummerRekvisjonTilMellomlagring) {
         return webClient
             .post()
-            .uri(PDL_SED_PATH)
+            .uri("/api/sed")
             .bodyValue(dnummerRekvisjonTilMellomlagring)
             .retrieve()
             .toEntity(String.class)
