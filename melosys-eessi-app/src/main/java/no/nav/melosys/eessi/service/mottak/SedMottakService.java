@@ -143,12 +143,9 @@ public class SedMottakService {
             var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
 
             var dnummerRekvisjonTilMellomlagring = byggDnummerRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
-            log.info("[EESSI TEST] Prøver å rekvirere", dnummerRekvisjonTilMellomlagring);
 
             try {
                 String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(dnummerRekvisjonTilMellomlagring);
-
-                log.info("[EESSI TEST] Rekvirering OK: " + preutfylltLenkeForRekvirering);
 
                 oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                     journalpostID,
@@ -157,7 +154,7 @@ public class SedMottakService {
                     preutfylltLenkeForRekvirering
                 );
             } catch (Exception e) {
-                log.error("[EESSI TEST] Feil under rekvirering: " + e.getMessage());
+                log.error("Feil under rekvirering: " + e.getMessage());
                 throw e;
             }
         } else {
@@ -192,13 +189,7 @@ public class SedMottakService {
                 .statsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
                 .build())
             .kontaktadresse(DnummerRekvisisjonKontaktadresse.builder()
-                .utenlandskPostboksadresse(DnummerRekvisisjonUtenlandskPostboksadresse.builder()
-                    .postkode(sed.getNav().getBruker().getAdresse().get(0).getPostnummer())
-                    .bySted(sed.getNav().getBruker().getAdresse().get(0).getBy())
-                    .landkode(sed.getNav().getBruker().getAdresse().get(0).getLand())
-                    .regionDistriktOmraade(sed.getNav().getBruker().getAdresse().get(0).getRegion())
-                    .build())
-                .build());
+                .utenlandskPostboksadresse(hentUtenlandskPostAdresse(sed)).build());
 
         if (pinSEDErFraLandSedKommerFra) {
             dnummerRekvisjonTilMellomlagringBuilder.utenlandskIdentifikasjon(DnummerRekvisisjonUtenlandskIdentifikasjon.builder()
@@ -206,6 +197,20 @@ public class SedMottakService {
         }
 
         return dnummerRekvisjonTilMellomlagringBuilder.build();
+    }
+
+    private DnummerRekvisisjonUtenlandskPostboksadresse hentUtenlandskPostAdresse(SED sed) {
+        var adresse = sed.getNav().getBruker().getAdresse() != null ? sed.getNav().getBruker().getAdresse().get(0) : null;
+        if (adresse != null) {
+            return DnummerRekvisisjonUtenlandskPostboksadresse.builder()
+                .postkode(adresse.getPostnummer())
+                .bySted(adresse.getBy())
+                .landkode(adresse.getLand())
+                .regionDistriktOmraade(adresse.getRegion())
+                .build();
+        }
+
+        return null;
     }
 
     private PDLKjoennType hentPDLKjønn(Person personFraSed) {
