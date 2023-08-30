@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
-import no.nav.melosys.eessi.identifisering.OppgaveEndretConsumerGammel;
 import no.nav.melosys.eessi.kafka.consumers.OppgaveHendelseConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
 import no.nav.security.token.support.core.api.Unprotected;
@@ -29,17 +28,14 @@ public class KafkaAdminTjeneste {
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
 
     private final OppgaveHendelseConsumer oppgaveHendelseConsumer;
-    private final OppgaveEndretConsumerGammel oppgaveEndretConsumerGammel;
     private final SedMottattConsumer sedMottattConsumer;
     private final String apiKey;
 
     public KafkaAdminTjeneste(OppgaveHendelseConsumer oppgaveHendelseConsumer,
-                              OppgaveEndretConsumerGammel oppgaveEndretConsumerGammel,
                               SedMottattConsumer sedMottattConsumer,
                               @Value("${melosys.admin.api-key}") String apiKey,
                               KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
         this.oppgaveHendelseConsumer = oppgaveHendelseConsumer;
-        this.oppgaveEndretConsumerGammel = oppgaveEndretConsumerGammel;
         this.sedMottattConsumer = sedMottattConsumer;
         this.apiKey = apiKey;
         this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
@@ -100,7 +96,6 @@ public class KafkaAdminTjeneste {
         log.info("[KafkaAdminTjeneste] Setter offset for " + consumerId + " til: {}", offset);
         switch (consumerId) {
             case "oppgaveHendelse" -> oppgaveHendelseConsumer.settSpesifiktOffsetPåConsumer(offset);
-            case "oppgaveEndret" -> oppgaveEndretConsumerGammel.settSpesifiktOffsetPåConsumer(offset);
             case "sedMottatt" -> sedMottattConsumer.settSpesifiktOffsetPåConsumer(offset);
             default -> log.warn("Vi støtter ikke {}, gjør ingenting.", consumerId);
         }
