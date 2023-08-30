@@ -50,7 +50,22 @@ class OppgaveServiceTest {
         assertThat(oppgaveDto.getJournalpostId()).isEqualTo(journalpostID);
         assertThat(oppgaveDto.getTema()).isEqualTo("UFM");
         assertThat(oppgaveDto.getOppgavetype()).isEqualTo("JFR");
-        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009\n\rRina-sak - " + rinaSaksnummer+ "\n\rPreutfyllt url for rekvirrering: ");
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("EØS - A009\n\rRina-sak - " + rinaSaksnummer);
+    }
+
+    @Test
+    void opprettOppgaveIdOgFordeling_BeskrivelseBlirSatt() {
+
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto());
+        String journalpostID = "111";
+        String rinaSaksnummer = "123";
+        oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID, SedType.A009.name(), rinaSaksnummer, "https://test.local");
+
+        verify(oppgaveConsumer).opprettOppgave(captor.capture());
+
+        OppgaveDto oppgaveDto = captor.getValue();
+
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("Preutfyllt url for rekvirrering: https://test.local\n\rEØS - A009\n\rRina-sak - " + rinaSaksnummer);
     }
 
     @Test
