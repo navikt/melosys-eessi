@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.*;
+import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.*;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg;

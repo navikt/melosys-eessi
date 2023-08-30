@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.DnummerRekvisisjonTilMellomlagring;
+import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.DnummerRekvisisjonTilMellomlagring;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j

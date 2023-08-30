@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.integration.pdl.dto.sed;
+package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
 import lombok.*;
 

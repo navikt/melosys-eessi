@@ -1,7 +1,7 @@
-package no.nav.melosys.eessi.integration.pdl.dto.sed;
+package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
 import lombok.*;
-import no.nav.melosys.eessi.integration.pdl.dto.sed.adresse.Vegadresse;
+import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.adresse.Vegadresse;
 
 @Data
 @Builder
