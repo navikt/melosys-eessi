@@ -126,38 +126,7 @@ public class SedMottakService {
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed) {
         String journalpostID = opprettJournalpost(sedMottattHendelse, null);
-        boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
-
-        String oppgaveID = null;
-        var harNorskPersonnummer = true;
-        var personFraSed = sed.finnPerson().orElse(null);
-
-        if (personFraSed != null) {
-            harNorskPersonnummer = personFraSed.finnNorskPin()
-                .map(Pin::getIdentifikator)
-                .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
-        }
-
-        if (sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer && identRekvisisjonEnabled) {
-            var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
-            var identRekvisjonTilMellomlagring = byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
-
-            String preutfylltLenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
-
-            oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                journalpostID,
-                sedMottattHendelse.getSedHendelse().getSedType(),
-                sedMottattHendelse.getSedHendelse().getRinaSakId(),
-                preutfylltLenkeForRekvirering
-            );
-
-        } else {
-            oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
-                journalpostID,
-                sedMottattHendelse.getSedHendelse().getSedType(),
-                sedMottattHendelse.getSedHendelse().getRinaSakId()
-            );
-        }
+        var oppgaveID = opprettOgLagreIndetifiseringsoppgave(sedMottattHendelse, sed, journalpostID);
 
         bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
             .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
@@ -166,6 +135,39 @@ public class SedMottakService {
             .build());
 
         log.info("Opprettet oppgave med id {}", oppgaveID);
+    }
+
+    private String opprettOgLagreIndetifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
+        boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
+        var harNorskPersonnummer = true;
+
+        var personFraSed = sed.finnPerson().orElse(null);
+
+        if (sedMottattHendelse.getSedHendelse().erASED() && personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
+            var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
+            var identRekvisjonTilMellomlagring = byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
+
+            String preutfylltLenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
+
+            return oppgaveService.opprettOppgaveTilIdOgFordeling(
+                journalpostID,
+                sedMottattHendelse.getSedHendelse().getSedType(),
+                sedMottattHendelse.getSedHendelse().getRinaSakId(),
+                preutfylltLenkeForRekvirering
+            );
+        }
+        return oppgaveService.opprettOppgaveTilIdOgFordeling(
+            journalpostID,
+            sedMottattHendelse.getSedHendelse().getSedType(),
+            sedMottattHendelse.getSedHendelse().getRinaSakId()
+        );
+
+    }
+
+    private boolean harNorskPersonnummer(Person personFraSed) {
+        return personFraSed.finnNorskPin()
+            .map(Pin::getIdentifikator)
+            .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
     }
 
     private IdentRekvisisjonTilMellomlagring byggIdentRekvisisjonTilMellomlagring(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
