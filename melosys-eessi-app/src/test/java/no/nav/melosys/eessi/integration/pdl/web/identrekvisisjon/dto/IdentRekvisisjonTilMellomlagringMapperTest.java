@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class IdentRekvisisjonTilMellomlagringMapperTest {
 
@@ -61,6 +62,16 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
 
         assertEquals("12345678911", result.getUtenlandskIdentifikasjon().getUtenlandskId());
         assertEquals("SE", result.getUtenlandskIdentifikasjon().getUtstederland());
+    }
+
+    @Test
+    public void byggIdentRekvisisjonTilMellomlagringSetterIkkeUtenlandskIdentifikasjon() {
+        SED sed = lagSED();
+        sed.getNav().getBruker().getPerson().setPin(List.of(new Pin("12345678911", "DK", "sektor")));
+        SedMottattHendelse sedMottattHendelse = createSedHendelse();
+        IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
+
+        assertNull(result.getUtenlandskIdentifikasjon());
     }
 
     @Test
