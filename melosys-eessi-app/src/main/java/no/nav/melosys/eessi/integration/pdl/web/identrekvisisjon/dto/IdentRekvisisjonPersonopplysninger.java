@@ -14,7 +14,7 @@ import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisisjonPersonopplysninger {
+public class IdentRekvisisjonPersonopplysninger {
 
     private String fornavn;
     private String etternavn;

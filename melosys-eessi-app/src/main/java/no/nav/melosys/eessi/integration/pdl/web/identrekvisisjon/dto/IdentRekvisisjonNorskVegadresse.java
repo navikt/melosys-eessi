@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.adresse.Veg
 @Builder
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DnummerRekvisisjonNorskVegadresse extends Vegadresse {
+public class IdentRekvisisjonNorskVegadresse extends Vegadresse {
 
     private String adressenavn;
     private String husnummer;

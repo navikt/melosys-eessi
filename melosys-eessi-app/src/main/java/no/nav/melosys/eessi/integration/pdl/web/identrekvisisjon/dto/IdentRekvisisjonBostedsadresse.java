@@ -6,8 +6,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisisjonBostedsadresse {
+public class IdentRekvisisjonBostedsadresse {
 
     private String gyldigFraOgMed;
-    private DnummerRekvisisjonUtenlandskVegadresse utenlandskVegadresse;
+    private IdentRekvisisjonUtenlandskVegadresse utenlandskVegadresse;
 }

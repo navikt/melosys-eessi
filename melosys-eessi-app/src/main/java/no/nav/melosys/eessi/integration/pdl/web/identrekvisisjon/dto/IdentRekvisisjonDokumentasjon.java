@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisisjonDokumentasjon {
+public class IdentRekvisisjonDokumentasjon {
 
     private String dokumentasjonstype;
     private String ident;

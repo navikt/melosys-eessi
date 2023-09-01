@@ -6,7 +6,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisisjonRelasjon {
+public class IdentRekvisisjonRelasjon {
 
     private String minRolleForPerson;
     private String relatertPersonsRolle;

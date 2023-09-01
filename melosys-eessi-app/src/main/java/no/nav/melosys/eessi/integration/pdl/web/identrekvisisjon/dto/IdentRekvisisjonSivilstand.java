@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisisjonSivilstand {
+public class IdentRekvisisjonSivilstand {
 
     private String sivilstand;
     private String sivilstandsdato;

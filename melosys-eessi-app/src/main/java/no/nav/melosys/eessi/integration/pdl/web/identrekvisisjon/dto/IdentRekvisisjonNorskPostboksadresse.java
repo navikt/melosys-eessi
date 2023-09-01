@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.adresse.Pos
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class DnummerRekvisisjonNorskPostboksadresse extends Postboksadresse {
+public class IdentRekvisisjonNorskPostboksadresse extends Postboksadresse {
 
     private String postboks;
     private String postnummer;

@@ -6,8 +6,8 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DnummerRekvisisjonUtenlandskIdentifikasjon {
+public class IdentRekvisisjonKilde {
 
-    private String utstederland;
-    private String utenlandskId;
+    private String institusjon;
+    private String landkode;
 }

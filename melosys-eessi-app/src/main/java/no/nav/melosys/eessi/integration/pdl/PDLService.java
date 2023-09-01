@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
-import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.DnummerRekvisisjonTilMellomlagring;
+import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvisisjonTilMellomlagring;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
@@ -33,8 +33,8 @@ public class PDLService implements PersonFasade {
     }
 
     @Override
-    public String hentPreutfylltLenkeForRekvirering(DnummerRekvisisjonTilMellomlagring dnummerRekvisisjonTilMellomlagring) {
-        return pdlWebConsumer.hentPreutfylltLenkeForRekvirering(dnummerRekvisisjonTilMellomlagring);
+    public String hentPreutfylltLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring) {
+        return pdlWebConsumer.hentPreutfylltLenkeForRekvirering(identRekvisisjonTilMellomlagring);
     }
 
     @Override
