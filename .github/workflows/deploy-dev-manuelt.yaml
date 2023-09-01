@@ -7,7 +7,8 @@ on:
         description: 'Miljø (dev, q1 eller prod)'
         required: true
         default: 'dev'
-
+permissions:
+    contents: write
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
   IMAGE_MANIFEST: https://docker.pkg.github.com/v2/${{ github.repository }}/melosys-eessi/manifests/${{ github.sha }}

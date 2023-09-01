@@ -8,6 +8,9 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+permissions:
+    contents: write
+    packages: write
 env:
   docker_image: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
 jobs:
