@@ -14,7 +14,7 @@ public class PdlWebConsumer implements RestConsumer {
         this.webClient = webClient;
     }
 
-    public String hentLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring) {
+    public String opprettLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring) {
         return webClient
             .post()
             .uri("/api/identrekvisisjon/mellomlagring")

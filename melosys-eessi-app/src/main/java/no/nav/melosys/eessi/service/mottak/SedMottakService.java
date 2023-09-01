@@ -142,7 +142,7 @@ public class SedMottakService {
             var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
             var identRekvisjonTilMellomlagring = byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
 
-            String preutfylltLenkeForRekvirering = personFasade.hentLenkeForRekvirering(identRekvisjonTilMellomlagring);
+            String preutfylltLenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
 
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,

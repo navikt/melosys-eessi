@@ -65,7 +65,7 @@ class OppgaveServiceTest {
 
         OppgaveDto oppgaveDto = captor.getValue();
 
-        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("Preutfyllt url for rekvirrering: https://test.local\n\rEØS - A009\n\rRina-sak - " + rinaSaksnummer);
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("Url for rekvirering: https://test.local\n\rEØS - A009\n\rRina-sak - " + rinaSaksnummer);
     }
 
     @Test

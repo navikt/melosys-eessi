@@ -20,7 +20,7 @@ public class OppgaveService {
     private static final String ENHET_ID_FORDELING = "4303";
     private static final String ENHET_MEDLEMSKAP_OG_AVGIFT = "4530";
     private static final String PRIORITET_NORMAL = "NORM";
-    private static final String BESKRIVELSE_MED_REKVIRRERING_URL = "Preutfyllt url for rekvirrering: %s\n\rEØS - %s\n\rRina-sak - %s";
+    private static final String BESKRIVELSE_MED_REKVIRERING_URL = "Url for rekvirering: %s\n\rEØS - %s\n\rRina-sak - %s";
     private static final String BESKRIVELSE = "EØS - %s\n\rRina-sak - %s";
 
     private final OppgaveConsumer oppgaveConsumer;
@@ -48,7 +48,7 @@ public class OppgaveService {
         return response.getId();
     }
 
-    private OppgaveDto.OppgaveDtoBuilder lagOppgaveDto(String journalpostID, String sedType, String rinaSaksnummer, String preutfylltLenkeForRekvirering){
+    private OppgaveDto.OppgaveDtoBuilder lagOppgaveDto(String journalpostID, String sedType, String rinaSaksnummer, String lenkeForRekvirering){
         var oppgaveDto = OppgaveDto.builder()
             .aktivDato(LocalDate.now())
             .fristFerdigstillelse(LocalDate.now().plusDays(1))
@@ -58,8 +58,8 @@ public class OppgaveService {
             .tema(temaForSedType(sedType))
             .tildeltEnhetsnr(ENHET_ID_FORDELING)
             .metadata(Map.of(OppgaveMetadataKey.RINA_SAKID, rinaSaksnummer));
-        if (!StringUtils.isEmpty(preutfylltLenkeForRekvirering)) {
-            oppgaveDto.beskrivelse(String.format(BESKRIVELSE_MED_REKVIRRERING_URL, preutfylltLenkeForRekvirering, sedType, rinaSaksnummer));
+        if (!StringUtils.isEmpty(lenkeForRekvirering)) {
+            oppgaveDto.beskrivelse(String.format(BESKRIVELSE_MED_REKVIRERING_URL, lenkeForRekvirering, sedType, rinaSaksnummer));
         } else {
             oppgaveDto.beskrivelse(String.format(BESKRIVELSE, sedType, rinaSaksnummer));
         }
