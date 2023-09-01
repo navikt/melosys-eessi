@@ -9,6 +9,7 @@ on:
         default: 'dev'
 permissions:
     contents: write
+    packages: write
 env:
   IMAGE: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
   IMAGE_MANIFEST: https://docker.pkg.github.com/v2/${{ github.repository }}/melosys-eessi/manifests/${{ github.sha }}
