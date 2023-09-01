@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -23,5 +24,5 @@ public class IdentRekvisisjonPersonopplysninger {
     private PDLKjoennType kjoenn;
     private String foedested;
     private String foedeland;
-    private List<String> statsborgerskap;
+    private Set<String> statsborgerskap;
 }

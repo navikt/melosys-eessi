@@ -139,13 +139,11 @@ public class SedMottakService {
 
     private String opprettOgLagreIndetifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
         boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
-        var harNorskPersonnummer = true;
 
         var personFraSed = sed.finnPerson().orElse(null);
 
         if (sedMottattHendelse.getSedHendelse().erASED() && personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
-            var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
-            var identRekvisjonTilMellomlagring = byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
+            var identRekvisjonTilMellomlagring = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
             String preutfylltLenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
 
@@ -168,73 +166,6 @@ public class SedMottakService {
         return personFraSed.finnNorskPin()
             .map(Pin::getIdentifikator)
             .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
-    }
-
-    private IdentRekvisisjonTilMellomlagring byggIdentRekvisisjonTilMellomlagring(SedMottattHendelse sedMottattHendelse, SED sed, Person personFraSed, boolean pinSEDErFraLandSedKommerFra) {
-        var identRekvisjonTilMellomlagringBuilder = IdentRekvisisjonTilMellomlagring.builder()
-            .kilde(
-                IdentRekvisisjonKilde.builder()
-                    .institusjon(hentInstitusjon(sed))
-                    .landkode(Objects.requireNonNull(sedMottattHendelse.getSedHendelse().getLandkode(), "Landkode kan ikke være null fra SED"))
-                    .build()
-            )
-            .personopplysninger(
-                IdentRekvisisjonPersonopplysninger.builder()
-                    .fornavn(personFraSed.getFornavn())
-                    .etternavn(personFraSed.getEtternavn())
-                    .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
-                    .kjoenn(hentPDLKjønn(personFraSed))
-                    .foedeland(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getLand() : null)
-                    .statsborgerskap(personFraSed.getStatsborgerskap().stream().map(Statsborgerskap::getLand).collect(Collectors.toList()))
-                    .build()
-            )
-            .kontaktadresse(
-                IdentRekvisisjonKontaktadresse.builder()
-                    .utenlandskPostboksadresse(hentUtenlandskPostAdresse(sed))
-                    .build()
-            );
-
-        if (pinSEDErFraLandSedKommerFra) {
-            identRekvisjonTilMellomlagringBuilder.utenlandskIdentifikasjon(IdentRekvisisjonUtenlandskIdentifikasjon.builder()
-                .utstederland(sedMottattHendelse.getSedHendelse().getLandkode()).build());
-        }
-
-        return identRekvisjonTilMellomlagringBuilder.build();
-    }
-
-    private IdentRekvisisjonUtenlandskPostboksadresse hentUtenlandskPostAdresse(SED sed) {
-        var adresse = sed.getNav().getBruker().getAdresse() != null ? sed.getNav().getBruker().getAdresse().get(0) : null;
-        if (adresse != null) {
-            return IdentRekvisisjonUtenlandskPostboksadresse.builder()
-                .postkode(adresse.getPostnummer())
-                .bySted(adresse.getBy())
-                .landkode(adresse.getLand())
-                .regionDistriktOmraade(adresse.getRegion())
-                .build();
-        }
-
-        return null;
-    }
-
-    private PDLKjoennType hentPDLKjønn(Person personFraSed) {
-        if (personFraSed.getKjoenn() == Kjønn.K) {
-            return PDLKjoennType.KVINNE;
-        } else if (personFraSed.getKjoenn() == Kjønn.M) {
-            return PDLKjoennType.MANN;
-        }
-        return PDLKjoennType.UKJENT;
-
-    }
-
-    private String hentInstitusjon(SED sed) {
-        if (sed.getNav() != null
-            && sed.getNav().getSak() != null
-            && sed.getNav().getSak().getFjerninstitusjon() != null
-            && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null) {
-            return sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getNavn();
-        }
-
-        return "";
     }
 
     private String opprettJournalpost(SedMottattHendelse sedMottattHendelse, String navIdent) {
