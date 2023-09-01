@@ -126,7 +126,7 @@ public class SedMottakService {
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed) {
         String journalpostID = opprettJournalpost(sedMottattHendelse, null);
-        boolean preutfyllingEnabled = unleash.isEnabled("melosys.eessi.preutfylling.av.sed");
+        boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
 
         String oppgaveID = null;
         var harNorskPersonnummer = true;
@@ -138,11 +138,11 @@ public class SedMottakService {
                 .flatMap(FnrUtils::filtrerUtGyldigNorskIdent).isPresent();
         }
 
-        if (sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer && preutfyllingEnabled) {
+        if (sedMottattHendelse.getSedHendelse().erASED() && !harNorskPersonnummer && identRekvisisjonEnabled) {
             var pinSEDErFraLandSedKommerFra = personFraSed.getPin().stream().anyMatch(a -> a.getLand().equals(sedMottattHendelse.getSedHendelse().getLandkode()));
             var identRekvisjonTilMellomlagring = byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed, personFraSed, pinSEDErFraLandSedKommerFra);
 
-            String preutfylltLenkeForRekvirering = personFasade.hentPreutfylltLenkeForRekvirering(identRekvisjonTilMellomlagring);
+            String preutfylltLenkeForRekvirering = personFasade.hentLenkeForRekvirering(identRekvisjonTilMellomlagring);
 
             oppgaveID = oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,

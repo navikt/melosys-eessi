@@ -33,8 +33,8 @@ public class PDLService implements PersonFasade {
     }
 
     @Override
-    public String hentPreutfylltLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring) {
-        return pdlWebConsumer.hentPreutfylltLenkeForRekvirering(identRekvisisjonTilMellomlagring);
+    public String hentLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring) {
+        return pdlWebConsumer.hentLenkeForRekvirering(identRekvisisjonTilMellomlagring);
     }
 
     @Override

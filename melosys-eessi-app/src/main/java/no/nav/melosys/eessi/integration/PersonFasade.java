@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 
 public interface PersonFasade {
 
-    String hentPreutfylltLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring);
+    String hentLenkeForRekvirering(IdentRekvisisjonTilMellomlagring identRekvisisjonTilMellomlagring);
     PersonModell hentPerson(String ident);
     String hentAktoerId(String ident);
     String hentNorskIdent(String aktoerID);
