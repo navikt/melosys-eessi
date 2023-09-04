@@ -54,6 +54,21 @@ class OppgaveServiceTest {
     }
 
     @Test
+    void opprettOppgaveIdOgFordeling_BeskrivelseBlirSatt() {
+
+        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto());
+        String journalpostID = "111";
+        String rinaSaksnummer = "123";
+        oppgaveService.opprettOppgaveTilIdOgFordeling(journalpostID, SedType.A009.name(), rinaSaksnummer, "https://test.local");
+
+        verify(oppgaveConsumer).opprettOppgave(captor.capture());
+
+        OppgaveDto oppgaveDto = captor.getValue();
+
+        assertThat(oppgaveDto.getBeskrivelse()).isEqualTo("Url for rekvirering: https://test.local\n\rEØS - A009\n\rRina-sak - " + rinaSaksnummer);
+    }
+
+    @Test
     void opprettUtgåendeJfrOppgave_validerFelter() {
         when(oppgaveConsumer.opprettOppgave(any())).thenReturn(new HentOppgaveDto());
         String journalpostID = "111";

@@ -59,8 +59,6 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: nais
-    - name: EUX_RINA_API_SCOPE
-      value: api://{{CLUSTER_NAME_EUX_RINA_API}}.eessibasis.{{APP_NAME_EUX_RINA_API}}/.default
   ingresses:
     - {{INGRESS}}
   kafka:

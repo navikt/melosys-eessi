@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Miljø (dev, q1 eller prod)'
+        description: 'Miljø (q1, q2 eller prod)'
         required: true
-        default: 'dev'
+        default: 'q2'
 permissions:
     contents: write
     packages: write
@@ -67,9 +67,9 @@ jobs:
 
   # Deploy til dev (Q2) manuelt
   deploy_dev:
-    name: Deploy til dev (Q2)
+    name: Deploy til Q2
     needs: build
-    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && (github.event.inputs.environment == 'dev')
+    if: always() && (needs.build.result == 'success' || needs.build.result == 'skipped') && (github.event.inputs.environment == 'dev' || github.event.inputs.environment == 'q2')
     runs-on: ubuntu-latest
     environment: dev-fss-q2:teammelosys
     steps:
@@ -81,7 +81,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,APP_NAME_EUX_RINA_API=eux-rina-api-q2,CLUSTER_NAME_EUX_RINA_API=dev-fss
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,APP_NAME_EUX_RINA_API=eux-rina-api-q2
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
@@ -121,7 +121,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys-q1,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,APP_NAME_EUX_RINA_API=eux-rina-api-q1,CLUSTER_NAME_EUX_RINA_API=dev-fss
+          VAR: APP_NAME=melosys-eessi-q1,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi-q1.dev.intern.nav.no,KAFKA_POOL=nav-dev,APP_NAME_MELOSYS_API=melosys-q1,TENANT_URL=trygdeetaten.no,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57,APP_NAME_EUX_RINA_API=eux-rina-api-q1
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
@@ -161,7 +161,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod,APP_NAME_MELOSYS_API=melosys,TENANT_URL=nav.no,GROUP_MELOSYS_INNLOGGING=0d7c7755-fd5d-46ee-bbb9-975484cfb5b1,APP_NAME_EUX_RINA_API=eux-rina-api,CLUSTER_NAME_EUX_RINA_API=prod-fss
+          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=prod,INGRESS=https://melosys-eessi.intern.nav.no,KAFKA_POOL=nav-prod,APP_NAME_MELOSYS_API=melosys,TENANT_URL=nav.no,GROUP_MELOSYS_INNLOGGING=0d7c7755-fd5d-46ee-bbb9-975484cfb5b1,APP_NAME_EUX_RINA_API=eux-rina-api
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)

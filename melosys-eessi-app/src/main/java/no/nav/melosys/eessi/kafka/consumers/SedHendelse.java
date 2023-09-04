@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 @Data
 @Builder
 public class SedHendelse {
+
     private static final List<String> TRENGER_KONTROLL = Stream.of(SedType.X001, SedType.X006, SedType.X007, SedType.X008).map(Enum::name).toList();
     private long id;
     private String sedId;
@@ -35,8 +36,18 @@ public class SedHendelse {
     }
 
     @JsonIgnore
+    public String getInstitusjon() {
+        return avsenderId;
+    }
+
+    @JsonIgnore
     public boolean erX100() {
         return sedType.equals(SedType.X100.name());
+    }
+
+    @JsonIgnore
+    public boolean erASED() {
+        return SedType.valueOf(sedType).erASED();
     }
 
     @JsonIgnore

@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import javax.annotation.Nonnull;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,10 @@ import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
 
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
+
+@Slf4j
 @Component
 public class PDLSystemAuthFilter implements ExchangeFilterFunction {
 
@@ -25,10 +30,14 @@ public class PDLSystemAuthFilter implements ExchangeFilterFunction {
     @Override
     public Mono<ClientResponse> filter(@Nonnull ClientRequest clientRequest,
                                        @Nonnull ExchangeFunction exchangeFunction) {
+
         final String bearerToken = restStsClient.bearerToken();
+        var correlationID = getCorrelationId();
+
         return exchangeFunction.exchange(
             ClientRequest.from(clientRequest)
                 .header(HttpHeaders.AUTHORIZATION, bearerToken)
+                .header(X_CORRELATION_ID, correlationID)
                 .header(NAV_CONSUMER_TOKEN, bearerToken)
                 .build()
         );

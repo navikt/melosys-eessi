@@ -61,6 +61,10 @@ public enum SedType {
         return this.name().startsWith("X");
     }
 
+    public boolean erASED() {
+        return this.name().startsWith("A");
+    }
+
     public static boolean erLovvalgSed(String sedType) {
         return LOVVALG_SED_TYPER.stream().anyMatch(s -> s.name().equals(sedType));
     }
