@@ -33,7 +33,6 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
         errorHandler = "oppgaveEndretErrorHandler"
     )
     public void oppgaveHendelse(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
-        if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven")) {
             final var oppgaveEndretHendelse = consumerRecord.value();
             if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
                 log.info("Mottatt melding om oppgaveHendelse: {}", oppgaveEndretHendelse.oppgave().oppgaveId());
@@ -50,9 +49,6 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
             } finally {
                 remove(CORRELATION_ID);
             }
-        } else if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
-            log.info("Toggle for oppgavehendelse er slått av, konsumerer ikke mottatt melding om oppgavehendelse: {}", consumerRecord.value().oppgave().oppgaveId());
-        }
     }
 
     public void settSpesifiktOffsetPåConsumer(long offset) {

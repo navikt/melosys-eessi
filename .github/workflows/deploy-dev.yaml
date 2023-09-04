@@ -8,6 +8,9 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+permissions:
+    contents: write
+    packages: write
 env:
   docker_image: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
 jobs:
@@ -17,7 +20,7 @@ jobs:
     environment: dev-fss-q2:teammelosys
     steps:
       - name: Checkout latest code
-        uses: actions/checkout@v3.5.3
+        uses: actions/checkout@v3.6.0
         with:
           fetch-depth: 0
       - name: Set up JDK 17
@@ -70,7 +73,7 @@ jobs:
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
         if: success()
-        uses: rtCamp/action-slack-notify@v2.2.0
+        uses: rtCamp/action-slack-notify@v2.2.1
         env:
           SLACK_COLOR: good
           SLACK_USERNAME: Github Actions
@@ -80,7 +83,7 @@ jobs:
           SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
       - name: Slack Notification (deploy failure)
         if: failure()
-        uses: rtCamp/action-slack-notify@v2.2.0
+        uses: rtCamp/action-slack-notify@v2.2.1
         env:
           SLACK_COLOR: danger
           SLACK_USERNAME: Github Actions
