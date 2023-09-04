@@ -101,7 +101,12 @@ public class SedMottakService {
     }
 
     private void opprettOppgaveIdentifisering(SedMottattHendelse sedMottatt, SED sed) {
-        log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getRinaDokumentId());
+        if (!sedMottatt.getSedHendelse().erASED()) {
+            log.info("SED er ikke A-sed, oppretter ikke oppgave til ID og fordeling, SED: {}", sedMottatt.getSedHendelse().getSedId());
+            return;
+        }
+
+        log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.getSedHendelse().getSedId());
 
         final var rinaSaksnummer = sedMottatt.getSedHendelse().getRinaSakId();
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
@@ -136,7 +141,7 @@ public class SedMottakService {
 
         var personFraSed = sed.finnPerson().orElse(null);
 
-        if (sedMottattHendelse.getSedHendelse().erASED() && personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
+        if (personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
             var identRekvisjonTilMellomlagring = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
             String lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);

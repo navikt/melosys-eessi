@@ -111,6 +111,32 @@ class SedMottakServiceTest {
         verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
 
+
+    @Test
+    void behandleSed_finnerIkkePerson_oppgaveOpprettesNårIkkeASed() {
+        fakeUnleash.disableAll();
+        when(euxService.hentSedMedRetry(anyString(), anyString()))
+            .thenReturn(opprettSED());
+        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
+        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
+        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
+
+        SedHendelse sedHendelse = sedHendelseUtenBruker();
+        sedHendelse.setSedType("H001");
+        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
+
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse);
+
+
+        verify(euxService).hentSedMedRetry(anyString(), anyString());
+        verify(personIdentifisering).identifiserPerson(any(), any());
+        verify(sedMottattHendelseRepository).findBySedID(any());
+        verifyNoInteractions(opprettInngaaendeJournalpostService);
+        verifyNoInteractions(oppgaveService);
+    }
+
+
     @Test
     void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
