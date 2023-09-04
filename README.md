@@ -1,23 +1,22 @@
 Melosys-eessi
 ========================
-Applikasjon for Lovvalgs-domenet som er en del av EESSI-2 prosjeket. 
+Applikasjon for Lovvalgs-domenet som er en del av EESSI-2 prosjeket.
 
-Melosys-eessi er en mikrotjeneste utviklet av Team Melosys, og har som oppgave å håndtere all integrasjon videre mot eux. 
+Melosys-eessi er en mikrotjeneste utviklet av Team Melosys, og har som oppgave å håndtere all integrasjon videre mot eux.
 Dette innebærer mapping til SED for å sende videre til eux og journalføring/opprettelse av sak/oppgave for både innkommende
 og utgående SED'er.
 
 # Utviklingsoppsett
 
-Klon repositoriet og sett det opp som et standard Maven-prosjekt i foretrukket IDE. 
+Klon repositoriet og sett det opp som et standard Maven-prosjekt i foretrukket IDE.
 
 Sett først miljøvariabler:
-
 ```
 SRV_USERNAME
 SRV_PASSWORD
 KAFKA_BOOTSTRAP_SERVERS
 ```
- 
+
 Disse kan fås enten på Vault eller ved å spørre på slack-kanal #melosys-utvikling.
 
 Du må også kjøre opp en postgers-instans. Det kan gjøres gjennom følgende docker-kommando:
@@ -29,10 +28,10 @@ For å aksessere postgres-databasen i preprod må man først koble seg mot og lo
 Dokumentasjon hvordan det gjøres finnes her: https://github.com/navikt/utvikling/blob/main/docs/teknisk/Vault.md
 
 ## Kjøre applikasjonen lokalt
-### Skaff deg en fungerende versjon av NAVs SSL-truststore 
-Dette er en fil som heter noe á la `nav_truststore_nonproduction_ny2.jts`, og ett tilhørende passord 
+### Skaff deg en fungerende versjon av NAVs SSL-truststore
+Dette er en fil som heter noe á la `nav_truststore_nonproduction_ny2.jts`, og ett tilhørende passord
 som JVM-en trenger for å lese innholdet. Det fins flere versjoner av den i omløp på Fasit, og de endres av og til.
-Vanligvis er det enkleste å kopiere fila og passordet fra ett annet NAV-prosjekt. 
+Vanligvis er det enkleste å kopiere fila og passordet fra ett annet NAV-prosjekt.
 
 ### Kjøring i IDE
 For å kjøre i din IDE, opprett en kjørekonfigurasjon for SpringBoot-main-klassen, `MelosysEessiApplication` med følgende systemegenskaper (`Run Configurations` | `Arguments`| `VM Arguments` i Eclipse):
@@ -56,7 +55,7 @@ er dette på `Window | Preferences | Java | Installed JREs | <JRE> | Edit | Defa
 
 Spørsmål knyttet til koden eller prosjektet kan rettes mot:
 
-* [Team Melosys](https://github.com/orgs/navikt/teams/melosys)  
+* [Team Melosys](https://github.com/orgs/navikt/teams/melosys)
 
 ## For NAV-ansatte
 
