@@ -139,13 +139,13 @@ public class SedMottakService {
         if (sedMottattHendelse.getSedHendelse().erASED() && personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
             var identRekvisjonTilMellomlagring = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
-            String preutfylltLenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
+            String lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
 
             return oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,
                 sedMottattHendelse.getSedHendelse().getSedType(),
                 sedMottattHendelse.getSedHendelse().getRinaSakId(),
-                preutfylltLenkeForRekvirering
+                lenkeForRekvirering
             );
         }
         return oppgaveService.opprettOppgaveTilIdOgFordeling(

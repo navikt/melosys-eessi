@@ -33,10 +33,10 @@ public class OppgaveService {
         return oppgaveConsumer.hentOppgave(oppgaveID);
     }
 
-    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer, String preutfylltLenkeForRekvirering) {
-        var oppgaveDto = lagOppgaveDto(journalpostID,sedType,rinaSaksnummer, preutfylltLenkeForRekvirering).build();
+    public String opprettOppgaveTilIdOgFordeling(String journalpostID, String sedType, String rinaSaksnummer, String lenkeForRekvirering) {
+        var oppgaveDto = lagOppgaveDto(journalpostID,sedType,rinaSaksnummer, lenkeForRekvirering).build();
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
-        log.info("Oppgave til ID og fordeling opprettet med id {}, rekvirering uuid {}", response.getId(), preutfylltLenkeForRekvirering);
+        log.info("Oppgave til ID og fordeling opprettet med id {}, rekvirering uuid {}", response.getId(), lenkeForRekvirering);
         return response.getId();
     }
 
