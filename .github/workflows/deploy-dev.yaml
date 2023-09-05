@@ -15,7 +15,7 @@ env:
   docker_image: docker.pkg.github.com/${{ github.repository }}/melosys-eessi:${{ github.sha }}
 jobs:
   build:
-    name: Build, deploy to q2, and draft release
+    name: Build, deploy to q2, and make draft release
     runs-on: ubuntu-latest
     environment: dev-fss-q2:teammelosys
     steps:
