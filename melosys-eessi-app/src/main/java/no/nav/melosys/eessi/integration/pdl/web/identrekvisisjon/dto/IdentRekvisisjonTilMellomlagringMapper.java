@@ -58,6 +58,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
             return IdentRekvisisjonUtenlandskPostboksadresse.builder()
                 .postkode(adresse.getPostnummer())
                 .bySted(adresse.getBy())
+                .postboksNummerNavn(adresse.getGate())
                 .landkode(adresse.getLand())
                 .regionDistriktOmraade(adresse.getRegion())
                 .build();
