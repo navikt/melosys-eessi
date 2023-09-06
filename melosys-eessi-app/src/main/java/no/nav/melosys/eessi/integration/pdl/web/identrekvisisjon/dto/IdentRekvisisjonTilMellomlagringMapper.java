@@ -36,7 +36,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
             )
             .kontaktadresse(
                 IdentRekvisisjonKontaktadresse.builder()
-                    .utenlandskPostboksadresse(hentUtenlandskPostAdresse(sed))
+                    .utenlandskVegadresse(hentUtenlandskVegadresse(sed))
                     .build()
             );
 
@@ -52,15 +52,16 @@ public class IdentRekvisisjonTilMellomlagringMapper {
         return identRekvisjonTilMellomlagringBuilder.build();
     }
 
-    private static IdentRekvisisjonUtenlandskPostboksadresse hentUtenlandskPostAdresse(SED sed) {
+    private static IdentRekvisisjonUtenlandskVegadresse hentUtenlandskVegadresse(SED sed) {
         var adresse = sed.getNav().getBruker().getAdresse() != null ? sed.getNav().getBruker().getAdresse().get(0) : null;
         if (adresse != null) {
-            return IdentRekvisisjonUtenlandskPostboksadresse.builder()
+            return IdentRekvisisjonUtenlandskVegadresse.builder()
+                .adressenavnNummer(adresse.getGate())
+                .bygningEtasjeLeilighet(adresse.getBygning())
                 .postkode(adresse.getPostnummer())
                 .bySted(adresse.getBy())
-                .postboksNummerNavn(adresse.getGate())
-                .landkode(adresse.getLand())
                 .regionDistriktOmraade(adresse.getRegion())
+                .landkode(adresse.getLand())
                 .build();
         }
 
