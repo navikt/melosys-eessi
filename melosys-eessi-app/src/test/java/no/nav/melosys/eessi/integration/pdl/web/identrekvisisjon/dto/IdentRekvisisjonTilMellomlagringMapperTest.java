@@ -48,10 +48,12 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         SedMottattHendelse sedMottattHendelse = createSedHendelse();
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
-        assertEquals("TestLand", result.getKontaktadresse().getUtenlandskPostboksadresse().getLandkode());
-        assertEquals("TestBy", result.getKontaktadresse().getUtenlandskPostboksadresse().getBySted());
-        assertEquals("TestPostnummer", result.getKontaktadresse().getUtenlandskPostboksadresse().getPostkode());
-        assertEquals("TestRegion", result.getKontaktadresse().getUtenlandskPostboksadresse().getRegionDistriktOmraade());
+        assertEquals("TestLand", result.getKontaktadresse().getUtenlandskVegadresse().getLandkode());
+        assertEquals("TestBy", result.getKontaktadresse().getUtenlandskVegadresse().getBySted());
+        assertEquals("TestPostnummer", result.getKontaktadresse().getUtenlandskVegadresse().getPostkode());
+        assertEquals("TestRegion", result.getKontaktadresse().getUtenlandskVegadresse().getRegionDistriktOmraade());
+        assertEquals("TestGate", result.getKontaktadresse().getUtenlandskVegadresse().getAdressenavnNummer());
+        assertEquals("TestBygning", result.getKontaktadresse().getUtenlandskVegadresse().getBygningEtasjeLeilighet());
     }
 
     @Test
@@ -117,6 +119,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         adresse.setGate("TestGate");
         adresse.setPostnummer("TestPostnummer");
         adresse.setRegion("TestRegion");
+        adresse.setBygning("TestBygning");
         Bruker bruker = new Bruker();
         bruker.setPerson(person);
         bruker.setAdresse(List.of(adresse));
