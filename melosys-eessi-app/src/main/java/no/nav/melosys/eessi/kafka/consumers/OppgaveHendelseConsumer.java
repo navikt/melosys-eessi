@@ -33,22 +33,20 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
         errorHandler = "oppgaveEndretErrorHandler"
     )
     public void oppgaveHendelse(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
-            final var oppgaveEndretHendelse = consumerRecord.value();
-            if (unleash.isEnabled("melosys.eessi.oppgavehandtering_oppgavehendelser_aiven_logg")) {
-                log.info("Mottatt melding om oppgaveHendelse: {}", oppgaveEndretHendelse.oppgave().oppgaveId());
-            }
-            putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
+        final var oppgaveEndretHendelse = consumerRecord.value();
+        log.info("Mottatt melding om oppgaveHendelse: {}", oppgaveEndretHendelse.oppgave().oppgaveId());
+        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
-            try {
-                oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);
-            } catch (Exception e) {
-                String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-                log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, consumerRecord, e);
+        try {
+            oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);
+        } catch (Exception e) {
+            String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
+            log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, consumerRecord, e);
 
-                kafkaDLQService.lagreOppgaveEndretHendelse(oppgaveEndretHendelse, e.getMessage());
-            } finally {
-                remove(CORRELATION_ID);
-            }
+            kafkaDLQService.lagreOppgaveEndretHendelse(oppgaveEndretHendelse, e.getMessage());
+        } finally {
+            remove(CORRELATION_ID);
+        }
     }
 
     public void settSpesifiktOffsetPåConsumer(long offset) {
