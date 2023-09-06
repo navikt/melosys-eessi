@@ -38,7 +38,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         SedMottattHendelse sedMottattHendelse = createSedHendelse();
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
-        assertEquals("TestInstitusjon", result.getKilde().getInstitusjon());
+        assertEquals("SE:123", result.getKilde().getInstitusjon());
         assertEquals("SE", result.getKilde().getLandkode());
     }
 
@@ -121,9 +121,6 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         bruker.setPerson(person);
         bruker.setAdresse(List.of(adresse));
         Sak sak = new Sak();
-        sak.setFjerninstitusjon(new X006FjernInstitusjon());
-        sak.getFjerninstitusjon().setInstitusjon(new Institusjon());
-        sak.getFjerninstitusjon().getInstitusjon().setNavn("TestInstitusjon");
         Nav nav = new Nav();
         nav.setBruker(bruker);
         nav.setSak(sak);

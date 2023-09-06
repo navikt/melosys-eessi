@@ -19,7 +19,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
         var identRekvisjonTilMellomlagringBuilder = IdentRekvisisjonTilMellomlagring.builder()
             .kilde(
                 IdentRekvisisjonKilde.builder()
-                    .institusjon(hentInstitusjon(sed))
+                    .institusjon(sedMottattHendelse.getSedHendelse().getAvsenderId())
                     .landkode(Objects.requireNonNull(sedMottattHendelse.getSedHendelse().getLandkode(), "Landkode kan ikke være null fra SED"))
                     .build()
             )
@@ -74,16 +74,5 @@ public class IdentRekvisisjonTilMellomlagringMapper {
         }
         return PDLKjoennType.UKJENT;
 
-    }
-
-    private static String hentInstitusjon(SED sed) {
-        if (sed.getNav() != null
-            && sed.getNav().getSak() != null
-            && sed.getNav().getSak().getFjerninstitusjon() != null
-            && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null) {
-            return sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getNavn();
-        }
-
-        return "";
     }
 }
