@@ -27,7 +27,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         assertEquals("TestFornavn", result.getPersonopplysninger().getFornavn());
         assertEquals("TestEtternavn", result.getPersonopplysninger().getEtternavn());
         assertEquals(LocalDate.of(2000, 1, 1), result.getPersonopplysninger().getFoedselsdato());
-        assertEquals(Set.of("SE", "NO"), result.getPersonopplysninger().getStatsborgerskap());
+        assertEquals(Set.of("SWE", "NOR"), result.getPersonopplysninger().getStatsborgerskap());
         assertEquals("Miami", result.getPersonopplysninger().getFoedested());
         assertEquals("USA", result.getPersonopplysninger().getFoedeland());
     }
@@ -39,7 +39,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
         assertEquals("SE:123", result.getKilde().getInstitusjon());
-        assertEquals("SE", result.getKilde().getLandkode());
+        assertEquals("SWE", result.getKilde().getLandkode());
     }
 
     @Test
@@ -48,7 +48,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         SedMottattHendelse sedMottattHendelse = createSedHendelse();
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
-        assertEquals("TestLand", result.getKontaktadresse().getUtenlandskVegadresse().getLandkode());
+        assertEquals("NOR", result.getKontaktadresse().getUtenlandskVegadresse().getLandkode());
         assertEquals("TestBy", result.getKontaktadresse().getUtenlandskVegadresse().getBySted());
         assertEquals("TestPostnummer", result.getKontaktadresse().getUtenlandskVegadresse().getPostkode());
         assertEquals("TestRegion", result.getKontaktadresse().getUtenlandskVegadresse().getRegionDistriktOmraade());
@@ -63,7 +63,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
         assertEquals("12345678911", result.getUtenlandskIdentifikasjon().getUtenlandskId());
-        assertEquals("SE", result.getUtenlandskIdentifikasjon().getUtstederland());
+        assertEquals("SWE", result.getUtenlandskIdentifikasjon().getUtstederland());
     }
 
     @Test
@@ -115,7 +115,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         person.setPin(List.of(new Pin("12345678911", "SE", "sektor")));
         Adresse adresse = new Adresse();
         adresse.setBy("TestBy");
-        adresse.setLand("TestLand");
+        adresse.setLand("NO");
         adresse.setGate("TestGate");
         adresse.setPostnummer("TestPostnummer");
         adresse.setRegion("TestRegion");

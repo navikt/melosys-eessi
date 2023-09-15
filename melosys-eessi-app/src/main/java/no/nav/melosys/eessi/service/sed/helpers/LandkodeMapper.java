@@ -7,7 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class LandkodeMapper {
 
-    private LandkodeMapper() {}
+    private LandkodeMapper() {
+    }
 
     private static final Map<String, String> ISO3_TIL_ISO2_LANDKODER_MAP = new HashMap<>();
 
@@ -32,6 +33,21 @@ public final class LandkodeMapper {
         }
 
         return Optional.ofNullable(ISO3_TIL_ISO2_LANDKODER_MAP.get(landkodeIso3));
+    }
+
+    public static String finnLandkodeIso3(String landkodeIso2) {
+        if (landkodeIso2 == null) {
+            return null;
+        }
+
+        if (landkodeIso2.length() == 3) {
+            return landkodeIso2;
+        }
+        return ISO3_TIL_ISO2_LANDKODER_MAP.entrySet().stream()
+            .filter(entry -> entry.getValue().equals(landkodeIso2))
+            .map(Map.Entry::getKey)
+            .findFirst()
+            .orElse("???");
     }
 
     public static String mapTilNavLandkode(String landkode) {
