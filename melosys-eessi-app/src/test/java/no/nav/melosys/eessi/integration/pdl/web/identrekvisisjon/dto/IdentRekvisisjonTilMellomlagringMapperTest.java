@@ -38,7 +38,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         SedMottattHendelse sedMottattHendelse = createSedHendelse();
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
-        assertEquals("SE:123", result.getKilde().getInstitusjon());
+        assertEquals("Svensk institusjon", result.getKilde().getInstitusjon());
         assertEquals("SWE", result.getKilde().getLandkode());
     }
 
@@ -141,7 +141,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
                 .rinaDokumentId("rinadok")
                 .rinaSakId("rinasak")
                 .avsenderId("SE:123")
-                .avsenderNavn("Sweden")
+                .avsenderNavn("Svensk institusjon")
                 .bucType("buc")
                 .sedType("A001")
                 .id(1L)

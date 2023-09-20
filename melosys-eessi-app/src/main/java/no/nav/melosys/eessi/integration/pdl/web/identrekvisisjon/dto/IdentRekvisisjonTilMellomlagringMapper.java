@@ -22,7 +22,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
         var identRekvisjonTilMellomlagringBuilder = IdentRekvisisjonTilMellomlagring.builder()
             .kilde(
                 IdentRekvisisjonKilde.builder()
-                    .institusjon(sedMottattHendelse.getSedHendelse().getAvsenderId())
+                    .institusjon(sedMottattHendelse.getSedHendelse().getAvsenderNavn())
                     .landkode(Objects.requireNonNull(
                         finnLandkodeIso3(sedMottattHendelse.getSedHendelse().getLandkode())
                         , "Landkode kan ikke være null fra SED"))
