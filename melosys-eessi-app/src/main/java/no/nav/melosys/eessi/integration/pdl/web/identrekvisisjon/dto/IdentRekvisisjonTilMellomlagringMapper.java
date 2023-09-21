@@ -1,16 +1,15 @@
 package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Kjønn;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.finnLandkodeIso3;
 
