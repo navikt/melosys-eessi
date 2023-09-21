@@ -44,26 +44,36 @@ class LandkodeMapperTest {
 
     @Test
     public void skalReturnereISO3KodeForGyldigISO2Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("US")).isEqualTo("USA");
+        assertThat(LandkodeMapper.finnLandkodeIso3("US", true)).isEqualTo("USA");
     }
 
     @Test
     public void skalReturnereSammeKodeForISO3Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("USA")).isEqualTo("USA");
+        assertThat(LandkodeMapper.finnLandkodeIso3("USA", true)).isEqualTo("USA");
     }
 
     @Test
-    public void skalReturnereUkjentForUgyldigISO2Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ")).isEqualTo("???");
+    public void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", false)).isEqualTo("???");
+    }
+
+    @Test
+    public void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", true)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereNullForNullInndata() {
-        assertThat(LandkodeMapper.finnLandkodeIso3(null)).isEqualTo(null);
+        assertThat(LandkodeMapper.finnLandkodeIso3(null, true)).isEqualTo(null);
     }
 
     @Test
-    public void skalReturnereUkjentForTomStreng() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("")).isEqualTo("???");
+    public void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3("", false)).isEqualTo("???");
+    }
+
+    @Test
+    public void skalReturnereUkjentForTomStrengMedPdlFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3("", true)).isEqualTo("XUK");
     }
 }
