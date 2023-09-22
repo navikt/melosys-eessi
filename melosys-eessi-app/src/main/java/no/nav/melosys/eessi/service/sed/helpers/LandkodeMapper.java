@@ -35,7 +35,7 @@ public final class LandkodeMapper {
         return Optional.ofNullable(ISO3_TIL_ISO2_LANDKODER_MAP.get(landkodeIso3));
     }
 
-    public static String finnLandkodeIso3(String landkodeIso2) {
+    public static String finnLandkodeIso3(String landkodeIso2, boolean ukjentLandkodeMedPdlFormat ) {
         if (landkodeIso2 == null) {
             return null;
         }
@@ -47,7 +47,7 @@ public final class LandkodeMapper {
             .filter(entry -> entry.getValue().equals(landkodeIso2))
             .map(Map.Entry::getKey)
             .findFirst()
-            .orElse("???");
+            .orElse(ukjentLandkodeMedPdlFormat ? "XUK" : "???");
     }
 
     public static String mapTilNavLandkode(String landkode) {

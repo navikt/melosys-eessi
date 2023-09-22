@@ -1,16 +1,15 @@
 package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Kjønn;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.finnLandkodeIso3;
 
@@ -24,7 +23,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
                 IdentRekvisisjonKilde.builder()
                     .institusjon(sedMottattHendelse.getSedHendelse().getAvsenderNavn())
                     .landkode(Objects.requireNonNull(
-                        finnLandkodeIso3(sedMottattHendelse.getSedHendelse().getLandkode())
+                        finnLandkodeIso3(sedMottattHendelse.getSedHendelse().getLandkode(), true)
                         , "Landkode kan ikke være null fra SED"))
                     .build()
             )
@@ -34,13 +33,13 @@ public class IdentRekvisisjonTilMellomlagringMapper {
                     .etternavn(personFraSed.getEtternavn())
                     .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
                     .kjoenn(hentPDLKjønn(personFraSed))
-                    .foedeland(personFraSed.getFoedested() != null ? finnLandkodeIso3(personFraSed.getFoedested().getLand()) : null)
+                    .foedeland(personFraSed.getFoedested() != null ? finnLandkodeIso3(personFraSed.getFoedested().getLand(), true) : null)
                     .foedested(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getBy() : null)
                     .statsborgerskap(
                         personFraSed.getStatsborgerskap()
                             .stream()
                             .map(Statsborgerskap::getLand)
-                            .map(LandkodeMapper::finnLandkodeIso3)
+                            .map(land -> finnLandkodeIso3(land, true))
                             .collect(Collectors.toSet()))
                     .build()
             )
@@ -55,7 +54,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
             .ifPresent(pin -> identRekvisjonTilMellomlagringBuilder.utenlandskIdentifikasjon(
                 IdentRekvisisjonUtenlandskIdentifikasjon
                     .builder()
-                    .utstederland(finnLandkodeIso3(pin.getLand()))
+                    .utstederland(finnLandkodeIso3(pin.getLand(), true))
                     .utenlandskId(pin.getIdentifikator())
                     .build()));
 
@@ -71,7 +70,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
                 .postkode(adresse.getPostnummer())
                 .bySted(adresse.getBy())
                 .regionDistriktOmraade(adresse.getRegion())
-                .landkode(finnLandkodeIso3(adresse.getLand()))
+                .landkode(finnLandkodeIso3(adresse.getLand(), true))
                 .build();
         }
 
