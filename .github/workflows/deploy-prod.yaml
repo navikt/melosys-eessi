@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: prod-fss:teammelosys
     steps:
-      - uses: actions/checkout@v3.6.0
+      - uses: actions/checkout@v4.1.0
       - name: get release tag
         run: |
           APPLICATION=$(echo $GITHUB_REPOSITORY | cut -d "/" -f 2)

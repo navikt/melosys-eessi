@@ -20,7 +20,7 @@ jobs:
     environment: dev-fss-q2:teammelosys
     steps:
       - name: Checkout latest code
-        uses: actions/checkout@v3.6.0
+        uses: actions/checkout@v4.1.0
         with:
           fetch-depth: 0
       - name: Set up JDK 17
