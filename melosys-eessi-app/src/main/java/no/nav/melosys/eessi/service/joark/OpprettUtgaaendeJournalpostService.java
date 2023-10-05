@@ -41,7 +41,6 @@ public class OpprettUtgaaendeJournalpostService {
 
     public void behandleSedSendtHendelse(SedHendelse sedSendt) {
         try {
-            if (unleash.isEnabled("melosys.eessi.ikkeJournalfoer.uten.personid")) {
                 if (sedInneholderPersonId(sedSendt)) {
                     String journalpostId = arkiverUtgaaendeSed(sedSendt);
                     log.info("Journalpost opprettet med id: {}", journalpostId);
@@ -50,10 +49,6 @@ public class OpprettUtgaaendeJournalpostService {
                     log.info("SED {} inneholder ikke personId, journalfører ikke.", sedSendt.getRinaDokumentId());
                     sedSendtHendelseRepository.save(new SedSendtHendelse(sedSendt.getId(), sedSendt, null));
                 }
-            } else {
-                String journalpostId = arkiverUtgaaendeSed(sedSendt);
-                log.info("Journalpost opprettet med id: {}", journalpostId);
-            }
 
             sedMetrikker.sedSendt(sedSendt.getSedType());
 
