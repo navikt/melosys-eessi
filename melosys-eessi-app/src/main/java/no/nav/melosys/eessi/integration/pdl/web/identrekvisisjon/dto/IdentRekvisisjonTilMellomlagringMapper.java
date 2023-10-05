@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
+import no.nav.melosys.eessi.models.DatoUtils;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Kjønn;
@@ -31,7 +31,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
                 IdentRekvisisjonPersonopplysninger.builder()
                     .fornavn(personFraSed.getFornavn())
                     .etternavn(personFraSed.getEtternavn())
-                    .foedselsdato(LocalDate.parse(personFraSed.getFoedselsdato()))
+                    .foedselsdato(DatoUtils.tilLocalDate(personFraSed.getFoedselsdato()))
                     .kjoenn(hentPDLKjønn(personFraSed))
                     .foedeland(personFraSed.getFoedested() != null ? finnLandkodeIso3(personFraSed.getFoedested().getLand(), true) : null)
                     .foedested(personFraSed.getFoedested() != null ? personFraSed.getFoedested().getBy() : null)
