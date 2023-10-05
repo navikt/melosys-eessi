@@ -107,7 +107,7 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         Person person = new Person();
         person.setFornavn("TestFornavn");
         person.setEtternavn("TestEtternavn");
-        person.setFoedselsdato("2000-01-01");
+        person.setFoedselsdato("2000-01-01+00:00");
         person.setFoedested(new Foedested());
         person.getFoedested().setLand("USA");
         person.getFoedested().setBy("Miami");
