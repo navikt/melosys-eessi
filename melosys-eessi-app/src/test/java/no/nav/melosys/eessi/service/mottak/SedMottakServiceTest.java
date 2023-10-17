@@ -106,7 +106,7 @@ class SedMottakServiceTest {
         verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
+        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString(), any());
         verify(sedMottattHendelseRepository, times(2)).save(any());
         verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
@@ -256,6 +256,7 @@ class SedMottakServiceTest {
     private SedHendelse sedHendelseUtenBruker() {
         SedHendelse sedHendelse = new SedHendelse();
         sedHendelse.setNavBruker("ukjent");
+        sedHendelse.setAvsenderId("SE:12345");
         sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
         sedHendelse.setRinaDokumentId("456");
         sedHendelse.setSedId(SED_ID);
