@@ -137,11 +137,9 @@ public class SedMottakService {
     }
 
     private String opprettOgLagreIndetifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
-        boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
-
         var personFraSed = sed.finnPerson().orElse(null);
 
-        if (personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
+        if (personFraSed != null && !harNorskPersonnummer(personFraSed)) {
             var identRekvisjonTilMellomlagring = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
             String lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);
