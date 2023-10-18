@@ -4,7 +4,6 @@ import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
@@ -45,8 +44,6 @@ public class SedMottakService {
     private final SedMetrikker sedMetrikker;
     private final PersonIdentifisering personIdentifisering;
     private final BucIdentifisertService bucIdentifisertService;
-
-    private final Unleash unleash;
 
 
     @Value("${rina.institusjon-id}")
