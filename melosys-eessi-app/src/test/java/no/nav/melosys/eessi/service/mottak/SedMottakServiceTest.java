@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import no.finn.unleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
@@ -61,9 +60,6 @@ class SedMottakServiceTest {
 
     private SedMottakService sedMottakService;
 
-    private final FakeUnleash fakeUnleash = new FakeUnleash();
-
-
     private static final String IDENT = "1122334455";
     private static final String SED_ID = "555554444";
     private static final String RINA_SAKSNUMMER = "12313213";
@@ -80,14 +76,12 @@ class SedMottakServiceTest {
             journalpostSedKoblingService,
             sedMetrikker,
             personIdentifisering,
-            bucIdentifisertService,
-            fakeUnleash
+            bucIdentifisertService
         );
     }
 
     @Test
     void behandleSed_finnerIkkePerson_OppgaveOpprettes() {
-        fakeUnleash.disableAll();
         when(euxService.hentSedMedRetry(anyString(), anyString()))
             .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
@@ -114,7 +108,6 @@ class SedMottakServiceTest {
 
     @Test
     void behandleSed_finnerIkkePerson_oppgaveOpprettesNårIkkeASed() {
-        fakeUnleash.disableAll();
         when(euxService.hentSedMedRetry(anyString(), anyString()))
             .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
