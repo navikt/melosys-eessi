@@ -4,7 +4,6 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
@@ -22,7 +21,6 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
 
     private final OppgaveEndretService oppgaveEndretService;
     private final KafkaDLQService kafkaDLQService;
-    private final Unleash unleash;
 
     @KafkaListener(
         id = "oppgaveHendelse",

@@ -45,6 +45,8 @@ spec:
       rules:
         - application: {{APP_NAME_MELOSYS_API}}
     outbound:
+      external:
+        - host: "melosys-unleash-api.nav.cloud.nais.io"
       rules:
         - application: {{APP_NAME_EUX_RINA_API}}
   webproxy: true
@@ -59,6 +61,10 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: nais
+    - name: app_name
+      value: {{app_name}}
+  envFrom:
+    - secret: {{app_name}}-unleash-api-token
   ingresses:
     - {{INGRESS}}
   kafka:

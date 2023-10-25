@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.*;
 
+import io.getunleash.Unleash;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -42,6 +43,8 @@ class SedServiceTest {
     private EuxService euxService;
     @Mock
     private SaksrelasjonService saksrelasjonService;
+    @Mock
+    private Unleash unleash;
 
     private SedService sendSedService;
 
@@ -49,7 +52,7 @@ class SedServiceTest {
 
     @BeforeEach
     public void setup() {
-        sendSedService = new SedService(euxService, saksrelasjonService);
+        sendSedService = new SedService(euxService, saksrelasjonService, unleash);
     }
 
     @Test

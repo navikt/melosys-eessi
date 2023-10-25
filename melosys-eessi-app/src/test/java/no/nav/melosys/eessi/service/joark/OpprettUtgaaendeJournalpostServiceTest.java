@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import io.github.benas.randombeans.api.EnhancedRandom;
-import no.finn.unleash.FakeUnleash;
+import io.getunleash.FakeUnleash;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;

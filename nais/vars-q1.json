@@ -1,0 +1,11 @@
+{
+    "app_name": "melosys-eessi-q1",
+    "vault_cluster": "dev",
+    "ingress": "https://melosys-eessi-q1.dev.intern.nav.no",
+    "kafka_pool": "nav-dev",
+    "app_name_melosys_api": "melosys-q1",
+    "tenant_url": "trygdeetaten.no",
+    "group_melosys_innlogging": "52981246-8032-40f0-863a-2bd2844f2d57",
+    "app_name_eux_rina_api": "eux-rina-api-q1",
+    "unleash_environment": "development"
+}
