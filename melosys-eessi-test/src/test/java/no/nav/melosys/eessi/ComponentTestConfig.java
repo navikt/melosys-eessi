@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi;
 
-import no.finn.unleash.FakeUnleash;
-import no.finn.unleash.Unleash;
+import io.getunleash.FakeUnleash;
+import io.getunleash.Unleash;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;

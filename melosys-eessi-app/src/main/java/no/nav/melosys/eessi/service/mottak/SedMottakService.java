@@ -4,7 +4,7 @@ import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.finn.unleash.Unleash;
+import io.getunleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
@@ -125,7 +125,7 @@ public class SedMottakService {
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed) {
         String journalpostID = opprettJournalpost(sedMottattHendelse, null);
-        var oppgaveID = opprettOgLagreIndetifiseringsoppgave(sedMottattHendelse, sed, journalpostID);
+        var oppgaveID = opprettOgLagreIndentifiseringsoppgave(sedMottattHendelse, sed, journalpostID);
 
         bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
             .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
@@ -136,7 +136,7 @@ public class SedMottakService {
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }
 
-    private String opprettOgLagreIndetifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
+    private String opprettOgLagreIndentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
         boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
 
         var personFraSed = sed.finnPerson().orElse(null);
