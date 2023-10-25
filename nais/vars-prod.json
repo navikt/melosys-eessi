@@ -1,11 +1,11 @@
 {
-    "app_name": "melosys-eessi",
-    "vault_cluster": "prod",
-    "ingress": "https://melosys-eessi.intern.nav.no",
-    "kafka_pool": "nav-prod",
-    "app_name_melosys_api": "melosys",
-    "tenant_url": "nav.no",
-    "group_melosys_innlogging": "0d7c7755-fd5d-46ee-bbb9-975484cfb5b1",
-    "app_name_eux_rina_api": "eux-rina-api",
-    "unleash_environment": "production"
+    "APP_NAME": "melosys-eessi",
+    "VAULT_CLUSTER": "prod",
+    "INGRESS": "https://melosys-eessi.intern.nav.no",
+    "KAFKA_POOL": "nav-prod",
+    "APP_NAME_MELOSYS_API": "melosys",
+    "TENANT_URL": "nav.no",
+    "GROUP_MELOSYS_INNLOGGING": "0d7c7755-fd5d-46ee-bbb9-975484cfb5b1",
+    "APP_NAME_EUX_RINA_API": "eux-rina-api",
+    "UNLEASH_ENVIRONMENT": "production"
 }
