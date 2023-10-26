@@ -61,10 +61,10 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: nais
-    - name: app_name
-      value: {{app_name}}
+    - name: APP_NAME
+      value: {{APP_NAME}}
   envFrom:
-    - secret: {{app_name}}-unleash-api-token
+    - secret: {{APP_NAME}}-unleash-api-token
   ingresses:
     - {{INGRESS}}
   kafka:
