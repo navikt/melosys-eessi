@@ -1,7 +1,7 @@
 apiVersion: unleash.nais.io/v1
 kind: ApiToken
 metadata:
-  name: {{app_name}}
+  name: {{APP_NAME}}
   namespace: teammelosys
   labels:
     team: teammelosys
