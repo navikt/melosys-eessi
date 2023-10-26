@@ -34,12 +34,12 @@ spec:
     application:
       enabled: true
       tenant: {{TENANT_URL}}
+      allowAllUsers: false
       claims:
         extra:
           - "NAVident"
         groups:
           - id: {{GROUP_MELOSYS_INNLOGGING}}
-        allowAllUsers: false
   accessPolicy:
     inbound:
       rules:
