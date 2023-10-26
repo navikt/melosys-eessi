@@ -4,7 +4,7 @@
     "INGRESS": "https://melosys-eessi.dev.intern.nav.no",
     "KAFKA_POOL": "nav-dev",
     "APP_NAME_MELOSYS_API": "melosys",
-    "TENANT_URL": "nav.no",
+    "TENANT_URL": "trygdeetaten.no",
     "GROUP_MELOSYS_INNLOGGING": "52981246-8032-40f0-863a-2bd2844f2d57",
     "APP_NAME_EUX_RINA_API": "eux-rina-api-q2",
     "UNLEASH_ENVIRONMENT": "development"
