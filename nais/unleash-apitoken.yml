@@ -10,7 +10,7 @@ spec:
     apiVersion: unleash.nais.io/v1
     kind: RemoteUnleash
     name: melosys
-  secretName: {{app_name}}-unleash-api-token
+  secretName: {{APP_NAME}}-unleash-api-token
 
   # Specify which environment the API token should be created for.
   # Can be one of: development, or production.
