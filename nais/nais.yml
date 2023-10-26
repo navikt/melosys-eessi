@@ -34,7 +34,6 @@ spec:
     application:
       enabled: true
       tenant: {{TENANT_URL}}
-      allowAllUsers: false
       claims:
         extra:
           - "NAVident"

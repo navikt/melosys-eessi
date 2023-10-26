@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -35,15 +34,12 @@ public class SedService {
 
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
-    private final Unleash unleash;
 
     @Autowired
     public SedService(@Qualifier("tokenContext") EuxService euxService,
-                      SaksrelasjonService saksrelasjonService,
-                      Unleash unleash) {
+                      SaksrelasjonService saksrelasjonService) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
-        this.unleash = unleash;
     }
 
     public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto,
@@ -52,8 +48,6 @@ public class SedService {
                                                 boolean sendAutomatisk,
                                                 boolean forsøkOppdaterEksisterende)
         throws ValidationException {
-        //TODO: Fjern loglinje for testing av unleash next
-        log.info("melosys.eessi.identrekvisisjon togglestatus:" + unleash.isEnabled("melosys.eessi.identrekvisisjon"));
 
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);

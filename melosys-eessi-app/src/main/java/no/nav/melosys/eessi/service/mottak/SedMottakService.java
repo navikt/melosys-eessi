@@ -54,6 +54,8 @@ public class SedMottakService {
 
     @Transactional
     public void behandleSedMottakHendelse(SedMottattHendelse sedMottattHendelse) {
+        //TODO: Fjern loglinje for testing av unleash next
+        log.info("melosys.eessi.identrekvisisjon togglestatus:" + unleash.isEnabled("melosys.eessi.identrekvisisjon"));
         if (sedMottattHendelse.getSedHendelse().erX100()) {
             log.info("Ignorerer mottatt SED {} av typen X100", sedMottattHendelse.getSedHendelse().getSedId());
             return;
