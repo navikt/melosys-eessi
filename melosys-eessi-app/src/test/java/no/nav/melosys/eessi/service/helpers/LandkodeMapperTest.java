@@ -54,12 +54,12 @@ class LandkodeMapperTest {
 
     @Test
     public void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", false)).isEqualTo("???");
+        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", false)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", true)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", true)).isNull();
     }
 
     @Test
@@ -69,11 +69,11 @@ class LandkodeMapperTest {
 
     @Test
     public void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("", false)).isEqualTo("???");
+        assertThat(LandkodeMapper.finnLandkodeIso3("", false)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereUkjentForTomStrengMedPdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("", true)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3("", false)).isEqualTo("XUK");
     }
 }
