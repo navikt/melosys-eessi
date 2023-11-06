@@ -35,7 +35,7 @@ public final class LandkodeMapper {
         return Optional.ofNullable(ISO3_TIL_ISO2_LANDKODER_MAP.get(landkodeIso3));
     }
 
-    public static String finnLandkodeIso3(String landkodeIso2, boolean skalReturnereNullForUkjent ) {
+    public static String finnLandkodeIso3ForIdentRekvisasjon(String landkodeIso2, boolean skalReturnereNullForUkjent ) {
         if (landkodeIso2 == null) {
             return null;
         }
