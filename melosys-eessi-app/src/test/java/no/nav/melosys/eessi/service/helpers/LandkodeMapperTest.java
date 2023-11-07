@@ -36,36 +36,36 @@ class LandkodeMapperTest {
 
     @Test
     public void skalReturnereISO3KodeForGyldigISO2Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon("US", true)).isEqualTo("USA");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("US", true)).isEqualTo("USA");
     }
 
     @Test
     public void skalReturnereSammeKodeForISO3Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon("USA", true)).isEqualTo("USA");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("USA", true)).isEqualTo("USA");
     }
 
     @Test
     public void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon("ZZ", false)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", false)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon("ZZ", true)).isNull();
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", true)).isNull();
     }
 
     @Test
     public void skalReturnereNullForNullInndata() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon(null, true)).isEqualTo(null);
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon(null, true)).isEqualTo(null);
     }
 
     @Test
     public void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon("", false)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereUkjentForTomStrengMedPdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisasjon("", false)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
     }
 }
