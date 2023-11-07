@@ -1,17 +1,9 @@
 package no.nav.melosys.eessi.service.helpers;
 
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 
 class LandkodeMapperTest {
@@ -44,36 +36,36 @@ class LandkodeMapperTest {
 
     @Test
     public void skalReturnereISO3KodeForGyldigISO2Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("US", true)).isEqualTo("USA");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("US", true)).isEqualTo("USA");
     }
 
     @Test
     public void skalReturnereSammeKodeForISO3Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("USA", true)).isEqualTo("USA");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("USA", true)).isEqualTo("USA");
     }
 
     @Test
     public void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", false)).isEqualTo("???");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", false)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", true)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", true)).isNull();
     }
 
     @Test
     public void skalReturnereNullForNullInndata() {
-        assertThat(LandkodeMapper.finnLandkodeIso3(null, true)).isEqualTo(null);
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon(null, true)).isEqualTo(null);
     }
 
     @Test
     public void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("", false)).isEqualTo("???");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
     }
 
     @Test
     public void skalReturnereUkjentForTomStrengMedPdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("", true)).isEqualTo("XUK");
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
     }
 }

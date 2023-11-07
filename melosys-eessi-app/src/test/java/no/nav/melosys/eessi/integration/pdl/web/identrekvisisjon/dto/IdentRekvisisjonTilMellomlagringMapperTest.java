@@ -1,6 +1,8 @@
 package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -28,6 +30,21 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
         assertEquals("TestEtternavn", result.getPersonopplysninger().getEtternavn());
         assertEquals(LocalDate.of(2000, 1, 1), result.getPersonopplysninger().getFoedselsdato());
         assertEquals(Set.of("SWE", "NOR"), result.getPersonopplysninger().getStatsborgerskap());
+        assertEquals("Miami", result.getPersonopplysninger().getFoedested());
+        assertEquals("USA", result.getPersonopplysninger().getFoedeland());
+    }
+
+    @Test
+    void byggIdentRekvisisjonTilMellomlagringUkjentStatsborgerskap() {
+        SED sed = lagSED();
+        sed.getNav().getBruker().getPerson().setStatsborgerskap(Collections.singletonList(new Statsborgerskap("")));
+        SedMottattHendelse sedMottattHendelse = createSedHendelse();
+        IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
+
+        assertEquals("TestFornavn", result.getPersonopplysninger().getFornavn());
+        assertEquals("TestEtternavn", result.getPersonopplysninger().getEtternavn());
+        assertEquals(LocalDate.of(2000, 1, 1), result.getPersonopplysninger().getFoedselsdato());
+        assertEquals(Set.of("XUK"), result.getPersonopplysninger().getStatsborgerskap());
         assertEquals("Miami", result.getPersonopplysninger().getFoedested());
         assertEquals("USA", result.getPersonopplysninger().getFoedeland());
     }
