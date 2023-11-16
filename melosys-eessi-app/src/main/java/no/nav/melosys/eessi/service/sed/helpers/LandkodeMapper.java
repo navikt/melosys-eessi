@@ -44,7 +44,7 @@ public final class LandkodeMapper {
             return landkodeIso2;
         }
         return ISO3_TIL_ISO2_LANDKODER_MAP.entrySet().stream()
-            .filter(entry -> entry.getValue().equals(landkodeIso2))
+            .filter(entry -> entry.getValue().equals(mapTilNavLandkode(landkodeIso2)))
             .map(Map.Entry::getKey)
             .findFirst()
             .orElse(skalReturnereNullForUkjent ? null : "XUK");
