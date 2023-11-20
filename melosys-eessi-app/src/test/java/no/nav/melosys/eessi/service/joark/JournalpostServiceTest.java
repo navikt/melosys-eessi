@@ -47,7 +47,7 @@ class JournalpostServiceTest {
     private static final String JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}";
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         journalpostService = new JournalpostService(dokkatService, journalpostapiConsumer);
 
         sedHendelse = random.nextObject(SedHendelse.class);
@@ -71,7 +71,7 @@ class JournalpostServiceTest {
     }
 
     @Test
-    void opprettInngaaendeJournalpos_sedAlleredeJournalførtException_returnererOpprettJournalpostResponse() throws Exception{
+    void opprettInngaaendeJournalpos_sedAlleredeJournalførtException_returnererOpprettJournalpostResponse() throws Exception {
         HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.CONFLICT, "", JOURNALPOST_RESPONSE.getBytes(), Charset.defaultCharset());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false)))
             .thenThrow(new SedAlleredeJournalførtException("Sed allerede journalført", "123", httpClientErrorException));
@@ -85,6 +85,6 @@ class JournalpostServiceTest {
     }
 
     private SedMedVedlegg sedMedVedlegg(byte[] innhold) {
-        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("","", innhold), Collections.emptyList());
+        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("", "", innhold), Collections.emptyList());
     }
 }
