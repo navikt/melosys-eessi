@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getunleash.FakeUnleash;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
@@ -18,6 +19,7 @@ import no.nav.melosys.eessi.service.dokkat.DokkatService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -35,27 +37,31 @@ class JournalpostServiceTest {
     private DokkatService dokkatService;
     @Mock
     private JournalpostapiConsumer journalpostapiConsumer;
+    @Mock
+    private JournalpostMetadataService journalpostMetadataService;
+    private final FakeUnleash unleash = new FakeUnleash();
+    private final EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
+    private final JournalpostMetadata journalpostMetadata = new JournalpostMetadata("dokumentTittel fra journalpostMetadata", "behandlingstema fra journalpostMetadata");
 
     private JournalpostService journalpostService;
 
-    private EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
-
     private SedHendelse sedHendelse;
     private Sak sak;
-    private DokkatSedInfo dokkatSedInfo;
     private ObjectMapper objectMapper;
     private static final String JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}";
 
     @BeforeEach
     public void setUp() {
-        journalpostService = new JournalpostService(dokkatService, journalpostapiConsumer);
+        unleash.disableAll();
+        journalpostService = new JournalpostService(dokkatService, journalpostMetadataService, unleash, journalpostapiConsumer);
 
         sedHendelse = random.nextObject(SedHendelse.class);
         sak = random.nextObject(Sak.class);
-        dokkatSedInfo = random.nextObject(DokkatSedInfo.class);
+        DokkatSedInfo dokkatSedInfo = random.nextObject(DokkatSedInfo.class);
         objectMapper = new ObjectMapper();
 
         when(dokkatService.hentMetadataFraDokkat(anyString())).thenReturn(dokkatSedInfo);
+        when(journalpostMetadataService.hentJournalpostMetadata(anyString())).thenReturn(journalpostMetadata);
     }
 
     @Test
@@ -68,6 +74,30 @@ class JournalpostServiceTest {
     void opprettUtgaaendeJournalpost_verifiserEndeligJfr() {
         journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(true));
+    }
+
+    @Test
+    void opprettInngaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
+        unleash.enableAll();
+        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+        verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(false));
+        assertThat(captor.getValue())
+            .isNotNull()
+            .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
+            .containsExactly(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
+    }
+
+    @Test
+    void opprettUtgaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
+        unleash.enableAll();
+        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+        verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(true));
+        assertThat(captor.getValue())
+            .isNotNull()
+            .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
+            .containsExactly(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
     }
 
     @Test
