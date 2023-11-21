@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
+import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient;

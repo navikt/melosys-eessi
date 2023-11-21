@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.joark;
+package no.nav.melosys.eessi.service.journalfoering;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
