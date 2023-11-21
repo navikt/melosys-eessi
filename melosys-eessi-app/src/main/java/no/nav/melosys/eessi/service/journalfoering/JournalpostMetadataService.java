@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.service.journalfoering;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.SedType;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
-import java.util.Objects;
 
 @Slf4j
 @Component
@@ -63,8 +63,10 @@ public class JournalpostMetadataService {
             case H004 ->
                 new JournalpostMetadata("Svar på fremlegg om bostedsland/uenighet med vedtak om bostedsland", UTLAND);
             case H005 -> new JournalpostMetadata("Anmodning om informasjon om bosted", UTLAND);
+            case H006 -> new JournalpostMetadata("Svar på anmodning om informasjon om bosted", UTLAND);
             case H010 -> new JournalpostMetadata("Melding om endring av lovvalg", MEDLEMSKAP);
             case H011 -> new JournalpostMetadata("Anmodning om dato for endring av lovvalg", MEDLEMSKAP);
+            case H012 -> new JournalpostMetadata("Svar på anmodning for endring av lovvalg", MEDLEMSKAP);
             case H020 ->
                 new JournalpostMetadata("Krav om refusjon - administrativ kontroll/medisinsk refusjon", UTLAND);
             case H061 -> new JournalpostMetadata("Melding/anmodning om personnummer", UTLAND);
