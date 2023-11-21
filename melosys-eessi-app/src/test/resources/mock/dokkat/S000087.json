@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000087",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Krav om uførepensjon",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P2200",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

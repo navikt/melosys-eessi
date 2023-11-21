@@ -3,11 +3,9 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.joark.SakInformasjon;
-import org.jetbrains.annotations.NotNull;
+import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 

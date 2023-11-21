@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000140",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Krav om refusjon av avgifter som er foreløpig innbetalt",
+  "tema" : "TRY",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "R010",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

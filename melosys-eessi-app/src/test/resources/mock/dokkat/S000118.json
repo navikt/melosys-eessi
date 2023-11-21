@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000118",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Slovakia",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_SK",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

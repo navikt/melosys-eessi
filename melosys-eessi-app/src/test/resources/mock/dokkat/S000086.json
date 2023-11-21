@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000086",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Krav om etterlattepensjon",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P2100",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

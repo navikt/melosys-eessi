@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000174",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om familieinformasjon",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U005",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000202",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Fjern institusjon",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "X006",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

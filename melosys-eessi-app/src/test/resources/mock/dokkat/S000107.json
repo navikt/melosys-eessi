@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000107",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Litauen",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_LT",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000176",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om eksportdokument",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0306",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U007",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

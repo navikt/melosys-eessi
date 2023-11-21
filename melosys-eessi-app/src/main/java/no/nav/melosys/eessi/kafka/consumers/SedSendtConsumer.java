@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
+import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;

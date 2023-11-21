@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000163",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Informasjon om kontantytelser som følge av arbeidsuførhet eller annen vesentlig informasjon, gitt av kompetent institusjon.",
+  "tema" : "SYK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "S047",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

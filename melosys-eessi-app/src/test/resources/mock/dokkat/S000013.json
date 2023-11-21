@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000013",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Søknad om kontantytelser",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA031",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}
