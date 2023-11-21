@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000024",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Melding om at vilkår for yrkessykdom ikke er oppfylt samt videresending av erklæring eller varsel",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA051",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

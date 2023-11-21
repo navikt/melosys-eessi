@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000114",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Portugal",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_PT",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

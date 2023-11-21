@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000162",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Informasjon om utbetaling eller ikke utbetaling av kontantytelser",
+  "tema" : "SYK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "S046",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

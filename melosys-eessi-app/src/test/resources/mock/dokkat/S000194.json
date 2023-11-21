@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000194",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Rentebetaling",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0310",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U026",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

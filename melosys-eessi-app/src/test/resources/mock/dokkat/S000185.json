@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000185",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Opphør av rettigheter - eksport",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0307",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U016",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

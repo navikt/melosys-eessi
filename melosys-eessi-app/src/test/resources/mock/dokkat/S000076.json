@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000076",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Informasjon om estimerte kostnader/svar på anmodning eller administrativ kontroll",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "H131",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

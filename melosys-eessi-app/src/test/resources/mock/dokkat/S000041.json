@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000041",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Vedtak om tilbakebetaling av for mye utbetalt",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA074",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

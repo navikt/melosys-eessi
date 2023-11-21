@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000034",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Videresend et krav om pensjon eller tilleggsytelser til kompetent institusjon",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA061",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

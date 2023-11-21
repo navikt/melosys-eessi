@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000057",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Melding/anmodning om informasjon",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "H001",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

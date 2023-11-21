@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000124",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om tilleggsinformasjon",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P8000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

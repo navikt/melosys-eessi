@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000137",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på anmodning om informasjon",
+  "tema" : "PEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "R006",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}
