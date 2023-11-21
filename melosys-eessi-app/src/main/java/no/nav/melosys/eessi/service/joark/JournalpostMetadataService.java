@@ -20,7 +20,7 @@ public class JournalpostMetadataService {
     }
 
     public JournalpostMetadata hentJournalpostMetadata(String sedType) {
-        if (!unleash.isEnabled("blah") && Arrays.stream(SedType.values()).noneMatch(s -> Objects.equals(s.name(), sedType))) {
+        if (!unleash.isEnabled("melosys.eessi.erstatte_dokkat") && Arrays.stream(SedType.values()).noneMatch(s -> Objects.equals(s.name(), sedType))) {
             log.error("SedType {} er ikke støttet. Dersom vi skal støtte denne må den legges inn.", sedType);
             return new JournalpostMetadata("", "");
         }

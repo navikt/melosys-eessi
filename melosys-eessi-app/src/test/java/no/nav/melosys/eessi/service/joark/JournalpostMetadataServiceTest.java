@@ -24,21 +24,23 @@ class JournalpostMetadataServiceTest {
 
     @Test
     void hentJournalpostMetadata_ugyldigSedType_kasterFeilNårToggleEnabled() {
-        unleash.enableAll();
+        unleash.enable("melosys.eessi.erstatte_dokkat");
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> journalpostMetadataService.hentJournalpostMetadata("ugyldig SedType"))
             .withMessageContaining("No enum constant");
     }
 
+    @Deprecated(since = "Denne kan slettes når toggle melosys.eessi.erstatte_dokkat fjernes")
     @Test
     void hentJournalpostMetadata_ugyldigSedType_kasterIkkeFeilNårToggleDisabled() {
-        unleash.disableAll();
+        unleash.disable("melosys.eessi.erstatte_dokkat");
         assertThat(journalpostMetadataService.hentJournalpostMetadata("ugyldig SedType"))
             .isNotNull()
             .extracting(JournalpostMetadata::dokumentTittel, JournalpostMetadata::behandlingstema)
             .containsExactly("", "");
     }
 
+    @Deprecated(since = "Denne og filene innenfor mock/dokkat kan slettes når toggle melosys.eessi.erstatte_dokkat fjernes")
     @Test
     void journalpostMetadataErLikDenFraDokkat() throws IOException {
         var alleDokkatFiler = new File(getClass().getClassLoader().getResource("mock/dokkat").getFile()).listFiles();

@@ -61,7 +61,7 @@ public class JournalpostService {
         if (!Objects.equals(dokumentTittel, dokkatSedInfo.getDokumentTittel())) {
             log.error("DokumentTittel fra journalpostMetadataService er ikke lik den vi får fra dokkat: {} vs {}", dokumentTittel, dokkatSedInfo.getDokumentTittel());
         }
-        if (unleash.isEnabled("blah")) {
+        if (unleash.isEnabled("melosys.eessi.erstatte_dokkat")) {
             return dokumentTittel;
         }
         return dokkatSedInfo.getDokumentTittel();
@@ -72,7 +72,7 @@ public class JournalpostService {
         if (!Objects.equals(behandlingstema, dokkatSedInfo.getBehandlingstema())) {
             log.error("Behandlingstema fra journalpostMetadataService er ikke lik den vi får fra dokkat: {} vs {}", behandlingstema, dokkatSedInfo.getBehandlingstema());
         }
-        if (unleash.isEnabled("blah")) {
+        if (unleash.isEnabled("melosys.eessi.erstatte_dokkat")) {
             return behandlingstema;
         }
         return dokkatSedInfo.getBehandlingstema();
