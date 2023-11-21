@@ -52,7 +52,7 @@ class JournalpostServiceTest {
 
     @BeforeEach
     public void setUp() {
-        unleash.disableAll();
+        unleash.resetAll();
         journalpostService = new JournalpostService(dokkatService, journalpostMetadataService, unleash, journalpostapiConsumer);
 
         sedHendelse = random.nextObject(SedHendelse.class);
@@ -77,8 +77,8 @@ class JournalpostServiceTest {
     }
 
     @Test
-    void opprettInngaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
-        unleash.enableAll();
+    void opprettInngaaendeJournalpost_toggleEnabled_verifiserDokumentTittelOgBehandlingstema() {
+        unleash.enable("melosys.eessi.erstatte_dokkat");
         journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
         verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(false));
@@ -89,8 +89,8 @@ class JournalpostServiceTest {
     }
 
     @Test
-    void opprettUtgaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
-        unleash.enableAll();
+    void opprettUtgaaendeJournalpost_toggleEnabled_verifiserDokumentTittelOgBehandlingstema() {
+        unleash.enable("melosys.eessi.erstatte_dokkat");
         journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
         verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(true));
@@ -98,6 +98,30 @@ class JournalpostServiceTest {
             .isNotNull()
             .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
             .containsExactly(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
+    }
+
+    @Test
+    void opprettInngaaendeJournalpost_toggleDisabled_verifiserDokumentTittelOgBehandlingstema() {
+        unleash.disable("melosys.eessi.erstatte_dokkat");
+        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+        verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(false));
+        assertThat(captor.getValue())
+            .isNotNull()
+            .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
+            .doesNotContain(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
+    }
+
+    @Test
+    void opprettUtgaaendeJournalpost_toggleDisabled_verifiserDokumentTittelOgBehandlingstema() {
+        unleash.disable("melosys.eessi.erstatte_dokkat");
+        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+        verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(true));
+        assertThat(captor.getValue())
+            .isNotNull()
+            .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
+            .doesNotContain(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
     }
 
     @Test
