@@ -38,6 +38,7 @@ public class IdentRekvisisjonTilMellomlagringMapper {
                     .statsborgerskap(
                         personFraSed.getStatsborgerskap()
                             .stream()
+                            .filter(Objects::nonNull)
                             .map(Statsborgerskap::getLand)
                             .map(land -> finnLandkodeIso3ForIdentRekvisisjon(land, false))
                             .collect(Collectors.toSet()))
