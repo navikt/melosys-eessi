@@ -31,8 +31,9 @@ public class JournalpostService {
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                             SedMedVedlegg sedMedVedlegg, String personIdent) {
         DokkatSedInfo dokkatSedInfo = hentDokkatSedInfo(sedHendelse.getSedType());
+        boolean skalKonvertereTilPDF = unleash.isEnabled("melosys.vedlegg_pdf");
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
-            sedHendelse, sedMedVedlegg, sak, finnDokumentTittel(dokkatSedInfo, sedHendelse.getSedType()), finnBehandlingstema(dokkatSedInfo, sedHendelse.getSedType()), personIdent);
+            sedHendelse, sedMedVedlegg, sak, finnDokumentTittel(dokkatSedInfo, sedHendelse.getSedType()), finnBehandlingstema(dokkatSedInfo, sedHendelse.getSedType()), personIdent, skalKonvertereTilPDF);
         try {
             return opprettJournalpost(request, false);
         } catch (SedAlleredeJournalførtException e) {
@@ -43,8 +44,10 @@ public class JournalpostService {
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                            SedMedVedlegg sedMedVedlegg, String personIdent) {
         DokkatSedInfo dokkatSedInfo = hentDokkatSedInfo(sedHendelse.getSedType());
+        boolean skalKonvertereTilPDF = unleash.isEnabled("melosys.vedlegg_pdf");
+
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
-            sedHendelse, sedMedVedlegg, sak, finnDokumentTittel(dokkatSedInfo, sedHendelse.getSedType()), finnBehandlingstema(dokkatSedInfo, sedHendelse.getSedType()), personIdent);
+            sedHendelse, sedMedVedlegg, sak, finnDokumentTittel(dokkatSedInfo, sedHendelse.getSedType()), finnBehandlingstema(dokkatSedInfo, sedHendelse.getSedType()), personIdent, skalKonvertereTilPDF);
         return opprettJournalpost(request, true);
     }
 

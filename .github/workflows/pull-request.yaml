@@ -4,13 +4,12 @@ on: pull_request
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu22/20231115.7
     permissions:
       pull-requests: write
       checks: write
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
     steps:
     - name: Checkout
       uses: actions/checkout@v3.6.0

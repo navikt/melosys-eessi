@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,6 +17,9 @@ import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
@@ -147,13 +152,27 @@ public class EuxConsumer implements RestConsumer {
                 rinaSaksnummer, dokumentId);
     }
 
-    public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filType,
+
+    private boolean skalKonvertereTilPDF(String filType) {
+        return Arrays.asList(".doc", ".docx", ".jpg", ".jpeg", ".TIF", ".TIFF").contains(filType.toLowerCase());
+    }
+
+    public String leggTilVedlegg(String rinaSaksnummer, String dokumentId, String filtype,
                                  SedVedlegg vedlegg) {
         log.info("Legger til vedlegg på sak {} og dokument {}", rinaSaksnummer, dokumentId);
 
+        if (skalKonvertereTilPDF(filtype)) {
+            log.info("KonverterTilPDF: Konverterer vedlegget til PDF fra {}, dokument {}", filtype, dokumentId);
+            byte[] pdfContent = konverterToPDF(vedlegg.getInnhold(), filtype);
+            vedlegg = new SedVedlegg(vedlegg.getTittel(), pdfContent);
+            filtype = "pdf";
+        } else {
+            log.info("KonverterTilPDF: Konverterer ikke, {}", filtype);
+        }
+
         var headers = defaultHeaders();
         String base64Content = Base64.getEncoder().encodeToString(vedlegg.getInnhold());
-        var body = new EuxVedlegg(base64Content, filType, vedlegg.getTittel(), true);
+        var body = new EuxVedlegg(base64Content, filtype, vedlegg.getTittel(), true);
 
         return exchange(VEDLEGG_PATH, HttpMethod.POST,
             new HttpEntity<>(body, headers),
@@ -161,6 +180,28 @@ public class EuxConsumer implements RestConsumer {
             rinaSaksnummer, dokumentId);
     }
 
+
+    private byte[] konverterToPDF(byte[] content, String filtype) {
+        try (PDDocument document = new PDDocument()) {
+            log.info("KonverterTilPDF: Prøver å converte filtype: {}", filtype);
+
+            PDPage page = new PDPage();
+            document.addPage(page);
+
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
+                contentStream.showText(new String(content));
+            }
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            document.save(outputStream);
+            document.close();
+
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.info("KonverterTilPDF feiler: {}", e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
     public void setSakSensitiv(String rinaSaksnummer) {
         log.info("Setter sak {} sensitiv", rinaSaksnummer);
 
