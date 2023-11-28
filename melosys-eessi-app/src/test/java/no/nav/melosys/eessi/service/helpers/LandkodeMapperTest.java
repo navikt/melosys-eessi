@@ -22,21 +22,27 @@ class LandkodeMapperTest {
         assertThat(LandkodeMapper.mapTilLandkodeIso2("DK")).isEqualTo("DK");
     }
 
-    @Test
-    void getIso3_ikkeFunnet_girUkjent() {
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("ABC")).isEqualTo("???");
-    }
 
     @Test
     void getIso2_medIkkeISOStandardKoder_forventSammeKodeTilbake() {
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("???");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("XU");
         assertThat(LandkodeMapper.mapTilLandkodeIso2("XXX")).isEqualTo("XS");
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("???");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("XU");
     }
 
     @Test
     void skalReturnereISO3KodeForGyldigISO2Kode() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("US", true)).isEqualTo("USA");
+    }
+
+    @Test
+    void finnLandkodeIso3ForIdentRekvisisjon_ikkeFunnet_girUkjent() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("AB", false)).isEqualTo("XUK");
+    }
+
+    @Test
+    void finnLandkodeIso3ForIdentRekvisisjon_ikkeFunnet_girNull() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("AB", true)).isEqualTo(null);
     }
 
     @Test
