@@ -25,7 +25,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
        java-version: '17'
-       distribution: 'adopt-openj9'
+       distribution: 'temurin'
     - name: Build and test
       run: mvn verify
 
