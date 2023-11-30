@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.ValidationException;
-import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostService;
+import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Autowired;

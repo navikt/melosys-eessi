@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
-import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 

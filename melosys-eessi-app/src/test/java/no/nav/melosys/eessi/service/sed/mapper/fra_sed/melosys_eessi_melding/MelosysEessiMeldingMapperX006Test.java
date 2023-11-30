@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Institusjon;
 import no.nav.melosys.eessi.models.sed.nav.Sak;
 import no.nav.melosys.eessi.models.sed.nav.X006FjernInstitusjon;
-import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
+import no.nav.melosys.eessi.service.joark.SakInformasjon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.kafkadlq.*;
 import no.nav.melosys.eessi.repository.KafkaDLQRepository;
-import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostService;
+import no.nav.melosys.eessi.service.joark.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.springframework.stereotype.Service;

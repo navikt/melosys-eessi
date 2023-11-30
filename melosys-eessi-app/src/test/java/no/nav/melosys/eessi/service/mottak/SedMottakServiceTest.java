@@ -20,7 +20,7 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.junit.jupiter.api.BeforeEach;
