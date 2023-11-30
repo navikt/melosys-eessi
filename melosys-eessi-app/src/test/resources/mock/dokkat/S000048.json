@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000048",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på anmodning om overføring av ytelser",
+  "tema" : "BAR",
+  "behandlingstema" : "ab0058",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "F017",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

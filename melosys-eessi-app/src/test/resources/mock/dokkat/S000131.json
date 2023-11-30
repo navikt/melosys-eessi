@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000131",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Overføring av pensjonssaker til EESSI",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P15000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

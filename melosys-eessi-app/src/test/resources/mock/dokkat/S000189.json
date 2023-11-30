@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000189",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om refusjon",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0310",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U020",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

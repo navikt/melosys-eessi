@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000003",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Beslutning om lovvalg",
+  "tema" : "MED",
+  "behandlingstema" : "ab0269",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "A003",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

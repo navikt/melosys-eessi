@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000017",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Informasjon om person som er innkalt til undersøkelse i forbindelse med en ulykke på vei til eller fra jobb",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA043",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

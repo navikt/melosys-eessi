@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000203",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Videresende sak",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "X007",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

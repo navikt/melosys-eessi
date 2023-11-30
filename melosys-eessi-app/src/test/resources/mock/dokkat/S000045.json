@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000045",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om utdypende forklaring",
+  "tema" : "BAR",
+  "behandlingstema" : "ab0058",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "F004",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

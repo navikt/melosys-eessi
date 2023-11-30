@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000142",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om informasjon",
+  "tema" : "FEI",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "R012",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

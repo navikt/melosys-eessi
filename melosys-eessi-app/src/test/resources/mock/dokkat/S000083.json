@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000083",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning for perioder med foreldreansvar",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P1000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

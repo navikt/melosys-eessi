@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000073",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om medisinsk informasjon",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "H120",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}
