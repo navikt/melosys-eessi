@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000036",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Godkjenning av transport til bosted eller sykehus",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA063",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

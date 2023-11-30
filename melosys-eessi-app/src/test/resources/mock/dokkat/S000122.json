@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000122",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Vedtak om pensjon",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P6000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

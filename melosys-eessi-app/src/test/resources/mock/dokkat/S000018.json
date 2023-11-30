@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000018",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om detaljert utredning sammen med legeerklæringer",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA044",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

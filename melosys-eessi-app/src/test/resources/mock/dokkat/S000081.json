@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000081",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om informasjon om ansettelsesforhold/selvstendig næringsvirksomhet/bosetningsperioder - særskilte innskuddsfrie kontantytelser",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "M052",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000050",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på anmodning om trygdeperioder for tilleggsytelser",
+  "tema" : "BAR",
+  "behandlingstema" : "ab0058",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "F019",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000187",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om registreringsinformasjon - grensearbeider",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U018",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

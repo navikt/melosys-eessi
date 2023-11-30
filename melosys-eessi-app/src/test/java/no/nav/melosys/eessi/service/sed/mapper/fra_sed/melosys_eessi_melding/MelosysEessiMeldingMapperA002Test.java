@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

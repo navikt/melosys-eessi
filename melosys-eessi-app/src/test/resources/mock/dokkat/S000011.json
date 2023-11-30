@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000011",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Innvilgelse av søknad om unntak",
+  "tema" : "MED",
+  "behandlingstema" : "ab0269",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "A011",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

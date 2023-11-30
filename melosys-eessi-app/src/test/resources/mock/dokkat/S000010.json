@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000010",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Melding om lovvalg",
+  "tema" : "MED",
+  "behandlingstema" : "ab0269",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "A010",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

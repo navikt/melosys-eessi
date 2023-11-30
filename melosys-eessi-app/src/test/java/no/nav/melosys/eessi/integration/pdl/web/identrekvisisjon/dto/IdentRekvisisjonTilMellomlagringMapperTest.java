@@ -23,6 +23,9 @@ class IdentRekvisisjonTilMellomlagringMapperTest {
     @Test
     public void byggIdentRekvisisjonTilMellomlagringSetterRiktigPersonopplysninger() {
         SED sed = lagSED();
+        sed.finnPerson().get().setStatsborgerskap(
+            Arrays.asList(new Statsborgerskap("SWE"), new Statsborgerskap("NOR"), null)
+        );
         SedMottattHendelse sedMottattHendelse = createSedHendelse();
         IdentRekvisisjonTilMellomlagring result = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 

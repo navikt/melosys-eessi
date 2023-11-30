@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000181",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om månedlig oppfølging - eksport",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0307",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U012",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

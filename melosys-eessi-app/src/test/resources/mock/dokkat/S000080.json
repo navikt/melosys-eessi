@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000080",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på anmodning om informasjon om inntekt - særskilte innskuddsfrie kontantytelser",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "M051",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

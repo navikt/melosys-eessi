@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000109",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Latvia",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_LV",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

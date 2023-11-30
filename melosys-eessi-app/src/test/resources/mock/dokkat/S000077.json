@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000077",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Krav om begravelsesstønad",
+  "tema" : "GRA",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "M030",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

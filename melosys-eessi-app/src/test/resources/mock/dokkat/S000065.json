@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000065",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på anmodning for endring av lovvalg",
+  "tema" : "MED",
+  "behandlingstema" : "ab0269",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "H012",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

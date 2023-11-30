@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000167",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på melding om søknad om kontantytelser - langtidspleie",
+  "tema" : "AAP",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "S057",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

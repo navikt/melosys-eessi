@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000126",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Overføring av mer informasjon",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P10000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

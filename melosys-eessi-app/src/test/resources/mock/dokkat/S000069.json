@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000069",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Bekreftelse/svar på anmodning om personnummer",
+  "tema" : "AGR",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "H062",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

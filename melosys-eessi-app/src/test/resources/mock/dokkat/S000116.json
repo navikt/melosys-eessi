@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000116",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Sverige",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_SE",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

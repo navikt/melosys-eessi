@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000159",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på forespørsel om perioder - trygdeytelse: sykdom, svangerskap og fødsel",
+  "tema" : "SYK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "S041",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

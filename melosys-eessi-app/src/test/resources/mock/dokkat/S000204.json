@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000204",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Ugyldiggjøre SED",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "X008",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

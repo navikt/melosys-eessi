@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000056",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på mer informasjon",
+  "tema" : "BAR",
+  "behandlingstema" : "ab0058",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "F027",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

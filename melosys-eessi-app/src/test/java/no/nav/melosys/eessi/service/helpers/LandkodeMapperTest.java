@@ -22,50 +22,66 @@ class LandkodeMapperTest {
         assertThat(LandkodeMapper.mapTilLandkodeIso2("DK")).isEqualTo("DK");
     }
 
-    @Test
-    void getIso3_ikkeFunnet_girUkjent() {
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("ABC")).isEqualTo("???");
-    }
 
     @Test
     void getIso2_medIkkeISOStandardKoder_forventSammeKodeTilbake() {
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("???");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("XU");
         assertThat(LandkodeMapper.mapTilLandkodeIso2("XXX")).isEqualTo("XS");
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("???");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("XU");
     }
 
     @Test
-    public void skalReturnereISO3KodeForGyldigISO2Kode() {
+    void skalReturnereISO3KodeForGyldigISO2Kode() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("US", true)).isEqualTo("USA");
     }
 
     @Test
-    public void skalReturnereSammeKodeForISO3Kode() {
+    void finnLandkodeIso3ForIdentRekvisisjon_ikkeFunnet_girUkjent() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("AB", false)).isEqualTo("XUK");
+    }
+
+    @Test
+    void finnLandkodeIso3ForIdentRekvisisjon_ikkeFunnet_girNull() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("AB", true)).isEqualTo(null);
+    }
+
+    @Test
+    void skalReturnereSammeKodeForISO3Kode() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("USA", true)).isEqualTo("USA");
     }
 
     @Test
-    public void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
+    void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", false)).isEqualTo("XUK");
     }
 
     @Test
-    public void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
+    void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", true)).isNull();
     }
 
     @Test
-    public void skalReturnereNullForNullInndata() {
-        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon(null, true)).isEqualTo(null);
+    void skalReturnereNullForNullInndata() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon(null, true)).isNull();
     }
 
     @Test
-    public void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
+    void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
     }
 
     @Test
-    public void skalReturnereUkjentForTomStrengMedPdlFormat() {
+    void skalReturnereUkjentForTomStrengMedPdlFormat() {
         assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
+    }
+
+    @Test
+    void skalReturnereGBsinISO3ForUK() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("UK", false)).isEqualTo("GBR");
+    }
+
+    @Test
+    void skalReturnereGRsinISO3IForEL() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("EL", false)).isEqualTo("GRC");
     }
 }
