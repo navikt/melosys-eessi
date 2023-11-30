@@ -10,7 +10,6 @@ og utgående SED'er.
 
 Klon repositoriet og sett det opp som et standard Maven-prosjekt i foretrukket IDE.
 
-
 Sett først miljøvariabler:
 ```
 SRV_USERNAME
