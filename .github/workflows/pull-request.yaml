@@ -4,7 +4,7 @@ on: pull_request
 
 jobs:
   build:
-    runs-on: ubuntu-22.04:20231115.7
+    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
       checks: write
