@@ -30,6 +30,12 @@
             <artifactId>poi-scratchpad</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
             <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
         </dependency>
