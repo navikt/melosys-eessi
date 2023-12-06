@@ -47,13 +47,13 @@ public class BucIdentifisertService {
     }
 
     public void lagreIdentifisertPerson(String rinaSaksnummer, String ident) {
-        try {
-            bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
-                .ifPresentOrElse(
-                    i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer),
-                    () -> bucIdentifisertRepository.save(new BucIdentifisert(null, rinaSaksnummer, ident))
-                );
-            applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
+    try {
+        bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
+            .ifPresentOrElse(
+                i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer),
+                () -> bucIdentifisertRepository.save(new BucIdentifisert(null, rinaSaksnummer, ident))
+            );
+        applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
     } catch (IncorrectResultSizeDataAccessException e) {
             log.error("Duplikat resultat ved oppslag av ident for rinaSak {}", rinaSaksnummer, e);
             throw e;
