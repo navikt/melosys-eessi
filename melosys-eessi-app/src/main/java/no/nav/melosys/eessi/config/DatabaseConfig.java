@@ -1,16 +1,19 @@
 package no.nav.melosys.eessi.config;
 
+import javax.persistence.EntityManagerFactory;
+import javax.sql.DataSource;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.SneakyThrows;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.flyway.FlywayConfigurationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.env.Environment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -18,23 +21,22 @@ import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
-
 @Profile("nais")
 @Configuration
 @EnableJpaRepositories(basePackages = "no.nav.melosys.eessi")
 public class DatabaseConfig {
 
-    private static final String APPLICATION_NAME = "melosys-eessi";
     private static final String PROD_MOUNT_PATH = "postgresql/prod-fss";
     private static final String PREPROD_MOUNT_PATH = "postgresql/preprod-fss";
 
-    private final Environment environment;
+    @Value("${NAIS_CLUSTER_NAME}")
+    private String cluster;
 
-    public DatabaseConfig(Environment environment) {
-        this.environment = environment;
-    }
+    @Value("${spring.datasource.url}")
+    private String jdbcUrl;
+
+    @Value("${DATABASE_NAME}")
+    private String databaseName;
 
     @Bean
     public DataSource adminDataSource() {
@@ -50,8 +52,7 @@ public class DatabaseConfig {
     @Bean
     public FlywayConfigurationCustomizer flywayConfig(@Qualifier("adminDataSource") DataSource adminDataSource) {
         return config ->
-                config.initSql(String.format("SET ROLE \"%s-admin\"",
-                                environment.getRequiredProperty("DATABASE_NAME")))
+                config.initSql(String.format("SET ROLE \"%s-admin\"", databaseName))
                         .dataSource(adminDataSource);
     }
 
@@ -76,25 +77,17 @@ public class DatabaseConfig {
     }
 
     @SneakyThrows
-    private HikariDataSource dataSource(String user) {
+    private HikariDataSource dataSource(String userType) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(environment.getProperty("spring.datasource.url"));
+        config.setJdbcUrl(jdbcUrl);
         config.setMaximumPoolSize(3);
         config.setMinimumIdle(1);
         String mountPath = isProduction() ? PROD_MOUNT_PATH : PREPROD_MOUNT_PATH;
-        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole(user));
-    }
-
-    private String dbRole(String role) {
-        final String namespace = environment.getProperty("NAIS_NAMESPACE");
-        if (isProduction()) {
-            return String.join("-", APPLICATION_NAME, role);
-        }
-        return String.join("-", APPLICATION_NAME, namespace, role);
+        String dbRole = String.join("-", databaseName, userType);
+        return HikariCPVaultUtil.createHikariDataSourceWithVaultIntegration(config, mountPath, dbRole);
     }
 
     private boolean isProduction() {
-        String cluster = environment.getProperty("NAIS_CLUSTER_NAME");
         return cluster != null && cluster.equalsIgnoreCase("prod-fss");
     }
 }

@@ -1,17 +1,9 @@
 package no.nav.melosys.eessi.service.helpers;
 
-import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 
 class LandkodeMapperTest {
@@ -30,50 +22,66 @@ class LandkodeMapperTest {
         assertThat(LandkodeMapper.mapTilLandkodeIso2("DK")).isEqualTo("DK");
     }
 
-    @Test
-    void getIso3_ikkeFunnet_girUkjent() {
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("ABC")).isEqualTo("???");
-    }
 
     @Test
     void getIso2_medIkkeISOStandardKoder_forventSammeKodeTilbake() {
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("???");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("???")).isEqualTo("XU");
         assertThat(LandkodeMapper.mapTilLandkodeIso2("XXX")).isEqualTo("XS");
-        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("???");
+        assertThat(LandkodeMapper.mapTilLandkodeIso2("XUK")).isEqualTo("XU");
     }
 
     @Test
-    public void skalReturnereISO3KodeForGyldigISO2Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("US", true)).isEqualTo("USA");
+    void skalReturnereISO3KodeForGyldigISO2Kode() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("US", true)).isEqualTo("USA");
     }
 
     @Test
-    public void skalReturnereSammeKodeForISO3Kode() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("USA", true)).isEqualTo("USA");
+    void finnLandkodeIso3ForIdentRekvisisjon_ikkeFunnet_girUkjent() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("AB", false)).isEqualTo("XUK");
     }
 
     @Test
-    public void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", false)).isEqualTo("???");
+    void finnLandkodeIso3ForIdentRekvisisjon_ikkeFunnet_girNull() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("AB", true)).isEqualTo(null);
     }
 
     @Test
-    public void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("ZZ", true)).isEqualTo("XUK");
+    void skalReturnereSammeKodeForISO3Kode() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("USA", true)).isEqualTo("USA");
     }
 
     @Test
-    public void skalReturnereNullForNullInndata() {
-        assertThat(LandkodeMapper.finnLandkodeIso3(null, true)).isEqualTo(null);
+    void skalReturnereUkjentForUgyldigISO2KodeFelleskodeverkFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", false)).isEqualTo("XUK");
     }
 
     @Test
-    public void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("", false)).isEqualTo("???");
+    void skalReturnereUkjentForUgyldigISO2KodePdlFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("ZZ", true)).isNull();
     }
 
     @Test
-    public void skalReturnereUkjentForTomStrengMedPdlFormat() {
-        assertThat(LandkodeMapper.finnLandkodeIso3("", true)).isEqualTo("XUK");
+    void skalReturnereNullForNullInndata() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon(null, true)).isNull();
+    }
+
+    @Test
+    void skalReturnereUkjentForTomStrengMedFelleskodeverkFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
+    }
+
+    @Test
+    void skalReturnereUkjentForTomStrengMedPdlFormat() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("", false)).isEqualTo("XUK");
+    }
+
+    @Test
+    void skalReturnereGBsinISO3ForUK() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("UK", false)).isEqualTo("GBR");
+    }
+
+    @Test
+    void skalReturnereGRsinISO3IForEL() {
+        assertThat(LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("EL", false)).isEqualTo("GRC");
     }
 }

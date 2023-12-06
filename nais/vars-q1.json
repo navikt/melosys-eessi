@@ -1,0 +1,11 @@
+{
+    "APP_NAME": "melosys-eessi-q1",
+    "VAULT_CLUSTER": "dev",
+    "INGRESS": "https://melosys-eessi-q1.dev.intern.nav.no",
+    "KAFKA_POOL": "nav-dev",
+    "APP_NAME_MELOSYS_API": "melosys-q1",
+    "TENANT_URL": "trygdeetaten.no",
+    "GROUP_MELOSYS_INNLOGGING": "52981246-8032-40f0-863a-2bd2844f2d57",
+    "APP_NAME_EUX_RINA_API": "eux-rina-api-q1",
+    "UNLEASH_ENVIRONMENT": "development"
+}

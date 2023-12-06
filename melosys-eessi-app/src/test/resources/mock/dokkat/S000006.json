@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000006",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar på anmodning om mer informasjon",
+  "tema" : "MED",
+  "behandlingstema" : "ab0269",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "A006",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

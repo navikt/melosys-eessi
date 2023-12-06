@@ -23,11 +23,18 @@ jobs:
         uses: actions/checkout@v3.6.0
         with:
           fetch-depth: 0
+      - name: deploy new Unleash Apikey to ${{github.event.inputs.environment}}
+        uses: nais/deploy/actions/deploy@v1
+        env:
+          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
+          CLUSTER: dev-fss
+          RESOURCE: nais/unleash-apitoken.yml
+          VARS: nais/vars-q2.json
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: 'adopt-openj9'
+          distribution: 'temurin'
       - name: Setup Maven
         uses: actions/cache@v3
         with:
@@ -53,8 +60,9 @@ jobs:
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
-          RESOURCE: deploy/nais.yaml
-          VAR: APP_NAME=melosys-eessi,VAULT_CLUSTER=dev,INGRESS=https://melosys-eessi.dev.intern.nav.no,KAFKA_POOL=nav-dev,image=${{ env.docker_image }},APP_NAME_MELOSYS_API=melosys,APP_NAME_EUX_RINA_API=eux-rina-api-q2,GROUP_MELOSYS_INNLOGGING=52981246-8032-40f0-863a-2bd2844f2d57
+          RESOURCE: nais/nais.yml
+          VAR: image=${{ env.docker_image }}
+          VARS: nais/vars-q2.json
       - name: post-deploy
         uses: navikt/digihot-deploy/actions/post-deploy@v2
         env:

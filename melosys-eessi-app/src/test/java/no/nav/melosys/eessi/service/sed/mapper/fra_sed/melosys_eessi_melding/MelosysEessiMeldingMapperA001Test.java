@@ -9,7 +9,7 @@ import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Grunnlag;
 import no.nav.melosys.eessi.models.sed.nav.Land;
 import no.nav.melosys.eessi.models.sed.nav.Unntak;
-import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

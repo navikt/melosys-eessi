@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000186",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forsikringsperioder - grensearbeider",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0308",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U017",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

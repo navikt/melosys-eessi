@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000195",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Svar angående renter",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0311",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U027",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

@@ -1,0 +1,71 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: {{APP_NAME}}
+  namespace: teammelosys
+  labels:
+    team: teammelosys
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "100M"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+spec:
+  image: {{image}}
+  port: 8080
+  replicas:
+    min: 2
+    max: 2
+    cpuThresholdPercentage: 50
+  liveness:
+    path: /internal/health
+    initialDelay: 60
+    timeout: 10
+  readiness:
+    path: /internal/health
+    initialDelay: 60
+    timeout: 10
+  resources:
+    limits:
+      cpu: 500m
+      memory: 2560Mi
+    requests:
+      cpu: 200m
+      memory: 1024Mi
+  azure:
+    application:
+      enabled: true
+      tenant: {{TENANT_URL}}
+      claims:
+        extra:
+          - "NAVident"
+        groups:
+          - id: {{GROUP_MELOSYS_INNLOGGING}}
+  accessPolicy:
+    inbound:
+      rules:
+        - application: {{APP_NAME_MELOSYS_API}}
+    outbound:
+      external:
+        - host: "melosys-unleash-api.nav.cloud.nais.io"
+      rules:
+        - application: {{APP_NAME_EUX_RINA_API}}
+  webproxy: true
+  vault:
+    enabled: true
+    paths:
+      - mountPath: /var/run/secrets/nais.io/serviceuser
+        kvPath: /serviceuser/data/{{VAULT_CLUSTER}}/srvmelosys-eessi
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: nais
+    - name: APP_NAME
+      value: {{APP_NAME}}
+  envFrom:
+    - secret: {{APP_NAME}}-unleash-api-token
+  ingresses:
+    - {{INGRESS}}
+  kafka:
+    pool: {{ KAFKA_POOL }}
+

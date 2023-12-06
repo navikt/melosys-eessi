@@ -6,7 +6,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.joark.SakInformasjon;
+import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 
 class MelosysEessiMeldingMapperStubs {
 

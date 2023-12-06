@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000106",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Liechtenstein",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_LI",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

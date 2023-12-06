@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000016",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Legeerklæring eller medisinsk rapport",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA042",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

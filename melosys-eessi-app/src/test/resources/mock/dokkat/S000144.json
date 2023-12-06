@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000144",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om varsel/forkynning",
+  "tema" : "FEI",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "R015",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

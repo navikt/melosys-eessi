@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000121",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forsikrings/bosettingsperioder",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P5000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

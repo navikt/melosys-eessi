@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000128",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Informasjon om pensjonsbeløp",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P12000",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

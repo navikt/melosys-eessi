@@ -39,7 +39,7 @@ public class MockData {
 
     SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident) {
         return SedHendelse.builder()
-                .avsenderId("avsenderId")
+                .avsenderId("US:avsenderId")
                 .avsenderNavn("avsender")
                 .bucType(LA_BUC_02.name())
                 .id(42L)

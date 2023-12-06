@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000104",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Island",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_IS",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

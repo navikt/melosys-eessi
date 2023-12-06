@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000019",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Anmodning om vedtak",
+  "tema" : "YRK",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "DA046",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

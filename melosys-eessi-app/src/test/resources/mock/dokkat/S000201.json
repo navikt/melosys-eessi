@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000201",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Legg til ny institusjon",
+  "tema" : "GEN",
+  "behandlingstema" : "ab0313",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "X005",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

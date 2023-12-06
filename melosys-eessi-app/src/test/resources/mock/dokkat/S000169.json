@@ -1,0 +1,16 @@
+{
+  "dokumenttypeId" : "S000169",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Forespørsel om forsikringsperioder - grensearbeider",
+  "tema" : "DAG",
+  "behandlingstema" : "ab0309",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "U001CB",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}

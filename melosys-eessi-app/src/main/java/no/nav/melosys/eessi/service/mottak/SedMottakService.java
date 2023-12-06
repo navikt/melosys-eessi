@@ -22,7 +22,7 @@ import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.joark.OpprettInngaaendeJournalpostService;
+import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,6 @@ public class SedMottakService {
     private final SedMetrikker sedMetrikker;
     private final PersonIdentifisering personIdentifisering;
     private final BucIdentifisertService bucIdentifisertService;
-
 
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
@@ -122,7 +121,7 @@ public class SedMottakService {
 
     private void opprettOgLagreIdentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed) {
         String journalpostID = opprettJournalpost(sedMottattHendelse, null);
-        var oppgaveID = opprettOgLagreIndetifiseringsoppgave(sedMottattHendelse, sed, journalpostID);
+        var oppgaveID = opprettOgLagreIndentifiseringsoppgave(sedMottattHendelse, sed, journalpostID);
 
         bucIdentifiseringOppgRepository.save(BucIdentifiseringOppg.builder()
             .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
@@ -133,7 +132,7 @@ public class SedMottakService {
         log.info("Opprettet oppgave med id {}", oppgaveID);
     }
 
-    private String opprettOgLagreIndetifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
+    private String opprettOgLagreIndentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
         var personFraSed = sed.finnPerson().orElse(null);
 
         if (personFraSed != null && !harNorskPersonnummer(personFraSed)) {

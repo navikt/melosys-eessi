@@ -1,0 +1,15 @@
+{
+  "dokumenttypeId" : "S000117",
+  "dokumentType" : "I",
+  "dokumentKategori" : "SED",
+  "dokumentTittel" : "Landsspesifikk informasjon – Slovenia",
+  "tema" : "PEN",
+  "arkivSystem" : "JOARK",
+  "dokumentMottakInfo" : {
+    "arkivBehandling" : "ARKIVER_FRA_MOTTAK",
+    "eksternDokumentTyper" : [ {
+      "eksternDokumentTypeId" : "P3000_SI",
+      "eksternIdType" : "SED_TYPE"
+    } ]
+  }
+}
