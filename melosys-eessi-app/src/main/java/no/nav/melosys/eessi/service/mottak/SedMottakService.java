@@ -4,7 +4,6 @@ import javax.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import io.getunleash.Unleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
@@ -46,16 +45,11 @@ public class SedMottakService {
     private final PersonIdentifisering personIdentifisering;
     private final BucIdentifisertService bucIdentifisertService;
 
-    private final Unleash unleash;
-
-
     @Value("${rina.institusjon-id}")
     private String rinaInstitusjonsId;
 
     @Transactional
     public void behandleSedMottakHendelse(SedMottattHendelse sedMottattHendelse) {
-        //TODO: Fjern loglinje for testing av unleash next
-        log.info("melosys.eessi.identrekvisisjon togglestatus:" + unleash.isEnabled("melosys.eessi.identrekvisisjon"));
         if (sedMottattHendelse.getSedHendelse().erX100()) {
             log.info("Ignorerer mottatt SED {} av typen X100", sedMottattHendelse.getSedHendelse().getSedId());
             return;
@@ -139,11 +133,9 @@ public class SedMottakService {
     }
 
     private String opprettOgLagreIndentifiseringsoppgave(SedMottattHendelse sedMottattHendelse, SED sed, String journalpostID) {
-        boolean identRekvisisjonEnabled = unleash.isEnabled("melosys.eessi.identrekvisisjon");
-
         var personFraSed = sed.finnPerson().orElse(null);
 
-        if (personFraSed != null && !harNorskPersonnummer(personFraSed) && identRekvisisjonEnabled) {
+        if (personFraSed != null && !harNorskPersonnummer(personFraSed)) {
             var identRekvisjonTilMellomlagring = IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed);
 
             String lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring);

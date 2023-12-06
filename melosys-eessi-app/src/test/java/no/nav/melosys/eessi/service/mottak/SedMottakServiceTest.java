@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import io.getunleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
@@ -61,9 +60,6 @@ class SedMottakServiceTest {
 
     private SedMottakService sedMottakService;
 
-    private final FakeUnleash fakeUnleash = new FakeUnleash();
-
-
     private static final String IDENT = "1122334455";
     private static final String SED_ID = "555554444";
     private static final String RINA_SAKSNUMMER = "12313213";
@@ -80,14 +76,12 @@ class SedMottakServiceTest {
             journalpostSedKoblingService,
             sedMetrikker,
             personIdentifisering,
-            bucIdentifisertService,
-            fakeUnleash
+            bucIdentifisertService
         );
     }
 
     @Test
     void behandleSed_finnerIkkePerson_OppgaveOpprettes() {
-        fakeUnleash.disableAll();
         when(euxService.hentSedMedRetry(anyString(), anyString()))
             .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
@@ -106,7 +100,7 @@ class SedMottakServiceTest {
         verify(euxService).hentSedMedRetry(anyString(), anyString());
         verify(personIdentifisering).identifiserPerson(any(), any());
         verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
+        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString(), any());
         verify(sedMottattHendelseRepository, times(2)).save(any());
         verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
     }
@@ -114,7 +108,6 @@ class SedMottakServiceTest {
 
     @Test
     void behandleSed_finnerIkkePerson_oppgaveOpprettesNårIkkeASed() {
-        fakeUnleash.disableAll();
         when(euxService.hentSedMedRetry(anyString(), anyString()))
             .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
@@ -256,6 +249,7 @@ class SedMottakServiceTest {
     private SedHendelse sedHendelseUtenBruker() {
         SedHendelse sedHendelse = new SedHendelse();
         sedHendelse.setNavBruker("ukjent");
+        sedHendelse.setAvsenderId("SE:12345");
         sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
         sedHendelse.setRinaDokumentId("456");
         sedHendelse.setSedId(SED_ID);
