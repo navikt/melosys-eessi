@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.BucIdentifisert;
 import no.nav.melosys.eessi.repository.BucIdentifisertRepository;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -46,12 +47,16 @@ public class BucIdentifisertService {
     }
 
     public void lagreIdentifisertPerson(String rinaSaksnummer, String ident) {
-        bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
-            .ifPresentOrElse(
-                i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer),
-                () -> bucIdentifisertRepository.save(new BucIdentifisert(null, rinaSaksnummer, ident))
-            );
-        applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
-
+        try {
+            bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)
+                .ifPresentOrElse(
+                    i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer),
+                    () -> bucIdentifisertRepository.save(new BucIdentifisert(null, rinaSaksnummer, ident))
+                );
+            applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
+    } catch (IncorrectResultSizeDataAccessException e) {
+            log.error("Duplikat resultat ved oppslag av ident for rinaSak {}", rinaSaksnummer, e);
+            throw e;
+        }
     }
 }
