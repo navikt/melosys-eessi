@@ -174,7 +174,7 @@ public final class OpprettJournalpostRequestMapper {
     };
 
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
-        log.info("KonverteringPDF: Konverter fra {} til PDF", filtype);
+        log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
             case PDF: {
                 return binaerFil.getInnhold();
@@ -187,7 +187,7 @@ public final class OpprettJournalpostRequestMapper {
                 return convertImageToPdf(binaerFil, filtype).toByteArray();
             }
             default:
-                throw new RuntimeException("Mangler logikk for vedleggstype " + filtype);
+                return binaerFil.getInnhold();
         }
     }
 
@@ -204,14 +204,12 @@ public final class OpprettJournalpostRequestMapper {
             } else {
                 throw new IllegalArgumentException("Ikke implementert støtte for konvertering av filtype " + konverterbarFiltype);
             }
-        } catch (IOException | StackOverflowError e) { // StackOverflowError kan kastes av PDF-konverteringen, f.eks. ved uendelig forsøk på tekstbryting
+        } catch (IOException | StackOverflowError e) {
             throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
                 " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
         }
         return out;
     }
-
-
 
     private static ByteArrayOutputStream convertImageToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -234,7 +232,7 @@ public final class OpprettJournalpostRequestMapper {
             }
             doc.save(baos);
         } catch (IOException e) {
-            throw new RuntimeException("KonverteringPDF: Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
+            throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
                 " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
         }
         return baos;
