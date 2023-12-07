@@ -63,7 +63,7 @@
         <google-errorprone.version>2.11.0</google-errorprone.version>
         <awaitility.version>4.2.0</awaitility.version>
         <pdfbox.version>3.0.0</pdfbox.version>
-        <opensagres.version>2.0.4</opensagres.version>
+        <opensagres.version>2.0.2</opensagres.version>
         <apache-poi.version>4.1.2</apache-poi.version>
         <org.apache.commons.version>1.25.0</org.apache.commons.version>
         <org.apache.pdfbox.version>3.0.1</org.apache.pdfbox.version>
@@ -80,6 +80,16 @@
                 <type>pom</type>
             </dependency>
             <!-- Transitive avhengigheter -->
+            <dependency>
+                <groupId>org.apache.xmlbeans</groupId>
+                <artifactId>xmlbeans</artifactId>
+                <version>3.1.0</version> <!-- or the version you want to use -->
+            </dependency>
+            <dependency>
+                <groupId>fr.opensagres.xdocreport</groupId>
+                <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
+                <version>${opensagres.version}</version>
+            </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>

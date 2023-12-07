@@ -4,6 +4,8 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
+import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -16,6 +18,7 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
@@ -193,33 +196,54 @@ public final class OpprettJournalpostRequestMapper {
         }
     }
 
-    private static ByteArrayOutputStream convertWordToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
-        InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//    private static ByteArrayOutputStream convertWordToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+//        InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
+//        ByteArrayOutputStream out = new ByteArrayOutputStream();
+//
+//        try (
+//            XWPFDocument document = new XWPFDocument(is)
+//        ) {
+//
+//            if (konverterbarFiltype == JournalpostFiltype.DOCX) {
+//                Document pdfDocument = new Document();
+//                PdfWriter.getInstance(pdfDocument, out);
+//                pdfDocument.open();
+//
+//
+//                List<XWPFParagraph> paragraphs = document.getParagraphs();
+//                for (XWPFParagraph paragraph : paragraphs) {
+//                    pdfDocument.add(new Paragraph(paragraph.getText()));
+//                }
+//                pdfDocument.close();
+//            } else {
+//                throw new IllegalArgumentException("Ikke implementert konvertering for filtype: " + konverterbarFiltype);
+//            }
+//        } catch (IOException | DocumentException | StackOverflowError e) {
+//            throw new RuntimeException("KonverteringPDF: Kunne ikke konvertere");
+//        }
+//        return out;
+//    }
 
-        try (
-            XWPFDocument document = new XWPFDocument(is)
-        ) {
+    protected static ByteArrayOutputStream convertWordToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try {
+            InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
 
             if (konverterbarFiltype == JournalpostFiltype.DOCX) {
-                Document pdfDocument = new Document();
-                PdfWriter.getInstance(pdfDocument, out);
-                pdfDocument.open();
-
-
-                List<XWPFParagraph> paragraphs = document.getParagraphs();
-                for (XWPFParagraph paragraph : paragraphs) {
-                    pdfDocument.add(new Paragraph(paragraph.getText()));
-                }
-                pdfDocument.close();
+                ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
+                XWPFDocument document = new XWPFDocument(is);
+                PdfOptions options = PdfOptions.create();
+                PdfConverter.getInstance().convert(document, out, options);
             } else {
-                throw new IllegalArgumentException("Ikke implementert konvertering for filtype: " + konverterbarFiltype);
+                throw new IllegalArgumentException("Ikke implementert støtte for konvertering av filtype " + konverterbarFiltype);
             }
-        } catch (IOException | DocumentException | StackOverflowError e) {
-            throw new RuntimeException("KonverteringPDF: Kunne ikke konvertere");
+        } catch (IOException | StackOverflowError e) { // StackOverflowError kan kastes av PDF-konverteringen, f.eks. ved uendelig forsøk på tekstbryting
+            throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
+                " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
         }
         return out;
     }
+
 
 
     private static ByteArrayOutputStream convertImageToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
