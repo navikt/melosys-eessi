@@ -64,7 +64,7 @@
         <awaitility.version>4.2.0</awaitility.version>
         <pdfbox.version>3.0.0</pdfbox.version>
         <opensagres.version>2.0.4</opensagres.version>
-        <apache-poi.version>5.2.0</apache-poi.version>
+        <apache-poi.version>5.2.3</apache-poi.version>
         <org.apache.commons.version>1.25.0</org.apache.commons.version>
         <org.apache.pdfbox.version>3.0.1</org.apache.pdfbox.version>
     </properties>

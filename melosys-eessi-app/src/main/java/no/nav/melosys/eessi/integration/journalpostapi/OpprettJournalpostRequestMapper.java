@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
-import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -194,26 +193,27 @@ public final class OpprettJournalpostRequestMapper {
 
     private static ByteArrayOutputStream convertWordToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        log.info("KonverteringPDF: Konverterer start convertWordToPdf");
-        try {
-            InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
-            log.info("KonverteringPDF: inputstream ferdig");
+        log.info("KonverteringPDF: Conversion started in convertWordToPdf");
+        try (InputStream is = new ByteArrayInputStream(binaerFil.getInnhold())) {
+            log.info("KonverteringPDF: InputStream ready");
 
             if (konverterbarFiltype == JournalpostFiltype.DOCX) {
                 ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
+                log.info("KonverteringPDF: sjekker inputstream {}", is);
                 XWPFDocument document = new XWPFDocument(is);
+                log.info("KonverteringPDF: inputstream over");
                 PdfOptions options = PdfOptions.create();
                 PdfConverter.getInstance().convert(document, out, options);
-                log.info("KonverteringPDF: convert ferdig");
-            } else {
-                throw new IllegalArgumentException("KonverteringPDF: Ikke implementert støtte for konvertering av filtype " + konverterbarFiltype);
-            }
-        } catch (IOException | StackOverflowError e) { // StackOverflowError kan kastes av PDF-konverteringen, f.eks. ved uendelig forsøk på tekstbryting
-            throw new RuntimeException("KonverteringPDF: Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
-                " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
-        }
-        log.info("KonverteringPDF: out er {}", out);
 
+                log.info("KonverteringPDF: Conversion completed");
+            } else {
+                throw new IllegalArgumentException("KonverteringPDF: Conversion not implemented for file type " + konverterbarFiltype);
+            }
+        } catch (IOException | StackOverflowError e) {
+            throw new RuntimeException("KonverteringPDF: Could not convert attachment " + binaerFil.getFilnavn() +
+                " with MIME-type " + binaerFil.getMimeType() + " to PDF", e);
+        }
+        log.info("KonverteringPDF: Output stream is {}", out);
         return out;
     }
 
