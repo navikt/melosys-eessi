@@ -197,11 +197,9 @@ public final class OpprettJournalpostRequestMapper {
         InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        log.info("KonverteringPDF: Conversion started in convertWordToPdf");
         try (
             XWPFDocument document = new XWPFDocument(is)
         ) {
-            log.info("KonverteringPDF: InputStream ready");
 
             if (konverterbarFiltype == JournalpostFiltype.DOCX) {
                 Document pdfDocument = new Document();
@@ -214,16 +212,12 @@ public final class OpprettJournalpostRequestMapper {
                     pdfDocument.add(new Paragraph(paragraph.getText()));
                 }
                 pdfDocument.close();
-
-                log.info("KonverteringPDF: Conversion completed");
             } else {
-                throw new IllegalArgumentException("KonverteringPDF: Conversion not implemented for file type " + konverterbarFiltype);
+                throw new IllegalArgumentException("Ikke implementert konvertering for filtype: " + konverterbarFiltype);
             }
         } catch (IOException | DocumentException | StackOverflowError e) {
-            throw new RuntimeException("KonverteringPDF: Could not convert attachment " + binaerFil.getFilnavn() +
-                " with MIME-type " + binaerFil.getMimeType() + " to PDF", e);
+            throw new RuntimeException("KonverteringPDF: Kunne ikke konvertere");
         }
-        log.info("KonverteringPDF: Output stream is {}", out);
         return out;
     }
 
