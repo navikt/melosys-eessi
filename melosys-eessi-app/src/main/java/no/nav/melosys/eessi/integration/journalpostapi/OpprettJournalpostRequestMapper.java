@@ -136,7 +136,6 @@ public final class OpprettJournalpostRequestMapper {
                                           final List<SedMedVedlegg.BinaerFil> vedleggListe,
                                           final Boolean skalKonvertereTilPDF) {
 
-        log.info("KonverteringPDF: toggle er {}", skalKonvertereTilPDF);
         return vedleggListe.stream()
             .map(binærfil -> {
                 JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn(), skalKonvertereTilPDF).orElseThrow(() -> new MappingException("Filtype kreves for "
@@ -161,18 +160,6 @@ public final class OpprettJournalpostRequestMapper {
         return temaForSedType(sedType);
     }
 
-    private static final Predicate<SedMedVedlegg.BinaerFil> gyldigFiltypePredicate = binaerFil -> {
-        final boolean gyldigFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn(), false)
-            .map(JournalpostFiltype::erGyldigFiltypeForVariantformatArkiv)
-            .orElse(Boolean.FALSE);
-
-        if (!gyldigFiltype) {
-            log.error("Et vedlegg av en SED har filtype som ikke støttes. "
-                + "Dette vedlegget kan ikke journalføres. Filnavn: {}", binaerFil.getFilnavn());
-        }
-        return gyldigFiltype;
-    };
-
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
         log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
@@ -180,18 +167,18 @@ public final class OpprettJournalpostRequestMapper {
                 return binaerFil.getInnhold();
             }
             case DOCX: {
-                return convertWordToPdf(binaerFil, filtype).toByteArray();
+                return konverterWordTilPdf(binaerFil, filtype).toByteArray();
             }
             case TIFF:
             case JPEG: {
-                return convertImageToPdf(binaerFil, filtype).toByteArray();
+                return konverterBildeTilPdf(binaerFil, filtype).toByteArray();
             }
             default:
                 return binaerFil.getInnhold();
         }
     }
 
-    protected static ByteArrayOutputStream convertWordToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+    protected static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
@@ -211,7 +198,7 @@ public final class OpprettJournalpostRequestMapper {
         return out;
     }
 
-    private static ByteArrayOutputStream convertImageToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
+    private static ByteArrayOutputStream konverterBildeTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PDDocument doc = new PDDocument()) {
             InputStream in = new ByteArrayInputStream(binaerFil.getInnhold());
