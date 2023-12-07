@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +20,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -192,18 +197,26 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static ByteArrayOutputStream convertWordToPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+        InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         log.info("KonverteringPDF: Conversion started in convertWordToPdf");
-        try (InputStream is = new ByteArrayInputStream(binaerFil.getInnhold())) {
+        try (
+            XWPFDocument document = new XWPFDocument(is);
+        ) {
             log.info("KonverteringPDF: InputStream ready");
 
             if (konverterbarFiltype == JournalpostFiltype.DOCX) {
-                ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
-                log.info("KonverteringPDF: sjekker inputstream {}", is);
-                XWPFDocument document = new XWPFDocument(is);
-                log.info("KonverteringPDF: inputstream over");
-                PdfOptions options = PdfOptions.create();
-                PdfConverter.getInstance().convert(document, out, options);
+                Document pdfDocument = new Document();
+                PdfWriter.getInstance(pdfDocument, out);
+                pdfDocument.open();
+
+
+                List<XWPFParagraph> paragraphs = document.getParagraphs();
+                for (XWPFParagraph paragraph : paragraphs) {
+                    pdfDocument.add(new Paragraph(paragraph.getText()));
+                }
+                pdfDocument.close();
 
                 log.info("KonverteringPDF: Conversion completed");
             } else {
@@ -212,6 +225,8 @@ public final class OpprettJournalpostRequestMapper {
         } catch (IOException | StackOverflowError e) {
             throw new RuntimeException("KonverteringPDF: Could not convert attachment " + binaerFil.getFilnavn() +
                 " with MIME-type " + binaerFil.getMimeType() + " to PDF", e);
+        } catch (DocumentException e) {
+            throw new RuntimeException(e);
         }
         log.info("KonverteringPDF: Output stream is {}", out);
         return out;
