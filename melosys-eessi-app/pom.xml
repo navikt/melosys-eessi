@@ -30,10 +30,13 @@
             <artifactId>poi-scratchpad</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>fr.opensagres.xdocreport</groupId>
