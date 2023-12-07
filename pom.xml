@@ -22,7 +22,7 @@
 
     <properties>
         <bekk-nocommons.version>0.12.0</bekk-nocommons.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <commons-io.version>2.15.0</commons-io.version>
         <guava.version>32.0.0-jre</guava.version>
         <hibernate-types.version>2.14.0</hibernate-types.version>
         <java.version>17</java.version>
@@ -64,10 +64,11 @@
         <awaitility.version>4.2.0</awaitility.version>
         <pdfbox.version>3.0.0</pdfbox.version>
         <opensagres.version>2.0.4</opensagres.version>
-        <apache-poi.version>5.2.0</apache-poi.version>
+        <apache-poi.version>5.2.5</apache-poi.version>
         <org.apache.commons.version>1.25.0</org.apache.commons.version>
         <org.apache.pdfbox.version>3.0.1</org.apache.pdfbox.version>
         <com.itextpdf.version>5.5.10</com.itextpdf.version>
+        <org.apache.commons.version>1.25.0</org.apache.commons.version>
     </properties>
 
     <dependencyManagement>
@@ -80,6 +81,11 @@
                 <type>pom</type>
             </dependency>
             <!-- Transitive avhengigheter -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${org.apache.commons.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.itextpdf</groupId>
                 <artifactId>itextpdf</artifactId>
@@ -125,17 +131,6 @@
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
                 <version>${pdfbox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>fr.opensagres.xdocreport</groupId>
-                <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
-                <version>${opensagres.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-utils</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>

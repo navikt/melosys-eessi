@@ -1,11 +1,9 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Paragraph;
-import com.lowagie.text.pdf.PdfWriter;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -18,7 +16,6 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 
@@ -222,11 +219,9 @@ public final class OpprettJournalpostRequestMapper {
             } else {
                 throw new IllegalArgumentException("KonverteringPDF: Conversion not implemented for file type " + konverterbarFiltype);
             }
-        } catch (IOException | StackOverflowError e) {
+        } catch (IOException | DocumentException | StackOverflowError e) {
             throw new RuntimeException("KonverteringPDF: Could not convert attachment " + binaerFil.getFilnavn() +
                 " with MIME-type " + binaerFil.getMimeType() + " to PDF", e);
-        } catch (DocumentException e) {
-            throw new RuntimeException(e);
         }
         log.info("KonverteringPDF: Output stream is {}", out);
         return out;
