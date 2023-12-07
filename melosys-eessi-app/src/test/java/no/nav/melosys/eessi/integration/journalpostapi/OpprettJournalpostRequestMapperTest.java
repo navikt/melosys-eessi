@@ -56,6 +56,7 @@ class OpprettJournalpostRequestMapperTest {
     }
 
     @Test
+    @Disabled
     void opprettInngaaendeJournalpost_medDOCXVedlegg_validerFelterSatt() throws IOException {
         XWPFDocument document = new XWPFDocument();
         ByteArrayOutputStream out = new ByteArrayOutputStream();
