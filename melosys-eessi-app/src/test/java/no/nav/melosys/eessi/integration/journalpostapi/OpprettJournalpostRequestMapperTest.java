@@ -57,52 +57,6 @@ class OpprettJournalpostRequestMapperTest {
 
     @Test
     @Disabled
-    void opprettInngaaendeJournalpost_medDOCXVedlegg_validerFelterSatt() throws IOException {
-        XWPFDocument document = new XWPFDocument();
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        document.createStyles();
-        XWPFParagraph paragraph = document.createParagraph();
-        XWPFRun run = paragraph.createRun();
-        run.setText("Hello, this is a simple DOCX file.");
-        document.write(out);
-        byte[] bytes = out.toByteArray();
-        out.close();
-
-        final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.docx", "DOCX", bytes);
-        final var sedHendelse = sedHendelse();
-        final var dokkatSedInfo = new DokkatSedInfo();
-        dokkatSedInfo.setDokumentTittel("titteipådeg");
-
-        OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
-            sedHendelse,
-            sedMedVedlegg(List.of(vedlegg)),
-            null,
-            dokkatSedInfo.getDokumentTittel(),
-            dokkatSedInfo.getBehandlingstema(),
-            ident,
-            true
-        );
-
-        assertThat(request.getDokumenter()).hasSize(2)
-            .flatExtracting(OpprettJournalpostRequest.Dokument::getTittel)
-            .containsExactly(dokkatSedInfo.getDokumentTittel(), vedlegg.getFilnavn());
-
-        assertThat(request).extracting(
-            OpprettJournalpostRequest::getKanal,
-            OpprettJournalpostRequest::getJournalpostType,
-            OpprettJournalpostRequest::getTema,
-            OpprettJournalpostRequest::getEksternReferanseId
-        ).containsExactly(
-            "EESSI",
-            OpprettJournalpostRequest.JournalpostType.INNGAAENDE,
-            "UFM",
-            sedHendelse.getSedId()
-        );
-    }
-
-
-    @Test
-    @Disabled
     void opprettUtgaaendeJournalpost_medJPGVedlegg_vedleggSettesIkke() {
         final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.jpeg", null, new byte[0]);
         final var sedHendelse = sedHendelse();
