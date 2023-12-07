@@ -199,7 +199,7 @@ public final class OpprettJournalpostRequestMapper {
 
         log.info("KonverteringPDF: Conversion started in convertWordToPdf");
         try (
-            XWPFDocument document = new XWPFDocument(is);
+            XWPFDocument document = new XWPFDocument(is)
         ) {
             log.info("KonverteringPDF: InputStream ready");
 
