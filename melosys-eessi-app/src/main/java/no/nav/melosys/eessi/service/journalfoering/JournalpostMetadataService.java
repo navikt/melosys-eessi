@@ -1,30 +1,15 @@
 package no.nav.melosys.eessi.service.journalfoering;
 
-import java.util.Arrays;
-import java.util.Objects;
-
-import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.SedType;
 import org.springframework.stereotype.Component;
 
-@Slf4j
 @Component
 public class JournalpostMetadataService {
     private static final String UTLAND = "ab0313";
     private static final String MEDLEMSKAP = "ab0269";
-    private final Unleash unleash;
-
-    public JournalpostMetadataService(Unleash unleash) {
-        this.unleash = unleash;
-    }
 
     public JournalpostMetadata hentJournalpostMetadata(String sedType) {
-        if (!unleash.isEnabled("melosys.eessi.erstatte_dokkat") && Arrays.stream(SedType.values()).noneMatch(s -> Objects.equals(s.name(), sedType))) {
-            log.error("SedType {} er ikke støttet. Dersom vi skal støtte denne må den legges inn.", sedType);
-            return new JournalpostMetadata("", "");
-        }
-
         return switch (SedType.valueOf(sedType)) {
             case X001 -> new JournalpostMetadata("Anmodning om avslutning", UTLAND);
             case X002 -> new JournalpostMetadata("Anmodning om gjenåpning av avsluttet sak", UTLAND);

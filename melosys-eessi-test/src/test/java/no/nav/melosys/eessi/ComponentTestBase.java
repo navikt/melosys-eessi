@@ -13,9 +13,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import io.getunleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
-import no.nav.melosys.eessi.integration.dokkat.DokumenttypeIdConsumer;
-import no.nav.melosys.eessi.integration.dokkat.DokumenttypeInfoConsumer;
-import no.nav.melosys.eessi.integration.dokkat.dto.DokumenttypeIdDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
@@ -87,12 +84,6 @@ public abstract class ComponentTestBase {
     SakConsumer sakConsumer;
 
     @MockBean
-    DokumenttypeIdConsumer dokumenttypeIdConsumer;
-
-    @MockBean
-    DokumenttypeInfoConsumer dokumenttypeInfoConsumer;
-
-    @MockBean
     JournalpostapiConsumer journalpostapiConsumer;
 
     @MockBean
@@ -126,8 +117,6 @@ public abstract class ComponentTestBase {
         unleash.enableAll();
         when(euxConsumer.hentBUC(anyString())).thenReturn(mockData.buc("rinadokumentid"));
         when(euxConsumer.hentSedMedVedlegg(anyString(), anyString())).thenReturn(mockData.sedMedVedlegg());
-        when(dokumenttypeIdConsumer.hentDokumenttypeId(anyString(), anyString())).thenReturn(new DokumenttypeIdDto("dokumenttypeId"));
-        when(dokumenttypeInfoConsumer.hentDokumenttypeInfo(anyString())).thenReturn(mockData.dokumentTypeInfoDto());
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean()))
             .thenAnswer(a -> mockData.journalpostResponse(a.getArgument(1, Boolean.class)));
     }
