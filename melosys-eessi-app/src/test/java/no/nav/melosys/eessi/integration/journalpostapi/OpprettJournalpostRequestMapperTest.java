@@ -1,11 +1,10 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.util.List;
+
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import no.nav.melosys.eessi.service.dokkat.DokkatSedInfo;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,21 +16,19 @@ class OpprettJournalpostRequestMapperTest {
     void opprettInngaaendeJournalpost_medPdfVedlegg_validerFelterSatt() {
         final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.pdf", null, new byte[0]);
         final var sedHendelse = sedHendelse();
-        final var dokkatSedInfo = new DokkatSedInfo();
-        dokkatSedInfo.setDokumentTittel("titteipådeg");
 
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
             sedHendelse,
             sedMedVedlegg(List.of(vedlegg)),
             null,
-            dokkatSedInfo.getDokumentTittel(),
-            dokkatSedInfo.getBehandlingstema(),
+            "dokumenttittel",
+            "behandlingstema",
             ident
         );
 
         assertThat(request.getDokumenter()).hasSize(2)
             .flatExtracting(OpprettJournalpostRequest.Dokument::getTittel)
-            .containsExactly(dokkatSedInfo.getDokumentTittel(), vedlegg.getFilnavn());
+            .containsExactly("dokumenttittel", vedlegg.getFilnavn());
 
         assertThat(request).extracting(
             OpprettJournalpostRequest::getKanal,
@@ -50,21 +47,19 @@ class OpprettJournalpostRequestMapperTest {
     void opprettUtgaaendeJournalpost_medJPGVedlegg_vedleggSettesIkke() {
         final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.jpeg", null, new byte[0]);
         final var sedHendelse = sedHendelse();
-        final var dokkatSedInfo = new DokkatSedInfo();
-        dokkatSedInfo.setDokumentTittel("titteipådeg");
 
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
             sedHendelse,
             sedMedVedlegg(List.of(vedlegg)),
             null,
-            dokkatSedInfo.getDokumentTittel(),
-            dokkatSedInfo.getBehandlingstema(),
+            "dokumenttittel",
+            "behandlingstema",
             ident
         );
 
         assertThat(request.getDokumenter()).hasSize(1)
             .flatExtracting(OpprettJournalpostRequest.Dokument::getTittel)
-            .containsExactly(dokkatSedInfo.getDokumentTittel());
+            .containsExactly("dokumenttittel");
 
         assertThat(request).extracting(
             OpprettJournalpostRequest::getKanal,
