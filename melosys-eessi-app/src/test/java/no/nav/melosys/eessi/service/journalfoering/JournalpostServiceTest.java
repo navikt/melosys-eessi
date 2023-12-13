@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getunleash.FakeUnleash;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
@@ -42,11 +43,14 @@ class JournalpostServiceTest {
     private SedHendelse sedHendelse;
     private Sak sak;
     private ObjectMapper objectMapper;
+    private final FakeUnleash fakeUnleash = new FakeUnleash();
+
     private static final String JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}";
+
 
     @BeforeEach
     public void setUp() {
-        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer);
+        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer, fakeUnleash);
 
         sedHendelse = random.nextObject(SedHendelse.class);
         sak = random.nextObject(Sak.class);

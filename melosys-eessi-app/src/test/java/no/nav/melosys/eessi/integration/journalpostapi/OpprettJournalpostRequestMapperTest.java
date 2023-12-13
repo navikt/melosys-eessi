@@ -23,7 +23,8 @@ class OpprettJournalpostRequestMapperTest {
             null,
             "dokumenttittel",
             "behandlingstema",
-            ident
+            ident,
+            false
         );
 
         assertThat(request.getDokumenter()).hasSize(2)
@@ -54,7 +55,8 @@ class OpprettJournalpostRequestMapperTest {
             null,
             "dokumenttittel",
             "behandlingstema",
-            ident
+            ident,
+            false
         );
 
         assertThat(request.getDokumenter()).hasSize(1)
