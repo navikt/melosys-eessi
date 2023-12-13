@@ -4,6 +4,7 @@ import java.util.List;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,38 +41,6 @@ class OpprettJournalpostRequestMapperTest {
             "EESSI",
             OpprettJournalpostRequest.JournalpostType.INNGAAENDE,
             "UFM",
-            sedHendelse.getSedId()
-        );
-    }
-
-    @Test
-    void opprettUtgaaendeJournalpost_medJPGVedlegg_vedleggSettesIkke() {
-        final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.jpeg", null, new byte[0]);
-        final var sedHendelse = sedHendelse();
-
-        OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
-            sedHendelse,
-            sedMedVedlegg(List.of(vedlegg)),
-            null,
-            "dokumenttittel",
-            "behandlingstema",
-            ident,
-            false
-        );
-
-        assertThat(request.getDokumenter()).hasSize(1)
-            .flatExtracting(OpprettJournalpostRequest.Dokument::getTittel)
-            .containsExactly("dokumenttittel");
-
-        assertThat(request).extracting(
-            OpprettJournalpostRequest::getKanal,
-            OpprettJournalpostRequest::getJournalpostType,
-            OpprettJournalpostRequest::getTema,
-            OpprettJournalpostRequest::getEksternReferanseId
-        ).containsExactly(
-            "EESSI",
-            OpprettJournalpostRequest.JournalpostType.UTGAAENDE,
-            "MED",
             sedHendelse.getSedId()
         );
     }

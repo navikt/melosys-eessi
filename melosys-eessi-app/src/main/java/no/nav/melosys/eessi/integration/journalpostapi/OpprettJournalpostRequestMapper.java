@@ -137,9 +137,8 @@ public final class OpprettJournalpostRequestMapper {
                                           final Boolean skalKonvertereTilPDF) {
 
         return vedleggListe.stream()
-            .filter(gyldigFiltypePredicate)
             .map(binærfil -> {
-                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
+                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn(), skalKonvertereTilPDF).orElseThrow(() -> new MappingException("Filtype kreves for "
                     + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
 
                 return dokument(sedType,
@@ -150,18 +149,6 @@ public final class OpprettJournalpostRequestMapper {
             )
             .collect(Collectors.toList());
     }
-
-    private static final Predicate<SedMedVedlegg.BinaerFil> gyldigFiltypePredicate = (binaerFil) -> {
-        final boolean gyldigFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn())
-            .map(JournalpostFiltype::erGyldigFiltypeForVariantformatArkiv)
-            .orElse(Boolean.FALSE);
-
-        if (!gyldigFiltype) {
-            log.error("Et vedlegg av en SED har filtype som ikke støttes. "
-                + "Dette vedlegget kan ikke journalføres. Filnavn: {}", binaerFil.getFilnavn());
-        }
-        return gyldigFiltype;
-    };
 
     private static String temaForSedTypeOgJournalpostType(final String sedType,
                                                           final JournalpostType journalpostType) {

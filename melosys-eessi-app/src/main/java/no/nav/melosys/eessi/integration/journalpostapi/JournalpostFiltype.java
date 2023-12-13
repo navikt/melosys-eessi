@@ -44,9 +44,13 @@ public enum JournalpostFiltype {
 
 
 
-    public static Optional<JournalpostFiltype> fraMimeOgFilnavn(String mimeType, String filnavn) {
-        if (MIMETYPE_FILTYPE_MAP_NY.containsKey(mimeType)) {
+    public static Optional<JournalpostFiltype> fraMimeOgFilnavn(String mimeType, String filnavn, Boolean skalKonvertereTilPDF ) {
+        if (skalKonvertereTilPDF && MIMETYPE_FILTYPE_MAP_NY.containsKey(mimeType)) {
             return Optional.of(MIMETYPE_FILTYPE_MAP_NY.get(mimeType));
+        }
+
+        if (MIMETYPE_FILTYPE_MAP.containsKey(mimeType)) {
+          return Optional.of(MIMETYPE_FILTYPE_MAP.get(mimeType));
         }
 
         return Optional.ofNullable(filnavn)
