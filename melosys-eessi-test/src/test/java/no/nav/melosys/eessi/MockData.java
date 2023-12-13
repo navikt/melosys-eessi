@@ -8,7 +8,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import no.nav.melosys.eessi.integration.dokkat.dto.DokumentTypeInfoDto;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -25,16 +24,6 @@ import static no.nav.melosys.eessi.models.SedType.A003;
 
 public class MockData {
     public MockData() {
-    }
-
-    DokumentTypeInfoDto dokumentTypeInfoDto() {
-        DokumentTypeInfoDto dokumentTypeInfoDto = new DokumentTypeInfoDto();
-        dokumentTypeInfoDto.setDokumentKategori("dokumentKategori");
-        dokumentTypeInfoDto.setDokumentTittel("dokumentTittel");
-        dokumentTypeInfoDto.setDokumenttypeId("dokumenttypeId");
-        dokumentTypeInfoDto.setBehandlingstema("behandlingstema");
-        dokumentTypeInfoDto.setTema("tema");
-        return dokumentTypeInfoDto;
     }
 
     SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident) {

@@ -69,10 +69,6 @@ melosys:
     saf-url: ${SAF_URL}
     pdl-url: ${PDL_URL}
     pdl-web-url: ${PDL_WEB_URL}
-
-    dokkat:
-      typeid-url: ${DOKKATTYPEID_URL}
-      typeinfo-url: ${DOKKATTYPEINFO_URL}
     gsak:
       sak-url: ${SAK_URL}
       oppgave-url: ${OPPGAVE_URL}
