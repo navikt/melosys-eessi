@@ -27,7 +27,7 @@ class JournalpostFiltypeTest {
     void filnavn_filnavnErTomt_forventOptionalEmpty() {
         String filnavn = "abc_234gf_T43T_re4";
         String mimeType = null;
-        Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn);
+        Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn, false);
         assertThat(journalpostFiltype).isNotPresent();
     }
 
@@ -35,12 +35,12 @@ class JournalpostFiltypeTest {
     void filnavn_filnavnErNullMimetypePdf_forventPDFA() {
         String filnavn = "abc_234gf_T43T_re4";
         String mimeType = "application/pdf";
-        Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn);
+        Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn, false);
         assertThat(journalpostFiltype).contains(JournalpostFiltype.PDF);
     }
 
     private void assertFiltype(String filnavn, String mimeType, JournalpostFiltype forventetFiltype) {
-        Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn);
+        Optional<JournalpostFiltype> journalpostFiltype = JournalpostFiltype.fraMimeOgFilnavn(mimeType, filnavn, false);
         assertThat(journalpostFiltype).contains(forventetFiltype);
     }
 }
