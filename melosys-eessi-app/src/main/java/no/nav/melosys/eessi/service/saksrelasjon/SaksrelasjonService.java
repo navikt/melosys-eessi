@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -14,6 +15,7 @@ import no.nav.melosys.eessi.service.sak.ArkivsakService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class SaksrelasjonService {
@@ -38,6 +40,7 @@ public class SaksrelasjonService {
     }
 
     private void oppdaterEllerLagreIEuxCaseStore(Long gsakSaksnummer, String rinaSaksnummer) {
+        log.info("Oppdaterer eller lagrer i casestire for gsaknummer: {} og rinaSaksnummer {}", gsakSaksnummer, rinaSaksnummer);
         caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer)
             .stream()
             .findFirst()
@@ -81,6 +84,7 @@ public class SaksrelasjonService {
             .map(FagsakRinasakKobling::getGsakSaksnummer);
 
         if (saksnummer.isEmpty()) {
+            log.info("Saksnummer er tomt - henter fra casestore for rinsaksnummer {}", rinaSaksnummer);
             saksnummer = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer).stream()
                 .findFirst().map(CaseStoreDto::getFagsaknummer).map(Long::parseLong);
         }
