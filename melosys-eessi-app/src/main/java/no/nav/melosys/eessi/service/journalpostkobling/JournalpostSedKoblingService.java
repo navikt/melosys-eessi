@@ -73,9 +73,12 @@ public class JournalpostSedKoblingService {
 
     private Optional<String> søkEtterRinaSaksnummerForJournalpost(String journalpostID) {
         Optional<String> rinaSaksnummer = safConsumer.hentRinasakForJournalpost(journalpostID);
+        if (rinaSaksnummer.isEmpty()) {
+            log.info("Rinasaksnummer er null fra saf for journalpostId: {}", journalpostID);
+        }
 
         return rinaSaksnummer.isPresent() ? rinaSaksnummer : caseStoreConsumer.finnVedJournalpostID(journalpostID)
-                .stream().findFirst().map(CaseStoreDto::getRinaSaksnummer);
+            .stream().findFirst().map(CaseStoreDto::getRinaSaksnummer);
     }
 
     private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling) {
