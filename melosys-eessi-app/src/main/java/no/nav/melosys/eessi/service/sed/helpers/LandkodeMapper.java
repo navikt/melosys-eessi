@@ -25,6 +25,7 @@ public final class LandkodeMapper {
     static {
         Arrays.stream(Locale.getISOCountries()).forEach(c -> ISO3_TIL_ISO2_LANDKODER_MAP.put(new Locale("", c).getISO3Country(), c));
         ISO3_TIL_ISO2_LANDKODER_MAP.put("XXX", "XS");
+        ISO3_TIL_ISO2_LANDKODER_MAP.put(UKJENT_LANDKODE_ISO3, UKJENT_LANDKODE_ISO2);
     }
 
     public static String mapTilLandkodeIso2(String landkodeIso3) {
