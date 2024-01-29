@@ -161,7 +161,7 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
-        log.info("Konverter fra {} til PDF", filtype);
+        if(filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
             case PDF: {
                 return binaerFil.getInnhold();
