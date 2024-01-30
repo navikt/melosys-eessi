@@ -24,9 +24,8 @@ public class JournalpostService {
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                             SedMedVedlegg sedMedVedlegg, String personIdent) {
         var journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.getSedType());
-        boolean skalKonvertereTilPDF = unleash.isEnabled("melosys.vedlegg_pdf");
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
-            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent, skalKonvertereTilPDF);
+            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent);
         try {
             return opprettJournalpost(request, false);
         } catch (SedAlleredeJournalførtException e) {
@@ -37,9 +36,8 @@ public class JournalpostService {
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                            SedMedVedlegg sedMedVedlegg, String personIdent) {
         var journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.getSedType());
-        boolean skalKonvertereTilPDF = unleash.isEnabled("melosys.vedlegg_pdf");
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
-            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent, skalKonvertereTilPDF);
+            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent);
         return opprettJournalpost(request, true);
     }
 
