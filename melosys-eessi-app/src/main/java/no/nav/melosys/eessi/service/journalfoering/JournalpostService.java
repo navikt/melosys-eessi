@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.journalfoering;
 
-import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.journalpostapi.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -13,12 +12,10 @@ import org.springframework.stereotype.Service;
 public class JournalpostService {
     private final JournalpostMetadataService journalpostMetadataService;
     private final JournalpostapiConsumer journalpostapiConsumer;
-    private final Unleash unleash;
 
-    public JournalpostService(JournalpostMetadataService journalpostMetadataService, JournalpostapiConsumer journalpostapiConsumer, Unleash unleash) {
+    public JournalpostService(JournalpostMetadataService journalpostMetadataService, JournalpostapiConsumer journalpostapiConsumer) {
         this.journalpostMetadataService = journalpostMetadataService;
         this.journalpostapiConsumer = journalpostapiConsumer;
-        this.unleash = unleash;
     }
 
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,

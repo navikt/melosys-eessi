@@ -50,7 +50,7 @@ class JournalpostServiceTest {
 
     @BeforeEach
     public void setUp() {
-        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer, fakeUnleash);
+        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer);
 
         sedHendelse = random.nextObject(SedHendelse.class);
         sak = random.nextObject(Sak.class);
