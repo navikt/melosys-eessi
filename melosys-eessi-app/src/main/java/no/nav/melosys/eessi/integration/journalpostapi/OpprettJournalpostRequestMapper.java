@@ -46,9 +46,8 @@ public final class OpprettJournalpostRequestMapper {
                                                                          final Sak sak,
                                                                          final String dokumentTittel,
                                                                          final String behandlingstema,
-                                                                         final String personIdent,
-                                                                         final Boolean skalKonvertereTilPDF) {
-        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent, skalKonvertereTilPDF);
+                                                                         final String personIdent) {
+        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent);
     }
 
     public static OpprettJournalpostRequest opprettUtgaaendeJournalpost(final SedHendelse sedHendelse,
@@ -56,9 +55,8 @@ public final class OpprettJournalpostRequestMapper {
                                                                         final Sak sak,
                                                                         final String dokumentTittel,
                                                                         final String behandlingstema,
-                                                                        final String personIdent,
-                                                                        final Boolean skalKonvertereTilPDF) {
-        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent, skalKonvertereTilPDF);
+                                                                        final String personIdent) {
+        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent);
     }
 
 
@@ -68,14 +66,13 @@ public final class OpprettJournalpostRequestMapper {
                                                                        final Sak sak,
                                                                        final String dokumentTittel,
                                                                        final String behandlingstema,
-                                                                       final String personIdent,
-                                                                       final Boolean skalKonvertereTilPDF) {
+                                                                       final String personIdent) {
 
         return OpprettJournalpostRequest.builder()
             .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
             .behandlingstema(behandlingstema)
             .bruker(isNotEmpty(personIdent) ? lagBruker(personIdent) : null)
-            .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokumentTittel, skalKonvertereTilPDF))
+            .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokumentTittel))
             .eksternReferanseId(sedHendelse.getSedId())
             .journalfoerendeEnhet("4530")
             .journalpostType(journalpostType)
@@ -108,12 +105,11 @@ public final class OpprettJournalpostRequestMapper {
 
     private static List<Dokument> dokumenter(final String sedType,
                                              final SedMedVedlegg sedMedVedlegg,
-                                             final String dokumentTittel,
-                                             final Boolean skalKonvertereTilPDF) {
+                                             final String dokumentTittel) {
         final List<Dokument> dokumenter = new ArrayList<>();
 
         dokumenter.add(dokument(sedType, dokumentTittel, JournalpostFiltype.PDFA, sedMedVedlegg.getSed().getInnhold()));
-        dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe(), skalKonvertereTilPDF));
+        dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe()));
         return dokumenter;
     }
 
@@ -133,18 +129,17 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static List<Dokument> vedlegg(final String sedType,
-                                          final List<SedMedVedlegg.BinaerFil> vedleggListe,
-                                          final Boolean skalKonvertereTilPDF) {
+                                          final List<SedMedVedlegg.BinaerFil> vedleggListe) {
 
         return vedleggListe.stream()
             .map(binærfil -> {
-                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn(), skalKonvertereTilPDF).orElseThrow(() -> new MappingException("Filtype kreves for "
+                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
                     + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
 
                 return dokument(sedType,
                     isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn(),
-                    skalKonvertereTilPDF ? PDF : opprinneligFiltype,
-                    skalKonvertereTilPDF ? getPdfByteArray(binærfil, opprinneligFiltype) : binærfil.getInnhold());
+                    PDF,
+                    getPdfByteArray(binærfil, opprinneligFiltype));
                 }
             )
             .collect(Collectors.toList());

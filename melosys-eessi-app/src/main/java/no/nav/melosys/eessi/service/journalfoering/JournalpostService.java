@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.journalfoering;
 
-import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.journalpostapi.*;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -13,20 +12,17 @@ import org.springframework.stereotype.Service;
 public class JournalpostService {
     private final JournalpostMetadataService journalpostMetadataService;
     private final JournalpostapiConsumer journalpostapiConsumer;
-    private final Unleash unleash;
 
-    public JournalpostService(JournalpostMetadataService journalpostMetadataService, JournalpostapiConsumer journalpostapiConsumer, Unleash unleash) {
+    public JournalpostService(JournalpostMetadataService journalpostMetadataService, JournalpostapiConsumer journalpostapiConsumer) {
         this.journalpostMetadataService = journalpostMetadataService;
         this.journalpostapiConsumer = journalpostapiConsumer;
-        this.unleash = unleash;
     }
 
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                             SedMedVedlegg sedMedVedlegg, String personIdent) {
         var journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.getSedType());
-        boolean skalKonvertereTilPDF = unleash.isEnabled("melosys.vedlegg_pdf");
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
-            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent, skalKonvertereTilPDF);
+            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent);
         try {
             return opprettJournalpost(request, false);
         } catch (SedAlleredeJournalførtException e) {
@@ -37,9 +33,8 @@ public class JournalpostService {
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                            SedMedVedlegg sedMedVedlegg, String personIdent) {
         var journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.getSedType());
-        boolean skalKonvertereTilPDF = unleash.isEnabled("melosys.vedlegg_pdf");
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
-            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent, skalKonvertereTilPDF);
+            sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema(), personIdent);
         return opprettJournalpost(request, true);
     }
 
