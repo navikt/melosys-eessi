@@ -1,7 +1,17 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
-import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -14,23 +24,12 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-import org.apache.poi.openxml4j.util.ZipSecureFile;
-import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.docx4j.Docx4J;
+import org.docx4j.fonts.BestMatchingMapper;
+import org.docx4j.fonts.Mapper;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.*;
+import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.PDF;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -38,7 +37,6 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Slf4j
 public final class OpprettJournalpostRequestMapper {
-    public static final double MIN_INFLATE_RATIO = 0.001;
     public static final float PDF_MARGIN = 20.0f;
 
     public static OpprettJournalpostRequest opprettInngaaendeJournalpost(final SedHendelse sedHendelse,
@@ -133,13 +131,13 @@ public final class OpprettJournalpostRequestMapper {
 
         return vedleggListe.stream()
             .map(binærfil -> {
-                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
-                    + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
+                    JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
+                        + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
 
-                return dokument(sedType,
-                    isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn(),
-                    PDF,
-                    getPdfByteArray(binærfil, opprinneligFiltype));
+                    return dokument(sedType,
+                        isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn(),
+                        PDF,
+                        getPdfByteArray(binærfil, opprinneligFiltype));
                 }
             )
             .collect(Collectors.toList());
@@ -156,13 +154,13 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
-        if(filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
+        if (filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
             case PDF: {
                 return binaerFil.getInnhold();
             }
             case DOCX: {
-                return konverterWordTilPdf(binaerFil, filtype).toByteArray();
+                return konverterWordTilPdf(binaerFil).toByteArray();
             }
             case TIFF:
             case JPEG: {
@@ -173,20 +171,13 @@ public final class OpprettJournalpostRequestMapper {
         }
     }
 
-    protected static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+    protected static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         try {
             InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
-
-            if (konverterbarFiltype == JournalpostFiltype.DOCX) {
-                ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
-                XWPFDocument document = new XWPFDocument(is);
-                PdfOptions options = PdfOptions.create();
-                PdfConverter.getInstance().convert(document, out, options);
-            } else {
-                throw new IllegalArgumentException("Ikke implementert støtte for konvertering av filtype " + konverterbarFiltype);
-            }
-        } catch (IOException | StackOverflowError e) {
+            var wordMLPackage = WordprocessingMLPackage.load(is);
+            Docx4J.toPDF(wordMLPackage, out);
+        } catch (Exception e) {
             throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
                 " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
         }

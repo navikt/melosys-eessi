@@ -43,6 +43,10 @@
         <token-support.version>2.1.4</token-support.version>
         <unleash.version>8.3.0</unleash.version>
         <vault-jdbc.version>1.3.10</vault-jdbc.version>
+        <docx4j.version>11.4.8</docx4j.version>
+        <jakarta.xml.bind.version>3.0.1</jakarta.xml.bind.version>
+        <jakarta.activation.version>2.1.2</jakarta.activation.version>
+        <org.glassfish.jaxb.version>3.0.2</org.glassfish.jaxb.version>
 
         <!-- Transitive avhengigheter -->
         <asm.version>7.3.1</asm.version>
@@ -63,9 +67,8 @@
         <google-errorprone.version>2.11.0</google-errorprone.version>
         <awaitility.version>4.2.0</awaitility.version>
         <opensagres.version>2.0.2</opensagres.version>
-        <apache-poi.version>4.1.2</apache-poi.version>
         <org.apache.commons.version>1.25.0</org.apache.commons.version>
-        <org.apache.pdfbox.version>3.0.1</org.apache.pdfbox.version>
+        <org.apache.pdfbox.version>2.0.24</org.apache.pdfbox.version>
         <xmlbeans.version>3.1.0</xmlbeans.version>
     </properties>
 
@@ -85,11 +88,6 @@
                 <version>${xmlbeans.version}</version>
             </dependency>
             <dependency>
-                <groupId>fr.opensagres.xdocreport</groupId>
-                <artifactId>fr.opensagres.poi.xwpf.converter.pdf</artifactId>
-                <version>${opensagres.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${org.apache.commons.version}</version>
@@ -100,30 +98,9 @@
                 <version>${commons-io.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${apache-poi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${apache-poi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-utils</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
                 <version>${org.apache.pdfbox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${apache-poi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
@@ -229,6 +206,32 @@
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
                 <version>${awaitility.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.docx4j</groupId>
+                <artifactId>docx4j-JAXB-ReferenceImpl</artifactId>
+                <version>${docx4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.docx4j</groupId>
+                <artifactId>docx4j-export-fo</artifactId>
+                <version>${docx4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.xml.bind</groupId>
+                <artifactId>jakarta.xml.bind-api</artifactId>
+                <version>${jakarta.xml.bind.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.activation</groupId>
+                <artifactId>jakarta.activation-api</artifactId>
+                <version>${jakarta.activation.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish.jaxb</groupId>
+                <artifactId>jaxb-runtime</artifactId>
+                <version>${org.glassfish.jaxb.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

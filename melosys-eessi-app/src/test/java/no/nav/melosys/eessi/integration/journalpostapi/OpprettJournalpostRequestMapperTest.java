@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -42,6 +46,25 @@ class OpprettJournalpostRequestMapperTest {
             "UFM",
             sedHendelse.getSedId()
         );
+    }
+
+    @Test
+    void konverterWordTilPdf_girGyldigPDF () throws IOException {
+        ClassLoader classLoader = getClass().getClassLoader();
+        byte[] bytes = classLoader.getResourceAsStream("testdok.docx").readAllBytes();
+        SedMedVedlegg.BinaerFil binaerFil = new SedMedVedlegg.BinaerFil("testdok.docx", "application/vnd.openxmlformats-officedocument.wordprocessingml" +
+            ".document", bytes);
+
+        ByteArrayOutputStream outputStream = OpprettJournalpostRequestMapper.konverterWordTilPdf(binaerFil);
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream("testpdf");
+            outputStream.writeTo(fileOutputStream);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            fileOutputStream.close();
+        }
     }
 
     private SedMedVedlegg sedMedVedlegg(List<SedMedVedlegg.BinaerFil> vedlegg) {
