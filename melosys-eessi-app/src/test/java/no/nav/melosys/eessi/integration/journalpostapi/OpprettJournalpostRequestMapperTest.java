@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.io.IOException;
 import java.util.List;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

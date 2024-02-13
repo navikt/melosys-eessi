@@ -1,5 +1,18 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
+
+import fr.opensagres.poi.xwpf.converter.core.XWPFConverterException;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import lombok.extern.slf4j.Slf4j;
@@ -17,20 +30,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.*;
+import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.PDF;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -129,17 +129,25 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static List<Dokument> vedlegg(final String sedType,
-                                          final List<SedMedVedlegg.BinaerFil> vedleggListe) {
+                                            final List<SedMedVedlegg.BinaerFil> vedleggListe) {
 
         return vedleggListe.stream()
             .map(binærfil -> {
-                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
-                    + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
+                    JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
+                        + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
 
-                return dokument(sedType,
-                    isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn(),
-                    PDF,
-                    getPdfByteArray(binærfil, opprinneligFiltype));
+                    byte[] bytes;
+                    var filnavn = isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn();
+                    try {
+                        bytes = getPdfByteArray(binærfil, opprinneligFiltype);
+                    } catch (XWPFConverterException | IOException | StackOverflowError e) {
+                        log.error("Kunne ikke konvertere vedlegg " + binærfil.getFilnavn() +
+                            " med MIME-type " + binærfil.getMimeType() + " til PDF");
+                        filnavn = "Konverteringsfeil - " + filnavn;
+                        bytes = new byte[0];
+                    }
+
+                    return dokument(sedType, filnavn, PDF, bytes);
                 }
             )
             .collect(Collectors.toList());
@@ -155,14 +163,14 @@ public final class OpprettJournalpostRequestMapper {
         return temaForSedType(sedType);
     }
 
-    private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
-        if(filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
+    private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
+        if (filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
             case PDF: {
                 return binaerFil.getInnhold();
             }
             case DOCX: {
-                return konverterWordTilPdf(binaerFil, filtype).toByteArray();
+                return konverterWordTilPdf(binaerFil).toByteArray();
             }
             case TIFF:
             case JPEG: {
@@ -173,50 +181,38 @@ public final class OpprettJournalpostRequestMapper {
         }
     }
 
-    protected static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+    private static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
 
-            if (konverterbarFiltype == JournalpostFiltype.DOCX) {
-                ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
-                XWPFDocument document = new XWPFDocument(is);
-                PdfOptions options = PdfOptions.create();
-                PdfConverter.getInstance().convert(document, out, options);
-            } else {
-                throw new IllegalArgumentException("Ikke implementert støtte for konvertering av filtype " + konverterbarFiltype);
-            }
-        } catch (IOException | StackOverflowError e) {
-            throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
-                " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
-        }
+        InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
+        ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
+        XWPFDocument document = new XWPFDocument(is);
+        PdfOptions options = PdfOptions.create();
+        PdfConverter.getInstance().convert(document, out, options);
+
         return out;
     }
 
-    private static ByteArrayOutputStream konverterBildeTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
+    private static ByteArrayOutputStream konverterBildeTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (PDDocument doc = new PDDocument()) {
-            InputStream in = new ByteArrayInputStream(binaerFil.getInnhold());
-            BufferedImage bImageFromConvert = ImageIO.read(in);
-            PDImageXObject pdImage;
-            if (filtype == JournalpostFiltype.JPEG) {
-                pdImage = JPEGFactory.createFromImage(doc, bImageFromConvert);
-            } else {
-                pdImage = LosslessFactory.createFromImage(doc, bImageFromConvert);
-            }
-
-            PDRectangle rectangle = new PDRectangle(pdImage.getWidth() + PDF_MARGIN * 2, pdImage.getHeight() + PDF_MARGIN * 2);
-            PDPage page = new PDPage(rectangle);
-            doc.addPage(page);
-
-            try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
-                contents.drawImage(pdImage, PDF_MARGIN, PDF_MARGIN);
-            }
-            doc.save(baos);
-        } catch (IOException e) {
-            throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
-                " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
+        PDDocument doc = new PDDocument();
+        InputStream in = new ByteArrayInputStream(binaerFil.getInnhold());
+        BufferedImage bImageFromConvert = ImageIO.read(in);
+        PDImageXObject pdImage;
+        if (filtype == JournalpostFiltype.JPEG) {
+            pdImage = JPEGFactory.createFromImage(doc, bImageFromConvert);
+        } else {
+            pdImage = LosslessFactory.createFromImage(doc, bImageFromConvert);
         }
+
+        PDRectangle rectangle = new PDRectangle(pdImage.getWidth() + PDF_MARGIN * 2, pdImage.getHeight() + PDF_MARGIN * 2);
+        PDPage page = new PDPage(rectangle);
+        doc.addPage(page);
+
+        try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
+            contents.drawImage(pdImage, PDF_MARGIN, PDF_MARGIN);
+        }
+        doc.save(baos);
         return baos;
     }
 

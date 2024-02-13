@@ -63,7 +63,6 @@
         <google-errorprone.version>2.11.0</google-errorprone.version>
         <awaitility.version>4.2.0</awaitility.version>
         <opensagres.version>2.0.2</opensagres.version>
-        <apache-poi.version>4.1.2</apache-poi.version>
         <org.apache.commons.version>1.25.0</org.apache.commons.version>
         <org.apache.pdfbox.version>3.0.1</org.apache.pdfbox.version>
         <xmlbeans.version>3.1.0</xmlbeans.version>
@@ -100,30 +99,9 @@
                 <version>${commons-io.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi</artifactId>
-                <version>${apache-poi.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-ooxml</artifactId>
-                <version>${apache-poi.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-utils</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.pdfbox</groupId>
                 <artifactId>pdfbox</artifactId>
                 <version>${org.apache.pdfbox.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.poi</groupId>
-                <artifactId>poi-scratchpad</artifactId>
-                <version>${apache-poi.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.checkerframework</groupId>
