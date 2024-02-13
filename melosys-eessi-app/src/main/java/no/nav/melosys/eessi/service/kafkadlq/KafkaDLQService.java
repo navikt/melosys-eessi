@@ -76,7 +76,7 @@ public class KafkaDLQService {
 
     @Transactional
     public void rekjørAlleKafkaMeldinger() {
-        kafkaDLQRepository.findAll().forEach(
+        kafkaDLQRepository.findAll().stream().filter(a -> !a.getSkip()).forEach(
             kafkaMelding -> {
                 try {
                     rekjørKafkaMelding(kafkaMelding.getId());

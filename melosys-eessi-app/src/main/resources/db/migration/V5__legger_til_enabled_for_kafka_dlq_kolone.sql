@@ -1,0 +1,2 @@
+ALTER TABLE kafka_dlq
+    ADD skip BOOLEAN NOT NULL DEFAULT false;

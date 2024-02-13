@@ -21,4 +21,5 @@ public class KafkaDLQDto {
     private String sisteFeilmelding;
     private int antallRekjoringer;
     private String melding;
+    private Boolean skip;
 }
