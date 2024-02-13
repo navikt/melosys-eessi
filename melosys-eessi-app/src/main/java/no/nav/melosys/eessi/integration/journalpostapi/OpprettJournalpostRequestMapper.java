@@ -143,8 +143,8 @@ public final class OpprettJournalpostRequestMapper {
                     } catch (XWPFConverterException | IOException | StackOverflowError e) {
                         log.error("Kunne ikke konvertere vedlegg " + binærfil.getFilnavn() +
                             " med MIME-type " + binærfil.getMimeType() + " til PDF");
-                        filnavn = "Konverteringsfeil - " + filnavn;
-                        bytes = new byte[0];
+                        filnavn = "PDF konverteringsfeil - " + filnavn;
+                        bytes = binærfil.getInnhold();
                     }
 
                     return dokument(sedType, filnavn, PDF, bytes);
