@@ -11,6 +11,7 @@ public final class MetrikkerNavn {
 
     static final String SED_MOTTATT_ALLEREDEJOURNALFOERT = SED_MOTTATT + ".alleredejournalfoert";
     static final String SED_SENDT = METRIKKER_NAMESPACE + "sed.sendt";
+    static final String SED_KONVERTERING_FEILET = METRIKKER_NAMESPACE + "sed.konvertering.feilet.antall";
     static final String BUC_OPPRETTET = METRIKKER_NAMESPACE + "buc.opprettet";
     static final String BUC_LUKKET = METRIKKER_NAMESPACE + "buc.lukket";
 

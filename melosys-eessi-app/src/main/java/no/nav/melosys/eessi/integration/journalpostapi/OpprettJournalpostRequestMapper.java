@@ -18,6 +18,7 @@ import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -46,8 +47,10 @@ public final class OpprettJournalpostRequestMapper {
                                                                          final Sak sak,
                                                                          final String dokumentTittel,
                                                                          final String behandlingstema,
-                                                                         final String personIdent) {
-        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent);
+                                                                         final String personIdent,
+                                                                         final SedMetrikker sedMetrikker) {
+        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel,
+            behandlingstema, personIdent, sedMetrikker);
     }
 
     public static OpprettJournalpostRequest opprettUtgaaendeJournalpost(final SedHendelse sedHendelse,
@@ -55,8 +58,10 @@ public final class OpprettJournalpostRequestMapper {
                                                                         final Sak sak,
                                                                         final String dokumentTittel,
                                                                         final String behandlingstema,
-                                                                        final String personIdent) {
-        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent);
+                                                                        final String personIdent,
+                                                                        final SedMetrikker sedMetrikker) {
+        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel,
+            behandlingstema, personIdent, sedMetrikker);
     }
 
 
@@ -66,13 +71,14 @@ public final class OpprettJournalpostRequestMapper {
                                                                        final Sak sak,
                                                                        final String dokumentTittel,
                                                                        final String behandlingstema,
-                                                                       final String personIdent) {
+                                                                       final String personIdent,
+                                                                       final SedMetrikker sedMetrikker) {
 
         return OpprettJournalpostRequest.builder()
             .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
             .behandlingstema(behandlingstema)
             .bruker(isNotEmpty(personIdent) ? lagBruker(personIdent) : null)
-            .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokumentTittel))
+            .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokumentTittel, sedMetrikker))
             .eksternReferanseId(sedHendelse.getSedId())
             .journalfoerendeEnhet("4530")
             .journalpostType(journalpostType)
@@ -105,11 +111,12 @@ public final class OpprettJournalpostRequestMapper {
 
     private static List<Dokument> dokumenter(final String sedType,
                                              final SedMedVedlegg sedMedVedlegg,
-                                             final String dokumentTittel) {
+                                             final String dokumentTittel,
+                                             final SedMetrikker sedMetrikker) {
         final List<Dokument> dokumenter = new ArrayList<>();
 
         dokumenter.add(dokument(sedType, dokumentTittel, JournalpostFiltype.PDFA, sedMedVedlegg.getSed().getInnhold()));
-        dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe()));
+        dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe(), sedMetrikker));
         return dokumenter;
     }
 
@@ -129,7 +136,7 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static List<Dokument> vedlegg(final String sedType,
-                                            final List<SedMedVedlegg.BinaerFil> vedleggListe) {
+                                            final List<SedMedVedlegg.BinaerFil> vedleggListe, SedMetrikker sedMetrikker) {
         List<Dokument> vedlegg = new ArrayList<>();
         for (SedMedVedlegg.BinaerFil binaerFil: vedleggListe) {
             JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
@@ -146,6 +153,7 @@ public final class OpprettJournalpostRequestMapper {
             } catch (XWPFConverterException | IOException | StackOverflowError e) {
                 log.error("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
                     " med MIME-type " + binaerFil.getMimeType() + " til PDF");
+                sedMetrikker.sedPdfKonverteringFeilet();
             }
         }
 
