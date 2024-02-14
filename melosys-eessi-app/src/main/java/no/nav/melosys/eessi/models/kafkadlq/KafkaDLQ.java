@@ -38,7 +38,7 @@ public abstract class KafkaDLQ {
     private int antallRekjoringer;
 
     @Column(name = "skip")
-    private Boolean skip;
+    private Boolean skip = false;
 
     public void økAntallRekjøringerMed1() {
         antallRekjoringer++;
