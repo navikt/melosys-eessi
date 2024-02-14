@@ -130,27 +130,26 @@ public final class OpprettJournalpostRequestMapper {
 
     private static List<Dokument> vedlegg(final String sedType,
                                             final List<SedMedVedlegg.BinaerFil> vedleggListe) {
+        List<Dokument> vedlegg = new ArrayList<>();
+        for (SedMedVedlegg.BinaerFil binaerFil: vedleggListe) {
+            JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
+                + binaerFil.getFilnavn() + " (" + binaerFil.getMimeType() + ")"));
+            try {
+                vedlegg.add(
+                    dokument(
+                        sedType,
+                        isEmpty(binaerFil.getFilnavn()) ? "Vedlegg" : binaerFil.getFilnavn(),
+                        PDF,
+                        getPdfByteArray(binaerFil, opprinneligFiltype)
+                    )
+                );
+            } catch (XWPFConverterException | IOException | StackOverflowError e) {
+                log.error("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
+                    " med MIME-type " + binaerFil.getMimeType() + " til PDF");
+            }
+        }
 
-        return vedleggListe.stream()
-            .map(binærfil -> {
-                    JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
-                        + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
-
-                    byte[] bytes;
-                    var filnavn = isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn();
-                    try {
-                        bytes = getPdfByteArray(binærfil, opprinneligFiltype);
-                    } catch (XWPFConverterException | IOException | StackOverflowError e) {
-                        log.error("Kunne ikke konvertere vedlegg " + binærfil.getFilnavn() +
-                            " med MIME-type " + binærfil.getMimeType() + " til PDF");
-                        filnavn = "PDF konverteringsfeil - " + filnavn;
-                        bytes = binærfil.getInnhold();
-                    }
-
-                    return dokument(sedType, filnavn, PDF, bytes);
-                }
-            )
-            .collect(Collectors.toList());
+        return vedlegg;
     }
 
     private static String temaForSedTypeOgJournalpostType(final String sedType,
