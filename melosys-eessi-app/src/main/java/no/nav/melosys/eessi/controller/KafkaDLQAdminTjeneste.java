@@ -67,6 +67,7 @@ public class KafkaDLQAdminTjeneste {
             .tidSistRekjort(entitet.getTidSistRekjort())
             .antallRekjoringer(entitet.getAntallRekjoringer())
             .melding(entitet.hentMeldingSomStreng())
+            .skip(entitet.getSkip())
             .build();
 
     }
