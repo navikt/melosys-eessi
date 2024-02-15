@@ -62,6 +62,8 @@ public class SedMetrikker {
     }
 
     public void sedPdfKonverteringFeilet() {
+        // TODO: Fjern log
+        log.info("Inkrementerer " + SED_KONVERTERING_FEILET + "til " + (Metrics.counter(SED_KONVERTERING_FEILET).count() + 1));
         Metrics.counter(SED_KONVERTERING_FEILET).increment();
     }
 }
