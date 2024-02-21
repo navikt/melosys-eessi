@@ -78,7 +78,7 @@ public final class OpprettJournalpostRequestMapper {
             .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
             .behandlingstema(behandlingstema)
             .bruker(isNotEmpty(personIdent) ? lagBruker(personIdent) : null)
-            .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokumentTittel, sedMetrikker))
+            .dokumenter(dokumenter(sedHendelse, sedMedVedlegg, dokumentTittel, sedMetrikker))
             .eksternReferanseId(sedHendelse.getSedId())
             .journalfoerendeEnhet("4530")
             .journalpostType(journalpostType)
@@ -109,14 +109,15 @@ public final class OpprettJournalpostRequestMapper {
             .build();
     }
 
-    private static List<Dokument> dokumenter(final String sedType,
+    private static List<Dokument> dokumenter(final SedHendelse sedHendelse,
                                              final SedMedVedlegg sedMedVedlegg,
                                              final String dokumentTittel,
                                              final SedMetrikker sedMetrikker) {
         final List<Dokument> dokumenter = new ArrayList<>();
 
-        dokumenter.add(dokument(sedType, dokumentTittel, JournalpostFiltype.PDFA, sedMedVedlegg.getSed().getInnhold()));
-        dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe(), sedMetrikker));
+        dokumenter.add(dokument(sedHendelse.getSedType(), dokumentTittel, JournalpostFiltype.PDFA,
+            sedMedVedlegg.getSed().getInnhold()));
+        dokumenter.addAll(vedlegg(sedHendelse, sedMedVedlegg.getVedleggListe(), sedMetrikker));
         return dokumenter;
     }
 
@@ -135,24 +136,24 @@ public final class OpprettJournalpostRequestMapper {
             .build();
     }
 
-    private static List<Dokument> vedlegg(final String sedType,
-                                            final List<SedMedVedlegg.BinaerFil> vedleggListe, SedMetrikker sedMetrikker) {
+    private static List<Dokument> vedlegg(final SedHendelse sedHendelse,
+                                          final List<SedMedVedlegg.BinaerFil> vedleggListe, SedMetrikker sedMetrikker) {
         List<Dokument> vedlegg = new ArrayList<>();
-        for (SedMedVedlegg.BinaerFil binaerFil: vedleggListe) {
+        for (SedMedVedlegg.BinaerFil binaerFil : vedleggListe) {
             JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
                 + binaerFil.getFilnavn() + " (" + binaerFil.getMimeType() + ")"));
             try {
                 vedlegg.add(
                     dokument(
-                        sedType,
+                        sedHendelse.getSedType(),
                         isEmpty(binaerFil.getFilnavn()) ? "Vedlegg" : binaerFil.getFilnavn(),
                         PDF,
                         getPdfByteArray(binaerFil, opprinneligFiltype)
                     )
                 );
             } catch (XWPFConverterException | IOException | StackOverflowError e) {
-                log.error("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
-                    " med MIME-type " + binaerFil.getMimeType() + " til PDF");
+                log.error("Kunne ikke konvertere vedlegg %s med MIME-type %s til PDF. RINA saksnummer: %s"
+                    .formatted(binaerFil.getFilnavn(), binaerFil.getMimeType(), sedHendelse.getRinaSakId()));
                 sedMetrikker.sedPdfKonverteringFeilet();
             }
         }
