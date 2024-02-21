@@ -60,4 +60,8 @@ public class SedMetrikker {
             log.info("Kan ikke telle ukjent sedtype {}", sedType);
         }
     }
+
+    public void sedPdfKonverteringFeilet() {
+        Metrics.counter(SED_KONVERTERING_FEILET).increment();
+    }
 }

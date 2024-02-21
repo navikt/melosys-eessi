@@ -1,10 +1,24 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.imageio.ImageIO;
+
+import fr.opensagres.poi.xwpf.converter.core.XWPFConverterException;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -17,20 +31,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.*;
+import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.PDF;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
@@ -46,8 +47,10 @@ public final class OpprettJournalpostRequestMapper {
                                                                          final Sak sak,
                                                                          final String dokumentTittel,
                                                                          final String behandlingstema,
-                                                                         final String personIdent) {
-        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent);
+                                                                         final String personIdent,
+                                                                         final SedMetrikker sedMetrikker) {
+        return opprettJournalpostRequest(JournalpostType.INNGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel,
+            behandlingstema, personIdent, sedMetrikker);
     }
 
     public static OpprettJournalpostRequest opprettUtgaaendeJournalpost(final SedHendelse sedHendelse,
@@ -55,8 +58,10 @@ public final class OpprettJournalpostRequestMapper {
                                                                         final Sak sak,
                                                                         final String dokumentTittel,
                                                                         final String behandlingstema,
-                                                                        final String personIdent) {
-        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel, behandlingstema, personIdent);
+                                                                        final String personIdent,
+                                                                        final SedMetrikker sedMetrikker) {
+        return opprettJournalpostRequest(JournalpostType.UTGAAENDE, sedHendelse, sedMedVedlegg, sak, dokumentTittel,
+            behandlingstema, personIdent, sedMetrikker);
     }
 
 
@@ -66,13 +71,14 @@ public final class OpprettJournalpostRequestMapper {
                                                                        final Sak sak,
                                                                        final String dokumentTittel,
                                                                        final String behandlingstema,
-                                                                       final String personIdent) {
+                                                                       final String personIdent,
+                                                                       final SedMetrikker sedMetrikker) {
 
         return OpprettJournalpostRequest.builder()
             .avsenderMottaker(getAvsenderMottaker(journalpostType, sedHendelse))
             .behandlingstema(behandlingstema)
             .bruker(isNotEmpty(personIdent) ? lagBruker(personIdent) : null)
-            .dokumenter(dokumenter(sedHendelse.getSedType(), sedMedVedlegg, dokumentTittel))
+            .dokumenter(dokumenter(sedHendelse, sedMedVedlegg, dokumentTittel, sedMetrikker))
             .eksternReferanseId(sedHendelse.getSedId())
             .journalfoerendeEnhet("4530")
             .journalpostType(journalpostType)
@@ -103,13 +109,15 @@ public final class OpprettJournalpostRequestMapper {
             .build();
     }
 
-    private static List<Dokument> dokumenter(final String sedType,
+    private static List<Dokument> dokumenter(final SedHendelse sedHendelse,
                                              final SedMedVedlegg sedMedVedlegg,
-                                             final String dokumentTittel) {
+                                             final String dokumentTittel,
+                                             final SedMetrikker sedMetrikker) {
         final List<Dokument> dokumenter = new ArrayList<>();
 
-        dokumenter.add(dokument(sedType, dokumentTittel, JournalpostFiltype.PDFA, sedMedVedlegg.getSed().getInnhold()));
-        dokumenter.addAll(vedlegg(sedType, sedMedVedlegg.getVedleggListe()));
+        dokumenter.add(dokument(sedHendelse.getSedType(), dokumentTittel, JournalpostFiltype.PDFA,
+            sedMedVedlegg.getSed().getInnhold()));
+        dokumenter.addAll(vedlegg(sedHendelse, sedMedVedlegg.getVedleggListe(), sedMetrikker));
         return dokumenter;
     }
 
@@ -128,21 +136,29 @@ public final class OpprettJournalpostRequestMapper {
             .build();
     }
 
-    private static List<Dokument> vedlegg(final String sedType,
-                                          final List<SedMedVedlegg.BinaerFil> vedleggListe) {
+    private static List<Dokument> vedlegg(final SedHendelse sedHendelse,
+                                          final List<SedMedVedlegg.BinaerFil> vedleggListe, SedMetrikker sedMetrikker) {
+        List<Dokument> vedlegg = new ArrayList<>();
+        for (SedMedVedlegg.BinaerFil binaerFil : vedleggListe) {
+            JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
+                + binaerFil.getFilnavn() + " (" + binaerFil.getMimeType() + ")"));
+            try {
+                vedlegg.add(
+                    dokument(
+                        sedHendelse.getSedType(),
+                        isEmpty(binaerFil.getFilnavn()) ? "Vedlegg" : binaerFil.getFilnavn(),
+                        PDF,
+                        getPdfByteArray(binaerFil, opprinneligFiltype)
+                    )
+                );
+            } catch (XWPFConverterException | IOException | StackOverflowError e) {
+                log.error("Kunne ikke konvertere vedlegg %s med MIME-type %s til PDF. RINA saksnummer: %s"
+                    .formatted(binaerFil.getFilnavn(), binaerFil.getMimeType(), sedHendelse.getRinaSakId()));
+                sedMetrikker.sedPdfKonverteringFeilet();
+            }
+        }
 
-        return vedleggListe.stream()
-            .map(binærfil -> {
-                JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binærfil.getMimeType(), binærfil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
-                    + binærfil.getFilnavn() + " (" + binærfil.getMimeType() + ")"));
-
-                return dokument(sedType,
-                    isEmpty(binærfil.getFilnavn()) ? "Vedlegg" : binærfil.getFilnavn(),
-                    PDF,
-                    getPdfByteArray(binærfil, opprinneligFiltype));
-                }
-            )
-            .collect(Collectors.toList());
+        return vedlegg;
     }
 
     private static String temaForSedTypeOgJournalpostType(final String sedType,
@@ -155,14 +171,14 @@ public final class OpprettJournalpostRequestMapper {
         return temaForSedType(sedType);
     }
 
-    private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
-        if(filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
+    private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
+        if (filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
             case PDF: {
                 return binaerFil.getInnhold();
             }
             case DOCX: {
-                return konverterWordTilPdf(binaerFil, filtype).toByteArray();
+                return konverterWordTilPdf(binaerFil).toByteArray();
             }
             case TIFF:
             case JPEG: {
@@ -173,50 +189,38 @@ public final class OpprettJournalpostRequestMapper {
         }
     }
 
-    protected static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype konverterbarFiltype) {
+    private static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        try {
-            InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
 
-            if (konverterbarFiltype == JournalpostFiltype.DOCX) {
-                ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
-                XWPFDocument document = new XWPFDocument(is);
-                PdfOptions options = PdfOptions.create();
-                PdfConverter.getInstance().convert(document, out, options);
-            } else {
-                throw new IllegalArgumentException("Ikke implementert støtte for konvertering av filtype " + konverterbarFiltype);
-            }
-        } catch (IOException | StackOverflowError e) {
-            throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
-                " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
-        }
+        InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
+        ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
+        XWPFDocument document = new XWPFDocument(is);
+        PdfOptions options = PdfOptions.create();
+        PdfConverter.getInstance().convert(document, out, options);
+
         return out;
     }
 
-    private static ByteArrayOutputStream konverterBildeTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) {
+    private static ByteArrayOutputStream konverterBildeTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try (PDDocument doc = new PDDocument()) {
-            InputStream in = new ByteArrayInputStream(binaerFil.getInnhold());
-            BufferedImage bImageFromConvert = ImageIO.read(in);
-            PDImageXObject pdImage;
-            if (filtype == JournalpostFiltype.JPEG) {
-                pdImage = JPEGFactory.createFromImage(doc, bImageFromConvert);
-            } else {
-                pdImage = LosslessFactory.createFromImage(doc, bImageFromConvert);
-            }
-
-            PDRectangle rectangle = new PDRectangle(pdImage.getWidth() + PDF_MARGIN * 2, pdImage.getHeight() + PDF_MARGIN * 2);
-            PDPage page = new PDPage(rectangle);
-            doc.addPage(page);
-
-            try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
-                contents.drawImage(pdImage, PDF_MARGIN, PDF_MARGIN);
-            }
-            doc.save(baos);
-        } catch (IOException e) {
-            throw new RuntimeException("Kunne ikke konvertere vedlegg " + binaerFil.getFilnavn() +
-                " med MIME-type " + binaerFil.getMimeType() + "  til PDF", e);
+        PDDocument doc = new PDDocument();
+        InputStream in = new ByteArrayInputStream(binaerFil.getInnhold());
+        BufferedImage bImageFromConvert = ImageIO.read(in);
+        PDImageXObject pdImage;
+        if (filtype == JournalpostFiltype.JPEG) {
+            pdImage = JPEGFactory.createFromImage(doc, bImageFromConvert);
+        } else {
+            pdImage = LosslessFactory.createFromImage(doc, bImageFromConvert);
         }
+
+        PDRectangle rectangle = new PDRectangle(pdImage.getWidth() + PDF_MARGIN * 2, pdImage.getHeight() + PDF_MARGIN * 2);
+        PDPage page = new PDPage(rectangle);
+        doc.addPage(page);
+
+        try (PDPageContentStream contents = new PDPageContentStream(doc, page)) {
+            contents.drawImage(pdImage, PDF_MARGIN, PDF_MARGIN);
+        }
+        doc.save(baos);
         return baos;
     }
 

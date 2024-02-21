@@ -1,16 +1,20 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
+import java.io.IOException;
 import java.util.List;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OpprettJournalpostRequestMapperTest {
 
+    @Mock
+    private SedMetrikker sedMetrikker;
     private final String ident = "123123123123";
 
     @Test
@@ -24,7 +28,8 @@ class OpprettJournalpostRequestMapperTest {
             null,
             "dokumenttittel",
             "behandlingstema",
-            ident
+            ident,
+            sedMetrikker
         );
 
         assertThat(request.getDokumenter()).hasSize(2)

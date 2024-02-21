@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,8 @@ class JournalpostServiceTest {
     private JournalpostapiConsumer journalpostapiConsumer;
     @Mock
     private JournalpostMetadataService journalpostMetadataService;
+    @Mock
+    private SedMetrikker sedMetrikker;
 
     private final EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
     private final JournalpostMetadata journalpostMetadata = new JournalpostMetadata("dokumentTittel fra journalpostMetadata", "behandlingstema fra journalpostMetadata");
@@ -50,7 +53,7 @@ class JournalpostServiceTest {
 
     @BeforeEach
     public void setUp() {
-        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer);
+        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer, sedMetrikker);
 
         sedHendelse = random.nextObject(SedHendelse.class);
         sak = random.nextObject(Sak.class);
