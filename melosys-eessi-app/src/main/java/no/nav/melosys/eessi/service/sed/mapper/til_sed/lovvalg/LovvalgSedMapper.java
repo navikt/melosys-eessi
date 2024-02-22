@@ -23,7 +23,7 @@ public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
     default void setVedtaksdata(Vedtak vedtak, VedtakDto vedtakDto) {
         if (vedtakDto != null && !vedtakDto.isErFørstegangsvedtak()) {
             vedtak.setEropprinneligvedtak(null);
-            vedtak.setErendringsvedtak(null);
+            vedtak.setErendringsvedtak("nei");
             vedtak.setDatoforrigevedtak(
                 vedtakDto.getDatoForrigeVedtak() != null ? vedtakDto.getDatoForrigeVedtak().toString() : null
             );
