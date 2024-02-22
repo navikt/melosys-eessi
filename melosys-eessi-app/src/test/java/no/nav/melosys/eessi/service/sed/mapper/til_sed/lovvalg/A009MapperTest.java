@@ -12,7 +12,6 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -58,7 +57,7 @@ class A009MapperTest {
     }
 
     @Test
-    void erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
+    void erIkkeOpprinneligVedtak_ErOpprinneligVedtakOgErEndringsvedtakSattKorrektOgDatoForrigeVedtakIkkeNull() {
         VedtakDto vedtakDto = new VedtakDto();
         vedtakDto.setErFørstegangsvedtak(false);
         vedtakDto.setDatoForrigeVedtak(LocalDate.now());
@@ -69,12 +68,29 @@ class A009MapperTest {
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
-
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
-
         assertThat(medlemskapA009).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isNull();
+        assertThat(medlemskapA009.getVedtak().getErendringsvedtak()).isEqualTo("nei");
         assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
+    }
+
+    @Test
+    void erOpprinneligVedtak_ErOpprinneligVedtakOgErEndringsvedtakSattKorrektOgDatoForrigeVedtakNull() {
+        VedtakDto vedtakDto = new VedtakDto();
+        vedtakDto.setErFørstegangsvedtak(true);
+        sedData.setVedtakDto(vedtakDto);
+
+
+        SED sed = a009Mapper.mapTilSed(sedData);
+
+
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
+        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
+        assertThat(medlemskapA009).isNotNull();
+        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("ja");
+        assertThat(medlemskapA009.getVedtak().getErendringsvedtak()).isNull();
+        assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isNull();
     }
 
     @Test
@@ -98,15 +114,15 @@ class A009MapperTest {
     void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
         assertThatExceptionOfType(MappingException.class)
-                .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
-                .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
+            .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
+            .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
     }
 
     @Test
     void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
         assertThatExceptionOfType(NullPointerException.class)
-                .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
+            .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
     }
 
     @Test
