@@ -11,11 +11,10 @@ import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -71,7 +70,7 @@ class A010MapperTest {
     }
 
     @Test
-    void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksNeiOgDatoForrigeVedtakIkkeNull() {
+    void mapTilSed_erIkkeOpprinneligVedtak_ErOpprinneligVedtaksOgErEndringsvedtakSattKorrektOgDatoForrigeVedtakIkkeNull() {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
         VedtakDto vedtakDto = new VedtakDto();
@@ -84,12 +83,31 @@ class A010MapperTest {
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
-
         MedlemskapA010 medlemskapA010 = (MedlemskapA010) sed.getMedlemskap();
-
         assertThat(medlemskapA010).isNotNull();
-        assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isEqualTo("nei");
+        assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isNull();
+        assertThat(medlemskapA010.getVedtak().getErendringsvedtak()).isEqualTo("nei");
         assertThat(medlemskapA010.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
+    }
+
+    @Test
+    void mapTilSed_erOpprinneligVedtak_ErOpprinneligVedtaksOgErEndringsvedtakSattKorrektOgDatoForrigeVedtakNull() {
+        lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
+        lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
+        VedtakDto vedtakDto = new VedtakDto();
+        vedtakDto.setErFørstegangsvedtak(true);
+        sedData.setVedtakDto(vedtakDto);
+
+
+        SED sed = a010Mapper.mapTilSed(sedData);
+
+
+        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
+        MedlemskapA010 medlemskapA010 = (MedlemskapA010) sed.getMedlemskap();
+        assertThat(medlemskapA010).isNotNull();
+        assertThat(medlemskapA010.getVedtak().getEropprinneligvedtak()).isEqualTo("ja");
+        assertThat(medlemskapA010.getVedtak().getErendringsvedtak()).isNull();
+        assertThat(medlemskapA010.getVedtak().getDatoforrigevedtak()).isNull();
     }
 
     @Test
@@ -99,6 +117,6 @@ class A010MapperTest {
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_12_1);
 
         assertThatExceptionOfType(MappingException.class).isThrownBy(() -> a010Mapper.mapTilSed(sedData))
-                .withMessageContaining("Kan ikke mappe til bestemmelse i A010 for lovvalgsperiode ");
+            .withMessageContaining("Kan ikke mappe til bestemmelse i A010 for lovvalgsperiode ");
     }
 }
