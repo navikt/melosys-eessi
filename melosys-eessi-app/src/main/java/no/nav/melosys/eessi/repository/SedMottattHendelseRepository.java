@@ -23,7 +23,7 @@ public interface SedMottattHendelseRepository extends JpaRepository<SedMottattHe
     int countAllByRinaSaksnummer(String rinaSaksnummer);
 
     @Query(
-            value = "select * from sed_mottatt_hendelse where sed_hendelse ->> 'sedId' = ?1",
+            value = "select * from sed_mottatt_hendelse where sed_hendelse ->> 'sedId' = ?1 order by mottatt_dato limit 1",
             nativeQuery = true)
     Optional<SedMottattHendelse> findBySedID(String sedID);
 
