@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.imageio.ImageIO;
 
 import fr.opensagres.poi.xwpf.converter.core.XWPFConverterException;
@@ -140,9 +139,9 @@ public final class OpprettJournalpostRequestMapper {
                                           final List<SedMedVedlegg.BinaerFil> vedleggListe, SedMetrikker sedMetrikker) {
         List<Dokument> vedlegg = new ArrayList<>();
         for (SedMedVedlegg.BinaerFil binaerFil : vedleggListe) {
-            JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(() -> new MappingException("Filtype kreves for "
-                + binaerFil.getFilnavn() + " (" + binaerFil.getMimeType() + ")"));
             try {
+                JournalpostFiltype opprinneligFiltype =
+                    JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(MappingException::new);
                 vedlegg.add(
                     dokument(
                         sedHendelse.getSedType(),
@@ -151,7 +150,7 @@ public final class OpprettJournalpostRequestMapper {
                         getPdfByteArray(binaerFil, opprinneligFiltype)
                     )
                 );
-            } catch (XWPFConverterException | IOException | StackOverflowError e) {
+            } catch (XWPFConverterException | IOException | StackOverflowError | MappingException e) {
                 log.error("Kunne ikke konvertere vedlegg %s med MIME-type %s til PDF. RINA saksnummer: %s"
                     .formatted(binaerFil.getFilnavn(), binaerFil.getMimeType(), sedHendelse.getRinaSakId()));
                 sedMetrikker.sedPdfKonverteringFeilet();
