@@ -26,6 +26,8 @@ public class BucIdentifisertConcurrencyIT extends ComponentTestBase {
     private BucIdentifisertRepository bucIdentifisertRepository;
 
     @Test
+    // Tester problem med duplikater som blir opprettet pga att vi kjører 2 pods.
+    // Vi simulerer det ved å kjøre 2 tråder som prøver å lagre samme bucIdentifisert
     public void sedIdentifisert_duplicateWrites_forhindres() throws InterruptedException {
         String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
         ExecutorService executor = Executors.newFixedThreadPool(2);
