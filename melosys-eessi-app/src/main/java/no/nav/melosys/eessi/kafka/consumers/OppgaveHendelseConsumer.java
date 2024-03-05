@@ -39,7 +39,7 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
             oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveEndretHendelse);
         } catch (Exception e) {
             String message = e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName();
-            log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, consumerRecord, e);
+            log.error("Klarte ikke å konsumere melding om oppgave endret: {}\n{}", message, toString(consumerRecord), e);
 
             kafkaDLQService.lagreOppgaveEndretHendelse(oppgaveEndretHendelse, e.getMessage());
         } finally {
@@ -47,6 +47,10 @@ public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
         }
     }
 
+    private static String toString(ConsumerRecord<String, OppgaveKafkaAivenRecord> consumerRecord) {
+        // fjern ident for å anonymisere
+        return consumerRecord.toString().replaceAll("\\bident=\\d+", "ident=xxxxxxxxxxx");
+    }
     public void settSpesifiktOffsetPåConsumer(long offset) {
         getSeekCallbacks().forEach((tp, callback) -> callback.seek(tp.topic(), tp.partition(), offset));
     }
