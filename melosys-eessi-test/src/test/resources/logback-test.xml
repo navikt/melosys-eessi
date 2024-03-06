@@ -1,20 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
-    <encoder>
-        <pattern>%d{HH:mm:ss.SSS} | %X{correlation-id} | %logger{10} | %highlight(%level) | %msg%n</pattern>
-    </encoder>
-  </appender>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} | %X{correlation-id} | %logger{10} | %highlight(%level) | %msg%n</pattern>
+        </encoder>
+    </appender>
 
-  <root level="INFO">
-    <appender-ref ref="console"/>
-  </root>
+    <appender name="stdout_json" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.mask.MaskingJsonGeneratorDecorator">
+                <valueMask>
+                    <value>(^|\W)\d{11}(?=$|\W)</value>
+                    <mask>$1***********</mask>
+                </valueMask>
+            </jsonGeneratorDecorator>
+        </encoder>
+    </appender>
 
-  <logger name="org.apache.kafka" level="WARN"/>
-  <logger name="org.apache.zookeeper" level="WARN"/>
-  <logger name="org.springframework.kafka" level="WARN"/>
-  <logger name="org.hibernate" level="WARN"/>
-  <logger name="kafka" level="WARN"/>
-  <logger name="springfox" level="WARN"/>
+    <root level="INFO">
+        <appender-ref ref="console"/>
+    </root>
+
+    <logger name="org.apache.kafka" level="WARN"/>
+    <logger name="org.apache.zookeeper" level="WARN"/>
+    <logger name="org.springframework.kafka" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="kafka" level="WARN"/>
+    <logger name="springfox" level="WARN"/>
 </configuration>
