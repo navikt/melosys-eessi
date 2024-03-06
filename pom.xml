@@ -27,7 +27,7 @@
         <hibernate-types.version>2.14.0</hibernate-types.version>
         <java.version>17</java.version>
         <logback-classic.version>1.2.3</logback-classic.version>
-        <logstash-encoder.version>7.4</logstash-encoder.version>
+        <logstash-encoder.version>7.3</logstash-encoder.version>
         <lombok.version>1.18.22</lombok.version>
         <jackson.version>2.14.1</jackson.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
