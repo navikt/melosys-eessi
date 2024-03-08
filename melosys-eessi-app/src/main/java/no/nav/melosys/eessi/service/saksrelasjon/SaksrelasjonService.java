@@ -3,8 +3,10 @@ package no.nav.melosys.eessi.service.saksrelasjon;
 import java.util.List;
 import java.util.Optional;
 
+import io.getunleash.Unleash;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -23,6 +25,7 @@ public class SaksrelasjonService {
     private final FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     private final CaseStoreConsumer caseStoreConsumer;
     private final ArkivsakService arkivsakService;
+    private final Unleash unleash;
 
     @Transactional
     public FagsakRinasakKobling lagreKobling(Long gsakSaksnummer, String rinaSaksnummer, BucType bucType) {
@@ -84,9 +87,15 @@ public class SaksrelasjonService {
             .map(FagsakRinasakKobling::getGsakSaksnummer);
 
         if (saksnummer.isEmpty()) {
-            log.info("Saksnummer er tomt - henter fra casestore for rinsaksnummer {}", rinaSaksnummer);
-            saksnummer = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer).stream()
-                .findFirst().map(CaseStoreDto::getFagsaknummer).map(Long::parseLong);
+            if (unleash.isEnabled(ToggleName.IKKE_HENT_FRA_CASESTORE)) {
+                log.info("søkEtterSaksnummerFraRinaSaksnummer: " +
+                    "Saksnummer er tomt for rinsaksnummer {} - henting fra casestore er togglet av", rinaSaksnummer);
+            } else {
+                log.info("Saksnummer er tomt - henter fra casestore for rinsaksnummer {}", rinaSaksnummer);
+                saksnummer = caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer).stream()
+                    .findFirst().map(CaseStoreDto::getFagsaknummer).map(Long::parseLong);
+            }
+
         }
 
         return saksnummer;

@@ -3,6 +3,8 @@ package no.nav.melosys.eessi.service.journalpostkobling;
 import java.util.Collections;
 import java.util.Optional;
 
+import io.getunleash.FakeUnleash;
+import io.getunleash.Unleash;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
@@ -58,7 +60,7 @@ class JournalpostSedKoblingServiceTest {
     public void setup() {
         journalpostSedKoblingService = new JournalpostSedKoblingService(
                 journalpostSedKoblingRepository, caseStoreConsumer, euxService, saksrelasjonService,
-                safConsumer, melosysEessiMeldingMapperFactory);
+                safConsumer, melosysEessiMeldingMapperFactory, new FakeUnleash());
 
         EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
         buc = enhancedRandom.nextObject(BUC.class);
