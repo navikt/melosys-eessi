@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.models;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
+
 import lombok.Data;
 
 @Data

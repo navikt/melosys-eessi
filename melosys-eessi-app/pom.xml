@@ -51,11 +51,6 @@
             <version>${spring-kafka.version}</version>
         </dependency>
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback-classic.version}</version>
-        </dependency>
-        <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash-encoder.version}</version>
@@ -75,24 +70,9 @@
             <version>${micrometer-jvm-extras.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.nimbusds</groupId>
-            <artifactId>nimbus-jose-jwt</artifactId>
-            <version>${nimbus-jose-jwt.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox-swagger2.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox-swagger2.version}</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -145,10 +125,15 @@
             <artifactId>shedlock-provider-jdbc-template</artifactId>
             <version>${shedlock-version}</version>
         </dependency>
+        <!--        <dependency>
+                    <groupId>com.vladmihalcea</groupId>
+                    <artifactId>hibernate-types-60</artifactId>
+                    <version>${hibernate-types.version}</version>
+                </dependency> -->
         <dependency>
-            <groupId>com.vladmihalcea</groupId>
-            <artifactId>hibernate-types-52</artifactId>
-            <version>${hibernate-types.version}</version>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-63</artifactId>
+            <version>${hypersistence-utils.version}</version>
         </dependency>
         <dependency>
             <groupId>io.getunleash</groupId>

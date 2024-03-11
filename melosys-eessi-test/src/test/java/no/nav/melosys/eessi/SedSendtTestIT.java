@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
-import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -90,7 +89,7 @@ class SedSendtTestIT extends ComponentTestBase {
         PDLSokPerson pdlSokPerson = new PDLSokPerson();
         pdlSokPerson.setHits(Collections.singletonList(new PDLSokHit()));
         when(personFasade.soekEtterPerson(any())).thenReturn(List.of());
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sedUkjentPin( LocalDate.of(2000, 1, 1), "DK", null));
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sedUkjentPin(LocalDate.of(2000, 1, 1), "DK", null));
 
 
         kafkaTestConsumer.reset(3);
@@ -118,7 +117,7 @@ class SedSendtTestIT extends ComponentTestBase {
         pdlSokPerson.setHits(Collections.singletonList(new PDLSokHit()));
         when(personFasade.soekEtterPerson(any())).thenReturn(List.of());
 
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sedUkjentPin( LocalDate.of(2000, 1, 1), "DK", null));
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sedUkjentPin(LocalDate.of(2000, 1, 1), "DK", null));
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();

@@ -1,14 +1,15 @@
 package no.nav.melosys.eessi.models;
 
 import java.time.LocalDateTime;
-import javax.persistence.*;
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
+import jakarta.persistence.*;
+
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -16,7 +17,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode
-@TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+@Convert(attributeName = "jsonb", converter = JsonBinaryType.class)
 public class SedMottatt {
 
     @Id
@@ -24,11 +25,11 @@ public class SedMottatt {
     @Column(name = "id")
     private Long id;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "sed_hendelse")
     private SedHendelse sedHendelse;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "sed_kontekst")
     private SedKontekst sedKontekst;
 

@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.models;
 
 import java.time.LocalDate;
-import javax.xml.datatype.XMLGregorianCalendar;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass

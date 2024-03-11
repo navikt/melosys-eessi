@@ -8,7 +8,7 @@ public interface WebClientConfig {
         return ExchangeFilterFunction.ofResponseProcessor(response -> {
             if (response.statusCode().isError()) {
                 return response.bodyToMono(String.class)
-                    .defaultIfEmpty(response.statusCode().getReasonPhrase())
+                    .defaultIfEmpty(response.statusCode().toString())
                     .flatMap(
                         errorBody -> Mono.error(new RuntimeException(feilmelding + " " + response.statusCode() + " - " + errorBody)));
             }
