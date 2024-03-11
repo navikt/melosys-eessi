@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.saksrelasjon;
 import java.util.Collections;
 import java.util.Optional;
 
+import io.getunleash.FakeUnleash;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
 import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.Sak;
@@ -35,7 +36,7 @@ class SaksrelasjonServiceTest {
 
     @BeforeEach
     public void setup() {
-        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, arkivsakService);
+        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, arkivsakService, new FakeUnleash());
     }
 
     private final String RINA_ID = "321";
