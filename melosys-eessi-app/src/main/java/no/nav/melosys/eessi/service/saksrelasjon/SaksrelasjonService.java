@@ -36,14 +36,19 @@ public class SaksrelasjonService {
         fagsakRinasakKobling = fagsakRinasakKoblingRepository.save(fagsakRinasakKobling);
 
         if (!bucType.erLovvalgBuc()) {
-            oppdaterEllerLagreIEuxCaseStore(gsakSaksnummer, rinaSaksnummer);
+            if (unleash.isEnabled(ToggleName.IKKE_HENT_FRA_CASESTORE)) {
+                log.info("Oppdaterer eller lagrer i casestore for gsaknummer: {} og rinaSaksnummer {} er togglet av", gsakSaksnummer, rinaSaksnummer);
+            } else {
+                oppdaterEllerLagreIEuxCaseStore(gsakSaksnummer, rinaSaksnummer);
+            }
+
         }
 
         return fagsakRinasakKobling;
     }
 
     private void oppdaterEllerLagreIEuxCaseStore(Long gsakSaksnummer, String rinaSaksnummer) {
-        log.info("Oppdaterer eller lagrer i casestire for gsaknummer: {} og rinaSaksnummer {}", gsakSaksnummer, rinaSaksnummer);
+        log.info("Oppdaterer eller lagrer i casestore for gsaknummer: {} og rinaSaksnummer {}", gsakSaksnummer, rinaSaksnummer);
         caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer)
             .stream()
             .findFirst()
