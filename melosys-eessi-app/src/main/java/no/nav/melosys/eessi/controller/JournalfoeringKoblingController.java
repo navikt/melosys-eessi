@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.controller;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.JournalpostSedKoblingDto;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
@@ -23,14 +24,14 @@ public class JournalfoeringKoblingController {
         this.journalpostSedKoblingService = journalpostSedKoblingService;
     }
 
-    // @ApiOperation(value = "Henter objekt som beskriver dataen mottatt i sed som journalpost er koblet til")
+    @ApiResponse(description = "Henter objekt som beskriver dataen mottatt i sed som journalpost er koblet til")
     @GetMapping("{journalpostID}/eessimelding")
     public MelosysEessiMelding hentEessiMeldingFraJournalpost(@PathVariable("journalpostID") String journalpostID) {
         return journalpostSedKoblingService.finnVedJournalpostIDOpprettMelosysEessiMelding(journalpostID)
             .orElseThrow(() -> new NotFoundException("Finner ikke rinasak tilhørende journalpostID " + journalpostID));
     }
 
-    // @ApiOperation(value = "Henter sed koblet til journalpost. Gir tomt svar om det ikke finnes en relasjon")
+    @ApiResponse(description = "Henter sed koblet til journalpost. Gir tomt svar om det ikke finnes en relasjon")
     @GetMapping("{journalpostID}")
     public JournalpostSedKoblingDto hentJournalpostInfo(@PathVariable("journalpostID") String journalpostID) {
         return journalpostSedKoblingService.finnVedJournalpostID(journalpostID)

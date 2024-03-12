@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.melosys.eessi.service.buc.KopierBucService;
 import no.nav.security.token.support.core.api.Protected;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +21,7 @@ public class KopierBucController {
         this.kopierBucService = kopierBucService;
     }
 
-    //  @ApiOperation("Kopierer over første SED i en BUC til en ny BUC og lagrer saksrelasjon på samme arkivsak som tidligere BUC")
+    @ApiResponse(description = "Kopierer over første SED i en BUC til en ny BUC og lagrer saksrelasjon på samme arkivsak som tidligere BUC")
     @PostMapping("/bucer/kopier")
     public Map<String, String> kopierOverBUCer(@RequestBody Collection<String> bucer) {
         var saker = new HashMap<String, String>();

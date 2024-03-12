@@ -4,6 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
 import jakarta.websocket.server.PathParam;
 
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +40,7 @@ public class SakController {
 
 
     @GetMapping("/{gsakSaksnummer}/bucer")
-    // @ApiOperation(value = "Henter bucer tilknyttet en sak")
+    @ApiResponse(description = "Henter bucer tilknyttet en sak")
     public List<BucinfoDto> hentTilknyttedeBucer(@PathVariable Long gsakSaksnummer,
                                                  @RequestParam(required = false) List<String> statuser) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
@@ -49,7 +52,7 @@ public class SakController {
     }
 
     @PostMapping
-    // @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
+    @ApiResponse(description = "Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
     public ResponseEntity<Void> lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
         throws ValidationException {
         validerSaksrelasjonDto(saksrelasjonDto);
@@ -61,7 +64,7 @@ public class SakController {
     }
 
     @GetMapping
-    //  @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
+    @ApiResponse(description = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
     public List<SaksrelasjonDto> hentSaksrelasjon(
         @PathParam("rinaSaksnummer") String rinaSaksnummer,
         @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
