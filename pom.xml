@@ -28,7 +28,6 @@
         <java.version>17</java.version>
         <logstash-encoder.version>7.4</logstash-encoder.version>
         <lombok.version>1.18.30</lombok.version>
-        <jackson.version>2.14.1</jackson.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <micrometer.version>1.12.3</micrometer.version>
