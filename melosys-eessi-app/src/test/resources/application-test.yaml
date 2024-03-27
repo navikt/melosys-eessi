@@ -1,5 +1,5 @@
 server:
-  port: 8081
+    port: 8081
 
 # Integrations
 EUXAPP_URL: dummy
@@ -27,45 +27,45 @@ KAFKA_BOOTSTRAP_SERVERS: ${spring.embedded.kafka.brokers}
 KAFKA_BROKERS: ${spring.embedded.kafka.brokers}
 
 spring.datasource:
-  username: postgres
-  password: su
+    username: postgres
+    password: su
 
 spring.jpa:
-  hibernate:
-    ddl-auto: none
-    use-new-id-generator-mappings: true
-  database-platform: org.hibernate.dialect.PostgreSQL95Dialect
-  show-sql: false
-  properties:
     hibernate:
-      default_schema: PUBLIC
-      format_sql: true
-      jdbc.lob.non_contextual_creation: true
-    jadira.usertype.autoRegisterUserTypes: true
+        ddl-auto: none
+        use-new-id-generator-mappings: true
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+    properties:
+        hibernate:
+            default_schema: PUBLIC
+            format_sql: true
+            jdbc.lob.non_contextual_creation: true
+        jadira.usertype.autoRegisterUserTypes: true
 
 spring:
-  application:
-    name: melosys-eessi
-  kafka:
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    application:
+        name: melosys-eessi
+    kafka:
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
-    properties:
-      schema.registry.url: dummy
-      reconnect.backoff.ms: 1000
-      ssl:
-        truststore.location:
-        truststore.password:
-        protocol: PLAINTEXT
-      security.protocol: PLAINTEXT
+        properties:
+            schema.registry.url: dummy
+            reconnect.backoff.ms: 1000
+            ssl:
+                truststore.location:
+                truststore.password:
+                protocol: PLAINTEXT
+            security.protocol: PLAINTEXT
 
 # Apikey til SedMottakAdminTjeneste
 melosys:
-  admin:
-    api-key: dummy
+    admin:
+        api-key: dummy
 
 no.nav.security.jwt.issuer:
-          aad:
-            discoveryurl: http://localhost:${mock-oauth2-server.port}/issuer1/.well-known/openid-configuration
-            acceptedaudience: dumbdumb
+    aad:
+        discoveryurl: http://localhost:${mock-oauth2-server.port}/issuer1/.well-known/openid-configuration
+        acceptedaudience: dumbdumb

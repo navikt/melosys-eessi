@@ -1,13 +1,14 @@
 package no.nav.melosys.eessi.models;
 
-import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
-import lombok.*;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import org.hibernate.annotations.Type;
-import org.hibernate.annotations.TypeDef;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.*;
 
-import javax.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity(name = "sed_sendt_hendelse")
 @Data
@@ -21,7 +22,7 @@ public class SedSendtHendelse {
     @Column(name = "id")
     private Long id;
 
-    @Type(type = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "sed_hendelse")
     private SedHendelse sedHendelse;
 

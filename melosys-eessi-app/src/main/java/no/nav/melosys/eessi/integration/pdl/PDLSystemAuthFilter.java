@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.integration.pdl;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;

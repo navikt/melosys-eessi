@@ -1,6 +1,11 @@
 package no.nav.melosys.eessi.service.kafkadlq;
 
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
@@ -14,13 +19,7 @@ import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
 import static no.nav.melosys.eessi.config.MDCOperations.*;
-import static no.nav.melosys.eessi.config.MDCOperations.SED_ID;
 
 @Slf4j
 @Service
