@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.security;
 import java.io.IOException;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
@@ -13,7 +14,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-
+@Slf4j
 public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsClient restStsClient;
@@ -35,9 +36,11 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String accessToken = "";
         if (ContextHolder.getInstance().canExchangeOBOToken()) {
+            log.info("Using azure");
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
             accessToken = response.getAccessToken();
         } else {
+            log.info("Using sts");
             accessToken = restStsClient.collectToken();
         }
 
