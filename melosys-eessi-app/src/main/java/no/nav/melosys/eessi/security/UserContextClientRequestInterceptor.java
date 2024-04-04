@@ -37,7 +37,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
         String accessToken = "";
         if (ContextHolder.getInstance().canExchangeOBOToken()) {
             log.info("Using azure");
-            log.info("Debugging i Q2: " + clientProperties);
+            log.info("Debugging i Q2 grant type: " + clientProperties.getGrantType());
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
             log.info("Debugging i Q2: " + response);
             accessToken = response.getAccessToken();
