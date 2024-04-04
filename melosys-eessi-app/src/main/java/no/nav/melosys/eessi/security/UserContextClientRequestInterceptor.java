@@ -37,7 +37,9 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
         String accessToken = "";
         if (ContextHolder.getInstance().canExchangeOBOToken()) {
             log.info("Using azure");
+            log.info("Debugging i Q2: " + clientProperties);
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
+            log.info("Debugging i Q2: " + response);
             accessToken = response.getAccessToken();
         } else {
             log.info("Using sts");
@@ -45,6 +47,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
         }
 
         request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+        log.info("Debugging i Q2: " + request);
         return execution.execute(request, body);
     }
 }
