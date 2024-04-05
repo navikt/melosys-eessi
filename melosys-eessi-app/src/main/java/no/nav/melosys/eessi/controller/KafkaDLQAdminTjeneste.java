@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/kafka/dlq")
+@Profile("!local-q1 & !local-q2")
 public class KafkaDLQAdminTjeneste {
 
     private static final String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";

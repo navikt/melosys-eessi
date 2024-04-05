@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.BucIdentifisert;
 import no.nav.melosys.eessi.repository.BucIdentifisertRepository;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Profile;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 

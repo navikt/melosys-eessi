@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,7 @@ import static no.nav.melosys.eessi.config.MDCOperations.*;
 @Slf4j
 @RequiredArgsConstructor
 @Component
+@Profile("!local-q1 & !local-q2")
 public class OppgaveHendelseConsumer extends AbstractConsumerSeekAware {
 
     private final OppgaveEndretService oppgaveEndretService;
