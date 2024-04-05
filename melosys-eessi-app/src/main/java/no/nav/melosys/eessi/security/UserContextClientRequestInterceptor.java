@@ -35,7 +35,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
         String accessToken = "";
-        if (ContextHolder.getInstance().canExchangeOBOToken()) {
+        if (ContextHolder.getInstance().canExchangeOBOToken()) { //TODO && request.getURI() != "eux")
             log.info("Using azure");
             log.info("Debugging i Q2 grant type: " + clientProperties.getGrantType());
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
