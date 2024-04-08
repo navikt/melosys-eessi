@@ -47,6 +47,8 @@ class A001MapperTest {
         MedlemskapA001 medlemskapA001 = (MedlemskapA001) sed.getMedlemskap();
         assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
         assertThat(medlemskapA001.getVertsland().getArbeidsgiver()).noneMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
+        assertThat(medlemskapA001.getNaavaerendemedlemskap()).allMatch(medlemskap -> "SE".equalsIgnoreCase(medlemskap.getLandkode()));
+        assertThat(medlemskapA001.getForespurtmedlemskap()).allMatch(medlemskap -> "NO".equalsIgnoreCase(medlemskap.getLandkode()));
     }
 }
 
