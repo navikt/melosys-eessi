@@ -24,7 +24,7 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
 
         if (lovvalgsperiode.isPresent()) {
             medlemskap.setUnntak(getUnntak(lovvalgsperiode.get()));
-            medlemskap.setNaavaerendemedlemskap(getLovvalgsland(lovvalgsperiode.get()));
+            medlemskap.setNaavaerendemedlemskap(getUnntakFraLovvalgsland(lovvalgsperiode.get()));
             medlemskap.setForespurtmedlemskap(getLovvalgsland(lovvalgsperiode.get()));
             medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode.get()));
             medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
@@ -60,6 +60,13 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
         vertsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
 
         return vertsland;
+    }
+
+    private List<Land> getUnntakFraLovvalgsland(Lovvalgsperiode lovvalgsperiode) {
+        Land land = new Land();
+        land.setLandkode(LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.getUnntakFraLovvalgsland()));
+
+        return Collections.singletonList(land);
     }
 
     private List<Land> getLovvalgsland(Lovvalgsperiode lovvalgsperiode) {
