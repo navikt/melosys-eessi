@@ -315,6 +315,7 @@ public class EuxConsumer implements RestConsumer {
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,
                            ParameterizedTypeReference<T> responseType, Object... variabler) {
         try {
+            var test = euxRestTemplate.exchange(uri, method, entity, responseType, variabler);
             return euxRestTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
         } catch (HttpClientErrorException.NotFound e) {
             throw new NotFoundException("404 fra eux: " + hentFeilmeldingForEux(e), e);

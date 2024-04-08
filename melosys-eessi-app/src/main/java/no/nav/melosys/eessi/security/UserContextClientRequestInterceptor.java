@@ -39,6 +39,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
             log.info("Using azure");
             log.info("Debugging i Q2 grant type: " + clientProperties.getGrantType());
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
+            System.out.println("Token: " + response);
             log.info("Debugging i Q2: " + response);
             accessToken = response.getAccessToken();
         } else {

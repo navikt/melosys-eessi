@@ -49,6 +49,7 @@ public class SedService {
                                                 boolean forsøkOppdaterEksisterende)
         throws ValidationException {
 
+        //TODO fiks her en plass
         Long gsakSaksnummer = hentGsakSaksnummer(sedDataDto);
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer);
 
