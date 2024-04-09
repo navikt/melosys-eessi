@@ -19,7 +19,6 @@ import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Slf4j

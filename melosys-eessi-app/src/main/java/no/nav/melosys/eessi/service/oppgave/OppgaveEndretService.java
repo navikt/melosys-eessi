@@ -9,7 +9,6 @@ import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.context.annotation.Profile;
 
 import java.util.Collection;
 import java.util.Set;

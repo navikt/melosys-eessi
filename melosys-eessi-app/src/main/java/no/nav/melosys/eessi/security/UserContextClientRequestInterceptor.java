@@ -15,7 +15,6 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-@Slf4j
 public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsClient restStsClient;
