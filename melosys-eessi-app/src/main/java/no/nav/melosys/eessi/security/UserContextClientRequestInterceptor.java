@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
+import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -34,21 +35,25 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        String accessToken = "";
-        if (ContextHolder.getInstance().canExchangeOBOToken()) { //TODO && request.getURI() != "eux")
-            log.info("Using azure");
-            log.info("Debugging i Q2 grant type: " + clientProperties.getGrantType());
-            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
-            System.out.println("Token: " + response);
-            log.info("Debugging i Q2: " + response);
-            accessToken = response.getAccessToken();
-        } else {
-            log.info("Using sts");
-            accessToken = restStsClient.collectToken();
-        }
-
-        request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        log.info("Debugging i Q2: " + request);
+        request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + genererAccessToken(request));
         return execution.execute(request, body);
+    }
+
+    private String genererAccessToken(HttpRequest request) {
+        if (ContextHolder.getInstance().canExchangeOBOToken()) {
+            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
+            return response.getAccessToken();
+        } else if (request.getURI().toString().contains("eux-rina-api")) {
+            var clientPropertiesForSystem = ClientProperties.builder()
+                .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
+                .scope(clientProperties.getScope())
+                .authentication(clientProperties.getAuthentication())
+                .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
+                .build();
+            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
+            return response.getAccessToken();
+        } else {
+            return restStsClient.collectToken();
+        }
     }
 }
