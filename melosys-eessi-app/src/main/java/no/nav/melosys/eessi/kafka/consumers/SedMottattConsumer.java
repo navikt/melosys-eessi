@@ -20,7 +20,7 @@ import static no.nav.melosys.eessi.config.MDCOperations.*;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-@Profile("!local-q1 & !local-q2")
+@Profile("!local-q2")
 public class SedMottattConsumer extends AbstractConsumerSeekAware {
 
     private final SedMottakService sedMottakService;

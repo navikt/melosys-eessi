@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/kafka/dlq")
-@Profile("!local-q1 & !local-q2")
+@Profile("!local-q2")
 public class KafkaDLQAdminTjeneste {
 
     private static final String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";

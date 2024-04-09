@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Unprotected
 @RestController
 @RequestMapping("/admin/kafka/consumers")
-@Profile("!local-q1 & !local-q2")
+@Profile("!local-q2")
 public class KafkaAdminTjeneste {
 
     private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";

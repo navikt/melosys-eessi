@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @AllArgsConstructor
-@Profile("!local-q1 & !local-q2")
+@Profile("!local-q2")
 public class BucIdentifisertEventListener {
 
     private final BehandleBucIdentifisertService behandleBucIdentifisertService;

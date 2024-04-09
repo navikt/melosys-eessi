@@ -17,7 +17,7 @@ import static no.nav.melosys.eessi.config.MDCOperations.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Profile("!local-q1 & !local-q2")
+@Profile("!local-q2")
 public class SedSendtConsumer {
 
     private final OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;

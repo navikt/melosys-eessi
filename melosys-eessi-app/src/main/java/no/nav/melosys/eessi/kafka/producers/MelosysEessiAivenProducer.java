@@ -17,7 +17,7 @@ import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
 
 @Slf4j
 @Service
-@Profile("!local-q1 & !local-q2")
+@Profile("!local-q2")
 public class MelosysEessiAivenProducer {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
