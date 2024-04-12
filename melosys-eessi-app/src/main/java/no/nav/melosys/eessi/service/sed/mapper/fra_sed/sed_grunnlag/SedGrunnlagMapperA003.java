@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.getunleash.Unleash;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedGrunnlagA003Dto;
@@ -19,6 +20,8 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper;
 import org.springframework.util.CollectionUtils;
 
 public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
+    private Unleash unleash;
+
     @Override
     public SedGrunnlagA003Dto map(SED sed) {
         MedlemskapA003 medlemskap = hentMedlemskap(sed);

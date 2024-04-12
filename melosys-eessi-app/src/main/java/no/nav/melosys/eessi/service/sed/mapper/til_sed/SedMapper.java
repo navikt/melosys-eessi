@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsland;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.Konstanter;
@@ -48,6 +49,7 @@ public interface SedMapper {
 
         nav.setBruker(hentBruker(sedData));
         nav.setArbeidssted(hentArbeidssted(sedData));
+        nav.setArbeidsland(hentArbeidsland(sedData));
         nav.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), sedData.finnLovvalgslandDefaultNO()));
         nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
 
@@ -174,7 +176,21 @@ public interface SedMapper {
             bruker.setMor(mor);
         }
     }
+    default List<Arbeidsland> hentArbeidsland(SedDataDto sedData) {
 
+        List<Arbeidsland> arbeidslands = Lists.newArrayList();
+
+        for (no.nav.melosys.eessi.controller.dto.Arbeidsland arbLand : sedData.getArbeidsland()) {
+            var arbeidsland = new Arbeidsland();
+            arbeidsland.setLand(arbLand.getLand());
+            arbeidsland.setArbeidssted(hentArbeidssted(sedData));
+            arbeidsland.setHarfastarbeidssted(arbLand.getHarfastarbeidssted());
+
+            arbeidslands.add(arbeidsland);
+        }
+
+        return arbeidslands;
+    }
     default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) {
 
         List<Arbeidssted> arbeidsstedList = Lists.newArrayList();

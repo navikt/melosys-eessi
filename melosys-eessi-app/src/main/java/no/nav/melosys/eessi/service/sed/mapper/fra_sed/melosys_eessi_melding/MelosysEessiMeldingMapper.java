@@ -4,10 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import no.nav.melosys.eessi.kafka.producers.model.Arbeidssted;
-import no.nav.melosys.eessi.kafka.producers.model.Avsender;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.kafka.producers.model.Statsborgerskap;
+import no.nav.melosys.eessi.kafka.producers.model.*;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 
@@ -38,6 +35,10 @@ public interface MelosysEessiMeldingMapper {
 
         if (sed.getNav() != null && sed.getNav().getArbeidssted() != null) {
             melosysEessiMelding.setArbeidssteder(sed.getNav().getArbeidssted().stream().map(Arbeidssted::new).collect(Collectors.toList()));
+        }
+
+        if (sed.getNav() != null && sed.getNav().getArbeidsland() != null) {
+            melosysEessiMelding.setArbeidsland(sed.getNav().getArbeidsland().stream().map(Arbeidsland::new).collect(Collectors.toList()));
         }
 
         melosysEessiMelding.setErEndring(sedErEndring);

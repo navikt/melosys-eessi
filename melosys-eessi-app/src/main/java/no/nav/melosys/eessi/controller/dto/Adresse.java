@@ -11,6 +11,7 @@ public class Adresse {
     private String postnr;
     private String land;
     private String gateadresse;
+    private String tilleggsnavn;
     private String region;
     private Adressetype adressetype;
 
@@ -25,10 +26,8 @@ public class Adresse {
         adresse.postnr = adresseFraRina.getPostnummer();
         adresse.land = LandkodeMapper.mapTilNavLandkode(adresseFraRina.getLand());
 
-        adresse.gateadresse = String.format("%s %s",
-                StringUtils.defaultIfEmpty(adresseFraRina.getGate(), ""),
-                StringUtils.defaultIfEmpty(adresseFraRina.getBygning(), "")
-        ).trim();
+        adresse.gateadresse = StringUtils.defaultIfEmpty(adresseFraRina.getGate(), "");
+        adresse.tilleggsnavn = StringUtils.defaultIfEmpty(adresseFraRina.getBygning(), "");
 
         adresse.region = adresseFraRina.getRegion();
         adresse.adressetype = Adressetype.fraAdressetypeRina(adresseFraRina.getType());

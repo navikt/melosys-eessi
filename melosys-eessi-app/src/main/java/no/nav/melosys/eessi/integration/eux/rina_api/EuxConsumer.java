@@ -137,10 +137,17 @@ public class EuxConsumer implements RestConsumer {
         var headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_PDF));
 
+        log.info("Kaller /sed/pdf med {}", sed);
+
+        var a = exchange("/sed/pdf", HttpMethod.POST,
+            new HttpEntity<>(sed, headers),
+            new ParameterizedTypeReference<>() {});
+
+        log.info("Får i retur: {}", a);
+
         return exchange("/sed/pdf", HttpMethod.POST,
-                new HttpEntity<>(sed, headers),
-                new ParameterizedTypeReference<>() {}
-        );
+            new HttpEntity<>(sed, headers),
+            new ParameterizedTypeReference<>() {});
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId) {
