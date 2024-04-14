@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.security;
 import java.io.IOException;
 import java.util.Optional;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
@@ -15,6 +14,9 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+
+import static no.nav.security.token.support.client.core.OAuth2GrantType.JWT_BEARER;
+
 public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsClient restStsClient;
@@ -34,15 +36,15 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + genererAccessToken(request));
+        request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + hentAccessToken());
         return execution.execute(request, body);
     }
 
-    private String genererAccessToken(HttpRequest request) {
+    private String hentAccessToken() {
         if (ContextHolder.getInstance().canExchangeOBOToken()) {
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
             return response.getAccessToken();
-        } else if (request.getURI().toString().contains("eux-rina-api")) {
+        } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
             var clientPropertiesForSystem = ClientProperties.builder()
                 .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
                 .scope(clientProperties.getScope())
