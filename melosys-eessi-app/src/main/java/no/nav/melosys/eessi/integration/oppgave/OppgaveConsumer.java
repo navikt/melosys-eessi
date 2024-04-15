@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.RestUtils;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -28,7 +28,7 @@ public class OppgaveConsumer implements RestConsumer {
             .uri("/oppgaver/{oppgaveID}", oppgaveID)
             .header(X_CORRELATION_ID, correlationID)
             .retrieve()
-            .onStatus(HttpStatus::isError, this::håndterFeil)
+            .onStatus(HttpStatusCode::isError, this::håndterFeil)
             .bodyToMono(HentOppgaveDto.class)
             .block();
     }
@@ -41,7 +41,7 @@ public class OppgaveConsumer implements RestConsumer {
             .header(X_CORRELATION_ID, correlationID)
             .bodyValue(oppgaveDto)
             .retrieve()
-            .onStatus(HttpStatus::isError, this::håndterFeil)
+            .onStatus(HttpStatusCode::isError, this::håndterFeil)
             .bodyToMono(HentOppgaveDto.class)
             .block();
     }
@@ -54,7 +54,7 @@ public class OppgaveConsumer implements RestConsumer {
             .header(X_CORRELATION_ID, correlationID)
             .bodyValue(oppgaveOppdateringDto)
             .retrieve()
-            .onStatus(HttpStatus::isError, this::håndterFeil)
+            .onStatus(HttpStatusCode::isError, this::håndterFeil)
             .bodyToMono(HentOppgaveDto.class)
             .block();
     }

@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.security;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import org.springframework.http.HttpHeaders;

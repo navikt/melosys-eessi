@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.config;
 
-import javax.persistence.EntityManagerFactory;
-import javax.sql.DataSource;
+import jakarta.persistence.EntityManagerFactory;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,8 +52,8 @@ public class DatabaseConfig {
     @Bean
     public FlywayConfigurationCustomizer flywayConfig(@Qualifier("adminDataSource") DataSource adminDataSource) {
         return config ->
-                config.initSql(String.format("SET ROLE \"%s-admin\"", databaseName))
-                        .dataSource(adminDataSource);
+            config.initSql(String.format("SET ROLE \"%s-admin\"", databaseName))
+                .dataSource(adminDataSource);
     }
 
     @Bean

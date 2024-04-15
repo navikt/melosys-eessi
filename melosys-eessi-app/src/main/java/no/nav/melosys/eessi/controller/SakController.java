@@ -4,9 +4,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.websocket.server.PathParam;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+
+import jakarta.websocket.server.PathParam;
+
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.BucinfoDto;
 import no.nav.melosys.eessi.controller.dto.SaksrelasjonDto;
@@ -38,43 +40,43 @@ public class SakController {
 
 
     @GetMapping("/{gsakSaksnummer}/bucer")
-    @ApiOperation(value = "Henter bucer tilknyttet en sak")
+    @ApiResponse(description = "Henter bucer tilknyttet en sak")
     public List<BucinfoDto> hentTilknyttedeBucer(@PathVariable Long gsakSaksnummer,
                                                  @RequestParam(required = false) List<String> statuser) {
         return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
-                .map(FagsakRinasakKobling::getRinaSaksnummer)
-                .map(euxService::finnBUC)
-                .flatMap(Optional::stream)
-                .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrl(buc.getId())))
-                .collect(Collectors.toList());
+            .map(FagsakRinasakKobling::getRinaSaksnummer)
+            .map(euxService::finnBUC)
+            .flatMap(Optional::stream)
+            .map(buc -> BucinfoDto.av(buc, statuser, euxService.hentRinaUrl(buc.getId())))
+            .collect(Collectors.toList());
     }
 
     @PostMapping
-    @ApiOperation("Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
+    @ApiResponse(description = "Lagrer en saksrelasjon mellom en rinasak og en gsak-sak")
     public ResponseEntity<Void> lagreSaksrelasjon(@RequestBody SaksrelasjonDto saksrelasjonDto)
-            throws ValidationException {
+        throws ValidationException {
         validerSaksrelasjonDto(saksrelasjonDto);
 
         saksrelasjonService.lagreKobling(saksrelasjonDto.getGsakSaksnummer(),
-                saksrelasjonDto.getRinaSaksnummer(), BucType.valueOf(saksrelasjonDto.getBucType()));
+            saksrelasjonDto.getRinaSaksnummer(), BucType.valueOf(saksrelasjonDto.getBucType()));
 
         return ResponseEntity.ok().build();
     }
 
     @GetMapping
-    @ApiOperation(value = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
+    @ApiResponse(description = "Søker etter saksrelasjon basert på enten rinaSaksnummer eller gsakSaksnummer")
     public List<SaksrelasjonDto> hentSaksrelasjon(
-            @PathParam("rinaSaksnummer") String rinaSaksnummer,
-            @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
+        @PathParam("rinaSaksnummer") String rinaSaksnummer,
+        @PathParam("gsakSaksnummer") Long gsakSaksnummer) throws ValidationException {
 
         if (!StringUtils.hasText(rinaSaksnummer) && gsakSaksnummer != null) {
             return saksrelasjonService.finnVedGsakSaksnummer(gsakSaksnummer).stream()
-                    .map(SaksrelasjonDto::av)
-                    .collect(Collectors.toList());
+                .map(SaksrelasjonDto::av)
+                .collect(Collectors.toList());
         } else if (StringUtils.hasText(rinaSaksnummer) && gsakSaksnummer == null) {
             return saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer)
-                    .map(saksnummer -> Collections.singletonList(new SaksrelasjonDto(saksnummer, rinaSaksnummer, null)))
-                    .orElse(Collections.emptyList());
+                .map(saksnummer -> Collections.singletonList(new SaksrelasjonDto(saksnummer, rinaSaksnummer, null)))
+                .orElse(Collections.emptyList());
         }
 
         throw new ValidationException("Kun en av rinaSaksnummer og gsakSaksnummer kan spørres på");
@@ -92,7 +94,7 @@ public class SakController {
 
         if (eksisterende.isPresent() && !eksisterende.get().getGsakSaksnummer().equals(saksrelasjonDto.getGsakSaksnummer())) {
             throw new ValidationException("Rinasak " + saksrelasjonDto.getRinaSaksnummer() +
-                    " er allerede koblet mot gsakSaksnummer " + eksisterende.get().getGsakSaksnummer());
+                " er allerede koblet mot gsakSaksnummer " + eksisterende.get().getGsakSaksnummer());
         }
     }
 }

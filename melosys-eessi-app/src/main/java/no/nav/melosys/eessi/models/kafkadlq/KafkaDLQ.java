@@ -1,11 +1,14 @@
 package no.nav.melosys.eessi.models.kafkadlq;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import jakarta.persistence.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -31,7 +34,7 @@ public abstract class KafkaDLQ {
     @Column(name = "tid_sist_rekjort")
     private LocalDateTime tidSistRekjort;
 
-    @Column(name="siste_feilmelding")
+    @Column(name = "siste_feilmelding")
     private String sisteFeilmelding;
 
     @Column(name = "antall_rekjoringer")

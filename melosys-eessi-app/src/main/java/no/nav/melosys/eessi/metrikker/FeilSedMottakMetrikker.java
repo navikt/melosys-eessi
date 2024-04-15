@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.metrikker;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -17,7 +17,7 @@ public class FeilSedMottakMetrikker {
     private final SedMottattRepository sedMottattRepository;
 
     public FeilSedMottakMetrikker(MeterRegistry meterRegistry,
-            SedMottattRepository sedMottattRepository) {
+                                  SedMottattRepository sedMottattRepository) {
         this.meterRegistry = meterRegistry;
         this.sedMottattRepository = sedMottattRepository;
     }
@@ -25,6 +25,6 @@ public class FeilSedMottakMetrikker {
     @PostConstruct
     public void initGauge() {
         Gauge.builder(MetrikkerNavn.SED_MOTTATT_FEILET_DEPRECATED, this, v -> sedMottattRepository.countByFeiletIsTrue())
-                .register(meterRegistry);
+            .register(meterRegistry);
     }
 }

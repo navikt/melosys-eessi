@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.identifisering;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import javax.annotation.Nullable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import jakarta.annotation.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public record OppgaveKafkaAivenRecord(Hendelse hendelse, UtfortAv utfortAv, Oppgave oppgave) {
     public record Hendelse(Hendelsestype hendelsestype, LocalDateTime tidspunkt) {

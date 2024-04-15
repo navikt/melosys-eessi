@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
@@ -44,7 +44,7 @@ public class BucController {
         this.euxConsumer = euxConsumer;
     }
 
-    @ApiOperation(value = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true. " +
+    @ApiResponse(description = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true. " +
         "Sender på eksisterende BUC hvis BUCen meddeler et lovvalg med utenlandsk myndighet, og BUCen er åpen.")
     @PostMapping(
         value = "/{bucType}",
@@ -68,7 +68,7 @@ public class BucController {
             oppdaterEksisterende);
     }
 
-    @ApiOperation(value = "Oppretter og sender en sed på en eksisterende buc")
+    @ApiResponse(description = "Oppretter og sender en sed på en eksisterende buc")
     @PostMapping("/{rinaSaksnummer}/sed/{sedType}")
     public void sendPåEksisterendeBuc(
         @RequestBody SedDataDto sedDataDto,
@@ -81,7 +81,7 @@ public class BucController {
         sedService.sendPåEksisterendeBuc(sedDataDto, rinaSaksnummer, sedType);
     }
 
-    @ApiOperation(value = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
+    @ApiResponse(description = "Henter mottakerinstitusjoner som er satt som EESSI-klare for den spesifikke buc-type")
     @GetMapping("/{bucType}/institusjoner")
     public List<InstitusjonDto> hentMottakerinstitusjoner(@PathVariable BucType bucType,
                                                           @RequestParam(required = false) Collection<String> land) {
@@ -90,20 +90,20 @@ public class BucController {
             .collect(Collectors.toList());
     }
 
-    @ApiOperation(value = "Henter sedGrunnlag for gitt sed")
+    @ApiResponse(description = "Henter sedGrunnlag for gitt sed")
     @GetMapping("/{rinaSaksnummer}/sed/{rinaDokumentId}/grunnlag")
     public SedGrunnlagDto hentSedGrunnlag(@PathVariable String rinaSaksnummer, @PathVariable String rinaDokumentId) {
         var sed = euxService.hentSed(rinaSaksnummer, rinaDokumentId);
         return SedGrunnlagMapperFactory.getMapper(SedType.valueOf(sed.getSedType())).map(sed);
     }
 
-    @ApiOperation(value = "Oppretter en asynkron jobb som forsøker å lukke en spesifikk BUC, om den har actions som tillater det")
+    @ApiResponse(description = "Oppretter en asynkron jobb som forsøker å lukke en spesifikk BUC, om den har actions som tillater det")
     @PostMapping("/{rinaSaksnummer}/lukk")
     public void lukkBuc(@PathVariable("rinaSaksnummer") String rinaSaksnummer) {
         lukkBucService.forsøkLukkBucAsync(rinaSaksnummer);
     }
 
-    @ApiOperation(value= "Henter mulige aksjoner på en Buc")
+    @ApiResponse(description = "Henter mulige aksjoner på en Buc")
     @GetMapping("/{rinaSaksnummer}/aksjoner")
     public Collection<String> hentMuligeBucHandlinger(@PathVariable("rinaSaksnummer") String rinaSaksnummer) {
         return euxConsumer.hentBucHandlinger(rinaSaksnummer);
