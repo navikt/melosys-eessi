@@ -15,6 +15,7 @@ public class SedGrunnlagDto {
     private List<Virksomhet> selvstendigeVirksomheter;
     private List<Arbeidssted> arbeidssteder;
     private List<Arbeidsland> arbeidsland;
+    private Boolean harfastarbeidssted;
     private List<Lovvalgsperiode> lovvalgsperioder;
     private String ytterligereInformasjon;
     private String gjeldenderegler;

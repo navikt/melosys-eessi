@@ -48,8 +48,11 @@ public interface SedMapper {
         var nav = new Nav();
 
         nav.setBruker(hentBruker(sedData));
-        nav.setArbeidssted(hentArbeidssted(sedData));
+
+        List<Arbeidssted> arbeidsstedList = hentArbeidssted(sedData);
+        nav.setArbeidssted(arbeidsstedList);
         nav.setArbeidsland(hentArbeidsland(sedData));
+        nav.setHarfastarbeidssted(sedData.getHarfastarbeidssted() ? "ja" : "nei");
         nav.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), sedData.finnLovvalgslandDefaultNO()));
         nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
 
@@ -183,13 +186,34 @@ public interface SedMapper {
         for (no.nav.melosys.eessi.controller.dto.Arbeidsland arbLand : sedData.getArbeidsland()) {
             var arbeidsland = new Arbeidsland();
             arbeidsland.setLand(arbLand.getLand());
-            arbeidsland.setArbeidssted(hentArbeidssted(sedData));
-            arbeidsland.setHarfastarbeidssted(arbLand.getHarfastarbeidssted());
+            arbeidsland.setArbeidssted(hentArbeidssted4_3(arbLand.getArbeidssted()));
 
             arbeidslands.add(arbeidsland);
         }
 
         return arbeidslands;
+    }
+
+    default List<Arbeidssted> hentArbeidssted4_3(List<no.nav.melosys.eessi.controller.dto.Arbeidssted> arbeidssteder) {
+
+        List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
+
+        for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : arbeidssteder) {
+            var arbeidssted = new Arbeidssted();
+            arbeidssted.setNavn(arbStd.getNavn());
+            arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
+            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
+
+            if (arbStd.isFysisk()) {
+                arbeidssted.setErikkefastadresse("nei");
+            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
+                arbeidssted.setErikkefastadresse("ja");
+            }
+
+            arbeidsstedList.add(arbeidssted);
+        }
+
+        return arbeidsstedList;
     }
     default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) {
 

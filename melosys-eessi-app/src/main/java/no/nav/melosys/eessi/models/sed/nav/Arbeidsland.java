@@ -13,7 +13,5 @@ public class Arbeidsland {
 
     private List<Arbeidssted> arbeidssted;
 
-    private String harfastarbeidssted;
-
     private String land;
 }
