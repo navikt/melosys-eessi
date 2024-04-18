@@ -16,6 +16,8 @@ public class Adresse {
     private Adressetype adressetype;
 
     public static Adresse av(no.nav.melosys.eessi.models.sed.nav.Adresse adresseFraRina) {
+        var erCDM4_3 = false;
+
         if (adresseFraRina == null) {
             return new Adresse();
         }
@@ -26,8 +28,15 @@ public class Adresse {
         adresse.postnr = adresseFraRina.getPostnummer();
         adresse.land = LandkodeMapper.mapTilNavLandkode(adresseFraRina.getLand());
 
-        adresse.gateadresse = StringUtils.defaultIfEmpty(adresseFraRina.getGate(), "");
-        adresse.tilleggsnavn = StringUtils.defaultIfEmpty(adresseFraRina.getBygning(), "");
+        if(erCDM4_3) {
+            adresse.gateadresse = StringUtils.defaultIfEmpty(adresseFraRina.getGate(), "");
+            adresse.tilleggsnavn = StringUtils.defaultIfEmpty(adresseFraRina.getBygning(), "");
+        } else {
+            adresse.gateadresse = String.format("%s %s",
+                StringUtils.defaultIfEmpty(adresseFraRina.getGate(), ""),
+                StringUtils.defaultIfEmpty(adresseFraRina.getBygning(), "")
+            ).trim();
+        }
 
         adresse.region = adresseFraRina.getRegion();
         adresse.adressetype = Adressetype.fraAdressetypeRina(adresseFraRina.getType());

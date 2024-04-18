@@ -136,7 +136,6 @@ public class EuxConsumer implements RestConsumer {
 
         var headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_PDF));
-        log.info("Kaller /sed/pdf med {}", sed);
 
         return exchange("/sed/pdf", HttpMethod.POST,
             new HttpEntity<>(sed, headers),

@@ -9,6 +9,8 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
+import io.getunleash.Unleash;
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsland;
 import no.nav.melosys.eessi.models.SedType;
@@ -34,7 +36,7 @@ public interface SedMapper {
     default SED mapTilSed(SedDataDto sedData) {
         var sed = new SED();
 
-        sed.setNav(prefillNav(sedData));
+        sed.setNav(prefillNav(sedData, false));
         sed.setSedType(getSedType().name());
         sed.setSedGVer(DEFAULT_SED_G_VER);
         sed.setSedVer(DEFAULT_SED_VER);
@@ -44,15 +46,18 @@ public interface SedMapper {
 
     SedType getSedType();
 
-    default Nav prefillNav(SedDataDto sedData) {
+    default Nav prefillNav(SedDataDto sedData, boolean erCDM4_3) {
         var nav = new Nav();
 
         nav.setBruker(hentBruker(sedData));
 
         List<Arbeidssted> arbeidsstedList = hentArbeidssted(sedData);
         nav.setArbeidssted(arbeidsstedList);
-        nav.setArbeidsland(hentArbeidsland(sedData));
-        nav.setHarfastarbeidssted(sedData.getHarfastarbeidssted() ? "ja" : "nei");
+        if(erCDM4_3){
+            nav.setArbeidsland(hentArbeidsland(sedData));
+            nav.setHarfastarbeidssted(sedData.getHarfastarbeidssted() ? "ja" : "nei");
+        }
+
         nav.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), sedData.finnLovvalgslandDefaultNO()));
         nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
 
