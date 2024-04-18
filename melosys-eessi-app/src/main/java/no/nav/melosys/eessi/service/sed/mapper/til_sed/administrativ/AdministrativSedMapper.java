@@ -7,7 +7,7 @@ import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 
 public interface AdministrativSedMapper extends SedMapper {
     @Override
-    default SED mapTilSed(SedDataDto sedData) {
+    default SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
         throw new MappingException("Kan ikke mappe Administrativ SED fra SedDataDto");
     }
 }

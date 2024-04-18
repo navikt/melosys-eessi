@@ -38,7 +38,7 @@ class A001MapperTest {
 
     @Test
     void mapTilSed() throws MappingException, NotFoundException {
-        SED sed = a001Mapper.mapTilSed(sedData);
+        SED sed = a001Mapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA001.class);
 

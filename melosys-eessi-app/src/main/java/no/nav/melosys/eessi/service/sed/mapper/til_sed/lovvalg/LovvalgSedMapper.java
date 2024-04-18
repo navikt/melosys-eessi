@@ -13,8 +13,8 @@ import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
  */
 public interface LovvalgSedMapper<T extends Medlemskap> extends SedMapper {
     @Override
-    default SED mapTilSed(SedDataDto sedData) {
-        var sed = SedMapper.super.mapTilSed(sedData);
+    default SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
+        var sed = SedMapper.super.mapTilSed(sedData, erCDM4_3);
         sed.setMedlemskap(getMedlemskap(sedData));
 
         return sed;

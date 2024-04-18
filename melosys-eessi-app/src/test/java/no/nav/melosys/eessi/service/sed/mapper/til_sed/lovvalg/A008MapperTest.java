@@ -29,7 +29,7 @@ class A008MapperTest {
     @Test
     void mapTilSed() throws MappingException, NotFoundException {
         sedData.setAvklartBostedsland("SE");
-        SED sed = a008Mapper.mapTilSed(sedData);
+        SED sed = a008Mapper.mapTilSed(sedData, false);
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA008.class);
 
         MedlemskapA008 medlemskap = (MedlemskapA008) sed.getMedlemskap();

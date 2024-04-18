@@ -39,7 +39,7 @@ class A009MapperTest {
 
     @Test
     void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
@@ -64,7 +64,7 @@ class A009MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
@@ -82,7 +82,7 @@ class A009MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
@@ -96,7 +96,7 @@ class A009MapperTest {
     @Test
     void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
@@ -114,7 +114,7 @@ class A009MapperTest {
     void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
         assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
+            .isThrownBy(() -> a009Mapper.mapTilSed(sedData, false))
             .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
     }
 
@@ -122,13 +122,13 @@ class A009MapperTest {
     void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
+            .isThrownBy(() -> a009Mapper.mapTilSed(sedData, false));
     }
 
     @Test
     void erIkkeFysisk_forventErIkkeFastadresse() {
         sedData.getArbeidssteder().get(0).setFysisk(false);
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
         assertThat(sed.getNav().getArbeidssted().get(0).getErikkefastadresse()).isEqualTo("ja");
     }
 }

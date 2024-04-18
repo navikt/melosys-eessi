@@ -4,7 +4,9 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
+import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
@@ -27,11 +29,13 @@ public class LukkBucService {
     private final EuxService euxService;
     private final X001Mapper x001Mapper;
     private final BucMetrikker bucMetrikker;
+    private final Unleash unleash;
 
-    public LukkBucService(EuxService euxService, BucMetrikker bucMetrikker) {
+    public LukkBucService(EuxService euxService, BucMetrikker bucMetrikker, Unleash unleash) {
         this.euxService = euxService;
         this.x001Mapper = new X001Mapper();
         this.bucMetrikker = bucMetrikker;
+        this.unleash = unleash;
     }
 
     public void lukkBucerAvType(BucType bucType) {
@@ -98,7 +102,7 @@ public class LukkBucService {
     }
 
     private SED opprettX001(BUC buc, String aarsak) {
-        return x001Mapper.mapFraSed(hentSisteLovvalgSed(buc), aarsak);
+        return x001Mapper.mapFraSed(hentSisteLovvalgSed(buc), aarsak, unleash.isEnabled(ToggleName.CDM_4_3));
     }
 
     private SED hentSisteLovvalgSed(BUC buc) {

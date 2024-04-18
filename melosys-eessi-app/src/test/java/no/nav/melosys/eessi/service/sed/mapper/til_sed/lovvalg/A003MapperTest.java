@@ -30,7 +30,7 @@ class A003MapperTest {
 
     @Test
     void mapTilSed() throws MappingException, NotFoundException {
-        SED sed = sedMapper.mapTilSed(sedData);
+        SED sed = sedMapper.mapTilSed(sedData, false);
 
         assertThat(sed).isNotNull();
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA003.class);
@@ -48,7 +48,7 @@ class A003MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = sedMapper.mapTilSed(sedData);
+        SED sed = sedMapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
@@ -66,7 +66,7 @@ class A003MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = sedMapper.mapTilSed(sedData);
+        SED sed = sedMapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA003.class);
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();

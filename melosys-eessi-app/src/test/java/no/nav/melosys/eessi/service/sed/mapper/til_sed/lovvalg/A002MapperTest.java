@@ -30,7 +30,7 @@ class A002MapperTest {
         );
         sedData.setSvarAnmodningUnntak(svarAnmodningUnntakDto);
 
-        SED a002 = a002Mapper.mapTilSed(sedData);
+        SED a002 = a002Mapper.mapTilSed(sedData, false);
         assertThat(a002).isNotNull();
         assertThat(a002.getMedlemskap()).isInstanceOf(MedlemskapA002.class);
     }
@@ -39,7 +39,7 @@ class A002MapperTest {
     void mapTilSed_utenSvarAnmodningUnntak_forventException() throws IOException, URISyntaxException {
         SedDataDto sedData = SedDataStub.getStub();
         assertThatExceptionOfType(MappingException.class)
-                .isThrownBy(() -> a002Mapper.mapTilSed(sedData))
+                .isThrownBy(() -> a002Mapper.mapTilSed(sedData, false))
                 .withMessageContaining("Trenger SvarAnmodningUnntak");
     }
 }

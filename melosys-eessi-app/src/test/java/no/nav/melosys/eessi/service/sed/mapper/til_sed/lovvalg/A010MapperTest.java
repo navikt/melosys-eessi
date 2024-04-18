@@ -39,7 +39,7 @@ class A010MapperTest {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_b);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_c);
 
-        SED sed = a010Mapper.mapTilSed(sedData);
+        SED sed = a010Mapper.mapTilSed(sedData, false);
 
         assertThat(sed).isNotNull();
         assertThat(sed.getSedType()).isEqualTo(SedType.A010.name());
@@ -59,7 +59,7 @@ class A010MapperTest {
         lovvalgsperiode.setBestemmelse(Bestemmelse.ART_11_3_a);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_11_3_b);
 
-        SED sed = a010Mapper.mapTilSed(sedData);
+        SED sed = a010Mapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA010.class);
 
@@ -79,7 +79,7 @@ class A010MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = a010Mapper.mapTilSed(sedData);
+        SED sed = a010Mapper.mapTilSed(sedData, false);
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
@@ -99,7 +99,7 @@ class A010MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = a010Mapper.mapTilSed(sedData);
+        SED sed = a010Mapper.mapTilSed(sedData, false);
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA010.class);
@@ -116,7 +116,7 @@ class A010MapperTest {
         lovvalgsperiode.setBestemmelse(bestemmelse);
         lovvalgsperiode.setTilleggsBestemmelse(Bestemmelse.ART_12_1);
 
-        assertThatExceptionOfType(MappingException.class).isThrownBy(() -> a010Mapper.mapTilSed(sedData))
+        assertThatExceptionOfType(MappingException.class).isThrownBy(() -> a010Mapper.mapTilSed(sedData, false))
             .withMessageContaining("Kan ikke mappe til bestemmelse i A010 for lovvalgsperiode ");
     }
 }
