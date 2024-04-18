@@ -36,6 +36,24 @@
       "navn": "MinJobb"
     }
   ],
+    "harfastarbeidssted": true,
+    "arbeidsland": [
+        {
+            "land": "NO",
+            "arbeidssted": [
+                {
+                    "adresse": {
+                        "gateadresse": "testadresse",
+                        "postnr": "1212",
+                        "poststed": "Hønefoss"
+                    },
+                    "fysisk": true,
+                    "hjemmebase": null,
+                    "navn": "MinJobb"
+                }
+            ]
+        }
+    ],
   "bostedsadresse": {
     "gateadresse": "blulul",
     "land": "NO",

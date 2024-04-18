@@ -38,6 +38,23 @@ class A003MapperTest {
         MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
         assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equals(a.getAdresse().getLand()));
         assertThat(medlemskapA003.getAndreland().getArbeidsgiver()).noneMatch(a -> "NO".equals(a.getAdresse().getLand()));
+        assertThat(sed.getNav().getArbeidsland()).isNull();
+        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+    }
+    @Test
+    void mapTilSed4_3() throws MappingException, NotFoundException {
+        SED sed = sedMapper.mapTilSed(sedData, true);
+
+        assertThat(sed).isNotNull();
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA003.class);
+
+        MedlemskapA003 medlemskapA003 = (MedlemskapA003) sed.getMedlemskap();
+        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equals(a.getAdresse().getLand()));
+        assertThat(medlemskapA003.getAndreland().getArbeidsgiver()).noneMatch(a -> "NO".equals(a.getAdresse().getLand()));
+        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
+        assertThat(sed.getSedVer()).isEqualTo("3");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
     }
 
     @Test

@@ -9,8 +9,11 @@ import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
+import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,28 @@ class A009MapperTest {
         lovvalgsperiode.setFom(LocalDate.now());
         lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
         lovvalgsperiode.setLovvalgsland(lovvalgsland);
+    }
+
+    @Test
+    void mapTilSed() throws MappingException, NotFoundException {
+        sedData.setAvklartBostedsland("SE");
+        SED sed = a009Mapper.mapTilSed(sedData, false);
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA009.class);
+
+        assertThat(sed.getNav().getArbeidsland()).isNull();
+        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+    }
+
+    @Test
+    void mapTilSed4_3() throws MappingException, NotFoundException {
+        sedData.setAvklartBostedsland("SE");
+        SED sed = a009Mapper.mapTilSed(sedData, true);
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA009.class);
+
+        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
+        assertThat(sed.getSedVer()).isEqualTo("3");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
     }
 
     @Test

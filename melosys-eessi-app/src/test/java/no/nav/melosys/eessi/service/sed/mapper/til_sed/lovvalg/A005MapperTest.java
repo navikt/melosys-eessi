@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA005;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -24,5 +25,22 @@ class A005MapperTest {
 
         assertThat(sed).isNotNull();
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA005.class);
+        assertThat(sed.getNav().getArbeidsland()).isNull();
+        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+    }
+
+
+    @Test
+    void mapTilSed4_3_skalIkkeBliPåvirketAvToggleCDM4_3() throws IOException, URISyntaxException, MappingException, NotFoundException {
+        SedDataDto sedDataDto = SedDataStub.getStub();
+        SED sed = sedMapper.mapTilSed(sedDataDto, true);
+
+        assertThat(sed).isNotNull();
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA005.class);
+        assertThat(sed.getNav().getArbeidsland()).isNull();
+        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+
     }
 }

@@ -23,6 +23,7 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.util.StringUtils;
 
+import static no.nav.melosys.eessi.models.SedType.*;
 import static no.nav.melosys.eessi.models.sed.Konstanter.*;
 
 /**
@@ -55,16 +56,21 @@ public interface SedMapper {
 
     default Nav prefillNav(SedDataDto sedData, boolean erCDM4_3) {
         var nav = new Nav();
-
-        nav.setBruker(hentBruker(sedData));
+        var sedType = getSedType();
 
         if(erCDM4_3){
-            nav.setArbeidsland(hentArbeidsland(sedData));
-            nav.setHarfastarbeidssted(sedData.getHarfastarbeidssted() ? "ja" : "nei");
+            switch (sedType) {
+                case A001, A002, A003, A008, A009, A010 -> {
+                    nav.setArbeidsland(hentArbeidsland(sedData));
+                    nav.setHarfastarbeidssted(sedData.getHarfastarbeidssted() ? "ja" : "nei");
+                }
+                default -> nav.setArbeidssted(hentArbeidssted(sedData));
+            }
         } else {
             nav.setArbeidssted(hentArbeidssted(sedData));
         }
 
+        nav.setBruker(hentBruker(sedData));
         nav.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), sedData.finnLovvalgslandDefaultNO()));
         nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
 
@@ -204,6 +210,11 @@ public interface SedMapper {
         }
 
         return arbeidslands;
+    }
+
+
+    default Boolean hentHarfastarbeidssted(SedDataDto sedData) {
+        return sedData.getHarfastarbeidssted();
     }
 
     default List<Arbeidssted> hentArbeidssted4_3(List<no.nav.melosys.eessi.controller.dto.Arbeidssted> arbeidssteder) {
