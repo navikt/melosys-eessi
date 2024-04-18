@@ -14,7 +14,6 @@ final class ContextHolder {
     private static ContextHolder instans;
 
     private static final String AAD = "aad";
-    private static final String REST_STS = "reststs";
 
     private ContextHolder(SpringTokenValidationContextHolder context) {
         this.context = context;
@@ -27,30 +26,8 @@ final class ContextHolder {
         return instans;
     }
 
-    Optional<String> getOidcToken() {
-        if (RequestContextHolder.getRequestAttributes() == null) {
-            return Optional.empty();
-        }
-
-        String restStsToken = restStsToken();
-        return restStsToken != null ? Optional.of(restStsToken) : Optional.ofNullable(azureToken());
-    }
-
     boolean canExchangeOBOToken() {
         return getTokenContext().getJwtToken(AAD) != null;
-    }
-
-    private String restStsToken() {
-        return jwtTokenAsString(REST_STS);
-    }
-
-    private String azureToken() {
-        return jwtTokenAsString(AAD);
-    }
-
-    private String jwtTokenAsString(String issuer) {
-        JwtToken jwtToken = getTokenContext().getJwtToken(issuer);
-        return jwtToken != null ? jwtToken.getTokenAsString() : null;
     }
 
     private TokenValidationContext getTokenContext() {

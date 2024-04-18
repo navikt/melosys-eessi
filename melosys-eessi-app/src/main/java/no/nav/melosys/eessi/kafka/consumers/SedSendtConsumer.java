@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import static no.nav.melosys.eessi.config.MDCOperations.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@Profile("!local-q2")
 public class SedSendtConsumer {
 
     private final OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
