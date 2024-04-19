@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
+import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+
+import static no.nav.security.token.support.client.core.OAuth2GrantType.JWT_BEARER;
 
 public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
@@ -33,15 +36,25 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
-        String accessToken = "";
+        request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + hentAccessToken());
+        return execution.execute(request, body);
+    }
+
+    private String hentAccessToken() {
         if (ContextHolder.getInstance().canExchangeOBOToken()) {
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
-            accessToken = response.getAccessToken();
+            return response.getAccessToken();
+        } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
+            var clientPropertiesForSystem = ClientProperties.builder()
+                .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
+                .scope(clientProperties.getScope())
+                .authentication(clientProperties.getAuthentication())
+                .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
+                .build();
+            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
+            return response.getAccessToken();
         } else {
-            accessToken = restStsClient.collectToken();
+            return restStsClient.collectToken();
         }
-
-        request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-        return execution.execute(request, body);
     }
 }

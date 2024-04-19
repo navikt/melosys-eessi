@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @Unprotected
 @RestController
 @RequestMapping("/admin/kafka/consumers")
+@Profile("!local-q2")
 public class KafkaAdminTjeneste {
 
     private final static String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
