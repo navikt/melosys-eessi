@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
+import no.nav.security.token.support.client.core.OAuth2ClientException;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
@@ -46,19 +47,14 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     private String hentAccessToken() {
         try {
             if (ContextHolder.getInstance().canExchangeOBOToken()) {
-                log.info("Using obo token");
                 OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
                 return response.getAccessToken();
             } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
                 return hentAccessTokenForSystem();
             } else {
-                log.info("using sts token");
                 return restStsClient.collectToken();
             }
-        } catch (Exception e) {
-            log.info("Debug: " + e.getClass());
-            log.info("Debug feilmeldingmessage" + e.getMessage());
-            log.error(e.getMessage());
+        } catch (OAuth2ClientException e) {
             if (e.getMessage().contains("invalid_grant")) {
                 log.warn("Feilmelding invalid_grant fra eux, forsøker med system token");
                 return hentAccessTokenForSystem();
@@ -67,7 +63,6 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     }
 
     private String hentAccessTokenForSystem() {
-        log.info("using client credentials token");
         var clientPropertiesForSystem = ClientProperties.builder()
             .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
             .scope(clientProperties.getScope())
