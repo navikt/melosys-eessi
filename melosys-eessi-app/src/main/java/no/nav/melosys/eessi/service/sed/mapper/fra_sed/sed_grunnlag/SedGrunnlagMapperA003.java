@@ -20,7 +20,6 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper;
 import org.springframework.util.CollectionUtils;
 
 public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
-    private Unleash unleash;
 
     @Override
     public SedGrunnlagA003Dto map(SED sed) {

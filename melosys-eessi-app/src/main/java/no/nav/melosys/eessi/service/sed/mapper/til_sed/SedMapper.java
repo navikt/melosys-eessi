@@ -23,7 +23,6 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.util.StringUtils;
 
-import static no.nav.melosys.eessi.models.SedType.*;
 import static no.nav.melosys.eessi.models.sed.Konstanter.*;
 
 /**
@@ -33,13 +32,11 @@ import static no.nav.melosys.eessi.models.sed.Konstanter.*;
 public interface SedMapper {
     default SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
         var sed = new SED();
-        var sedType = getSedType();
-
         sed.setNav(prefillNav(sedData, erCDM4_3));
-        sed.setSedType(sedType.name());
+        sed.setSedType(getSedType().name());
         sed.setSedGVer(DEFAULT_SED_G_VER);
 
-        if(erCDM4_3){
+        if (erCDM4_3) {
             sed.setSedVer(SED_VER_CDM_4_3);
         } else {
             sed.setSedVer(DEFAULT_SED_VER);
@@ -55,11 +52,11 @@ public interface SedMapper {
         var nav = new Nav();
         var sedType = getSedType();
 
-        if(erCDM4_3){
+        if (erCDM4_3) {
             switch (sedType) {
                 case A001, A002, A003, A008, A009, A010 -> {
                     nav.setArbeidsland(hentArbeidsland(sedData));
-                    nav.setHarfastarbeidssted(sedData.getHarfastarbeidssted() ? "ja" : "nei");
+                    nav.setHarfastarbeidssted(sedData.getHarFastArbeidssted() ? "ja" : "nei");
                 }
                 default -> nav.setArbeidssted(hentArbeidssted(sedData));
             }
@@ -194,24 +191,19 @@ public interface SedMapper {
             bruker.setMor(mor);
         }
     }
+
     default List<Arbeidsland> hentArbeidsland(SedDataDto sedData) {
-
-        List<Arbeidsland> arbeidslands = Lists.newArrayList();
-
-        for (no.nav.melosys.eessi.controller.dto.Arbeidsland arbLand : sedData.getArbeidsland()) {
-            var arbeidsland = new Arbeidsland();
-            arbeidsland.setLand(arbLand.getLand());
-            arbeidsland.setArbeidssted(hentArbeidssted4_3(arbLand.getArbeidssted()));
-
-            arbeidslands.add(arbeidsland);
-        }
-
-        return arbeidslands;
+        return sedData.getArbeidsland().stream().map(arbeidsland -> {
+            var arbeidslandSed = new Arbeidsland();
+            arbeidslandSed.setLand(arbeidsland.getLand());
+            arbeidslandSed.setArbeidssted(hentArbeidssted4_3(arbeidsland.getArbeidssted()));
+            return arbeidslandSed;
+        }).toList();
     }
 
 
     default Boolean hentHarfastarbeidssted(SedDataDto sedData) {
-        return sedData.getHarfastarbeidssted();
+        return sedData.getHarFastArbeidssted();
     }
 
     default List<Arbeidssted> hentArbeidssted4_3(List<no.nav.melosys.eessi.controller.dto.Arbeidssted> arbeidssteder) {
@@ -235,6 +227,7 @@ public interface SedMapper {
 
         return arbeidsstedList;
     }
+
     default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) {
 
         List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
