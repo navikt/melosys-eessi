@@ -39,7 +39,7 @@ class A005MapperTest {
         assertThat(sed).isNotNull();
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA005.class);
         assertThat(sed.getNav().getArbeidsland()).isNull();
-        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedVer()).isEqualTo("3");
         assertThat(sed.getSedGVer()).isEqualTo("4");
 
     }

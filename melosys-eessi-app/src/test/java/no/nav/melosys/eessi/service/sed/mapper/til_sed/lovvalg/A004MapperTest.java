@@ -54,7 +54,7 @@ class A004MapperTest {
         AssertionsForClassTypes.assertThat(sed).isNotNull();
         AssertionsForClassTypes.assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA004.class);
         AssertionsForClassTypes.assertThat(sed.getNav().getArbeidsland()).isNull();
-        AssertionsForClassTypes.assertThat(sed.getSedVer()).isEqualTo("2");
+        AssertionsForClassTypes.assertThat(sed.getSedVer()).isEqualTo("3");
         AssertionsForClassTypes.assertThat(sed.getSedGVer()).isEqualTo("4");
 
     }
