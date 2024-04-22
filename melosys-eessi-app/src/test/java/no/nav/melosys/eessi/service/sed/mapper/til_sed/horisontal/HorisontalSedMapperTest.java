@@ -27,7 +27,7 @@ class HorisontalSedMapperTest {
 
     @Test
     void mapTilSed() throws MappingException, NotFoundException {
-        SED h005 = h005Mapper.mapTilSed(sedData);
+        SED h005 = h005Mapper.mapTilSed(sedData, false);
 
         assertThat(h005).isNotNull();
         assertThat(h005.getMedlemskap()).isNull();

@@ -9,8 +9,11 @@ import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.controller.dto.VedtakDto;
 import no.nav.melosys.eessi.models.exception.MappingException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
+import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,8 +41,30 @@ class A009MapperTest {
     }
 
     @Test
+    void mapTilSed() throws MappingException, NotFoundException {
+        sedData.setAvklartBostedsland("SE");
+        SED sed = a009Mapper.mapTilSed(sedData, false);
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA009.class);
+
+        assertThat(sed.getNav().getArbeidsland()).isNull();
+        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+    }
+
+    @Test
+    void mapTilSed4_3() throws MappingException, NotFoundException {
+        sedData.setAvklartBostedsland("SE");
+        SED sed = a009Mapper.mapTilSed(sedData, true);
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA009.class);
+
+        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
+        assertThat(sed.getSedVer()).isEqualTo("3");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+    }
+
+    @Test
     void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
         MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
 
@@ -64,7 +89,7 @@ class A009MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
@@ -82,7 +107,7 @@ class A009MapperTest {
         sedData.setVedtakDto(vedtakDto);
 
 
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
@@ -96,7 +121,7 @@ class A009MapperTest {
     @Test
     void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
 
@@ -114,7 +139,7 @@ class A009MapperTest {
     void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
         sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
         assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> a009Mapper.mapTilSed(sedData))
+            .isThrownBy(() -> a009Mapper.mapTilSed(sedData, false))
             .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
     }
 
@@ -122,13 +147,13 @@ class A009MapperTest {
     void ingenLovvalgsperioder_expectNullPointerException() {
         sedData.setLovvalgsperioder(null);
         assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> a009Mapper.mapTilSed(sedData));
+            .isThrownBy(() -> a009Mapper.mapTilSed(sedData, false));
     }
 
     @Test
     void erIkkeFysisk_forventErIkkeFastadresse() {
         sedData.getArbeidssteder().get(0).setFysisk(false);
-        SED sed = a009Mapper.mapTilSed(sedData);
+        SED sed = a009Mapper.mapTilSed(sedData, false);
         assertThat(sed.getNav().getArbeidssted().get(0).getErikkefastadresse()).isEqualTo("ja");
     }
 }

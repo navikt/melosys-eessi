@@ -38,7 +38,7 @@ class A001MapperTest {
 
     @Test
     void mapTilSed() throws MappingException, NotFoundException {
-        SED sed = a001Mapper.mapTilSed(sedData);
+        SED sed = a001Mapper.mapTilSed(sedData, false);
 
         assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA001.class);
 
@@ -49,6 +49,27 @@ class A001MapperTest {
         assertThat(medlemskapA001.getVertsland().getArbeidsgiver()).noneMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
         assertThat(medlemskapA001.getNaavaerendemedlemskap()).allMatch(medlemskap -> "SE".equalsIgnoreCase(medlemskap.getLandkode()));
         assertThat(medlemskapA001.getForespurtmedlemskap()).allMatch(medlemskap -> "NO".equalsIgnoreCase(medlemskap.getLandkode()));
+        assertThat(sed.getNav().getArbeidsland()).isNull();
+        assertThat(sed.getSedVer()).isEqualTo("2");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
+    }
+
+    @Test
+    void mapTilSed4_3() throws MappingException, NotFoundException {
+        SED sed = a001Mapper.mapTilSed(sedData, true);
+
+        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA001.class);
+
+        assertThat(sed.getMedlemskap()).isNotNull().isInstanceOf(MedlemskapA001.class);
+
+        MedlemskapA001 medlemskapA001 = (MedlemskapA001) sed.getMedlemskap();
+        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
+        assertThat(medlemskapA001.getVertsland().getArbeidsgiver()).noneMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
+        assertThat(medlemskapA001.getNaavaerendemedlemskap()).allMatch(medlemskap -> "SE".equalsIgnoreCase(medlemskap.getLandkode()));
+        assertThat(medlemskapA001.getForespurtmedlemskap()).allMatch(medlemskap -> "NO".equalsIgnoreCase(medlemskap.getLandkode()));
+        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
+        assertThat(sed.getSedVer()).isEqualTo("3");
+        assertThat(sed.getSedGVer()).isEqualTo("4");
     }
 }
 

@@ -21,6 +21,7 @@ public interface SedGrunnlagMapper {
         sedGrunnlagDto.setBostedsadresse(mapBosted(nav.getBruker().getAdresse()));
         sedGrunnlagDto.setUtenlandskIdent(mapUtenlandskIdent(nav.getBruker().getPerson().getPin()));
         sedGrunnlagDto.setArbeidssteder(mapArbeidssteder(nav.getArbeidssted()));
+        sedGrunnlagDto.setArbeidsland(mapArbeidsland(nav.getArbeidsland()));
         sedGrunnlagDto.setArbeidsgivendeVirksomheter(mapVirksomheter(nav.getArbeidsgiver()));
         sedGrunnlagDto.setSelvstendigeVirksomheter(mapSelvstendig(nav.getSelvstendig()));
         sedGrunnlagDto.setYtterligereInformasjon(nav.getYtterligereinformasjon());
@@ -50,6 +51,11 @@ public interface SedGrunnlagMapper {
     default List<Arbeidssted> mapArbeidssteder(List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> arbeidssted) {
         return StreamUtils.nullableStream(arbeidssted).map(Arbeidssted::av).collect(Collectors.toList());
     }
+
+    default List<Arbeidsland> mapArbeidsland(List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> arbeidsland) {
+        return StreamUtils.nullableStream(arbeidsland).map(Arbeidsland::av).collect(Collectors.toList());
+    }
+
 
     default List<Virksomhet> mapVirksomheter(List<Arbeidsgiver> arbeidsgivere) {
         return StreamUtils.nullableStream(arbeidsgivere).map(Virksomhet::av).collect(Collectors.toList());

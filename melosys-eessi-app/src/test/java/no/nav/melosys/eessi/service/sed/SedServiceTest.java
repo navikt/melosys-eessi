@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.*;
 
+import io.getunleash.FakeUnleash;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.Periode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
@@ -44,12 +45,13 @@ class SedServiceTest {
     private SaksrelasjonService saksrelasjonService;
 
     private SedService sendSedService;
+    private FakeUnleash fakeUnleash = new FakeUnleash();
 
     private final String RINA_ID = "aabbcc";
 
     @BeforeEach
     public void setup() {
-        sendSedService = new SedService(euxService, saksrelasjonService);
+        sendSedService = new SedService(euxService, saksrelasjonService, fakeUnleash);
     }
 
     @Test

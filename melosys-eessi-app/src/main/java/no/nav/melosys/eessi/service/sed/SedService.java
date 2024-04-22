@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.BucType;
@@ -35,11 +37,14 @@ public class SedService {
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
 
+    private final Unleash unleash;
+
     @Autowired
     public SedService(@Qualifier("tokenContext") EuxService euxService,
-                      SaksrelasjonService saksrelasjonService) {
+                      SaksrelasjonService saksrelasjonService, Unleash unleash) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
+        this.unleash = unleash;
     }
 
     public BucOgSedOpprettetDto opprettBucOgSed(SedDataDto sedDataDto,
@@ -55,7 +60,7 @@ public class SedService {
         Collection<String> mottakere = sedDataDto.getMottakerIder();
         var sedType = bucType.hentFørsteLovligeSed();
         var sedMapper = SedMapperFactory.sedMapper(sedType);
-        var sed = sedMapper.mapTilSed(sedDataDto);
+        var sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3));
 
         validerMottakerInstitusjoner(bucType, mottakere);
 
@@ -113,7 +118,8 @@ public class SedService {
 
     public byte[] genererPdfFraSed(SedDataDto sedDataDto, SedType sedType) {
         var sedMapper = SedMapperFactory.sedMapper(sedType);
-        var sed = sedMapper.mapTilSed(sedDataDto);
+        var sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3));
+
 
         return euxService.genererPdfFraSed(sed);
     }
@@ -121,7 +127,7 @@ public class SedService {
     public void sendPåEksisterendeBuc(SedDataDto sedDataDto, String rinaSaksnummer, SedType sedType) {
         var buc = euxService.hentBuc(rinaSaksnummer);
 
-        var sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto);
+        var sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3));
         verifiserSedVersjonErBucVersjon(buc, sed);
         euxService.opprettOgSendSed(sed, rinaSaksnummer);
     }

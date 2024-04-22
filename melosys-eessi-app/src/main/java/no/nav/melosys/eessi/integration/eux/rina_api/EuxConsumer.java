@@ -138,9 +138,8 @@ public class EuxConsumer implements RestConsumer {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_PDF));
 
         return exchange("/sed/pdf", HttpMethod.POST,
-                new HttpEntity<>(sed, headers),
-                new ParameterizedTypeReference<>() {}
-        );
+            new HttpEntity<>(sed, headers),
+            new ParameterizedTypeReference<>() {});
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId) {

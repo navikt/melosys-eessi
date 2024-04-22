@@ -7,17 +7,16 @@ import no.nav.melosys.eessi.models.sed.Konstanter;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.*;
 
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
+import static no.nav.melosys.eessi.models.sed.Konstanter.*;
 
 
 public class X001Mapper implements AdministrativSedMapper {
 
-    public SED mapFraSed(SED sed, String aarsak) {
+    public SED mapFraSed(SED sed, String aarsak, Boolean erCDM4_3) {
         SED x001 = new SED();
         x001.setSedType(SedType.X001.toString());
         x001.setSedGVer(DEFAULT_SED_G_VER);
-        x001.setSedVer(DEFAULT_SED_VER);
+        x001.setSedVer(erCDM4_3 ? SED_VER_CDM_4_3 : DEFAULT_SED_VER);
         x001.setNav(mapNav(sed, aarsak));
 
         return x001;

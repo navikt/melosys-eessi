@@ -29,9 +29,9 @@ public class SED {
     @JsonProperty(value = "sed")
     private String sedType;
 
-    private String sedGVer;
-
     private String sedVer;
+
+    private String sedGVer;
 
     public Optional<Person> finnPerson() {
         return erXSED()

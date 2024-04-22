@@ -16,6 +16,8 @@ import no.nav.melosys.eessi.models.sed.ArbeidsgiverDeserializer;
 @Data
 public class Nav {
     private List<Arbeidssted> arbeidssted;
+    private List<Arbeidsland> arbeidsland;
+    private String harfastarbeidssted;
 
     private Bruker bruker;
 
