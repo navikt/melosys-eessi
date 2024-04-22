@@ -40,10 +40,7 @@ public interface SedMapper {
         sed.setSedGVer(DEFAULT_SED_G_VER);
 
         if(erCDM4_3){
-            switch (sedType) {
-                case A001, A002, A003, A008, A009, A010 -> sed.setSedVer(SED_VER_CDM_4_3);
-                default -> sed.setSedVer(DEFAULT_SED_VER);
-            }
+            sed.setSedVer(SED_VER_CDM_4_3);
         } else {
             sed.setSedVer(DEFAULT_SED_VER);
         }
