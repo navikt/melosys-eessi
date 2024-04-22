@@ -42,9 +42,11 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
 
     private String hentAccessToken() {
         if (ContextHolder.getInstance().canExchangeOBOToken()) {
+            System.out.println("Using obo token");
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
             return response.getAccessToken();
         } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
+            System.out.println("using client credentials token");
             var clientPropertiesForSystem = ClientProperties.builder()
                 .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
                 .scope(clientProperties.getScope())
@@ -54,6 +56,7 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
             OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
             return response.getAccessToken();
         } else {
+            System.out.println("using sts token");
             return restStsClient.collectToken();
         }
     }
