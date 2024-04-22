@@ -9,8 +9,8 @@ import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
 public class X008Mapper implements SedMapper {
 
     @Override
-    public SED mapTilSed(SedDataDto sedData) {
-        var sed = SedMapper.super.mapTilSed(sedData);
+    public SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
+        var sed = SedMapper.super.mapTilSed(sedData, erCDM4_3);
 
         Sak sakForSed = mapSak(sedData, sed);
         sed.getNav().setSak(sakForSed);

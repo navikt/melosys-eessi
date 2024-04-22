@@ -19,6 +19,7 @@ public class MelosysEessiMelding {
     private String aktoerId;
     private List<Statsborgerskap> statsborgerskap = new ArrayList<>();
     private List<Arbeidssted> arbeidssteder = new ArrayList<>();
+    private List<Arbeidsland> arbeidsland = new ArrayList<>();
     private Periode periode;
     private String lovvalgsland;
     private String artikkel;

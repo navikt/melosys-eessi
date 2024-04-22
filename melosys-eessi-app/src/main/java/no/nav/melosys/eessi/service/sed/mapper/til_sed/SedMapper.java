@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsland;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.Konstanter;
@@ -22,32 +23,48 @@ import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.util.StringUtils;
 
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
+import static no.nav.melosys.eessi.models.sed.Konstanter.*;
 
 /**
  * Felles mapper-interface for alle typer SED. Mapper NAV-objektet i NAV-SED, som brukes av eux for
  * å plukke ut nødvendig informasjon for en angitt SED.
  */
 public interface SedMapper {
-    default SED mapTilSed(SedDataDto sedData) {
+    default SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
         var sed = new SED();
-
-        sed.setNav(prefillNav(sedData));
+        sed.setNav(prefillNav(sedData, erCDM4_3));
         sed.setSedType(getSedType().name());
         sed.setSedGVer(DEFAULT_SED_G_VER);
-        sed.setSedVer(DEFAULT_SED_VER);
+
+        if (erCDM4_3) {
+            sed.setSedVer(SED_VER_CDM_4_3);
+        } else {
+            sed.setSedVer(DEFAULT_SED_VER);
+        }
+
 
         return sed;
     }
 
     SedType getSedType();
 
-    default Nav prefillNav(SedDataDto sedData) {
+    default Nav prefillNav(SedDataDto sedData, boolean erCDM4_3) {
         var nav = new Nav();
+        var sedType = getSedType();
+
+        if (erCDM4_3) {
+            switch (sedType) {
+                case A001, A002, A003, A008, A009, A010 -> {
+                    nav.setArbeidsland(hentArbeidsland(sedData));
+                    nav.setHarfastarbeidssted(sedData.getHarFastArbeidssted() ? "ja" : "nei");
+                }
+                default -> nav.setArbeidssted(hentArbeidssted(sedData));
+            }
+        } else {
+            nav.setArbeidssted(hentArbeidssted(sedData));
+        }
 
         nav.setBruker(hentBruker(sedData));
-        nav.setArbeidssted(hentArbeidssted(sedData));
         nav.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), sedData.finnLovvalgslandDefaultNO()));
         nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
 
@@ -173,6 +190,42 @@ public interface SedMapper {
             mor.setPerson(person);
             bruker.setMor(mor);
         }
+    }
+
+    default List<Arbeidsland> hentArbeidsland(SedDataDto sedData) {
+        return sedData.getArbeidsland().stream().map(arbeidsland -> {
+            var arbeidslandSed = new Arbeidsland();
+            arbeidslandSed.setLand(arbeidsland.getLand());
+            arbeidslandSed.setArbeidssted(hentArbeidssted4_3(arbeidsland.getArbeidssted()));
+            return arbeidslandSed;
+        }).toList();
+    }
+
+
+    default Boolean hentHarfastarbeidssted(SedDataDto sedData) {
+        return sedData.getHarFastArbeidssted();
+    }
+
+    default List<Arbeidssted> hentArbeidssted4_3(List<no.nav.melosys.eessi.controller.dto.Arbeidssted> arbeidssteder) {
+
+        List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
+
+        for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : arbeidssteder) {
+            var arbeidssted = new Arbeidssted();
+            arbeidssted.setNavn(arbStd.getNavn());
+            arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
+            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
+
+            if (arbStd.isFysisk()) {
+                arbeidssted.setErikkefastadresse("nei");
+            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
+                arbeidssted.setErikkefastadresse("ja");
+            }
+
+            arbeidsstedList.add(arbeidssted);
+        }
+
+        return arbeidsstedList;
     }
 
     default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) {

@@ -19,6 +19,7 @@ public class SedGrunnlagA003Dto extends SedGrunnlagDto {
         setBostedsadresse(sedGrunnlagDto.getBostedsadresse());
         setUtenlandskIdent(sedGrunnlagDto.getUtenlandskIdent());
         setArbeidssteder(sedGrunnlagDto.getArbeidssteder());
+        setArbeidsland(sedGrunnlagDto.getArbeidsland());
         setArbeidsgivendeVirksomheter(sedGrunnlagDto.getArbeidsgivendeVirksomheter());
         setSelvstendigeVirksomheter(sedGrunnlagDto.getSelvstendigeVirksomheter());
         setYtterligereInformasjon(sedGrunnlagDto.getYtterligereInformasjon());

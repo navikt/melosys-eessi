@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.controller.dto.Adressetype;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.nav.Adresse;
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsland;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,24 @@ class SedMapperTest {
             .anyMatch(adresse -> Adressetype.BOSTEDSADRESSE.getAdressetypeRina().equals(adresse.getType()))
             .anyMatch(adresse -> Adressetype.KONTAKTADRESSE.getAdressetypeRina().equals(adresse.getType()))
             .anyMatch(adresse -> Adressetype.POSTADRESSE.getAdressetypeRina().equals(adresse.getType()));
+    }
+
+    @Test
+    void hentArbeidsland() {
+        final List<Arbeidsland> arbeidsland = sedMapper.hentArbeidsland(sedData);
+
+        assertThat(arbeidsland).hasSize(1);
+
+        arbeidsland.stream().forEach(arbLand -> {
+            assertThat(arbLand.getArbeidssted()).hasSize(1);
+        });
+    }
+
+    @Test
+    void hentHarfastarbeidssted() {
+        final Boolean harfastarbeidssted = sedMapper.hentHarfastarbeidssted(sedData);
+
+        assertThat(harfastarbeidssted).isTrue();
     }
 
     @Test

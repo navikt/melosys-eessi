@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import io.getunleash.FakeUnleash;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
@@ -45,9 +46,11 @@ class LukkBucServiceTest {
 
     private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
 
+    private final FakeUnleash fakeUnleash = new FakeUnleash();
+
     @BeforeEach
     public void setup() {
-        lukkBucService = new LukkBucService(euxService, bucMetrikker);
+        lukkBucService = new LukkBucService(euxService, bucMetrikker, fakeUnleash);
     }
 
     @Test

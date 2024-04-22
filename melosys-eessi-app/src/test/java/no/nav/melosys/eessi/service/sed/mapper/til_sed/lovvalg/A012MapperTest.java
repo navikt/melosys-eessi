@@ -19,7 +19,7 @@ class A012MapperTest {
     @Test
     void mapTilSed_forventSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
         SedDataDto sedData = SedDataStub.getStub();
-        SED a012 = a012Mapper.mapTilSed(sedData);
+        SED a012 = a012Mapper.mapTilSed(sedData, false);
 
         assertThat(a012).isNotNull();
         assertThat(a012.getMedlemskap()).isInstanceOf(MedlemskapA012.class);
