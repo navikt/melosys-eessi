@@ -15,6 +15,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static no.nav.security.token.support.client.core.OAuth2GrantType.JWT_BEARER;
 
@@ -43,23 +44,34 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     }
 
     private String hentAccessToken() {
-        if (ContextHolder.getInstance().canExchangeOBOToken()) {
-            log.info("Using obo token");
-            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
-            return response.getAccessToken();
-        } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
-            log.info("using client credentials token");
-            var clientPropertiesForSystem = ClientProperties.builder()
-                .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
-                .scope(clientProperties.getScope())
-                .authentication(clientProperties.getAuthentication())
-                .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
-                .build();
-            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
-            return response.getAccessToken();
-        } else {
-            log.info("using sts token");
-            return restStsClient.collectToken();
+        try {
+            if (ContextHolder.getInstance().canExchangeOBOToken()) {
+                log.info("Using obo token");
+                OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
+                return response.getAccessToken();
+            } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
+                return hentAccessTokenForSystem();
+            } else {
+                log.info("using sts token");
+                return restStsClient.collectToken();
+            }
+        } catch (HttpClientErrorException.BadRequest e) {
+            if (e.getMessage().contains("invalid_grant")) {
+                log.warn("Feilmelding invalid_grant fra eux, forsøker med system token");
+                return hentAccessTokenForSystem();
+            } else throw e;
         }
+    }
+
+    private String hentAccessTokenForSystem() {
+        log.info("using client credentials token");
+        var clientPropertiesForSystem = ClientProperties.builder()
+            .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
+            .scope(clientProperties.getScope())
+            .authentication(clientProperties.getAuthentication())
+            .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
+            .build();
+        OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
+        return  response.getAccessToken();
     }
 }
