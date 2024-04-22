@@ -1,11 +1,7 @@
 package no.nav.melosys.eessi.security;
 
-import java.util.Optional;
-
 import no.nav.security.token.support.core.context.TokenValidationContext;
-import no.nav.security.token.support.core.jwt.JwtToken;
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder;
-import org.springframework.web.context.request.RequestContextHolder;
 
 final class ContextHolder {
 

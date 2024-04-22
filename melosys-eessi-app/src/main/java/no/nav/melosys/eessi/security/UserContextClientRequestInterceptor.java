@@ -3,8 +3,10 @@ package no.nav.melosys.eessi.security;
 import java.io.IOException;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
+import no.nav.security.token.support.client.core.OAuth2ClientException;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
@@ -14,9 +16,11 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static no.nav.security.token.support.client.core.OAuth2GrantType.JWT_BEARER;
 
+@Slf4j
 public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsClient restStsClient;
@@ -41,20 +45,31 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
     }
 
     private String hentAccessToken() {
-        if (ContextHolder.getInstance().canExchangeOBOToken()) {
-            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
-            return response.getAccessToken();
-        } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
-            var clientPropertiesForSystem = ClientProperties.builder()
-                .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
-                .scope(clientProperties.getScope())
-                .authentication(clientProperties.getAuthentication())
-                .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
-                .build();
-            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
-            return response.getAccessToken();
-        } else {
-            return restStsClient.collectToken();
+        try {
+            if (ContextHolder.getInstance().canExchangeOBOToken()) {
+                OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
+                return response.getAccessToken();
+            } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
+                return hentAccessTokenForSystem();
+            } else {
+                return restStsClient.collectToken();
+            }
+        } catch (OAuth2ClientException e) {
+            if (e.getMessage().contains("invalid_grant")) {
+                log.warn("Feilmelding invalid_grant fra eux, forsøker med system token");
+                return hentAccessTokenForSystem();
+            } else throw e;
         }
+    }
+
+    private String hentAccessTokenForSystem() {
+        var clientPropertiesForSystem = ClientProperties.builder()
+            .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
+            .scope(clientProperties.getScope())
+            .authentication(clientProperties.getAuthentication())
+            .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
+            .build();
+        OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
+        return  response.getAccessToken();
     }
 }
