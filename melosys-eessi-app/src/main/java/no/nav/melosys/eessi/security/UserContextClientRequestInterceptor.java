@@ -55,8 +55,8 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
                 log.info("using sts token");
                 return restStsClient.collectToken();
             }
-        } catch (HttpClientErrorException.BadRequest e) {
-            log.info("Debug feilmeldingresponse" + e.getResponseBodyAsString());
+        } catch (Exception e) {
+            log.info("Debug: " + e.getClass());
             log.info("Debug feilmeldingmessage" + e.getMessage());
             log.error(e.getMessage());
             if (e.getMessage().contains("invalid_grant")) {
