@@ -54,11 +54,9 @@ public class UserContextClientRequestInterceptor implements ClientHttpRequestInt
             } else {
                 return restStsClient.collectToken();
             }
-        } catch (OAuth2ClientException e) {
-            if (e.getMessage().contains("invalid_grant")) {
-                log.warn("Feilmelding invalid_grant fra eux, forsøker med system token");
-                return hentAccessTokenForSystem();
-            } else throw e;
+        } catch (Exception e) {
+            log.error("Feil under henting av access token", e);
+            throw new RuntimeException(e);
         }
     }
 
