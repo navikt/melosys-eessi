@@ -80,7 +80,11 @@ public class OppgaveService {
                 .aktoerId(aktørId)
                 .build();
 
+        log.info("DEBUG OppgaveService opprettUtgåendeJfrOppgave oppgaveDto: " + oppgaveDto.toString());
+
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
+
+        log.info("DEBUG OppgaveService opprettUtgåendeJfrOppgave response: " + response.toString());
         log.info("Utgående journalføringsoppgave opprettet med id {}", response.getId());
         return response.getId();
     }

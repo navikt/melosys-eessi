@@ -14,6 +14,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@ToString
 public class OppgaveDto {
     private String aktoerId;
     private String tilordnetRessurs;

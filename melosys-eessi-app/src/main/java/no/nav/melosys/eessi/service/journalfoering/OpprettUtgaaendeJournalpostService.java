@@ -82,6 +82,7 @@ public class OpprettUtgaaendeJournalpostService {
             return arkiverUtenSak(sedSendt);
         }
 
+
         return arkiverMedSak(sedSendt, sak.get());
     }
 
@@ -89,6 +90,11 @@ public class OpprettUtgaaendeJournalpostService {
         log.info("Journalfører dokument: {}", sedSendt.getRinaDokumentId());
         String navIdent = personFasade.hentNorskIdent(sak.getAktoerId());
         OpprettJournalpostResponse response = opprettUtgåendeJournalpost(sedSendt, sak, navIdent);
+
+        log.info("DEBUG OpprettUtgåendeJournalpostService arkiverMedSak response: " + response.toString());
+        log.info("DEBUG OpprettUtgåendeJournalpostService arkiverMedSak sedSendt: " + sedSendt.toString());
+        log.info("DEBUG OpprettUtgåendeJournalpostService arkiverMedSak navIdent: " + navIdent);
+        log.info("DEBUG OpprettUtgåendeJournalpostService arkiverMedSak sak: " + sak.toString());
 
         if (!"ENDELIG".equalsIgnoreCase(response.getJournalstatus())) {
             log.info("Journalpost {} ble ikke endelig journalført. Melding: {}", response.getJournalpostId(), response.getMelding());

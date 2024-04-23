@@ -24,6 +24,13 @@ public class JournalpostService {
 
     OpprettJournalpostResponse opprettInngaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                             SedMedVedlegg sedMedVedlegg, String personIdent) {
+        log.info("Oppretter inngående journalpost for sak {} og sed {}", sak.getId(), sedHendelse.getSedType());
+
+        log.info("DEBUG JournalpostService opprettInngaaendeJournalpost sedHendelse: " + sedHendelse.toString());
+        log.info("DEBUG JournalpostService opprettInngaaendeJournalpost sak: " + sak.toString());
+        log.info("DEBUG JournalpostService opprettInngaaendeJournalpost sedMedVedlegg: " + sedMedVedlegg.toString());
+        log.info("DEBUG JournalpostService opprettInngaaendeJournalpost personIdent: " + personIdent);
+
         var journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.getSedType());
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
             sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(),
@@ -38,9 +45,11 @@ public class JournalpostService {
     OpprettJournalpostResponse opprettUtgaaendeJournalpost(SedHendelse sedHendelse, Sak sak,
                                                            SedMedVedlegg sedMedVedlegg, String personIdent) {
         var journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.getSedType());
+        log.info("DEBUG JournalpostService opprettUtgaaendeJournalpost journalpostMetadata: " + journalpostMetadata.toString());
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettUtgaaendeJournalpost(
             sedHendelse, sedMedVedlegg, sak, journalpostMetadata.dokumentTittel(),
             journalpostMetadata.behandlingstema(), personIdent, sedMetrikker);
+        log.info("DEBUG JournalpostService opprettUtgaaendeJournalpost request: " + request.toString());
         return opprettJournalpost(request, true);
     }
 

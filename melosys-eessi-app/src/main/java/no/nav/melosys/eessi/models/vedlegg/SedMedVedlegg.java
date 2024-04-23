@@ -4,9 +4,11 @@ import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
+@ToString
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class SedMedVedlegg {
 

@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 @Data
 @Builder
+@ToString
 public class SedHendelse {
 
     private static final List<String> TRENGER_KONTROLL = Stream.of(SedType.X001, SedType.X006, SedType.X007, SedType.X008).map(Enum::name).toList();
