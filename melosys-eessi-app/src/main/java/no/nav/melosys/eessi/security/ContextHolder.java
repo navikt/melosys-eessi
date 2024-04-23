@@ -7,6 +7,7 @@ import no.nav.security.token.support.core.jwt.JwtToken;
 import no.nav.security.token.support.spring.SpringTokenValidationContextHolder;
 
 import java.text.ParseException;
+import java.util.Map;
 
 @Slf4j
 final class ContextHolder {
@@ -16,6 +17,8 @@ final class ContextHolder {
     private static ContextHolder instans;
 
     private static final String AAD = "aad";
+    private static final String IDTYP = "idtyp";
+    private static final String APP = "app";
 
     private ContextHolder(SpringTokenValidationContextHolder context) {
         this.context = context;
@@ -31,16 +34,17 @@ final class ContextHolder {
     boolean canExchangeOBOToken() throws ParseException {
         JwtToken jwtToken = getTokenContext().getJwtToken(AAD);
         try {
-            return (jwtToken != null && harNavIdent(jwtToken));
+            return (jwtToken != null && !aktørErApplikasjon(jwtToken));
         } catch (ParseException e) {
             log.error("Feil ved parsing av JWT token", e);
             throw e;
         }
     }
 
-    boolean harNavIdent(JwtToken jwtToken) throws ParseException {
+    boolean aktørErApplikasjon(JwtToken jwtToken) throws ParseException {
         SignedJWT jwt = SignedJWT.parse(jwtToken.getTokenAsString());
-        return jwt.getPayload().toJSONObject().containsKey("NAVident");
+        Map<String, Object> payload = jwt.getPayload().toJSONObject();
+        return payload.containsKey(IDTYP) && payload.get(IDTYP).equals(APP);
     }
 
     private TokenValidationContext getTokenContext() {
