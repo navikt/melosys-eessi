@@ -11,12 +11,12 @@ import lombok.Value;
 public class SedMedVedlegg {
 
   private final BinaerFil sed;
-  private List<BinaerFil> vedleggListe;
+  private List<BinaerFil> vedlegg;
 
   @ConstructorProperties({"sed", "vedlegg"})
-  public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedleggListe) {
+  public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedlegg) {
     this.sed = sed;
-    this.vedleggListe = vedleggListe != null ? vedleggListe : Collections.emptyList();
+    this.vedlegg = vedlegg != null ? vedlegg : Collections.emptyList();
   }
 
   @Value
