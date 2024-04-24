@@ -13,7 +13,6 @@ public class SedMedVedlegg {
   private final BinaerFil sed;
   private List<BinaerFil> vedlegg;
 
-  @ConstructorProperties({"sed", "vedlegg"})
   public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedlegg) {
     this.sed = sed;
     this.vedlegg = vedlegg != null ? vedlegg : Collections.emptyList();
@@ -27,7 +26,6 @@ public class SedMedVedlegg {
     private String mimeType;
     private byte[] innhold;
 
-    @ConstructorProperties({"fraMimeOgFilnavn", "mimeType", "innhold"})
     public BinaerFil(String filnavn, String mimeType, byte[] innhold) {
       this.filnavn = filnavn;
       this.mimeType = mimeType;
