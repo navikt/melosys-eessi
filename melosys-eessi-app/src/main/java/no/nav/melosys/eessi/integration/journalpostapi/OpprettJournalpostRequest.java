@@ -98,6 +98,7 @@ public class OpprettJournalpostRequest {
   @Getter
   @NoArgsConstructor
   @AllArgsConstructor
+  @ToString
   public static class Dokument {
 
     private String tittel;

@@ -25,6 +25,9 @@ public class JournalpostapiConsumer {
         log.info("Oppretter journalpost av type {} for arkivsakid {}",
             request.getJournalpostType().name(), request.getSak() != null ? request.getSak().getArkivsaksnummer() : "ukjent");
         log.info("DEBUG JournalpostAiConsumer OpprettJournalpostRequest: " + request.toString());
+        for (OpprettJournalpostRequest.Dokument dokument : request.getDokumenter()) {
+            log.info("DEBUG JournalpostApiConsumer OpprettJournalpostRequest dokument: " + dokument.toString());
+        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
