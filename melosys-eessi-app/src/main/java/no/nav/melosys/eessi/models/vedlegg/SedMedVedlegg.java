@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.models.vedlegg;
 
-import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Value;
 
@@ -11,12 +11,11 @@ import lombok.Value;
 public class SedMedVedlegg {
 
   private final BinaerFil sed;
-  private List<BinaerFil> vedleggListe;
+  private List<BinaerFil> vedlegg;
 
-  @ConstructorProperties({"sed", "vedlegg"})
-  public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedleggListe) {
+  public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedlegg) {
     this.sed = sed;
-    this.vedleggListe = vedleggListe != null ? vedleggListe : Collections.emptyList();
+    this.vedlegg = vedlegg != null ? vedlegg : Collections.emptyList();
   }
 
   @Value
@@ -27,7 +26,6 @@ public class SedMedVedlegg {
     private String mimeType;
     private byte[] innhold;
 
-    @ConstructorProperties({"fraMimeOgFilnavn", "mimeType", "innhold"})
     public BinaerFil(String filnavn, String mimeType, byte[] innhold) {
       this.filnavn = filnavn;
       this.mimeType = mimeType;

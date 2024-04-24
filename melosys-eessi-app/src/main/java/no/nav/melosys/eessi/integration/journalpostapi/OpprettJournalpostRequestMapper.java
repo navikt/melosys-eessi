@@ -116,7 +116,7 @@ public final class OpprettJournalpostRequestMapper {
 
         dokumenter.add(dokument(sedHendelse.getSedType(), dokumentTittel, JournalpostFiltype.PDFA,
             sedMedVedlegg.getSed().getInnhold()));
-        dokumenter.addAll(vedlegg(sedHendelse, sedMedVedlegg.getVedleggListe(), sedMetrikker));
+        dokumenter.addAll(vedlegg(sedHendelse, sedMedVedlegg.getVedlegg(), sedMetrikker));
         return dokumenter;
     }
 
