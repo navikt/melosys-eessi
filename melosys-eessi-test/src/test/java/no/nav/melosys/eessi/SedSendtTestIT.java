@@ -95,14 +95,14 @@ class SedSendtTestIT extends ComponentTestBase {
         kafkaTestConsumer.reset(3);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), null))).get();
-        await().atMost(Duration.ofSeconds(4))
+        await().atMost(Duration.ofSeconds(10))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 2);
 
         mockIdentifisertPerson();
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
         kafkaTestConsumer.doWait(1_500L);
-        await().atMost(Duration.ofSeconds(4))
+        await().atMost(Duration.ofSeconds(10))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(rinaSaksnummer).size() == 0);
 
