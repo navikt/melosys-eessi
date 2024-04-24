@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.models.vedlegg;
 
-import java.beans.ConstructorProperties;
 import java.util.Collections;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Value;
 
