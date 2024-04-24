@@ -303,7 +303,7 @@ public interface SedMapper {
         adresse.setPostnummer(sAdresse.getPostnr());
         adresse.setBy(sAdresse.getPoststed());
         adresse.setLand(LandkodeMapper.mapTilLandkodeIso2(sAdresse.getLand()));
-        adresse.setBygning(null);
+        adresse.setBygning(sAdresse.getTilleggsnavn());
         adresse.setRegion(sAdresse.getRegion());
 
         if (!StringUtils.hasText(adresse.getBy()) || !StringUtils.hasText(adresse.getLand())) {
