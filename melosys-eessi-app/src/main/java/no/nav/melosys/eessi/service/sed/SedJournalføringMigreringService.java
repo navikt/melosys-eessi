@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.sed;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Synchronized;
@@ -40,7 +40,8 @@ public class SedJournalføringMigreringService {
     LocalDateTime sluttTidspunktDev = LocalDateTime.of(2024, 4, 25, 15, 37);
 
     boolean erKartleggingPågående = false;
-    private List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList = List.of();
+
+    private final List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList = new ArrayList<>();
     private int antallSedMottattHendelser = 0;
     private int antallSedSjekket = 0;
 
@@ -63,16 +64,7 @@ public class SedJournalføringMigreringService {
             if (!erKartleggingPågående) {
                 break;
             }
-            String rinaSaksnummer = sedMottattHendelse.getSedHendelse().getRinaSakId();
-            String dokumentId = sedMottattHendelse.getSedHendelse().getRinaDokumentId();
-            antallSedSjekket++;
-
-            SedMedVedlegg sedMedVedlegg = euxConsumer.hentSedMedVedlegg(rinaSaksnummer, dokumentId);
-            if (!sedMedVedlegg.getVedlegg().isEmpty()) {
-                String journalpostId = sedMottattHendelse.getJournalpostId();
-                log.info("Fant vedlegg for sed med rinaSaksnummer {}, dokumentId {} og journalpostid {}", rinaSaksnummer, dokumentId, journalpostId);
-                sedMottattMigreringRapportDtoList.add(new SedMottattMigreringRapportDto(rinaSaksnummer, dokumentId, journalpostId));
-            }
+            kartleggForSedMottattHendelse(sedMottattHendelse);
         }
         erKartleggingPågående = false;
     }
@@ -84,5 +76,18 @@ public class SedJournalføringMigreringService {
 
     public SedJournalføringMigreringRapportDto hentStatus() {
         return new SedJournalføringMigreringRapportDto(sedMottattMigreringRapportDtoList, antallSedMottattHendelser, antallSedSjekket);
+    }
+
+    private void kartleggForSedMottattHendelse(SedMottattHendelse sedMottattHendelse) {
+        String rinaSaksnummer = sedMottattHendelse.getSedHendelse().getRinaSakId();
+        String dokumentId = sedMottattHendelse.getSedHendelse().getRinaDokumentId();
+        antallSedSjekket++;
+
+        SedMedVedlegg sedMedVedlegg = euxConsumer.hentSedMedVedlegg(rinaSaksnummer, dokumentId);
+        if (!sedMedVedlegg.getVedlegg().isEmpty()) {
+            String journalpostId = sedMottattHendelse.getJournalpostId();
+            log.info("Fant vedlegg for sed med rinaSaksnummer {}, dokumentId {} og journalpostid {}", rinaSaksnummer, dokumentId, journalpostId);
+            sedMottattMigreringRapportDtoList.add(new SedMottattMigreringRapportDto(rinaSaksnummer, dokumentId, journalpostId));
+        }
     }
 }
