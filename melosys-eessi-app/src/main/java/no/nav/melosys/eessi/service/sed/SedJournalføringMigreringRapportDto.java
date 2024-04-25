@@ -1,6 +1,6 @@
 package no.nav.melosys.eessi.service.sed;
 
-import java.util.HashMap;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class SedJournalføringMigreringRapportDto {
-    private final HashMap<String, String> rinasaksnummerTilDokumentId;
+    private final List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList;
     private int antallSedMottattHendelser;
     private int antallSedSjekket;
 }

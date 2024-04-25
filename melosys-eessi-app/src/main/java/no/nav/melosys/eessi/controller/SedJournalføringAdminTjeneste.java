@@ -29,7 +29,7 @@ public class SedJournalføringAdminTjeneste {
     @PostMapping("/sed/sed-med-vedlegg/start")
     public ResponseEntity<String> startKartleggingAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
-        sedJournalføringMigreringService.startRapportering();
+        sedJournalføringMigreringService.startKartleggingAvSedMottatt();
 
         return ResponseEntity.ok("Startet rapportering av sed med vedlegg");
     }

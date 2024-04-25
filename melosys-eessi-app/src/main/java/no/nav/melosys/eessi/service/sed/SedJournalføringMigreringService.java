@@ -41,12 +41,13 @@ public class SedJournalføringMigreringService {
 
     boolean erKartleggingPågående = false;
     private final HashMap<String, String> rinasaksnummerTilDokumentId = new HashMap<>();
+    private final List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList = List.of();
     private int antallSedMottattHendelser = 0;
     private int antallSedSjekket = 0;
 
     @Async
     @Synchronized
-    public void startRapportering() {
+    public void startKartleggingAvSedMottatt() {
         LocalDateTime startTidspunkt = naisClusterName.equals("prod-fss") ? startTidspunktProd : startTidspunktDev;
         LocalDateTime sluttTidspunkt = naisClusterName.equals("prod-fss") ? sluttTidspunktProd : sluttTidspunktDev;
 
@@ -54,6 +55,8 @@ public class SedJournalføringMigreringService {
         erKartleggingPågående = true;
         antallSedMottattHendelser = sedMottattHendelseListe.size();
         antallSedSjekket = 0;
+
+        sedMottattMigreringRapportDtoList.clear();
 
         log.info("Starter rapportering av sed med vedlegg fra {} til {}. Antall SedMottattHendelser {}", startTidspunkt, sluttTidspunkt, antallSedMottattHendelser);
 
@@ -67,8 +70,9 @@ public class SedJournalføringMigreringService {
 
             SedMedVedlegg sedMedVedlegg = euxConsumer.hentSedMedVedlegg(rinaSaksnummer, dokumentId);
             if (!sedMedVedlegg.getVedlegg().isEmpty()) {
-                log.info("Fant vedlegg for sed med rinaSaksnummer {} og dokumentId {}", rinaSaksnummer, dokumentId);
-                rinasaksnummerTilDokumentId.put(rinaSaksnummer, dokumentId);
+                String journalpostId = sedMottattHendelse.getJournalpostId();
+                log.info("Fant vedlegg for sed med rinaSaksnummer {}, dokumentId {} og journalpostid {}", rinaSaksnummer, dokumentId, journalpostId);
+                sedMottattMigreringRapportDtoList.add(new SedMottattMigreringRapportDto(rinaSaksnummer, dokumentId, journalpostId));
             }
         }
         erKartleggingPågående = false;
@@ -80,6 +84,6 @@ public class SedJournalføringMigreringService {
     }
 
     public SedJournalføringMigreringRapportDto hentStatus() {
-        return new SedJournalføringMigreringRapportDto(rinasaksnummerTilDokumentId, antallSedMottattHendelser, antallSedSjekket);
+        return new SedJournalføringMigreringRapportDto(sedMottattMigreringRapportDtoList, antallSedMottattHendelser, antallSedSjekket);
     }
 }
