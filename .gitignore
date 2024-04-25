@@ -24,3 +24,4 @@ target/
 /nbdist/
 /.nb-gradle/
 /build/
+/q2.env

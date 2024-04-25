@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
+@Profile("!local-q2")
 public class BehandleBucIdentifisertService {
 
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
