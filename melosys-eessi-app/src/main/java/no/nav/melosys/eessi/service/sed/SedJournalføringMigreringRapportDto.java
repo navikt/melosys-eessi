@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class SedJournalføringMigreringRapporteringDto {
+public class SedJournalføringMigreringRapportDto {
     private final HashMap<String, String> rinasaksnummerTilDokumentId;
     private int antallSedMottattHendelser;
     private int antallSedSjekket;

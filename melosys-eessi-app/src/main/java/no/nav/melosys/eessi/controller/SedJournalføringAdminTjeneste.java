@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.service.sed.SedJournalføringMigreringRapporteringDto;
+import no.nav.melosys.eessi.service.sed.SedJournalføringMigreringRapportDto;
 import no.nav.melosys.eessi.service.sed.SedJournalføringMigreringService;
 import no.nav.security.token.support.core.api.Unprotected;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class SedJournalføringAdminTjeneste {
     }
 
     @PostMapping("/sed/sed-med-vedlegg/start")
-    public ResponseEntity<String> startRapporteringAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    public ResponseEntity<String> startKartleggingAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
         sedJournalføringMigreringService.startRapportering();
 
@@ -35,14 +35,14 @@ public class SedJournalføringAdminTjeneste {
     }
 
     @PostMapping("/sed/sed-med-vedlegg/stop")
-    public ResponseEntity<String> stoppRapporteringAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    public ResponseEntity<String> stoppKartleggingAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
-        sedJournalføringMigreringService.stoppRapportering();
+        sedJournalføringMigreringService.stoppKartlegging();
         return ResponseEntity.ok("Stoppet rapportering av sed med vedlegg");
     }
 
     @GetMapping("/sed/sed-med-vedlegg/status")
-    public ResponseEntity<SedJournalføringMigreringRapporteringDto> hentStatusForRapporteringAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    public ResponseEntity<SedJournalføringMigreringRapportDto> hentStatusForKartleggingAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
         return ResponseEntity.ok(sedJournalføringMigreringService.hentStatus());
     }

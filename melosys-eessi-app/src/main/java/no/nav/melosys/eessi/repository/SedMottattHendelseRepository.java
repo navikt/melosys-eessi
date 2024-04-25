@@ -18,7 +18,6 @@ public interface SedMottattHendelseRepository extends JpaRepository<SedMottattHe
             nativeQuery = true)
     List<SedMottattHendelse> findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(String rinaSaksnummer, boolean publisertKafka);
 
-    // Find all where mottatt_dato is between startTidspunkt and sluttTidspunkt
     @Query(
             value = "select * from sed_mottatt_hendelse where mottatt_dato between ?1 and ?2",
             nativeQuery = true)
