@@ -40,8 +40,7 @@ public class SedJournalføringMigreringService {
     LocalDateTime sluttTidspunktDev = LocalDateTime.of(2024, 4, 25, 15, 37);
 
     boolean erKartleggingPågående = false;
-    private final HashMap<String, String> rinasaksnummerTilDokumentId = new HashMap<>();
-    private final List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList = List.of();
+    private List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList = List.of();
     private int antallSedMottattHendelser = 0;
     private int antallSedSjekket = 0;
 
@@ -79,7 +78,7 @@ public class SedJournalføringMigreringService {
     }
 
     public void stoppKartlegging() {
-        log.info("Stopp rapportering av sed med vedlegg. Sjekket {} SED. Funnet {} av {} sed med vedlegg.", antallSedSjekket, rinasaksnummerTilDokumentId.size(), antallSedMottattHendelser);
+        log.info("Stopp rapportering av sed med vedlegg. Sjekket {} SED. Funnet {} av {} sed med vedlegg.", antallSedSjekket, sedMottattMigreringRapportDtoList.size(), antallSedMottattHendelser);
         erKartleggingPågående = false;
     }
 
