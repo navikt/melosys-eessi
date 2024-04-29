@@ -9,6 +9,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class SedJournalføringMigreringRapportDto {
     private final List<SedMottattMigreringRapportDto> sedMottattMigreringRapportDtoList;
+    private final List<SedSendtMigreringRapportDto> sedSendtMigreringRapportDtoList;
     private int antallSedMottattHendelser;
     private int antallSedSjekket;
 }
