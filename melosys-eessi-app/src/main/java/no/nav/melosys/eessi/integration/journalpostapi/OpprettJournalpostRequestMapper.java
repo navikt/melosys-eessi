@@ -78,7 +78,7 @@ public final class OpprettJournalpostRequestMapper {
             .behandlingstema(behandlingstema)
             .bruker(isNotEmpty(personIdent) ? lagBruker(personIdent) : null)
             .dokumenter(dokumenter(sedHendelse, sedMedVedlegg, dokumentTittel, sedMetrikker))
-            .eksternReferanseId(sedHendelse.getSedId())
+            .eksternReferanseId(sedHendelse.getId() + "_" + sedHendelse.getSedId())
             .journalfoerendeEnhet("4530")
             .journalpostType(journalpostType)
             .kanal("EESSI")
