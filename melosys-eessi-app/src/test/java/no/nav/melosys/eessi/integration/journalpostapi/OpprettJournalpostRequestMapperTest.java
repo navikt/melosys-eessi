@@ -45,7 +45,7 @@ class OpprettJournalpostRequestMapperTest {
             "EESSI",
             OpprettJournalpostRequest.JournalpostType.INNGAAENDE,
             "UFM",
-            sedHendelse.getSedId()
+            sedHendelse.getId() + "_" + sedHendelse.getSedId()
         );
     }
 
