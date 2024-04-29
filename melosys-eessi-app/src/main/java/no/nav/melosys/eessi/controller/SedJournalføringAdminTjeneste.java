@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 @Slf4j
 @Unprotected
 @RestController
@@ -26,18 +29,34 @@ public class SedJournalføringAdminTjeneste {
         this.sedJournalføringMigreringService = sedJournalføringMigreringService;
     }
 
-    @PostMapping("/sed/sed-med-vedlegg/start")
-    public ResponseEntity<String> startKartleggingAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    @PostMapping("/sed/sed-med-vedlegg/mottatt/start")
+    public ResponseEntity<String> startKartleggingAvSedMottattMedVedlegg(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
         sedJournalføringMigreringService.startKartleggingAvSedMottatt();
 
-        return ResponseEntity.ok("Startet rapportering av sed med vedlegg");
+        return ResponseEntity.ok("Startet rapportering av sed mottatt med vedlegg");
     }
 
-    @PostMapping("/sed/sed-med-vedlegg/stop")
-    public ResponseEntity<String> stoppKartleggingAvVedleggMedSed(@RequestHeader(API_KEY_HEADER) String apiKey) {
+    @PostMapping("/sed/sed-med-vedlegg/sendt/start")
+    public ResponseEntity<String> startKartleggingAvSedSendtMedVedlegg(@RequestHeader(API_KEY_HEADER) String apiKey) throws IOException, URISyntaxException {
         validerApikey(apiKey);
-        sedJournalføringMigreringService.stoppKartlegging();
+        sedJournalføringMigreringService.startKartleggingAvSedSendt();
+
+        return ResponseEntity.ok("Startet rapportering av sed sendt med vedlegg");
+    }
+
+
+    @PostMapping("/sed/sed-med-vedlegg/mottatt/stop")
+    public ResponseEntity<String> stoppKartleggingAvSedMottattMedVedlegg(@RequestHeader(API_KEY_HEADER) String apiKey) {
+        validerApikey(apiKey);
+        sedJournalføringMigreringService.stoppSedMottattKartlegging();
+        return ResponseEntity.ok("Stoppet rapportering av sed med vedlegg");
+    }
+
+    @PostMapping("/sed/sed-med-vedlegg/sendt/stop")
+    public ResponseEntity<String> stoppKartleggingAvSedSendtMedVedlegg(@RequestHeader(API_KEY_HEADER) String apiKey) {
+        validerApikey(apiKey);
+        sedJournalføringMigreringService.stoppSedMendtKartlegging();
         return ResponseEntity.ok("Stoppet rapportering av sed med vedlegg");
     }
 
