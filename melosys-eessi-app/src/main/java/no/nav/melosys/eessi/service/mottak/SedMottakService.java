@@ -55,11 +55,6 @@ public class SedMottakService {
             return;
         }
 
-        if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.getSedHendelse().getSedId()).isPresent()) {
-            log.info("Mottatt SED {} er allerede behandlet", sedMottattHendelse.getSedHendelse().getSedId());
-            return;
-        }
-
         if (erXSedBehandletUtenASed(sedMottattHendelse.getSedHendelse())) {
             throw new IllegalStateException("Mottatt SED %s av type %s har ikke tilhørende A sed behandlet"
                 .formatted(sedMottattHendelse.getSedHendelse().getSedId(), sedMottattHendelse.getSedHendelse().getSedType()));
