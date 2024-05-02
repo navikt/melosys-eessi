@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.integration.saf;
 
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
-import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextSafClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -19,12 +19,11 @@ public class SafConsumerProducer {
     }
 
     @Bean
-    public RestTemplate safRestTemplate(SystemContextClientRequestInterceptor interceptor,
+    public RestTemplate safRestTemplate(SystemContextSafClientRequestInterceptor interceptor,
                                         CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
         return new RestTemplateBuilder()
                 .uriTemplateHandler(new DefaultUriBuilderFactory(uri))
                 .interceptors(interceptor, correlationIdOutgoingInterceptor)
                 .build();
     }
-
 }

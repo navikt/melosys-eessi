@@ -5,6 +5,7 @@ import java.util.Optional;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextEuxClientRequestInterceptor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -19,7 +20,7 @@ class EuxConsumerProducerTest {
     void opprettResttemplate_verifiserModifisertObjectMapper() {
         EuxConsumerProducer euxConsumerProducer = new EuxConsumerProducer("uri");
         RestTemplate restTemplate = euxConsumerProducer.euxRestTemplate(new RestTemplateBuilder(r -> {}), mock(
-                SystemContextClientRequestInterceptor.class));
+            SystemContextEuxClientRequestInterceptor.class));
 
         Optional<MappingJackson2HttpMessageConverter> converter = restTemplate.getMessageConverters()
                 .stream()

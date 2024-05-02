@@ -1,6 +1,13 @@
 package no.nav.melosys.eessi.security;
 
+import com.nimbusds.jose.util.ResourceRetriever;
+import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
 import no.nav.melosys.eessi.service.sts.RestStsClient;
+import no.nav.security.token.support.client.core.ClientProperties;
+import no.nav.security.token.support.client.core.OAuth2GrantType;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
+import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +18,10 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.mock.http.client.MockClientHttpRequest;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -20,7 +31,7 @@ import static org.mockito.Mockito.when;
 class SystemContextClientRequestInterceptorTest {
 
     @Mock
-    private RestStsClient restStsClient;
+    private OAuth2AccessTokenService oAuth2AccessTokenService;
 
     private SystemContextClientRequestInterceptor systemContextClientRequestInterceptor;
 
@@ -31,8 +42,16 @@ class SystemContextClientRequestInterceptorTest {
 
     @BeforeEach
     public void setup() {
-        systemContextClientRequestInterceptor = new SystemContextClientRequestInterceptor(restStsClient);
-        when(restStsClient.collectToken()).thenReturn(oidcKey);
+        var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api", ClientProperties.builder()
+            .wellKnownUrl(URI.create("test"))
+            .tokenEndpointUrl(URI.create("token_endpoint"))
+            .grantType(OAuth2GrantType.JWT_BEARER)
+            .scope(List.of("scope1", "scope2"))
+            .resourceUrl(URI.create("resource_url"))
+            .build()));
+
+        systemContextClientRequestInterceptor = new SystemContextClientRequestInterceptor(oAuth2AccessTokenService, clientConfigurationProperties, "eux-rina-api");
+        when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken(oidcKey).build());
     }
 
     @Test
@@ -41,7 +60,6 @@ class SystemContextClientRequestInterceptorTest {
         systemContextClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
 
         verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
-        verify(restStsClient).collectToken();
 
         assertThat(httpRequest.getHeaders()).containsKey(HttpHeaders.AUTHORIZATION);
         assertThat(httpRequest.getHeaders().get(HttpHeaders.AUTHORIZATION)).contains("Bearer " + oidcKey);

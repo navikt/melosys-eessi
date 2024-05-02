@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.integration.oppgave;
 
 import java.util.Collections;
 
-import no.nav.melosys.eessi.security.SystemContextRequestFilter;
+import no.nav.melosys.eessi.security.OppgaveSakRequestExchangeFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +20,12 @@ public class OppgaveConsumerProducer {
     }
 
     @Bean
-    public OppgaveConsumer oppgaveConsumer(WebClient.Builder webClientBuilder, SystemContextRequestFilter systemContextRequestFilter) {
+    public OppgaveConsumer oppgaveConsumer(WebClient.Builder webClientBuilder, OppgaveSakRequestExchangeFilter oppgaveSakRequestExchangeFilter) {
         return new OppgaveConsumer(
                 webClientBuilder
                         .baseUrl(url)
                         .defaultHeaders(this::defaultHeaders)
-                        .filter(systemContextRequestFilter)
+                        .filter(oppgaveSakRequestExchangeFilter)
                         .build()
         );
     }

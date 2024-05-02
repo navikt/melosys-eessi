@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextEuxClientRequestInterceptor;
 import no.nav.melosys.eessi.security.UserContextEuxClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +28,7 @@ public class EuxConsumerProducer {
 
     @Bean
     @Primary
-    public EuxConsumer euxConsumer(RestTemplateBuilder builder, SystemContextClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
+    public EuxConsumer euxConsumer(RestTemplateBuilder builder, SystemContextEuxClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
         return new EuxConsumer(euxRestTemplate(builder, interceptor), objectMapper);
     }
 
@@ -38,7 +39,7 @@ public class EuxConsumerProducer {
     }
 
     protected RestTemplate euxRestTemplate(RestTemplateBuilder restTemplateBuilder,
-                                     SystemContextClientRequestInterceptor interceptor) {
+                                           SystemContextEuxClientRequestInterceptor interceptor) {
         return lagRestTemplate(restTemplateBuilder, interceptor);
     }
 

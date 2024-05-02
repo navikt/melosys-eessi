@@ -5,12 +5,12 @@ import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserContextEuxClientRequestInterceptor extends UserContextClientRequestInterceptor {
+public class SystemContextSafClientRequestInterceptor extends SystemContextClientRequestInterceptor {
 
-    static final String CLIENT_NAME = "eux-rina-api";
+    static final String CLIENT_NAME = "saf";
 
-    public UserContextEuxClientRequestInterceptor(ClientConfigurationProperties clientConfigurationProperties,
+    public SystemContextSafClientRequestInterceptor(ClientConfigurationProperties clientConfigurationProperties,
                                                   OAuth2AccessTokenService oAuth2AccessTokenService) {
-        super(clientConfigurationProperties, oAuth2AccessTokenService, CLIENT_NAME);
+        super(oAuth2AccessTokenService, clientConfigurationProperties, CLIENT_NAME);
     }
 }

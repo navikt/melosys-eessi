@@ -4,7 +4,7 @@ import java.time.Duration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
-import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextClientRequestRestSTSInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +27,7 @@ public class JournalpostapiConfiguration {
     @Bean
     public RestTemplate journalpostapiRestTemplate(
         RestTemplateBuilder restTemplateBuilder,
-        SystemContextClientRequestInterceptor systemContextClientRequestInterceptor,
+        SystemContextClientRequestRestSTSInterceptor systemContextClientRequestInterceptor,
         CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
         return restTemplateBuilder
             .requestFactory(SimpleClientHttpRequestFactory::new)

@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.util.Collection;
 import java.util.List;
@@ -19,10 +20,19 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextEuxClientRequestInterceptor;
 import no.nav.melosys.eessi.service.sts.RestStsClientServiceClient;
+import no.nav.security.token.support.client.core.ClientProperties;
+import no.nav.security.token.support.client.core.OAuth2GrantType;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
+import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -33,14 +43,19 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+@ExtendWith(MockitoExtension.class)
 class EuxConsumerTest {
 
+    @Mock
+    private OAuth2AccessTokenService oAuth2AccessTokenService;
     private EuxConsumer euxConsumer;
 
     private MockRestServiceServer server;
@@ -50,11 +65,21 @@ class EuxConsumerTest {
     @BeforeEach
     void setup() {
         EuxConsumerProducer consumerConfig = new EuxConsumerProducer(null);
-        SystemContextClientRequestInterceptor interceptor = new SystemContextClientRequestInterceptor(mock(RestStsClientServiceClient.class));
+
+        var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api", ClientProperties.builder()
+            .wellKnownUrl(URI.create("test"))
+            .tokenEndpointUrl(URI.create("token_endpoint"))
+            .grantType(OAuth2GrantType.JWT_BEARER)
+            .scope(List.of("scope1", "scope2"))
+            .resourceUrl(URI.create("resource_url"))
+            .build()));
+
+        SystemContextEuxClientRequestInterceptor interceptor = new SystemContextEuxClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService);
 
         RestTemplate restTemplate = consumerConfig.euxRestTemplate(new RestTemplateBuilder(), interceptor);
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
         server = MockRestServiceServer.createServer(restTemplate);
+        when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken("accesstoken").build());
     }
 
     @Test

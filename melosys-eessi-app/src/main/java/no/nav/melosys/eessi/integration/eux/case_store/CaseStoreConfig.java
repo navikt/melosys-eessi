@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.eux.case_store;
 
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
+import no.nav.melosys.eessi.security.SystemContextClientRequestRestSTSInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ public class CaseStoreConfig {
 
     @Bean("caseStoreResttemplate")
     public RestTemplate caseStoreResttemplate(RestTemplateBuilder restTemplateBuilder,
-                                              SystemContextClientRequestInterceptor requestInterceptor,
+                                              SystemContextClientRequestRestSTSInterceptor requestInterceptor,
                                               CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
         return restTemplateBuilder
                 .defaultMessageConverters()
