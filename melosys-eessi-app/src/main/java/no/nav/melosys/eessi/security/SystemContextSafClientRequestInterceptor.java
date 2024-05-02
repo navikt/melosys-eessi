@@ -5,12 +5,12 @@ import no.nav.security.token.support.client.spring.ClientConfigurationProperties
 import org.springframework.stereotype.Component;
 
 @Component
-public class SystemContextSafClientRequestInterceptor extends SystemContextClientRequestInterceptor {
+public class SystemContextSafClientRequestInterceptor extends ClientRequestInterceptor {
 
     static final String CLIENT_NAME = "saf";
 
     public SystemContextSafClientRequestInterceptor(ClientConfigurationProperties clientConfigurationProperties,
                                                   OAuth2AccessTokenService oAuth2AccessTokenService) {
-        super(oAuth2AccessTokenService, clientConfigurationProperties, CLIENT_NAME);
+        super(clientConfigurationProperties, oAuth2AccessTokenService, CLIENT_NAME);
     }
 }

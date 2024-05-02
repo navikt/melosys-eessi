@@ -18,15 +18,15 @@ import org.springframework.http.client.ClientHttpResponse;
 import static no.nav.security.token.support.client.core.OAuth2GrantType.JWT_BEARER;
 
 @Slf4j
-public class UserContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
+public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private final OAuth2AccessTokenService oAuth2AccessTokenService;
 
     private final ClientProperties clientProperties;
 
-    public UserContextClientRequestInterceptor(ClientConfigurationProperties clientConfigurationProperties,
-                                               OAuth2AccessTokenService oAuth2AccessTokenService,
-                                               String clientName) {
+    public ClientRequestInterceptor(ClientConfigurationProperties clientConfigurationProperties,
+                                    OAuth2AccessTokenService oAuth2AccessTokenService,
+                                    String clientName) {
         this.oAuth2AccessTokenService = oAuth2AccessTokenService;
         this.clientProperties = Optional.ofNullable(clientConfigurationProperties.getRegistration().get(clientName))
             .orElseThrow(() -> new RuntimeException("Fant ikke OAuth2-config for " + clientName));
