@@ -1,8 +1,5 @@
 package no.nav.melosys.eessi.security;
 
-import com.nimbusds.jose.util.ResourceRetriever;
-import com.nimbusds.oauth2.sdk.as.AuthorizationServerMetadata;
-import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
@@ -28,12 +25,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class SystemContextClientRequestInterceptorTest {
+class AzureRequestInterceptorTest {
 
     @Mock
     private OAuth2AccessTokenService oAuth2AccessTokenService;
 
-    private SystemContextClientRequestInterceptor systemContextClientRequestInterceptor;
+    private ClientRequestInterceptor clientRequestInterceptor;
 
     @Mock
     private ClientHttpRequestExecution httpRequestExecution;
@@ -50,14 +47,14 @@ class SystemContextClientRequestInterceptorTest {
             .resourceUrl(URI.create("resource_url"))
             .build()));
 
-        systemContextClientRequestInterceptor = new SystemContextClientRequestInterceptor(oAuth2AccessTokenService, clientConfigurationProperties, "eux-rina-api");
+        clientRequestInterceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
         when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken(oidcKey).build());
     }
 
     @Test
     void intercept() throws Exception {
         MockClientHttpRequest httpRequest = new MockClientHttpRequest();
-        systemContextClientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
+        clientRequestInterceptor.intercept(httpRequest, new byte[0], httpRequestExecution);
 
         verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
 

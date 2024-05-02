@@ -24,6 +24,10 @@ final class ContextHolder {
         this.context = context;
     }
 
+    public ContextHolder(){
+        this.context = new SpringTokenValidationContextHolder();
+    }
+
     static ContextHolder getInstance() {
         if (instans == null) {
             instans = new ContextHolder(new SpringTokenValidationContextHolder());
@@ -47,7 +51,7 @@ final class ContextHolder {
         return payload.containsKey(IDTYP) && payload.get(IDTYP).equals(APP);
     }
 
-    private TokenValidationContext getTokenContext() {
+    public TokenValidationContext getTokenContext() {
         return context.getTokenValidationContext();
     }
 }

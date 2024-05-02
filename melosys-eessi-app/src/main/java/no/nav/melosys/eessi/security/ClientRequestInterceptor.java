@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
@@ -43,10 +44,9 @@ public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
             if (ContextHolder.getInstance().canExchangeOBOToken()) {
                 OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
                 return response.getAccessToken();
-            } else if (clientProperties.getGrantType().equals(JWT_BEARER)) {
+            }
+             else {
                 return hentAccessTokenForSystem();
-            } else {
-                throw new Exception();
             }
         } catch (Exception e) {
             log.error("Feil under henting av access token", e);
