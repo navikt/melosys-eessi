@@ -1,18 +1,23 @@
 package no.nav.melosys.eessi.integration.saf;
 
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
+import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -28,10 +33,19 @@ class SafConsumerTest {
 
     private final static String JOURNALPOST_ID = "143432657";
 
+    private static MockWebServer mockServer;
+
+    @BeforeAll
+    static void setupServer() throws IOException {
+        mockServer = new MockWebServer();
+        mockServer.start();
+    }
+
     @BeforeEach
     public void setup() {
         server = MockRestServiceServer.createServer(restTemplate);
-        safConsumer = new SafConsumer(restTemplate);
+
+        safConsumer = new SafConsumer(WebClient.builder().baseUrl(String.format("http://localhost:%s", mockServer.getPort())).build());
     }
 
     @Test
