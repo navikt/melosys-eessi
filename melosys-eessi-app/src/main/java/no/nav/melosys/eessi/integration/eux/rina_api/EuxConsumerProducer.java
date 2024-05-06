@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
-import no.nav.melosys.eessi.security.SystemContextEuxClientRequestInterceptor;
-import no.nav.melosys.eessi.security.EuxClientRequestInterceptor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import no.nav.melosys.eessi.security.ClientRequestInterceptor;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
+import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -27,33 +29,21 @@ public class EuxConsumerProducer {
 
     @Bean
     @Primary
-    public EuxConsumer euxConsumer(RestTemplateBuilder builder, SystemContextEuxClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
-        return new EuxConsumer(euxRestTemplate(builder, interceptor), objectMapper);
-    }
-
-    @Bean
-    @Qualifier("tokenContext")
-    public EuxConsumer euxTokenContextConsumer(RestTemplateBuilder builder, EuxClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
-        return new EuxConsumer(euxTokenContextRestTemplate(builder, interceptor), objectMapper);
-    }
-
-    protected RestTemplate euxRestTemplate(RestTemplateBuilder restTemplateBuilder,
-                                           SystemContextEuxClientRequestInterceptor interceptor) {
-        return lagRestTemplate(restTemplateBuilder, interceptor);
-    }
-
-    private RestTemplate euxTokenContextRestTemplate(RestTemplateBuilder restTemplateBuilder,
-                                                     EuxClientRequestInterceptor interceptor) {
-        return lagRestTemplate(restTemplateBuilder, interceptor);
+    public EuxConsumer euxConsumer(RestTemplateBuilder builder, ClientConfigurationProperties clientConfigurationProperties,
+                                   OAuth2AccessTokenService oAuth2AccessTokenService, ObjectMapper objectMapper) {
+        ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
+        return new EuxConsumer(lagRestTemplate(builder, interceptor), objectMapper);
     }
 
     private RestTemplate lagRestTemplate(RestTemplateBuilder restTemplateBuilder,
                                          ClientHttpRequestInterceptor interceptor) {
-        RestTemplate restTemplate =  restTemplateBuilder
-                .defaultMessageConverters()
-                .rootUri(uri)
-                .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-                .build();
+        RestTemplate restTemplate = restTemplateBuilder
+            .defaultMessageConverters()
+            .rootUri(uri)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+            .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
+            .build();
 
         return configureJacksonMapper(restTemplate);
     }
@@ -61,13 +51,13 @@ public class EuxConsumerProducer {
     private static RestTemplate configureJacksonMapper(RestTemplate restTemplate) {
         //For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
         restTemplate.getMessageConverters().stream()
-                .filter(MappingJackson2HttpMessageConverter.class::isInstance)
-                .map(MappingJackson2HttpMessageConverter.class::cast)
-                .findFirst().ifPresent(jacksonConverer ->
-                        jacksonConverer.getObjectMapper()
-                                .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
-                                .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
-                );
+            .filter(MappingJackson2HttpMessageConverter.class::isInstance)
+            .map(MappingJackson2HttpMessageConverter.class::cast)
+            .findFirst().ifPresent(jacksonConverer ->
+                jacksonConverer.getObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
+                    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+            );
 
         return restTemplate;
     }

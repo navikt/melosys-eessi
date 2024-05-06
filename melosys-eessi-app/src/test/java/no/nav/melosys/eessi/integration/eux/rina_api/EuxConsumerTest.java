@@ -11,6 +11,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.*;
@@ -19,7 +20,7 @@ import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
-import no.nav.melosys.eessi.security.SystemContextEuxClientRequestInterceptor;
+import no.nav.melosys.eessi.security.ClientRequestInterceptor;
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
@@ -35,6 +36,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -42,7 +44,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -72,9 +73,9 @@ class EuxConsumerTest {
             .resourceUrl(URI.create("resource_url"))
             .build()));
 
-        SystemContextEuxClientRequestInterceptor interceptor = new SystemContextEuxClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService);
+        ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
 
-        RestTemplate restTemplate = consumerConfig.euxRestTemplate(new RestTemplateBuilder(), interceptor);
+        RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
         server = MockRestServiceServer.createServer(restTemplate);
         when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken("accesstoken").build());
@@ -90,7 +91,7 @@ class EuxConsumerTest {
         String id = "1234";
 
         server.expect(requestTo("/buc/" + id))
-                .andRespond(withSuccess(buc, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(buc, MediaType.APPLICATION_JSON));
 
         BUC response = euxConsumer.hentBUC(id);
         assertThat(response).isNotNull();
@@ -100,11 +101,11 @@ class EuxConsumerTest {
         assertThat(response.getBucVersjon()).isEqualTo("v4.1");
 
         assertThat(response.getDocuments())
-                .flatExtracting(Document::getConversations)
-                .flatExtracting(Conversation::getParticipants)
-                .extracting(Participant::getOrganisation)
-                .extracting(Organisation::getId)
-                .containsAll(List.of("NO:NAVT003", "NO:NAVT007"));
+            .flatExtracting(Document::getConversations)
+            .flatExtracting(Conversation::getParticipants)
+            .extracting(Participant::getOrganisation)
+            .extracting(Organisation::getId)
+            .containsAll(List.of("NO:NAVT003", "NO:NAVT007"));
     }
 
     @Test
@@ -112,7 +113,7 @@ class EuxConsumerTest {
         String id = "1234";
         String buc = "LA_BUC_04";
         server.expect(requestTo("/buc?BuCType=" + buc))
-                .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         String response = euxConsumer.opprettBUC(buc);
         assertThat(response).isEqualTo(id);
@@ -122,8 +123,8 @@ class EuxConsumerTest {
     void slettBUC_ingenRetur() {
         String id = "1234";
         server.expect(requestTo("/buc/" + id))
-                .andExpect(method(HttpMethod.DELETE))
-                .andRespond(withSuccess());
+            .andExpect(method(HttpMethod.DELETE))
+            .andRespond(withSuccess());
 
         euxConsumer.slettBUC(id);
     }
@@ -135,7 +136,7 @@ class EuxConsumerTest {
         String danmark = "DK:4321";
 
         server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "," + danmark))
-                .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         euxConsumer.settMottakere(rinaSaksnummer, List.of(sverige, danmark));
     }
@@ -148,10 +149,10 @@ class EuxConsumerTest {
         var mottakere = List.of(sverige, danmark);
 
         server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "," + danmark))
-                .andRespond(withStatus(HttpStatus.NOT_FOUND));
+            .andRespond(withStatus(HttpStatus.NOT_FOUND));
 
         assertThatExceptionOfType(NotFoundException.class)
-                .isThrownBy(() -> euxConsumer.settMottakere(rinaSaksnummer, mottakere));
+            .isThrownBy(() -> euxConsumer.settMottakere(rinaSaksnummer, mottakere));
     }
 
     @Test
@@ -160,7 +161,7 @@ class EuxConsumerTest {
         String domene = "https://rina-ss1-q.adeo.no/portal/#/caseManagement/";
 
         server.expect(requestTo("/url/buc/" + rinaSaksnummer))
-                .andRespond(withSuccess(domene + rinaSaksnummer, MediaType.TEXT_PLAIN));
+            .andRespond(withSuccess(domene + rinaSaksnummer, MediaType.TEXT_PLAIN));
 
         String response = euxConsumer.hentRinaUrl(rinaSaksnummer);
         assertThat(response).isEqualTo(domene + rinaSaksnummer);
@@ -177,7 +178,7 @@ class EuxConsumerTest {
         String landkode = "NO";
 
         server.expect(requestTo("/institusjoner?BuCType=" + buctype + "&LandKode=" + landkode))
-                .andRespond(withSuccess(institusjonerString, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(institusjonerString, MediaType.APPLICATION_JSON));
 
         List<Institusjon> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
         assertThat(resultat).isNotNull();
@@ -199,7 +200,7 @@ class EuxConsumerTest {
         forventetResultat.put("attachmentId", "ffrewf24");
 
         server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map<String, String> resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
         assertThat(resultat).isEqualTo(forventetResultat);
@@ -216,13 +217,13 @@ class EuxConsumerTest {
 
         //Må encode uri, da non-ascii blir escaped
         String uri = UriComponentsBuilder
-                .fromUriString("/rinasaker?buctype=" + bucType + "&status=" + status).toUriString();
+            .fromUriString("/rinasaker?buctype=" + bucType + "&status=" + status).toUriString();
 
         server.expect(requestTo(uri))
-                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         List<BucInfo> resultat = euxConsumer
-                .finnRinaSaker(bucType, status);
+            .finnRinaSaker(bucType, status);
         assertThat(resultat).isNotEmpty();
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0).getId()).isEqualTo("100485");
@@ -238,12 +239,12 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull()
-                .extracting(nav -> nav.getArbeidsgiver().get(0).getNavn()).isEqualTo("Testarbeidsgiver");
+            .extracting(nav -> nav.getArbeidsgiver().get(0).getNavn()).isEqualTo("Testarbeidsgiver");
         assertThat(resultat.getMedlemskap()).isNotNull();
         assertThat(resultat.getSedType()).isEqualTo(SedType.A001.name());
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA001.class);
@@ -262,7 +263,7 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
@@ -285,7 +286,7 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
@@ -308,7 +309,7 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
@@ -328,7 +329,7 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
@@ -348,7 +349,7 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
@@ -367,12 +368,12 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
         assertThat(resultat).isNotNull();
         assertThat(resultat.getNav()).isNotNull()
-                .extracting(Nav::getArbeidsgiver).asList().hasSize(1);
+            .extracting(Nav::getArbeidsgiver).asList().hasSize(1);
         assertThat(resultat.getSedType()).isEqualTo(SedType.H001.name());
         assertThat(resultat.getMedlemskap()).isNull();
     }
@@ -403,7 +404,7 @@ class EuxConsumerTest {
         byte[] forventetRetur = "teststring".getBytes();
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/pdf"))
-                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
+            .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
 
         byte[] resultat = euxConsumer.hentSedPdf(id, dokumentId);
         assertThat(resultat).isEqualTo(forventetRetur);
@@ -415,7 +416,7 @@ class EuxConsumerTest {
         byte[] forventetRetur = "teststring".getBytes();
 
         server.expect(requestTo("/sed/pdf"))
-                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_PDF));
+            .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_PDF));
 
         byte[] resultat = euxConsumer.genererPdfFraSed(sed);
         assertThat(forventetRetur).isEqualTo(resultat);
@@ -429,7 +430,7 @@ class EuxConsumerTest {
         String forventetRetur = "123321";
 
         server.expect(requestTo("/buc/" + id + "/sed"))
-                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.opprettSed(id, sed);
         assertThat(resultat).isEqualTo(forventetRetur);
@@ -442,7 +443,7 @@ class EuxConsumerTest {
         SED sed = new SED();
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
-                .andRespond(withSuccess());
+            .andRespond(withSuccess());
 
         euxConsumer.oppdaterSed(id, dokumentId, sed);
     }
@@ -453,7 +454,7 @@ class EuxConsumerTest {
         String dokumentId = "22";
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/send"))
-                .andRespond(withSuccess());
+            .andRespond(withSuccess());
 
         euxConsumer.sendSed(id, dokumentId);
     }
@@ -468,7 +469,7 @@ class EuxConsumerTest {
         final String forventetRetur = "546327ghrjek";
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedleggJson"))
-                .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, new SedVedlegg(filNavn, "vedlegg".getBytes()));
         assertThat(resultat).isEqualTo(forventetRetur);
@@ -479,7 +480,7 @@ class EuxConsumerTest {
 
         String id = "123";
         server.expect(requestTo("/buc/" + id + "/sensitivsak"))
-                .andRespond(withSuccess());
+            .andRespond(withSuccess());
 
         euxConsumer.setSakSensitiv(id);
     }
@@ -496,5 +497,17 @@ class EuxConsumerTest {
         assertThat(resultat)
             .hasSize(2)
             .containsExactlyInAnyOrder("Close", "Create");
+    }
+
+
+    private RestTemplate lagRestTemplate(String uri,
+                                         RestTemplateBuilder restTemplateBuilder,
+                                         ClientHttpRequestInterceptor interceptor) {
+
+        return restTemplateBuilder
+            .defaultMessageConverters()
+            .rootUri(uri)
+            .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
+            .build();
     }
 }

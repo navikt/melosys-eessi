@@ -15,6 +15,11 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
+/**
+ * Interceptor som legger til Authorization-header med Bearer-token for en RestTemplate.
+ * RestTemplate er deprecated og bør fases ut i favør for WebClient. 
+ */
+@Deprecated
 @Slf4j
 public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
 
