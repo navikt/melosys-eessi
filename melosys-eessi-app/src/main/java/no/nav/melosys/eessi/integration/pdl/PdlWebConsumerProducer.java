@@ -17,9 +17,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class PdlWebConsumerProducer implements WebClientConfig {
 
     @Bean
-    public PdlWebConsumer pdlConsumer(WebClient.Builder webclientBuilder,
-                                      @Value("${melosys.integrations.pdl-web-url}") String pdlWebUrl,
-                                      GenericAuthFilterFactory genericAuthFilterFactory
+    public PdlWebConsumer pdlWebConsumer(WebClient.Builder webclientBuilder,
+                                         @Value("${melosys.integrations.pdl-web-url}") String pdlWebUrl,
+                                         GenericAuthFilterFactory genericAuthFilterFactory
     ) {
         return new PdlWebConsumer(
             webclientBuilder
