@@ -46,8 +46,8 @@ final class ContextHolder {
         return false;
     }
 
+    // Token har allerede blitt validert
     @SneakyThrows
-        // Token har allerede blitt validert
     boolean aktørErApplikasjon(JwtToken jwtToken) {
         SignedJWT jwt = SignedJWT.parse(jwtToken.getTokenAsString());
         Map<String, Object> payload = jwt.getPayload().toJSONObject();
