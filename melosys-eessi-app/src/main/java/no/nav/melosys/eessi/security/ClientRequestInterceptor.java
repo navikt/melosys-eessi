@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.service.sts.RestStsClient;
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
@@ -15,8 +14,6 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-
-import static no.nav.security.token.support.client.core.OAuth2GrantType.JWT_BEARER;
 
 @Slf4j
 public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
@@ -40,18 +37,13 @@ public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
     }
 
     private String hentAccessToken() {
-        try {
-            if (ContextHolder.getInstance().canExchangeOBOToken()) {
-                OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
-                return response.getAccessToken();
-            }
-             else {
-                return hentAccessTokenForSystem();
-            }
-        } catch (Exception e) {
-            log.error("Feil under henting av access token", e);
-            throw new RuntimeException(e);
+        if (ContextHolder.getInstance().canExchangeOBOToken()) {
+            OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientProperties);
+            return response.getAccessToken();
+        } else {
+            return hentAccessTokenForSystem();
         }
+
     }
 
     private String hentAccessTokenForSystem() {
@@ -62,6 +54,6 @@ public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
             .grantType(OAuth2GrantType.CLIENT_CREDENTIALS)
             .build();
         OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
-        return  response.getAccessToken();
+        return response.getAccessToken();
     }
 }
