@@ -10,10 +10,12 @@ import java.util.Optional;
 
 import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
@@ -26,32 +28,33 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 class SafConsumerTest {
 
-    private MockRestServiceServer server;
-    private final RestTemplate restTemplate = new RestTemplate();
-
     private SafConsumer safConsumer;
 
     private final static String JOURNALPOST_ID = "143432657";
 
     private static MockWebServer mockServer;
+    private static String rootUri;
 
     @BeforeAll
     static void setupServer() throws IOException {
         mockServer = new MockWebServer();
         mockServer.start();
+        rootUri = String.format("http://localhost:%s", mockServer.getPort());
     }
 
     @BeforeEach
     public void setup() {
-        server = MockRestServiceServer.createServer(restTemplate);
-
-        safConsumer = new SafConsumer(WebClient.builder().baseUrl(String.format("http://localhost:%s", mockServer.getPort())).build());
+        safConsumer = new SafConsumer(WebClient.builder().baseUrl(rootUri).build());
     }
 
     @Test
     void hentTilleggsopplysning_ingenFeil_returnererTilleggsopplynsning() throws Exception {
         final String rinaSaksnummer = "64789743";
-        server.expect(requestTo("/graphql")).andRespond(withSuccess(hentOkRespons(), MediaType.APPLICATION_JSON));
+        mockServer.enqueue(
+            new MockResponse()
+                .setBody(hentOkRespons())
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
 
         Optional<String> optionalRinasaksnummer = safConsumer.hentRinasakForJournalpost(JOURNALPOST_ID);
         assertThat(optionalRinasaksnummer).contains(rinaSaksnummer);
@@ -59,7 +62,11 @@ class SafConsumerTest {
 
     @Test
     void hentTilleggsopplysning_medFeil_kasterException() throws Exception {
-        server.expect(requestTo("/graphql")).andRespond(withSuccess(hentErrorRespons(), MediaType.APPLICATION_JSON));
+        mockServer.enqueue(
+            new MockResponse()
+                .setBody(hentErrorRespons())
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        );
 
         assertThatExceptionOfType(IntegrationException.class)
                 .isThrownBy(() -> safConsumer.hentRinasakForJournalpost("1231"))
