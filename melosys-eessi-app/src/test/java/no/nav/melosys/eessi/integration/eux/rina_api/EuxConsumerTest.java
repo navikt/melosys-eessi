@@ -63,8 +63,6 @@ class EuxConsumerTest {
 
     @BeforeEach
     void setup() {
-        EuxConsumerProducer consumerConfig = new EuxConsumerProducer(null);
-
         var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api", ClientProperties.builder()
             .wellKnownUrl(URI.create("test"))
             .tokenEndpointUrl(URI.create("token_endpoint"))
