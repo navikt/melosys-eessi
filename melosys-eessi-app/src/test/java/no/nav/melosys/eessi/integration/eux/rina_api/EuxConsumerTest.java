@@ -44,6 +44,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import static no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerProducer.configureJacksonMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -77,7 +78,6 @@ class EuxConsumerTest {
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
 
         RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
-
 
 
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
@@ -512,19 +512,5 @@ class EuxConsumerTest {
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
             .build());
-    }
-
-    private static RestTemplate configureJacksonMapper(RestTemplate restTemplate) {
-        //For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
-        restTemplate.getMessageConverters().stream()
-            .filter(MappingJackson2HttpMessageConverter.class::isInstance)
-            .map(MappingJackson2HttpMessageConverter.class::cast)
-            .findFirst().ifPresent(jacksonConverer ->
-                jacksonConverer.getObjectMapper()
-                    .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
-                    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
-            );
-
-        return restTemplate;
     }
 }

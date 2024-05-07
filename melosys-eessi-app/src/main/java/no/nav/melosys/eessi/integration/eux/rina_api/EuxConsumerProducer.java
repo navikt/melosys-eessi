@@ -48,7 +48,7 @@ public class EuxConsumerProducer {
         return configureJacksonMapper(restTemplate);
     }
 
-    private static RestTemplate configureJacksonMapper(RestTemplate restTemplate) {
+    public static RestTemplate configureJacksonMapper(RestTemplate restTemplate) {
         //For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
         restTemplate.getMessageConverters().stream()
             .filter(MappingJackson2HttpMessageConverter.class::isInstance)
