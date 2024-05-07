@@ -16,6 +16,8 @@ public class PdlWebConsumerProducer implements WebClientConfig {
 
     private final String uri;
     private final PDLWebContextExchangeFilter pdlWebContextExchangeFilter;
+    private static final String BEHANDLINGSNUMMER = "behandlingsnummer";
+    private static final String MELOSYS_EESSI_BEHANDLINGSNUMMER = "B358";
 
     public PdlWebConsumerProducer(@Value("${melosys.integrations.pdl-web-url}") String uri,
                                   PDLWebContextExchangeFilter pdlWebContextExchangeFilter) {
@@ -37,6 +39,8 @@ public class PdlWebConsumerProducer implements WebClientConfig {
     }
 
     private void defaultHeaders(HttpHeaders httpHeaders) {
+        httpHeaders.set(BEHANDLINGSNUMMER, MELOSYS_EESSI_BEHANDLINGSNUMMER);
+
         if (MDCOperations.getCorrelationId() != null) {
             httpHeaders.add(MDCOperations.X_CORRELATION_ID, MDCOperations.getCorrelationId());
         }
