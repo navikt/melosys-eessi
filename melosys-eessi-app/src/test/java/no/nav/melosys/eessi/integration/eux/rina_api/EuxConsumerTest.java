@@ -8,7 +8,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
@@ -37,6 +39,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -74,6 +77,9 @@ class EuxConsumerTest {
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
 
         RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
+
+
+
         euxConsumer = new EuxConsumer(restTemplate, objectMapper);
         server = MockRestServiceServer.createServer(restTemplate);
         when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken("accesstoken").build());
@@ -497,15 +503,28 @@ class EuxConsumerTest {
             .containsExactlyInAnyOrder("Close", "Create");
     }
 
-
     private RestTemplate lagRestTemplate(String uri,
                                          RestTemplateBuilder restTemplateBuilder,
                                          ClientHttpRequestInterceptor interceptor) {
 
-        return restTemplateBuilder
+        return configureJacksonMapper(restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-            .build();
+            .build());
+    }
+
+    private static RestTemplate configureJacksonMapper(RestTemplate restTemplate) {
+        //For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
+        restTemplate.getMessageConverters().stream()
+            .filter(MappingJackson2HttpMessageConverter.class::isInstance)
+            .map(MappingJackson2HttpMessageConverter.class::cast)
+            .findFirst().ifPresent(jacksonConverer ->
+                jacksonConverer.getObjectMapper()
+                    .configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false)
+                    .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true)
+            );
+
+        return restTemplate;
     }
 }
