@@ -19,7 +19,6 @@ class EuxConsumerProducerTest {
 
     @Test
     void opprettResttemplate_verifiserModifisertObjectMapper() {
-        EuxConsumerProducer euxConsumerProducer = new EuxConsumerProducer("uri");
         RestTemplate restTemplate = lagRestTemplate("uri", new RestTemplateBuilder(r -> {
         }), mock(
             ClientRequestInterceptor.class));
@@ -44,11 +43,11 @@ class EuxConsumerProducerTest {
                                          RestTemplateBuilder restTemplateBuilder,
                                          ClientHttpRequestInterceptor interceptor) {
 
-        return restTemplateBuilder
+        return EuxConsumerProducer.configureJacksonMapper(restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-            .build();
+            .build());
     }
 
 }
