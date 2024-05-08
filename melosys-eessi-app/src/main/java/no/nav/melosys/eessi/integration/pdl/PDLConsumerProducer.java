@@ -13,6 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Configuration
 public class PDLConsumerProducer {
 
+    private static final String BEHANDLINGSNUMMER = "behandlingsnummer";
+    private static final String MELOSYS_EESSI_BEHANDLINGSNUMMER = "B358";
     @Bean
     public PDLConsumer pdlConsumer(WebClient.Builder webclientBuilder,
                                    @Value("${melosys.integrations.pdl-url}") String pdlUrl,
@@ -30,6 +32,6 @@ public class PDLConsumerProducer {
     private void defaultHeaders(HttpHeaders httpHeaders) {
         httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("Tema", "MED");
+        httpHeaders.set(BEHANDLINGSNUMMER, MELOSYS_EESSI_BEHANDLINGSNUMMER);
     }
 }
