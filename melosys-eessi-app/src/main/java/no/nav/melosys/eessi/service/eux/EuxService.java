@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxRinasakerConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxMelosysSedOppdateringDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
@@ -192,7 +193,9 @@ public class EuxService {
         if (!StringUtils.hasText(rinaSaksnummer)) {
             throw new IllegalArgumentException("Trenger rina-saksnummer for å oppdatere sed");
         }
-        euxRinasakerConsumer.settSedJournalstatus(rinaSaksnummer, dokumentId, versjon, sedJournalstatus);
+
+
+        euxRinasakerConsumer.settSedJournalstatus(new EuxMelosysSedOppdateringDto(rinaSaksnummer, dokumentId, versjon, sedJournalstatus));
     }
 
     public void settSakSensitiv(String rinaSaksnummer) {
