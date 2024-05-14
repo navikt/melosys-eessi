@@ -75,7 +75,7 @@ public class SedService {
         }
 
         if (sedType.name().startsWith("H")) {
-            euxService.settSedJournalstatus(response.getRinaSaksnummer(), UUID.fromString(response.getDokumentId()).toString(), 0, SedJournalstatus.MELOSYS_JOURNALFOERER);
+            euxService.settSedJournalstatus(response.getRinaSaksnummer(), tilUUIDMedBindestreker(response.getDokumentId()), 0, SedJournalstatus.MELOSYS_JOURNALFOERER);
         }
 
         if (sendAutomatisk) {
@@ -88,6 +88,15 @@ public class SedService {
             .build();
     }
 
+    private String tilUUIDMedBindestreker(String uuidString){
+        return UUID.fromString(
+            uuidString.substring(0, 8) + "-" +
+                uuidString.substring(8, 12) + "-" +
+                uuidString.substring(12, 16) + "-" +
+                uuidString.substring(16, 20) + "-" +
+                uuidString.substring(20)
+        ).toString();
+    }
     private void validerMottakerInstitusjoner(BucType bucType, Collection<String> mottakere) throws ValidationException {
         if (mottakere.isEmpty()) {
             throw new ValidationException("Mottakere er påkrevd");

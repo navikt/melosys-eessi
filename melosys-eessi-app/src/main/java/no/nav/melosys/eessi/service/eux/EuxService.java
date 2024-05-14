@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.eux;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -194,11 +195,11 @@ public class EuxService {
             throw new IllegalArgumentException("Trenger rina-saksnummer for å oppdatere sed");
         }
 
-
         euxRinasakerConsumer.settSedJournalstatus(new EuxMelosysSedOppdateringDto(rinaSaksnummer, dokumentId, versjon, sedJournalstatus));
     }
 
     public void settSakSensitiv(String rinaSaksnummer) {
         euxConsumer.setSakSensitiv(rinaSaksnummer);
     }
+
 }
