@@ -51,13 +51,12 @@ public class EuxRinasakerConsumer implements RestConsumer {
         this.objectMapper = objectMapper;
     }
 
-    public String settSedJournalstatus(String rinasakId, String sedId, Integer sedVersjon, SedJournalstatus sedJournalstatus) {
+    public void settSedJournalstatus(String rinasakId, String sedId, Integer sedVersjon, SedJournalstatus sedJournalstatus) {
         log.info("Oppdaterer sed med ny status med Rina saksnummer {}", rinasakId);
 
-        return exchange(SETT_SED_JOURNALSTATUS_PATH, HttpMethod.PUT,
+        exchange(SETT_SED_JOURNALSTATUS_PATH, HttpMethod.PUT,
             new HttpEntity<>(defaultHeaders()),
-            new ParameterizedTypeReference<>() {
-            },
+            new ParameterizedTypeReference<Void>() {},
             rinasakId, sedId, sedVersjon, sedJournalstatus);
     }
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity,

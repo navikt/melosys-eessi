@@ -188,11 +188,11 @@ public class EuxService {
         return euxConsumer.hentRinaUrl(rinaCaseId);
     }
 
-    public String settSedJournalstatus(String rinaSaksnummer, String dokumentId, Integer versjon, SedJournalstatus sedJournalstatus) {
+    public void settSedJournalstatus(String rinaSaksnummer, String dokumentId, Integer versjon, SedJournalstatus sedJournalstatus) {
         if (!StringUtils.hasText(rinaSaksnummer)) {
             throw new IllegalArgumentException("Trenger rina-saksnummer for å oppdatere sed");
         }
-        return euxRinasakerConsumer.settSedJournalstatus(rinaSaksnummer, dokumentId, versjon, sedJournalstatus);
+        euxRinasakerConsumer.settSedJournalstatus(rinaSaksnummer, dokumentId, versjon, sedJournalstatus);
     }
 
     public void settSakSensitiv(String rinaSaksnummer) {
