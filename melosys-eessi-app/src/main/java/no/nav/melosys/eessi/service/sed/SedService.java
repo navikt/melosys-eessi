@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -70,6 +71,10 @@ public class SedService {
 
         if (sedDataDto.getBruker().isHarSensitiveOpplysninger()) {
             euxService.settSakSensitiv(response.getRinaSaksnummer());
+        }
+
+        if (sedType.name().startsWith("H")) {
+            euxService.settSedJournalstatus(response.getRinaSaksnummer(), response.getDokumentId(), 0, SedJournalstatus.MELOSYS_JOURNALFOERER);
         }
 
         if (sendAutomatisk) {

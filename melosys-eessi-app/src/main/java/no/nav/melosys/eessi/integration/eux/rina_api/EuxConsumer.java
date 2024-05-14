@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxVedlegg;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -281,6 +282,16 @@ public class EuxConsumer implements RestConsumer {
                 rinaSaksnummer);
     }
 
+
+    public String settSedJournalstatus(String rinasakId, String sedId, Integer sedVersjon, SedJournalstatus sedJournalstatus) {
+        log.info("Oppdaterer sed med ny status med Rina saksnummer {}", rinasakId);
+
+        return exchange("/sed/journalstatuser", HttpMethod.PUT,
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            rinasakId, sedId, sedVersjon, sedJournalstatus);
+    }
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
         log.info("Henter SED med vedlegg for sak {} og sed {}", rinaSaksnummer, dokumentId);
 
