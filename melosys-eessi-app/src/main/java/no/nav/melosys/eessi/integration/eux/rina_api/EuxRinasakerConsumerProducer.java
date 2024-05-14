@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.SystemContextClientRequestInterceptor;
-import no.nav.melosys.eessi.security.UserContextEuxClientRequestInterceptor;
+import no.nav.melosys.eessi.security.UserContextEuxRinasakClientRequestInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -33,7 +33,7 @@ public class EuxRinasakerConsumerProducer {
 
     @Bean
     @Qualifier("tokenContext")
-    public EuxRinasakerConsumer euxRinasakerTokenContextConsumer(RestTemplateBuilder builder, UserContextEuxClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
+    public EuxRinasakerConsumer euxRinasakerTokenContextConsumer(RestTemplateBuilder builder, UserContextEuxRinasakClientRequestInterceptor interceptor, ObjectMapper objectMapper) {
         return new EuxRinasakerConsumer(euxRinasakerTokenContextRestTemplate(builder, interceptor), objectMapper);
     }
 
@@ -43,7 +43,7 @@ public class EuxRinasakerConsumerProducer {
     }
 
     private RestTemplate euxRinasakerTokenContextRestTemplate(RestTemplateBuilder restTemplateBuilder,
-                                                              UserContextEuxClientRequestInterceptor interceptor) {
+                                                              UserContextEuxRinasakClientRequestInterceptor interceptor) {
         return lagRestTemplate(restTemplateBuilder, interceptor);
     }
 
