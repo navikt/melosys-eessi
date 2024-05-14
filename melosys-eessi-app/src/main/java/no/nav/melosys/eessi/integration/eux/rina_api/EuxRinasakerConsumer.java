@@ -30,7 +30,7 @@ public class EuxRinasakerConsumer implements RestConsumer {
 
     public void settSedJournalstatus(EuxMelosysSedOppdateringDto euxMelosysSedOppdateringDto) {
         log.info("Oppdaterer sed med ny status med Rina saksnummer {}", euxMelosysSedOppdateringDto.rinasakId());
-
+        log.info("EuxMelosysSedOppdateringDto {}", euxMelosysSedOppdateringDto);
         exchange(SETT_SED_JOURNALSTATUS_PATH, HttpMethod.PUT,
             new HttpEntity<>(euxMelosysSedOppdateringDto, defaultHeaders()),
             new ParameterizedTypeReference<Void>() {});
