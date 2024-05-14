@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.SneakyThrows;
 import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxRinasakerConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
@@ -37,6 +38,9 @@ class EuxServiceTest {
 
     @Mock
     private EuxConsumer euxConsumer;
+
+    @Mock
+    private EuxRinasakerConsumer euxRinasakerConsumer;
     @Mock
     private BucMetrikker bucMetrikker;
 
@@ -49,7 +53,7 @@ class EuxServiceTest {
 
     @BeforeEach
     public void setup() throws IOException, IntegrationException {
-        euxService = new EuxService(euxConsumer, bucMetrikker);
+        euxService = new EuxService(euxConsumer, bucMetrikker, euxRinasakerConsumer);
     }
 
     @Test
