@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class EuxTokenContextService extends EuxService {
 
     public EuxTokenContextService(@Qualifier("tokenContext") EuxConsumer euxConsumer,
-                                  EuxRinasakerConsumer euxRinasakerConsumer,
+                                  @Qualifier("tokenContext") EuxRinasakerConsumer euxRinasakerConsumer,
                                   BucMetrikker bucMetrikker) {
         super(euxConsumer, bucMetrikker, euxRinasakerConsumer);
     }
