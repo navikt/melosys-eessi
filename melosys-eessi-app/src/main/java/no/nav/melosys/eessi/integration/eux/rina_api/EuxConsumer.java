@@ -282,16 +282,6 @@ public class EuxConsumer implements RestConsumer {
                 rinaSaksnummer);
     }
 
-
-    public String settSedJournalstatus(String rinasakId, String sedId, Integer sedVersjon, SedJournalstatus sedJournalstatus) {
-        log.info("Oppdaterer sed med ny status med Rina saksnummer {}", rinasakId);
-
-        return exchange("/sed/journalstatuser", HttpMethod.PUT,
-            new HttpEntity<>(defaultHeaders()),
-            new ParameterizedTypeReference<>() {
-            },
-            rinasakId, sedId, sedVersjon, sedJournalstatus);
-    }
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
         log.info("Henter SED med vedlegg for sak {} og sed {}", rinaSaksnummer, dokumentId);
 

@@ -62,6 +62,7 @@ melosys:
     password: ${SRV_PASSWORD}
   integrations:
     euxapp-url: ${EUXAPP_URL}
+    euxapp-rinasaker-url: ${EUXAPP_RINASAKER_URL}
     reststs-url: ${RESTSTS_URL}
     rina-host-url: ${RINA_HOST_URL}
     journalpostapi-url: ${JOURNALPOSTAPI_URL}

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxRinasakerConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
@@ -37,14 +38,18 @@ public class EuxService {
     private static final String FILTYPE_PDF = "pdf";
 
     private final EuxConsumer euxConsumer;
+
+    private final EuxRinasakerConsumer euxRinasakerConsumer;
     private final BucMetrikker bucMetrikker;
 
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker) {
+                      BucMetrikker bucMetrikker,
+                      EuxRinasakerConsumer euxRinasakerConsumer) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
+        this.euxRinasakerConsumer = euxRinasakerConsumer;
     }
 
     public void slettBUC(String rinaSaksnummer) {
@@ -187,7 +192,7 @@ public class EuxService {
         if (!StringUtils.hasText(rinaSaksnummer)) {
             throw new IllegalArgumentException("Trenger rina-saksnummer for å oppdatere sed");
         }
-        return euxConsumer.settSedJournalstatus(rinaSaksnummer, dokumentId, versjon, sedJournalstatus);
+        return euxRinasakerConsumer.settSedJournalstatus(rinaSaksnummer, dokumentId, versjon, sedJournalstatus);
     }
 
     public void settSakSensitiv(String rinaSaksnummer) {
