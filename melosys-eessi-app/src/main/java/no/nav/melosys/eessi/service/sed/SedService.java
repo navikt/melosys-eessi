@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import io.getunleash.Unleash;
@@ -74,7 +75,7 @@ public class SedService {
         }
 
         if (sedType.name().startsWith("H")) {
-            euxService.settSedJournalstatus(response.getRinaSaksnummer(), response.getDokumentId(), 0, SedJournalstatus.MELOSYS_JOURNALFOERER);
+            euxService.settSedJournalstatus(response.getRinaSaksnummer(), UUID.fromString(response.getDokumentId()).toString(), 0, SedJournalstatus.MELOSYS_JOURNALFOERER);
         }
 
         if (sendAutomatisk) {
