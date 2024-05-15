@@ -120,6 +120,30 @@ no.nav.security.jwt.client.registration:
       client-id: ${AZURE_APP_CLIENT_ID}
       client-secret: ${AZURE_APP_CLIENT_SECRET}
       client-auth-method: client_secret_basic
+  pdl:
+    token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+    grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+    scope: ${PDL_SCOPE}
+    authentication:
+      client-id: ${AZURE_APP_CLIENT_ID}
+      client-secret: ${AZURE_APP_CLIENT_SECRET}
+      client-auth-method: client_secret_basic
+  oppgave-sak:
+    token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+    grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+    scope: ${OPPGAVE_API_SCOPE}
+    authentication:
+      client-id: ${AZURE_APP_CLIENT_ID}
+      client-secret: ${AZURE_APP_CLIENT_SECRET}
+      client-auth-method: client_secret_basic
+  saf:
+    token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+    grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+    scope: ${SAF_SCOPE}
+    authentication:
+      client-id: ${AZURE_APP_CLIENT_ID}
+      client-secret: ${AZURE_APP_CLIENT_SECRET}
+      client-auth-method: client_secret_basic
 
 unleash:
   token: ${UNLEASH_SERVER_API_TOKEN}

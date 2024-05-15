@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import java.util.Collections;
 
+import no.nav.melosys.eessi.security.GenericAuthFilterFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,14 +18,15 @@ public class PDLConsumerProducer {
     @Bean
     public PDLConsumer pdlConsumer(WebClient.Builder webclientBuilder,
                                    @Value("${melosys.integrations.pdl-url}") String pdlUrl,
-                                   PDLSystemAuthFilter pdlSystemAuthFilter) {
-        return new PDLConsumer(
+                                   GenericAuthFilterFactory genericAuthFilterFactory
+    ) {
+            return new PDLConsumer(
                 webclientBuilder
-                        .baseUrl(pdlUrl)
-                        .defaultHeaders(this::defaultHeaders)
-                        .filter(pdlSystemAuthFilter)
-                        .build()
-        );
+                    .baseUrl(pdlUrl)
+                    .defaultHeaders(this::defaultHeaders)
+                    .filter(genericAuthFilterFactory.getAzureFilter("pdl"))
+                    .build()
+            );
     }
 
     private void defaultHeaders(HttpHeaders httpHeaders) {

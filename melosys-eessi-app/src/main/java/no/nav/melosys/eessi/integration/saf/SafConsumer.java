@@ -9,33 +9,30 @@ import no.nav.melosys.eessi.integration.common.graphql.response.GraphQLResponse;
 import no.nav.melosys.eessi.integration.saf.dto.SafResponse;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 @Slf4j
-@Component
 public class SafConsumer implements RestConsumer {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
     private static final String QUERY = "{query: journalpost(journalpostId: \"%s\") {tilleggsopplysninger{nokkel verdi}}}";
 
-    public SafConsumer(RestTemplate safRestTemplate) {
-        this.restTemplate = safRestTemplate;
+    public SafConsumer(WebClient webClient) {
+        this.webClient = webClient;
     }
 
     public Optional<String> hentRinasakForJournalpost(String journalpostID) {
 
-        HttpEntity<GraphQLRequest> httpEntity = new HttpEntity<>(new GraphQLRequest(String.format(QUERY, journalpostID), null), defaultHeaders());
-        GraphQLResponse<SafResponse> response = restTemplate.exchange(
-                "/graphql",
-                HttpMethod.POST,
-                httpEntity,
-                new ParameterizedTypeReference<GraphQLResponse<SafResponse>>() {
-                }
-        ).getBody();
+        Mono<GraphQLResponse<SafResponse>> responseMono = webClient.post()
+            .uri("/graphql")
+            .bodyValue(new GraphQLRequest(String.format(QUERY, journalpostID), null))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<>() {
+            });
+
+        GraphQLResponse<SafResponse> response = responseMono.block();
 
         if (response == null) {
             log.info("Mottatt null-response fra SAF");

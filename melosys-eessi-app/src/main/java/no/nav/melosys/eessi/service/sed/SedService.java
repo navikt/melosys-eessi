@@ -40,7 +40,7 @@ public class SedService {
     private final Unleash unleash;
 
     @Autowired
-    public SedService(@Qualifier("tokenContext") EuxService euxService,
+    public SedService(EuxService euxService,
                       SaksrelasjonService saksrelasjonService, Unleash unleash) {
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;

@@ -13,6 +13,9 @@ SRV_PASSWORD: dummy
 EUXCASESTORE_URL: dummy
 SAF_URL: dummy
 PDL_URL: dummy
+PDL_SCOPE: dummy
+OPPGAVE_SAK_SCOPE: dummy
+SAF_SCOPE: dummy
 PDL_WEB_URL: dummy
 PDL_WEB_SCOPE: dummy
 RINA_INSTITUSJON_ID: dummy

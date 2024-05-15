@@ -34,7 +34,7 @@ public class BucController {
     private final LukkBucService lukkBucService;
     private final EuxConsumer euxConsumer;
 
-    public BucController(@Qualifier("tokenContext") EuxService euxService,
+    public BucController(EuxService euxService,
                          SedService sedService,
                          LukkBucService lukkBucService,
                          EuxConsumer euxConsumer) {

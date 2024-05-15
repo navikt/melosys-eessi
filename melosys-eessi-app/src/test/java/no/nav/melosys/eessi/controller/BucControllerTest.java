@@ -47,7 +47,6 @@ class BucControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    @Qualifier("tokenContext")
     private EuxService euxService;
     @MockBean
     private SedService sedService;

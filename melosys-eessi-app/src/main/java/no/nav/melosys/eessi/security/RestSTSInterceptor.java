@@ -11,11 +11,11 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SystemContextClientRequestInterceptor implements ClientHttpRequestInterceptor {
+public class RestSTSInterceptor implements ClientHttpRequestInterceptor {
 
     private final RestStsClient restStsClient;
 
-    public SystemContextClientRequestInterceptor(RestStsClient restStsClient) {
+    public RestSTSInterceptor(RestStsClient restStsClient) {
         this.restStsClient = restStsClient;
     }
 
