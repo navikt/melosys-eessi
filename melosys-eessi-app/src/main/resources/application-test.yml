@@ -1,6 +1,8 @@
 no.nav.security.jwt.client.registration:
   eux-rina-api:
     token-endpoint-url: dummy
+  eux-nav-rinasak:
+      token-endpoint-url: dummy
   pdl-web:
     token-endpoint-url: dummy
   pdl:
@@ -9,7 +11,7 @@ no.nav.security.jwt.client.registration:
     token-endpoint-url: dummy
   saf:
     token-endpoint-url: dummy
-    
+
 
 
 unleash:
