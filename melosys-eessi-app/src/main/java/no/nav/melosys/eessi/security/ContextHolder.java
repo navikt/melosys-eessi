@@ -39,7 +39,7 @@ final class ContextHolder {
     boolean canExchangeOBOToken() {
         TokenValidationContext tokenValidationContext = getTokenContext();
         if (tokenValidationContext != null) {
-            JwtToken jwtToken = getTokenContext().getJwtToken(AAD);
+            JwtToken jwtToken = tokenValidationContext.getJwtToken(AAD);
 
             return (jwtToken != null && !aktørErApplikasjon(jwtToken));
         }
