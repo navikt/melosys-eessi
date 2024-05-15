@@ -3,6 +3,14 @@ no.nav.security.jwt.client.registration:
     token-endpoint-url: dummy
   pdl-web:
     token-endpoint-url: dummy
+  pdl:
+    token-endpoint-url: dummy
+  oppgave-sak:
+    token-endpoint-url: dummy
+  saf:
+    token-endpoint-url: dummy
+    
+
 
 unleash:
   token: "fake"

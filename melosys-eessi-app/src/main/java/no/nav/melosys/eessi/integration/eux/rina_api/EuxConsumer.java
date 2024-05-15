@@ -61,63 +61,70 @@ public class EuxConsumer implements RestConsumer {
     public BUC hentBUC(String rinaSaksnummer) {
         log.info("Henter buc: {}", rinaSaksnummer);
         return exchange(BUC_PATH, HttpMethod.GET, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {}, rinaSaksnummer);
+            new ParameterizedTypeReference<>() {
+            }, rinaSaksnummer);
     }
 
     public String opprettBUC(String bucType) {
         log.info("Oppretter buc, type: {}", bucType);
 
         return exchange("/buc?BuCType={bucType}", HttpMethod.POST,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {},
-                bucType);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            bucType);
     }
 
     public void slettBUC(String rinaSaksnummer) {
         log.info("Sletter buc: {}", rinaSaksnummer);
         exchange(BUC_PATH, HttpMethod.DELETE, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {},
-                rinaSaksnummer);
+            new ParameterizedTypeReference<Void>() {
+            },
+            rinaSaksnummer);
     }
 
     @Retryable(
-            value = NotFoundException.class,
-            backoff = @Backoff(delay = 2000, maxDelay = 4000, multiplier = 2),
-            maxAttempts = 5)
+        value = NotFoundException.class,
+        backoff = @Backoff(delay = 2000, maxDelay = 4000, multiplier = 2),
+        maxAttempts = 5)
     public void settMottakere(String rinaSaksnummer, Collection<String> mottakerIDer) {
 
         log.info("Setter mottaker {} til sak {}", mottakerIDer, rinaSaksnummer);
 
         exchange("/buc/{rinaSaksnummer}/mottakere?mottakere={mottakere}", HttpMethod.PUT, new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {},
-                rinaSaksnummer, mottakerIDer.toArray());
+            new ParameterizedTypeReference<Void>() {
+            },
+            rinaSaksnummer, mottakerIDer.toArray());
     }
 
     public String opprettSed(String rinaSaksnummer, SED sed) {
         log.info("Oppretter SED {} på sak {}", sed.getSedType(), rinaSaksnummer);
 
         return exchange("/buc/{rinaSaksnummer}/sed", HttpMethod.POST,
-                new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<>() {},
-                rinaSaksnummer);
+            new HttpEntity<>(sed, defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            rinaSaksnummer);
     }
 
     public SED hentSed(String rinaSaksnummer, String dokumentId) {
         log.info("Henter sed med id {}, fra sak {}", dokumentId, rinaSaksnummer);
 
         return exchange(SED_PATH, HttpMethod.GET,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {},
-                rinaSaksnummer, dokumentId);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            rinaSaksnummer, dokumentId);
     }
 
     public void oppdaterSed(String rinaSaksnummer, String dokumentId, SED sed) {
         log.info("Oppdaterer sed {} på sak {}", dokumentId, rinaSaksnummer);
 
         exchange(SED_PATH, HttpMethod.PUT,
-                new HttpEntity<>(sed, defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {},
-                rinaSaksnummer, dokumentId);
+            new HttpEntity<>(sed, defaultHeaders()),
+            new ParameterizedTypeReference<Void>() {
+            },
+            rinaSaksnummer, dokumentId);
     }
 
     public byte[] hentSedPdf(String rinaSaksnummer, String dokumentId) {
@@ -127,9 +134,10 @@ public class EuxConsumer implements RestConsumer {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM));
 
         return exchange(SED_PATH_PDF, HttpMethod.GET,
-                new HttpEntity<>(headers),
-                new ParameterizedTypeReference<>() {},
-                rinaSaksnummer, dokumentId);
+            new HttpEntity<>(headers),
+            new ParameterizedTypeReference<>() {
+            },
+            rinaSaksnummer, dokumentId);
     }
 
     public byte[] genererPdfFraSed(SED sed) {
@@ -140,16 +148,18 @@ public class EuxConsumer implements RestConsumer {
 
         return exchange("/sed/pdf", HttpMethod.POST,
             new HttpEntity<>(sed, headers),
-            new ParameterizedTypeReference<>() {});
+            new ParameterizedTypeReference<>() {
+            });
     }
 
     public void sendSed(String rinaSaksnummer, String dokumentId) {
         log.info("Sender sed {} fra sak {}", dokumentId, rinaSaksnummer);
 
         exchange(SED_PATH + "/send", HttpMethod.POST,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {},
-                rinaSaksnummer, dokumentId);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<Void>() {
+            },
+            rinaSaksnummer, dokumentId);
     }
 
 
@@ -176,7 +186,8 @@ public class EuxConsumer implements RestConsumer {
 
         return exchange(VEDLEGG_PATH, HttpMethod.POST,
             new HttpEntity<>(body, headers),
-            new ParameterizedTypeReference<>() {},
+            new ParameterizedTypeReference<>() {
+            },
             rinaSaksnummer, dokumentId);
     }
 
@@ -202,19 +213,21 @@ public class EuxConsumer implements RestConsumer {
             throw new RuntimeException(e);
         }
     }
+
     public void setSakSensitiv(String rinaSaksnummer) {
         log.info("Setter sak {} sensitiv", rinaSaksnummer);
 
         exchange(BUC_PATH + "/sensitivsak", HttpMethod.PUT,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<Void>() {},
-                rinaSaksnummer);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<Void>() {
+            },
+            rinaSaksnummer);
     }
 
     public Map<String, String> opprettBucOgSedMedVedlegg(String bucType, String mottakerId, String filType,
                                                          SED sed, byte[] vedlegg) {
         log.info("Oppretter buc {}, med sed {}, med mottaker {} og legger til vedlegg. ", bucType,
-                sed.getSedType(), mottakerId);
+            sed.getSedType(), mottakerId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -246,10 +259,11 @@ public class EuxConsumer implements RestConsumer {
         multipartBody.add("attachment", attachment);
 
         return exchange("/buc/sed/vedlegg?BuCType={bucType}&MottakerID={mottakerID}&FilType={filType}",
-                HttpMethod.POST,
-                new HttpEntity<>(multipartBody, headers),
-                new ParameterizedTypeReference<>() {},
-                bucType, mottakerId, filType);
+            HttpMethod.POST,
+            new HttpEntity<>(multipartBody, headers),
+            new ParameterizedTypeReference<>() {
+            },
+            bucType, mottakerId, filType);
     }
 
     @Cacheable("institusjoner")
@@ -257,39 +271,40 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter institusjoner for buctype {} og landkode {}", bucType, landkode);
 
         return exchange("/institusjoner?BuCType={bucType}&LandKode={landkode}", HttpMethod.GET,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {},
-                bucType, landkode);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            bucType, landkode);
     }
 
     public List<BucInfo> finnRinaSaker(String bucType, String status) {
         log.info("Søker etter rina-saker med buctype {} og status {}", bucType, status);
 
         return exchange("/rinasaker?buctype={buctype}&status={status}", HttpMethod.GET,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {
-                },
-                bucType, status);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            bucType, status);
     }
 
     public String hentRinaUrl(String rinaSaksnummer) {
         log.info("Søker etter rina-url mot Rina med saksnummer {}", rinaSaksnummer);
 
         return exchange(RINA_LENKE_PATH, HttpMethod.GET,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {
-                },
-                rinaSaksnummer);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            rinaSaksnummer);
     }
 
     public SedMedVedlegg hentSedMedVedlegg(String rinaSaksnummer, String dokumentId) {
         log.info("Henter SED med vedlegg for sak {} og sed {}", rinaSaksnummer, dokumentId);
 
         return exchange(SED_MED_VEDLEGG_PATH, HttpMethod.GET,
-                new HttpEntity<>(defaultHeaders()),
-                new ParameterizedTypeReference<>() {
-                },
-                rinaSaksnummer, dokumentId);
+            new HttpEntity<>(defaultHeaders()),
+            new ParameterizedTypeReference<>() {
+            },
+            rinaSaksnummer, dokumentId);
     }
 
     public Collection<String> hentSedHandlinger(String rinaSaksnummer, String sedId) {
