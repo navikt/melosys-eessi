@@ -62,6 +62,7 @@ melosys:
     password: ${SRV_PASSWORD}
   integrations:
     euxapp-url: ${EUXAPP_URL}
+    euxapp-rinasaker-url: ${EUXAPP_RINASAKER_URL}
     reststs-url: ${RESTSTS_URL}
     rina-host-url: ${RINA_HOST_URL}
     journalpostapi-url: ${JOURNALPOSTAPI_URL}
@@ -108,6 +109,14 @@ no.nav.security.jwt.client.registration:
     token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
     grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
     scope: ${EUX_RINA_API_SCOPE}
+    authentication:
+      client-id: ${AZURE_APP_CLIENT_ID}
+      client-secret: ${AZURE_APP_CLIENT_SECRET}
+      client-auth-method: client_secret_basic
+  eux-nav-rinasak:
+    token-endpoint-url: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
+    grant-type: urn:ietf:params:oauth:grant-type:jwt-bearer
+    scope: ${EUX_NAV_RINASAK_SCOPE}
     authentication:
       client-id: ${AZURE_APP_CLIENT_ID}
       client-secret: ${AZURE_APP_CLIENT_SECRET}

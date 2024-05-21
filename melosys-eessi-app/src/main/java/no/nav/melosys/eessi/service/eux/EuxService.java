@@ -3,12 +3,16 @@ package no.nav.melosys.eessi.service.eux;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxRinasakerConsumer;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxMelosysSedOppdateringDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.TilegnetBuc;
 import no.nav.melosys.eessi.metrikker.BucMetrikker;
 import no.nav.melosys.eessi.models.BucType;
@@ -36,14 +40,18 @@ public class EuxService {
     private static final String FILTYPE_PDF = "pdf";
 
     private final EuxConsumer euxConsumer;
+
+    private final EuxRinasakerConsumer euxRinasakerConsumer;
     private final BucMetrikker bucMetrikker;
 
 
     @Autowired
     public EuxService(EuxConsumer euxConsumer,
-                      BucMetrikker bucMetrikker) {
+                      BucMetrikker bucMetrikker,
+                      EuxRinasakerConsumer euxRinasakerConsumer) {
         this.euxConsumer = euxConsumer;
         this.bucMetrikker = bucMetrikker;
+        this.euxRinasakerConsumer = euxRinasakerConsumer;
     }
 
     public void slettBUC(String rinaSaksnummer) {
@@ -182,7 +190,16 @@ public class EuxService {
         return euxConsumer.hentRinaUrl(rinaCaseId);
     }
 
+    public void settSedJournalstatus(String rinaSaksnummer, String dokumentId, Integer versjon, SedJournalstatus sedJournalstatus) {
+        if (!StringUtils.hasText(rinaSaksnummer)) {
+            throw new IllegalArgumentException("Trenger rina-saksnummer for å oppdatere sed");
+        }
+
+        euxRinasakerConsumer.settSedJournalstatus(new EuxMelosysSedOppdateringDto(rinaSaksnummer, dokumentId, versjon, sedJournalstatus));
+    }
+
     public void settSakSensitiv(String rinaSaksnummer) {
         euxConsumer.setSakSensitiv(rinaSaksnummer);
     }
+
 }

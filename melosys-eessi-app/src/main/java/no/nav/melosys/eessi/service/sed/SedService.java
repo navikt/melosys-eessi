@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import io.getunleash.Unleash;
@@ -10,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.SedType;
@@ -72,6 +74,10 @@ public class SedService {
             euxService.settSakSensitiv(response.getRinaSaksnummer());
         }
 
+        if (sedType.name().startsWith("H")) {
+            euxService.settSedJournalstatus(response.getRinaSaksnummer(), tilUUIDMedBindestreker(response.getDokumentId()), 0, SedJournalstatus.MELOSYS_JOURNALFOERER);
+        }
+
         if (sendAutomatisk) {
             sendSed(response.getRinaSaksnummer(), response.getDokumentId(), sed.getSedType());
         }
@@ -82,6 +88,15 @@ public class SedService {
             .build();
     }
 
+    private String tilUUIDMedBindestreker(String uuidString){
+        return UUID.fromString(
+            uuidString.substring(0, 8) + "-" +
+                uuidString.substring(8, 12) + "-" +
+                uuidString.substring(12, 16) + "-" +
+                uuidString.substring(16, 20) + "-" +
+                uuidString.substring(20)
+        ).toString();
+    }
     private void validerMottakerInstitusjoner(BucType bucType, Collection<String> mottakere) throws ValidationException {
         if (mottakere.isEmpty()) {
             throw new ValidationException("Mottakere er påkrevd");

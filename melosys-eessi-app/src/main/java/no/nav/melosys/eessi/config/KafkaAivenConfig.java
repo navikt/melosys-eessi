@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -66,7 +67,8 @@ public class KafkaAivenConfig {
     @Value("${melosys.kafka.aiven.credstorePassword}")
     private String credstorePassword;
 
-    private static final String LEGISLATION_APPLICABLE_CODE = "LA";
+    private static final String LEGISLATION_APPLICABLE_CODE_LA = "LA";
+    private static final String LEGISLATION_APPLICABLE_CODE_H = "H";
 
     @Bean
     public KafkaListenerErrorHandler sedMottattErrorHandler() {
@@ -191,7 +193,7 @@ public class KafkaAivenConfig {
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
         // Return false to be dismissed
-        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE.equalsIgnoreCase(consumerRecord.value().getSektorKode());
+        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()) || LEGISLATION_APPLICABLE_CODE_H.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
