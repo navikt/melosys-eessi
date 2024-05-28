@@ -38,6 +38,7 @@ public class SedMapperFactory {
             .put(SedType.H020, new HorisontalSedMapper(SedType.H020))
             .put(SedType.H021, new HorisontalSedMapper(SedType.H021))
             .put(SedType.H061, new HorisontalSedMapper(SedType.H061))
+            .put(SedType.H062, new HorisontalSedMapper(SedType.H062))
             .put(SedType.H065, new HorisontalSedMapper(SedType.H065))
             .put(SedType.H066, new HorisontalSedMapper(SedType.H066))
             .put(SedType.H070, new HorisontalSedMapper(SedType.H070))

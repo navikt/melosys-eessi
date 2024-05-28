@@ -48,6 +48,7 @@ class SedMapperFactoryTest {
                 SedType.H020,
                 SedType.H021,
                 SedType.H061,
+                SedType.H062,
                 SedType.H065,
                 SedType.H066,
                 SedType.H070,

@@ -56,6 +56,7 @@ public class JournalpostMetadataService {
                 new JournalpostMetadata("Krav om refusjon - administrativ kontroll/medisinsk refusjon", UTLAND);
             case H021 -> new JournalpostMetadata("Svar på krav om refusjon – administrativ kontroll/medisinsk informasjon", UTLAND);
             case H061 -> new JournalpostMetadata("Melding/anmodning om personnummer", UTLAND);
+            case H062 -> new JournalpostMetadata("Bekreftelse/svar på anmodning om personlig identifikasjonsnummer", UTLAND);
             case H065 -> new JournalpostMetadata("Overføring av krav/dokument/informasjon", UTLAND);
             case H066 -> new JournalpostMetadata("Svar på overføring av krav/dokument/informasjon", UTLAND);
             case H070 -> new JournalpostMetadata("Melding om dødsfall", UTLAND);
