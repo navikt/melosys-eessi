@@ -193,7 +193,7 @@ public class KafkaAivenConfig {
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
         // Return false to be dismissed
-        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()) || LEGISLATION_APPLICABLE_CODE_H.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
+        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
