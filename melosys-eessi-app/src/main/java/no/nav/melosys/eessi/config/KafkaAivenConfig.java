@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,13 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -42,6 +41,7 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.Message;
 
 import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendelse.Hendelsestype.OPPGAVE_ENDRET;
+import static no.nav.melosys.eessi.models.BucType.*;
 
 @Configuration
 @EnableKafka
@@ -49,11 +49,9 @@ import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendel
 @Profile("!local-q2")
 public class KafkaAivenConfig {
 
-    @Autowired
-    private Environment env;
-
-    @Autowired
-    OppgaveEndretService oppgaveEndretService;
+    private final Environment env;
+    private final OppgaveEndretService oppgaveEndretService;
+    private final SaksrelasjonService saksrelasjonService;
 
     @Value("${melosys.kafka.aiven.brokers}")
     private String brokersUrl;
@@ -68,7 +66,12 @@ public class KafkaAivenConfig {
     private String credstorePassword;
 
     private static final String LEGISLATION_APPLICABLE_CODE_LA = "LA";
-    private static final String LEGISLATION_APPLICABLE_CODE_H = "H";
+
+    public KafkaAivenConfig(Environment env, OppgaveEndretService oppgaveEndretService, SaksrelasjonService saksrelasjonService) {
+        this.env = env;
+        this.oppgaveEndretService = oppgaveEndretService;
+        this.saksrelasjonService = saksrelasjonService;
+    }
 
     @Bean
     public KafkaListenerErrorHandler sedMottattErrorHandler() {
@@ -193,7 +196,14 @@ public class KafkaAivenConfig {
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
         // Return false to be dismissed
-        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
+        return consumerRecord -> !(
+            LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode())
+                || (skalHBucKonsumeres(consumerRecord.value().getBucType()) && erRinaSakIEessi(consumerRecord.value().getRinaSakId()))
+        );
+    }
+
+    private boolean erRinaSakIEessi(String rinaSakId) {
+        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent();
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
