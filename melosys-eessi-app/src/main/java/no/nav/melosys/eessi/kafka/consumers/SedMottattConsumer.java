@@ -37,6 +37,10 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
     )
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedHendelse = consumerRecord.value();
+        if (sedHendelse.erIkkeLaBuc()) {
+            return;
+        }
+
         putToMDC(SED_ID, sedHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 

@@ -33,6 +33,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
+import static no.nav.melosys.eessi.models.BucType.H_BUC_01;
+import static no.nav.melosys.eessi.models.BucType.H_BUC_05;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.eq;
@@ -78,6 +80,44 @@ class SedSendtTestIT extends ComponentTestBase {
         assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
             .isEqualTo(Long.toString(arkivsakID));
+    }
+
+    @Test
+    void sedSendt_saksrelasjonFinnesPåHBuc_journalpostOpprettesOgFerdigstilles() throws Exception {
+        mockPerson();
+        mockArkivsak();
+        mockIdentifisertPerson();
+        lagFagsakRinasakKobling();
+
+        kafkaTestConsumer.reset(1);
+        SedHendelse sedHendelse = mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR);
+        sedHendelse.setSektorKode("H");
+        sedHendelse.setBucType(H_BUC_01.name());
+        kafkaTemplate.send(lagSedSendtRecord(sedHendelse)).get();
+        kafkaTestConsumer.doWait(1_500L);
+
+        verify(journalpostapiConsumer, timeout(15000L)).opprettJournalpost(argumentCaptor.capture(), eq(true));
+
+        assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
+            .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
+            .isEqualTo(Long.toString(arkivsakID));
+    }
+
+    @Test
+    void sedSendt_HBucErIkkeFraMelosys_meldingIgnoreres() throws Exception {
+        mockPerson();
+        mockArkivsak();
+        mockIdentifisertPerson();
+
+        kafkaTestConsumer.reset(1);
+        SedHendelse sedHendelse = mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR);
+        sedHendelse.setSektorKode("H");
+        sedHendelse.setBucType(H_BUC_05.name());
+        kafkaTemplate.send(lagSedSendtRecord(sedHendelse)).get();
+        kafkaTestConsumer.doWait(1_500L);
+
+        verifyNoInteractions(journalpostapiConsumer);
+
     }
 
     @Test

@@ -41,7 +41,6 @@ import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.Message;
 
 import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendelse.Hendelsestype.OPPGAVE_ENDRET;
-import static no.nav.melosys.eessi.models.BucType.*;
 
 @Configuration
 @EnableKafka
@@ -64,8 +63,6 @@ public class KafkaAivenConfig {
 
     @Value("${melosys.kafka.aiven.credstorePassword}")
     private String credstorePassword;
-
-    private static final String LEGISLATION_APPLICABLE_CODE_LA = "LA";
 
     public KafkaAivenConfig(Environment env, OppgaveEndretService oppgaveEndretService, SaksrelasjonService saksrelasjonService) {
         this.env = env;
@@ -108,7 +105,6 @@ public class KafkaAivenConfig {
             props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
-        factory.setRecordFilterStrategy(recordFilterStrategySedSendtListener());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
@@ -123,11 +119,11 @@ public class KafkaAivenConfig {
             props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
-        factory.setRecordFilterStrategy(recordFilterStrategySedMottattListener());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
     }
+
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveKafkaAivenRecord>> oppgaveEndretListenerContainerFactory(KafkaProperties kafkaProperties) {
         return oppgaveListenerContainerFactory(kafkaProperties);
@@ -202,23 +198,6 @@ public class KafkaAivenConfig {
                 || profile.equalsIgnoreCase("test")
                 || profile.equalsIgnoreCase("local-mock"))
         );
-    }
-
-    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedSendtListener() {
-        // Return false to be dismissed
-        return consumerRecord -> !(
-            LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode())
-                || (erHBucsomSkalKonsumeres(consumerRecord.value().getBucType()) && erRinaSakIEessi(consumerRecord.value().getRinaSakId()))
-        );
-    }
-
-    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedMottattListener() {
-        // Return false to be dismissed
-        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode());
-    }
-
-    private boolean erRinaSakIEessi(String rinaSakId) {
-        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent();
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {

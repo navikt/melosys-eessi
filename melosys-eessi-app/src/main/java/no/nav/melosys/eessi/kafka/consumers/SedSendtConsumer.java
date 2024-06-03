@@ -6,12 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostService;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
+import static no.nav.melosys.eessi.models.BucType.erHBucsomSkalKonsumeres;
 
 
 @Service
@@ -22,6 +24,7 @@ public class SedSendtConsumer {
 
     private final OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
     private final KafkaDLQService kafkaDLQService;
+    private final SaksrelasjonService saksrelasjonService;
 
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt",
         topics = "${melosys.kafka.aiven.consumer.sendt.topic}",
@@ -30,6 +33,10 @@ public class SedSendtConsumer {
     )
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendtHendelse = consumerRecord.value();
+        if(sedSendtHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedSendtHendelse)){
+            return;
+        }
+
         putToMDC(SED_ID, sedSendtHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 
@@ -45,5 +52,13 @@ public class SedSendtConsumer {
             remove(SED_ID);
             remove(CORRELATION_ID);
         }
+    }
+
+    private boolean erHBucFraMelosys(SedHendelse sedSendtHendelse) {
+        return erHBucsomSkalKonsumeres(sedSendtHendelse.getBucType()) && erRinaSakIEessi(sedSendtHendelse.getRinaSakId());
+    }
+
+    private boolean erRinaSakIEessi(String rinaSakId) {
+        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent();
     }
 }
