@@ -5,7 +5,9 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public enum BucType {
     LA_BUC_01,
     LA_BUC_02,
@@ -81,8 +83,15 @@ public enum BucType {
         return FØRSTE_LOVLIGE_SED_FRA_BUC_MAP.get(this);
     }
 
-    public static boolean skalHBucKonsumeres(String bucType) {
-        return Arrays.asList(H_BUC_01, H_BUC_02a, H_BUC_02b, H_BUC_02c, H_BUC_03a, H_BUC_03b).contains(valueOf(bucType));
+    public static boolean erHBucsomSkalKonsumeres(String bucType) {
+        BucType type;
+        try {
+            type = valueOf(bucType);
+        } catch (IllegalArgumentException e) {
+            log.debug("Input buctype eksisterer ikke: " + bucType);
+            return false;
+        }
+        return Arrays.asList(H_BUC_01, H_BUC_02a, H_BUC_02b, H_BUC_02c, H_BUC_03a, H_BUC_03b).contains(type);
     }
 
 }

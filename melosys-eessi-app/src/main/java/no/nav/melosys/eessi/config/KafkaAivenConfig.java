@@ -208,13 +208,13 @@ public class KafkaAivenConfig {
         // Return false to be dismissed
         return consumerRecord -> !(
             LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode())
-                || (skalHBucKonsumeres(consumerRecord.value().getBucType()) && erRinaSakIEessi(consumerRecord.value().getRinaSakId()))
+                || (erHBucsomSkalKonsumeres(consumerRecord.value().getBucType()) && erRinaSakIEessi(consumerRecord.value().getRinaSakId()))
         );
     }
 
     private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedMottattListener() {
         // Return false to be dismissed
-        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
+        return consumerRecord -> !LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode());
     }
 
     private boolean erRinaSakIEessi(String rinaSakId) {
