@@ -101,30 +101,40 @@ public class KafkaAivenConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
-        return sedListenerContainerFactory(kafkaProperties);
-    }
-
-    @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveKafkaAivenRecord>> oppgaveEndretListenerContainerFactory(KafkaProperties kafkaProperties) {
-        return oppgaveListenerContainerFactory(kafkaProperties);
-    }
-
-    private ConcurrentKafkaListenerContainerFactory<String, SedHendelse> sedListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedSendtHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
         props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
             props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(defaultKafkaConsumerFactory);
-        factory.setRecordFilterStrategy(recordFilterStrategySedListener());
+        factory.setRecordFilterStrategy(recordFilterStrategySedSendtListener());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
 
         return factory;
     }
 
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedMottattHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        props.putAll(consumerConfig());
+        DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+            props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
+        ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.setRecordFilterStrategy(recordFilterStrategySedMottattListener());
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+
+        return factory;
+    }
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, OppgaveKafkaAivenRecord>> oppgaveEndretListenerContainerFactory(KafkaProperties kafkaProperties) {
+        return oppgaveListenerContainerFactory(kafkaProperties);
+    }
+
     private ConcurrentKafkaListenerContainerFactory<String, OppgaveKafkaAivenRecord> oppgaveListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
         props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, OppgaveKafkaAivenRecord> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
             props, new StringDeserializer(), valueDeserializer(OppgaveKafkaAivenRecord.class));
@@ -194,12 +204,17 @@ public class KafkaAivenConfig {
         );
     }
 
-    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
+    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedSendtListener() {
         // Return false to be dismissed
         return consumerRecord -> !(
             LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode())
                 || (skalHBucKonsumeres(consumerRecord.value().getBucType()) && erRinaSakIEessi(consumerRecord.value().getRinaSakId()))
         );
+    }
+
+    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedMottattListener() {
+        // Return false to be dismissed
+        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
     }
 
     private boolean erRinaSakIEessi(String rinaSakId) {

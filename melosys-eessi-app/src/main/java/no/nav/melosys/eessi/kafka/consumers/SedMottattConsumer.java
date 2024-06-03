@@ -31,7 +31,7 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         id = "sedMottatt",
         clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
-        containerFactory = "sedHendelseListenerContainerFactory",
+        containerFactory = "sedMottattHendelseListenerContainerFactory",
         groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}",
         errorHandler = "sedMottattErrorHandler"
     )
