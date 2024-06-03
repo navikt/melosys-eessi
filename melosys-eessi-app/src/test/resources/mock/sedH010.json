@@ -1,0 +1,68 @@
+{
+    "nav": {
+        "bruker": {
+            "mor": {
+                "person": {
+                    "etternavnvedfoedsel": "æøå",
+                    "fornavn": "æøå"
+                }
+            },
+            "person": {
+                "pin": [
+                    {
+                        "sektor": "yrkesskade_og_yrkessykdom",
+                        "land": "NO",
+                        "institusjonsid": "æøå",
+                        "institusjonsnavn": "æøå",
+                        "identifikator": "æøå"
+                    }
+                ],
+                "fornavn": "æøå",
+                "foedested": {
+                    "region": "æøå",
+                    "by": "æøå",
+                    "land": "NO"
+                },
+                "kjoenn": "M",
+                "etternavn": "æøå",
+                "etternavnvedfoedsel": "æøå",
+                "foedselsdato": "æøå",
+                "fornavnvedfoedsel": "æøå",
+                "tidligereetternavn": "æøå",
+                "statsborgerskap": [
+                    {
+                        "land": "NO"
+                    }
+                ],
+                "tidligerefornavn": "æøå"
+            },
+            "adresse": [
+                {
+                    "bygning": "æøå",
+                    "type": "bosted",
+                    "land": "NO",
+                    "by": "æøå",
+                    "postnummer": "æøå",
+                    "gate": "æøå",
+                    "region": "æøå"
+                }
+            ],
+            "far": {
+                "person": {
+                    "etternavnvedfoedsel": "æøå",
+                    "fornavn": "æøå"
+                }
+            }
+        }
+    },
+    "sedGVer": "4",
+    "sedVer": "2",
+    "medlemskap": {
+        "endring": {
+            "sluttdato": "2022-01-01",
+            "startdato": "2020-01-01"
+        }
+    },
+    "sed": "H010",
+    "Sector Components/Horizontal/H010": "Sector Components/Horizontal/H010"
+}
