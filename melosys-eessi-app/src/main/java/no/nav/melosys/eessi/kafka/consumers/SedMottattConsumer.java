@@ -31,12 +31,16 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         id = "sedMottatt",
         clientIdPrefix = "melosys-eessi-sedMottatt",
         topics = "${melosys.kafka.aiven.consumer.mottatt.topic}",
-        containerFactory = "sedHendelseListenerContainerFactory",
+        containerFactory = "sedMottattHendelseListenerContainerFactory",
         groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}",
         errorHandler = "sedMottattErrorHandler"
     )
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedHendelse = consumerRecord.value();
+        if (sedHendelse.erIkkeLaBuc()) {
+            return;
+        }
+
         putToMDC(SED_ID, sedHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
 

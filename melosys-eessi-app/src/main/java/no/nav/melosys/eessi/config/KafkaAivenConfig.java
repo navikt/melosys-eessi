@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.config;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,13 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
@@ -49,11 +48,9 @@ import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendel
 @Profile("!local-q2")
 public class KafkaAivenConfig {
 
-    @Autowired
-    private Environment env;
-
-    @Autowired
-    OppgaveEndretService oppgaveEndretService;
+    private final Environment env;
+    private final OppgaveEndretService oppgaveEndretService;
+    private final SaksrelasjonService saksrelasjonService;
 
     @Value("${melosys.kafka.aiven.brokers}")
     private String brokersUrl;
@@ -67,8 +64,11 @@ public class KafkaAivenConfig {
     @Value("${melosys.kafka.aiven.credstorePassword}")
     private String credstorePassword;
 
-    private static final String LEGISLATION_APPLICABLE_CODE_LA = "LA";
-    private static final String LEGISLATION_APPLICABLE_CODE_H = "H";
+    public KafkaAivenConfig(Environment env, OppgaveEndretService oppgaveEndretService, SaksrelasjonService saksrelasjonService) {
+        this.env = env;
+        this.oppgaveEndretService = oppgaveEndretService;
+        this.saksrelasjonService = saksrelasjonService;
+    }
 
     @Bean
     public KafkaListenerErrorHandler sedMottattErrorHandler() {
@@ -98,8 +98,30 @@ public class KafkaAivenConfig {
     }
 
     @Bean
-    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
-        return sedListenerContainerFactory(kafkaProperties);
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedSendtHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        props.putAll(consumerConfig());
+        DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+            props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
+        ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+
+        return factory;
+    }
+
+
+    @Bean
+    public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedMottattHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        props.putAll(consumerConfig());
+        DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
+            props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
+        ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(defaultKafkaConsumerFactory);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
+
+        return factory;
     }
 
     @Bean
@@ -107,21 +129,8 @@ public class KafkaAivenConfig {
         return oppgaveListenerContainerFactory(kafkaProperties);
     }
 
-    private ConcurrentKafkaListenerContainerFactory<String, SedHendelse> sedListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
-        props.putAll(consumerConfig());
-        DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
-            props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
-        ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(defaultKafkaConsumerFactory);
-        factory.setRecordFilterStrategy(recordFilterStrategySedListener());
-        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.RECORD);
-
-        return factory;
-    }
-
     private ConcurrentKafkaListenerContainerFactory<String, OppgaveKafkaAivenRecord> oppgaveListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
         props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, OppgaveKafkaAivenRecord> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(
             props, new StringDeserializer(), valueDeserializer(OppgaveKafkaAivenRecord.class));
@@ -189,11 +198,6 @@ public class KafkaAivenConfig {
                 || profile.equalsIgnoreCase("test")
                 || profile.equalsIgnoreCase("local-mock"))
         );
-    }
-
-    private RecordFilterStrategy<String, SedHendelse> recordFilterStrategySedListener() {
-        // Return false to be dismissed
-        return consumerRecord -> !(LEGISLATION_APPLICABLE_CODE_LA.equalsIgnoreCase(consumerRecord.value().getSektorKode()));
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {

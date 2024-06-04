@@ -1,11 +1,11 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import no.nav.melosys.eessi.models.SedType;
-
-import java.util.List;
-import java.util.stream.Stream;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,4 +55,8 @@ public class SedHendelse {
         return TRENGER_KONTROLL.contains(sedType.toUpperCase());
     }
 
+    @JsonIgnore
+    public boolean erIkkeLaBuc() {
+        return !"LA".equals(getSektorKode());
+    }
 }

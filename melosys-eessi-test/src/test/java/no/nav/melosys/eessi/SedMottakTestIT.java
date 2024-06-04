@@ -6,13 +6,11 @@ import java.util.Random;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
-import io.getunleash.FakeUnleash;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import org.junit.jupiter.api.Test;
@@ -48,6 +46,19 @@ class SedMottakTestIT extends ComponentTestBase {
         kafkaTestConsumer.doWait(5_000L);
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+    }
+
+    @Test
+    void sedMottattMedFnr_sektorKodeH_ignorererMelding() throws Exception {
+        final var sedID = UUID.randomUUID().toString();
+
+        kafkaTestConsumer.reset(1);
+        SedHendelse sedHendelse = mockData.sedHendelse(rinaSaksnummer, sedID, FNR);
+        sedHendelse.setSektorKode("H");
+        kafkaTemplate.send(lagSedMottattRecord(sedHendelse)).get();
+        kafkaTestConsumer.doWait(5_000L);
+
+        verifyNoInteractions(euxConsumer);
     }
 
     @Test

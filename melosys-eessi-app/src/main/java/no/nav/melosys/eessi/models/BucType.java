@@ -1,10 +1,13 @@
 package no.nav.melosys.eessi.models;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public enum BucType {
     LA_BUC_01,
     LA_BUC_02,
@@ -48,29 +51,29 @@ public enum BucType {
     }
 
     private static final Map<BucType, SedType> FØRSTE_LOVLIGE_SED_FRA_BUC_MAP =
-            Maps.immutableEnumMap(ImmutableMap.<BucType, SedType>builder()
-                    .put(BucType.LA_BUC_01, SedType.A001)
-                    .put(BucType.LA_BUC_02, SedType.A003)
-                    .put(BucType.LA_BUC_03, SedType.A008)
-                    .put(BucType.LA_BUC_04, SedType.A009)
-                    .put(BucType.LA_BUC_05, SedType.A010)
-                    .put(BucType.LA_BUC_06, SedType.A005)
+        Maps.immutableEnumMap(ImmutableMap.<BucType, SedType>builder()
+            .put(BucType.LA_BUC_01, SedType.A001)
+            .put(BucType.LA_BUC_02, SedType.A003)
+            .put(BucType.LA_BUC_03, SedType.A008)
+            .put(BucType.LA_BUC_04, SedType.A009)
+            .put(BucType.LA_BUC_05, SedType.A010)
+            .put(BucType.LA_BUC_06, SedType.A005)
 
-                    .put(BucType.H_BUC_01, SedType.H001)
-                    .put(BucType.H_BUC_02a, SedType.H005)
-                    .put(BucType.H_BUC_02b, SedType.H004)
-                    .put(BucType.H_BUC_02c, SedType.H003)
-                    .put(BucType.H_BUC_03a, SedType.H010)
-                    .put(BucType.H_BUC_03b, SedType.H011)
-                    .put(BucType.H_BUC_04, SedType.H020)
-                    .put(BucType.H_BUC_05, SedType.H061)
-                    .put(BucType.H_BUC_06, SedType.H065)
-                    .put(BucType.H_BUC_07, SedType.H070)
-                    .put(BucType.H_BUC_08, SedType.H120)
-                    .put(BucType.H_BUC_09, SedType.H121)
-                    .put(BucType.H_BUC_10, SedType.H130)
+            .put(BucType.H_BUC_01, SedType.H001)
+            .put(BucType.H_BUC_02a, SedType.H005)
+            .put(BucType.H_BUC_02b, SedType.H004)
+            .put(BucType.H_BUC_02c, SedType.H003)
+            .put(BucType.H_BUC_03a, SedType.H010)
+            .put(BucType.H_BUC_03b, SedType.H011)
+            .put(BucType.H_BUC_04, SedType.H020)
+            .put(BucType.H_BUC_05, SedType.H061)
+            .put(BucType.H_BUC_06, SedType.H065)
+            .put(BucType.H_BUC_07, SedType.H070)
+            .put(BucType.H_BUC_08, SedType.H120)
+            .put(BucType.H_BUC_09, SedType.H121)
+            .put(BucType.H_BUC_10, SedType.H130)
 
-                    .build());
+            .build());
 
     public SedType hentFørsteLovligeSed() {
         if (!FØRSTE_LOVLIGE_SED_FRA_BUC_MAP.containsKey(this)) {
@@ -79,4 +82,16 @@ public enum BucType {
 
         return FØRSTE_LOVLIGE_SED_FRA_BUC_MAP.get(this);
     }
+
+    public static boolean erHBucsomSkalKonsumeres(String bucType) {
+        BucType type;
+        try {
+            type = valueOf(bucType);
+        } catch (IllegalArgumentException e) {
+            log.debug("Input buctype eksisterer ikke: " + bucType);
+            return false;
+        }
+        return Arrays.asList(H_BUC_01, H_BUC_02a, H_BUC_02b, H_BUC_02c, H_BUC_03a, H_BUC_03b).contains(type);
+    }
+
 }

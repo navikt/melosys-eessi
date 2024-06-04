@@ -8,9 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
@@ -39,7 +37,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -231,6 +228,25 @@ class EuxConsumerTest {
         assertThat(resultat).isNotEmpty();
         assertThat(resultat.size()).isEqualTo(2);
         assertThat(resultat.get(0).getId()).isEqualTo("100485");
+    }
+
+    @Test
+    void hentSedH010_forventSed() throws Exception {
+        String id = "123";
+        String dokumentId = "312";
+
+        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedH010.json");
+        assertThat(jsonUrl).isNotNull();
+        String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
+
+        server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
+
+        SED resultat = euxConsumer.hentSed(id, dokumentId);
+        assertThat(resultat).isNotNull();
+        assertThat(resultat.getNav()).isNotNull();
+
+        assertThat(resultat.getMedlemskap()).isNotNull();
     }
 
     @Test

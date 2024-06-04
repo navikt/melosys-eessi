@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.models.sed;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;
@@ -17,7 +17,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 class MedlemskapTypeResolver implements TypeIdResolver {
 
     private static final Class<? extends Medlemskap> DEFAULT_CLASS = NoType.class;
-    private static final List<String> SED_TYPES_STRING = Arrays.stream(SedType.values()).map(SedType::name).collect(Collectors.toList());
+    private static final List<String> SED_TYPES_STRING = Arrays.stream(SedType.values()).map(SedType::name).toList();
 
     private static final EnumMap<SedType, Class<? extends Medlemskap>> mapping = new EnumMap<>(SedType.class);
 
@@ -34,6 +34,8 @@ class MedlemskapTypeResolver implements TypeIdResolver {
         mapping.put(SedType.A010, MedlemskapA010.class);
         mapping.put(SedType.A011, MedlemskapA011.class);
         mapping.put(SedType.A012, MedlemskapA012.class);
+
+        mapping.put(SedType.H010, MedlemskapH010.class);
     }
 
     private JavaType sedType;
