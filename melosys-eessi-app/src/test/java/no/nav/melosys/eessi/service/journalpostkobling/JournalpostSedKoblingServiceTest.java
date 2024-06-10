@@ -3,13 +3,9 @@ package no.nav.melosys.eessi.service.journalpostkobling;
 import java.util.Collections;
 import java.util.Optional;
 
-import io.getunleash.FakeUnleash;
-import io.getunleash.Unleash;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.JournalpostSedKobling;
@@ -38,8 +34,6 @@ class JournalpostSedKoblingServiceTest {
     @Mock
     private JournalpostSedKoblingRepository journalpostSedKoblingRepository;
     @Mock
-    private CaseStoreConsumer caseStoreConsumer;
-    @Mock
     private EuxService euxService;
     @Mock
     private SaksrelasjonService saksrelasjonService;
@@ -59,8 +53,8 @@ class JournalpostSedKoblingServiceTest {
     @BeforeEach
     public void setup() {
         journalpostSedKoblingService = new JournalpostSedKoblingService(
-                journalpostSedKoblingRepository, caseStoreConsumer, euxService, saksrelasjonService,
-                safConsumer, melosysEessiMeldingMapperFactory, new FakeUnleash());
+                journalpostSedKoblingRepository, euxService, saksrelasjonService,
+                safConsumer, melosysEessiMeldingMapperFactory);
 
         EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
         buc = enhancedRandom.nextObject(BUC.class);
@@ -90,23 +84,6 @@ class JournalpostSedKoblingServiceTest {
 
         assertThat(melosysEessiMelding).isPresent();
         assertThat(melosysEessiMelding.get().getSedType()).isEqualTo("A008");
-        assertThat(melosysEessiMelding.get().getAvsender().getAvsenderID()).isEqualTo(organisation.getId());
-    }
-
-    @Test
-    void finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIEuxCaseStore_forventMelosysEessiMelding() {
-        when(journalpostSedKoblingRepository.findByJournalpostID(anyString()))
-                .thenReturn(Optional.empty());
-        when(caseStoreConsumer.finnVedJournalpostID(anyString()))
-                .thenReturn(Collections.singletonList(new CaseStoreDto("123", "321")));
-        when(euxService.hentBuc(anyString())).thenReturn(buc);
-        when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
-
-        Optional<MelosysEessiMelding> melosysEessiMelding = journalpostSedKoblingService
-                .finnVedJournalpostIDOpprettMelosysEessiMelding("123");
-
-        assertThat(melosysEessiMelding).isPresent();
-        assertThat(melosysEessiMelding.get().getSedType()).isEqualTo(document.getType());
         assertThat(melosysEessiMelding.get().getAvsender().getAvsenderID()).isEqualTo(organisation.getId());
     }
 }
