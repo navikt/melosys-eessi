@@ -66,7 +66,7 @@ melosys:
     reststs-url: ${RESTSTS_URL}
     rina-host-url: ${RINA_HOST_URL}
     journalpostapi-url: ${JOURNALPOSTAPI_URL}
-    eux-case-store-url: ${EUXCASESTORE_URL}
+
     saf-url: ${SAF_URL}
     pdl-url: ${PDL_URL}
     pdl-web-url: ${PDL_WEB_URL}
