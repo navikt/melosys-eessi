@@ -1,11 +1,7 @@
 package no.nav.melosys.eessi.service.saksrelasjon;
 
-import java.util.Collections;
 import java.util.Optional;
 
-import io.getunleash.FakeUnleash;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -18,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,39 +24,21 @@ class SaksrelasjonServiceTest {
     @Mock
     private FagsakRinasakKoblingRepository fagsakRinasakKoblingRepository;
     @Mock
-    private CaseStoreConsumer caseStoreConsumer;
-    @Mock
     private ArkivsakService arkivsakService;
 
     private SaksrelasjonService saksrelasjonService;
 
     @BeforeEach
     public void setup() {
-        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, caseStoreConsumer, arkivsakService, new FakeUnleash());
+        saksrelasjonService = new SaksrelasjonService(fagsakRinasakKoblingRepository, arkivsakService);
     }
 
     private final String RINA_ID = "321";
 
     @Test
-    void lagre_bucErIkkeLovvalg_oppdatertEuxCaseStore() {
-        when(caseStoreConsumer.finnVedRinaSaksnummer(anyString())).thenReturn(Collections.emptyList());
-        saksrelasjonService.lagreKobling(123L, "321", BucType.H_BUC_01);
-        verify(caseStoreConsumer).lagre("123", "321");
-    }
-
-    @Test
     void lagreKobling_verifiserRepositoryKall() {
         saksrelasjonService.lagreKobling(123L, RINA_ID, BucType.LA_BUC_04);
         verify(fagsakRinasakKoblingRepository).save(any(FagsakRinasakKobling.class));
-    }
-
-    @Test
-    void lagreKobling_ikkeLovvalgBucSakEksistererICaseStore_oppdaterCaseStore() {
-        CaseStoreDto caseStoreDto = new CaseStoreDto(1L, "bucid", "saksnummer", "rinasaksnummer", "journalpostid", "tema");
-        when(arkivsakService.hentsak(anyLong())).thenReturn(new Sak());
-        when(caseStoreConsumer.finnVedRinaSaksnummer(anyString())).thenReturn(Collections.singletonList(caseStoreDto));
-        saksrelasjonService.lagreKobling(123L, "321", BucType.H_BUC_01);
-        verify(caseStoreConsumer).lagre(any(CaseStoreDto.class));
     }
 
     @Test
@@ -79,15 +57,6 @@ class SaksrelasjonServiceTest {
     void finnVedGsakSaksnummer_verifiserRepositoryKall() {
         saksrelasjonService.finnVedGsakSaksnummer(123L);
         verify(fagsakRinasakKoblingRepository).findAllByGsakSaksnummer(123L);
-    }
-
-    @Test
-    void søkEtterSaksnummerFraRinaSaksnummer_finnesIEuxCaseStore_forventSaksnummer() {
-        final String rinaSaksnummer = "1231232";
-        when(caseStoreConsumer.finnVedRinaSaksnummer(rinaSaksnummer))
-                .thenReturn(Collections.singletonList(new CaseStoreDto("123", rinaSaksnummer)));
-        Optional<Long> saksnummer = saksrelasjonService.søkEtterSaksnummerFraRinaSaksnummer(rinaSaksnummer);
-        assertThat(saksnummer).contains(123L);
     }
 
     @Test

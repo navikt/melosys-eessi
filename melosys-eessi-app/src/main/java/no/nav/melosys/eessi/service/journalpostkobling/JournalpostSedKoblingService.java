@@ -2,11 +2,7 @@ package no.nav.melosys.eessi.service.journalpostkobling;
 
 import java.util.Optional;
 
-import io.getunleash.Unleash;
 import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreConsumer;
-import no.nav.melosys.eessi.integration.eux.case_store.CaseStoreDto;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
@@ -26,27 +22,22 @@ import org.springframework.stereotype.Service;
 public class JournalpostSedKoblingService {
 
     private final JournalpostSedKoblingRepository journalpostSedKoblingRepository;
-    private final CaseStoreConsumer caseStoreConsumer;
     private final EuxService euxService;
     private final SaksrelasjonService saksrelasjonService;
     private final SafConsumer safConsumer;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
-    private final Unleash unleash;
 
     public JournalpostSedKoblingService(
             JournalpostSedKoblingRepository journalpostSedKoblingRepository,
-            CaseStoreConsumer caseStoreConsumer,
             EuxService euxService,
             SaksrelasjonService saksrelasjonService,
             SafConsumer safConsumer,
-            MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory, Unleash unleash) {
+            MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory) {
         this.journalpostSedKoblingRepository = journalpostSedKoblingRepository;
-        this.caseStoreConsumer = caseStoreConsumer;
         this.euxService = euxService;
         this.saksrelasjonService = saksrelasjonService;
         this.safConsumer = safConsumer;
         this.melosysEessiMeldingMapperFactory = melosysEessiMeldingMapperFactory;
-        this.unleash = unleash;
     }
 
     public Optional<JournalpostSedKobling> finnVedJournalpostID(String journalpostID) {
@@ -81,17 +72,7 @@ public class JournalpostSedKoblingService {
             log.info("Rinasaksnummer er null fra saf for journalpostId: {}", journalpostID);
         }
 
-        return rinaSaksnummer.isPresent() ? rinaSaksnummer : hentFraCaseStore(journalpostID);
-    }
-
-    private Optional<String> hentFraCaseStore(String journalpostID) {
-        if(unleash.isEnabled(ToggleName.IKKE_HENT_FRA_CASESTORE)) {
-            log.info("søkEtterRinaSaksnummerForJournalpost: henting fra casestore er togglet av");
-            return Optional.empty();
-        }
-
-        return caseStoreConsumer.finnVedJournalpostID(journalpostID)
-            .stream().findFirst().map(CaseStoreDto::getRinaSaksnummer);
+        return rinaSaksnummer;
     }
 
     private MelosysEessiMelding opprettEessiMelding(JournalpostSedKobling journalpostSedKobling) {
