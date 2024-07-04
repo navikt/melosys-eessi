@@ -36,7 +36,8 @@ public final class IdentifiseringsKontrollResultat {
         final IdentifiseringsKontrollResultat other = (IdentifiseringsKontrollResultat) o;
         final java.lang.Object this$begrunnelser = this.getBegrunnelser();
         final java.lang.Object other$begrunnelser = other.getBegrunnelser();
-        if (this$begrunnelser == null ? other$begrunnelser != null : !this$begrunnelser.equals(other$begrunnelser)) return false;
+        if (this$begrunnelser == null ? other$begrunnelser != null : !this$begrunnelser.equals(other$begrunnelser))
+            return false;
         return true;
     }
 

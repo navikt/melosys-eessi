@@ -100,7 +100,8 @@ public class EndringA008 {
         if (this$periode == null ? other$periode != null : !this$periode.equals(other$periode)) return false;
         final java.lang.Object this$arbeidssted = this.getArbeidssted();
         final java.lang.Object other$arbeidssted = other.getArbeidssted();
-        if (this$arbeidssted == null ? other$arbeidssted != null : !this$arbeidssted.equals(other$arbeidssted)) return false;
+        if (this$arbeidssted == null ? other$arbeidssted != null : !this$arbeidssted.equals(other$arbeidssted))
+            return false;
         final java.lang.Object this$adresse = this.getAdresse();
         final java.lang.Object other$adresse = other.getAdresse();
         if (this$adresse == null ? other$adresse != null : !this$adresse.equals(other$adresse)) return false;
@@ -109,7 +110,8 @@ public class EndringA008 {
         if (this$bruker == null ? other$bruker != null : !this$bruker.equals(other$bruker)) return false;
         final java.lang.Object this$trerikraftfra = this.getTrerikraftfra();
         final java.lang.Object other$trerikraftfra = other.getTrerikraftfra();
-        if (this$trerikraftfra == null ? other$trerikraftfra != null : !this$trerikraftfra.equals(other$trerikraftfra)) return false;
+        if (this$trerikraftfra == null ? other$trerikraftfra != null : !this$trerikraftfra.equals(other$trerikraftfra))
+            return false;
         final java.lang.Object this$startdato = this.getStartdato();
         final java.lang.Object other$startdato = other.getStartdato();
         if (this$startdato == null ? other$startdato != null : !this$startdato.equals(other$startdato)) return false;

@@ -27,7 +27,8 @@ public class ArbeidsgiverAktivitet {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$eraktivitetmarginal = this.getEraktivitetmarginal();
         final java.lang.Object other$eraktivitetmarginal = other.getEraktivitetmarginal();
-        if (this$eraktivitetmarginal == null ? other$eraktivitetmarginal != null : !this$eraktivitetmarginal.equals(other$eraktivitetmarginal)) return false;
+        if (this$eraktivitetmarginal == null ? other$eraktivitetmarginal != null : !this$eraktivitetmarginal.equals(other$eraktivitetmarginal))
+            return false;
         return true;
     }
 

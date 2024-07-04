@@ -409,46 +409,57 @@ public class OppgaveDto {
         if (this$aktoerId == null ? other$aktoerId != null : !this$aktoerId.equals(other$aktoerId)) return false;
         final java.lang.Object this$tilordnetRessurs = this.getTilordnetRessurs();
         final java.lang.Object other$tilordnetRessurs = other.getTilordnetRessurs();
-        if (this$tilordnetRessurs == null ? other$tilordnetRessurs != null : !this$tilordnetRessurs.equals(other$tilordnetRessurs)) return false;
+        if (this$tilordnetRessurs == null ? other$tilordnetRessurs != null : !this$tilordnetRessurs.equals(other$tilordnetRessurs))
+            return false;
         final java.lang.Object this$tema = this.getTema();
         final java.lang.Object other$tema = other.getTema();
         if (this$tema == null ? other$tema != null : !this$tema.equals(other$tema)) return false;
         final java.lang.Object this$oppgavetype = this.getOppgavetype();
         final java.lang.Object other$oppgavetype = other.getOppgavetype();
-        if (this$oppgavetype == null ? other$oppgavetype != null : !this$oppgavetype.equals(other$oppgavetype)) return false;
+        if (this$oppgavetype == null ? other$oppgavetype != null : !this$oppgavetype.equals(other$oppgavetype))
+            return false;
         final java.lang.Object this$journalpostId = this.getJournalpostId();
         final java.lang.Object other$journalpostId = other.getJournalpostId();
-        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId)) return false;
+        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId))
+            return false;
         final java.lang.Object this$aktivDato = this.getAktivDato();
         final java.lang.Object other$aktivDato = other.getAktivDato();
         if (this$aktivDato == null ? other$aktivDato != null : !this$aktivDato.equals(other$aktivDato)) return false;
         final java.lang.Object this$fristFerdigstillelse = this.getFristFerdigstillelse();
         final java.lang.Object other$fristFerdigstillelse = other.getFristFerdigstillelse();
-        if (this$fristFerdigstillelse == null ? other$fristFerdigstillelse != null : !this$fristFerdigstillelse.equals(other$fristFerdigstillelse)) return false;
+        if (this$fristFerdigstillelse == null ? other$fristFerdigstillelse != null : !this$fristFerdigstillelse.equals(other$fristFerdigstillelse))
+            return false;
         final java.lang.Object this$prioritet = this.getPrioritet();
         final java.lang.Object other$prioritet = other.getPrioritet();
         if (this$prioritet == null ? other$prioritet != null : !this$prioritet.equals(other$prioritet)) return false;
         final java.lang.Object this$saksreferanse = this.getSaksreferanse();
         final java.lang.Object other$saksreferanse = other.getSaksreferanse();
-        if (this$saksreferanse == null ? other$saksreferanse != null : !this$saksreferanse.equals(other$saksreferanse)) return false;
+        if (this$saksreferanse == null ? other$saksreferanse != null : !this$saksreferanse.equals(other$saksreferanse))
+            return false;
         final java.lang.Object this$behandlingstype = this.getBehandlingstype();
         final java.lang.Object other$behandlingstype = other.getBehandlingstype();
-        if (this$behandlingstype == null ? other$behandlingstype != null : !this$behandlingstype.equals(other$behandlingstype)) return false;
+        if (this$behandlingstype == null ? other$behandlingstype != null : !this$behandlingstype.equals(other$behandlingstype))
+            return false;
         final java.lang.Object this$behandlingstema = this.getBehandlingstema();
         final java.lang.Object other$behandlingstema = other.getBehandlingstema();
-        if (this$behandlingstema == null ? other$behandlingstema != null : !this$behandlingstema.equals(other$behandlingstema)) return false;
+        if (this$behandlingstema == null ? other$behandlingstema != null : !this$behandlingstema.equals(other$behandlingstema))
+            return false;
         final java.lang.Object this$temagruppe = this.getTemagruppe();
         final java.lang.Object other$temagruppe = other.getTemagruppe();
-        if (this$temagruppe == null ? other$temagruppe != null : !this$temagruppe.equals(other$temagruppe)) return false;
+        if (this$temagruppe == null ? other$temagruppe != null : !this$temagruppe.equals(other$temagruppe))
+            return false;
         final java.lang.Object this$tildeltEnhetsnr = this.getTildeltEnhetsnr();
         final java.lang.Object other$tildeltEnhetsnr = other.getTildeltEnhetsnr();
-        if (this$tildeltEnhetsnr == null ? other$tildeltEnhetsnr != null : !this$tildeltEnhetsnr.equals(other$tildeltEnhetsnr)) return false;
+        if (this$tildeltEnhetsnr == null ? other$tildeltEnhetsnr != null : !this$tildeltEnhetsnr.equals(other$tildeltEnhetsnr))
+            return false;
         final java.lang.Object this$behandlesAvApplikasjon = this.getBehandlesAvApplikasjon();
         final java.lang.Object other$behandlesAvApplikasjon = other.getBehandlesAvApplikasjon();
-        if (this$behandlesAvApplikasjon == null ? other$behandlesAvApplikasjon != null : !this$behandlesAvApplikasjon.equals(other$behandlesAvApplikasjon)) return false;
+        if (this$behandlesAvApplikasjon == null ? other$behandlesAvApplikasjon != null : !this$behandlesAvApplikasjon.equals(other$behandlesAvApplikasjon))
+            return false;
         final java.lang.Object this$beskrivelse = this.getBeskrivelse();
         final java.lang.Object other$beskrivelse = other.getBeskrivelse();
-        if (this$beskrivelse == null ? other$beskrivelse != null : !this$beskrivelse.equals(other$beskrivelse)) return false;
+        if (this$beskrivelse == null ? other$beskrivelse != null : !this$beskrivelse.equals(other$beskrivelse))
+            return false;
         final java.lang.Object this$metadata = this.getMetadata();
         final java.lang.Object other$metadata = other.getMetadata();
         if (this$metadata == null ? other$metadata != null : !this$metadata.equals(other$metadata)) return false;

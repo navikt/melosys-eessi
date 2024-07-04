@@ -51,7 +51,8 @@ public class Organisation {
         if (this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
         final java.lang.Object this$countryCode = this.getCountryCode();
         final java.lang.Object other$countryCode = other.getCountryCode();
-        if (this$countryCode == null ? other$countryCode != null : !this$countryCode.equals(other$countryCode)) return false;
+        if (this$countryCode == null ? other$countryCode != null : !this$countryCode.equals(other$countryCode))
+            return false;
         final java.lang.Object this$id = this.getId();
         final java.lang.Object other$id = other.getId();
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;

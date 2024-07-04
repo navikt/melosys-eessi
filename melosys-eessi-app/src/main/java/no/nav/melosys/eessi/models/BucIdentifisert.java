@@ -60,10 +60,12 @@ public class BucIdentifisert {
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$folkeregisterident = this.getFolkeregisterident();
         final java.lang.Object other$folkeregisterident = other.getFolkeregisterident();
-        if (this$folkeregisterident == null ? other$folkeregisterident != null : !this$folkeregisterident.equals(other$folkeregisterident)) return false;
+        if (this$folkeregisterident == null ? other$folkeregisterident != null : !this$folkeregisterident.equals(other$folkeregisterident))
+            return false;
         return true;
     }
 

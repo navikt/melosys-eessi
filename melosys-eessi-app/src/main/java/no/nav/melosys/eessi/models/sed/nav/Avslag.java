@@ -52,13 +52,16 @@ public class Avslag {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$erbehovformerinformasjon = this.getErbehovformerinformasjon();
         final java.lang.Object other$erbehovformerinformasjon = other.getErbehovformerinformasjon();
-        if (this$erbehovformerinformasjon == null ? other$erbehovformerinformasjon != null : !this$erbehovformerinformasjon.equals(other$erbehovformerinformasjon)) return false;
+        if (this$erbehovformerinformasjon == null ? other$erbehovformerinformasjon != null : !this$erbehovformerinformasjon.equals(other$erbehovformerinformasjon))
+            return false;
         final java.lang.Object this$forslagformedlemskap = this.getForslagformedlemskap();
         final java.lang.Object other$forslagformedlemskap = other.getForslagformedlemskap();
-        if (this$forslagformedlemskap == null ? other$forslagformedlemskap != null : !this$forslagformedlemskap.equals(other$forslagformedlemskap)) return false;
+        if (this$forslagformedlemskap == null ? other$forslagformedlemskap != null : !this$forslagformedlemskap.equals(other$forslagformedlemskap))
+            return false;
         final java.lang.Object this$begrunnelse = this.getBegrunnelse();
         final java.lang.Object other$begrunnelse = other.getBegrunnelse();
-        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse)) return false;
+        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse))
+            return false;
         return true;
     }
 

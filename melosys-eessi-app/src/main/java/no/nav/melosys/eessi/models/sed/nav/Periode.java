@@ -46,10 +46,12 @@ public class Periode {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$aapenperiode = this.getAapenperiode();
         final java.lang.Object other$aapenperiode = other.getAapenperiode();
-        if (this$aapenperiode == null ? other$aapenperiode != null : !this$aapenperiode.equals(other$aapenperiode)) return false;
+        if (this$aapenperiode == null ? other$aapenperiode != null : !this$aapenperiode.equals(other$aapenperiode))
+            return false;
         final java.lang.Object this$fastperiode = this.getFastperiode();
         final java.lang.Object other$fastperiode = other.getFastperiode();
-        if (this$fastperiode == null ? other$fastperiode != null : !this$fastperiode.equals(other$fastperiode)) return false;
+        if (this$fastperiode == null ? other$fastperiode != null : !this$fastperiode.equals(other$fastperiode))
+            return false;
         return true;
     }
 

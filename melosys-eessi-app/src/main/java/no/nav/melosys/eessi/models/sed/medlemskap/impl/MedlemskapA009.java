@@ -21,7 +21,8 @@ public class MedlemskapA009 implements Medlemskap {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$utsendingsland = this.getUtsendingsland();
         final java.lang.Object other$utsendingsland = other.getUtsendingsland();
-        if (this$utsendingsland == null ? other$utsendingsland != null : !this$utsendingsland.equals(other$utsendingsland)) return false;
+        if (this$utsendingsland == null ? other$utsendingsland != null : !this$utsendingsland.equals(other$utsendingsland))
+            return false;
         final java.lang.Object this$andreland = this.getAndreland();
         final java.lang.Object other$andreland = other.getAndreland();
         if (this$andreland == null ? other$andreland != null : !this$andreland.equals(other$andreland)) return false;

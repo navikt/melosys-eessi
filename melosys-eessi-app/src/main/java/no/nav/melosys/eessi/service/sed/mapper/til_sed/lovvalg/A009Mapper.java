@@ -61,7 +61,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     private boolean erGyldigLovvalgbestemmelse(Bestemmelse bestemmelse) {
         return bestemmelse == Bestemmelse.ART_12_1
-                || bestemmelse == Bestemmelse.ART_12_2;
+            || bestemmelse == Bestemmelse.ART_12_2;
     }
 
     private Utsendingsland getUtsendingsland(SedDataDto sedData) {

@@ -232,7 +232,8 @@ public class BUC {
         if (this$startDate == null ? other$startDate != null : !this$startDate.equals(other$startDate)) return false;
         final java.lang.Object this$lastUpdate = this.getLastUpdate();
         final java.lang.Object other$lastUpdate = other.getLastUpdate();
-        if (this$lastUpdate == null ? other$lastUpdate != null : !this$lastUpdate.equals(other$lastUpdate)) return false;
+        if (this$lastUpdate == null ? other$lastUpdate != null : !this$lastUpdate.equals(other$lastUpdate))
+            return false;
         final java.lang.Object this$status = this.getStatus();
         final java.lang.Object other$status = other.getStatus();
         if (this$status == null ? other$status != null : !this$status.equals(other$status)) return false;
@@ -250,13 +251,16 @@ public class BUC {
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;
         final java.lang.Object this$bucVersjon = this.getBucVersjon();
         final java.lang.Object other$bucVersjon = other.getBucVersjon();
-        if (this$bucVersjon == null ? other$bucVersjon != null : !this$bucVersjon.equals(other$bucVersjon)) return false;
+        if (this$bucVersjon == null ? other$bucVersjon != null : !this$bucVersjon.equals(other$bucVersjon))
+            return false;
         final java.lang.Object this$participants = this.getParticipants();
         final java.lang.Object other$participants = other.getParticipants();
-        if (this$participants == null ? other$participants != null : !this$participants.equals(other$participants)) return false;
+        if (this$participants == null ? other$participants != null : !this$participants.equals(other$participants))
+            return false;
         final java.lang.Object this$internationalId = this.getInternationalId();
         final java.lang.Object other$internationalId = other.getInternationalId();
-        if (this$internationalId == null ? other$internationalId != null : !this$internationalId.equals(other$internationalId)) return false;
+        if (this$internationalId == null ? other$internationalId != null : !this$internationalId.equals(other$internationalId))
+            return false;
         return true;
     }
 

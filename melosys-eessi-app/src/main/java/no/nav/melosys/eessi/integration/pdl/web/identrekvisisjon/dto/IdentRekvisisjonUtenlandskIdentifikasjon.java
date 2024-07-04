@@ -81,10 +81,12 @@ public class IdentRekvisisjonUtenlandskIdentifikasjon {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$utstederland = this.getUtstederland();
         final java.lang.Object other$utstederland = other.getUtstederland();
-        if (this$utstederland == null ? other$utstederland != null : !this$utstederland.equals(other$utstederland)) return false;
+        if (this$utstederland == null ? other$utstederland != null : !this$utstederland.equals(other$utstederland))
+            return false;
         final java.lang.Object this$utenlandskId = this.getUtenlandskId();
         final java.lang.Object other$utenlandskId = other.getUtenlandskId();
-        if (this$utenlandskId == null ? other$utenlandskId != null : !this$utenlandskId.equals(other$utenlandskId)) return false;
+        if (this$utenlandskId == null ? other$utenlandskId != null : !this$utenlandskId.equals(other$utenlandskId))
+            return false;
         return true;
     }
 

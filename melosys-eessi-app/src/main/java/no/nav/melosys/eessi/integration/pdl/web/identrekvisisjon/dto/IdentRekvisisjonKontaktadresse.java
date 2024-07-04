@@ -125,16 +125,20 @@ public class IdentRekvisisjonKontaktadresse {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$norskVegadresse = this.getNorskVegadresse();
         final java.lang.Object other$norskVegadresse = other.getNorskVegadresse();
-        if (this$norskVegadresse == null ? other$norskVegadresse != null : !this$norskVegadresse.equals(other$norskVegadresse)) return false;
+        if (this$norskVegadresse == null ? other$norskVegadresse != null : !this$norskVegadresse.equals(other$norskVegadresse))
+            return false;
         final java.lang.Object this$norskPostboksadresse = this.getNorskPostboksadresse();
         final java.lang.Object other$norskPostboksadresse = other.getNorskPostboksadresse();
-        if (this$norskPostboksadresse == null ? other$norskPostboksadresse != null : !this$norskPostboksadresse.equals(other$norskPostboksadresse)) return false;
+        if (this$norskPostboksadresse == null ? other$norskPostboksadresse != null : !this$norskPostboksadresse.equals(other$norskPostboksadresse))
+            return false;
         final java.lang.Object this$utenlandskVegadresse = this.getUtenlandskVegadresse();
         final java.lang.Object other$utenlandskVegadresse = other.getUtenlandskVegadresse();
-        if (this$utenlandskVegadresse == null ? other$utenlandskVegadresse != null : !this$utenlandskVegadresse.equals(other$utenlandskVegadresse)) return false;
+        if (this$utenlandskVegadresse == null ? other$utenlandskVegadresse != null : !this$utenlandskVegadresse.equals(other$utenlandskVegadresse))
+            return false;
         final java.lang.Object this$utenlandskPostboksadresse = this.getUtenlandskPostboksadresse();
         final java.lang.Object other$utenlandskPostboksadresse = other.getUtenlandskPostboksadresse();
-        if (this$utenlandskPostboksadresse == null ? other$utenlandskPostboksadresse != null : !this$utenlandskPostboksadresse.equals(other$utenlandskPostboksadresse)) return false;
+        if (this$utenlandskPostboksadresse == null ? other$utenlandskPostboksadresse != null : !this$utenlandskPostboksadresse.equals(other$utenlandskPostboksadresse))
+            return false;
         return true;
     }
 

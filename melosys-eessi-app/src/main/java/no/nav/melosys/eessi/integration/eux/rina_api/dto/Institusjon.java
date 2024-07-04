@@ -88,7 +88,8 @@ public class Institusjon {
         if (this$navn == null ? other$navn != null : !this$navn.equals(other$navn)) return false;
         final java.lang.Object this$tilegnetBucs = this.getTilegnetBucs();
         final java.lang.Object other$tilegnetBucs = other.getTilegnetBucs();
-        if (this$tilegnetBucs == null ? other$tilegnetBucs != null : !this$tilegnetBucs.equals(other$tilegnetBucs)) return false;
+        if (this$tilegnetBucs == null ? other$tilegnetBucs != null : !this$tilegnetBucs.equals(other$tilegnetBucs))
+            return false;
         return true;
     }
 

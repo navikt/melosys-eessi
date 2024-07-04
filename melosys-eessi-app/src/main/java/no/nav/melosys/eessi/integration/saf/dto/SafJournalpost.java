@@ -35,7 +35,8 @@ public class SafJournalpost {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$tilleggsopplysninger = this.getTilleggsopplysninger();
         final java.lang.Object other$tilleggsopplysninger = other.getTilleggsopplysninger();
-        if (this$tilleggsopplysninger == null ? other$tilleggsopplysninger != null : !this$tilleggsopplysninger.equals(other$tilleggsopplysninger)) return false;
+        if (this$tilleggsopplysninger == null ? other$tilleggsopplysninger != null : !this$tilleggsopplysninger.equals(other$tilleggsopplysninger))
+            return false;
         return true;
     }
 

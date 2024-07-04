@@ -156,7 +156,8 @@ public class BucIdentifiseringOppg {
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$oppgaveId = this.getOppgaveId();
         final java.lang.Object other$oppgaveId = other.getOppgaveId();
         if (this$oppgaveId == null ? other$oppgaveId != null : !this$oppgaveId.equals(other$oppgaveId)) return false;

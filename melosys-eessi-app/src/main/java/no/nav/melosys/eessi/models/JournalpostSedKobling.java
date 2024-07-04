@@ -94,16 +94,19 @@ public class JournalpostSedKobling {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$journalpostID = this.getJournalpostID();
         final java.lang.Object other$journalpostID = other.getJournalpostID();
-        if (this$journalpostID == null ? other$journalpostID != null : !this$journalpostID.equals(other$journalpostID)) return false;
+        if (this$journalpostID == null ? other$journalpostID != null : !this$journalpostID.equals(other$journalpostID))
+            return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$sedId = this.getSedId();
         final java.lang.Object other$sedId = other.getSedId();
         if (this$sedId == null ? other$sedId != null : !this$sedId.equals(other$sedId)) return false;
         final java.lang.Object this$sedVersjon = this.getSedVersjon();
         final java.lang.Object other$sedVersjon = other.getSedVersjon();
-        if (this$sedVersjon == null ? other$sedVersjon != null : !this$sedVersjon.equals(other$sedVersjon)) return false;
+        if (this$sedVersjon == null ? other$sedVersjon != null : !this$sedVersjon.equals(other$sedVersjon))
+            return false;
         final java.lang.Object this$bucType = this.getBucType();
         final java.lang.Object other$bucType = other.getBucType();
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;

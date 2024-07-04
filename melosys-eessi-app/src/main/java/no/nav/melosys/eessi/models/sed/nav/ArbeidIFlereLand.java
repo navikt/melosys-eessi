@@ -44,7 +44,8 @@ public class ArbeidIFlereLand {
         if (this$bosted == null ? other$bosted != null : !this$bosted.equals(other$bosted)) return false;
         final java.lang.Object this$yrkesaktivitet = this.getYrkesaktivitet();
         final java.lang.Object other$yrkesaktivitet = other.getYrkesaktivitet();
-        if (this$yrkesaktivitet == null ? other$yrkesaktivitet != null : !this$yrkesaktivitet.equals(other$yrkesaktivitet)) return false;
+        if (this$yrkesaktivitet == null ? other$yrkesaktivitet != null : !this$yrkesaktivitet.equals(other$yrkesaktivitet))
+            return false;
         return true;
     }
 

@@ -58,7 +58,8 @@ public class Arbeidsgiver {
         if (this$adresse == null ? other$adresse != null : !this$adresse.equals(other$adresse)) return false;
         final java.lang.Object this$identifikator = this.getIdentifikator();
         final java.lang.Object other$identifikator = other.getIdentifikator();
-        if (this$identifikator == null ? other$identifikator != null : !this$identifikator.equals(other$identifikator)) return false;
+        if (this$identifikator == null ? other$identifikator != null : !this$identifikator.equals(other$identifikator))
+            return false;
         final java.lang.Object this$navn = this.getNavn();
         final java.lang.Object other$navn = other.getNavn();
         if (this$navn == null ? other$navn != null : !this$navn.equals(other$navn)) return false;

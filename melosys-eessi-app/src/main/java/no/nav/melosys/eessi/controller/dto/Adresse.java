@@ -120,16 +120,19 @@ public class Adresse {
         if (this$land == null ? other$land != null : !this$land.equals(other$land)) return false;
         final java.lang.Object this$gateadresse = this.getGateadresse();
         final java.lang.Object other$gateadresse = other.getGateadresse();
-        if (this$gateadresse == null ? other$gateadresse != null : !this$gateadresse.equals(other$gateadresse)) return false;
+        if (this$gateadresse == null ? other$gateadresse != null : !this$gateadresse.equals(other$gateadresse))
+            return false;
         final java.lang.Object this$tilleggsnavn = this.getTilleggsnavn();
         final java.lang.Object other$tilleggsnavn = other.getTilleggsnavn();
-        if (this$tilleggsnavn == null ? other$tilleggsnavn != null : !this$tilleggsnavn.equals(other$tilleggsnavn)) return false;
+        if (this$tilleggsnavn == null ? other$tilleggsnavn != null : !this$tilleggsnavn.equals(other$tilleggsnavn))
+            return false;
         final java.lang.Object this$region = this.getRegion();
         final java.lang.Object other$region = other.getRegion();
         if (this$region == null ? other$region != null : !this$region.equals(other$region)) return false;
         final java.lang.Object this$adressetype = this.getAdressetype();
         final java.lang.Object other$adressetype = other.getAdressetype();
-        if (this$adressetype == null ? other$adressetype != null : !this$adressetype.equals(other$adressetype)) return false;
+        if (this$adressetype == null ? other$adressetype != null : !this$adressetype.equals(other$adressetype))
+            return false;
         return true;
     }
 

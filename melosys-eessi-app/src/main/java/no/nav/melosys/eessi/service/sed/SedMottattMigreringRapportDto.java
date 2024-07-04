@@ -30,13 +30,16 @@ public class SedMottattMigreringRapportDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$dokumentId = this.getDokumentId();
         final java.lang.Object other$dokumentId = other.getDokumentId();
-        if (this$dokumentId == null ? other$dokumentId != null : !this$dokumentId.equals(other$dokumentId)) return false;
+        if (this$dokumentId == null ? other$dokumentId != null : !this$dokumentId.equals(other$dokumentId))
+            return false;
         final java.lang.Object this$journalpostId = this.getJournalpostId();
         final java.lang.Object other$journalpostId = other.getJournalpostId();
-        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId)) return false;
+        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId))
+            return false;
         return true;
     }
 

@@ -81,7 +81,8 @@ public class IdentRekvisisjonKilde {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$institusjon = this.getInstitusjon();
         final java.lang.Object other$institusjon = other.getInstitusjon();
-        if (this$institusjon == null ? other$institusjon != null : !this$institusjon.equals(other$institusjon)) return false;
+        if (this$institusjon == null ? other$institusjon != null : !this$institusjon.equals(other$institusjon))
+            return false;
         final java.lang.Object this$landkode = this.getLandkode();
         final java.lang.Object other$landkode = other.getLandkode();
         if (this$landkode == null ? other$landkode != null : !this$landkode.equals(other$landkode)) return false;

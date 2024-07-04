@@ -386,7 +386,8 @@ public class SedHendelse {
         if (this$sedId == null ? other$sedId != null : !this$sedId.equals(other$sedId)) return false;
         final java.lang.Object this$sektorKode = this.getSektorKode();
         final java.lang.Object other$sektorKode = other.getSektorKode();
-        if (this$sektorKode == null ? other$sektorKode != null : !this$sektorKode.equals(other$sektorKode)) return false;
+        if (this$sektorKode == null ? other$sektorKode != null : !this$sektorKode.equals(other$sektorKode))
+            return false;
         final java.lang.Object this$bucType = this.getBucType();
         final java.lang.Object other$bucType = other.getBucType();
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;
@@ -395,22 +396,28 @@ public class SedHendelse {
         if (this$rinaSakId == null ? other$rinaSakId != null : !this$rinaSakId.equals(other$rinaSakId)) return false;
         final java.lang.Object this$avsenderId = this.getAvsenderId();
         final java.lang.Object other$avsenderId = other.getAvsenderId();
-        if (this$avsenderId == null ? other$avsenderId != null : !this$avsenderId.equals(other$avsenderId)) return false;
+        if (this$avsenderId == null ? other$avsenderId != null : !this$avsenderId.equals(other$avsenderId))
+            return false;
         final java.lang.Object this$avsenderNavn = this.getAvsenderNavn();
         final java.lang.Object other$avsenderNavn = other.getAvsenderNavn();
-        if (this$avsenderNavn == null ? other$avsenderNavn != null : !this$avsenderNavn.equals(other$avsenderNavn)) return false;
+        if (this$avsenderNavn == null ? other$avsenderNavn != null : !this$avsenderNavn.equals(other$avsenderNavn))
+            return false;
         final java.lang.Object this$mottakerId = this.getMottakerId();
         final java.lang.Object other$mottakerId = other.getMottakerId();
-        if (this$mottakerId == null ? other$mottakerId != null : !this$mottakerId.equals(other$mottakerId)) return false;
+        if (this$mottakerId == null ? other$mottakerId != null : !this$mottakerId.equals(other$mottakerId))
+            return false;
         final java.lang.Object this$mottakerNavn = this.getMottakerNavn();
         final java.lang.Object other$mottakerNavn = other.getMottakerNavn();
-        if (this$mottakerNavn == null ? other$mottakerNavn != null : !this$mottakerNavn.equals(other$mottakerNavn)) return false;
+        if (this$mottakerNavn == null ? other$mottakerNavn != null : !this$mottakerNavn.equals(other$mottakerNavn))
+            return false;
         final java.lang.Object this$rinaDokumentId = this.getRinaDokumentId();
         final java.lang.Object other$rinaDokumentId = other.getRinaDokumentId();
-        if (this$rinaDokumentId == null ? other$rinaDokumentId != null : !this$rinaDokumentId.equals(other$rinaDokumentId)) return false;
+        if (this$rinaDokumentId == null ? other$rinaDokumentId != null : !this$rinaDokumentId.equals(other$rinaDokumentId))
+            return false;
         final java.lang.Object this$rinaDokumentVersjon = this.getRinaDokumentVersjon();
         final java.lang.Object other$rinaDokumentVersjon = other.getRinaDokumentVersjon();
-        if (this$rinaDokumentVersjon == null ? other$rinaDokumentVersjon != null : !this$rinaDokumentVersjon.equals(other$rinaDokumentVersjon)) return false;
+        if (this$rinaDokumentVersjon == null ? other$rinaDokumentVersjon != null : !this$rinaDokumentVersjon.equals(other$rinaDokumentVersjon))
+            return false;
         final java.lang.Object this$sedType = this.getSedType();
         final java.lang.Object other$sedType = other.getSedType();
         if (this$sedType == null ? other$sedType != null : !this$sedType.equals(other$sedType)) return false;

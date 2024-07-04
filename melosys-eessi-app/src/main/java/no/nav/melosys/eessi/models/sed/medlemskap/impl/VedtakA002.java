@@ -54,10 +54,12 @@ public class VedtakA002 {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$annenperiode = this.getAnnenperiode();
         final java.lang.Object other$annenperiode = other.getAnnenperiode();
-        if (this$annenperiode == null ? other$annenperiode != null : !this$annenperiode.equals(other$annenperiode)) return false;
+        if (this$annenperiode == null ? other$annenperiode != null : !this$annenperiode.equals(other$annenperiode))
+            return false;
         final java.lang.Object this$begrunnelse = this.getBegrunnelse();
         final java.lang.Object other$begrunnelse = other.getBegrunnelse();
-        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse)) return false;
+        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse))
+            return false;
         final java.lang.Object this$resultat = this.getResultat();
         final java.lang.Object other$resultat = other.getResultat();
         if (this$resultat == null ? other$resultat != null : !this$resultat.equals(other$resultat)) return false;

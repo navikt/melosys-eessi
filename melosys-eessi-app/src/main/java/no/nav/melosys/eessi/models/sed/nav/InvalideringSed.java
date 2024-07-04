@@ -48,7 +48,8 @@ public class InvalideringSed {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$utstedelsesdato = this.getUtstedelsesdato();
         final java.lang.Object other$utstedelsesdato = other.getUtstedelsesdato();
-        if (this$utstedelsesdato == null ? other$utstedelsesdato != null : !this$utstedelsesdato.equals(other$utstedelsesdato)) return false;
+        if (this$utstedelsesdato == null ? other$utstedelsesdato != null : !this$utstedelsesdato.equals(other$utstedelsesdato))
+            return false;
         final java.lang.Object this$type = this.getType();
         final java.lang.Object other$type = other.getType();
         if (this$type == null ? other$type != null : !this$type.equals(other$type)) return false;

@@ -240,28 +240,36 @@ public class IdentRekvisisjonTilMellomlagring {
         if (this$kilde == null ? other$kilde != null : !this$kilde.equals(other$kilde)) return false;
         final java.lang.Object this$personopplysninger = this.getPersonopplysninger();
         final java.lang.Object other$personopplysninger = other.getPersonopplysninger();
-        if (this$personopplysninger == null ? other$personopplysninger != null : !this$personopplysninger.equals(other$personopplysninger)) return false;
+        if (this$personopplysninger == null ? other$personopplysninger != null : !this$personopplysninger.equals(other$personopplysninger))
+            return false;
         final java.lang.Object this$utenlandskIdentifikasjon = this.getUtenlandskIdentifikasjon();
         final java.lang.Object other$utenlandskIdentifikasjon = other.getUtenlandskIdentifikasjon();
-        if (this$utenlandskIdentifikasjon == null ? other$utenlandskIdentifikasjon != null : !this$utenlandskIdentifikasjon.equals(other$utenlandskIdentifikasjon)) return false;
+        if (this$utenlandskIdentifikasjon == null ? other$utenlandskIdentifikasjon != null : !this$utenlandskIdentifikasjon.equals(other$utenlandskIdentifikasjon))
+            return false;
         final java.lang.Object this$bostedsadresse = this.getBostedsadresse();
         final java.lang.Object other$bostedsadresse = other.getBostedsadresse();
-        if (this$bostedsadresse == null ? other$bostedsadresse != null : !this$bostedsadresse.equals(other$bostedsadresse)) return false;
+        if (this$bostedsadresse == null ? other$bostedsadresse != null : !this$bostedsadresse.equals(other$bostedsadresse))
+            return false;
         final java.lang.Object this$oppholdsadresse = this.getOppholdsadresse();
         final java.lang.Object other$oppholdsadresse = other.getOppholdsadresse();
-        if (this$oppholdsadresse == null ? other$oppholdsadresse != null : !this$oppholdsadresse.equals(other$oppholdsadresse)) return false;
+        if (this$oppholdsadresse == null ? other$oppholdsadresse != null : !this$oppholdsadresse.equals(other$oppholdsadresse))
+            return false;
         final java.lang.Object this$kontaktadresse = this.getKontaktadresse();
         final java.lang.Object other$kontaktadresse = other.getKontaktadresse();
-        if (this$kontaktadresse == null ? other$kontaktadresse != null : !this$kontaktadresse.equals(other$kontaktadresse)) return false;
+        if (this$kontaktadresse == null ? other$kontaktadresse != null : !this$kontaktadresse.equals(other$kontaktadresse))
+            return false;
         final java.lang.Object this$dokumentasjon = this.getDokumentasjon();
         final java.lang.Object other$dokumentasjon = other.getDokumentasjon();
-        if (this$dokumentasjon == null ? other$dokumentasjon != null : !this$dokumentasjon.equals(other$dokumentasjon)) return false;
+        if (this$dokumentasjon == null ? other$dokumentasjon != null : !this$dokumentasjon.equals(other$dokumentasjon))
+            return false;
         final java.lang.Object this$relasjoner = this.getRelasjoner();
         final java.lang.Object other$relasjoner = other.getRelasjoner();
-        if (this$relasjoner == null ? other$relasjoner != null : !this$relasjoner.equals(other$relasjoner)) return false;
+        if (this$relasjoner == null ? other$relasjoner != null : !this$relasjoner.equals(other$relasjoner))
+            return false;
         final java.lang.Object this$sivilstand = this.getSivilstand();
         final java.lang.Object other$sivilstand = other.getSivilstand();
-        if (this$sivilstand == null ? other$sivilstand != null : !this$sivilstand.equals(other$sivilstand)) return false;
+        if (this$sivilstand == null ? other$sivilstand != null : !this$sivilstand.equals(other$sivilstand))
+            return false;
         return true;
     }
 

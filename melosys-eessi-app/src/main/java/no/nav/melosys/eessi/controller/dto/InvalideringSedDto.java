@@ -38,10 +38,12 @@ public class InvalideringSedDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$sedTypeSomSkalInvalideres = this.getSedTypeSomSkalInvalideres();
         final java.lang.Object other$sedTypeSomSkalInvalideres = other.getSedTypeSomSkalInvalideres();
-        if (this$sedTypeSomSkalInvalideres == null ? other$sedTypeSomSkalInvalideres != null : !this$sedTypeSomSkalInvalideres.equals(other$sedTypeSomSkalInvalideres)) return false;
+        if (this$sedTypeSomSkalInvalideres == null ? other$sedTypeSomSkalInvalideres != null : !this$sedTypeSomSkalInvalideres.equals(other$sedTypeSomSkalInvalideres))
+            return false;
         final java.lang.Object this$utstedelsedato = this.getUtstedelsedato();
         final java.lang.Object other$utstedelsedato = other.getUtstedelsedato();
-        if (this$utstedelsedato == null ? other$utstedelsedato != null : !this$utstedelsedato.equals(other$utstedelsedato)) return false;
+        if (this$utstedelsedato == null ? other$utstedelsedato != null : !this$utstedelsedato.equals(other$utstedelsedato))
+            return false;
         return true;
     }
 

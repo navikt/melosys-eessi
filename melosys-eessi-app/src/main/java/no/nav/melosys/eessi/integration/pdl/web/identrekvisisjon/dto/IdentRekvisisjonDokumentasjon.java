@@ -34,7 +34,8 @@ public class IdentRekvisisjonDokumentasjon {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$dokumentasjonstype = this.getDokumentasjonstype();
         final java.lang.Object other$dokumentasjonstype = other.getDokumentasjonstype();
-        if (this$dokumentasjonstype == null ? other$dokumentasjonstype != null : !this$dokumentasjonstype.equals(other$dokumentasjonstype)) return false;
+        if (this$dokumentasjonstype == null ? other$dokumentasjonstype != null : !this$dokumentasjonstype.equals(other$dokumentasjonstype))
+            return false;
         final java.lang.Object this$ident = this.getIdent();
         final java.lang.Object other$ident = other.getIdent();
         if (this$ident == null ? other$ident != null : !this$ident.equals(other$ident)) return false;

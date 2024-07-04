@@ -38,10 +38,12 @@ public class AnmodningUnntak {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$unntakFraLovvalgsland = this.getUnntakFraLovvalgsland();
         final java.lang.Object other$unntakFraLovvalgsland = other.getUnntakFraLovvalgsland();
-        if (this$unntakFraLovvalgsland == null ? other$unntakFraLovvalgsland != null : !this$unntakFraLovvalgsland.equals(other$unntakFraLovvalgsland)) return false;
+        if (this$unntakFraLovvalgsland == null ? other$unntakFraLovvalgsland != null : !this$unntakFraLovvalgsland.equals(other$unntakFraLovvalgsland))
+            return false;
         final java.lang.Object this$unntakFraLovvalgsbestemmelse = this.getUnntakFraLovvalgsbestemmelse();
         final java.lang.Object other$unntakFraLovvalgsbestemmelse = other.getUnntakFraLovvalgsbestemmelse();
-        if (this$unntakFraLovvalgsbestemmelse == null ? other$unntakFraLovvalgsbestemmelse != null : !this$unntakFraLovvalgsbestemmelse.equals(other$unntakFraLovvalgsbestemmelse)) return false;
+        if (this$unntakFraLovvalgsbestemmelse == null ? other$unntakFraLovvalgsbestemmelse != null : !this$unntakFraLovvalgsbestemmelse.equals(other$unntakFraLovvalgsbestemmelse))
+            return false;
         return true;
     }
 

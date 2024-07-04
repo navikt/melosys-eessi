@@ -68,7 +68,8 @@ public final class PDLSokCriterion {
         if (this$fieldName == null ? other$fieldName != null : !this$fieldName.equals(other$fieldName)) return false;
         final java.lang.Object this$searchRule = this.getSearchRule();
         final java.lang.Object other$searchRule = other.getSearchRule();
-        if (this$searchRule == null ? other$searchRule != null : !this$searchRule.equals(other$searchRule)) return false;
+        if (this$searchRule == null ? other$searchRule != null : !this$searchRule.equals(other$searchRule))
+            return false;
         return true;
     }
 

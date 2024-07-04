@@ -144,10 +144,12 @@ public class Document {
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
         final java.lang.Object this$creationDate = this.getCreationDate();
         final java.lang.Object other$creationDate = other.getCreationDate();
-        if (this$creationDate == null ? other$creationDate != null : !this$creationDate.equals(other$creationDate)) return false;
+        if (this$creationDate == null ? other$creationDate != null : !this$creationDate.equals(other$creationDate))
+            return false;
         final java.lang.Object this$lastUpdate = this.getLastUpdate();
         final java.lang.Object other$lastUpdate = other.getLastUpdate();
-        if (this$lastUpdate == null ? other$lastUpdate != null : !this$lastUpdate.equals(other$lastUpdate)) return false;
+        if (this$lastUpdate == null ? other$lastUpdate != null : !this$lastUpdate.equals(other$lastUpdate))
+            return false;
         final java.lang.Object this$creator = this.getCreator();
         final java.lang.Object other$creator = other.getCreator();
         if (this$creator == null ? other$creator != null : !this$creator.equals(other$creator)) return false;
@@ -162,7 +164,8 @@ public class Document {
         if (this$direction == null ? other$direction != null : !this$direction.equals(other$direction)) return false;
         final java.lang.Object this$conversations = this.getConversations();
         final java.lang.Object other$conversations = other.getConversations();
-        if (this$conversations == null ? other$conversations != null : !this$conversations.equals(other$conversations)) return false;
+        if (this$conversations == null ? other$conversations != null : !this$conversations.equals(other$conversations))
+            return false;
         return true;
     }
 

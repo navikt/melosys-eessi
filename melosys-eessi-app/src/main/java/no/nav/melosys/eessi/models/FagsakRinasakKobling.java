@@ -57,10 +57,12 @@ public class FagsakRinasakKobling {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$gsakSaksnummer = this.getGsakSaksnummer();
         final java.lang.Object other$gsakSaksnummer = other.getGsakSaksnummer();
-        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer)) return false;
+        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer))
+            return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$bucType = this.getBucType();
         final java.lang.Object other$bucType = other.getBucType();
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;

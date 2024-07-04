@@ -200,10 +200,12 @@ public class BucSearch {
         if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
         final java.lang.Object this$foedselsdato = this.getFoedselsdato();
         final java.lang.Object other$foedselsdato = other.getFoedselsdato();
-        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato)) return false;
+        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato))
+            return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$bucType = this.getBucType();
         final java.lang.Object other$bucType = other.getBucType();
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;

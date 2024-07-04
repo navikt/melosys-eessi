@@ -137,16 +137,19 @@ public class KafkaConsumerResponse {
         if (this.isActive() != other.isActive()) return false;
         final java.lang.Object this$consumerId = this.getConsumerId();
         final java.lang.Object other$consumerId = other.getConsumerId();
-        if (this$consumerId == null ? other$consumerId != null : !this$consumerId.equals(other$consumerId)) return false;
+        if (this$consumerId == null ? other$consumerId != null : !this$consumerId.equals(other$consumerId))
+            return false;
         final java.lang.Object this$groupId = this.getGroupId();
         final java.lang.Object other$groupId = other.getGroupId();
         if (this$groupId == null ? other$groupId != null : !this$groupId.equals(other$groupId)) return false;
         final java.lang.Object this$listenerId = this.getListenerId();
         final java.lang.Object other$listenerId = other.getListenerId();
-        if (this$listenerId == null ? other$listenerId != null : !this$listenerId.equals(other$listenerId)) return false;
+        if (this$listenerId == null ? other$listenerId != null : !this$listenerId.equals(other$listenerId))
+            return false;
         final java.lang.Object this$assignments = this.getAssignments();
         final java.lang.Object other$assignments = other.getAssignments();
-        if (this$assignments == null ? other$assignments != null : !this$assignments.equals(other$assignments)) return false;
+        if (this$assignments == null ? other$assignments != null : !this$assignments.equals(other$assignments))
+            return false;
         return true;
     }
 

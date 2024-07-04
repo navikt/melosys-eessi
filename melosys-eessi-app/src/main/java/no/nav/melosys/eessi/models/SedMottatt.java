@@ -165,16 +165,20 @@ public class SedMottatt {
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
         final java.lang.Object this$sedHendelse = this.getSedHendelse();
         final java.lang.Object other$sedHendelse = other.getSedHendelse();
-        if (this$sedHendelse == null ? other$sedHendelse != null : !this$sedHendelse.equals(other$sedHendelse)) return false;
+        if (this$sedHendelse == null ? other$sedHendelse != null : !this$sedHendelse.equals(other$sedHendelse))
+            return false;
         final java.lang.Object this$sedKontekst = this.getSedKontekst();
         final java.lang.Object other$sedKontekst = other.getSedKontekst();
-        if (this$sedKontekst == null ? other$sedKontekst != null : !this$sedKontekst.equals(other$sedKontekst)) return false;
+        if (this$sedKontekst == null ? other$sedKontekst != null : !this$sedKontekst.equals(other$sedKontekst))
+            return false;
         final java.lang.Object this$mottattDato = this.getMottattDato();
         final java.lang.Object other$mottattDato = other.getMottattDato();
-        if (this$mottattDato == null ? other$mottattDato != null : !this$mottattDato.equals(other$mottattDato)) return false;
+        if (this$mottattDato == null ? other$mottattDato != null : !this$mottattDato.equals(other$mottattDato))
+            return false;
         final java.lang.Object this$sistEndretDato = this.getSistEndretDato();
         final java.lang.Object other$sistEndretDato = other.getSistEndretDato();
-        if (this$sistEndretDato == null ? other$sistEndretDato != null : !this$sistEndretDato.equals(other$sistEndretDato)) return false;
+        if (this$sistEndretDato == null ? other$sistEndretDato != null : !this$sistEndretDato.equals(other$sistEndretDato))
+            return false;
         return true;
     }
 

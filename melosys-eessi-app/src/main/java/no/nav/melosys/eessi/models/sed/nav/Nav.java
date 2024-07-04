@@ -129,25 +129,31 @@ public class Nav {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$arbeidssted = this.getArbeidssted();
         final java.lang.Object other$arbeidssted = other.getArbeidssted();
-        if (this$arbeidssted == null ? other$arbeidssted != null : !this$arbeidssted.equals(other$arbeidssted)) return false;
+        if (this$arbeidssted == null ? other$arbeidssted != null : !this$arbeidssted.equals(other$arbeidssted))
+            return false;
         final java.lang.Object this$arbeidsland = this.getArbeidsland();
         final java.lang.Object other$arbeidsland = other.getArbeidsland();
-        if (this$arbeidsland == null ? other$arbeidsland != null : !this$arbeidsland.equals(other$arbeidsland)) return false;
+        if (this$arbeidsland == null ? other$arbeidsland != null : !this$arbeidsland.equals(other$arbeidsland))
+            return false;
         final java.lang.Object this$harfastarbeidssted = this.getHarfastarbeidssted();
         final java.lang.Object other$harfastarbeidssted = other.getHarfastarbeidssted();
-        if (this$harfastarbeidssted == null ? other$harfastarbeidssted != null : !this$harfastarbeidssted.equals(other$harfastarbeidssted)) return false;
+        if (this$harfastarbeidssted == null ? other$harfastarbeidssted != null : !this$harfastarbeidssted.equals(other$harfastarbeidssted))
+            return false;
         final java.lang.Object this$bruker = this.getBruker();
         final java.lang.Object other$bruker = other.getBruker();
         if (this$bruker == null ? other$bruker != null : !this$bruker.equals(other$bruker)) return false;
         final java.lang.Object this$selvstendig = this.getSelvstendig();
         final java.lang.Object other$selvstendig = other.getSelvstendig();
-        if (this$selvstendig == null ? other$selvstendig != null : !this$selvstendig.equals(other$selvstendig)) return false;
+        if (this$selvstendig == null ? other$selvstendig != null : !this$selvstendig.equals(other$selvstendig))
+            return false;
         final java.lang.Object this$ytterligereinformasjon = this.getYtterligereinformasjon();
         final java.lang.Object other$ytterligereinformasjon = other.getYtterligereinformasjon();
-        if (this$ytterligereinformasjon == null ? other$ytterligereinformasjon != null : !this$ytterligereinformasjon.equals(other$ytterligereinformasjon)) return false;
+        if (this$ytterligereinformasjon == null ? other$ytterligereinformasjon != null : !this$ytterligereinformasjon.equals(other$ytterligereinformasjon))
+            return false;
         final java.lang.Object this$arbeidsgiver = this.getArbeidsgiver();
         final java.lang.Object other$arbeidsgiver = other.getArbeidsgiver();
-        if (this$arbeidsgiver == null ? other$arbeidsgiver != null : !this$arbeidsgiver.equals(other$arbeidsgiver)) return false;
+        if (this$arbeidsgiver == null ? other$arbeidsgiver != null : !this$arbeidsgiver.equals(other$arbeidsgiver))
+            return false;
         final java.lang.Object this$sak = this.getSak();
         final java.lang.Object other$sak = other.getSak();
         if (this$sak == null ? other$sak != null : !this$sak.equals(other$sak)) return false;

@@ -69,10 +69,12 @@ public class Sak {
         if (this$kontekst == null ? other$kontekst != null : !this$kontekst.equals(other$kontekst)) return false;
         final java.lang.Object this$fjerninstitusjon = this.getFjerninstitusjon();
         final java.lang.Object other$fjerninstitusjon = other.getFjerninstitusjon();
-        if (this$fjerninstitusjon == null ? other$fjerninstitusjon != null : !this$fjerninstitusjon.equals(other$fjerninstitusjon)) return false;
+        if (this$fjerninstitusjon == null ? other$fjerninstitusjon != null : !this$fjerninstitusjon.equals(other$fjerninstitusjon))
+            return false;
         final java.lang.Object this$ugyldiggjoere = this.getUgyldiggjoere();
         final java.lang.Object other$ugyldiggjoere = other.getUgyldiggjoere();
-        if (this$ugyldiggjoere == null ? other$ugyldiggjoere != null : !this$ugyldiggjoere.equals(other$ugyldiggjoere)) return false;
+        if (this$ugyldiggjoere == null ? other$ugyldiggjoere != null : !this$ugyldiggjoere.equals(other$ugyldiggjoere))
+            return false;
         return true;
     }
 

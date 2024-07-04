@@ -119,10 +119,12 @@ public class SedSendtHendelse {
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
         final java.lang.Object this$sedHendelse = this.getSedHendelse();
         final java.lang.Object other$sedHendelse = other.getSedHendelse();
-        if (this$sedHendelse == null ? other$sedHendelse != null : !this$sedHendelse.equals(other$sedHendelse)) return false;
+        if (this$sedHendelse == null ? other$sedHendelse != null : !this$sedHendelse.equals(other$sedHendelse))
+            return false;
         final java.lang.Object this$journalpostId = this.getJournalpostId();
         final java.lang.Object other$journalpostId = other.getJournalpostId();
-        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId)) return false;
+        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId))
+            return false;
         return true;
     }
 

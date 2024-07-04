@@ -206,7 +206,8 @@ public class IdentRekvisisjonPersonopplysninger {
         if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
         final java.lang.Object this$foedselsdato = this.getFoedselsdato();
         final java.lang.Object other$foedselsdato = other.getFoedselsdato();
-        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato)) return false;
+        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato))
+            return false;
         final java.lang.Object this$kjoenn = this.getKjoenn();
         final java.lang.Object other$kjoenn = other.getKjoenn();
         if (this$kjoenn == null ? other$kjoenn != null : !this$kjoenn.equals(other$kjoenn)) return false;
@@ -218,7 +219,8 @@ public class IdentRekvisisjonPersonopplysninger {
         if (this$foedeland == null ? other$foedeland != null : !this$foedeland.equals(other$foedeland)) return false;
         final java.lang.Object this$statsborgerskap = this.getStatsborgerskap();
         final java.lang.Object other$statsborgerskap = other.getStatsborgerskap();
-        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap)) return false;
+        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap))
+            return false;
         return true;
     }
 

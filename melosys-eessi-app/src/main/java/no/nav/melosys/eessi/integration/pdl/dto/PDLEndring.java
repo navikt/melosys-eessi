@@ -45,7 +45,8 @@ public class PDLEndring {
         if (this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
         final java.lang.Object this$registrert = this.getRegistrert();
         final java.lang.Object other$registrert = other.getRegistrert();
-        if (this$registrert == null ? other$registrert != null : !this$registrert.equals(other$registrert)) return false;
+        if (this$registrert == null ? other$registrert != null : !this$registrert.equals(other$registrert))
+            return false;
         return true;
     }
 

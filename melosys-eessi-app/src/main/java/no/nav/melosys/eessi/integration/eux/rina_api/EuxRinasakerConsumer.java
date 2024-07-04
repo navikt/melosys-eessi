@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 public class EuxRinasakerConsumer implements RestConsumer {

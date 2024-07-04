@@ -127,16 +127,20 @@ public class Lovvalgsperiode {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$lovvalgsland = this.getLovvalgsland();
         final java.lang.Object other$lovvalgsland = other.getLovvalgsland();
-        if (this$lovvalgsland == null ? other$lovvalgsland != null : !this$lovvalgsland.equals(other$lovvalgsland)) return false;
+        if (this$lovvalgsland == null ? other$lovvalgsland != null : !this$lovvalgsland.equals(other$lovvalgsland))
+            return false;
         final java.lang.Object this$unntakFraLovvalgsland = this.getUnntakFraLovvalgsland();
         final java.lang.Object other$unntakFraLovvalgsland = other.getUnntakFraLovvalgsland();
-        if (this$unntakFraLovvalgsland == null ? other$unntakFraLovvalgsland != null : !this$unntakFraLovvalgsland.equals(other$unntakFraLovvalgsland)) return false;
+        if (this$unntakFraLovvalgsland == null ? other$unntakFraLovvalgsland != null : !this$unntakFraLovvalgsland.equals(other$unntakFraLovvalgsland))
+            return false;
         final java.lang.Object this$bestemmelse = this.getBestemmelse();
         final java.lang.Object other$bestemmelse = other.getBestemmelse();
-        if (this$bestemmelse == null ? other$bestemmelse != null : !this$bestemmelse.equals(other$bestemmelse)) return false;
+        if (this$bestemmelse == null ? other$bestemmelse != null : !this$bestemmelse.equals(other$bestemmelse))
+            return false;
         final java.lang.Object this$tilleggsBestemmelse = this.getTilleggsBestemmelse();
         final java.lang.Object other$tilleggsBestemmelse = other.getTilleggsBestemmelse();
-        if (this$tilleggsBestemmelse == null ? other$tilleggsBestemmelse != null : !this$tilleggsBestemmelse.equals(other$tilleggsBestemmelse)) return false;
+        if (this$tilleggsBestemmelse == null ? other$tilleggsBestemmelse != null : !this$tilleggsBestemmelse.equals(other$tilleggsBestemmelse))
+            return false;
         final java.lang.Object this$fom = this.getFom();
         final java.lang.Object other$fom = other.getFom();
         if (this$fom == null ? other$fom != null : !this$fom.equals(other$fom)) return false;
@@ -145,10 +149,12 @@ public class Lovvalgsperiode {
         if (this$tom == null ? other$tom != null : !this$tom.equals(other$tom)) return false;
         final java.lang.Object this$unntaksBegrunnelse = this.getUnntaksBegrunnelse();
         final java.lang.Object other$unntaksBegrunnelse = other.getUnntaksBegrunnelse();
-        if (this$unntaksBegrunnelse == null ? other$unntaksBegrunnelse != null : !this$unntaksBegrunnelse.equals(other$unntaksBegrunnelse)) return false;
+        if (this$unntaksBegrunnelse == null ? other$unntaksBegrunnelse != null : !this$unntaksBegrunnelse.equals(other$unntaksBegrunnelse))
+            return false;
         final java.lang.Object this$unntakFraBestemmelse = this.getUnntakFraBestemmelse();
         final java.lang.Object other$unntakFraBestemmelse = other.getUnntakFraBestemmelse();
-        if (this$unntakFraBestemmelse == null ? other$unntakFraBestemmelse != null : !this$unntakFraBestemmelse.equals(other$unntakFraBestemmelse)) return false;
+        if (this$unntakFraBestemmelse == null ? other$unntakFraBestemmelse != null : !this$unntakFraBestemmelse.equals(other$unntakFraBestemmelse))
+            return false;
         return true;
     }
 

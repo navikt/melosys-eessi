@@ -43,7 +43,8 @@ public class Arbeidsland {
         if (this$land == null ? other$land != null : !this$land.equals(other$land)) return false;
         final java.lang.Object this$arbeidssted = this.getArbeidssted();
         final java.lang.Object other$arbeidssted = other.getArbeidssted();
-        if (this$arbeidssted == null ? other$arbeidssted != null : !this$arbeidssted.equals(other$arbeidssted)) return false;
+        if (this$arbeidssted == null ? other$arbeidssted != null : !this$arbeidssted.equals(other$arbeidssted))
+            return false;
         return true;
     }
 

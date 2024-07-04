@@ -16,10 +16,12 @@ public class VedtakA003 extends Vedtak {
         if (!super.equals(o)) return false;
         final java.lang.Object this$gjeldervarighetyrkesaktivitet = this.getGjeldervarighetyrkesaktivitet();
         final java.lang.Object other$gjeldervarighetyrkesaktivitet = other.getGjeldervarighetyrkesaktivitet();
-        if (this$gjeldervarighetyrkesaktivitet == null ? other$gjeldervarighetyrkesaktivitet != null : !this$gjeldervarighetyrkesaktivitet.equals(other$gjeldervarighetyrkesaktivitet)) return false;
+        if (this$gjeldervarighetyrkesaktivitet == null ? other$gjeldervarighetyrkesaktivitet != null : !this$gjeldervarighetyrkesaktivitet.equals(other$gjeldervarighetyrkesaktivitet))
+            return false;
         final java.lang.Object this$gjelderperiode = this.getGjelderperiode();
         final java.lang.Object other$gjelderperiode = other.getGjelderperiode();
-        if (this$gjelderperiode == null ? other$gjelderperiode != null : !this$gjelderperiode.equals(other$gjelderperiode)) return false;
+        if (this$gjelderperiode == null ? other$gjelderperiode != null : !this$gjelderperiode.equals(other$gjelderperiode))
+            return false;
         final java.lang.Object this$land = this.getLand();
         final java.lang.Object other$land = other.getLand();
         if (this$land == null ? other$land != null : !this$land.equals(other$land)) return false;

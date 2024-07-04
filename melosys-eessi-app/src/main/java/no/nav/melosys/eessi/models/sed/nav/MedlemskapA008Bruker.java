@@ -30,7 +30,8 @@ public class MedlemskapA008Bruker {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$arbeidiflereland = this.getArbeidiflereland();
         final java.lang.Object other$arbeidiflereland = other.getArbeidiflereland();
-        if (this$arbeidiflereland == null ? other$arbeidiflereland != null : !this$arbeidiflereland.equals(other$arbeidiflereland)) return false;
+        if (this$arbeidiflereland == null ? other$arbeidiflereland != null : !this$arbeidiflereland.equals(other$arbeidiflereland))
+            return false;
         return true;
     }
 

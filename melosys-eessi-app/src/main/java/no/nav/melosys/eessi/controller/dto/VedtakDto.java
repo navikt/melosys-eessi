@@ -52,7 +52,8 @@ public class VedtakDto {
         if (this.isErFørstegangsvedtak() != other.isErFørstegangsvedtak()) return false;
         final java.lang.Object this$datoForrigeVedtak = this.getDatoForrigeVedtak();
         final java.lang.Object other$datoForrigeVedtak = other.getDatoForrigeVedtak();
-        if (this$datoForrigeVedtak == null ? other$datoForrigeVedtak != null : !this$datoForrigeVedtak.equals(other$datoForrigeVedtak)) return false;
+        if (this$datoForrigeVedtak == null ? other$datoForrigeVedtak != null : !this$datoForrigeVedtak.equals(other$datoForrigeVedtak))
+            return false;
         return true;
     }
 

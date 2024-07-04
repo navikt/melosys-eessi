@@ -98,7 +98,8 @@ public class SED {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$medlemskap = this.getMedlemskap();
         final java.lang.Object other$medlemskap = other.getMedlemskap();
-        if (this$medlemskap == null ? other$medlemskap != null : !this$medlemskap.equals(other$medlemskap)) return false;
+        if (this$medlemskap == null ? other$medlemskap != null : !this$medlemskap.equals(other$medlemskap))
+            return false;
         final java.lang.Object this$nav = this.getNav();
         final java.lang.Object other$nav = other.getNav();
         if (this$nav == null ? other$nav != null : !this$nav.equals(other$nav)) return false;

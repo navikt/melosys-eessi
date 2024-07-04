@@ -195,7 +195,8 @@ public class BucinfoDto {
         if (this.isErÅpen() != other.isErÅpen()) return false;
         final java.lang.Object this$opprettetDato = this.getOpprettetDato();
         final java.lang.Object other$opprettetDato = other.getOpprettetDato();
-        if (this$opprettetDato == null ? other$opprettetDato != null : !this$opprettetDato.equals(other$opprettetDato)) return false;
+        if (this$opprettetDato == null ? other$opprettetDato != null : !this$opprettetDato.equals(other$opprettetDato))
+            return false;
         final java.lang.Object this$id = this.getId();
         final java.lang.Object other$id = other.getId();
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
@@ -204,7 +205,8 @@ public class BucinfoDto {
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;
         final java.lang.Object this$mottakerinstitusjoner = this.getMottakerinstitusjoner();
         final java.lang.Object other$mottakerinstitusjoner = other.getMottakerinstitusjoner();
-        if (this$mottakerinstitusjoner == null ? other$mottakerinstitusjoner != null : !this$mottakerinstitusjoner.equals(other$mottakerinstitusjoner)) return false;
+        if (this$mottakerinstitusjoner == null ? other$mottakerinstitusjoner != null : !this$mottakerinstitusjoner.equals(other$mottakerinstitusjoner))
+            return false;
         final java.lang.Object this$seder = this.getSeder();
         final java.lang.Object other$seder = other.getSeder();
         if (this$seder == null ? other$seder != null : !this$seder.equals(other$seder)) return false;

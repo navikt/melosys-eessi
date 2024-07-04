@@ -205,46 +205,58 @@ public class SedDataDto extends SedGrunnlagDto {
         if (!super.equals(o)) return false;
         final java.lang.Object this$gsakSaksnummer = this.getGsakSaksnummer();
         final java.lang.Object other$gsakSaksnummer = other.getGsakSaksnummer();
-        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer)) return false;
+        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer))
+            return false;
         final java.lang.Object this$bruker = this.getBruker();
         final java.lang.Object other$bruker = other.getBruker();
         if (this$bruker == null ? other$bruker != null : !this$bruker.equals(other$bruker)) return false;
         final java.lang.Object this$kontaktadresse = this.getKontaktadresse();
         final java.lang.Object other$kontaktadresse = other.getKontaktadresse();
-        if (this$kontaktadresse == null ? other$kontaktadresse != null : !this$kontaktadresse.equals(other$kontaktadresse)) return false;
+        if (this$kontaktadresse == null ? other$kontaktadresse != null : !this$kontaktadresse.equals(other$kontaktadresse))
+            return false;
         final java.lang.Object this$oppholdsadresse = this.getOppholdsadresse();
         final java.lang.Object other$oppholdsadresse = other.getOppholdsadresse();
-        if (this$oppholdsadresse == null ? other$oppholdsadresse != null : !this$oppholdsadresse.equals(other$oppholdsadresse)) return false;
+        if (this$oppholdsadresse == null ? other$oppholdsadresse != null : !this$oppholdsadresse.equals(other$oppholdsadresse))
+            return false;
         final java.lang.Object this$familieMedlem = this.getFamilieMedlem();
         final java.lang.Object other$familieMedlem = other.getFamilieMedlem();
-        if (this$familieMedlem == null ? other$familieMedlem != null : !this$familieMedlem.equals(other$familieMedlem)) return false;
+        if (this$familieMedlem == null ? other$familieMedlem != null : !this$familieMedlem.equals(other$familieMedlem))
+            return false;
         final java.lang.Object this$søknadsperiode = this.getSøknadsperiode();
         final java.lang.Object other$søknadsperiode = other.getSøknadsperiode();
-        if (this$søknadsperiode == null ? other$søknadsperiode != null : !this$søknadsperiode.equals(other$søknadsperiode)) return false;
+        if (this$søknadsperiode == null ? other$søknadsperiode != null : !this$søknadsperiode.equals(other$søknadsperiode))
+            return false;
         final java.lang.Object this$avklartBostedsland = this.getAvklartBostedsland();
         final java.lang.Object other$avklartBostedsland = other.getAvklartBostedsland();
-        if (this$avklartBostedsland == null ? other$avklartBostedsland != null : !this$avklartBostedsland.equals(other$avklartBostedsland)) return false;
+        if (this$avklartBostedsland == null ? other$avklartBostedsland != null : !this$avklartBostedsland.equals(other$avklartBostedsland))
+            return false;
         final java.lang.Object this$vedtakDto = this.getVedtakDto();
         final java.lang.Object other$vedtakDto = other.getVedtakDto();
         if (this$vedtakDto == null ? other$vedtakDto != null : !this$vedtakDto.equals(other$vedtakDto)) return false;
         final java.lang.Object this$invalideringSedDto = this.getInvalideringSedDto();
         final java.lang.Object other$invalideringSedDto = other.getInvalideringSedDto();
-        if (this$invalideringSedDto == null ? other$invalideringSedDto != null : !this$invalideringSedDto.equals(other$invalideringSedDto)) return false;
+        if (this$invalideringSedDto == null ? other$invalideringSedDto != null : !this$invalideringSedDto.equals(other$invalideringSedDto))
+            return false;
         final java.lang.Object this$tidligereLovvalgsperioder = this.getTidligereLovvalgsperioder();
         final java.lang.Object other$tidligereLovvalgsperioder = other.getTidligereLovvalgsperioder();
-        if (this$tidligereLovvalgsperioder == null ? other$tidligereLovvalgsperioder != null : !this$tidligereLovvalgsperioder.equals(other$tidligereLovvalgsperioder)) return false;
+        if (this$tidligereLovvalgsperioder == null ? other$tidligereLovvalgsperioder != null : !this$tidligereLovvalgsperioder.equals(other$tidligereLovvalgsperioder))
+            return false;
         final java.lang.Object this$mottakerIder = this.getMottakerIder();
         final java.lang.Object other$mottakerIder = other.getMottakerIder();
-        if (this$mottakerIder == null ? other$mottakerIder != null : !this$mottakerIder.equals(other$mottakerIder)) return false;
+        if (this$mottakerIder == null ? other$mottakerIder != null : !this$mottakerIder.equals(other$mottakerIder))
+            return false;
         final java.lang.Object this$ytterligereInformasjon = this.getYtterligereInformasjon();
         final java.lang.Object other$ytterligereInformasjon = other.getYtterligereInformasjon();
-        if (this$ytterligereInformasjon == null ? other$ytterligereInformasjon != null : !this$ytterligereInformasjon.equals(other$ytterligereInformasjon)) return false;
+        if (this$ytterligereInformasjon == null ? other$ytterligereInformasjon != null : !this$ytterligereInformasjon.equals(other$ytterligereInformasjon))
+            return false;
         final java.lang.Object this$svarAnmodningUnntak = this.getSvarAnmodningUnntak();
         final java.lang.Object other$svarAnmodningUnntak = other.getSvarAnmodningUnntak();
-        if (this$svarAnmodningUnntak == null ? other$svarAnmodningUnntak != null : !this$svarAnmodningUnntak.equals(other$svarAnmodningUnntak)) return false;
+        if (this$svarAnmodningUnntak == null ? other$svarAnmodningUnntak != null : !this$svarAnmodningUnntak.equals(other$svarAnmodningUnntak))
+            return false;
         final java.lang.Object this$utpekingAvvis = this.getUtpekingAvvis();
         final java.lang.Object other$utpekingAvvis = other.getUtpekingAvvis();
-        if (this$utpekingAvvis == null ? other$utpekingAvvis != null : !this$utpekingAvvis.equals(other$utpekingAvvis)) return false;
+        if (this$utpekingAvvis == null ? other$utpekingAvvis != null : !this$utpekingAvvis.equals(other$utpekingAvvis))
+            return false;
         return true;
     }
 

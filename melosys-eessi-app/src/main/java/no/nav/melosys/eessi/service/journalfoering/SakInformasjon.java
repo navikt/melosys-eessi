@@ -103,13 +103,16 @@ public class SakInformasjon {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$journalpostId = this.getJournalpostId();
         final java.lang.Object other$journalpostId = other.getJournalpostId();
-        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId)) return false;
+        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId))
+            return false;
         final java.lang.Object this$dokumentId = this.getDokumentId();
         final java.lang.Object other$dokumentId = other.getDokumentId();
-        if (this$dokumentId == null ? other$dokumentId != null : !this$dokumentId.equals(other$dokumentId)) return false;
+        if (this$dokumentId == null ? other$dokumentId != null : !this$dokumentId.equals(other$dokumentId))
+            return false;
         final java.lang.Object this$gsakSaksnummer = this.getGsakSaksnummer();
         final java.lang.Object other$gsakSaksnummer = other.getGsakSaksnummer();
-        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer)) return false;
+        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer))
+            return false;
         return true;
     }
 

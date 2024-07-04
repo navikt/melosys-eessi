@@ -15,18 +15,19 @@ public class PDLConsumerProducer {
 
     private static final String BEHANDLINGSNUMMER = "behandlingsnummer";
     private static final String MELOSYS_EESSI_BEHANDLINGSNUMMER = "B358";
+
     @Bean
     public PDLConsumer pdlConsumer(WebClient.Builder webclientBuilder,
                                    @Value("${melosys.integrations.pdl-url}") String pdlUrl,
                                    GenericAuthFilterFactory genericAuthFilterFactory
     ) {
-            return new PDLConsumer(
-                webclientBuilder
-                    .baseUrl(pdlUrl)
-                    .defaultHeaders(this::defaultHeaders)
-                    .filter(genericAuthFilterFactory.getAzureFilter("pdl"))
-                    .build()
-            );
+        return new PDLConsumer(
+            webclientBuilder
+                .baseUrl(pdlUrl)
+                .defaultHeaders(this::defaultHeaders)
+                .filter(genericAuthFilterFactory.getAzureFilter("pdl"))
+                .build()
+        );
     }
 
     private void defaultHeaders(HttpHeaders httpHeaders) {

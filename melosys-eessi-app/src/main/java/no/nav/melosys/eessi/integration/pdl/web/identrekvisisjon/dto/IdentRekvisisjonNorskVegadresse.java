@@ -211,25 +211,31 @@ public class IdentRekvisisjonNorskVegadresse extends Vegadresse {
         if (!super.equals(o)) return false;
         final java.lang.Object this$adressenavn = this.getAdressenavn();
         final java.lang.Object other$adressenavn = other.getAdressenavn();
-        if (this$adressenavn == null ? other$adressenavn != null : !this$adressenavn.equals(other$adressenavn)) return false;
+        if (this$adressenavn == null ? other$adressenavn != null : !this$adressenavn.equals(other$adressenavn))
+            return false;
         final java.lang.Object this$husnummer = this.getHusnummer();
         final java.lang.Object other$husnummer = other.getHusnummer();
         if (this$husnummer == null ? other$husnummer != null : !this$husnummer.equals(other$husnummer)) return false;
         final java.lang.Object this$husbokstav = this.getHusbokstav();
         final java.lang.Object other$husbokstav = other.getHusbokstav();
-        if (this$husbokstav == null ? other$husbokstav != null : !this$husbokstav.equals(other$husbokstav)) return false;
+        if (this$husbokstav == null ? other$husbokstav != null : !this$husbokstav.equals(other$husbokstav))
+            return false;
         final java.lang.Object this$postnummer = this.getPostnummer();
         final java.lang.Object other$postnummer = other.getPostnummer();
-        if (this$postnummer == null ? other$postnummer != null : !this$postnummer.equals(other$postnummer)) return false;
+        if (this$postnummer == null ? other$postnummer != null : !this$postnummer.equals(other$postnummer))
+            return false;
         final java.lang.Object this$bruksenhetsnummer = this.getBruksenhetsnummer();
         final java.lang.Object other$bruksenhetsnummer = other.getBruksenhetsnummer();
-        if (this$bruksenhetsnummer == null ? other$bruksenhetsnummer != null : !this$bruksenhetsnummer.equals(other$bruksenhetsnummer)) return false;
+        if (this$bruksenhetsnummer == null ? other$bruksenhetsnummer != null : !this$bruksenhetsnummer.equals(other$bruksenhetsnummer))
+            return false;
         final java.lang.Object this$tilleggsnavn = this.getTilleggsnavn();
         final java.lang.Object other$tilleggsnavn = other.getTilleggsnavn();
-        if (this$tilleggsnavn == null ? other$tilleggsnavn != null : !this$tilleggsnavn.equals(other$tilleggsnavn)) return false;
+        if (this$tilleggsnavn == null ? other$tilleggsnavn != null : !this$tilleggsnavn.equals(other$tilleggsnavn))
+            return false;
         final java.lang.Object this$matrikkelId = this.getMatrikkelId();
         final java.lang.Object other$matrikkelId = other.getMatrikkelId();
-        if (this$matrikkelId == null ? other$matrikkelId != null : !this$matrikkelId.equals(other$matrikkelId)) return false;
+        if (this$matrikkelId == null ? other$matrikkelId != null : !this$matrikkelId.equals(other$matrikkelId))
+            return false;
         return true;
     }
 

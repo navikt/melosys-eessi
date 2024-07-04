@@ -69,7 +69,8 @@ public class Arbeidssted {
         if (this$adresse == null ? other$adresse != null : !this$adresse.equals(other$adresse)) return false;
         final java.lang.Object this$hjemmebase = this.getHjemmebase();
         final java.lang.Object other$hjemmebase = other.getHjemmebase();
-        if (this$hjemmebase == null ? other$hjemmebase != null : !this$hjemmebase.equals(other$hjemmebase)) return false;
+        if (this$hjemmebase == null ? other$hjemmebase != null : !this$hjemmebase.equals(other$hjemmebase))
+            return false;
         return true;
     }
 

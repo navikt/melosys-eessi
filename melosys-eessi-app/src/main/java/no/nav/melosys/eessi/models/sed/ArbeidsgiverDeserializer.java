@@ -14,7 +14,8 @@ import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
 
 public class ArbeidsgiverDeserializer extends StdDeserializer<List<Arbeidsgiver>> {
 
-    private static final TypeReference<List<Arbeidsgiver >> LIST_TYPE_REFERENCE = new TypeReference<>(){};
+    private static final TypeReference<List<Arbeidsgiver>> LIST_TYPE_REFERENCE = new TypeReference<>() {
+    };
 
     @SuppressWarnings("unused")
     public ArbeidsgiverDeserializer() {

@@ -4,7 +4,7 @@ import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 
-public class SedGrunnlagMapperA001 implements SedGrunnlagMapper{
+public class SedGrunnlagMapperA001 implements SedGrunnlagMapper {
 
     @Override
     public SedGrunnlagDto map(SED sed) {

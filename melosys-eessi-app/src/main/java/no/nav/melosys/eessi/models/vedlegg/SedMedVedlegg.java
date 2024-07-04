@@ -8,118 +8,118 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public final class SedMedVedlegg {
-  private final BinaerFil sed;
-  private final List<BinaerFil> vedlegg;
+    private final BinaerFil sed;
+    private final List<BinaerFil> vedlegg;
 
-  public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedlegg) {
-    this.sed = sed;
-    this.vedlegg = vedlegg != null ? vedlegg : Collections.emptyList();
-  }
+    public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedlegg) {
+        this.sed = sed;
+        this.vedlegg = vedlegg != null ? vedlegg : Collections.emptyList();
+    }
 
 
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  public static final class BinaerFil {
-    private final String filnavn;
-    private final String mimeType;
-    private final byte[] innhold;
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    public static final class BinaerFil {
+        private final String filnavn;
+        private final String mimeType;
+        private final byte[] innhold;
 
-    public BinaerFil(String filnavn, String mimeType, byte[] innhold) {
-      this.filnavn = filnavn;
-      this.mimeType = mimeType;
-      this.innhold = innhold;
+        public BinaerFil(String filnavn, String mimeType, byte[] innhold) {
+            this.filnavn = filnavn;
+            this.mimeType = mimeType;
+            this.innhold = innhold;
+        }
+
+        @java.lang.SuppressWarnings("all")
+        public String getFilnavn() {
+            return this.filnavn;
+        }
+
+        @java.lang.SuppressWarnings("all")
+        public String getMimeType() {
+            return this.mimeType;
+        }
+
+        @java.lang.SuppressWarnings("all")
+        public byte[] getInnhold() {
+            return this.innhold;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+        public boolean equals(final java.lang.Object o) {
+            if (o == this) return true;
+            if (!(o instanceof SedMedVedlegg.BinaerFil)) return false;
+            final SedMedVedlegg.BinaerFil other = (SedMedVedlegg.BinaerFil) o;
+            final java.lang.Object this$filnavn = this.getFilnavn();
+            final java.lang.Object other$filnavn = other.getFilnavn();
+            if (this$filnavn == null ? other$filnavn != null : !this$filnavn.equals(other$filnavn)) return false;
+            final java.lang.Object this$mimeType = this.getMimeType();
+            final java.lang.Object other$mimeType = other.getMimeType();
+            if (this$mimeType == null ? other$mimeType != null : !this$mimeType.equals(other$mimeType)) return false;
+            if (!java.util.Arrays.equals(this.getInnhold(), other.getInnhold())) return false;
+            return true;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+        public int hashCode() {
+            final int PRIME = 59;
+            int result = 1;
+            final java.lang.Object $filnavn = this.getFilnavn();
+            result = result * PRIME + ($filnavn == null ? 43 : $filnavn.hashCode());
+            final java.lang.Object $mimeType = this.getMimeType();
+            result = result * PRIME + ($mimeType == null ? 43 : $mimeType.hashCode());
+            result = result * PRIME + java.util.Arrays.hashCode(this.getInnhold());
+            return result;
+        }
+
+        @java.lang.Override
+        @java.lang.SuppressWarnings("all")
+        public java.lang.String toString() {
+            return "SedMedVedlegg.BinaerFil(filnavn=" + this.getFilnavn() + ", mimeType=" + this.getMimeType() + ", innhold=" + java.util.Arrays.toString(this.getInnhold()) + ")";
+        }
     }
 
     @java.lang.SuppressWarnings("all")
-    public String getFilnavn() {
-      return this.filnavn;
+    public BinaerFil getSed() {
+        return this.sed;
     }
 
     @java.lang.SuppressWarnings("all")
-    public String getMimeType() {
-      return this.mimeType;
-    }
-
-    @java.lang.SuppressWarnings("all")
-    public byte[] getInnhold() {
-      return this.innhold;
+    public List<BinaerFil> getVedlegg() {
+        return this.vedlegg;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
     public boolean equals(final java.lang.Object o) {
-      if (o == this) return true;
-      if (!(o instanceof SedMedVedlegg.BinaerFil)) return false;
-      final SedMedVedlegg.BinaerFil other = (SedMedVedlegg.BinaerFil) o;
-      final java.lang.Object this$filnavn = this.getFilnavn();
-      final java.lang.Object other$filnavn = other.getFilnavn();
-      if (this$filnavn == null ? other$filnavn != null : !this$filnavn.equals(other$filnavn)) return false;
-      final java.lang.Object this$mimeType = this.getMimeType();
-      final java.lang.Object other$mimeType = other.getMimeType();
-      if (this$mimeType == null ? other$mimeType != null : !this$mimeType.equals(other$mimeType)) return false;
-      if (!java.util.Arrays.equals(this.getInnhold(), other.getInnhold())) return false;
-      return true;
+        if (o == this) return true;
+        if (!(o instanceof SedMedVedlegg)) return false;
+        final SedMedVedlegg other = (SedMedVedlegg) o;
+        final java.lang.Object this$sed = this.getSed();
+        final java.lang.Object other$sed = other.getSed();
+        if (this$sed == null ? other$sed != null : !this$sed.equals(other$sed)) return false;
+        final java.lang.Object this$vedlegg = this.getVedlegg();
+        final java.lang.Object other$vedlegg = other.getVedlegg();
+        if (this$vedlegg == null ? other$vedlegg != null : !this$vedlegg.equals(other$vedlegg)) return false;
+        return true;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
     public int hashCode() {
-      final int PRIME = 59;
-      int result = 1;
-      final java.lang.Object $filnavn = this.getFilnavn();
-      result = result * PRIME + ($filnavn == null ? 43 : $filnavn.hashCode());
-      final java.lang.Object $mimeType = this.getMimeType();
-      result = result * PRIME + ($mimeType == null ? 43 : $mimeType.hashCode());
-      result = result * PRIME + java.util.Arrays.hashCode(this.getInnhold());
-      return result;
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $sed = this.getSed();
+        result = result * PRIME + ($sed == null ? 43 : $sed.hashCode());
+        final java.lang.Object $vedlegg = this.getVedlegg();
+        result = result * PRIME + ($vedlegg == null ? 43 : $vedlegg.hashCode());
+        return result;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
     public java.lang.String toString() {
-      return "SedMedVedlegg.BinaerFil(filnavn=" + this.getFilnavn() + ", mimeType=" + this.getMimeType() + ", innhold=" + java.util.Arrays.toString(this.getInnhold()) + ")";
+        return "SedMedVedlegg(sed=" + this.getSed() + ", vedlegg=" + this.getVedlegg() + ")";
     }
-  }
-
-  @java.lang.SuppressWarnings("all")
-  public BinaerFil getSed() {
-    return this.sed;
-  }
-
-  @java.lang.SuppressWarnings("all")
-  public List<BinaerFil> getVedlegg() {
-    return this.vedlegg;
-  }
-
-  @java.lang.Override
-  @java.lang.SuppressWarnings("all")
-  public boolean equals(final java.lang.Object o) {
-    if (o == this) return true;
-    if (!(o instanceof SedMedVedlegg)) return false;
-    final SedMedVedlegg other = (SedMedVedlegg) o;
-    final java.lang.Object this$sed = this.getSed();
-    final java.lang.Object other$sed = other.getSed();
-    if (this$sed == null ? other$sed != null : !this$sed.equals(other$sed)) return false;
-    final java.lang.Object this$vedlegg = this.getVedlegg();
-    final java.lang.Object other$vedlegg = other.getVedlegg();
-    if (this$vedlegg == null ? other$vedlegg != null : !this$vedlegg.equals(other$vedlegg)) return false;
-    return true;
-  }
-
-  @java.lang.Override
-  @java.lang.SuppressWarnings("all")
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    final java.lang.Object $sed = this.getSed();
-    result = result * PRIME + ($sed == null ? 43 : $sed.hashCode());
-    final java.lang.Object $vedlegg = this.getVedlegg();
-    result = result * PRIME + ($vedlegg == null ? 43 : $vedlegg.hashCode());
-    return result;
-  }
-
-  @java.lang.Override
-  @java.lang.SuppressWarnings("all")
-  public java.lang.String toString() {
-    return "SedMedVedlegg(sed=" + this.getSed() + ", vedlegg=" + this.getVedlegg() + ")";
-  }
 }

@@ -27,7 +27,8 @@ public class PDLHentIdenterResponse {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$hentIdenter = this.getHentIdenter();
         final java.lang.Object other$hentIdenter = other.getHentIdenter();
-        if (this$hentIdenter == null ? other$hentIdenter != null : !this$hentIdenter.equals(other$hentIdenter)) return false;
+        if (this$hentIdenter == null ? other$hentIdenter != null : !this$hentIdenter.equals(other$hentIdenter))
+            return false;
         return true;
     }
 

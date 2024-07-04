@@ -49,10 +49,12 @@ public class UtpekingAvvisDto {
         if (this.isVilSendeAnmodningOmMerInformasjon() != other.isVilSendeAnmodningOmMerInformasjon()) return false;
         final java.lang.Object this$nyttLovvalgsland = this.getNyttLovvalgsland();
         final java.lang.Object other$nyttLovvalgsland = other.getNyttLovvalgsland();
-        if (this$nyttLovvalgsland == null ? other$nyttLovvalgsland != null : !this$nyttLovvalgsland.equals(other$nyttLovvalgsland)) return false;
+        if (this$nyttLovvalgsland == null ? other$nyttLovvalgsland != null : !this$nyttLovvalgsland.equals(other$nyttLovvalgsland))
+            return false;
         final java.lang.Object this$begrunnelseUtenlandskMyndighet = this.getBegrunnelseUtenlandskMyndighet();
         final java.lang.Object other$begrunnelseUtenlandskMyndighet = other.getBegrunnelseUtenlandskMyndighet();
-        if (this$begrunnelseUtenlandskMyndighet == null ? other$begrunnelseUtenlandskMyndighet != null : !this$begrunnelseUtenlandskMyndighet.equals(other$begrunnelseUtenlandskMyndighet)) return false;
+        if (this$begrunnelseUtenlandskMyndighet == null ? other$begrunnelseUtenlandskMyndighet != null : !this$begrunnelseUtenlandskMyndighet.equals(other$begrunnelseUtenlandskMyndighet))
+            return false;
         return true;
     }
 

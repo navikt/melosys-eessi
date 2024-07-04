@@ -45,7 +45,8 @@ public class SpesielleOmstendigheter {
         if (this$type == null ? other$type != null : !this$type.equals(other$type)) return false;
         final java.lang.Object this$beskrivelseannensituasjon = this.getBeskrivelseannensituasjon();
         final java.lang.Object other$beskrivelseannensituasjon = other.getBeskrivelseannensituasjon();
-        if (this$beskrivelseannensituasjon == null ? other$beskrivelseannensituasjon != null : !this$beskrivelseannensituasjon.equals(other$beskrivelseannensituasjon)) return false;
+        if (this$beskrivelseannensituasjon == null ? other$beskrivelseannensituasjon != null : !this$beskrivelseannensituasjon.equals(other$beskrivelseannensituasjon))
+            return false;
         return true;
     }
 

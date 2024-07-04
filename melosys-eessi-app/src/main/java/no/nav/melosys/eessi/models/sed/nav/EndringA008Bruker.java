@@ -5,69 +5,69 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class EndringA008Bruker {
-        private String fornavn;
-        private String etternavn;
+    private String fornavn;
+    private String etternavn;
 
-        @java.lang.SuppressWarnings("all")
-        public EndringA008Bruker() {
-        }
+    @java.lang.SuppressWarnings("all")
+    public EndringA008Bruker() {
+    }
 
-        @java.lang.SuppressWarnings("all")
-        public String getFornavn() {
-                return this.fornavn;
-        }
+    @java.lang.SuppressWarnings("all")
+    public String getFornavn() {
+        return this.fornavn;
+    }
 
-        @java.lang.SuppressWarnings("all")
-        public String getEtternavn() {
-                return this.etternavn;
-        }
+    @java.lang.SuppressWarnings("all")
+    public String getEtternavn() {
+        return this.etternavn;
+    }
 
-        @java.lang.SuppressWarnings("all")
-        public void setFornavn(final String fornavn) {
-                this.fornavn = fornavn;
-        }
+    @java.lang.SuppressWarnings("all")
+    public void setFornavn(final String fornavn) {
+        this.fornavn = fornavn;
+    }
 
-        @java.lang.SuppressWarnings("all")
-        public void setEtternavn(final String etternavn) {
-                this.etternavn = etternavn;
-        }
+    @java.lang.SuppressWarnings("all")
+    public void setEtternavn(final String etternavn) {
+        this.etternavn = etternavn;
+    }
 
-        @java.lang.Override
-        @java.lang.SuppressWarnings("all")
-        public boolean equals(final java.lang.Object o) {
-                if (o == this) return true;
-                if (!(o instanceof EndringA008Bruker)) return false;
-                final EndringA008Bruker other = (EndringA008Bruker) o;
-                if (!other.canEqual((java.lang.Object) this)) return false;
-                final java.lang.Object this$fornavn = this.getFornavn();
-                final java.lang.Object other$fornavn = other.getFornavn();
-                if (this$fornavn == null ? other$fornavn != null : !this$fornavn.equals(other$fornavn)) return false;
-                final java.lang.Object this$etternavn = this.getEtternavn();
-                final java.lang.Object other$etternavn = other.getEtternavn();
-                if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
-                return true;
-        }
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+    public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof EndringA008Bruker)) return false;
+        final EndringA008Bruker other = (EndringA008Bruker) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$fornavn = this.getFornavn();
+        final java.lang.Object other$fornavn = other.getFornavn();
+        if (this$fornavn == null ? other$fornavn != null : !this$fornavn.equals(other$fornavn)) return false;
+        final java.lang.Object this$etternavn = this.getEtternavn();
+        final java.lang.Object other$etternavn = other.getEtternavn();
+        if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
+        return true;
+    }
 
-        @java.lang.SuppressWarnings("all")
-        protected boolean canEqual(final java.lang.Object other) {
-                return other instanceof EndringA008Bruker;
-        }
+    @java.lang.SuppressWarnings("all")
+    protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof EndringA008Bruker;
+    }
 
-        @java.lang.Override
-        @java.lang.SuppressWarnings("all")
-        public int hashCode() {
-                final int PRIME = 59;
-                int result = 1;
-                final java.lang.Object $fornavn = this.getFornavn();
-                result = result * PRIME + ($fornavn == null ? 43 : $fornavn.hashCode());
-                final java.lang.Object $etternavn = this.getEtternavn();
-                result = result * PRIME + ($etternavn == null ? 43 : $etternavn.hashCode());
-                return result;
-        }
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $fornavn = this.getFornavn();
+        result = result * PRIME + ($fornavn == null ? 43 : $fornavn.hashCode());
+        final java.lang.Object $etternavn = this.getEtternavn();
+        result = result * PRIME + ($etternavn == null ? 43 : $etternavn.hashCode());
+        return result;
+    }
 
-        @java.lang.Override
-        @java.lang.SuppressWarnings("all")
-        public java.lang.String toString() {
-                return "EndringA008Bruker(fornavn=" + this.getFornavn() + ", etternavn=" + this.getEtternavn() + ")";
-        }
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+    public java.lang.String toString() {
+        return "EndringA008Bruker(fornavn=" + this.getFornavn() + ", etternavn=" + this.getEtternavn() + ")";
+    }
 }

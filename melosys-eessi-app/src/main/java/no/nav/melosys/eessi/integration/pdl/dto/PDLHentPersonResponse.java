@@ -27,7 +27,8 @@ public class PDLHentPersonResponse {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$hentPerson = this.getHentPerson();
         final java.lang.Object other$hentPerson = other.getHentPerson();
-        if (this$hentPerson == null ? other$hentPerson != null : !this$hentPerson.equals(other$hentPerson)) return false;
+        if (this$hentPerson == null ? other$hentPerson != null : !this$hentPerson.equals(other$hentPerson))
+            return false;
         return true;
     }
 

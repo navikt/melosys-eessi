@@ -110,13 +110,16 @@ public class SedKontekst {
         if (this$navIdent == null ? other$navIdent != null : !this$navIdent.equals(other$navIdent)) return false;
         final java.lang.Object this$journalpostID = this.getJournalpostID();
         final java.lang.Object other$journalpostID = other.getJournalpostID();
-        if (this$journalpostID == null ? other$journalpostID != null : !this$journalpostID.equals(other$journalpostID)) return false;
+        if (this$journalpostID == null ? other$journalpostID != null : !this$journalpostID.equals(other$journalpostID))
+            return false;
         final java.lang.Object this$dokumentID = this.getDokumentID();
         final java.lang.Object other$dokumentID = other.getDokumentID();
-        if (this$dokumentID == null ? other$dokumentID != null : !this$dokumentID.equals(other$dokumentID)) return false;
+        if (this$dokumentID == null ? other$dokumentID != null : !this$dokumentID.equals(other$dokumentID))
+            return false;
         final java.lang.Object this$gsakSaksnummer = this.getGsakSaksnummer();
         final java.lang.Object other$gsakSaksnummer = other.getGsakSaksnummer();
-        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer)) return false;
+        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer))
+            return false;
         final java.lang.Object this$oppgaveID = this.getOppgaveID();
         final java.lang.Object other$oppgaveID = other.getOppgaveID();
         if (this$oppgaveID == null ? other$oppgaveID != null : !this$oppgaveID.equals(other$oppgaveID)) return false;

@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.melosys.eessi.repository.SedMottattRepository;
 import org.springframework.stereotype.Component;
+
 //TODO: må erstattes med nye metrikker
 @Component
 @Deprecated(forRemoval = true)

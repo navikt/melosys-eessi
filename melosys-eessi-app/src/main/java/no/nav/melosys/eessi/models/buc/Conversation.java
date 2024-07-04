@@ -61,7 +61,8 @@ public class Conversation {
         if (this$versionId == null ? other$versionId != null : !this$versionId.equals(other$versionId)) return false;
         final java.lang.Object this$participants = this.getParticipants();
         final java.lang.Object other$participants = other.getParticipants();
-        if (this$participants == null ? other$participants != null : !this$participants.equals(other$participants)) return false;
+        if (this$participants == null ? other$participants != null : !this$participants.equals(other$participants))
+            return false;
         return true;
     }
 

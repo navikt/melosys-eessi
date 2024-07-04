@@ -49,13 +49,16 @@ public abstract class Vedtak {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$datoforrigevedtak = this.getDatoforrigevedtak();
         final java.lang.Object other$datoforrigevedtak = other.getDatoforrigevedtak();
-        if (this$datoforrigevedtak == null ? other$datoforrigevedtak != null : !this$datoforrigevedtak.equals(other$datoforrigevedtak)) return false;
+        if (this$datoforrigevedtak == null ? other$datoforrigevedtak != null : !this$datoforrigevedtak.equals(other$datoforrigevedtak))
+            return false;
         final java.lang.Object this$eropprinneligvedtak = this.getEropprinneligvedtak();
         final java.lang.Object other$eropprinneligvedtak = other.getEropprinneligvedtak();
-        if (this$eropprinneligvedtak == null ? other$eropprinneligvedtak != null : !this$eropprinneligvedtak.equals(other$eropprinneligvedtak)) return false;
+        if (this$eropprinneligvedtak == null ? other$eropprinneligvedtak != null : !this$eropprinneligvedtak.equals(other$eropprinneligvedtak))
+            return false;
         final java.lang.Object this$erendringsvedtak = this.getErendringsvedtak();
         final java.lang.Object other$erendringsvedtak = other.getErendringsvedtak();
-        if (this$erendringsvedtak == null ? other$erendringsvedtak != null : !this$erendringsvedtak.equals(other$erendringsvedtak)) return false;
+        if (this$erendringsvedtak == null ? other$erendringsvedtak != null : !this$erendringsvedtak.equals(other$erendringsvedtak))
+            return false;
         return true;
     }
 

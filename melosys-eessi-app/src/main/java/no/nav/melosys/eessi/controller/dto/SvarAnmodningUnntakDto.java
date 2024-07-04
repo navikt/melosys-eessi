@@ -49,13 +49,16 @@ public class SvarAnmodningUnntakDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$beslutning = this.getBeslutning();
         final java.lang.Object other$beslutning = other.getBeslutning();
-        if (this$beslutning == null ? other$beslutning != null : !this$beslutning.equals(other$beslutning)) return false;
+        if (this$beslutning == null ? other$beslutning != null : !this$beslutning.equals(other$beslutning))
+            return false;
         final java.lang.Object this$begrunnelse = this.getBegrunnelse();
         final java.lang.Object other$begrunnelse = other.getBegrunnelse();
-        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse)) return false;
+        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse))
+            return false;
         final java.lang.Object this$delvisInnvilgetPeriode = this.getDelvisInnvilgetPeriode();
         final java.lang.Object other$delvisInnvilgetPeriode = other.getDelvisInnvilgetPeriode();
-        if (this$delvisInnvilgetPeriode == null ? other$delvisInnvilgetPeriode != null : !this$delvisInnvilgetPeriode.equals(other$delvisInnvilgetPeriode)) return false;
+        if (this$delvisInnvilgetPeriode == null ? other$delvisInnvilgetPeriode != null : !this$delvisInnvilgetPeriode.equals(other$delvisInnvilgetPeriode))
+            return false;
         return true;
     }
 

@@ -30,7 +30,8 @@ public class Creator {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$organisation = this.getOrganisation();
         final java.lang.Object other$organisation = other.getOrganisation();
-        if (this$organisation == null ? other$organisation != null : !this$organisation.equals(other$organisation)) return false;
+        if (this$organisation == null ? other$organisation != null : !this$organisation.equals(other$organisation))
+            return false;
         return true;
     }
 

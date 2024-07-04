@@ -197,13 +197,16 @@ public final class PersonModell {
         if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
         final java.lang.Object this$fødselsdato = this.getFødselsdato();
         final java.lang.Object other$fødselsdato = other.getFødselsdato();
-        if (this$fødselsdato == null ? other$fødselsdato != null : !this$fødselsdato.equals(other$fødselsdato)) return false;
+        if (this$fødselsdato == null ? other$fødselsdato != null : !this$fødselsdato.equals(other$fødselsdato))
+            return false;
         final java.lang.Object this$statsborgerskapLandkodeISO2 = this.getStatsborgerskapLandkodeISO2();
         final java.lang.Object other$statsborgerskapLandkodeISO2 = other.getStatsborgerskapLandkodeISO2();
-        if (this$statsborgerskapLandkodeISO2 == null ? other$statsborgerskapLandkodeISO2 != null : !this$statsborgerskapLandkodeISO2.equals(other$statsborgerskapLandkodeISO2)) return false;
+        if (this$statsborgerskapLandkodeISO2 == null ? other$statsborgerskapLandkodeISO2 != null : !this$statsborgerskapLandkodeISO2.equals(other$statsborgerskapLandkodeISO2))
+            return false;
         final java.lang.Object this$utenlandskId = this.getUtenlandskId();
         final java.lang.Object other$utenlandskId = other.getUtenlandskId();
-        if (this$utenlandskId == null ? other$utenlandskId != null : !this$utenlandskId.equals(other$utenlandskId)) return false;
+        if (this$utenlandskId == null ? other$utenlandskId != null : !this$utenlandskId.equals(other$utenlandskId))
+            return false;
         final java.lang.Object this$kjønn = this.getKjønn();
         final java.lang.Object other$kjønn = other.getKjønn();
         if (this$kjønn == null ? other$kjønn != null : !this$kjønn.equals(other$kjønn)) return false;

@@ -90,13 +90,16 @@ public class PDLPerson {
         if (this$foedsel == null ? other$foedsel != null : !this$foedsel.equals(other$foedsel)) return false;
         final java.lang.Object this$statsborgerskap = this.getStatsborgerskap();
         final java.lang.Object other$statsborgerskap = other.getStatsborgerskap();
-        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap)) return false;
+        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap))
+            return false;
         final java.lang.Object this$folkeregisterpersonstatus = this.getFolkeregisterpersonstatus();
         final java.lang.Object other$folkeregisterpersonstatus = other.getFolkeregisterpersonstatus();
-        if (this$folkeregisterpersonstatus == null ? other$folkeregisterpersonstatus != null : !this$folkeregisterpersonstatus.equals(other$folkeregisterpersonstatus)) return false;
+        if (this$folkeregisterpersonstatus == null ? other$folkeregisterpersonstatus != null : !this$folkeregisterpersonstatus.equals(other$folkeregisterpersonstatus))
+            return false;
         final java.lang.Object this$utenlandskIdentifikasjonsnummer = this.getUtenlandskIdentifikasjonsnummer();
         final java.lang.Object other$utenlandskIdentifikasjonsnummer = other.getUtenlandskIdentifikasjonsnummer();
-        if (this$utenlandskIdentifikasjonsnummer == null ? other$utenlandskIdentifikasjonsnummer != null : !this$utenlandskIdentifikasjonsnummer.equals(other$utenlandskIdentifikasjonsnummer)) return false;
+        if (this$utenlandskIdentifikasjonsnummer == null ? other$utenlandskIdentifikasjonsnummer != null : !this$utenlandskIdentifikasjonsnummer.equals(other$utenlandskIdentifikasjonsnummer))
+            return false;
         final java.lang.Object this$kjoenn = this.getKjoenn();
         final java.lang.Object other$kjoenn = other.getKjoenn();
         if (this$kjoenn == null ? other$kjoenn != null : !this$kjoenn.equals(other$kjoenn)) return false;

@@ -30,7 +30,8 @@ public class X001Anmodning {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$avslutning = this.getAvslutning();
         final java.lang.Object other$avslutning = other.getAvslutning();
-        if (this$avslutning == null ? other$avslutning != null : !this$avslutning.equals(other$avslutning)) return false;
+        if (this$avslutning == null ? other$avslutning != null : !this$avslutning.equals(other$avslutning))
+            return false;
         return true;
     }
 

@@ -69,7 +69,8 @@ public class PDLMetadata {
         if (this.isHistorisk() != other.isHistorisk()) return false;
         final java.lang.Object this$opplysningsId = this.getOpplysningsId();
         final java.lang.Object other$opplysningsId = other.getOpplysningsId();
-        if (this$opplysningsId == null ? other$opplysningsId != null : !this$opplysningsId.equals(other$opplysningsId)) return false;
+        if (this$opplysningsId == null ? other$opplysningsId != null : !this$opplysningsId.equals(other$opplysningsId))
+            return false;
         final java.lang.Object this$master = this.getMaster();
         final java.lang.Object other$master = other.getMaster();
         if (this$master == null ? other$master != null : !this$master.equals(other$master)) return false;

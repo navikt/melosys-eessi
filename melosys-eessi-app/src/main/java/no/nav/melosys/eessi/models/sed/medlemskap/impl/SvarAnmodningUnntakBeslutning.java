@@ -14,8 +14,8 @@ public enum SvarAnmodningUnntakBeslutning {
     private final String rinaKode;
 
     private static final Map<String, SvarAnmodningUnntakBeslutning> rel = Collections.unmodifiableMap(
-            Arrays.stream(values())
-                    .collect(Collectors.toMap(SvarAnmodningUnntakBeslutning::getRinaKode, e -> e)));
+        Arrays.stream(values())
+            .collect(Collectors.toMap(SvarAnmodningUnntakBeslutning::getRinaKode, e -> e)));
 
     SvarAnmodningUnntakBeslutning(String rinaKode) {
         this.rinaKode = rinaKode;

@@ -79,10 +79,12 @@ public class MedlemskapA003 implements Medlemskap {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$gjeldendereglerEC883 = this.getGjeldendereglerEC883();
         final java.lang.Object other$gjeldendereglerEC883 = other.getGjeldendereglerEC883();
-        if (this$gjeldendereglerEC883 == null ? other$gjeldendereglerEC883 != null : !this$gjeldendereglerEC883.equals(other$gjeldendereglerEC883)) return false;
+        if (this$gjeldendereglerEC883 == null ? other$gjeldendereglerEC883 != null : !this$gjeldendereglerEC883.equals(other$gjeldendereglerEC883))
+            return false;
         final java.lang.Object this$relevantartikkelfor8832004eller9872009 = this.getRelevantartikkelfor8832004eller9872009();
         final java.lang.Object other$relevantartikkelfor8832004eller9872009 = other.getRelevantartikkelfor8832004eller9872009();
-        if (this$relevantartikkelfor8832004eller9872009 == null ? other$relevantartikkelfor8832004eller9872009 != null : !this$relevantartikkelfor8832004eller9872009.equals(other$relevantartikkelfor8832004eller9872009)) return false;
+        if (this$relevantartikkelfor8832004eller9872009 == null ? other$relevantartikkelfor8832004eller9872009 != null : !this$relevantartikkelfor8832004eller9872009.equals(other$relevantartikkelfor8832004eller9872009))
+            return false;
         final java.lang.Object this$andreland = this.getAndreland();
         final java.lang.Object other$andreland = other.getAndreland();
         if (this$andreland == null ? other$andreland != null : !this$andreland.equals(other$andreland)) return false;
@@ -91,7 +93,8 @@ public class MedlemskapA003 implements Medlemskap {
         if (this$vedtak == null ? other$vedtak != null : !this$vedtak.equals(other$vedtak)) return false;
         final java.lang.Object this$isDeterminationProvisional = this.getIsDeterminationProvisional();
         final java.lang.Object other$isDeterminationProvisional = other.getIsDeterminationProvisional();
-        if (this$isDeterminationProvisional == null ? other$isDeterminationProvisional != null : !this$isDeterminationProvisional.equals(other$isDeterminationProvisional)) return false;
+        if (this$isDeterminationProvisional == null ? other$isDeterminationProvisional != null : !this$isDeterminationProvisional.equals(other$isDeterminationProvisional))
+            return false;
         return true;
     }
 

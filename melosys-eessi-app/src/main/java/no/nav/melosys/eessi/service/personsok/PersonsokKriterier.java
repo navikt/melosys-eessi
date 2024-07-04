@@ -142,10 +142,12 @@ public class PersonsokKriterier {
         if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
         final java.lang.Object this$foedselsdato = this.getFoedselsdato();
         final java.lang.Object other$foedselsdato = other.getFoedselsdato();
-        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato)) return false;
+        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato))
+            return false;
         final java.lang.Object this$statsborgerskapISO2 = this.getStatsborgerskapISO2();
         final java.lang.Object other$statsborgerskapISO2 = other.getStatsborgerskapISO2();
-        if (this$statsborgerskapISO2 == null ? other$statsborgerskapISO2 != null : !this$statsborgerskapISO2.equals(other$statsborgerskapISO2)) return false;
+        if (this$statsborgerskapISO2 == null ? other$statsborgerskapISO2 != null : !this$statsborgerskapISO2.equals(other$statsborgerskapISO2))
+            return false;
         return true;
     }
 

@@ -40,7 +40,8 @@ public class PDLFoedsel implements HarMetadata {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$foedselsdato = this.getFoedselsdato();
         final java.lang.Object other$foedselsdato = other.getFoedselsdato();
-        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato)) return false;
+        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato))
+            return false;
         final java.lang.Object this$metadata = this.getMetadata();
         final java.lang.Object other$metadata = other.getMetadata();
         if (this$metadata == null ? other$metadata != null : !this$metadata.equals(other$metadata)) return false;

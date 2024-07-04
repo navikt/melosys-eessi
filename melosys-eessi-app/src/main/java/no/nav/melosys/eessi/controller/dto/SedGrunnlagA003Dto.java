@@ -56,10 +56,12 @@ public class SedGrunnlagA003Dto extends SedGrunnlagDto {
         if (!super.equals(o)) return false;
         final java.lang.Object this$overgangsregelbestemmelser = this.getOvergangsregelbestemmelser();
         final java.lang.Object other$overgangsregelbestemmelser = other.getOvergangsregelbestemmelser();
-        if (this$overgangsregelbestemmelser == null ? other$overgangsregelbestemmelser != null : !this$overgangsregelbestemmelser.equals(other$overgangsregelbestemmelser)) return false;
+        if (this$overgangsregelbestemmelser == null ? other$overgangsregelbestemmelser != null : !this$overgangsregelbestemmelser.equals(other$overgangsregelbestemmelser))
+            return false;
         final java.lang.Object this$norskeArbeidsgivendeVirksomheter = this.getNorskeArbeidsgivendeVirksomheter();
         final java.lang.Object other$norskeArbeidsgivendeVirksomheter = other.getNorskeArbeidsgivendeVirksomheter();
-        if (this$norskeArbeidsgivendeVirksomheter == null ? other$norskeArbeidsgivendeVirksomheter != null : !this$norskeArbeidsgivendeVirksomheter.equals(other$norskeArbeidsgivendeVirksomheter)) return false;
+        if (this$norskeArbeidsgivendeVirksomheter == null ? other$norskeArbeidsgivendeVirksomheter != null : !this$norskeArbeidsgivendeVirksomheter.equals(other$norskeArbeidsgivendeVirksomheter))
+            return false;
         return true;
     }
 

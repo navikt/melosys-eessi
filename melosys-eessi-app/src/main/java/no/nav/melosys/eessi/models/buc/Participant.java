@@ -59,7 +59,8 @@ public class Participant {
         if (this$role == null ? other$role != null : !this$role.equals(other$role)) return false;
         final java.lang.Object this$organisation = this.getOrganisation();
         final java.lang.Object other$organisation = other.getOrganisation();
-        if (this$organisation == null ? other$organisation != null : !this$organisation.equals(other$organisation)) return false;
+        if (this$organisation == null ? other$organisation != null : !this$organisation.equals(other$organisation))
+            return false;
         return true;
     }
 

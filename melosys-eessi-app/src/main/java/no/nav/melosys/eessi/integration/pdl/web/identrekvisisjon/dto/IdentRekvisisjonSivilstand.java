@@ -56,16 +56,20 @@ public class IdentRekvisisjonSivilstand {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$sivilstand = this.getSivilstand();
         final java.lang.Object other$sivilstand = other.getSivilstand();
-        if (this$sivilstand == null ? other$sivilstand != null : !this$sivilstand.equals(other$sivilstand)) return false;
+        if (this$sivilstand == null ? other$sivilstand != null : !this$sivilstand.equals(other$sivilstand))
+            return false;
         final java.lang.Object this$sivilstandsdato = this.getSivilstandsdato();
         final java.lang.Object other$sivilstandsdato = other.getSivilstandsdato();
-        if (this$sivilstandsdato == null ? other$sivilstandsdato != null : !this$sivilstandsdato.equals(other$sivilstandsdato)) return false;
+        if (this$sivilstandsdato == null ? other$sivilstandsdato != null : !this$sivilstandsdato.equals(other$sivilstandsdato))
+            return false;
         final java.lang.Object this$bekreftelsesdato = this.getBekreftelsesdato();
         final java.lang.Object other$bekreftelsesdato = other.getBekreftelsesdato();
-        if (this$bekreftelsesdato == null ? other$bekreftelsesdato != null : !this$bekreftelsesdato.equals(other$bekreftelsesdato)) return false;
+        if (this$bekreftelsesdato == null ? other$bekreftelsesdato != null : !this$bekreftelsesdato.equals(other$bekreftelsesdato))
+            return false;
         final java.lang.Object this$relatertVedSivilstand = this.getRelatertVedSivilstand();
         final java.lang.Object other$relatertVedSivilstand = other.getRelatertVedSivilstand();
-        if (this$relatertVedSivilstand == null ? other$relatertVedSivilstand != null : !this$relatertVedSivilstand.equals(other$relatertVedSivilstand)) return false;
+        if (this$relatertVedSivilstand == null ? other$relatertVedSivilstand != null : !this$relatertVedSivilstand.equals(other$relatertVedSivilstand))
+            return false;
         return true;
     }
 

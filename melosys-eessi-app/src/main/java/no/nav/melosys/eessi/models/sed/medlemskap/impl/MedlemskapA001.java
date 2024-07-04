@@ -117,22 +117,27 @@ public class MedlemskapA001 implements Medlemskap {
         if (this$vertsland == null ? other$vertsland != null : !this$vertsland.equals(other$vertsland)) return false;
         final java.lang.Object this$soeknadsperiode = this.getSoeknadsperiode();
         final java.lang.Object other$soeknadsperiode = other.getSoeknadsperiode();
-        if (this$soeknadsperiode == null ? other$soeknadsperiode != null : !this$soeknadsperiode.equals(other$soeknadsperiode)) return false;
+        if (this$soeknadsperiode == null ? other$soeknadsperiode != null : !this$soeknadsperiode.equals(other$soeknadsperiode))
+            return false;
         final java.lang.Object this$tidligereperiode = this.getTidligereperiode();
         final java.lang.Object other$tidligereperiode = other.getTidligereperiode();
-        if (this$tidligereperiode == null ? other$tidligereperiode != null : !this$tidligereperiode.equals(other$tidligereperiode)) return false;
+        if (this$tidligereperiode == null ? other$tidligereperiode != null : !this$tidligereperiode.equals(other$tidligereperiode))
+            return false;
         final java.lang.Object this$naavaerendemedlemskap = this.getNaavaerendemedlemskap();
         final java.lang.Object other$naavaerendemedlemskap = other.getNaavaerendemedlemskap();
-        if (this$naavaerendemedlemskap == null ? other$naavaerendemedlemskap != null : !this$naavaerendemedlemskap.equals(other$naavaerendemedlemskap)) return false;
+        if (this$naavaerendemedlemskap == null ? other$naavaerendemedlemskap != null : !this$naavaerendemedlemskap.equals(other$naavaerendemedlemskap))
+            return false;
         final java.lang.Object this$forespurtmedlemskap = this.getForespurtmedlemskap();
         final java.lang.Object other$forespurtmedlemskap = other.getForespurtmedlemskap();
-        if (this$forespurtmedlemskap == null ? other$forespurtmedlemskap != null : !this$forespurtmedlemskap.equals(other$forespurtmedlemskap)) return false;
+        if (this$forespurtmedlemskap == null ? other$forespurtmedlemskap != null : !this$forespurtmedlemskap.equals(other$forespurtmedlemskap))
+            return false;
         final java.lang.Object this$anmodning = this.getAnmodning();
         final java.lang.Object other$anmodning = other.getAnmodning();
         if (this$anmodning == null ? other$anmodning != null : !this$anmodning.equals(other$anmodning)) return false;
         final java.lang.Object this$forrigesoeknad = this.getForrigesoeknad();
         final java.lang.Object other$forrigesoeknad = other.getForrigesoeknad();
-        if (this$forrigesoeknad == null ? other$forrigesoeknad != null : !this$forrigesoeknad.equals(other$forrigesoeknad)) return false;
+        if (this$forrigesoeknad == null ? other$forrigesoeknad != null : !this$forrigesoeknad.equals(other$forrigesoeknad))
+            return false;
         return true;
     }
 

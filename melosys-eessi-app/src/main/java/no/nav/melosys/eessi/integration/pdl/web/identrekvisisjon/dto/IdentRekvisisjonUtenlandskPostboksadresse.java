@@ -169,10 +169,12 @@ public class IdentRekvisisjonUtenlandskPostboksadresse extends Postboksadresse {
         if (!super.equals(o)) return false;
         final java.lang.Object this$postboksNummerNavn = this.getPostboksNummerNavn();
         final java.lang.Object other$postboksNummerNavn = other.getPostboksNummerNavn();
-        if (this$postboksNummerNavn == null ? other$postboksNummerNavn != null : !this$postboksNummerNavn.equals(other$postboksNummerNavn)) return false;
+        if (this$postboksNummerNavn == null ? other$postboksNummerNavn != null : !this$postboksNummerNavn.equals(other$postboksNummerNavn))
+            return false;
         final java.lang.Object this$regionDistriktOmraade = this.getRegionDistriktOmraade();
         final java.lang.Object other$regionDistriktOmraade = other.getRegionDistriktOmraade();
-        if (this$regionDistriktOmraade == null ? other$regionDistriktOmraade != null : !this$regionDistriktOmraade.equals(other$regionDistriktOmraade)) return false;
+        if (this$regionDistriktOmraade == null ? other$regionDistriktOmraade != null : !this$regionDistriktOmraade.equals(other$regionDistriktOmraade))
+            return false;
         final java.lang.Object this$postkode = this.getPostkode();
         final java.lang.Object other$postkode = other.getPostkode();
         if (this$postkode == null ? other$postkode != null : !this$postkode.equals(other$postkode)) return false;

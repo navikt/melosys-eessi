@@ -67,10 +67,12 @@ public class Arbeidssted {
         if (this$adresse == null ? other$adresse != null : !this$adresse.equals(other$adresse)) return false;
         final java.lang.Object this$erikkefastadresse = this.getErikkefastadresse();
         final java.lang.Object other$erikkefastadresse = other.getErikkefastadresse();
-        if (this$erikkefastadresse == null ? other$erikkefastadresse != null : !this$erikkefastadresse.equals(other$erikkefastadresse)) return false;
+        if (this$erikkefastadresse == null ? other$erikkefastadresse != null : !this$erikkefastadresse.equals(other$erikkefastadresse))
+            return false;
         final java.lang.Object this$hjemmebase = this.getHjemmebase();
         final java.lang.Object other$hjemmebase = other.getHjemmebase();
-        if (this$hjemmebase == null ? other$hjemmebase != null : !this$hjemmebase.equals(other$hjemmebase)) return false;
+        if (this$hjemmebase == null ? other$hjemmebase != null : !this$hjemmebase.equals(other$hjemmebase))
+            return false;
         final java.lang.Object this$navn = this.getNavn();
         final java.lang.Object other$navn = other.getNavn();
         if (this$navn == null ? other$navn != null : !this$navn.equals(other$navn)) return false;

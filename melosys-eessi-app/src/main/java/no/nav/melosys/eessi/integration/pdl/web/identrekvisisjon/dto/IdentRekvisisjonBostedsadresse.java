@@ -81,10 +81,12 @@ public class IdentRekvisisjonBostedsadresse {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$gyldigFraOgMed = this.getGyldigFraOgMed();
         final java.lang.Object other$gyldigFraOgMed = other.getGyldigFraOgMed();
-        if (this$gyldigFraOgMed == null ? other$gyldigFraOgMed != null : !this$gyldigFraOgMed.equals(other$gyldigFraOgMed)) return false;
+        if (this$gyldigFraOgMed == null ? other$gyldigFraOgMed != null : !this$gyldigFraOgMed.equals(other$gyldigFraOgMed))
+            return false;
         final java.lang.Object this$utenlandskVegadresse = this.getUtenlandskVegadresse();
         final java.lang.Object other$utenlandskVegadresse = other.getUtenlandskVegadresse();
-        if (this$utenlandskVegadresse == null ? other$utenlandskVegadresse != null : !this$utenlandskVegadresse.equals(other$utenlandskVegadresse)) return false;
+        if (this$utenlandskVegadresse == null ? other$utenlandskVegadresse != null : !this$utenlandskVegadresse.equals(other$utenlandskVegadresse))
+            return false;
         return true;
     }
 

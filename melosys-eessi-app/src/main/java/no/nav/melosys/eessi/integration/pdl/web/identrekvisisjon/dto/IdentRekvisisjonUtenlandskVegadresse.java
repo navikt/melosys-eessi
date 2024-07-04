@@ -192,10 +192,12 @@ public class IdentRekvisisjonUtenlandskVegadresse extends Vegadresse {
         if (!super.equals(o)) return false;
         final java.lang.Object this$adressenavnNummer = this.getAdressenavnNummer();
         final java.lang.Object other$adressenavnNummer = other.getAdressenavnNummer();
-        if (this$adressenavnNummer == null ? other$adressenavnNummer != null : !this$adressenavnNummer.equals(other$adressenavnNummer)) return false;
+        if (this$adressenavnNummer == null ? other$adressenavnNummer != null : !this$adressenavnNummer.equals(other$adressenavnNummer))
+            return false;
         final java.lang.Object this$bygningEtasjeLeilighet = this.getBygningEtasjeLeilighet();
         final java.lang.Object other$bygningEtasjeLeilighet = other.getBygningEtasjeLeilighet();
-        if (this$bygningEtasjeLeilighet == null ? other$bygningEtasjeLeilighet != null : !this$bygningEtasjeLeilighet.equals(other$bygningEtasjeLeilighet)) return false;
+        if (this$bygningEtasjeLeilighet == null ? other$bygningEtasjeLeilighet != null : !this$bygningEtasjeLeilighet.equals(other$bygningEtasjeLeilighet))
+            return false;
         final java.lang.Object this$postkode = this.getPostkode();
         final java.lang.Object other$postkode = other.getPostkode();
         if (this$postkode == null ? other$postkode != null : !this$postkode.equals(other$postkode)) return false;
@@ -204,7 +206,8 @@ public class IdentRekvisisjonUtenlandskVegadresse extends Vegadresse {
         if (this$bySted == null ? other$bySted != null : !this$bySted.equals(other$bySted)) return false;
         final java.lang.Object this$regionDistriktOmraade = this.getRegionDistriktOmraade();
         final java.lang.Object other$regionDistriktOmraade = other.getRegionDistriktOmraade();
-        if (this$regionDistriktOmraade == null ? other$regionDistriktOmraade != null : !this$regionDistriktOmraade.equals(other$regionDistriktOmraade)) return false;
+        if (this$regionDistriktOmraade == null ? other$regionDistriktOmraade != null : !this$regionDistriktOmraade.equals(other$regionDistriktOmraade))
+            return false;
         final java.lang.Object this$landkode = this.getLandkode();
         final java.lang.Object other$landkode = other.getLandkode();
         if (this$landkode == null ? other$landkode != null : !this$landkode.equals(other$landkode)) return false;

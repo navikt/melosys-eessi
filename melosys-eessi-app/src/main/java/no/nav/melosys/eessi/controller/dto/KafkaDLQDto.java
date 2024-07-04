@@ -243,13 +243,16 @@ public class KafkaDLQDto {
         if (this$queueType == null ? other$queueType != null : !this$queueType.equals(other$queueType)) return false;
         final java.lang.Object this$tidRegistrert = this.getTidRegistrert();
         final java.lang.Object other$tidRegistrert = other.getTidRegistrert();
-        if (this$tidRegistrert == null ? other$tidRegistrert != null : !this$tidRegistrert.equals(other$tidRegistrert)) return false;
+        if (this$tidRegistrert == null ? other$tidRegistrert != null : !this$tidRegistrert.equals(other$tidRegistrert))
+            return false;
         final java.lang.Object this$tidSistRekjort = this.getTidSistRekjort();
         final java.lang.Object other$tidSistRekjort = other.getTidSistRekjort();
-        if (this$tidSistRekjort == null ? other$tidSistRekjort != null : !this$tidSistRekjort.equals(other$tidSistRekjort)) return false;
+        if (this$tidSistRekjort == null ? other$tidSistRekjort != null : !this$tidSistRekjort.equals(other$tidSistRekjort))
+            return false;
         final java.lang.Object this$sisteFeilmelding = this.getSisteFeilmelding();
         final java.lang.Object other$sisteFeilmelding = other.getSisteFeilmelding();
-        if (this$sisteFeilmelding == null ? other$sisteFeilmelding != null : !this$sisteFeilmelding.equals(other$sisteFeilmelding)) return false;
+        if (this$sisteFeilmelding == null ? other$sisteFeilmelding != null : !this$sisteFeilmelding.equals(other$sisteFeilmelding))
+            return false;
         final java.lang.Object this$melding = this.getMelding();
         final java.lang.Object other$melding = other.getMelding();
         if (this$melding == null ? other$melding != null : !this$melding.equals(other$melding)) return false;

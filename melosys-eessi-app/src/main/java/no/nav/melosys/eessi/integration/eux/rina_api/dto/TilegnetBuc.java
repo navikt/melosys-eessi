@@ -72,10 +72,12 @@ public class TilegnetBuc {
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;
         final java.lang.Object this$gyldigStartDato = this.getGyldigStartDato();
         final java.lang.Object other$gyldigStartDato = other.getGyldigStartDato();
-        if (this$gyldigStartDato == null ? other$gyldigStartDato != null : !this$gyldigStartDato.equals(other$gyldigStartDato)) return false;
+        if (this$gyldigStartDato == null ? other$gyldigStartDato != null : !this$gyldigStartDato.equals(other$gyldigStartDato))
+            return false;
         final java.lang.Object this$institusjonsrolle = this.getInstitusjonsrolle();
         final java.lang.Object other$institusjonsrolle = other.getInstitusjonsrolle();
-        if (this$institusjonsrolle == null ? other$institusjonsrolle != null : !this$institusjonsrolle.equals(other$institusjonsrolle)) return false;
+        if (this$institusjonsrolle == null ? other$institusjonsrolle != null : !this$institusjonsrolle.equals(other$institusjonsrolle))
+            return false;
         return true;
     }
 

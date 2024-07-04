@@ -62,10 +62,12 @@ public class Action {
         if (this$name == null ? other$name != null : !this$name.equals(other$name)) return false;
         final java.lang.Object this$documentType = this.getDocumentType();
         final java.lang.Object other$documentType = other.getDocumentType();
-        if (this$documentType == null ? other$documentType != null : !this$documentType.equals(other$documentType)) return false;
+        if (this$documentType == null ? other$documentType != null : !this$documentType.equals(other$documentType))
+            return false;
         final java.lang.Object this$documentId = this.getDocumentId();
         final java.lang.Object other$documentId = other.getDocumentId();
-        if (this$documentId == null ? other$documentId != null : !this$documentId.equals(other$documentId)) return false;
+        if (this$documentId == null ? other$documentId != null : !this$documentId.equals(other$documentId))
+            return false;
         final java.lang.Object this$operation = this.getOperation();
         final java.lang.Object other$operation = other.getOperation();
         if (this$operation == null ? other$operation != null : !this$operation.equals(other$operation)) return false;

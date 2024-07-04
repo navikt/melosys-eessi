@@ -264,49 +264,59 @@ public class MelosysEessiMelding {
         if (this.isX006NavErFjernet() != other.isX006NavErFjernet()) return false;
         final java.lang.Object this$gsakSaksnummer = this.getGsakSaksnummer();
         final java.lang.Object other$gsakSaksnummer = other.getGsakSaksnummer();
-        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer)) return false;
+        if (this$gsakSaksnummer == null ? other$gsakSaksnummer != null : !this$gsakSaksnummer.equals(other$gsakSaksnummer))
+            return false;
         final java.lang.Object this$sedId = this.getSedId();
         final java.lang.Object other$sedId = other.getSedId();
         if (this$sedId == null ? other$sedId != null : !this$sedId.equals(other$sedId)) return false;
         final java.lang.Object this$sedVersjon = this.getSedVersjon();
         final java.lang.Object other$sedVersjon = other.getSedVersjon();
-        if (this$sedVersjon == null ? other$sedVersjon != null : !this$sedVersjon.equals(other$sedVersjon)) return false;
+        if (this$sedVersjon == null ? other$sedVersjon != null : !this$sedVersjon.equals(other$sedVersjon))
+            return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$avsender = this.getAvsender();
         final java.lang.Object other$avsender = other.getAvsender();
         if (this$avsender == null ? other$avsender != null : !this$avsender.equals(other$avsender)) return false;
         final java.lang.Object this$journalpostId = this.getJournalpostId();
         final java.lang.Object other$journalpostId = other.getJournalpostId();
-        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId)) return false;
+        if (this$journalpostId == null ? other$journalpostId != null : !this$journalpostId.equals(other$journalpostId))
+            return false;
         final java.lang.Object this$dokumentId = this.getDokumentId();
         final java.lang.Object other$dokumentId = other.getDokumentId();
-        if (this$dokumentId == null ? other$dokumentId != null : !this$dokumentId.equals(other$dokumentId)) return false;
+        if (this$dokumentId == null ? other$dokumentId != null : !this$dokumentId.equals(other$dokumentId))
+            return false;
         final java.lang.Object this$aktoerId = this.getAktoerId();
         final java.lang.Object other$aktoerId = other.getAktoerId();
         if (this$aktoerId == null ? other$aktoerId != null : !this$aktoerId.equals(other$aktoerId)) return false;
         final java.lang.Object this$statsborgerskap = this.getStatsborgerskap();
         final java.lang.Object other$statsborgerskap = other.getStatsborgerskap();
-        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap)) return false;
+        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap))
+            return false;
         final java.lang.Object this$arbeidssteder = this.getArbeidssteder();
         final java.lang.Object other$arbeidssteder = other.getArbeidssteder();
-        if (this$arbeidssteder == null ? other$arbeidssteder != null : !this$arbeidssteder.equals(other$arbeidssteder)) return false;
+        if (this$arbeidssteder == null ? other$arbeidssteder != null : !this$arbeidssteder.equals(other$arbeidssteder))
+            return false;
         final java.lang.Object this$arbeidsland = this.getArbeidsland();
         final java.lang.Object other$arbeidsland = other.getArbeidsland();
-        if (this$arbeidsland == null ? other$arbeidsland != null : !this$arbeidsland.equals(other$arbeidsland)) return false;
+        if (this$arbeidsland == null ? other$arbeidsland != null : !this$arbeidsland.equals(other$arbeidsland))
+            return false;
         final java.lang.Object this$periode = this.getPeriode();
         final java.lang.Object other$periode = other.getPeriode();
         if (this$periode == null ? other$periode != null : !this$periode.equals(other$periode)) return false;
         final java.lang.Object this$lovvalgsland = this.getLovvalgsland();
         final java.lang.Object other$lovvalgsland = other.getLovvalgsland();
-        if (this$lovvalgsland == null ? other$lovvalgsland != null : !this$lovvalgsland.equals(other$lovvalgsland)) return false;
+        if (this$lovvalgsland == null ? other$lovvalgsland != null : !this$lovvalgsland.equals(other$lovvalgsland))
+            return false;
         final java.lang.Object this$artikkel = this.getArtikkel();
         final java.lang.Object other$artikkel = other.getArtikkel();
         if (this$artikkel == null ? other$artikkel != null : !this$artikkel.equals(other$artikkel)) return false;
         final java.lang.Object this$ytterligereInformasjon = this.getYtterligereInformasjon();
         final java.lang.Object other$ytterligereInformasjon = other.getYtterligereInformasjon();
-        if (this$ytterligereInformasjon == null ? other$ytterligereInformasjon != null : !this$ytterligereInformasjon.equals(other$ytterligereInformasjon)) return false;
+        if (this$ytterligereInformasjon == null ? other$ytterligereInformasjon != null : !this$ytterligereInformasjon.equals(other$ytterligereInformasjon))
+            return false;
         final java.lang.Object this$bucType = this.getBucType();
         final java.lang.Object other$bucType = other.getBucType();
         if (this$bucType == null ? other$bucType != null : !this$bucType.equals(other$bucType)) return false;
@@ -315,10 +325,12 @@ public class MelosysEessiMelding {
         if (this$sedType == null ? other$sedType != null : !this$sedType.equals(other$sedType)) return false;
         final java.lang.Object this$svarAnmodningUnntak = this.getSvarAnmodningUnntak();
         final java.lang.Object other$svarAnmodningUnntak = other.getSvarAnmodningUnntak();
-        if (this$svarAnmodningUnntak == null ? other$svarAnmodningUnntak != null : !this$svarAnmodningUnntak.equals(other$svarAnmodningUnntak)) return false;
+        if (this$svarAnmodningUnntak == null ? other$svarAnmodningUnntak != null : !this$svarAnmodningUnntak.equals(other$svarAnmodningUnntak))
+            return false;
         final java.lang.Object this$anmodningUnntak = this.getAnmodningUnntak();
         final java.lang.Object other$anmodningUnntak = other.getAnmodningUnntak();
-        if (this$anmodningUnntak == null ? other$anmodningUnntak != null : !this$anmodningUnntak.equals(other$anmodningUnntak)) return false;
+        if (this$anmodningUnntak == null ? other$anmodningUnntak != null : !this$anmodningUnntak.equals(other$anmodningUnntak))
+            return false;
         return true;
     }
 

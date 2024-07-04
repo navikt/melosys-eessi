@@ -11,5 +11,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 @Deprecated(forRemoval = true)
 public interface SedMottattRepository extends JpaRepository<SedMottatt, Long> {
     Collection<SedMottatt> findAllByFerdigFalseAndFeiletFalse();
+
     Double countByFeiletIsTrue();
 }

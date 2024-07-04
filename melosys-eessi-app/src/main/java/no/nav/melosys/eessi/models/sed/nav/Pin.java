@@ -77,7 +77,8 @@ public class Pin {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$identifikator = this.getIdentifikator();
         final java.lang.Object other$identifikator = other.getIdentifikator();
-        if (this$identifikator == null ? other$identifikator != null : !this$identifikator.equals(other$identifikator)) return false;
+        if (this$identifikator == null ? other$identifikator != null : !this$identifikator.equals(other$identifikator))
+            return false;
         final java.lang.Object this$land = this.getLand();
         final java.lang.Object other$land = other.getLand();
         if (this$land == null ? other$land != null : !this$land.equals(other$land)) return false;
@@ -86,10 +87,12 @@ public class Pin {
         if (this$sektor == null ? other$sektor != null : !this$sektor.equals(other$sektor)) return false;
         final java.lang.Object this$institusjonsid = this.getInstitusjonsid();
         final java.lang.Object other$institusjonsid = other.getInstitusjonsid();
-        if (this$institusjonsid == null ? other$institusjonsid != null : !this$institusjonsid.equals(other$institusjonsid)) return false;
+        if (this$institusjonsid == null ? other$institusjonsid != null : !this$institusjonsid.equals(other$institusjonsid))
+            return false;
         final java.lang.Object this$institusjonsnavn = this.getInstitusjonsnavn();
         final java.lang.Object other$institusjonsnavn = other.getInstitusjonsnavn();
-        if (this$institusjonsnavn == null ? other$institusjonsnavn != null : !this$institusjonsnavn.equals(other$institusjonsnavn)) return false;
+        if (this$institusjonsnavn == null ? other$institusjonsnavn != null : !this$institusjonsnavn.equals(other$institusjonsnavn))
+            return false;
         return true;
     }
 

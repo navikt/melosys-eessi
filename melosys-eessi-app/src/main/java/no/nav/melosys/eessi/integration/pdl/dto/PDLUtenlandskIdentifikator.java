@@ -38,10 +38,12 @@ public class PDLUtenlandskIdentifikator {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$identifikasjonsnummer = this.getIdentifikasjonsnummer();
         final java.lang.Object other$identifikasjonsnummer = other.getIdentifikasjonsnummer();
-        if (this$identifikasjonsnummer == null ? other$identifikasjonsnummer != null : !this$identifikasjonsnummer.equals(other$identifikasjonsnummer)) return false;
+        if (this$identifikasjonsnummer == null ? other$identifikasjonsnummer != null : !this$identifikasjonsnummer.equals(other$identifikasjonsnummer))
+            return false;
         final java.lang.Object this$utstederland = this.getUtstederland();
         final java.lang.Object other$utstederland = other.getUtstederland();
-        if (this$utstederland == null ? other$utstederland != null : !this$utstederland.equals(other$utstederland)) return false;
+        if (this$utstederland == null ? other$utstederland != null : !this$utstederland.equals(other$utstederland))
+            return false;
         return true;
     }
 

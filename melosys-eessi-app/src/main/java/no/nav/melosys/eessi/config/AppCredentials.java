@@ -7,69 +7,69 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "melosys.systemuser")
 public class AppCredentials {
-  private String username;
-  private String password;
+    private String username;
+    private String password;
 
-  @java.lang.SuppressWarnings("all")
-  public AppCredentials() {
-  }
+    @java.lang.SuppressWarnings("all")
+    public AppCredentials() {
+    }
 
-  @java.lang.SuppressWarnings("all")
-  public String getUsername() {
-    return this.username;
-  }
+    @java.lang.SuppressWarnings("all")
+    public String getUsername() {
+        return this.username;
+    }
 
-  @java.lang.SuppressWarnings("all")
-  public String getPassword() {
-    return this.password;
-  }
+    @java.lang.SuppressWarnings("all")
+    public String getPassword() {
+        return this.password;
+    }
 
-  @java.lang.SuppressWarnings("all")
-  public void setUsername(final String username) {
-    this.username = username;
-  }
+    @java.lang.SuppressWarnings("all")
+    public void setUsername(final String username) {
+        this.username = username;
+    }
 
-  @java.lang.SuppressWarnings("all")
-  public void setPassword(final String password) {
-    this.password = password;
-  }
+    @java.lang.SuppressWarnings("all")
+    public void setPassword(final String password) {
+        this.password = password;
+    }
 
-  @java.lang.Override
-  @java.lang.SuppressWarnings("all")
-  public boolean equals(final java.lang.Object o) {
-    if (o == this) return true;
-    if (!(o instanceof AppCredentials)) return false;
-    final AppCredentials other = (AppCredentials) o;
-    if (!other.canEqual((java.lang.Object) this)) return false;
-    final java.lang.Object this$username = this.getUsername();
-    final java.lang.Object other$username = other.getUsername();
-    if (this$username == null ? other$username != null : !this$username.equals(other$username)) return false;
-    final java.lang.Object this$password = this.getPassword();
-    final java.lang.Object other$password = other.getPassword();
-    if (this$password == null ? other$password != null : !this$password.equals(other$password)) return false;
-    return true;
-  }
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+    public boolean equals(final java.lang.Object o) {
+        if (o == this) return true;
+        if (!(o instanceof AppCredentials)) return false;
+        final AppCredentials other = (AppCredentials) o;
+        if (!other.canEqual((java.lang.Object) this)) return false;
+        final java.lang.Object this$username = this.getUsername();
+        final java.lang.Object other$username = other.getUsername();
+        if (this$username == null ? other$username != null : !this$username.equals(other$username)) return false;
+        final java.lang.Object this$password = this.getPassword();
+        final java.lang.Object other$password = other.getPassword();
+        if (this$password == null ? other$password != null : !this$password.equals(other$password)) return false;
+        return true;
+    }
 
-  @java.lang.SuppressWarnings("all")
-  protected boolean canEqual(final java.lang.Object other) {
-    return other instanceof AppCredentials;
-  }
+    @java.lang.SuppressWarnings("all")
+    protected boolean canEqual(final java.lang.Object other) {
+        return other instanceof AppCredentials;
+    }
 
-  @java.lang.Override
-  @java.lang.SuppressWarnings("all")
-  public int hashCode() {
-    final int PRIME = 59;
-    int result = 1;
-    final java.lang.Object $username = this.getUsername();
-    result = result * PRIME + ($username == null ? 43 : $username.hashCode());
-    final java.lang.Object $password = this.getPassword();
-    result = result * PRIME + ($password == null ? 43 : $password.hashCode());
-    return result;
-  }
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        final java.lang.Object $username = this.getUsername();
+        result = result * PRIME + ($username == null ? 43 : $username.hashCode());
+        final java.lang.Object $password = this.getPassword();
+        result = result * PRIME + ($password == null ? 43 : $password.hashCode());
+        return result;
+    }
 
-  @java.lang.Override
-  @java.lang.SuppressWarnings("all")
-  public java.lang.String toString() {
-    return "AppCredentials(username=" + this.getUsername() + ", password=" + this.getPassword() + ")";
-  }
+    @java.lang.Override
+    @java.lang.SuppressWarnings("all")
+    public java.lang.String toString() {
+        return "AppCredentials(username=" + this.getUsername() + ", password=" + this.getPassword() + ")";
+    }
 }

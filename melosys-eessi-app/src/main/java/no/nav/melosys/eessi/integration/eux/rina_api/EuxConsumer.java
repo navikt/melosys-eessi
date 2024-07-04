@@ -4,12 +4,12 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxVedlegg;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
-import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
@@ -34,6 +34,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
 public class EuxConsumer implements RestConsumer {

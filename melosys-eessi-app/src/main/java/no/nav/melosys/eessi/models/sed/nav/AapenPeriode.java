@@ -45,7 +45,8 @@ public class AapenPeriode {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$ukjentEllerÅpenSluttdato = this.getUkjentEllerÅpenSluttdato();
         final java.lang.Object other$ukjentEllerÅpenSluttdato = other.getUkjentEllerÅpenSluttdato();
-        if (this$ukjentEllerÅpenSluttdato == null ? other$ukjentEllerÅpenSluttdato != null : !this$ukjentEllerÅpenSluttdato.equals(other$ukjentEllerÅpenSluttdato)) return false;
+        if (this$ukjentEllerÅpenSluttdato == null ? other$ukjentEllerÅpenSluttdato != null : !this$ukjentEllerÅpenSluttdato.equals(other$ukjentEllerÅpenSluttdato))
+            return false;
         final java.lang.Object this$startdato = this.getStartdato();
         final java.lang.Object other$startdato = other.getStartdato();
         if (this$startdato == null ? other$startdato != null : !this$startdato.equals(other$startdato)) return false;

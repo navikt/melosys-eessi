@@ -98,21 +98,18 @@ public final class OpprettJournalpostRequestMapper {
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
         if (filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
-        case PDF:
-            {
+            case PDF: {
                 return binaerFil.getInnhold();
             }
-        case DOCX:
-            {
+            case DOCX: {
                 return konverterWordTilPdf(binaerFil).toByteArray();
             }
-        case TIFF:
-        case JPEG:
-            {
+            case TIFF:
+            case JPEG: {
                 return konverterBildeTilPdf(binaerFil, filtype).toByteArray();
             }
-        default:
-            return binaerFil.getInnhold();
+            default:
+                return binaerFil.getInnhold();
         }
     }
 

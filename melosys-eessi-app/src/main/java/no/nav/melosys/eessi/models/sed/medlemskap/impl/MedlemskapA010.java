@@ -28,7 +28,8 @@ public class MedlemskapA010 implements Medlemskap {
         if (this$vedtak == null ? other$vedtak != null : !this$vedtak.equals(other$vedtak)) return false;
         final java.lang.Object this$meldingomlovvalg = this.getMeldingomlovvalg();
         final java.lang.Object other$meldingomlovvalg = other.getMeldingomlovvalg();
-        if (this$meldingomlovvalg == null ? other$meldingomlovvalg != null : !this$meldingomlovvalg.equals(other$meldingomlovvalg)) return false;
+        if (this$meldingomlovvalg == null ? other$meldingomlovvalg != null : !this$meldingomlovvalg.equals(other$meldingomlovvalg))
+            return false;
         return true;
     }
 

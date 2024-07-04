@@ -34,7 +34,8 @@ public class Avsender {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$avsenderID = this.getAvsenderID();
         final java.lang.Object other$avsenderID = other.getAvsenderID();
-        if (this$avsenderID == null ? other$avsenderID != null : !this$avsenderID.equals(other$avsenderID)) return false;
+        if (this$avsenderID == null ? other$avsenderID != null : !this$avsenderID.equals(other$avsenderID))
+            return false;
         final java.lang.Object this$landkode = this.getLandkode();
         final java.lang.Object other$landkode = other.getLandkode();
         if (this$landkode == null ? other$landkode != null : !this$landkode.equals(other$landkode)) return false;

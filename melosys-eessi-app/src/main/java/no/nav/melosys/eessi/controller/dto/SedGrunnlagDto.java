@@ -142,37 +142,47 @@ public class SedGrunnlagDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$harFastArbeidssted = this.getHarFastArbeidssted();
         final java.lang.Object other$harFastArbeidssted = other.getHarFastArbeidssted();
-        if (this$harFastArbeidssted == null ? other$harFastArbeidssted != null : !this$harFastArbeidssted.equals(other$harFastArbeidssted)) return false;
+        if (this$harFastArbeidssted == null ? other$harFastArbeidssted != null : !this$harFastArbeidssted.equals(other$harFastArbeidssted))
+            return false;
         final java.lang.Object this$sedType = this.getSedType();
         final java.lang.Object other$sedType = other.getSedType();
         if (this$sedType == null ? other$sedType != null : !this$sedType.equals(other$sedType)) return false;
         final java.lang.Object this$utenlandskIdent = this.getUtenlandskIdent();
         final java.lang.Object other$utenlandskIdent = other.getUtenlandskIdent();
-        if (this$utenlandskIdent == null ? other$utenlandskIdent != null : !this$utenlandskIdent.equals(other$utenlandskIdent)) return false;
+        if (this$utenlandskIdent == null ? other$utenlandskIdent != null : !this$utenlandskIdent.equals(other$utenlandskIdent))
+            return false;
         final java.lang.Object this$bostedsadresse = this.getBostedsadresse();
         final java.lang.Object other$bostedsadresse = other.getBostedsadresse();
-        if (this$bostedsadresse == null ? other$bostedsadresse != null : !this$bostedsadresse.equals(other$bostedsadresse)) return false;
+        if (this$bostedsadresse == null ? other$bostedsadresse != null : !this$bostedsadresse.equals(other$bostedsadresse))
+            return false;
         final java.lang.Object this$arbeidsgivendeVirksomheter = this.getArbeidsgivendeVirksomheter();
         final java.lang.Object other$arbeidsgivendeVirksomheter = other.getArbeidsgivendeVirksomheter();
-        if (this$arbeidsgivendeVirksomheter == null ? other$arbeidsgivendeVirksomheter != null : !this$arbeidsgivendeVirksomheter.equals(other$arbeidsgivendeVirksomheter)) return false;
+        if (this$arbeidsgivendeVirksomheter == null ? other$arbeidsgivendeVirksomheter != null : !this$arbeidsgivendeVirksomheter.equals(other$arbeidsgivendeVirksomheter))
+            return false;
         final java.lang.Object this$selvstendigeVirksomheter = this.getSelvstendigeVirksomheter();
         final java.lang.Object other$selvstendigeVirksomheter = other.getSelvstendigeVirksomheter();
-        if (this$selvstendigeVirksomheter == null ? other$selvstendigeVirksomheter != null : !this$selvstendigeVirksomheter.equals(other$selvstendigeVirksomheter)) return false;
+        if (this$selvstendigeVirksomheter == null ? other$selvstendigeVirksomheter != null : !this$selvstendigeVirksomheter.equals(other$selvstendigeVirksomheter))
+            return false;
         final java.lang.Object this$arbeidssteder = this.getArbeidssteder();
         final java.lang.Object other$arbeidssteder = other.getArbeidssteder();
-        if (this$arbeidssteder == null ? other$arbeidssteder != null : !this$arbeidssteder.equals(other$arbeidssteder)) return false;
+        if (this$arbeidssteder == null ? other$arbeidssteder != null : !this$arbeidssteder.equals(other$arbeidssteder))
+            return false;
         final java.lang.Object this$arbeidsland = this.getArbeidsland();
         final java.lang.Object other$arbeidsland = other.getArbeidsland();
-        if (this$arbeidsland == null ? other$arbeidsland != null : !this$arbeidsland.equals(other$arbeidsland)) return false;
+        if (this$arbeidsland == null ? other$arbeidsland != null : !this$arbeidsland.equals(other$arbeidsland))
+            return false;
         final java.lang.Object this$lovvalgsperioder = this.getLovvalgsperioder();
         final java.lang.Object other$lovvalgsperioder = other.getLovvalgsperioder();
-        if (this$lovvalgsperioder == null ? other$lovvalgsperioder != null : !this$lovvalgsperioder.equals(other$lovvalgsperioder)) return false;
+        if (this$lovvalgsperioder == null ? other$lovvalgsperioder != null : !this$lovvalgsperioder.equals(other$lovvalgsperioder))
+            return false;
         final java.lang.Object this$ytterligereInformasjon = this.getYtterligereInformasjon();
         final java.lang.Object other$ytterligereInformasjon = other.getYtterligereInformasjon();
-        if (this$ytterligereInformasjon == null ? other$ytterligereInformasjon != null : !this$ytterligereInformasjon.equals(other$ytterligereInformasjon)) return false;
+        if (this$ytterligereInformasjon == null ? other$ytterligereInformasjon != null : !this$ytterligereInformasjon.equals(other$ytterligereInformasjon))
+            return false;
         final java.lang.Object this$gjeldenderegler = this.getGjeldenderegler();
         final java.lang.Object other$gjeldenderegler = other.getGjeldenderegler();
-        if (this$gjeldenderegler == null ? other$gjeldenderegler != null : !this$gjeldenderegler.equals(other$gjeldenderegler)) return false;
+        if (this$gjeldenderegler == null ? other$gjeldenderegler != null : !this$gjeldenderegler.equals(other$gjeldenderegler))
+            return false;
         return true;
     }
 

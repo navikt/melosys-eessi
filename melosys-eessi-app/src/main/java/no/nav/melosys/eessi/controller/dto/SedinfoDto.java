@@ -205,10 +205,12 @@ public class SedinfoDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$opprettetDato = this.getOpprettetDato();
         final java.lang.Object other$opprettetDato = other.getOpprettetDato();
-        if (this$opprettetDato == null ? other$opprettetDato != null : !this$opprettetDato.equals(other$opprettetDato)) return false;
+        if (this$opprettetDato == null ? other$opprettetDato != null : !this$opprettetDato.equals(other$opprettetDato))
+            return false;
         final java.lang.Object this$sistOppdatert = this.getSistOppdatert();
         final java.lang.Object other$sistOppdatert = other.getSistOppdatert();
-        if (this$sistOppdatert == null ? other$sistOppdatert != null : !this$sistOppdatert.equals(other$sistOppdatert)) return false;
+        if (this$sistOppdatert == null ? other$sistOppdatert != null : !this$sistOppdatert.equals(other$sistOppdatert))
+            return false;
         final java.lang.Object this$bucId = this.getBucId();
         final java.lang.Object other$bucId = other.getBucId();
         if (this$bucId == null ? other$bucId != null : !this$bucId.equals(other$bucId)) return false;

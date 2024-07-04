@@ -86,22 +86,27 @@ public class Unntak {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$startdatoansattforsikret = this.getStartdatoansattforsikret();
         final java.lang.Object other$startdatoansattforsikret = other.getStartdatoansattforsikret();
-        if (this$startdatoansattforsikret == null ? other$startdatoansattforsikret != null : !this$startdatoansattforsikret.equals(other$startdatoansattforsikret)) return false;
+        if (this$startdatoansattforsikret == null ? other$startdatoansattforsikret != null : !this$startdatoansattforsikret.equals(other$startdatoansattforsikret))
+            return false;
         final java.lang.Object this$grunnlag = this.getGrunnlag();
         final java.lang.Object other$grunnlag = other.getGrunnlag();
         if (this$grunnlag == null ? other$grunnlag != null : !this$grunnlag.equals(other$grunnlag)) return false;
         final java.lang.Object this$spesielleomstendigheter = this.getSpesielleomstendigheter();
         final java.lang.Object other$spesielleomstendigheter = other.getSpesielleomstendigheter();
-        if (this$spesielleomstendigheter == null ? other$spesielleomstendigheter != null : !this$spesielleomstendigheter.equals(other$spesielleomstendigheter)) return false;
+        if (this$spesielleomstendigheter == null ? other$spesielleomstendigheter != null : !this$spesielleomstendigheter.equals(other$spesielleomstendigheter))
+            return false;
         final java.lang.Object this$startdatokontraktansettelse = this.getStartdatokontraktansettelse();
         final java.lang.Object other$startdatokontraktansettelse = other.getStartdatokontraktansettelse();
-        if (this$startdatokontraktansettelse == null ? other$startdatokontraktansettelse != null : !this$startdatokontraktansettelse.equals(other$startdatokontraktansettelse)) return false;
+        if (this$startdatokontraktansettelse == null ? other$startdatokontraktansettelse != null : !this$startdatokontraktansettelse.equals(other$startdatokontraktansettelse))
+            return false;
         final java.lang.Object this$begrunnelse = this.getBegrunnelse();
         final java.lang.Object other$begrunnelse = other.getBegrunnelse();
-        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse)) return false;
+        if (this$begrunnelse == null ? other$begrunnelse != null : !this$begrunnelse.equals(other$begrunnelse))
+            return false;
         final java.lang.Object this$a1grunnlag = this.getA1grunnlag();
         final java.lang.Object other$a1grunnlag = other.getA1grunnlag();
-        if (this$a1grunnlag == null ? other$a1grunnlag != null : !this$a1grunnlag.equals(other$a1grunnlag)) return false;
+        if (this$a1grunnlag == null ? other$a1grunnlag != null : !this$a1grunnlag.equals(other$a1grunnlag))
+            return false;
         return true;
     }
 

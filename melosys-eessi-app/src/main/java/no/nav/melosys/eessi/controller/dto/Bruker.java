@@ -115,13 +115,15 @@ public class Bruker {
         if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
         final java.lang.Object this$foedseldato = this.getFoedseldato();
         final java.lang.Object other$foedseldato = other.getFoedseldato();
-        if (this$foedseldato == null ? other$foedseldato != null : !this$foedseldato.equals(other$foedseldato)) return false;
+        if (this$foedseldato == null ? other$foedseldato != null : !this$foedseldato.equals(other$foedseldato))
+            return false;
         final java.lang.Object this$kjoenn = this.getKjoenn();
         final java.lang.Object other$kjoenn = other.getKjoenn();
         if (this$kjoenn == null ? other$kjoenn != null : !this$kjoenn.equals(other$kjoenn)) return false;
         final java.lang.Object this$statsborgerskap = this.getStatsborgerskap();
         final java.lang.Object other$statsborgerskap = other.getStatsborgerskap();
-        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap)) return false;
+        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap))
+            return false;
         final java.lang.Object this$fnr = this.getFnr();
         final java.lang.Object other$fnr = other.getFnr();
         if (this$fnr == null ? other$fnr != null : !this$fnr.equals(other$fnr)) return false;

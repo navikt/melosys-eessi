@@ -64,7 +64,8 @@ public class PeriodeA010 {
         if (this$sluttdato == null ? other$sluttdato != null : !this$sluttdato.equals(other$sluttdato)) return false;
         final java.lang.Object this$aapenperiode = this.getAapenperiode();
         final java.lang.Object other$aapenperiode = other.getAapenperiode();
-        if (this$aapenperiode == null ? other$aapenperiode != null : !this$aapenperiode.equals(other$aapenperiode)) return false;
+        if (this$aapenperiode == null ? other$aapenperiode != null : !this$aapenperiode.equals(other$aapenperiode))
+            return false;
         return true;
     }
 

@@ -58,7 +58,7 @@ public class OppgaveService {
 
     public String opprettUtgåendeJfrOppgave(String journalpostID, SedHendelse sedHendelse, String aktørId, String rinaUrl) {
         var oppgaveDto =  //Utgående vil alltid være MED
-        OppgaveDto.builder().aktivDato(LocalDate.now()).beskrivelse(lagBeskrivelseUtgåendeJfrOppgave(sedHendelse, rinaUrl)).fristFerdigstillelse(LocalDate.now().plusDays(1)).journalpostId(journalpostID).oppgavetype(JFR_UT).prioritet(PRIORITET_NORMAL).tema("MED").tildeltEnhetsnr(ENHET_MEDLEMSKAP_OG_AVGIFT).aktoerId(aktørId).build();
+            OppgaveDto.builder().aktivDato(LocalDate.now()).beskrivelse(lagBeskrivelseUtgåendeJfrOppgave(sedHendelse, rinaUrl)).fristFerdigstillelse(LocalDate.now().plusDays(1)).journalpostId(journalpostID).oppgavetype(JFR_UT).prioritet(PRIORITET_NORMAL).tema("MED").tildeltEnhetsnr(ENHET_MEDLEMSKAP_OG_AVGIFT).aktoerId(aktørId).build();
         HentOppgaveDto response = oppgaveConsumer.opprettOppgave(oppgaveDto);
         log.info("Utgående journalføringsoppgave opprettet med id {}", response.getId());
         return response.getId();

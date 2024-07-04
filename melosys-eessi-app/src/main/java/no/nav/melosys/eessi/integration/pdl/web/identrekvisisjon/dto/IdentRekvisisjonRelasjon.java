@@ -103,13 +103,16 @@ public class IdentRekvisisjonRelasjon {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$minRolleForPerson = this.getMinRolleForPerson();
         final java.lang.Object other$minRolleForPerson = other.getMinRolleForPerson();
-        if (this$minRolleForPerson == null ? other$minRolleForPerson != null : !this$minRolleForPerson.equals(other$minRolleForPerson)) return false;
+        if (this$minRolleForPerson == null ? other$minRolleForPerson != null : !this$minRolleForPerson.equals(other$minRolleForPerson))
+            return false;
         final java.lang.Object this$relatertPersonsRolle = this.getRelatertPersonsRolle();
         final java.lang.Object other$relatertPersonsRolle = other.getRelatertPersonsRolle();
-        if (this$relatertPersonsRolle == null ? other$relatertPersonsRolle != null : !this$relatertPersonsRolle.equals(other$relatertPersonsRolle)) return false;
+        if (this$relatertPersonsRolle == null ? other$relatertPersonsRolle != null : !this$relatertPersonsRolle.equals(other$relatertPersonsRolle))
+            return false;
         final java.lang.Object this$relatertPersonsIdent = this.getRelatertPersonsIdent();
         final java.lang.Object other$relatertPersonsIdent = other.getRelatertPersonsIdent();
-        if (this$relatertPersonsIdent == null ? other$relatertPersonsIdent != null : !this$relatertPersonsIdent.equals(other$relatertPersonsIdent)) return false;
+        if (this$relatertPersonsIdent == null ? other$relatertPersonsIdent != null : !this$relatertPersonsIdent.equals(other$relatertPersonsIdent))
+            return false;
         return true;
     }
 

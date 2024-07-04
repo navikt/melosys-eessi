@@ -41,10 +41,12 @@ public class EessiSak {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$institusjonsnummer = this.getInstitusjonsnummer();
         final java.lang.Object other$institusjonsnummer = other.getInstitusjonsnummer();
-        if (this$institusjonsnummer == null ? other$institusjonsnummer != null : !this$institusjonsnummer.equals(other$institusjonsnummer)) return false;
+        if (this$institusjonsnummer == null ? other$institusjonsnummer != null : !this$institusjonsnummer.equals(other$institusjonsnummer))
+            return false;
         final java.lang.Object this$institusjonsid = this.getInstitusjonsid();
         final java.lang.Object other$institusjonsid = other.getInstitusjonsid();
-        if (this$institusjonsid == null ? other$institusjonsid != null : !this$institusjonsid.equals(other$institusjonsid)) return false;
+        if (this$institusjonsid == null ? other$institusjonsid != null : !this$institusjonsid.equals(other$institusjonsid))
+            return false;
         return true;
     }
 

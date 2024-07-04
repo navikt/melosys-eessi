@@ -43,7 +43,8 @@ public class OpprettBucOgSedDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$sedDataDto = this.getSedDataDto();
         final java.lang.Object other$sedDataDto = other.getSedDataDto();
-        if (this$sedDataDto == null ? other$sedDataDto != null : !this$sedDataDto.equals(other$sedDataDto)) return false;
+        if (this$sedDataDto == null ? other$sedDataDto != null : !this$sedDataDto.equals(other$sedDataDto))
+            return false;
         final java.lang.Object this$vedlegg = this.getVedlegg();
         final java.lang.Object other$vedlegg = other.getVedlegg();
         if (this$vedlegg == null ? other$vedlegg != null : !this$vedlegg.equals(other$vedlegg)) return false;

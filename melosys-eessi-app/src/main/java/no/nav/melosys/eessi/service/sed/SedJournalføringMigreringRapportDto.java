@@ -50,10 +50,12 @@ public class SedJournalføringMigreringRapportDto {
         if (this.getAntallSedSjekket() != other.getAntallSedSjekket()) return false;
         final java.lang.Object this$sedMottattMigreringRapportDtoList = this.getSedMottattMigreringRapportDtoList();
         final java.lang.Object other$sedMottattMigreringRapportDtoList = other.getSedMottattMigreringRapportDtoList();
-        if (this$sedMottattMigreringRapportDtoList == null ? other$sedMottattMigreringRapportDtoList != null : !this$sedMottattMigreringRapportDtoList.equals(other$sedMottattMigreringRapportDtoList)) return false;
+        if (this$sedMottattMigreringRapportDtoList == null ? other$sedMottattMigreringRapportDtoList != null : !this$sedMottattMigreringRapportDtoList.equals(other$sedMottattMigreringRapportDtoList))
+            return false;
         final java.lang.Object this$sedSendtMigreringRapportDtoList = this.getSedSendtMigreringRapportDtoList();
         final java.lang.Object other$sedSendtMigreringRapportDtoList = other.getSedSendtMigreringRapportDtoList();
-        if (this$sedSendtMigreringRapportDtoList == null ? other$sedSendtMigreringRapportDtoList != null : !this$sedSendtMigreringRapportDtoList.equals(other$sedSendtMigreringRapportDtoList)) return false;
+        if (this$sedSendtMigreringRapportDtoList == null ? other$sedSendtMigreringRapportDtoList != null : !this$sedSendtMigreringRapportDtoList.equals(other$sedSendtMigreringRapportDtoList))
+            return false;
         return true;
     }
 

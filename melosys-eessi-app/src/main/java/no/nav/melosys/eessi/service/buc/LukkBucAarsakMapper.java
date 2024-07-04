@@ -6,7 +6,8 @@ import no.nav.melosys.eessi.models.buc.BUC;
 
 final class LukkBucAarsakMapper {
 
-    private LukkBucAarsakMapper() {}
+    private LukkBucAarsakMapper() {
+    }
 
     private static final String LOVVALG_BEKREFTET = "gjeldende_lovgivning_det_ble_oppnådd_enighet_om_anmodningen_om_unntak";
     private static final String INGEN_SVAR_2_MND = "gjeldende_lovgivning_fastsettelsen_ble_endelig_ingen_reaksjon_innen_2_måneder";
@@ -39,6 +40,6 @@ final class LukkBucAarsakMapper {
 
     private static boolean a012SendtFraBuc(BUC buc) {
         return buc.getDocuments().stream().anyMatch(d ->
-                SedType.A012.name().equals(d.getType()) && !"empty".equals(d.getStatus()));
+            SedType.A012.name().equals(d.getType()) && !"empty".equals(d.getStatus()));
     }
 }

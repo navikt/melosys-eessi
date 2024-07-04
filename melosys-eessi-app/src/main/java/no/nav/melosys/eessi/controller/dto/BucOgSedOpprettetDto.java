@@ -87,7 +87,8 @@ public class BucOgSedOpprettetDto {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$rinaSaksnummer = this.getRinaSaksnummer();
         final java.lang.Object other$rinaSaksnummer = other.getRinaSaksnummer();
-        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer)) return false;
+        if (this$rinaSaksnummer == null ? other$rinaSaksnummer != null : !this$rinaSaksnummer.equals(other$rinaSaksnummer))
+            return false;
         final java.lang.Object this$rinaUrl = this.getRinaUrl();
         final java.lang.Object other$rinaUrl = other.getRinaUrl();
         if (this$rinaUrl == null ? other$rinaUrl != null : !this$rinaUrl.equals(other$rinaUrl)) return false;

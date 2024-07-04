@@ -69,13 +69,15 @@ public class BucInfo {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$applicationRoleId = this.getApplicationRoleId();
         final java.lang.Object other$applicationRoleId = other.getApplicationRoleId();
-        if (this$applicationRoleId == null ? other$applicationRoleId != null : !this$applicationRoleId.equals(other$applicationRoleId)) return false;
+        if (this$applicationRoleId == null ? other$applicationRoleId != null : !this$applicationRoleId.equals(other$applicationRoleId))
+            return false;
         final java.lang.Object this$id = this.getId();
         final java.lang.Object other$id = other.getId();
         if (this$id == null ? other$id != null : !this$id.equals(other$id)) return false;
         final java.lang.Object this$processDefinitionId = this.getProcessDefinitionId();
         final java.lang.Object other$processDefinitionId = other.getProcessDefinitionId();
-        if (this$processDefinitionId == null ? other$processDefinitionId != null : !this$processDefinitionId.equals(other$processDefinitionId)) return false;
+        if (this$processDefinitionId == null ? other$processDefinitionId != null : !this$processDefinitionId.equals(other$processDefinitionId))
+            return false;
         final java.lang.Object this$status = this.getStatus();
         final java.lang.Object other$status = other.getStatus();
         if (this$status == null ? other$status != null : !this$status.equals(other$status)) return false;

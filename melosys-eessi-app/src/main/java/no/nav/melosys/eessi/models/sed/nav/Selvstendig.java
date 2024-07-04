@@ -33,7 +33,8 @@ public class Selvstendig {
         if (!other.canEqual((java.lang.Object) this)) return false;
         final java.lang.Object this$arbeidsgiver = this.getArbeidsgiver();
         final java.lang.Object other$arbeidsgiver = other.getArbeidsgiver();
-        if (this$arbeidsgiver == null ? other$arbeidsgiver != null : !this$arbeidsgiver.equals(other$arbeidsgiver)) return false;
+        if (this$arbeidsgiver == null ? other$arbeidsgiver != null : !this$arbeidsgiver.equals(other$arbeidsgiver))
+            return false;
         return true;
     }
 

@@ -25,10 +25,11 @@ public class PDLConsumer {
         var request = new GraphQLRequest(HENT_PERSON_QUERY, Map.of(IDENT_KEY, ident));
 
         var res = webClient.post()
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLHentPersonResponse>>() {})
-                .block();
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLHentPersonResponse>>() {
+            })
+            .block();
 
         håndterFeil(res);
         return res.getData().getHentPerson();
@@ -38,10 +39,11 @@ public class PDLConsumer {
         var request = new GraphQLRequest(SØK_PERSON_QUERY, requestVars);
 
         var res = webClient.post()
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLSokPersonResponse>>() {})
-                .block();
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLSokPersonResponse>>() {
+            })
+            .block();
 
         håndterFeil(res);
         return res.getData().getSokPerson();
@@ -51,10 +53,11 @@ public class PDLConsumer {
         var request = new GraphQLRequest(HENT_IDENTER_QUERY, Map.of(IDENT_KEY, ident));
 
         var res = webClient.post()
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLHentIdenterResponse>>() {})
-                .block();
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<GraphQLResponse<PDLHentIdenterResponse>>() {
+            })
+            .block();
 
         håndterFeil(res);
         return res.getData().getHentIdenter();

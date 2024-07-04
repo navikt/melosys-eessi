@@ -29,7 +29,7 @@ public class FeaturetoggleConfig {
             var localUnleash = new LocalUnleash();
             localUnleash.enableAll();
             return localUnleash;
-        } else if(List.of(environment.getActiveProfiles()).contains("test")) {
+        } else if (List.of(environment.getActiveProfiles()).contains("test")) {
             var fakeUnleash = new FakeUnleash();
             fakeUnleash.enableAll();
             return fakeUnleash;

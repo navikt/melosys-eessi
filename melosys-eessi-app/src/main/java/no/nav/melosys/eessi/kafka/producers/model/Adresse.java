@@ -105,7 +105,8 @@ public class Adresse {
         if (this$land == null ? other$land != null : !this$land.equals(other$land)) return false;
         final java.lang.Object this$postnummer = this.getPostnummer();
         final java.lang.Object other$postnummer = other.getPostnummer();
-        if (this$postnummer == null ? other$postnummer != null : !this$postnummer.equals(other$postnummer)) return false;
+        if (this$postnummer == null ? other$postnummer != null : !this$postnummer.equals(other$postnummer))
+            return false;
         final java.lang.Object this$region = this.getRegion();
         final java.lang.Object other$region = other.getRegion();
         if (this$region == null ? other$region != null : !this$region.equals(other$region)) return false;

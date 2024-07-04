@@ -110,7 +110,8 @@ public class SakDto {
         if (this$tema == null ? other$tema != null : !this$tema.equals(other$tema)) return false;
         final java.lang.Object this$applikasjon = this.getApplikasjon();
         final java.lang.Object other$applikasjon = other.getApplikasjon();
-        if (this$applikasjon == null ? other$applikasjon != null : !this$applikasjon.equals(other$applikasjon)) return false;
+        if (this$applikasjon == null ? other$applikasjon != null : !this$applikasjon.equals(other$applikasjon))
+            return false;
         final java.lang.Object this$fagsakNr = this.getFagsakNr();
         final java.lang.Object other$fagsakNr = other.getFagsakNr();
         if (this$fagsakNr == null ? other$fagsakNr != null : !this$fagsakNr.equals(other$fagsakNr)) return false;
@@ -122,10 +123,12 @@ public class SakDto {
         if (this$orgnr == null ? other$orgnr != null : !this$orgnr.equals(other$orgnr)) return false;
         final java.lang.Object this$opprettetAv = this.getOpprettetAv();
         final java.lang.Object other$opprettetAv = other.getOpprettetAv();
-        if (this$opprettetAv == null ? other$opprettetAv != null : !this$opprettetAv.equals(other$opprettetAv)) return false;
+        if (this$opprettetAv == null ? other$opprettetAv != null : !this$opprettetAv.equals(other$opprettetAv))
+            return false;
         final java.lang.Object this$opprettetTidspunkt = this.getOpprettetTidspunkt();
         final java.lang.Object other$opprettetTidspunkt = other.getOpprettetTidspunkt();
-        if (this$opprettetTidspunkt == null ? other$opprettetTidspunkt != null : !this$opprettetTidspunkt.equals(other$opprettetTidspunkt)) return false;
+        if (this$opprettetTidspunkt == null ? other$opprettetTidspunkt != null : !this$opprettetTidspunkt.equals(other$opprettetTidspunkt))
+            return false;
         return true;
     }
 

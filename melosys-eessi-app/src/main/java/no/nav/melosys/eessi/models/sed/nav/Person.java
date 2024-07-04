@@ -28,7 +28,7 @@ public class Person {
 
     public Collection<String> hentStatsborgerksapsliste() {
         return  //Kan av en mystisk grunn inneholde null-felter
-        statsborgerskap.stream().filter(Objects::nonNull).map(Statsborgerskap::getLand).collect(Collectors.toSet());
+            statsborgerskap.stream().filter(Objects::nonNull).map(Statsborgerskap::getLand).collect(Collectors.toSet());
     }
 
     public boolean harStatsborgerskap(String land) {
@@ -145,19 +145,22 @@ public class Person {
         if (this$etternavn == null ? other$etternavn != null : !this$etternavn.equals(other$etternavn)) return false;
         final java.lang.Object this$etternavnvedfoedsel = this.getEtternavnvedfoedsel();
         final java.lang.Object other$etternavnvedfoedsel = other.getEtternavnvedfoedsel();
-        if (this$etternavnvedfoedsel == null ? other$etternavnvedfoedsel != null : !this$etternavnvedfoedsel.equals(other$etternavnvedfoedsel)) return false;
+        if (this$etternavnvedfoedsel == null ? other$etternavnvedfoedsel != null : !this$etternavnvedfoedsel.equals(other$etternavnvedfoedsel))
+            return false;
         final java.lang.Object this$foedested = this.getFoedested();
         final java.lang.Object other$foedested = other.getFoedested();
         if (this$foedested == null ? other$foedested != null : !this$foedested.equals(other$foedested)) return false;
         final java.lang.Object this$foedselsdato = this.getFoedselsdato();
         final java.lang.Object other$foedselsdato = other.getFoedselsdato();
-        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato)) return false;
+        if (this$foedselsdato == null ? other$foedselsdato != null : !this$foedselsdato.equals(other$foedselsdato))
+            return false;
         final java.lang.Object this$fornavn = this.getFornavn();
         final java.lang.Object other$fornavn = other.getFornavn();
         if (this$fornavn == null ? other$fornavn != null : !this$fornavn.equals(other$fornavn)) return false;
         final java.lang.Object this$fornavnvedfoedsel = this.getFornavnvedfoedsel();
         final java.lang.Object other$fornavnvedfoedsel = other.getFornavnvedfoedsel();
-        if (this$fornavnvedfoedsel == null ? other$fornavnvedfoedsel != null : !this$fornavnvedfoedsel.equals(other$fornavnvedfoedsel)) return false;
+        if (this$fornavnvedfoedsel == null ? other$fornavnvedfoedsel != null : !this$fornavnvedfoedsel.equals(other$fornavnvedfoedsel))
+            return false;
         final java.lang.Object this$kjoenn = this.getKjoenn();
         final java.lang.Object other$kjoenn = other.getKjoenn();
         if (this$kjoenn == null ? other$kjoenn != null : !this$kjoenn.equals(other$kjoenn)) return false;
@@ -166,7 +169,8 @@ public class Person {
         if (this$pin == null ? other$pin != null : !this$pin.equals(other$pin)) return false;
         final java.lang.Object this$statsborgerskap = this.getStatsborgerskap();
         final java.lang.Object other$statsborgerskap = other.getStatsborgerskap();
-        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap)) return false;
+        if (this$statsborgerskap == null ? other$statsborgerskap != null : !this$statsborgerskap.equals(other$statsborgerskap))
+            return false;
         return true;
     }
 

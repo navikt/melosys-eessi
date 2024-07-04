@@ -103,7 +103,8 @@ public class IdentRekvisisjonNorskPostboksadresse extends Postboksadresse {
         if (this$postboks == null ? other$postboks != null : !this$postboks.equals(other$postboks)) return false;
         final java.lang.Object this$postnummer = this.getPostnummer();
         final java.lang.Object other$postnummer = other.getPostnummer();
-        if (this$postnummer == null ? other$postnummer != null : !this$postnummer.equals(other$postnummer)) return false;
+        if (this$postnummer == null ? other$postnummer != null : !this$postnummer.equals(other$postnummer))
+            return false;
         return true;
     }
 
