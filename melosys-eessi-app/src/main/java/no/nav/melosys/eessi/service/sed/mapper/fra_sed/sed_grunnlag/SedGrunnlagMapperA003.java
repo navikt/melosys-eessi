@@ -31,15 +31,15 @@ public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovva
 
         List<Arbeidsgiver> arbeidsgivere = hentArbeidsgivere(sed);
         List<Virksomhet> norskeVirksomheter = arbeidsgivere.stream()
-                .filter(SedGrunnlagMapperA003::erNorskArbeidsgiver)
-                .map(Virksomhet::av)
-                .collect(Collectors.toList());
+            .filter(SedGrunnlagMapperA003::erNorskArbeidsgiver)
+            .map(Virksomhet::av)
+            .collect(Collectors.toList());
         sedGrunnlagDto.setNorskeArbeidsgivendeVirksomheter(norskeVirksomheter);
 
         List<Virksomhet> utenlandskeVirksomheter = arbeidsgivere.stream()
-                .filter(SedGrunnlagMapperA003::erUtenlandskArbeidsgiver)
-                .map(Virksomhet::av)
-                .collect(Collectors.toList());
+            .filter(SedGrunnlagMapperA003::erUtenlandskArbeidsgiver)
+            .map(Virksomhet::av)
+            .collect(Collectors.toList());
         sedGrunnlagDto.setArbeidsgivendeVirksomheter(utenlandskeVirksomheter);
 
         return sedGrunnlagDto;
@@ -47,13 +47,13 @@ public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovva
 
     private List<Bestemmelse> mapOvergangsregelbestemmelse(MedlemskapA003 medlemskap) {
         return StreamUtils.nullableStream(medlemskap.getGjeldendereglerEC883())
-                .map(Bestemmelse::fraString).collect(Collectors.toList());
+            .map(Bestemmelse::fraString).collect(Collectors.toList());
     }
 
     private List<Arbeidsgiver> hentArbeidsgivere(SED sed) {
         return Stream.concat(
-                hentArbeidsgivere(sed.getNav()).stream(),
-                hentAndrelandArbeidsgivere(hentMedlemskap(sed)).stream()
+            hentArbeidsgivere(sed.getNav()).stream(),
+            hentAndrelandArbeidsgivere(hentMedlemskap(sed)).stream()
         ).collect(Collectors.toList());
     }
 

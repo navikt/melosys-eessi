@@ -6,10 +6,13 @@ import java.util.Set;
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.*;
+import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
-import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg;
+import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
+import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
+import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
 
 import static no.nav.melosys.eessi.controller.dto.Bestemmelse.*;
 

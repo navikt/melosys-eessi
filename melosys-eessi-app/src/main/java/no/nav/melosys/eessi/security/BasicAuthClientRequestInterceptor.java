@@ -31,9 +31,9 @@ public class BasicAuthClientRequestInterceptor implements ClientHttpRequestInter
 
     private String basicAuth() {
         return "Basic " + Base64.getEncoder().encodeToString(
-                String.format("%s:%s",
-                        appCredentials.getUsername(),
-                        appCredentials.getPassword()
-                ).getBytes(StandardCharsets.UTF_8));
+            String.format("%s:%s",
+                appCredentials.getUsername(),
+                appCredentials.getPassword()
+            ).getBytes(StandardCharsets.UTF_8));
     }
 }

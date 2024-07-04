@@ -22,9 +22,9 @@ public class SakConsumerProducer {
     public SakConsumer sakRestClient(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor,
                                      CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
         RestTemplate restTemplate = new RestTemplateBuilder()
-                .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-                .interceptors(basicAuthClientRequestInterceptor, correlationIdOutgoingInterceptor)
-                .build();
+            .uriTemplateHandler(new DefaultUriBuilderFactory(url))
+            .interceptors(basicAuthClientRequestInterceptor, correlationIdOutgoingInterceptor)
+            .build();
         return new SakConsumer(restTemplate);
     }
 }

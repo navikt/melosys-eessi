@@ -12,6 +12,6 @@ public class HorisontalSedMapper implements SedMapper {
 
     @Override
     public SedType getSedType() {
-       return sedType;
+        return sedType;
     }
 }

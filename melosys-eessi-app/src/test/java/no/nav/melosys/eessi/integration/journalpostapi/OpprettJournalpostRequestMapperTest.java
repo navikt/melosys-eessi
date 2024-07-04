@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import java.io.IOException;
 import java.util.List;
 
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;

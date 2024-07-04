@@ -15,8 +15,8 @@ public abstract class SvarAnmodningUnntakEessiMeldingMapper<T extends Medlemskap
                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer,
                                    boolean sedErEndring, String sedVersjon) {
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
-                rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
-                sedErEndring, sedVersjon);
+            rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
+            sedErEndring, sedVersjon);
 
         T medlemskap = hentMedlemskap(sed);
 

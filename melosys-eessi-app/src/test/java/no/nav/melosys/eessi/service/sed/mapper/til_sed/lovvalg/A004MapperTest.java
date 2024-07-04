@@ -9,7 +9,6 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA004;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA005;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Test;

@@ -76,7 +76,7 @@ public enum SedType {
 
     public static final List<SedType> KREVER_ADRESSE = Arrays.asList(SedType.A001, SedType.A002, SedType.A003, SedType.A004, SedType.A007, SedType.A009, SedType.A010);
 
-    public boolean kreverAdresse(){
+    public boolean kreverAdresse() {
         return KREVER_ADRESSE.stream().anyMatch(s -> s.equals(this));
     }
 }

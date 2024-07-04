@@ -6,10 +6,11 @@ import no.nav.melosys.eessi.models.exception.MappingException;
 // Verdiene er hentet fra 'a1grunnlagskoder.properties' i eux-prosjektet.
 class A1GrunnlagMapper {
 
-    private A1GrunnlagMapper() {}
+    private A1GrunnlagMapper() {
+    }
 
-    private static final String BESTEMMELSE_12_R  = "12_r";
-    private static final String BESTEMMELSE_16_R  = "16_R";
+    private static final String BESTEMMELSE_12_R = "12_r";
+    private static final String BESTEMMELSE_16_R = "16_R";
     private static final String BESTEMMELSE_OTHER = "annet";
 
     public static String mapFromBestemmelse(Bestemmelse bestemmelse) {

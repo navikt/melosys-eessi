@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.config;
 
 import java.util.concurrent.TimeUnit;
+
 import com.google.common.cache.CacheBuilder;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -20,8 +21,8 @@ public class CachingConfig {
             @Override
             protected Cache createConcurrentMapCache(String name) {
                 return new ConcurrentMapCache(name,
-                        CacheBuilder.newBuilder().expireAfterWrite(24, TimeUnit.HOURS).build().asMap(),
-                        false);
+                    CacheBuilder.newBuilder().expireAfterWrite(24, TimeUnit.HOURS).build().asMap(),
+                    false);
             }
         };
     }

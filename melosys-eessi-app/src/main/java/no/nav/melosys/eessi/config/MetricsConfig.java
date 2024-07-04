@@ -15,7 +15,7 @@ public class MetricsConfig {
     @Bean
     MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
         return registry -> registry.config().meterFilter(new PrometheusRenameFilter())
-                .commonTags("app", "melosys-eessi", "team", "teammelosys");
+            .commonTags("app", "melosys-eessi", "team", "teammelosys");
     }
 
     @Bean

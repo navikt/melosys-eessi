@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.security;
 
+import java.util.Optional;
 import jakarta.annotation.Nonnull;
 
 import no.nav.security.token.support.client.core.ClientProperties;
@@ -11,8 +12,6 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 public abstract class GenericContextExchangeFilter implements ExchangeFilterFunction {
 

@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.integration.interceptor;
 
+import java.io.IOException;
+
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;

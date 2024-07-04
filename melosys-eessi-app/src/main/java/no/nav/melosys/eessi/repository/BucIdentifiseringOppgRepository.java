@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 public interface BucIdentifiseringOppgRepository extends JpaRepository<BucIdentifiseringOppg, Long> {
 
     Collection<BucIdentifiseringOppg> findByRinaSaksnummer(String rinaSaksnummer);
+
     Optional<BucIdentifiseringOppg> findByOppgaveId(String oppgaveID);
 
     @Transactional

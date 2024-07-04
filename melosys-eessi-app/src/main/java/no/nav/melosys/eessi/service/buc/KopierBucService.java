@@ -32,17 +32,17 @@ public class KopierBucService {
         var førsteSEDType = bucType.hentFørsteLovligeSed();
 
         var sed = buc.getDocuments().stream()
-                .filter(d -> førsteSEDType.name().equals(d.getType()))
-                .filter(Document::erOpprettet)
-                .min(Comparator.comparing(Document::getCreationDate))
-                .map(d -> euxService.hentSed(rinaSaksnummer, d.getId()))
-                .orElseThrow(() -> new NoSuchElementException("Finner ikke første SED for rinasak " + rinaSaksnummer));
+            .filter(d -> førsteSEDType.name().equals(d.getType()))
+            .filter(Document::erOpprettet)
+            .min(Comparator.comparing(Document::getCreationDate))
+            .map(d -> euxService.hentSed(rinaSaksnummer, d.getId()))
+            .orElseThrow(() -> new NoSuchElementException("Finner ikke første SED for rinasak " + rinaSaksnummer));
 
         settYtterligereInfo(sed, buc.getInternationalId());
         var nyttRinaSaksnummer = euxService.opprettBucOgSed(bucType, buc.hentMottakere(), sed, Collections.emptySet()).getRinaSaksnummer();
 
         saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer)
-                .ifPresent(saksrelasjon -> saksrelasjonService.lagreKobling(saksrelasjon.getGsakSaksnummer(), nyttRinaSaksnummer, bucType));
+            .ifPresent(saksrelasjon -> saksrelasjonService.lagreKobling(saksrelasjon.getGsakSaksnummer(), nyttRinaSaksnummer, bucType));
 
         return nyttRinaSaksnummer;
     }
@@ -60,10 +60,10 @@ public class KopierBucService {
 
     private String hentInfoTekst(String sedType, String internasjonalID) {
         return String.format("""
-                Due to an error in Rina, we are sending you a new %s.
-                This BUC replaces a previously sent BUC with International ID: %s.
-                We are unable to read your reply to our %s in the original BUC.
-                Please reply in this BUC. We apologize for any inconvenience this may have caused.
-                """, sedType, internasjonalID, sedType);
+            Due to an error in Rina, we are sending you a new %s.
+            This BUC replaces a previously sent BUC with International ID: %s.
+            We are unable to read your reply to our %s in the original BUC.
+            Please reply in this BUC. We apologize for any inconvenience this may have caused.
+            """, sedType, internasjonalID, sedType);
     }
 }
