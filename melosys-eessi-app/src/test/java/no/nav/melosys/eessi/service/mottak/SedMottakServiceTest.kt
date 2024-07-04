@@ -1,7 +1,10 @@
 package no.nav.melosys.eessi.service.mottak
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
@@ -22,15 +25,12 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import io.kotest.matchers.shouldBe
-import io.kotest.assertions.throwables.shouldThrow
-import io.mockk.junit5.MockKExtension
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
 class SedMottakServiceTest {
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var opprettInngaaendeJournalpostService: OpprettInngaaendeJournalpostService
 
     @MockK(relaxed = true)
@@ -39,10 +39,10 @@ class SedMottakServiceTest {
     @MockK(relaxed = true)
     private lateinit var personIdentifisering: PersonIdentifisering
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var pdlService: PDLService
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var oppgaveService: OppgaveService
 
     @MockK(relaxed = true)
@@ -54,7 +54,7 @@ class SedMottakServiceTest {
     @MockK(relaxed = true)
     private lateinit var bucIdentifisertService: BucIdentifisertService
 
-    @MockK(relaxed = true)
+    @MockK
     private lateinit var journalpostSedKoblingService: JournalpostSedKoblingService
 
     @MockK(relaxed = true)
@@ -62,9 +62,6 @@ class SedMottakServiceTest {
 
     private lateinit var sedMottakService: SedMottakService
 
-    private val IDENT = "1122334455"
-    private val SED_ID = "555554444"
-    private val RINA_SAKSNUMMER = "12313213"
 
     @BeforeEach
     fun setup() {
@@ -87,8 +84,14 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed finnerIkkePerson OppgaveOpprettes`() {
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
-        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "9988776655"
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every {
+            opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
+                any(),
+                any(),
+                any()
+            )
+        } returns "9988776655"
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
         every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
         every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
@@ -108,13 +111,12 @@ class SedMottakServiceTest {
     }
 
     @Test
-    fun `behandleSed finnerIkkePerson oppgaveOpprettesNarIkkeASed`() {
+    fun `behandleSed finnerIkkePerson oppgaveOpprettesNårIkkeASed`() {
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
 
-        val sedHendelse = sedHendelseUtenBruker()
-        sedHendelse.sedType = "H001"
+        val sedHendelse = sedHendelseUtenBruker().apply { sedType = "H001" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
@@ -130,8 +132,7 @@ class SedMottakServiceTest {
     fun `behandleSed finnerPerson forventPersonIdentifisertEvent`() {
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
-
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         val sedHendelse = sedHendelseMedBruker()
 
         sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build())
@@ -145,12 +146,14 @@ class SedMottakServiceTest {
     }
 
     @Test
-    fun `behandleSed ikkeIdentifisertApenOppgaveFinnes oppretterIkkeNyOppgaveEllerJournalpost`() {
+    fun `behandleSed ikkeIdentifisertÅpenOppgaveFinnes oppretterIkkeNyOppgaveEllerJournalpost`() {
         val oppgaveID = "5555"
         val bucIdentifiseringOppg = BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID, 1)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns setOf(bucIdentifiseringOppg)
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns setOf(
+            bucIdentifiseringOppg
+        )
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         val oppgave = HentOppgaveDto().apply { status = "OPPRETTET" }
         every { oppgaveService.hentOppgave(oppgaveID) } returns oppgave
@@ -190,7 +193,6 @@ class SedMottakServiceTest {
     private fun opprettSED(): SED {
         val norge = Statsborgerskap().apply { land = "NO" }
         val sverige = Statsborgerskap().apply { land = "SE" }
-
         val statsborgerskap = listOf(norge, sverige)
 
         val person = Person().apply {
@@ -199,46 +201,43 @@ class SedMottakServiceTest {
         }
 
         val bruker = Bruker().apply { this.person = person }
-
         val nav = Nav().apply { this.bruker = bruker }
 
-        val sed = SED().apply {
+        return SED().apply {
             this.nav = nav
             sedType = "A009"
-        }
-
-        val medlemskap = MedlemskapA009().apply {
-            vedtak = VedtakA009().apply {
-                gjelderperiode = Periode().apply {
-                    fastperiode = Fastperiode().apply {
-                        startdato = "2019-05-01"
-                        sluttdato = "2019-12-01"
+            medlemskap = MedlemskapA009().apply {
+                vedtak = VedtakA009().apply {
+                    gjelderperiode = Periode().apply {
+                        fastperiode = Fastperiode().apply {
+                            startdato = "2019-05-01"
+                            sluttdato = "2019-12-01"
+                        }
                     }
                 }
             }
         }
-        sed.medlemskap = medlemskap
-
-        return sed
     }
 
-    private fun sedHendelseMedBruker(): SedHendelse {
-        return sedHendelseUtenBruker().apply {
-            avsenderId = "SE:12345"
-            navBruker = IDENT
-            sedId = SED_ID
-            rinaSakId = RINA_SAKSNUMMER
-        }
+    companion object {
+        private const val IDENT = "1122334455"
+        private const val SED_ID = "555554444"
+        private const val RINA_SAKSNUMMER = "12313213"
     }
 
-    private fun sedHendelseUtenBruker(): SedHendelse {
-        return SedHendelse().apply {
-            navBruker = "ukjent"
-            avsenderId = "SE:12345"
-            rinaSakId = RINA_SAKSNUMMER
-            rinaDokumentId = "456"
-            sedId = SED_ID
-            sedType = "A009"
-        }
+    private fun sedHendelseMedBruker() = sedHendelseUtenBruker().apply {
+        avsenderId = "SE:12345"
+        navBruker = IDENT
+        sedId = SED_ID
+        rinaSakId = RINA_SAKSNUMMER
+    }
+
+    private fun sedHendelseUtenBruker() = SedHendelse().apply {
+        navBruker = "ukjent"
+        avsenderId = "SE:12345"
+        rinaSakId = RINA_SAKSNUMMER
+        rinaDokumentId = "456"
+        sedId = SED_ID
+        sedType = "A009"
     }
 }
