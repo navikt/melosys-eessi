@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+
 import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
 

@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
 
 import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import no.nav.melosys.eessi.models.SedType;

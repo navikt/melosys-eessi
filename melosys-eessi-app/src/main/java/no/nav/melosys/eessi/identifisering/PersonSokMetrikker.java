@@ -4,9 +4,11 @@ package no.nav.melosys.eessi.identifisering;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 import org.springframework.stereotype.Component;
+
 import static no.nav.melosys.eessi.metrikker.MetrikkerNavn.METRIKKER_NAMESPACE;
 
 @Component

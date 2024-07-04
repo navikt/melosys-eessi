@@ -3,8 +3,8 @@ package no.nav.melosys.eessi.models;
 
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
+
 import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.*;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;

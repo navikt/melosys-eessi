@@ -4,6 +4,7 @@ package no.nav.melosys.eessi.config;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -38,6 +39,7 @@ import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 import org.springframework.messaging.Message;
+
 import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendelse.Hendelsestype.OPPGAVE_ENDRET;
 
 @Configuration

@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.models.sed.medlemskap.impl;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
 import no.nav.melosys.eessi.models.sed.nav.Andreland;

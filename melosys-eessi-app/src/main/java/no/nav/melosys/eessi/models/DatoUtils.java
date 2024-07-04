@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.models;
 
 import java.time.LocalDate;
+
 import javax.xml.datatype.XMLGregorianCalendar;
 
 public final class DatoUtils {

@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.security;
 
 import java.util.Map;
+
 import com.nimbusds.jwt.SignedJWT;
 import no.nav.security.token.support.core.context.TokenValidationContext;
 import no.nav.security.token.support.core.jwt.JwtToken;

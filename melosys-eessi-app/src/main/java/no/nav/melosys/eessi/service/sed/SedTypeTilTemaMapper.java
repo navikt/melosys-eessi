@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.service.sed;
 
 import java.util.EnumSet;
+
 import no.nav.melosys.eessi.models.SedType;
 
 public final class SedTypeTilTemaMapper {

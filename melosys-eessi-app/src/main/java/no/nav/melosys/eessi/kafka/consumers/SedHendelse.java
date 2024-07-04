@@ -3,8 +3,8 @@ package no.nav.melosys.eessi.kafka.consumers;
 
 import java.util.List;
 import java.util.stream.Stream;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
 import no.nav.melosys.eessi.models.SedType;
 
 public class SedHendelse {

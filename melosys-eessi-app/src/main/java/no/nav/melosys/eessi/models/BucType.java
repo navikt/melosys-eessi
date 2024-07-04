@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.models;
 
 import java.util.Arrays;
 import java.util.Map;
+
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 

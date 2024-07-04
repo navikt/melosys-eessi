@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto;
 
 import java.time.LocalDate;
 import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLKjoennType;
 

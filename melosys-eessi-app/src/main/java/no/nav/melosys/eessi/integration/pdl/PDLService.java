@@ -1,5 +1,11 @@
 package no.nav.melosys.eessi.integration.pdl;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvisisjonTilMellomlagring;
@@ -10,12 +16,6 @@ import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.HarMetadata.hentSisteOpplysning;
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriterion.*;

@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.mottak;
 
 import no.nav.melosys.eessi.identifisering.BehandleBucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
-import no.nav.melosys.eessi.integration.PersonFasade;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

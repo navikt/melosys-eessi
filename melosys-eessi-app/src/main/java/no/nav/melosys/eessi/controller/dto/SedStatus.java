@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.Arrays;
+
 import org.springframework.util.StringUtils;
 
 public enum SedStatus {

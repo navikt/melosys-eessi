@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.journalfoering;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.melosys.eessi.models.SedType;
 import org.springframework.stereotype.Component;
 

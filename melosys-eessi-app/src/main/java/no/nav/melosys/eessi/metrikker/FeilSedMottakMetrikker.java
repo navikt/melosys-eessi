@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.metrikker;
 
 import jakarta.annotation.PostConstruct;
+
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import no.nav.melosys.eessi.repository.SedMottattRepository;

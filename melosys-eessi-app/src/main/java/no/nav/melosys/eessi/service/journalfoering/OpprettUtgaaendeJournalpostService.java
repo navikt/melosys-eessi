@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.journalfoering;
 
 import java.util.List;
 import java.util.Optional;
+
 import io.getunleash.Unleash;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -17,6 +18,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.stereotype.Service;
+
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Service

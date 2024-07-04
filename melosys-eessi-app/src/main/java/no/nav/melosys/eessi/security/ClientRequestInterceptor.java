@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.security;
 
 import java.io.IOException;
 import java.util.Optional;
+
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;

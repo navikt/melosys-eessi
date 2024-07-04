@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.controller.dto;
 
 import java.util.Collection;
 import java.util.Collections;
+
 import no.nav.melosys.eessi.models.SedVedlegg;
 
 public class OpprettBucOgSedDto {

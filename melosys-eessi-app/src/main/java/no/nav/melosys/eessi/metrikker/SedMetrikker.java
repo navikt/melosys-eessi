@@ -2,9 +2,11 @@
 package no.nav.melosys.eessi.metrikker;
 
 import java.util.Arrays;
+
 import io.micrometer.core.instrument.Metrics;
 import no.nav.melosys.eessi.models.SedType;
 import org.springframework.stereotype.Component;
+
 import static no.nav.melosys.eessi.metrikker.MetrikkerNavn.*;
 
 @Component

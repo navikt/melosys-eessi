@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.kafka.producers.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 
 public class MelosysEessiMelding {
     private String sedId;

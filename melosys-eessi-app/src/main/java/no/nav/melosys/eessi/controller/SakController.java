@@ -5,8 +5,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.websocket.server.PathParam;
+
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.melosys.eessi.controller.dto.BucinfoDto;
 import no.nav.melosys.eessi.controller.dto.SaksrelasjonDto;
 import no.nav.melosys.eessi.models.BucType;

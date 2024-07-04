@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.jobs;
 
 import java.util.Arrays;
+
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.service.buc.LukkBucService;

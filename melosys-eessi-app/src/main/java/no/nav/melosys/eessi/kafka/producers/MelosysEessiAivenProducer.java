@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.kafka.producers;
 
 import java.util.concurrent.ExecutionException;
+
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
 import static no.nav.melosys.eessi.config.MDCOperations.CORRELATION_ID;
 import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
 

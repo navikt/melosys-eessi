@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.integration.saf;
 
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.common.graphql.request.GraphQLRequest;
 import no.nav.melosys.eessi.integration.common.graphql.response.GraphQLResponse;

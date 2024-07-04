@@ -4,11 +4,11 @@ package no.nav.melosys.eessi.integration.oppgave;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.Map;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import lombok.*;
 
 public class OppgaveDto {
     private String aktoerId;

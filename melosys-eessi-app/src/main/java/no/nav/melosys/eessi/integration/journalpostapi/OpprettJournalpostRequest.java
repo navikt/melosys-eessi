@@ -3,8 +3,9 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.NonNull;
 
 public class OpprettJournalpostRequest {
   @NonNull
@@ -20,14 +21,14 @@ public class OpprettJournalpostRequest {
   //"Ved automatisk journalføring uten mennesker involvert skal enhet settes til \"9999\"."
   private String journalfoerendeEnhet;
   private String eksternReferanseId;
-  private List<Tilleggsopplysning> tilleggsopplysninger;
+  private final List<Tilleggsopplysning> tilleggsopplysninger;
   private Sak sak;
   //"Første dokument blir tilknyttet som hoveddokument på journalposten. Øvrige dokumenter tilknyttes som vedlegg. Rekkefølgen på vedlegg beholdes ikke ved uthenting av journalpost."
   private List<Dokument> dokumenter;
 
 
   public enum JournalpostType {
-    INNGAAENDE, UTGAAENDE, NOTAT;
+    INNGAAENDE, UTGAAENDE, NOTAT
   }
 
 
@@ -39,7 +40,7 @@ public class OpprettJournalpostRequest {
 
 
     public enum IdType {
-      FNR, ORGNR, HPRNR, UTL_ORG;
+      FNR, ORGNR, HPRNR, UTL_ORG
     }
 
 
@@ -235,7 +236,7 @@ public class OpprettJournalpostRequest {
 
 
   public enum BrukerIdType {
-    FNR, ORGNR;
+    FNR, ORGNR
   }
 
 

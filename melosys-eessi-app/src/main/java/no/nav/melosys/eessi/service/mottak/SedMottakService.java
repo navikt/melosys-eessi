@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.service.mottak;
 
 import jakarta.transaction.Transactional;
+
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.FnrUtils;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;

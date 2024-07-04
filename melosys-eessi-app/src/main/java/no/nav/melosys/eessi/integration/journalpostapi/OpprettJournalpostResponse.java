@@ -2,7 +2,6 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.util.List;
-import lombok.*;
 
 public class OpprettJournalpostResponse {
   private String journalpostId;

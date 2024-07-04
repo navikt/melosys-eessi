@@ -4,6 +4,7 @@ package no.nav.melosys.eessi.controller;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
@@ -15,9 +16,9 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag.SedGrunnlagMapperFactory;
 import no.nav.security.token.support.core.api.Protected;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+
 import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 

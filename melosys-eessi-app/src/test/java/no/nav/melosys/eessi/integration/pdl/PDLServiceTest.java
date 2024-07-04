@@ -1,5 +1,11 @@
 package no.nav.melosys.eessi.integration.pdl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.person.Kjønn;
@@ -13,12 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.*;
 import static org.assertj.core.api.Assertions.assertThat;

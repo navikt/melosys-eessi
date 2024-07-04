@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.config;
 
 import java.util.concurrent.TimeUnit;
+
 import com.google.common.cache.CacheBuilder;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;

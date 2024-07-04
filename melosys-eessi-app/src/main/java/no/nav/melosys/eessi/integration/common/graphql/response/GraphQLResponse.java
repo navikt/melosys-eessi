@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.integration.common.graphql.response;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.springframework.util.CollectionUtils;
 
 public class GraphQLResponse<T> {

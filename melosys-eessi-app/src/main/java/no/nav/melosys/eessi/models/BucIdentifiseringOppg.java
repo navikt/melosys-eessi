@@ -2,7 +2,6 @@
 package no.nav.melosys.eessi.models;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 @Entity(name = "buc_identifisering_oppg")
 public class BucIdentifiseringOppg {

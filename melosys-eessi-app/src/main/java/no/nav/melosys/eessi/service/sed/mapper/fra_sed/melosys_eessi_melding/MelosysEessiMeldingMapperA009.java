@@ -2,11 +2,13 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
 
 import java.time.LocalDate;
+
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
+
 import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 
 class MelosysEessiMeldingMapperA009 implements NyttLovvalgEessiMeldingMapper<MedlemskapA009> {

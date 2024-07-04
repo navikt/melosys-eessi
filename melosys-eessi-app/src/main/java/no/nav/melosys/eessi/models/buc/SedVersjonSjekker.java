@@ -2,7 +2,9 @@
 package no.nav.melosys.eessi.models.buc;
 
 import java.util.regex.Pattern;
+
 import no.nav.melosys.eessi.models.sed.SED;
+
 import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
 import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
 

@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.util.stream.Stream;
+
 import org.apache.commons.lang3.StringUtils;
 
 public enum Adressetype {

@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.kafka.consumers;
 
 import java.util.UUID;
+
 import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
+
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Component

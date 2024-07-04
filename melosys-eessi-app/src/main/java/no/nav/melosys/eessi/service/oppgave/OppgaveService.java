@@ -3,10 +3,12 @@ package no.nav.melosys.eessi.service.oppgave;
 
 import java.time.LocalDate;
 import java.util.Map;
+
 import no.nav.melosys.eessi.integration.oppgave.*;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
 
 @Service

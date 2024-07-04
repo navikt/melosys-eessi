@@ -4,6 +4,7 @@ package no.nav.melosys.eessi.models.sed;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.DatabindContext;
 import com.fasterxml.jackson.databind.JavaType;

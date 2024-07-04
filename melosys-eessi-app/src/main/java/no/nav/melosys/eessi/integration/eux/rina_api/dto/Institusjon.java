@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.integration.eux.rina_api.dto;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)

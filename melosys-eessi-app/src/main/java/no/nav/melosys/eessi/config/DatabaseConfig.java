@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.config;
 
 import jakarta.persistence.EntityManagerFactory;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;

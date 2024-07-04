@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.service.journalfoering;
 
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;

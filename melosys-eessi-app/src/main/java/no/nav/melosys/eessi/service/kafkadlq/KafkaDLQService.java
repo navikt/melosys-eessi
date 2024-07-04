@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import jakarta.transaction.Transactional;
+
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -15,6 +16,7 @@ import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostSe
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.springframework.stereotype.Service;
+
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Service

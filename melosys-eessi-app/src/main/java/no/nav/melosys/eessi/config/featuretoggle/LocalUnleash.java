@@ -1,18 +1,18 @@
 package no.nav.melosys.eessi.config.featuretoggle;
 
-import io.getunleash.*;
-import io.getunleash.lang.Nullable;
-
 import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
+import io.getunleash.*;
+import io.getunleash.lang.Nullable;
+
 public final class LocalUnleash implements Unleash {
     private boolean enableAll = false;
     private boolean disableAll = false;
-    private Map<String, Boolean> features = new HashMap<>();
-    private Map<String, Variant> variants = new HashMap<>();
-    private Map<String, Boolean> excludedFeatures = new HashMap<>();
+    private final Map<String, Boolean> features = new HashMap<>();
+    private final Map<String, Variant> variants = new HashMap<>();
+    private final Map<String, Boolean> excludedFeatures = new HashMap<>();
 
     @Override
     public boolean isEnabled(String toggleName) {

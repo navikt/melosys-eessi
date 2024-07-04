@@ -13,7 +13,7 @@ public class Participant {
         UTSENDER, @JsonProperty("Participant")
         DELTAKER, @JsonProperty("CounterParty")
         MOTPART, @JsonProperty("CaseOwner")
-        SAKSEIER;
+        SAKSEIER
     }
 
     private ParticipantRole role;

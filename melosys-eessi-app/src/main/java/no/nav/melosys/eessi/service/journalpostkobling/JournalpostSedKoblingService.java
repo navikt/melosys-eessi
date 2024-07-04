@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.service.journalpostkobling;
 
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;

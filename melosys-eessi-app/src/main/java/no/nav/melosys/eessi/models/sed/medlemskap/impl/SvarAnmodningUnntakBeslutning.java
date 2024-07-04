@@ -11,7 +11,7 @@ public enum SvarAnmodningUnntakBeslutning {
     DELVIS_INNVILGELSE("godkjent_for_annen_periode"),
     AVSLAG("ikke_godkjent");
 
-    private String rinaKode;
+    private final String rinaKode;
 
     private static final Map<String, SvarAnmodningUnntakBeslutning> rel = Collections.unmodifiableMap(
             Arrays.stream(values())

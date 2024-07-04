@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import fr.opensagres.poi.xwpf.converter.core.XWPFConverterException;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfConverter;
 import fr.opensagres.poi.xwpf.converter.pdf.PdfOptions;
@@ -28,6 +29,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+
 import static no.nav.melosys.eessi.integration.journalpostapi.JournalpostFiltype.PDF;
 import static no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest.*;
 import static no.nav.melosys.eessi.service.sed.SedTypeTilTemaMapper.temaForSedType;
@@ -96,20 +98,20 @@ public final class OpprettJournalpostRequestMapper {
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
         if (filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
         switch (filtype) {
-        case PDF: 
+        case PDF:
             {
                 return binaerFil.getInnhold();
             }
-        case DOCX: 
+        case DOCX:
             {
                 return konverterWordTilPdf(binaerFil).toByteArray();
             }
-        case TIFF: 
-        case JPEG: 
+        case TIFF:
+        case JPEG:
             {
                 return konverterBildeTilPdf(binaerFil, filtype).toByteArray();
             }
-        default: 
+        default:
             return binaerFil.getInnhold();
         }
     }

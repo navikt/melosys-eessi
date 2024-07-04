@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.saksrelasjon;
 
 import java.util.List;
 import java.util.Optional;
+
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;

@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.controller.dto;
 
 import java.time.LocalDateTime;
+
 import no.nav.melosys.eessi.models.kafkadlq.QueueType;
 
 public class KafkaDLQDto {

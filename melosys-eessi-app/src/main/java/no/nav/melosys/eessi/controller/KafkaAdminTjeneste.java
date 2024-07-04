@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.controller;
 
 import java.util.List;
 import java.util.Optional;
+
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
 import no.nav.melosys.eessi.kafka.consumers.OppgaveHendelseConsumer;

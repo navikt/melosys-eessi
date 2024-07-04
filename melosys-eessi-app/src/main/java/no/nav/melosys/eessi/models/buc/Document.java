@@ -4,7 +4,7 @@ package no.nav.melosys.eessi.models.buc;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonFormat;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import no.nav.melosys.eessi.controller.dto.SedStatus;
 import no.nav.melosys.eessi.models.SedType;

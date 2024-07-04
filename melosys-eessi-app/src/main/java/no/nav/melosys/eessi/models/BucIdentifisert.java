@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.models;
 
 import jakarta.persistence.*;
+
 import org.checkerframework.common.aliasing.qual.Unique;
 
 @Entity(name = "buc_identifisert")

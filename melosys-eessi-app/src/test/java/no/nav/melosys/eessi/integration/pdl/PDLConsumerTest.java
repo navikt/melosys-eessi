@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
+
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.AKTORID;
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
 import static org.assertj.core.api.Assertions.assertThat;

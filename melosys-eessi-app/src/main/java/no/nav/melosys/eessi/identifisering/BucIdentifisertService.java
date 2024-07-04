@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.identifisering;
 
 import java.util.Optional;
+
 import no.nav.melosys.eessi.identifisering.event.BucIdentifisertEvent;
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.models.BucIdentifisert;
