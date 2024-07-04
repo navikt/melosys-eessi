@@ -1,263 +1,244 @@
-package no.nav.melosys.eessi.service.mottak;
+package no.nav.melosys.eessi.service.mottak
 
-import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
-import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import no.nav.melosys.eessi.integration.pdl.PDLService;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.metrikker.SedMetrikker;
-import no.nav.melosys.eessi.models.BucIdentifiseringOppg;
-import no.nav.melosys.eessi.models.SedMottattHendelse;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
-import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService;
-import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.oppgave.OppgaveService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import io.mockk.*
+import io.mockk.impl.annotations.MockK
+import no.nav.melosys.eessi.identifisering.BucIdentifisertService
+import no.nav.melosys.eessi.identifisering.PersonIdentifisering
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
+import no.nav.melosys.eessi.integration.pdl.PDLService
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.metrikker.SedMetrikker
+import no.nav.melosys.eessi.models.BucIdentifiseringOppg
+import no.nav.melosys.eessi.models.SedMottattHendelse
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
+import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
+import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
+import no.nav.melosys.eessi.service.eux.EuxService
+import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
+import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
+import no.nav.melosys.eessi.service.oppgave.OppgaveService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import io.kotest.matchers.shouldBe
+import io.kotest.assertions.throwables.shouldThrow
+import io.mockk.junit5.MockKExtension
+import java.util.*
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockKExtension::class)
 class SedMottakServiceTest {
 
-    @Mock
-    private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-    @Mock
-    private EuxService euxService;
-    @Mock
-    private PersonIdentifisering personIdentifisering;
-    @Mock
-    private PDLService pdlService;
-    @Mock
-    private OppgaveService oppgaveService;
-    @Mock
-    private SedMottattHendelseRepository sedMottattHendelseRepository;
-    @Mock
-    private BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
-    @Mock
-    private BucIdentifisertService bucIdentifisertService;
-    @Mock
-    private JournalpostSedKoblingService journalpostSedKoblingService;
-    @Mock
-    private SedMetrikker sedMetrikker;
+    @MockK(relaxed = true)
+    private lateinit var opprettInngaaendeJournalpostService: OpprettInngaaendeJournalpostService
 
-    private SedMottakService sedMottakService;
+    @MockK(relaxed = true)
+    private lateinit var euxService: EuxService
 
-    private static final String IDENT = "1122334455";
-    private static final String SED_ID = "555554444";
-    private static final String RINA_SAKSNUMMER = "12313213";
+    @MockK(relaxed = true)
+    private lateinit var personIdentifisering: PersonIdentifisering
+
+    @MockK(relaxed = true)
+    private lateinit var pdlService: PDLService
+
+    @MockK(relaxed = true)
+    private lateinit var oppgaveService: OppgaveService
+
+    @MockK(relaxed = true)
+    private lateinit var sedMottattHendelseRepository: SedMottattHendelseRepository
+
+    @MockK(relaxed = true)
+    private lateinit var bucIdentifiseringOppgRepository: BucIdentifiseringOppgRepository
+
+    @MockK(relaxed = true)
+    private lateinit var bucIdentifisertService: BucIdentifisertService
+
+    @MockK(relaxed = true)
+    private lateinit var journalpostSedKoblingService: JournalpostSedKoblingService
+
+    @MockK(relaxed = true)
+    private lateinit var sedMetrikker: SedMetrikker
+
+    private lateinit var sedMottakService: SedMottakService
+
+    private val IDENT = "1122334455"
+    private val SED_ID = "555554444"
+    private val RINA_SAKSNUMMER = "12313213"
 
     @BeforeEach
-    public void setup() throws Exception {
-        sedMottakService = new SedMottakService(
-                euxService,
-                pdlService,
-                opprettInngaaendeJournalpostService,
-                oppgaveService,
-                sedMottattHendelseRepository,
-                bucIdentifiseringOppgRepository,
-                journalpostSedKoblingService,
-                sedMetrikker,
-                personIdentifisering,
-                bucIdentifisertService,
-                "1"
-        );
+    fun setup() {
+        MockKAnnotations.init(this)
+        sedMottakService = SedMottakService(
+            euxService,
+            pdlService,
+            opprettInngaaendeJournalpostService,
+            oppgaveService,
+            sedMottattHendelseRepository,
+            bucIdentifiseringOppgRepository,
+            journalpostSedKoblingService,
+            sedMetrikker,
+            personIdentifisering,
+            bucIdentifisertService,
+            "1"
+        )
     }
 
     @Test
-    void behandleSed_finnerIkkePerson_OppgaveOpprettes() {
-        when(euxService.hentSedMedRetry(anyString(), anyString()))
-                .thenReturn(opprettSED());
-        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
-        when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
-                .thenReturn("9988776655");
-        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
-        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
-        when(pdlService.opprettLenkeForRekvirering(any())).thenReturn("http://lenke.no");
-        when(oppgaveService.opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString(), anyString()))
-                .thenReturn("ignorer");
+    fun `behandleSed finnerIkkePerson OppgaveOpprettes`() {
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
+        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "9988776655"
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
+        every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
 
-        SedHendelse sedHendelse = sedHendelseUtenBruker();
-        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
+        val sedHendelse = sedHendelseUtenBruker()
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
 
-        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse);
-
-
-        verify(euxService).hentSedMedRetry(anyString(), anyString());
-        verify(personIdentifisering).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString(), any());
-        verify(sedMottattHendelseRepository, times(2)).save(any());
-        verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
-    }
-
-
-    @Test
-    void behandleSed_finnerIkkePerson_oppgaveOpprettesNårIkkeASed() {
-        when(euxService.hentSedMedRetry(anyString(), anyString()))
-                .thenReturn(opprettSED());
-        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
-        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
-        when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
-
-        SedHendelse sedHendelse = sedHendelseUtenBruker();
-        sedHendelse.setSedType("H001");
-        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
-
-
-        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse);
-
-
-        verify(euxService).hentSedMedRetry(anyString(), anyString());
-        verify(personIdentifisering).identifiserPerson(any(), any());
-        verify(sedMottattHendelseRepository).findBySedID(any());
-        verifyNoInteractions(opprettInngaaendeJournalpostService);
-        verifyNoInteractions(oppgaveService);
-    }
-
-
-    @Test
-    void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
-        when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
-        when(euxService.hentSedMedRetry(anyString(), anyString()))
-                .thenReturn(opprettSED());
-        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
-        SedHendelse sedHendelse = sedHendelseMedBruker();
-
-
-        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
-
-
-        verify(euxService).hentSedMedRetry(anyString(), anyString());
-        verify(personIdentifisering).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(sedMottattHendelseRepository).save(any());
-        verify(bucIdentifisertService).lagreIdentifisertPerson(sedHendelse.getRinaSakId(), IDENT);
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify { personIdentifisering.identifiserPerson(any(), any()) }
+        verify { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
+        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
+        verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
+        verify(exactly = 0) { bucIdentifisertService.lagreIdentifisertPerson(any(), any()) }
     }
 
     @Test
-    void behandleSed_ikkeIdentifisertÅpenOppgaveFinnes_oppretterIkkeNyOppgaveEllerJournalpost() {
-        final var oppgaveID = "5555";
-        var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID, 1);
-        when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
-        when(euxService.hentSedMedRetry(anyString(), anyString()))
-                .thenReturn(opprettSED());
-        when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
+    fun `behandleSed finnerIkkePerson oppgaveOpprettesNarIkkeASed`() {
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
 
-        final var oppgave = new HentOppgaveDto();
-        oppgave.setStatus("OPPRETTET");
-        when(oppgaveService.hentOppgave(oppgaveID)).thenReturn(oppgave);
-        SedHendelse sedHendelse = sedHendelseMedBruker();
+        val sedHendelse = sedHendelseUtenBruker()
+        sedHendelse.sedType = "H001"
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
 
-        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
-
-
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString());
-        verify(bucIdentifisertService, never()).lagreIdentifisertPerson(anyString(), anyString());
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify { personIdentifisering.identifiserPerson(any(), any()) }
+        verify { sedMottattHendelseRepository.findBySedID(any()) }
+        verify { opprettInngaaendeJournalpostService wasNot Called }
+        verify { oppgaveService wasNot Called }
     }
 
     @Test
-    void behandleSed_sedAlleredeBehandlet_behandlerIkkeVidere() {
-        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build();
-        when(sedMottattHendelseRepository.findBySedID(SED_ID)).thenReturn(Optional.of(sedMottattHendelse));
+    fun `behandleSed finnerPerson forventPersonIdentifisertEvent`() {
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
 
+        val sedHendelse = sedHendelseMedBruker()
 
-        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse);
+        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build())
 
-
-        verify(euxService, never()).hentSedMedRetry(anyString(), anyString());
-        verify(personIdentifisering, never()).identifiserPerson(any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedUtenBruker(any(), any(), any());
-        verify(opprettInngaaendeJournalpostService, never()).arkiverInngaaendeSedHentSakinformasjon(any(), any(), any());
-        verify(oppgaveService, never()).opprettOppgaveTilIdOgFordeling(any(), any(), any());
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify { personIdentifisering.identifiserPerson(any(), any()) }
+        verify { opprettInngaaendeJournalpostService wasNot Called }
+        verify { oppgaveService wasNot Called }
+        verify { sedMottattHendelseRepository.save(any()) }
+        verify { bucIdentifisertService.lagreIdentifisertPerson(sedHendelse.rinaSakId, IDENT) }
     }
 
     @Test
-    void behandleSed_xSedUtenTilhørendeASed_kasterException() {
-        SedHendelse sedHendelse = sedHendelseMedBruker();
-        sedHendelse.setSedType("X008");
-        SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
-        when(journalpostSedKoblingService.erASedAlleredeBehandlet(anyString())).thenReturn(false);
+    fun `behandleSed ikkeIdentifisertApenOppgaveFinnes oppretterIkkeNyOppgaveEllerJournalpost`() {
+        val oppgaveID = "5555"
+        val bucIdentifiseringOppg = BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID, 1)
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns setOf(bucIdentifiseringOppg)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any()) } answers { firstArg() }
 
+        val oppgave = HentOppgaveDto().apply { status = "OPPRETTET" }
+        every { oppgaveService.hentOppgave(oppgaveID) } returns oppgave
+        val sedHendelse = sedHendelseMedBruker()
 
-        assertThatThrownBy(() -> sedMottakService.behandleSedMottakHendelse(sedMottattHendelse))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet");
+        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build())
+
+        verify { opprettInngaaendeJournalpostService wasNot Called }
+        verify { oppgaveService wasNot Called }
+        verify { bucIdentifisertService wasNot Called }
     }
 
-    private SED opprettSED() {
-        Statsborgerskap norge = new Statsborgerskap();
-        norge.setLand("NO");
+    @Test
+    fun `behandleSed sedAlleredeBehandlet behandlerIkkeVidere`() {
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build()
+        every { sedMottattHendelseRepository.findBySedID(SED_ID) } returns Optional.of(sedMottattHendelse)
 
-        Statsborgerskap sverige = new Statsborgerskap();
-        sverige.setLand("SE");
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
 
-        List<Statsborgerskap> statsborgerskap = Arrays.asList(norge, sverige);
-
-        Person person = new Person();
-        person.setStatsborgerskap(statsborgerskap);
-        person.setFoedselsdato("1990-01-01");
-
-        Bruker bruker = new Bruker();
-        bruker.setPerson(person);
-
-        Nav nav = new Nav();
-        nav.setBruker(bruker);
-
-        SED sed = new SED();
-        sed.setNav(nav);
-        sed.setSedType("A009");
-
-        MedlemskapA009 medlemskap = new MedlemskapA009();
-        medlemskap.setVedtak(new VedtakA009());
-        medlemskap.getVedtak().setGjelderperiode(new Periode());
-        Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setStartdato("2019-05-01");
-        fastperiode.setSluttdato("2019-12-01");
-        medlemskap.getVedtak().getGjelderperiode().setFastperiode(fastperiode);
-        sed.setMedlemskap(medlemskap);
-
-        return sed;
+        verify { euxService wasNot Called }
+        verify { personIdentifisering wasNot Called }
+        verify { opprettInngaaendeJournalpostService wasNot Called }
+        verify { oppgaveService wasNot Called }
     }
 
-    private SedHendelse sedHendelseMedBruker() {
-        SedHendelse sedHendelse = sedHendelseUtenBruker();
-        sedHendelse.setAvsenderId("SE:12345");
-        sedHendelse.setNavBruker(IDENT);
-        sedHendelse.setSedId(SED_ID);
-        sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
-        return sedHendelse;
+    @Test
+    fun `behandleSed xSedUtenTilhørendeASed kasterException`() {
+        val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet"
     }
 
-    private SedHendelse sedHendelseUtenBruker() {
-        SedHendelse sedHendelse = new SedHendelse();
-        sedHendelse.setNavBruker("ukjent");
-        sedHendelse.setAvsenderId("SE:12345");
-        sedHendelse.setRinaSakId(RINA_SAKSNUMMER);
-        sedHendelse.setRinaDokumentId("456");
-        sedHendelse.setSedId(SED_ID);
-        sedHendelse.setSedType("A009");
-        return sedHendelse;
+    private fun opprettSED(): SED {
+        val norge = Statsborgerskap().apply { land = "NO" }
+        val sverige = Statsborgerskap().apply { land = "SE" }
+
+        val statsborgerskap = listOf(norge, sverige)
+
+        val person = Person().apply {
+            this.statsborgerskap = statsborgerskap
+            foedselsdato = "1990-01-01"
+        }
+
+        val bruker = Bruker().apply { this.person = person }
+
+        val nav = Nav().apply { this.bruker = bruker }
+
+        val sed = SED().apply {
+            this.nav = nav
+            sedType = "A009"
+        }
+
+        val medlemskap = MedlemskapA009().apply {
+            vedtak = VedtakA009().apply {
+                gjelderperiode = Periode().apply {
+                    fastperiode = Fastperiode().apply {
+                        startdato = "2019-05-01"
+                        sluttdato = "2019-12-01"
+                    }
+                }
+            }
+        }
+        sed.medlemskap = medlemskap
+
+        return sed
+    }
+
+    private fun sedHendelseMedBruker(): SedHendelse {
+        return sedHendelseUtenBruker().apply {
+            avsenderId = "SE:12345"
+            navBruker = IDENT
+            sedId = SED_ID
+            rinaSakId = RINA_SAKSNUMMER
+        }
+    }
+
+    private fun sedHendelseUtenBruker(): SedHendelse {
+        return SedHendelse().apply {
+            navBruker = "ukjent"
+            avsenderId = "SE:12345"
+            rinaSakId = RINA_SAKSNUMMER
+            rinaDokumentId = "456"
+            sedId = SED_ID
+            sedType = "A009"
+        }
     }
 }
