@@ -1,10 +1,5 @@
 package no.nav.melosys.eessi.service.mottak;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
@@ -27,6 +22,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
@@ -67,28 +67,32 @@ class SedMottakServiceTest {
     @BeforeEach
     public void setup() throws Exception {
         sedMottakService = new SedMottakService(
-            euxService,
-            pdlService,
-            opprettInngaaendeJournalpostService,
-            oppgaveService,
-            sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository,
-            journalpostSedKoblingService,
-            sedMetrikker,
-            personIdentifisering,
-            bucIdentifisertService
+                euxService,
+                pdlService,
+                opprettInngaaendeJournalpostService,
+                oppgaveService,
+                sedMottattHendelseRepository,
+                bucIdentifiseringOppgRepository,
+                journalpostSedKoblingService,
+                sedMetrikker,
+                personIdentifisering,
+                bucIdentifisertService,
+                "1"
         );
     }
 
     @Test
     void behandleSed_finnerIkkePerson_OppgaveOpprettes() {
         when(euxService.hentSedMedRetry(anyString(), anyString()))
-            .thenReturn(opprettSED());
+                .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
         when(opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()))
-            .thenReturn("9988776655");
+                .thenReturn("9988776655");
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
         when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
+        when(pdlService.opprettLenkeForRekvirering(any())).thenReturn("http://lenke.no");
+        when(oppgaveService.opprettOppgaveTilIdOgFordeling(anyString(), anyString(), anyString(), anyString()))
+                .thenReturn("ignorer");
 
         SedHendelse sedHendelse = sedHendelseUtenBruker();
         SedMottattHendelse sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build();
@@ -109,7 +113,7 @@ class SedMottakServiceTest {
     @Test
     void behandleSed_finnerIkkePerson_oppgaveOpprettesNårIkkeASed() {
         when(euxService.hentSedMedRetry(anyString(), anyString()))
-            .thenReturn(opprettSED());
+                .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.empty());
         when(euxService.hentSedMedRetry(anyString(), anyString())).thenReturn(opprettSED());
@@ -134,7 +138,7 @@ class SedMottakServiceTest {
     void behandleSed_finnerPerson_forventPersonIdentifisertEvent() {
         when(personIdentifisering.identifiserPerson(any(), any())).thenReturn(Optional.of(IDENT));
         when(euxService.hentSedMedRetry(anyString(), anyString()))
-            .thenReturn(opprettSED());
+                .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
         SedHendelse sedHendelse = sedHendelseMedBruker();
 
@@ -156,7 +160,7 @@ class SedMottakServiceTest {
         var bucIdentifiseringOppg = new BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID, 1);
         when(bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Set.of(bucIdentifiseringOppg));
         when(euxService.hentSedMedRetry(anyString(), anyString()))
-            .thenReturn(opprettSED());
+                .thenReturn(opprettSED());
         when(sedMottattHendelseRepository.save(any(SedMottattHendelse.class))).then(returnsFirstArg());
 
         final var oppgave = new HentOppgaveDto();
@@ -198,8 +202,8 @@ class SedMottakServiceTest {
 
 
         assertThatThrownBy(() -> sedMottakService.behandleSedMottakHendelse(sedMottattHendelse))
-            .isInstanceOf(IllegalStateException.class)
-            .hasMessage("Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet");
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet");
     }
 
     private SED opprettSED() {
