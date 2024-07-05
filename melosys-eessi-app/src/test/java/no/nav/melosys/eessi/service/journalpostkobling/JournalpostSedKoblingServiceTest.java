@@ -57,7 +57,8 @@ class JournalpostSedKoblingServiceTest {
                 safConsumer, melosysEessiMeldingMapperFactory);
 
         EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
-        buc = enhancedRandom.nextObject(BUC.class);
+        buc = new BUC();
+        buc.setDocuments(Collections.singletonList(enhancedRandom.nextObject(Document.class)));
         document = buc.getDocuments().get(0);
         document.setId("sedID");
         document.setType("A008");
