@@ -10,7 +10,6 @@ import java.time.ZonedDateTime
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Collectors
-import java.util.stream.Stream
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class BUC @JsonCreator constructor(
@@ -18,118 +17,97 @@ data class BUC @JsonCreator constructor(
     @JsonProperty("startDate") var startDate: ZonedDateTime? = null,
     @JsonProperty("lastUpdate") var lastUpdate: ZonedDateTime? = null,
     @JsonProperty("status") var status: String? = null,
-    @JsonProperty("creator") var creator: Creator? = null,
+    @JsonProperty("creator") var creator: Creator? = null, // TODO: gjør denne none-nullable
     @JsonProperty("documents") var documents: List<Document> = ArrayList(),
     @JsonProperty("actions") var actions: List<Action> = ArrayList(),
-    @JsonProperty("processDefinitionName") var bucType: String? = null,
+    @JsonProperty("processDefinitionName") var bucType: String? = null, // TODO: gjør denne none-nullable
     @JsonProperty("processDefinitionVersion") var bucVersjon: String? = null,
     @JsonProperty("participants") var participants: Collection<Participant> = ArrayList(),
     @JsonProperty("internationalId") var internationalId: String? = null
 ) {
-    fun hentAvsenderLand(): String {
-        return creator!!.organisation.countryCode
+    fun hentAvsenderLand(): String = creator!!.organisation.countryCode
+
+    fun kanOppretteEllerOppdatereSed(sedType: SedType): Boolean = actions.any {
+        it.documentType.equals(sedType.name, ignoreCase = true) &&
+            it.operation?.uppercase() in setOf("UPDATE", "CREATE")
     }
 
-    fun kanOppretteEllerOppdatereSed(sedType: SedType): Boolean {
-        return actions.stream().filter { a: Action -> sedType.name.equals(a.documentType, ignoreCase = true) }
-            .anyMatch { action: Action ->
-                "CREATE".equals(action.operation, ignoreCase = true) || "UPDATE".equals(
-                    action.operation,
-                    ignoreCase = true
-                )
-            }
-    }
-
-    fun hentDokument(dokumentID: String?): Document {
-        return documents.stream().filter { d: Document -> d.id.equals(dokumentID, ignoreCase = true) }.findAny().orElseThrow()
-    }
+    fun hentDokument(dokumentID: String): Document =
+        documents.firstOrNull { it.id.equals(dokumentID, ignoreCase = true) }
+            ?: throw NoSuchElementException("No document found with ID: $dokumentID")
 
     fun hentSistOppdaterteDocument(): Optional<Document> {
-        return documents.stream().filter { d: Document -> SedStatus.erGyldigEngelskStatus(d.status) }.max(sistOppdatert)
+        return documents.filter { SedStatus.erGyldigEngelskStatus(it.status) }
+            .maxWithOrNull(compareBy { it.lastUpdate })
+            .let { Optional.ofNullable(it) }
     }
 
-    fun erÅpen(): Boolean {
-        return !"closed".equals(status, ignoreCase = true)
-    }
+    fun erÅpen(): Boolean = !"closed".equals(status, ignoreCase = true)
 
-    fun finnDokumentVedSedType(sedType: String): Optional<Document> {
-        return finnDokumenterVedSedType(sedType).min(sorterEtterStatus)
-    }
+    fun finnDokumentVedSedType(sedType: String): Optional<Document> =
+        finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) })
+            .let { Optional.ofNullable(it) }
 
-    private fun finnDokumenterVedSedType(sedType: String): Stream<Document> {
-        return documents.stream().filter { d: Document -> sedType == d.type }
-    }
+    private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
 
-    fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Optional<Document> {
-        return finnDokumenterVedSedType(sedType.name).filter { d: Document -> status.engelskStatus == d.status }.findFirst()
-    }
+    private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Optional<Document> =
+        finnDokumenterVedSedType(sedType.name)
+            .firstOrNull { d: Document -> status.engelskStatus == d.status }
+            .let { Optional.ofNullable(it) }
 
-    fun sedKanOppdateres(id: String): Boolean {
-        return actions.stream().filter { action: Action -> id == action.documentId }
-            .anyMatch { action: Action -> "Update".equals(action.operation, ignoreCase = true) }
-    }
+    fun sedKanOppdateres(id: String): Boolean = actions.filter { id == it.documentId }
+        .any { "Update".equals(it.operation, ignoreCase = true) }
 
-    fun harMottattSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean {
-        return finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT).filter { d: Document ->
-            d.erAntallDagerSidenOppdatering(
-                minstAntallDagerSidenMottatt
-            )
+    private fun harMottattSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT).filter {
+            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
         }.isPresent
-    }
 
-    fun harSendtSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean {
-        return finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT).filter { d: Document ->
-            d.erAntallDagerSidenOppdatering(
-                minstAntallDagerSidenMottatt
-            )
+    private fun harSendtSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT).filter {
+            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
         }.isPresent
-    }
 
-    fun kanLukkesAutomatisk(): Boolean {
-        val bucTypeEnum = BucType.valueOf(bucType!!)
-        if (bucTypeEnum == BucType.LA_BUC_06) {
-            return harMottattSedTypeAntallDagerSiden(SedType.A006, 30) && kanOppretteEllerOppdatereSed(SedType.X001)
-        } else if (bucTypeEnum == BucType.LA_BUC_01) {
-            val harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60) || harMottattSedTypeAntallDagerSiden(SedType.A011, 60)
-            return harMottattA002EllerA011 && kanOppretteEllerOppdatereSed(SedType.X001) && finnSistMottattSED { obj: Document -> obj.erLovvalgSED() }.map { d: Document ->
-                d.erAntallDagerSidenOppdatering(
-                    60
-                )
-            }
+    fun kanLukkesAutomatisk(): Boolean = when (BucType.valueOf(bucType!!)) {
+        BucType.LA_BUC_06 ->
+            harMottattSedTypeAntallDagerSiden(SedType.A006, 30) && kanOppretteEllerOppdatereSed(SedType.X001)
+
+        BucType.LA_BUC_01 -> {
+            val harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60) ||
+                harMottattSedTypeAntallDagerSiden(SedType.A011, 60)
+            val sisteMottattLovvalgSED = finnSistMottattSED { it.erLovvalgSED() }
+                .map { it.erAntallDagerSidenOppdatering(60) }
                 .orElse(false)
-        } else if (bucTypeEnum == BucType.LA_BUC_03) {
-            val harMottattX012EllerSendtX013EllerA008 =
-                (finnDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT).isEmpty || harMottattSedTypeAntallDagerSiden(
-                    SedType.X012,
-                    30
-                )) && (finnDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT).isEmpty || harSendtSedTypeAntallDagerSiden(
-                    SedType.X013,
-                    30
-                )) && harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
-            return harMottattX012EllerSendtX013EllerA008 && kanOppretteEllerOppdatereSed(SedType.X001)
+
+            harMottattA002EllerA011 && kanOppretteEllerOppdatereSed(SedType.X001) && sisteMottattLovvalgSED
         }
-        return kanOppretteEllerOppdatereSed(SedType.X001)
+
+        BucType.LA_BUC_03 -> {
+            val harMottattX012EllerSendtX013EllerA008 =
+                (finnDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT).isEmpty || harMottattSedTypeAntallDagerSiden(SedType.X012, 30)) &&
+                    (finnDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT).isEmpty || harSendtSedTypeAntallDagerSiden(SedType.X013, 30)) &&
+                    harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
+
+            harMottattX012EllerSendtX013EllerA008 && kanOppretteEllerOppdatereSed(SedType.X001)
+        }
+
+        else -> kanOppretteEllerOppdatereSed(SedType.X001)
     }
 
-    private fun finnSistMottattSED(documentPredicate: Predicate<Document>): Optional<Document> {
-        return documents.stream().filter { obj: Document -> obj.erInngående() }.filter { obj: Document -> obj.erOpprettet() }
-            .filter(documentPredicate).max(Comparator.comparing { obj: Document -> obj.lastUpdate })
-    }
+    private fun finnSistMottattSED(documentPredicate: (Document) -> Boolean): Optional<Document> = documents
+        .filter { it.erInngående() }
+        .filter { it.erOpprettet() }
+        .filter(documentPredicate)
+        .maxByOrNull { it.lastUpdate }
+        .let { Optional.ofNullable(it) }
 
-    fun finnFørstMottatteSed(): Optional<Document> {
-        return documents.stream().filter { obj: Document -> obj.erInngående() }.filter { obj: Document -> obj.erOpprettet() }
+    fun finnFørstMottatteSed(): Optional<Document> =
+        documents.stream().filter { obj: Document -> obj.erInngående() }.filter { obj: Document -> obj.erOpprettet() }
             .filter { obj: Document -> obj.erIkkeX100() }
             .min(Comparator.comparing { obj: Document -> obj.creationDate })
-    }
 
-    fun hentMottakere(): Set<String> {
-        return participants.stream().filter { obj: Participant -> obj.erMotpart() }
-            .map { p: Participant -> p.organisation.id }.collect(Collectors.toSet())
-    }
-
-    companion object {
-        private val sistOppdatert: Comparator<Document> = Comparator.comparing { obj: Document -> obj.lastUpdate }
-        private val sorterEtterStatus: Comparator<Document> =
-            Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) }
-    }
+    fun hentMottakere(): Set<String> = participants
+        .filter { it.erMotpart() }
+        .map { it.organisation.id }
+        .toSet()
 }
