@@ -85,12 +85,8 @@ class SedMottakServiceTest {
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         every {
-            opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-                any(),
-                any(),
-                any()
-            )
-        } returns "9988776655"
+            opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any())
+        } returns "ignorer"
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
         every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
         every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
@@ -189,39 +185,28 @@ class SedMottakServiceTest {
         }.message shouldBe "Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet"
     }
 
-    private fun opprettSED(): SED {
-        val norge = Statsborgerskap().apply { land = "NO" }
-        val sverige = Statsborgerskap().apply { land = "SE" }
-        val statsborgerskap = listOf(norge, sverige)
-
-        val person = Person().apply {
-            this.statsborgerskap = statsborgerskap
-            foedselsdato = "1990-01-01"
+    private fun opprettSED(): SED = SED().apply {
+        nav = Nav().apply {
+            bruker = Bruker().apply {
+                person = Person().apply {
+                    statsborgerskap = listOf("NO", "SE").map {
+                        Statsborgerskap().apply { land = it }
+                    }
+                    foedselsdato = "1990-01-01"
+                }
+            }
         }
-
-        val bruker = Bruker().apply { this.person = person }
-        val nav = Nav().apply { this.bruker = bruker }
-
-        return SED().apply {
-            this.nav = nav
-            sedType = "A009"
-            medlemskap = MedlemskapA009().apply {
-                vedtak = VedtakA009().apply {
-                    gjelderperiode = Periode().apply {
-                        fastperiode = Fastperiode().apply {
-                            startdato = "2019-05-01"
-                            sluttdato = "2019-12-01"
-                        }
+        sedType = "A009"
+        medlemskap = MedlemskapA009().apply {
+            vedtak = VedtakA009().apply {
+                gjelderperiode = Periode().apply {
+                    fastperiode = Fastperiode().apply {
+                        startdato = "2019-05-01"
+                        sluttdato = "2019-12-01"
                     }
                 }
             }
         }
-    }
-
-    companion object {
-        private const val IDENT = "1122334455"
-        private const val SED_ID = "555554444"
-        private const val RINA_SAKSNUMMER = "12313213"
     }
 
     private fun sedHendelseMedBruker() = sedHendelseUtenBruker().apply {
@@ -238,5 +223,11 @@ class SedMottakServiceTest {
         rinaDokumentId = "456"
         sedId = SED_ID
         sedType = "A009"
+    }
+
+    companion object {
+        private const val IDENT = "1122334455"
+        private const val SED_ID = "555554444"
+        private const val RINA_SAKSNUMMER = "12313213"
     }
 }
