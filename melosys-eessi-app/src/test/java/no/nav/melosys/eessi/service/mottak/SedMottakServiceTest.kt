@@ -191,7 +191,7 @@ class SedMottakServiceTest {
         }.message shouldBe "Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet"
     }
 
-    private fun opprettSED(): SED = SED().apply {
+    private fun opprettSED() = SED().apply {
         nav = Nav().apply {
             bruker = Bruker().apply {
                 person = Person().apply {
