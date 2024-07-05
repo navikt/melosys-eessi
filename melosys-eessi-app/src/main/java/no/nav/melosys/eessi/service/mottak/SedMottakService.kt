@@ -52,10 +52,10 @@ open class SedMottakService(
             return
         }
 
-        if (erXSedBehandletUtenASed(sedMottattHendelse.sedHendelse)) {
-            throw IllegalStateException(
-                "Mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av type ${sedMottattHendelse.sedHendelse.sedType} har ikke tilhørende A sed behandlet"
-            )
+        check(!erXSedBehandletUtenASed(sedMottattHendelse.sedHendelse)) {
+            "Mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av type ${
+                sedMottattHendelse.sedHendelse.sedType
+            } har ikke tilhørende A sed behandlet"
         }
 
         val lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse)
@@ -103,12 +103,11 @@ open class SedMottakService(
             return
         }
 
-        log.info("Oppretter oppgave til ID og fordeling for SED {}", sedMottatt.sedHendelse.sedId)
+        log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
 
         val rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
-            .filter { this.oppgaveErÅpen(it) }
-            .firstOrNull()
+            .firstOrNull { this.oppgaveErÅpen(it) }
             ?.let { log.info("Identifiseringsoppgave ${it.oppgaveId} finnes allerede for rinasak $rinaSaksnummer") }
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
@@ -117,7 +116,7 @@ open class SedMottakService(
         oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
 
     private fun opprettOgLagreIdentifiseringsoppgave(sedMottattHendelse: SedMottattHendelse, sed: SED) {
-        val journalpostID = opprettJournalpost(sedMottattHendelse, null)
+        val journalpostID = opprettJournalpost(sedMottattHendelse)
         val oppgaveID = opprettOgLagreIndentifiseringsoppgave(sedMottattHendelse, sed, journalpostID)
 
         bucIdentifiseringOppgRepository.save(
@@ -128,7 +127,7 @@ open class SedMottakService(
                 .build()
         )
 
-        log.info("Opprettet oppgave med id {}", oppgaveID)
+        log.info("Opprettet oppgave med id $oppgaveID")
     }
 
     private fun opprettOgLagreIndentifiseringsoppgave(
@@ -138,24 +137,28 @@ open class SedMottakService(
     ): String {
         val personFraSed = sed.finnPerson().orElse(null)
 
-        if (personFraSed != null && !harNorskPersonnummer(personFraSed)) {
-            val identRekvisjonTilMellomlagring =
-                IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed)
+        return when {
+            personFraSed != null && !harNorskPersonnummer(personFraSed) -> {
+                val identRekvisjonTilMellomlagring =
+                    IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed)
 
-            val lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring)
+                val lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring)
 
-            return oppgaveService.opprettOppgaveTilIdOgFordeling(
-                journalpostID,
-                sedMottattHendelse.sedHendelse.sedType,
-                sedMottattHendelse.sedHendelse.rinaSakId,
-                lenkeForRekvirering
-            )
-        } else {
-            return oppgaveService.opprettOppgaveTilIdOgFordeling(
-                journalpostID,
-                sedMottattHendelse.sedHendelse.sedType,
-                sedMottattHendelse.sedHendelse.rinaSakId
-            )
+                oppgaveService.opprettOppgaveTilIdOgFordeling(
+                    journalpostID,
+                    sedMottattHendelse.sedHendelse.sedType,
+                    sedMottattHendelse.sedHendelse.rinaSakId,
+                    lenkeForRekvirering
+                )
+            }
+
+            else -> {
+                oppgaveService.opprettOppgaveTilIdOgFordeling(
+                    journalpostID,
+                    sedMottattHendelse.sedHendelse.sedType,
+                    sedMottattHendelse.sedHendelse.rinaSakId
+                )
+            }
         }
     }
 
@@ -164,8 +167,8 @@ open class SedMottakService(
         .flatMap(FnrUtils::filtrerUtGyldigNorskIdent)
         .isPresent
 
-    private fun opprettJournalpost(sedMottattHendelse: SedMottattHendelse, navIdent: String?): String {
-        log.info("Oppretter journalpost for SED {}", sedMottattHendelse.sedHendelse.rinaDokumentId)
+    private fun opprettJournalpost(sedMottattHendelse: SedMottattHendelse, navIdent: String? = null): String {
+        log.info("Oppretter journalpost for SED ${sedMottattHendelse.sedHendelse.rinaDokumentId}")
         val sedMedVedlegg = euxService.hentSedMedVedlegg(
             sedMottattHendelse.sedHendelse.rinaSakId, sedMottattHendelse.sedHendelse.rinaDokumentId
         )
