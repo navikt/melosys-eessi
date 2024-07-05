@@ -65,7 +65,6 @@ class SedMottakServiceTest {
 
     @BeforeEach
     fun setup() {
-        MockKAnnotations.init(this)
         sedMottakService = SedMottakService(
             euxService,
             pdlService,
