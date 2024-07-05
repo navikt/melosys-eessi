@@ -91,11 +91,12 @@ class SedMottakServiceTest {
         every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
         every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
         every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
-
         val sedHendelse = sedHendelseUtenBruker()
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 
+
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
 
         verify { euxService.hentSedMedRetry(any(), any()) }
         verify { personIdentifisering.identifiserPerson(any(), any()) }
@@ -110,11 +111,12 @@ class SedMottakServiceTest {
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
-
         val sedHendelse = sedHendelseUtenBruker().apply { sedType = "H001" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 
+
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
 
         verify { euxService.hentSedMedRetry(any(), any()) }
         verify { personIdentifisering.identifiserPerson(any(), any()) }
@@ -130,7 +132,9 @@ class SedMottakServiceTest {
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         val sedHendelse = sedHendelseMedBruker()
 
+
         sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build())
+
 
         verify { euxService.hentSedMedRetry(any(), any()) }
         verify { personIdentifisering.identifiserPerson(any(), any()) }
@@ -149,12 +153,12 @@ class SedMottakServiceTest {
         )
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every { oppgaveService.hentOppgave(oppgaveID) } returns HentOppgaveDto().apply { status = "OPPRETTET" }
+        val sedMottattHendelse: SedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build()
 
-        val oppgave = HentOppgaveDto().apply { status = "OPPRETTET" }
-        every { oppgaveService.hentOppgave(oppgaveID) } returns oppgave
-        val sedHendelse = sedHendelseMedBruker()
 
-        sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build())
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
 
         verify { opprettInngaaendeJournalpostService wasNot Called }
         verify { oppgaveService wasNot Called }
@@ -166,7 +170,9 @@ class SedMottakServiceTest {
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build()
         every { sedMottattHendelseRepository.findBySedID(SED_ID) } returns Optional.of(sedMottattHendelse)
 
+
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
 
         verify { euxService wasNot Called }
         verify { personIdentifisering wasNot Called }
