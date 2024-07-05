@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.mottak
 
 import jakarta.transaction.Transactional
+import mu.KotlinLogging
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
 import no.nav.melosys.eessi.identifisering.FnrUtils
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
@@ -20,9 +21,10 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
-import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+
+private val log = KotlinLogging.logger {}
 
 @Service
 open class SedMottakService(
@@ -38,8 +40,6 @@ open class SedMottakService(
     private val bucIdentifisertService: BucIdentifisertService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
-    private val log = LoggerFactory.getLogger(SedMottakService::class.java)
-
     @Transactional
     open fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
         if (sedMottattHendelse.sedHendelse.erX100()) {
@@ -88,7 +88,7 @@ open class SedMottakService(
 
             val sedTypeErX007OgNorgeErSakseier = buc.participants.any { p ->
                 p.role == Participant.ParticipantRole.SAKSEIER
-                        && p.organisation.id == rinaInstitusjonsId
+                    && p.organisation.id == rinaInstitusjonsId
             }
 
             if (sedTypeErX007OgNorgeErSakseier) return false
@@ -138,20 +138,20 @@ open class SedMottakService(
     ): String {
         val personFraSed = sed.finnPerson().orElse(null)
 
-         if (personFraSed != null && !harNorskPersonnummer(personFraSed)) {
+        if (personFraSed != null && !harNorskPersonnummer(personFraSed)) {
             val identRekvisjonTilMellomlagring =
                 IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed)
 
             val lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring)
 
-             return  oppgaveService.opprettOppgaveTilIdOgFordeling(
+            return oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,
                 sedMottattHendelse.sedHendelse.sedType,
                 sedMottattHendelse.sedHendelse.rinaSakId,
                 lenkeForRekvirering
             )
         } else {
-             return oppgaveService.opprettOppgaveTilIdOgFordeling(
+            return oppgaveService.opprettOppgaveTilIdOgFordeling(
                 journalpostID,
                 sedMottattHendelse.sedHendelse.sedType,
                 sedMottattHendelse.sedHendelse.rinaSakId
