@@ -23,7 +23,7 @@ data class BUC @JsonCreator constructor(
     @JsonProperty("participants") var participants: Collection<Participant> = ArrayList(),
     @JsonProperty("internationalId") var internationalId: String? = null
 ) {
-    fun hentAvsenderLand(): String = creator!!.organisation!!.countryCode
+    fun hentAvsenderLand(): String = creator!!.organisation!!.countryCode!!
 
     fun kanOppretteEllerOppdatereSed(sedType: SedType): Boolean = actions.any {
         it.documentType.equals(sedType.name, ignoreCase = true) &&
@@ -82,7 +82,7 @@ data class BUC @JsonCreator constructor(
 
     fun hentMottakere(): Set<String> = participants
         .filter { it.erMotpart() }
-        .map { it.organisation.id }
+        .map { it.organisation.id!! }
         .toSet()
 
     private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
