@@ -82,7 +82,7 @@ data class BUC @JsonCreator constructor(
 
     fun hentMottakere(): Set<String> = participants
         .filter { it.erMotpart() }
-        .map { it.organisation.id!! }
+        .map { it.organisation!!.id!! }
         .toSet()
 
     private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
