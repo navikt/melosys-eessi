@@ -8,8 +8,6 @@ import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedType
 import java.time.ZonedDateTime
 import java.util.*
-import java.util.function.Predicate
-import java.util.stream.Collectors
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class BUC @JsonCreator constructor(
@@ -48,25 +46,8 @@ data class BUC @JsonCreator constructor(
         finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) })
             .let { Optional.ofNullable(it) }
 
-    private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
-
-    private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Optional<Document> =
-        finnDokumenterVedSedType(sedType.name)
-            .firstOrNull { d: Document -> status.engelskStatus == d.status }
-            .let { Optional.ofNullable(it) }
-
     fun sedKanOppdateres(id: String): Boolean = actions.filter { id == it.documentId }
         .any { "Update".equals(it.operation, ignoreCase = true) }
-
-    private fun harMottattSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
-        finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT).filter {
-            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
-        }.isPresent
-
-    private fun harSendtSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
-        finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT).filter {
-            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
-        }.isPresent
 
     fun kanLukkesAutomatisk(): Boolean = when (BucType.valueOf(bucType!!)) {
         BucType.LA_BUC_06 ->
@@ -94,13 +75,6 @@ data class BUC @JsonCreator constructor(
         else -> kanOppretteEllerOppdatereSed(SedType.X001)
     }
 
-    private fun finnSistMottattSED(documentPredicate: (Document) -> Boolean): Optional<Document> = documents
-        .filter { it.erInngående() }
-        .filter { it.erOpprettet() }
-        .filter(documentPredicate)
-        .maxByOrNull { it.lastUpdate }
-        .let { Optional.ofNullable(it) }
-
     fun finnFørstMottatteSed(): Optional<Document> =
         documents.stream().filter { obj: Document -> obj.erInngående() }.filter { obj: Document -> obj.erOpprettet() }
             .filter { obj: Document -> obj.erIkkeX100() }
@@ -110,4 +84,28 @@ data class BUC @JsonCreator constructor(
         .filter { it.erMotpart() }
         .map { it.organisation.id }
         .toSet()
+
+    private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
+
+    private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Optional<Document> =
+        finnDokumenterVedSedType(sedType.name)
+            .firstOrNull { d: Document -> status.engelskStatus == d.status }
+            .let { Optional.ofNullable(it) }
+
+    private fun harMottattSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT).filter {
+            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
+        }.isPresent
+
+    private fun harSendtSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT).filter {
+            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
+        }.isPresent
+
+    private fun finnSistMottattSED(documentPredicate: (Document) -> Boolean): Optional<Document> = documents
+        .filter { it.erInngående() }
+        .filter { it.erOpprettet() }
+        .filter(documentPredicate)
+        .maxByOrNull { it.lastUpdate }
+        .let { Optional.ofNullable(it) }
 }
