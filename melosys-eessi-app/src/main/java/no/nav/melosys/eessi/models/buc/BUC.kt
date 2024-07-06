@@ -106,6 +106,6 @@ data class BUC @JsonCreator constructor(
         .filter { it.erInngående() }
         .filter { it.erOpprettet() }
         .filter(documentPredicate)
-        .maxByOrNull { it.lastUpdate }
+        .maxByOrNull { it.lastUpdate!! }
         .let { Optional.ofNullable(it) }
 }
