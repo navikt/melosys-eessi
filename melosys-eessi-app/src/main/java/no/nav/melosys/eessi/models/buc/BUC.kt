@@ -19,7 +19,7 @@ data class BUC @JsonCreator constructor(
     @JsonProperty("documents") var documents: List<Document> = ArrayList(),
     @JsonProperty("actions") var actions: List<Action> = ArrayList(),
     @JsonProperty("processDefinitionName") var bucType: String? = null, // TODO: gjør denne none-nullable
-    @JsonProperty("processDefinitionVersion") var bucVersjon: String? = null,
+    @JsonProperty("processDefinitionVersion") var bucVersjon: String? = null, // TODO: gjør denne none-nullable
     @JsonProperty("participants") var participants: Collection<Participant> = ArrayList(),
     @JsonProperty("internationalId") var internationalId: String? = null
 ) {
