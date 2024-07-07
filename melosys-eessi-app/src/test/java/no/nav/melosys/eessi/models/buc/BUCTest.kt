@@ -1,11 +1,13 @@
 package no.nav.melosys.eessi.models.buc
 
+import io.kotest.matchers.collections.shouldContain
 import no.nav.melosys.eessi.controller.dto.SedStatus
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedType
 import java.time.ZonedDateTime
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import kotlin.test.assertFailsWith
 
 class BUCTest {
 
@@ -179,12 +181,98 @@ class BUCTest {
         buc03.kanLukkesAutomatisk() shouldBe true
     }
 
-    private fun createDocument(sedType: SedType, sedStatus: SedStatus, days: Long, direction: String): Document {
-        return Document(
-            type = sedType.name,
-            status = sedStatus.engelskStatus,
-            lastUpdate = ZonedDateTime.now().minusDays(days).minusSeconds(1),
-            direction = direction
-        )
+    @Test
+    fun hentAvsenderLand() {
+        val buc = BUC(creator = Creator(organisation = Organisation(countryCode = "NO")))
+
+        buc.hentAvsenderLand() shouldBe "NO"
     }
+
+    @Test
+    fun kanOppretteEllerOppdatereSed() {
+        val buc = BUC(actions = listOf(Action(documentType = SedType.X001.name, operation = "UPDATE")))
+
+        buc.kanOppretteEllerOppdatereSed(SedType.X001) shouldBe true
+    }
+
+    @Test
+    fun hentDokument() {
+        val buc = BUC(documents = listOf(Document(id = "123")))
+
+        buc.hentDokument("123") shouldBe Document(id = "123")
+    }
+
+    @Test
+    fun hentDokument_notFound() {
+        val buc = BUC(documents = listOf())
+
+        assertFailsWith<NoSuchElementException> {
+            buc.hentDokument("123")
+        }
+    }
+
+    @Test
+    fun erÅpen() {
+        val buc = BUC(status = "open")
+
+        buc.erÅpen() shouldBe true
+    }
+
+    @Test
+    fun erÅpen_closed() {
+        val buc = BUC(status = "closed")
+
+        buc.erÅpen() shouldBe false
+    }
+
+    @Test
+    fun finnDokumentVedSedType() {
+        val buc = BUC(documents = listOf(Document(type = SedType.X001.name)))
+
+        buc.finnDokumentVedSedType(SedType.X001.name) shouldBe Document(type = SedType.X001.name)
+    }
+
+    @Test
+    fun sedKanOppdateres() {
+        val buc = BUC(actions = listOf(Action(documentId = "123", operation = "UPDATE")))
+
+        buc.sedKanOppdateres("123") shouldBe true
+    }
+
+    @Test
+    fun finnFørstMottatteSed() {
+        val buc = BUC(
+            documents = listOf(
+                Document(
+                    type = SedType.X001.name,
+                    creationDate = ZonedDateTime.now().minusDays(1),
+                    direction = "IN",
+                    status = SedStatus.MOTTATT.engelskStatus
+                )
+            )
+        )
+
+        buc.finnFørstMottatteSed().isPresent shouldBe true
+    }
+
+    @Test
+    fun hentMottakere() {
+        val buc = BUC(
+            participants = listOf(
+                Participant(
+                    organisation = Organisation(id = "ORG1"),
+                    role = Participant.ParticipantRole.MOTPART
+                )
+            )
+        )
+
+        buc.hentMottakere() shouldContain "ORG1"
+    }
+
+    private fun createDocument(sedType: SedType, sedStatus: SedStatus, days: Long, direction: String) = Document(
+        type = sedType.name,
+        status = sedStatus.engelskStatus,
+        lastUpdate = ZonedDateTime.now().minusDays(days).minusSeconds(1),
+        direction = direction
+    )
 }
