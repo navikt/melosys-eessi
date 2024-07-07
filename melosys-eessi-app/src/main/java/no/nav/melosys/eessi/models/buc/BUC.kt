@@ -40,9 +40,8 @@ data class BUC @JsonCreator constructor(
 
     fun erÅpen(): Boolean = !"closed".equals(status, ignoreCase = true)
 
-    fun finnDokumentVedSedType(sedType: String): Optional<Document> =
+    fun finnDokumentVedSedType(sedType: String): Document? =
         finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) })
-            .let { Optional.ofNullable(it) }
 
     fun sedKanOppdateres(id: String): Boolean = actions.filter { id == it.documentId }
         .any { "Update".equals(it.operation, ignoreCase = true) }
@@ -61,11 +60,9 @@ data class BUC @JsonCreator constructor(
         BucType.LA_BUC_03 -> {
             val harMotattX012 = harIkkeDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT) || harMottattSedTypeAntallDagerSiden(SedType.X012, 30)
             val harSentX013 = harIkkeDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT) || harSendtSedTypeAntallDagerSiden(SedType.X013, 30)
-            val harA008 = harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
+            val harSentA008 = harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
 
-            val harMottattX012EllerSendtX013EllerA008 = harMotattX012 && harSentX013 && harA008
-
-            harMottattX012EllerSendtX013EllerA008 && kanOppretteEllerOppdatereSed(SedType.X001)
+            harMotattX012 && harSentX013 && harSentA008 && kanOppretteEllerOppdatereSed(SedType.X001)
         }
 
         else -> kanOppretteEllerOppdatereSed(SedType.X001)
@@ -82,7 +79,7 @@ data class BUC @JsonCreator constructor(
         .toSet()
 
     // TODO: finnes ingen test som dekker dette, om man bare setter denne til true så blir alle grønne
-    private fun sisteMottattLovvalgSED() = documents
+    private fun sisteMottattLovvalgSED(): Boolean = documents
         .filter { it.erInngående() }
         .filter { it.erOpprettet() }
         .filter { it.erLovvalgSED() }
