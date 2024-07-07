@@ -56,11 +56,8 @@ data class BUC @JsonCreator constructor(
         BucType.LA_BUC_01 -> {
             val harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60) ||
                 harMottattSedTypeAntallDagerSiden(SedType.A011, 60)
-            val sisteMottattLovvalgSED = finnSistMottattSED { it.erLovvalgSED() }
-                .map { it.erAntallDagerSidenOppdatering(60) }
-                .orElse(false)
 
-            harMottattA002EllerA011 && kanOppretteEllerOppdatereSed(SedType.X001) && sisteMottattLovvalgSED
+            harMottattA002EllerA011 && kanOppretteEllerOppdatereSed(SedType.X001) && sisteMottattLovvalgSED()
         }
 
         BucType.LA_BUC_03 -> {
@@ -85,6 +82,14 @@ data class BUC @JsonCreator constructor(
         .map { it.organisation!!.id!! }
         .toSet()
 
+    // TODO: finnes ingen test som dekker dette, om man bare setter denne til true så blir alle grønne
+    private fun sisteMottattLovvalgSED() = documents
+        .filter { it.erInngående() }
+        .filter { it.erOpprettet() }
+        .filter { it.erLovvalgSED() }
+        .maxByOrNull { it.lastUpdate!! }?.erAntallDagerSidenOppdatering(60) ?: false
+
+
     private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
 
     private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Optional<Document> =
@@ -101,11 +106,4 @@ data class BUC @JsonCreator constructor(
         finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT).filter {
             it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
         }.isPresent
-
-    private fun finnSistMottattSED(documentPredicate: (Document) -> Boolean): Optional<Document> = documents
-        .filter { it.erInngående() }
-        .filter { it.erOpprettet() }
-        .filter(documentPredicate)
-        .maxByOrNull { it.lastUpdate!! }
-        .let { Optional.ofNullable(it) }
 }
