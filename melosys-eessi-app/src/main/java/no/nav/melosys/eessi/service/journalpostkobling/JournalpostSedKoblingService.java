@@ -73,12 +73,12 @@ public class JournalpostSedKoblingService {
 
     private Optional<MelosysEessiMelding> opprettEessiMelding(String rinaSaksnummer, String journalpostID) {
         BUC buc = euxService.hentBuc(rinaSaksnummer);
-        Optional<Document> documentOptional = buc.hentSistOppdaterteDocument();
-        if (documentOptional.isEmpty()) {
+        Document documentOptional = buc.hentSistOppdaterteDocument();
+        if (documentOptional==null) {
             log.warn("Finner ikke sist oppdaterte sed for rinasak {}", rinaSaksnummer);
             return Optional.empty();
         }
-        final Document sedDocument = documentOptional.get();
+        final Document sedDocument = documentOptional;
         String sedID = sedDocument.getId();
         String sedType = sedDocument.getType();
         final var organisation = sedDocument.getCreator().getOrganisation();

@@ -34,10 +34,8 @@ data class BUC @JsonCreator constructor(
         documents.firstOrNull { it.id.equals(dokumentID, ignoreCase = true) }
             ?: throw NoSuchElementException("No document found with ID: $dokumentID")
 
-    fun hentSistOppdaterteDocument(): Optional<Document> {
-        return documents.filter { SedStatus.erGyldigEngelskStatus(it.status) }
-            .maxWithOrNull(compareBy { it.lastUpdate })
-            .let { Optional.ofNullable(it) }
+    fun hentSistOppdaterteDocument(): Document? {
+        return documents.filter { SedStatus.erGyldigEngelskStatus(it.status) }.maxWithOrNull(compareBy { it.lastUpdate })
     }
 
     fun erÅpen(): Boolean = !"closed".equals(status, ignoreCase = true)

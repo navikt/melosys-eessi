@@ -29,7 +29,7 @@ class BUCTest {
         document2.setLastUpdate(ZonedDateTime.now().plusWeeks(1));
 
         buc.setDocuments(Lists.newArrayList(document1, document2));
-        assertThat(buc.hentSistOppdaterteDocument()).contains(document2);
+        assertThat(buc.hentSistOppdaterteDocument()).isEqualTo(document2);
     }
 
     @Test
