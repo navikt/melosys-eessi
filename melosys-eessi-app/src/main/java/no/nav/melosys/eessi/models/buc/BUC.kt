@@ -59,10 +59,11 @@ data class BUC @JsonCreator constructor(
         }
 
         BucType.LA_BUC_03 -> {
-            val harMottattX012EllerSendtX013EllerA008 =
-                (finnDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT).isEmpty || harMottattSedTypeAntallDagerSiden(SedType.X012, 30)) &&
-                    (finnDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT).isEmpty || harSendtSedTypeAntallDagerSiden(SedType.X013, 30)) &&
-                    harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
+            val harMotattX012 = harIkkeDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT) || harMottattSedTypeAntallDagerSiden(SedType.X012, 30)
+            val harSentX013 = harIkkeDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT) || harSendtSedTypeAntallDagerSiden(SedType.X013, 30)
+            val harA008 = harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
+
+            val harMottattX012EllerSendtX013EllerA008 = harMotattX012 && harSentX013 && harA008
 
             harMottattX012EllerSendtX013EllerA008 && kanOppretteEllerOppdatereSed(SedType.X001)
         }
@@ -90,18 +91,15 @@ data class BUC @JsonCreator constructor(
 
     private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
 
-    private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Optional<Document> =
-        finnDokumenterVedSedType(sedType.name)
-            .firstOrNull { d: Document -> status.engelskStatus == d.status }
-            .let { Optional.ofNullable(it) }
+    private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Document? =
+        finnDokumenterVedSedType(sedType.name).firstOrNull { d: Document -> status.engelskStatus == d.status }
+
+    private fun harIkkeDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, status) == null
 
     private fun harMottattSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
-        finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT).filter {
-            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
-        }.isPresent
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT)?.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt) ?: false
 
     private fun harSendtSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
-        finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT).filter {
-            it.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt)
-        }.isPresent
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT)?.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt) ?: false
 }
