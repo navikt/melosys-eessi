@@ -8,7 +8,7 @@ import java.time.ZonedDateTime
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class Document(
     var id: String? = null,
-    var creationDate: ZonedDateTime? = null,
+    var creationDate: ZonedDateTime? = null, // TODO: gjør denne none-nullable
     var lastUpdate: ZonedDateTime? = null, // TODO: gjør denne none-nullable
     var creator: Creator? = null,
     var type: String? = null,

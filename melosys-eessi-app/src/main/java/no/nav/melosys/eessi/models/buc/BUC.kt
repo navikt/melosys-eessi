@@ -68,10 +68,14 @@ data class BUC @JsonCreator constructor(
         else -> kanOppretteEllerOppdatereSed(SedType.X001)
     }
 
-    fun finnFørstMottatteSed(): Optional<Document> =
-        documents.stream().filter { obj: Document -> obj.erInngående() }.filter { obj: Document -> obj.erOpprettet() }
-            .filter { obj: Document -> obj.erIkkeX100() }
-            .min(Comparator.comparing { obj: Document -> obj.creationDate })
+    fun finnFørstMottatteSed(): Optional<Document> {
+        return documents
+            .filter { it.erInngående() }
+            .filter { it.erOpprettet() }
+            .filter { it.erIkkeX100() }
+            .minByOrNull { it.creationDate!! }
+            .let { Optional.ofNullable(it) } // Fjern Optional når vi kan har konvertert IdentifiseringKontrollService til Kotlin
+    }
 
     fun hentMottakere(): Set<String> = participants
         .filter { it.erMotpart() }
