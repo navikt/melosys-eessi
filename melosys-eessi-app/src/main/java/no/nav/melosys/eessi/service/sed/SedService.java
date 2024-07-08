@@ -123,10 +123,10 @@ public class SedService {
             Optional<BUC> eksisterendeSak = finnAapenEksisterendeSak(saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType));
             if (eksisterendeSak.isPresent() && eksisterendeSak.get().erÅpen()) {
                 var buc = eksisterendeSak.get();
-                Optional<Document> document = buc.finnDokumentVedSedType(sed.getSedType());
-                if (document.isPresent() && buc.sedKanOppdateres(document.get().getId())) {
+                Document document = buc.finnDokumentVedSedType(sed.getSedType());
+                if (document != null && buc.sedKanOppdateres(document.getId())) {
                     String rinaSaksnummer = buc.getId();
-                    String dokumentId = document.get().getId();
+                    String dokumentId = document.getId();
                     verifiserSedVersjonErBucVersjon(buc, sed);
                     log.info("SED {} på rinasak {} oppdateres", dokumentId, rinaSaksnummer);
                     euxService.oppdaterSed(rinaSaksnummer, dokumentId, sed);

@@ -88,7 +88,7 @@ open class SedMottakService(
 
             val sedTypeErX007OgNorgeErSakseier = buc.participants.any { p ->
                 p.role == Participant.ParticipantRole.SAKSEIER
-                    && p.organisation.id == rinaInstitusjonsId
+                    && p.organisation!!.id == rinaInstitusjonsId
             }
 
             if (sedTypeErX007OgNorgeErSakseier) return false
