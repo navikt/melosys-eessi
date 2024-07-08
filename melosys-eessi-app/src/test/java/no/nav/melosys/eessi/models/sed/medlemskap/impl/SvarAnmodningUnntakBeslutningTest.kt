@@ -1,14 +1,17 @@
 package no.nav.melosys.eessi.models.sed.medlemskap.impl
 
-import org.assertj.core.api.Assertions
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
 
-internal class SvarAnmodningUnntakBeslutningTest {
+class SvarAnmodningUnntakBeslutningTest {
     @Test
     fun beslutningAvslag() {
         val beslutning: SvarAnmodningUnntakBeslutning? = SvarAnmodningUnntakBeslutning.fraRinaKode("ikke_godkjent")
 
-        Assertions.assertThat(beslutning).isEqualTo(SvarAnmodningUnntakBeslutning.AVSLAG)
-        Assertions.assertThat(beslutning!!.rinaKode).isEqualTo("ikke_godkjent")
+        beslutning.shouldNotBeNull().run {
+            this shouldBe SvarAnmodningUnntakBeslutning.AVSLAG
+            rinaKode shouldBe "ikke_godkjent"
+        }
     }
 }
