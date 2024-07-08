@@ -33,6 +33,6 @@ public abstract class FraSedA003Mapper implements NyttLovvalgSedMapper<Medlemska
 
     @Override
     public boolean erMidlertidigBestemmelse(MedlemskapA003 medlemskap) {
-        return "ja".equals(medlemskap.getIsDeterminationProvisional());
+        return "ja".equals(medlemskap.isDeterminationProvisional());
     }
 }

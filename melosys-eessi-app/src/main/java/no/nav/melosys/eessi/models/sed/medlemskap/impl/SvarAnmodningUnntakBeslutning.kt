@@ -1,31 +1,16 @@
-package no.nav.melosys.eessi.models.sed.medlemskap.impl;
+package no.nav.melosys.eessi.models.sed.medlemskap.impl
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-public enum SvarAnmodningUnntakBeslutning {
-
+enum class SvarAnmodningUnntakBeslutning(val rinaKode: String?) {
     INNVILGELSE(""),
     DELVIS_INNVILGELSE("godkjent_for_annen_periode"),
     AVSLAG("ikke_godkjent");
 
-    private final String rinaKode;
+    companion object {
+        private val rel: Map<String?, SvarAnmodningUnntakBeslutning?> = entries.associateBy { it.rinaKode }
 
-    private static final Map<String, SvarAnmodningUnntakBeslutning> rel = Collections.unmodifiableMap(
-        Arrays.stream(values())
-            .collect(Collectors.toMap(SvarAnmodningUnntakBeslutning::getRinaKode, e -> e)));
-
-    SvarAnmodningUnntakBeslutning(String rinaKode) {
-        this.rinaKode = rinaKode;
-    }
-
-    public String getRinaKode() {
-        return rinaKode;
-    }
-
-    public static SvarAnmodningUnntakBeslutning fraRinaKode(String rinaKode) {
-        return rel.get(rinaKode);
+        @JvmStatic
+        fun fraRinaKode(rinaKode: String?): SvarAnmodningUnntakBeslutning? {
+            return rel[rinaKode]
+        }
     }
 }

@@ -1,16 +1,14 @@
-package no.nav.melosys.eessi.models.sed.medlemskap.impl;
+package no.nav.melosys.eessi.models.sed.medlemskap.impl
 
-import org.junit.jupiter.api.Test;
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-class SvarAnmodningUnntakBeslutningTest {
-
+internal class SvarAnmodningUnntakBeslutningTest {
     @Test
-    void beslutningAvslag() {
-        SvarAnmodningUnntakBeslutning beslutning = SvarAnmodningUnntakBeslutning.fraRinaKode("ikke_godkjent");
+    fun beslutningAvslag() {
+        val beslutning: SvarAnmodningUnntakBeslutning? = SvarAnmodningUnntakBeslutning.fraRinaKode("ikke_godkjent")
 
-        assertThat(beslutning).isEqualTo(SvarAnmodningUnntakBeslutning.AVSLAG);
-        assertThat(beslutning.getRinaKode()).isEqualTo("ikke_godkjent");
+        Assertions.assertThat(beslutning).isEqualTo(SvarAnmodningUnntakBeslutning.AVSLAG)
+        Assertions.assertThat(beslutning!!.rinaKode).isEqualTo("ikke_godkjent")
     }
 }
