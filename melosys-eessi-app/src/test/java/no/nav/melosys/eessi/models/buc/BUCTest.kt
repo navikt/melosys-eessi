@@ -66,6 +66,32 @@ class BUCTest {
     }
 
     @Test
+    fun kanIkkeLukkesAutomatisk_LABUC01_59dagerSidenA011A002() {
+        val buc01 = BUC(
+            bucType = BucType.LA_BUC_01.name,
+            actions = listOf(Action("name", SedType.X001.name, "1", "UPDATE")),
+            documents = listOf(
+                createDocument(SedType.A002, SedStatus.MOTTATT, 59, "IN"),
+            )
+        )
+
+        buc01.kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC01_StatusTOM() {
+        val buc01 = BUC(
+            bucType = BucType.LA_BUC_01.name,
+            actions = listOf(Action("name", SedType.X001.name, "1", "UPDATE")),
+            documents = listOf(
+                createDocument(SedType.A002, SedStatus.TOM, 60, "IN"),
+            )
+        )
+
+        buc01.kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
     fun kanIkkeLukkesAutomatisk_LABUC03_20dagerSidenX013() {
         val buc03 = BUC(
             bucType = BucType.LA_BUC_03.name,

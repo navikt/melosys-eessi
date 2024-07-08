@@ -82,7 +82,6 @@ data class BUC @JsonCreator constructor(
         .map { it.organisation!!.id!! }
         .toSet()
 
-    // TODO: finnes ingen test som dekker dette, om man bare setter denne til true så blir alle grønne
     private fun sisteMottattLovvalgSED(): Boolean = documents
         .filter { it.erInngående() }
         .filter { it.erOpprettet() }
