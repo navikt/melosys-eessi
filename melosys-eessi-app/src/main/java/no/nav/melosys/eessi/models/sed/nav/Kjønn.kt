@@ -1,13 +1,13 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-public enum Kjønn {
+import no.nav.melosys.eessi.models.person.Kjønn
+
+enum class Kjønn {
     M, K, U;
 
-    public no.nav.melosys.eessi.models.person.Kjønn tilDomene() {
-        return switch (this) {
-            case K -> no.nav.melosys.eessi.models.person.Kjønn.KVINNE;
-            case M -> no.nav.melosys.eessi.models.person.Kjønn.MANN;
-            case U -> no.nav.melosys.eessi.models.person.Kjønn.UKJENT;
-        };
+    fun tilDomene(): Kjønn = when (this) {
+        K -> Kjønn.KVINNE
+        M -> Kjønn.MANN
+        U -> Kjønn.UKJENT
     }
 }
