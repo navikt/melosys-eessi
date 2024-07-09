@@ -1,8 +1,5 @@
 package no.nav.melosys.eessi.models
 
-import java.util.*
-import java.util.stream.Collectors
-
 enum class SedType {
     X001,
     X002,
@@ -56,28 +53,17 @@ enum class SedType {
     S040,
     S041;
 
-    fun erXSED(): Boolean {
-        return name.startsWith("X")
-    }
+    fun erXSED(): Boolean = name.startsWith("X")
 
-    fun erASED(): Boolean {
-        return name.startsWith("A")
-    }
+    fun erASED(): Boolean = name.startsWith("A")
 
-    fun kreverAdresse(): Boolean {
-        return KREVER_ADRESSE.stream().anyMatch { s: SedType -> s == this }
-    }
+    fun kreverAdresse(): Boolean = this in KREVER_ADRESSE
 
     companion object {
-        private val LOVVALG_SED_TYPER: Collection<SedType> = Arrays.stream(entries.toTypedArray())
-            .filter { s: SedType -> s.name.startsWith("A") }
-            .collect(Collectors.toSet())
+        private val LOVVALG_SED_TYPER: Set<SedType> = entries.filter { it.name.startsWith("A") }.toSet()
+        private val KREVER_ADRESSE = setOf(A001, A002, A003, A004, A007, A009, A010)
 
         @JvmStatic
-        fun erLovvalgSed(sedType: String?): Boolean {
-            return LOVVALG_SED_TYPER.stream().anyMatch { s: SedType -> s.name == sedType }
-        }
-
-        val KREVER_ADRESSE: List<SedType> = Arrays.asList(A001, A002, A003, A004, A007, A009, A010)
+        fun erLovvalgSed(sedType: String?): Boolean = LOVVALG_SED_TYPER.any { it.name == sedType }
     }
 }
