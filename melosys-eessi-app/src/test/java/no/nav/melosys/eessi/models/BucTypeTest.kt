@@ -1,19 +1,18 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import org.junit.jupiter.api.Test;
-
-import static no.nav.melosys.eessi.models.BucType.H_BUC_01;
-import static org.assertj.core.api.Assertions.assertThat;
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import org.junit.jupiter.api.Test
 
 class BucTypeTest {
 
     @Test
-    void bucType_hBucSomSkalKonsumeres_true() {
-        assertThat(BucType.erHBucsomSkalKonsumeres(H_BUC_01.name())).isTrue();
+    fun bucType_hBucSomSkalKonsumeres_true() {
+        BucType.erHBucsomSkalKonsumeres(BucType.H_BUC_01.name).shouldBeTrue()
     }
 
     @Test
-    void buctype_ikkeEksisterendeBucType_false() {
-        assertThat(BucType.erHBucsomSkalKonsumeres("buc")).isFalse();
+    fun buctype_ikkeEksisterendeBucType_false() {
+        BucType.erHBucsomSkalKonsumeres("buc").shouldBeFalse()
     }
 }
