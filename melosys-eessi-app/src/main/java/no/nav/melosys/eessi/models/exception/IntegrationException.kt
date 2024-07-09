@@ -1,12 +1,7 @@
-package no.nav.melosys.eessi.models.exception;
+package no.nav.melosys.eessi.models.exception
 
-public class IntegrationException extends RuntimeException {
+class IntegrationException : RuntimeException {
+    constructor(message: String?) : super(message)
 
-    public IntegrationException(String message) {
-        super(message);
-    }
-
-    public IntegrationException(String message, Throwable e) {
-        super(message, e);
-    }
+    constructor(message: String?, e: Throwable?) : super(message, e)
 }
