@@ -12,6 +12,7 @@ data class PersonModell(
     val erOpphørt: Boolean,
     val kjønn: Kjønn?
 ) {
+    // TODO: Se på om vi kan fjerne denne når vi er mer over på Kotlin
     data class PersonModellBuilder(
         var ident: String? = null,
         var fornavn: String? = null,
