@@ -47,7 +47,7 @@ class PersonSok {
     }
 
     private SoekBegrunnelse vurderPerson(PersonModell person, PersonsokKriterier personsokKriterier) {
-        if (person.isErOpphørt()) {
+        if (person.getErOpphørt()) {
             return SoekBegrunnelse.PERSON_OPPHORT;
         } else if (!harOverlappendeStatsborgerskap(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;

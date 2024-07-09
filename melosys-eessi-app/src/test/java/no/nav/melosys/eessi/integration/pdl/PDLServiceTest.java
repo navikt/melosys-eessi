@@ -56,7 +56,7 @@ class PDLServiceTest {
                 PersonModell::getEtternavn,
                 PersonModell::getFødselsdato,
                 PersonModell::getStatsborgerskapLandkodeISO2,
-                PersonModell::isErOpphørt,
+                PersonModell::getErOpphørt,
                 PersonModell::getUtenlandskId,
                 PersonModell::getKjønn)
             .containsExactly(
