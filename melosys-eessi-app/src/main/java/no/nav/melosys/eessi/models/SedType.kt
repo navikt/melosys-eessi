@@ -1,11 +1,9 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*
+import java.util.stream.Collectors
 
-public enum SedType {
+enum class SedType {
     X001,
     X002,
     X003,
@@ -58,25 +56,28 @@ public enum SedType {
     S040,
     S041;
 
-    private static final Collection<SedType> LOVVALG_SED_TYPER = Arrays.stream(SedType.values())
-        .filter(s -> s.name().startsWith("A"))
-        .collect(Collectors.toSet());
-
-    public boolean erXSED() {
-        return this.name().startsWith("X");
+    fun erXSED(): Boolean {
+        return name.startsWith("X")
     }
 
-    public boolean erASED() {
-        return this.name().startsWith("A");
+    fun erASED(): Boolean {
+        return name.startsWith("A")
     }
 
-    public static boolean erLovvalgSed(String sedType) {
-        return LOVVALG_SED_TYPER.stream().anyMatch(s -> s.name().equals(sedType));
+    fun kreverAdresse(): Boolean {
+        return KREVER_ADRESSE.stream().anyMatch { s: SedType -> s == this }
     }
 
-    public static final List<SedType> KREVER_ADRESSE = Arrays.asList(SedType.A001, SedType.A002, SedType.A003, SedType.A004, SedType.A007, SedType.A009, SedType.A010);
+    companion object {
+        private val LOVVALG_SED_TYPER: Collection<SedType> = Arrays.stream(entries.toTypedArray())
+            .filter { s: SedType -> s.name.startsWith("A") }
+            .collect(Collectors.toSet())
 
-    public boolean kreverAdresse() {
-        return KREVER_ADRESSE.stream().anyMatch(s -> s.equals(this));
+        @JvmStatic
+        fun erLovvalgSed(sedType: String?): Boolean {
+            return LOVVALG_SED_TYPER.stream().anyMatch { s: SedType -> s.name == sedType }
+        }
+
+        val KREVER_ADRESSE: List<SedType> = Arrays.asList(A001, A002, A003, A004, A007, A009, A010)
     }
 }
