@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.models.kafkadlq;
+package no.nav.melosys.eessi.models.kafkadlq
 
 /**
  * Dette er en enum for å representere forskjellige typer av Kafka-meldinger.
@@ -14,7 +14,7 @@ package no.nav.melosys.eessi.models.kafkadlq;
  *
  * I dette tilfellet, hvis du endrer SED_MOTTATT_HENDELSE til noe annet, må du også endre "SED_MOTTATT_HENDELSE" i `@DiscriminatorValue`-annoteringen.
  */
-public enum QueueType {
+enum class QueueType {
     SED_MOTTATT_HENDELSE,
     SED_SENDT_HENDELSE,
     OPPGAVE_HENDELSE_AIVEN
