@@ -10,7 +10,8 @@ import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 
 @Entity(name = "sed_mottatt")
-@Convert(attributeName = "jsonb", converter = JsonBinaryType::class) // Tester kjører uten TODO: skriv test som viser om den trengs
+@Convert(attributeName = "jsonb", converter = JsonBinaryType::class)
+@Deprecated("Kun brukt av SedMottattRepository, så kan vel slettes?")
 class SedMottatt(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,16 +45,4 @@ class SedMottatt(
 
     @Column(name = "ferdig", nullable = false)
     var ferdig: Boolean = false
-) {
-    companion object {
-        fun av(sedHendelse: SedHendelse): SedMottatt {
-            return SedMottatt(
-                sedHendelse = sedHendelse,
-                versjon = 1,
-                sedKontekst = SedKontekst(),
-                mottattDato = LocalDateTime.now(),
-                sistEndretDato = LocalDateTime.now()
-            )
-        }
-    }
-}
+)
