@@ -69,7 +69,7 @@ public class SakController {
         }
         String rinaSaksnummer = saksrelasjonDto.getRinaSaksnummer();
         Optional<FagsakRinasakKobling> eksisterende = saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer);
-        if (eksisterende.isPresent() && eksisterende.get().getGsakSaksnummer() != (saksrelasjonDto.getGsakSaksnummer())) {
+        if (eksisterende.isPresent() && eksisterende.get().getGsakSaksnummer() != saksrelasjonDto.getGsakSaksnummer()) {
             throw new ValidationException("Rinasak " + saksrelasjonDto.getRinaSaksnummer() + " er allerede koblet mot gsakSaksnummer " + eksisterende.get().getGsakSaksnummer());
         }
     }
