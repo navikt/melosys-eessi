@@ -227,10 +227,8 @@ class SedSendtTestIT extends ComponentTestBase {
     }
 
     private void mockIdentifisertPerson() {
-        BucIdentifisert bucIdentifisert = new BucIdentifisert();
-        bucIdentifisert.setId(1L);
-        bucIdentifisert.setRinaSaksnummer(rinaSaksnummer);
-        bucIdentifisert.setFolkeregisterident(FNR);
+        BucIdentifisert bucIdentifisert = new BucIdentifisert(1L, rinaSaksnummer, FNR);
+        when(bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)).thenReturn(Optional.of(bucIdentifisert));
 
         when(bucIdentifisertRepository.findByRinaSaksnummer(anyString())).thenReturn(Optional.of(bucIdentifisert));
     }

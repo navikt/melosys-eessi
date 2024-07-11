@@ -13,6 +13,8 @@ data class SedMedVedlegg(
         val mimeType: String?,
         val innhold: ByteArray
     ) {
+        // Trenger normalt ikke å implementere equals og hashCode med data class men pga ByteArray så må vi det
+        // Property with 'Array' type in a 'data' class: it is recommended to override 'equals()' and 'hashCode()
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (other !is BinaerFil) return false
