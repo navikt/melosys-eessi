@@ -148,7 +148,7 @@ class SedMottakServiceTest {
     fun `behandleSed ikkeIdentifisertÅpenOppgaveFinnes oppretterIkkeNyOppgaveEllerJournalpost`() {
         val oppgaveID = "5555"
         val bucIdentifiseringOppg = BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, oppgaveID, 1)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns setOf(
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns mutableSetOf(
             bucIdentifiseringOppg
         )
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
