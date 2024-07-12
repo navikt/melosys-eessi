@@ -1,45 +1,34 @@
-package no.nav.melosys.eessi.service.buc;
+package no.nav.melosys.eessi.service.buc
 
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.buc.BUC;
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.buc.BUC
 
-final class LukkBucAarsakMapper {
+object LukkBucAarsakMapper {
 
-    private LukkBucAarsakMapper() {
-    }
+    private const val LOVVALG_BEKREFTET = "gjeldende_lovgivning_det_ble_oppnådd_enighet_om_anmodningen_om_unntak"
+    private const val INGEN_SVAR_2_MND = "gjeldende_lovgivning_fastsettelsen_ble_endelig_ingen_reaksjon_innen_2_måneder"
+    private const val TRETTI_DAGER_SIDEN_A008 = "lovvalg_30_dager_siden_melding_om_relevant_informasjon"
+    private const val TRETTI_DAGER_SIDEN_MELDING_OM_UTSTASJONERING = "lovvalg_30_dager_siden_melding_om_utstasjonering"
+    private const val TRETTI_DAGER_SIDEN_SVAR_ANMODNING_MER_INFO = "gjeldende_lovgivning_30_dager_siden_svar_på_anmodning_om_mer_informasjon"
+    private const val ENIGHET_ANMODNING_UNNTAK = "gjeldende_lovgivning_det_ble_oppnådd_enighet_om_anmodningen_om_unntak"
 
-    private static final String LOVVALG_BEKREFTET = "gjeldende_lovgivning_det_ble_oppnådd_enighet_om_anmodningen_om_unntak";
-    private static final String INGEN_SVAR_2_MND = "gjeldende_lovgivning_fastsettelsen_ble_endelig_ingen_reaksjon_innen_2_måneder";
-    private static final String TRETTI_DAGER_SIDEN_A008 = "lovvalg_30_dager_siden_melding_om_relevant_informasjon";
-    private static final String TRETTI_DAGER_SIDEN_MELDING_OM_UTSTASJONERING = "lovvalg_30_dager_siden_melding_om_utstasjonering";
-    private static final String TRETTI_DAGER_SIDEN_SVAR_ANMODNING_MER_INFO = "gjeldende_lovgivning_30_dager_siden_svar_på_anmodning_om_mer_informasjon";
-    private static final String ENIGHET_ANMODNING_UNNTAK = "gjeldende_lovgivning_det_ble_oppnådd_enighet_om_anmodningen_om_unntak";
-
-
-    static String hentAarsakForLukking(BUC buc) {
-        var bucType = BucType.valueOf(buc.getBucType());
-        switch (bucType) {
-            case LA_BUC_01:
-                return ENIGHET_ANMODNING_UNNTAK;
-            case LA_BUC_02:
-                if (a012SendtFraBuc(buc)) {
-                    return LOVVALG_BEKREFTET;
-                }
-                return INGEN_SVAR_2_MND;
-            case LA_BUC_03:
-                return TRETTI_DAGER_SIDEN_A008;
-            case LA_BUC_04, LA_BUC_05:
-                return TRETTI_DAGER_SIDEN_MELDING_OM_UTSTASJONERING;
-            case LA_BUC_06:
-                return TRETTI_DAGER_SIDEN_SVAR_ANMODNING_MER_INFO;
-            default:
-                throw new IllegalArgumentException("Buctype " + bucType + " støttes ikke for lukking");
+    @JvmStatic
+    fun hentAarsakForLukking(buc: BUC): String {
+        val bucType = BucType.valueOf(buc.bucType!!)
+        return when (bucType) {
+            BucType.LA_BUC_01 -> ENIGHET_ANMODNING_UNNTAK
+            BucType.LA_BUC_02 -> if (a012SendtFraBuc(buc)) LOVVALG_BEKREFTET else INGEN_SVAR_2_MND
+            BucType.LA_BUC_03 -> TRETTI_DAGER_SIDEN_A008
+            BucType.LA_BUC_04, BucType.LA_BUC_05 -> TRETTI_DAGER_SIDEN_MELDING_OM_UTSTASJONERING
+            BucType.LA_BUC_06 -> TRETTI_DAGER_SIDEN_SVAR_ANMODNING_MER_INFO
+            else -> throw IllegalArgumentException("Buctype $bucType støttes ikke for lukking")
         }
     }
 
-    private static boolean a012SendtFraBuc(BUC buc) {
-        return buc.getDocuments().stream().anyMatch(d ->
-            SedType.A012.name().equals(d.getType()) && !"empty".equals(d.getStatus()));
+    private fun a012SendtFraBuc(buc: BUC): Boolean {
+        return buc.documents.any {
+            SedType.A012.name == it.type && "empty" != it.status
+        }
     }
 }

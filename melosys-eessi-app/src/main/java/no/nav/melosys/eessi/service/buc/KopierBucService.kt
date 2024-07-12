@@ -1,69 +1,63 @@
-package no.nav.melosys.eessi.service.buc;
+package no.nav.melosys.eessi.service.buc
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.buc.Document
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.service.eux.EuxService
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import org.springframework.stereotype.Service
 
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.springframework.stereotype.Service;
-
-import static java.util.Optional.ofNullable;
+import kotlin.NoSuchElementException
+import kotlin.jvm.optionals.getOrNull
 
 @Service
-public class KopierBucService {
+class KopierBucService(
+    private val euxService: EuxService,
+    private val saksrelasjonService: SaksrelasjonService
+) {
 
-    private static final int MAKS_LENGDE_YTTERLIGERE_INFO = 498; //500 minus to "\n"
-
-    private final EuxService euxService;
-    private final SaksrelasjonService saksrelasjonService;
-
-    public KopierBucService(EuxService euxService, SaksrelasjonService saksrelasjonService) {
-        this.euxService = euxService;
-        this.saksrelasjonService = saksrelasjonService;
+    companion object {
+        private const val MAKS_LENGDE_YTTERLIGERE_INFO = 498 //500 minus to "\n"
     }
 
-    public String kopierBUC(String rinaSaksnummer) {
-        var buc = euxService.hentBuc(rinaSaksnummer);
-        var bucType = BucType.valueOf(buc.getBucType());
-        var førsteSEDType = bucType.hentFørsteLovligeSed();
+    fun kopierBUC(rinaSaksnummer: String): String {
+        val buc = euxService.hentBuc(rinaSaksnummer)
+        val bucType = BucType.valueOf(buc.bucType!!)
+        val førsteSEDType = bucType.hentFørsteLovligeSed()
 
-        var sed = buc.getDocuments().stream()
-            .filter(d -> førsteSEDType.name().equals(d.getType()))
+        val sed = buc.documents
+            .filter { førsteSEDType.name == it.type }
             .filter(Document::erOpprettet)
-            .min(Comparator.comparing(Document::getCreationDate))
-            .map(d -> euxService.hentSed(rinaSaksnummer, d.getId()))
-            .orElseThrow(() -> new NoSuchElementException("Finner ikke første SED for rinasak " + rinaSaksnummer));
+            .minByOrNull { it.creationDate!! }
+            ?.let { euxService.hentSed(rinaSaksnummer, it.id) }
+            ?: throw NoSuchElementException("Finner ikke første SED for rinasak $rinaSaksnummer")
 
-        settYtterligereInfo(sed, buc.getInternationalId());
-        var nyttRinaSaksnummer = euxService.opprettBucOgSed(bucType, buc.hentMottakere(), sed, Collections.emptySet()).getRinaSaksnummer();
+        settYtterligereInfo(sed, buc.internationalId!!)
+        val nyttRinaSaksnummer = euxService.opprettBucOgSed(bucType, buc.hentMottakere(), sed, emptySet()).rinaSaksnummer
 
-        saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer)
-            .ifPresent(saksrelasjon -> saksrelasjonService.lagreKobling(saksrelasjon.getGsakSaksnummer(), nyttRinaSaksnummer, bucType));
+        saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer).getOrNull()
+            ?.let { saksrelasjonService.lagreKobling(it.gsakSaksnummer, nyttRinaSaksnummer, bucType) }
 
-        return nyttRinaSaksnummer;
+        return nyttRinaSaksnummer
     }
 
-    private void settYtterligereInfo(SED sed, String internasjonalID) {
-        final var infoTekst = hentInfoTekst(sed.getSedType(), internasjonalID);
-        final var ytterligereInfo = ofNullable(sed.getNav().getYtterligereinformasjon()).orElse("");
+    private fun settYtterligereInfo(sed: SED, internasjonalID: String) {
+        val infoTekst = hentInfoTekst(sed.sedType!!, internasjonalID)
+        val ytterligereInfo = sed.nav!!.ytterligereinformasjon.orEmpty()
 
-        if ((ytterligereInfo.length() + infoTekst.length()) > MAKS_LENGDE_YTTERLIGERE_INFO) {
-            sed.getNav().setYtterligereinformasjon(infoTekst);
+        sed.nav!!.ytterligereinformasjon = if ((ytterligereInfo.length + infoTekst.length) > MAKS_LENGDE_YTTERLIGERE_INFO) {
+            infoTekst
         } else {
-            sed.getNav().setYtterligereinformasjon(ytterligereInfo + "\n\n" + infoTekst);
+            "$ytterligereInfo\n\n$infoTekst"
         }
     }
 
-    private String hentInfoTekst(String sedType, String internasjonalID) {
-        return String.format("""
-            Due to an error in Rina, we are sending you a new %s.
-            This BUC replaces a previously sent BUC with International ID: %s.
-            We are unable to read your reply to our %s in the original BUC.
+    private fun hentInfoTekst(sedType: String, internasjonalID: String): String {
+        return """
+            Due to an error in Rina, we are sending you a new $sedType.
+            This BUC replaces a previously sent BUC with International ID: $internasjonalID.
+            We are unable to read your reply to our $sedType in the original BUC.
             Please reply in this BUC. We apologize for any inconvenience this may have caused.
-            """, sedType, internasjonalID, sedType);
+        """.trimIndent()
     }
 }
