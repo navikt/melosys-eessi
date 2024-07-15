@@ -16,11 +16,11 @@ data class BUC @JsonCreator constructor(
     @JsonProperty("lastUpdate") var lastUpdate: ZonedDateTime? = null,
     @JsonProperty("status") var status: String? = null,
     @JsonProperty("creator") var creator: Creator? = null, // TODO: gjør denne none-nullable
-    @JsonProperty("documents") var documents: List<Document> = ArrayList(),
-    @JsonProperty("actions") var actions: List<Action> = ArrayList(),
+    @JsonProperty("documents") var documents: List<Document> = listOf(),
+    @JsonProperty("actions") var actions: List<Action> = listOf(),
     @JsonProperty("processDefinitionName") var bucType: String? = null, // TODO: gjør denne none-nullable
     @JsonProperty("processDefinitionVersion") var bucVersjon: String? = null, // TODO: gjør denne none-nullable
-    @JsonProperty("participants") var participants: Collection<Participant> = ArrayList(),
+    @JsonProperty("participants") var participants: Collection<Participant> = listOf(),
     @JsonProperty("internationalId") var internationalId: String? = null
 ) {
     fun hentAvsenderLand(): String = creator!!.organisation!!.countryCode!!
