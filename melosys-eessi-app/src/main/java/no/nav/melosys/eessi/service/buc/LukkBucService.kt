@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.buc
 
 import io.getunleash.Unleash
+import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName
 import no.nav.melosys.eessi.metrikker.BucMetrikker
 import no.nav.melosys.eessi.models.BucType
@@ -13,8 +14,9 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.BucSearch
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X001Mapper
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+
+private val log = KotlinLogging.logger {}
 
 @Service
 class LukkBucService(
@@ -75,29 +77,22 @@ class LukkBucService(
         }
     }
 
-    private fun finnEksisterendeX001Utkast(buc: BUC): Document? {
-        return buc.documents
+    private fun finnEksisterendeX001Utkast(buc: BUC): Document? =
+        buc.documents
             .filter { it.erX001() && it.erOpprettet() }
             .minByOrNull { it.creationDate!! }
-    }
 
-    private fun opprettX001(buc: BUC, aarsak: String): SED {
-        return x001Mapper.mapFraSed(
+    private fun opprettX001(buc: BUC, aarsak: String): SED =
+        x001Mapper.mapFraSed(
             hentSisteLovvalgSed(buc),
             aarsak,
             unleash.isEnabled(ToggleName.CDM_4_3)
         )
-    }
 
-    private fun hentSisteLovvalgSed(buc: BUC): SED {
-        return buc.documents
+    private fun hentSisteLovvalgSed(buc: BUC): SED =
+        buc.documents
             .filter { it.sedErSendt() }
             .minByOrNull { it.creationDate!! }
             ?.let { euxService.hentSed(buc.id, it.id) }
             ?: throw IllegalStateException("Finner ingen lovvalgs-SED på buc ${buc.id}")
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger(LukkBucService::class.java)
-    }
 }

@@ -16,10 +16,6 @@ class KopierBucService(
     private val saksrelasjonService: SaksrelasjonService
 ) {
 
-    companion object {
-        private const val MAKS_LENGDE_YTTERLIGERE_INFO = 498 //500 minus to "\n"
-    }
-
     fun kopierBUC(rinaSaksnummer: String): String {
         val buc = euxService.hentBuc(rinaSaksnummer)
         val bucType = BucType.valueOf(buc.bucType!!)
@@ -52,12 +48,14 @@ class KopierBucService(
         }
     }
 
-    private fun hentInfoTekst(sedType: String, internasjonalID: String): String {
-        return """
-            Due to an error in Rina, we are sending you a new $sedType.
-            This BUC replaces a previously sent BUC with International ID: $internasjonalID.
-            We are unable to read your reply to our $sedType in the original BUC.
-            Please reply in this BUC. We apologize for any inconvenience this may have caused.
-        """.trimIndent()
+    private fun hentInfoTekst(sedType: String, internasjonalID: String): String = """
+        Due to an error in Rina, we are sending you a new $sedType.
+        This BUC replaces a previously sent BUC with International ID: $internasjonalID.
+        We are unable to read your reply to our $sedType in the original BUC.
+        Please reply in this BUC. We apologize for any inconvenience this may have caused.
+    """.trimIndent()
+
+    companion object {
+        private const val MAKS_LENGDE_YTTERLIGERE_INFO = 498 //500 minus to "\n"
     }
 }
