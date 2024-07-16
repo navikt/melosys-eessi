@@ -26,9 +26,7 @@ object LukkBucAarsakMapper {
         }
     }
 
-    private fun a012SendtFraBuc(buc: BUC): Boolean {
-        return buc.documents.any {
-            SedType.A012.name == it.type && "empty" != it.status
-        }
+    private fun a012SendtFraBuc(buc: BUC): Boolean = buc.documents.any {
+        SedType.A012.name == it.type && "empty" != it.status
     }
 }
