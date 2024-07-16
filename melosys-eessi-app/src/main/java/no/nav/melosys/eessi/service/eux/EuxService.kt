@@ -70,8 +70,13 @@ class EuxService @Autowired constructor(
     fun hentMottakerinstitusjoner(bucType: String, landkoder: Collection<String>): List<Institusjon> {
         return euxConsumer.hentInstitusjoner(bucType, null).map {
             it.apply { landkode = LandkodeMapper.mapTilNavLandkode(landkode) }
-        }.filter { filtrerPåLandkoder(it, landkoder) }
-            .filter { it.tilegnetBucs.any { tilegnetBuc -> bucType == tilegnetBuc.bucType && COUNTERPARTY == tilegnetBuc.institusjonsrolle && tilegnetBuc.erEessiKlar() } }
+        }.filter {
+            filtrerPåLandkoder(it, landkoder)
+        }.filter {
+            (it.tilegnetBucs ?: emptyList()).any { tilegnetBuc ->
+                bucType == tilegnetBuc.bucType && COUNTERPARTY == tilegnetBuc.institusjonsrolle && tilegnetBuc.erEessiKlar()
+            }
+        }
     }
 
     private fun filtrerPåLandkoder(institusjon: Institusjon, landkoder: Collection<String>): Boolean {
