@@ -3,9 +3,6 @@ package no.nav.melosys.eessi;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +17,7 @@ import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
 import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ;
 import no.nav.melosys.eessi.models.kafkadlq.SedSendtHendelseKafkaDLQ;
+import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.repository.BucIdentifisertRepository;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import no.nav.melosys.eessi.repository.KafkaDLQRepository;
@@ -74,6 +72,7 @@ class SedSendtTestIT extends ComponentTestBase {
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, UUID.randomUUID().toString(), FNR))).get();
         kafkaTestConsumer.doWait(1_500L);
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(new SED());
 
         verify(journalpostapiConsumer, timeout(15000L)).opprettJournalpost(argumentCaptor.capture(), eq(true));
 
@@ -95,6 +94,7 @@ class SedSendtTestIT extends ComponentTestBase {
         sedHendelse.setBucType(H_BUC_01.name());
         kafkaTemplate.send(lagSedSendtRecord(sedHendelse)).get();
         kafkaTestConsumer.doWait(1_500L);
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(new SED());
 
         verify(journalpostapiConsumer, timeout(15000L)).opprettJournalpost(argumentCaptor.capture(), eq(true));
 
@@ -181,6 +181,7 @@ class SedSendtTestIT extends ComponentTestBase {
         when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), anyBoolean()))
             .thenThrow(new HttpClientErrorException(HttpStatus.BAD_GATEWAY))
             .thenAnswer(a -> mockData.journalpostResponse(a.getArgument(1, Boolean.class)));
+        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(new SED());
 
         kafkaTestConsumer.reset(1);
         kafkaTemplate.send(lagSedSendtRecord(mockData.sedHendelse(rinaSaksnummer, sedId, FNR))).get();
@@ -191,9 +192,6 @@ class SedSendtTestIT extends ComponentTestBase {
         assertThat(argumentCaptor.getValue()).extracting(OpprettJournalpostRequest::getSak)
             .extracting(OpprettJournalpostRequest.Sak::getArkivsaksnummer)
             .isEqualTo(Long.toString(arkivsakID));
-
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        CompletableFuture<List<KafkaDLQ>> future = new CompletableFuture<>();
 
         await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             List<KafkaDLQ> dlqList = kafkaDLQRepository.findAll();

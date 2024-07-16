@@ -66,7 +66,10 @@ class EuxServiceTest {
 
     @Test
     void hentBuc_forventKonsumentKall() {
+        when(euxConsumer.hentBUC(any())).thenReturn(new BUC());
+
         euxService.hentBuc("123123123");
+
         verify(euxConsumer).hentBUC("123123123");
     }
 
