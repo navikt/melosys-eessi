@@ -26,6 +26,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
+
 class EuxServiceTest {
 
     private val euxConsumer = mockk<EuxConsumer>()
@@ -38,7 +39,6 @@ class EuxServiceTest {
 
     @BeforeEach
     fun setup() {
-        MockKAnnotations.init(this)
         euxService = EuxService(euxConsumer, bucMetrikker, euxRinasakerConsumer)
     }
 
@@ -54,11 +54,11 @@ class EuxServiceTest {
     @Test
     fun `hentBucer forventKonsumentKall`() {
         val bucSearch = BucSearch(bucType = BucType.LA_BUC_01.name)
-        every { euxConsumer.finnRinaSaker(eq(BucType.LA_BUC_01.name), isNull()) } returns emptyList()
+        every { euxConsumer.finnRinaSaker(BucType.LA_BUC_01.name, isNull()) } returns emptyList()
 
         euxService.hentBucer(bucSearch)
 
-        verify { euxConsumer.finnRinaSaker(eq(BucType.LA_BUC_01.name), isNull()) }
+        verify { euxConsumer.finnRinaSaker(BucType.LA_BUC_01.name, isNull()) }
     }
 
     @Test
@@ -91,8 +91,8 @@ class EuxServiceTest {
     @Test
     fun `opprettBucOgSed forventRinaSaksnummer`() {
         every { euxConsumer.opprettBUC(any()) } returns opprettetBucID
-        every { euxConsumer.opprettSed(eq(opprettetBucID), any()) } returns opprettetSedID
-        every { euxConsumer.leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), "pdf", any()) } returns "123"
+        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
+        every { euxConsumer.leggTilVedlegg(opprettetBucID, opprettetSedID, "pdf", any()) } returns "123"
         every { euxConsumer.settMottakere(any(), any()) } returns Unit
         every { bucMetrikker.bucOpprettet(any()) } returns Unit
         val bucType = BucType.LA_BUC_01
@@ -104,13 +104,13 @@ class EuxServiceTest {
 
         verify { euxConsumer.opprettBUC(bucType.name) }
         verify { euxConsumer.opprettSed(opprettetBucID, sed) }
-        verify { euxConsumer.leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any()) }
+        verify { euxConsumer.leggTilVedlegg(opprettetBucID, opprettetSedID, "pdf", any()) }
         opprettBucOgSedResponse.rinaSaksnummer shouldBe opprettetBucID
     }
 
     @Test
     fun `opprettOgSendSed medRinaSaksnummer forventKonsumentKall`() {
-        every { euxConsumer.opprettSed(eq(opprettetBucID), any()) } returns opprettetSedID
+        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
         every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
         every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns setOf(Aksjoner.SEND.hentHandling())
         every { euxConsumer.sendSed(opprettetBucID, opprettetSedID) } just Runs
@@ -145,7 +145,7 @@ class EuxServiceTest {
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medTomtSedHandling forventKasterException`() {
-        every { euxConsumer.opprettSed(eq(opprettetBucID), any()) } returns opprettetSedID
+        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
         every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
         every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns emptyList()
 
@@ -158,7 +158,7 @@ class EuxServiceTest {
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medUgyldigSedHandling kasterIntegrationException`() {
-        every { euxConsumer.opprettSed(eq(opprettetBucID), any()) } returns opprettetSedID
+        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
         every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedID Sedtype ${Aksjoner.CREATE.hentHandling()}")
         every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns setOf(Aksjoner.READ.hentHandling())
 
@@ -171,7 +171,7 @@ class EuxServiceTest {
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medFlereHandlinger forventKonsumentKall`() {
-        every { euxConsumer.opprettSed(eq(opprettetBucID), any()) } returns opprettetSedID
+        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
         every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("test test ${Aksjoner.CREATE.hentHandling()}")
         every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns listOf(
             Aksjoner.CLOSE.hentHandling(),
@@ -236,13 +236,13 @@ class EuxServiceTest {
 
         institusjoner.shouldHaveSize(1)
         institusjoner[0].akronym shouldBe "FK Sverige-TS70"
-        verify { euxConsumer.hentInstitusjoner(eq(BucType.LA_BUC_04.name), isNull()) }
+        verify { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) }
     }
 
     @Test
     fun `hentMottakerinstitusjoner sBuc18LandSverige forventIngenInstitusjoner`() {
         mockInstitusjoner()
-        every { euxConsumer.hentInstitusjoner(eq("S_BUC_24"), isNull()) } returns emptyList()
+        every { euxConsumer.hentInstitusjoner("S_BUC_24", isNull()) } returns emptyList()
 
         val institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", listOf("SE"))
 
@@ -321,7 +321,7 @@ class EuxServiceTest {
     private fun mockInstitusjoner() {
         val institusjonerJsonUrl = javaClass.classLoader.getResource("institusjoner.json")
         val institusjoner = objectMapper.readValue(institusjonerJsonUrl, object : TypeReference<List<Institusjon>>() {})
-        every { euxConsumer.hentInstitusjoner(eq(BucType.LA_BUC_04.name), isNull()) } returns institusjoner
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns institusjoner
     }
 
     private fun lagBucMedDocument(rinaSaksnummer: String, sedID: String) = BUC().apply {
