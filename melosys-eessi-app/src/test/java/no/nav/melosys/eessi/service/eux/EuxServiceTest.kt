@@ -26,15 +26,12 @@ import no.nav.melosys.eessi.models.sed.SED
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-
 class EuxServiceTest {
 
     private val euxConsumer = mockk<EuxConsumer>()
     private val euxRinasakerConsumer = mockk<EuxRinasakerConsumer>()
     private val bucMetrikker = mockk<BucMetrikker>()
     private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
-    private val opprettetBucID = "114433"
-    private val opprettetSedID = "12222"
     private lateinit var euxService: EuxService
 
     @BeforeEach
@@ -90,9 +87,9 @@ class EuxServiceTest {
 
     @Test
     fun `opprettBucOgSed forventRinaSaksnummer`() {
-        every { euxConsumer.opprettBUC(any()) } returns opprettetBucID
-        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
-        every { euxConsumer.leggTilVedlegg(opprettetBucID, opprettetSedID, "pdf", any()) } returns "123"
+        every { euxConsumer.opprettBUC(any()) } returns OPPRETTET_BUC_ID
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) } returns "123"
         every { euxConsumer.settMottakere(any(), any()) } returns Unit
         every { bucMetrikker.bucOpprettet(any()) } returns Unit
         val bucType = BucType.LA_BUC_01
@@ -103,87 +100,87 @@ class EuxServiceTest {
         val opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg)
 
         verify { euxConsumer.opprettBUC(bucType.name) }
-        verify { euxConsumer.opprettSed(opprettetBucID, sed) }
-        verify { euxConsumer.leggTilVedlegg(opprettetBucID, opprettetSedID, "pdf", any()) }
-        opprettBucOgSedResponse.rinaSaksnummer shouldBe opprettetBucID
+        verify { euxConsumer.opprettSed(OPPRETTET_BUC_ID, sed) }
+        verify { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) }
+        opprettBucOgSedResponse.rinaSaksnummer shouldBe OPPRETTET_BUC_ID
     }
 
     @Test
     fun `opprettOgSendSed medRinaSaksnummer forventKonsumentKall`() {
-        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
-        every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
-        every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns setOf(Aksjoner.SEND.hentHandling())
-        every { euxConsumer.sendSed(opprettetBucID, opprettetSedID) } just Runs
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns setOf(Aksjoner.SEND.hentHandling())
+        every { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } just Runs
 
         val sed = SED()
-        euxService.opprettOgSendSed(sed, opprettetBucID)
+        euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
 
-        verify { euxConsumer.sendSed(opprettetBucID, opprettetSedID) }
+        verify { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) }
     }
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medIngenMuligBucHandlingCreate forventKasterException`() {
-        every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
 
         val sed = SED()
         val exception = shouldThrow<ValidationException> {
-            euxService.opprettOgSendSed(sed, opprettetBucID)
+            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
         }
-        exception.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $opprettetBucID, ugyldig handling i Rina"
+        exception.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
     }
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medTomListeBucHandling forventKasterException`() {
-        every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
 
         val sed = SED()
         val exception = shouldThrow<ValidationException> {
-            euxService.opprettOgSendSed(sed, opprettetBucID)
+            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
         }
-        exception.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $opprettetBucID, ugyldig handling i Rina"
+        exception.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
     }
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medTomtSedHandling forventKasterException`() {
-        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
-        every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
-        every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns emptyList()
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns emptyList()
 
         val sed = SED()
         val exception = shouldThrow<ValidationException> {
-            euxService.opprettOgSendSed(sed, opprettetBucID)
+            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
         }
-        exception.message shouldBe "Kan ikke sende SED på BUC $opprettetBucID, ugyldig handling ${Aksjoner.SEND.hentHandling()} i Rina"
+        exception.message shouldBe "Kan ikke sende SED på BUC $OPPRETTET_BUC_ID, ugyldig handling ${Aksjoner.SEND.hentHandling()} i Rina"
     }
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medUgyldigSedHandling kasterIntegrationException`() {
-        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
-        every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("SedID Sedtype ${Aksjoner.CREATE.hentHandling()}")
-        every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns setOf(Aksjoner.READ.hentHandling())
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedID Sedtype ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns setOf(Aksjoner.READ.hentHandling())
 
         val sed = SED()
         val exception = shouldThrow<ValidationException> {
-            euxService.opprettOgSendSed(sed, opprettetBucID)
+            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
         }
-        exception.message shouldBe "Kan ikke sende SED på BUC $opprettetBucID, ugyldig handling ${Aksjoner.SEND.hentHandling()} i Rina"
+        exception.message shouldBe "Kan ikke sende SED på BUC $OPPRETTET_BUC_ID, ugyldig handling ${Aksjoner.SEND.hentHandling()} i Rina"
     }
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medFlereHandlinger forventKonsumentKall`() {
-        every { euxConsumer.opprettSed(opprettetBucID, any()) } returns opprettetSedID
-        every { euxConsumer.hentBucHandlinger(opprettetBucID) } returns listOf("test test ${Aksjoner.CREATE.hentHandling()}")
-        every { euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID) } returns listOf(
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("test test ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns listOf(
             Aksjoner.CLOSE.hentHandling(),
             Aksjoner.SEND.hentHandling(),
             Aksjoner.SEND.hentHandling()
         )
-        every { euxConsumer.sendSed(opprettetBucID, opprettetSedID) } just Runs
+        every { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } just Runs
 
         val sed = SED()
-        euxService.opprettOgSendSed(sed, opprettetBucID)
+        euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
 
-        verify { euxConsumer.sendSed(opprettetBucID, opprettetSedID) }
+        verify { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) }
     }
 
     @Test
@@ -330,5 +327,10 @@ class EuxServiceTest {
             id = sedID
             conversations = listOf(Conversation())
         })
+    }
+
+    companion object {
+        private const val OPPRETTET_BUC_ID = "123456"
+        private const val OPPRETTET_SED_ID = "654321"
     }
 }
