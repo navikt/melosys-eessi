@@ -53,7 +53,7 @@ class EuxServiceTest {
 
     @Test
     fun `hentBucer forventKonsumentKall`() {
-        val bucSearch = BucSearch.builder().bucType(BucType.LA_BUC_01.name).build()
+        val bucSearch = BucSearch(bucType = BucType.LA_BUC_01.name)
         every { euxConsumer.finnRinaSaker(eq(BucType.LA_BUC_01.name), isNull()) } returns emptyList()
 
         euxService.hentBucer(bucSearch)
