@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.journalfoering
 
-import io.getunleash.Unleash
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.PersonFasade
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse
@@ -27,8 +26,7 @@ class OpprettUtgaaendeJournalpostService(
     private val oppgaveService: OppgaveService,
     private val sedMetrikker: SedMetrikker,
     private val personIdentifisering: PersonIdentifisering,
-    private val sedSendtHendelseRepository: SedSendtHendelseRepository,
-    private val unleash: Unleash
+    private val sedSendtHendelseRepository: SedSendtHendelseRepository
 ) {
     fun behandleSedSendtHendelse(sedSendt: SedHendelse) {
         try {
@@ -77,7 +75,7 @@ class OpprettUtgaaendeJournalpostService(
         log.info("Journalfører dokument: {}", sedSendt.rinaDokumentId)
         val navIdent = personFasade.hentNorskIdent(sak.aktoerId)
         val response = opprettUtgåendeJournalpost(sedSendt, sak, navIdent)
-        if (!"ENDELIG".equals(response!!.journalstatus, ignoreCase = true)) {
+        if (!"ENDELIG".equals(response.journalstatus, ignoreCase = true)) {
             log.info("Journalpost {} ble ikke endelig journalført. Melding: {}", response.journalpostId, response.melding)
             opprettUtgåendeJournalføringsoppgave(sedSendt, response.journalpostId, personFasade.hentAktoerId(navIdent))
         }
@@ -88,11 +86,11 @@ class OpprettUtgaaendeJournalpostService(
         log.info("Journalfører dokument uten sakstilknytning: {}", sedSendt.rinaDokumentId)
         val navIdent = sedSendt.navBruker
         val response = opprettUtgåendeJournalpost(sedSendt, null, navIdent)
-        opprettUtgåendeJournalføringsoppgave(sedSendt, response!!.journalpostId, navIdent)
+        opprettUtgåendeJournalføringsoppgave(sedSendt, response.journalpostId, navIdent)
         return response.journalpostId
     }
 
-    private fun opprettUtgåendeJournalpost(sedSendt: SedHendelse, sak: Sak?, navIdent: String): OpprettJournalpostResponse? {
+    private fun opprettUtgåendeJournalpost(sedSendt: SedHendelse, sak: Sak?, navIdent: String?): OpprettJournalpostResponse {
         return journalpostService.opprettUtgaaendeJournalpost(
             sedSendt,
             sak,

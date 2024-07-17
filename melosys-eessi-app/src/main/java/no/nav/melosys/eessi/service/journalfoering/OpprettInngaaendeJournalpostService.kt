@@ -24,12 +24,12 @@ class OpprettInngaaendeJournalpostService @Autowired constructor(
         val response = opprettJournalpostLagreRelasjon(sedMottatt, arkivsak.orElse(null), sedMedVedlegg, personIdent)
         log.info("Midlertidig journalpost opprettet med id {}", response!!.journalpostId)
         val dokumentId = if (response.dokumenter == null) "ukjent" else response.dokumenter[0].dokumentInfoId
-        return SakInformasjon.Companion.builder().journalpostId(response.journalpostId).dokumentId(dokumentId)
+        return SakInformasjon.builder().journalpostId(response.journalpostId).dokumentId(dokumentId)
             .gsakSaksnummer(arkivsak.map<String?> { obj: Sak? -> obj!!.id }
                 .orElse(null)).build()
     }
 
-    fun arkiverInngaaendeSedUtenBruker(sedHendelse: SedHendelse, sedMedVedlegg: SedMedVedlegg, personIdent: String): String {
+    fun arkiverInngaaendeSedUtenBruker(sedHendelse: SedHendelse, sedMedVedlegg: SedMedVedlegg, personIdent: String?): String {
         return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg, personIdent)!!.journalpostId
     }
 
@@ -37,7 +37,7 @@ class OpprettInngaaendeJournalpostService @Autowired constructor(
         sedMottatt: SedHendelse,
         sak: Sak?,
         sedMedVedlegg: SedMedVedlegg,
-        personIdent: String
+        personIdent: String?
     ): OpprettJournalpostResponse? {
         val response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg, personIdent)
         lagreJournalpostRelasjon(sedMottatt, response)
