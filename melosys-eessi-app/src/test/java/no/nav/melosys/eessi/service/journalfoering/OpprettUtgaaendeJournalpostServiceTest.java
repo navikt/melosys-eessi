@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Optional;
 
-import io.getunleash.FakeUnleash;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering;
@@ -54,9 +53,6 @@ class OpprettUtgaaendeJournalpostServiceTest {
     @Mock
     private SedSendtHendelseRepository sedSendtHendelseRepository;
 
-    private final FakeUnleash fakeUnleash = new FakeUnleash();
-
-
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
     private SedHendelse sedSendt;
@@ -64,9 +60,8 @@ class OpprettUtgaaendeJournalpostServiceTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        fakeUnleash.enableAll();
         opprettUtgaaendeJournalpostService = new OpprettUtgaaendeJournalpostService(
-            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtHendelseRepository, fakeUnleash);
+            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtHendelseRepository);
 
         when(euxService.hentSedMedVedlegg(anyString(), anyString())).thenReturn(sedMedVedlegg(new byte[0]));
 
