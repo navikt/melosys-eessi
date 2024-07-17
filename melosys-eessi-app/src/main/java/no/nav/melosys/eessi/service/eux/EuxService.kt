@@ -18,7 +18,6 @@ import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
-import org.springframework.context.annotation.Primary
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
@@ -27,7 +26,6 @@ import java.util.*
 private val log = KotlinLogging.logger {}
 
 @Service
-@Primary // FIXME: Ganske sikker på at vi kan fjerne Primary her
 class EuxService(
     private val euxConsumer: EuxConsumer,
     private val bucMetrikker: BucMetrikker,
