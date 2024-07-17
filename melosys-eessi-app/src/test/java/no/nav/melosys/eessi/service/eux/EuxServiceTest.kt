@@ -1,8 +1,8 @@
 package no.nav.melosys.eessi.service.eux
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -21,17 +21,19 @@ import no.nav.melosys.eessi.models.buc.BUC
 import no.nav.melosys.eessi.models.buc.Conversation
 import no.nav.melosys.eessi.models.buc.Document
 import no.nav.melosys.eessi.models.exception.IntegrationException
+import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class EuxServiceTest {
 
     private val euxConsumer = mockk<EuxConsumer>()
     private val euxRinasakerConsumer = mockk<EuxRinasakerConsumer>()
     private val bucMetrikker = mockk<BucMetrikker>()
-    private val objectMapper = ObjectMapper().registerModule(JavaTimeModule())
+    private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     private lateinit var euxService: EuxService
 
     @BeforeEach
@@ -112,8 +114,7 @@ class EuxServiceTest {
         every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns setOf(Aksjoner.SEND.hentHandling())
         every { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } just Runs
 
-        val sed = SED()
-        euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
+        euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
 
         verify { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) }
     }
@@ -122,22 +123,18 @@ class EuxServiceTest {
     fun `opprettOgSendSedMedHandlingSjekk medIngenMuligBucHandlingCreate forventKasterException`() {
         every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
 
-        val sed = SED()
-        val exception = shouldThrow<ValidationException> {
-            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
-        }
-        exception.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
+        shouldThrow<ValidationException> {
+            euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
+        }.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
     }
 
     @Test
     fun `opprettOgSendSedMedHandlingSjekk medTomListeBucHandling forventKasterException`() {
         every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
 
-        val sed = SED()
-        val exception = shouldThrow<ValidationException> {
-            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
-        }
-        exception.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
+        shouldThrow<ValidationException> {
+            euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
+        }.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
     }
 
     @Test
@@ -177,8 +174,7 @@ class EuxServiceTest {
         )
         every { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } just Runs
 
-        val sed = SED()
-        euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
+        euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
 
         verify { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) }
     }
@@ -197,8 +193,8 @@ class EuxServiceTest {
         val rinaSak = "12345"
         val RINA_MOCK_URL = "https://rina-host-url.local"
         every { euxConsumer.hentRinaUrl(rinaSak) } returns "$RINA_MOCK_URL/portal/#/caseManagement/$rinaSak"
-
         val expectedUrl = "$RINA_MOCK_URL/portal/#/caseManagement/$rinaSak"
+
         val resultUrl = euxService.hentRinaUrl(rinaSak)
 
         resultUrl shouldBe expectedUrl
@@ -209,6 +205,7 @@ class EuxServiceTest {
         val exception = shouldThrow<IllegalArgumentException> {
             euxService.hentRinaUrl(null)
         }
+
         exception.message shouldBe "Trenger rina-saksnummer for å opprette url til rina"
     }
 
@@ -227,7 +224,7 @@ class EuxServiceTest {
 
     @Test
     fun `hentMottakerinstitusjoner laBuc04LandSverige forventEnInstitusjon`() {
-        mockInstitusjoner()
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
 
         val institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name, listOf("SE"))
 
@@ -238,7 +235,7 @@ class EuxServiceTest {
 
     @Test
     fun `hentMottakerinstitusjoner sBuc18LandSverige forventIngenInstitusjoner`() {
-        mockInstitusjoner()
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
         every { euxConsumer.hentInstitusjoner("S_BUC_24", isNull()) } returns emptyList()
 
         val institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", listOf("SE"))
@@ -248,7 +245,7 @@ class EuxServiceTest {
 
     @Test
     fun `hentMottakerinstitusjoner laBuc04LandGB forventEnInstitusjon`() {
-        mockInstitusjoner()
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
 
         val institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", listOf("GB"))
 
@@ -259,7 +256,7 @@ class EuxServiceTest {
 
     @Test
     fun `hentMottakerinstitusjoner laBuc04LandGR forventEnInstitusjon`() {
-        mockInstitusjoner()
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
 
         val institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", listOf("GR"))
 
@@ -301,12 +298,16 @@ class EuxServiceTest {
     @Test
     fun `sedErEndring utenSederForBuc forventFalse`() {
         val sedID = "33322"
-        val buc = BUC().apply {
-            documents = listOf(Document().apply {
-                id = sedID
-                conversations = listOf(Conversation())
-            }, Document(), Document())
-        }
+        val buc = BUC(
+            documents = listOf(
+                Document(
+                    id = sedID,
+                    conversations = listOf(Conversation())
+                ),
+                Document(),
+                Document()
+            )
+        )
         every { euxConsumer.hentBUC(any()) } returns buc
 
         val erEndring = euxService.sedErEndring(sedID, "123")
@@ -315,22 +316,28 @@ class EuxServiceTest {
         erEndring shouldBe false
     }
 
-    private fun mockInstitusjoner() {
-        val institusjonerJsonUrl = javaClass.classLoader.getResource("institusjoner.json")
-        val institusjoner = objectMapper.readValue(institusjonerJsonUrl, object : TypeReference<List<Institusjon>>() {})
-        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns institusjoner
-    }
+    private fun hentInstitusjoner(): List<Institusjon> =
+        objectMapper.readValue(
+            File(
+                javaClass.classLoader.getResource(INSTITUSJONER_JSON)?.toURI()
+                    ?: throw NotFoundException("Fant ikke $INSTITUSJONER_JSON")
+            )
+        )
 
-    private fun lagBucMedDocument(rinaSaksnummer: String, sedID: String) = BUC().apply {
-        id = rinaSaksnummer
-        documents = listOf(Document().apply {
-            id = sedID
-            conversations = listOf(Conversation())
-        })
-    }
+    private fun lagBucMedDocument(rinaSaksnummer: String, sedID: String) = BUC(
+        id = rinaSaksnummer,
+        documents = listOf(
+            Document(
+                id = sedID,
+                conversations = listOf(Conversation())
+            )
+        )
+    )
 
     companion object {
         private const val OPPRETTET_BUC_ID = "123456"
         private const val OPPRETTET_SED_ID = "654321"
+        private const val INSTITUSJONER_JSON = "institusjoner.json"
+
     }
 }
