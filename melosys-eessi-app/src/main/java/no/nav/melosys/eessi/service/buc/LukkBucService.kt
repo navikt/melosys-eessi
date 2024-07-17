@@ -30,7 +30,7 @@ class LukkBucService(
         try {
             log.info("Lukker bucer av type {}", bucType)
             // FIXME: søk på BUC fungerer ikke med status open. Venter på eux/rina-fix
-            val bucInfos = euxService.hentBucer(BucSearch.builder().bucType(bucType.name).build())
+            val bucInfos = euxService.hentBucer(BucSearch(bucType = bucType.name))
             bucInfos
                 .filter { it.bucErÅpen() && it.norgeErCaseOwner() }
                 .mapNotNull { euxService.finnBUC(it.id).orElse(null) }

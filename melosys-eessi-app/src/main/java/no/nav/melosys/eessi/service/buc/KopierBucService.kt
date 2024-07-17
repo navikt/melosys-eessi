@@ -29,7 +29,7 @@ class KopierBucService(
             ?: throw NoSuchElementException("Finner ikke første SED for rinasak $rinaSaksnummer")
 
         settYtterligereInfo(sed, buc.internationalId!!)
-        val nyttRinaSaksnummer = euxService.opprettBucOgSed(bucType, buc.hentMottakere(), sed, emptySet()).rinaSaksnummer
+        val nyttRinaSaksnummer = euxService.opprettBucOgSed(bucType, buc.hentMottakere(), sed, emptySet()).rinaSaksnummer!!
 
         saksrelasjonService.finnVedRinaSaksnummer(rinaSaksnummer).getOrNull()
             ?.let { saksrelasjonService.lagreKobling(it.gsakSaksnummer, nyttRinaSaksnummer, bucType) }
