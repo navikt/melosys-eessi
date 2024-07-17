@@ -174,7 +174,7 @@ open class SedMottakService(
         )
 
         val journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-            sedMottattHendelse.sedHendelse, sedMedVedlegg, navIdent
+            sedMottattHendelse.sedHendelse, sedMedVedlegg, navIdent!!
         )
 
         sedMottattHendelse.journalpostId = journalpostID

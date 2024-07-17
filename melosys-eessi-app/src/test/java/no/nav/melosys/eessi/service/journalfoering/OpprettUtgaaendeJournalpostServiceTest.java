@@ -139,6 +139,7 @@ class OpprettUtgaaendeJournalpostServiceTest {
     @MockitoSettings(strictness = Strictness.LENIENT)
     void behandleSedHendelse_harIkkePid_forventIkkeOpprettJfrOppgave() {
         when(personIdentifisering.identifiserPerson(anyString(), any())).thenReturn(Optional.empty());
+        when(sedSendtHendelseRepository.save(any(SedSendtHendelse.class))).thenReturn(new SedSendtHendelse());
 
         opprettUtgaaendeJournalpostService.behandleSedSendtHendelse(sedSendt);
 

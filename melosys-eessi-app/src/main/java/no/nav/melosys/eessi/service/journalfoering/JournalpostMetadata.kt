@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.journalfoering;
+package no.nav.melosys.eessi.service.journalfoering
 
-public record JournalpostMetadata(String dokumentTittel, String behandlingstema) {
-}
+@JvmRecord
+data class JournalpostMetadata(val dokumentTittel: String, val behandlingstema: String)

@@ -64,18 +64,28 @@ class JournalpostServiceTest {
 
     @Test
     void opprettInngaaendeJournalpost_verifiserEndeligJfr() {
+        when(journalpostapiConsumer.opprettJournalpost(any(), eq(false)))
+            .thenReturn(OpprettJournalpostResponse.builder().build());
+
         journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false));
     }
 
     @Test
     void opprettUtgaaendeJournalpost_verifiserEndeligJfr() {
+        when(journalpostapiConsumer.opprettJournalpost(any(), eq(true)))
+            .thenReturn(OpprettJournalpostResponse.builder().build());
+
         journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(true));
     }
 
     @Test
     void opprettInngaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
+        when(journalpostapiConsumer.opprettJournalpost(any(), eq(false)))
+            .thenReturn(OpprettJournalpostResponse.builder().build());
+
         journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
         verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(false));
@@ -87,8 +97,12 @@ class JournalpostServiceTest {
 
     @Test
     void opprettUtgaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
+        when(journalpostapiConsumer.opprettJournalpost(any(), eq(true)))
+            .thenReturn(OpprettJournalpostResponse.builder().build());
+
         journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
         var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+
         verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(true));
         assertThat(captor.getValue())
             .isNotNull()
