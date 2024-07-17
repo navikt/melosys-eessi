@@ -1,130 +1,118 @@
-package no.nav.melosys.eessi.service.journalfoering;
+package no.nav.melosys.eessi.service.journalfoering
 
-import java.nio.charset.Charset;
-import java.util.Collections;
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.github.benas.randombeans.api.EnhancedRandom
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
+import no.nav.melosys.eessi.EnhancedRandomCreator
+import no.nav.melosys.eessi.integration.journalpostapi.*
+import no.nav.melosys.eessi.integration.sak.Sak
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.metrikker.SedMetrikker
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
+import java.nio.charset.Charset
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getunleash.FakeUnleash;
-import io.github.benas.randombeans.api.EnhancedRandom;
-import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.integration.journalpostapi.JournalpostapiConsumer;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRequest;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
-import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtException;
-import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.metrikker.SedMetrikker;
-import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+@ExtendWith(MockKExtension::class)
+internal class JournalpostServiceTest {
+    private val journalpostapiConsumer: JournalpostapiConsumer = mockk()
+    private val journalpostMetadataService: JournalpostMetadataService = mockk()
+    private val sedMetrikker: SedMetrikker = mockk()
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+    private val random: EnhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom()
+    private val journalpostMetadata = JournalpostMetadata("dokumentTittel fra journalpostMetadata", "behandlingstema fra journalpostMetadata")
 
-@ExtendWith(MockitoExtension.class)
-class JournalpostServiceTest {
-    @Mock
-    private JournalpostapiConsumer journalpostapiConsumer;
-    @Mock
-    private JournalpostMetadataService journalpostMetadataService;
-    @Mock
-    private SedMetrikker sedMetrikker;
+    private lateinit var journalpostService: JournalpostService
 
-    private final EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
-    private final JournalpostMetadata journalpostMetadata = new JournalpostMetadata("dokumentTittel fra journalpostMetadata", "behandlingstema fra journalpostMetadata");
+    private lateinit var sedHendelse: SedHendelse
+    private lateinit var sak: Sak
+    private lateinit var objectMapper: ObjectMapper
 
-    private JournalpostService journalpostService;
-
-    private SedHendelse sedHendelse;
-    private Sak sak;
-    private ObjectMapper objectMapper;
-    private final FakeUnleash fakeUnleash = new FakeUnleash();
-
-    private static final String JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}";
-
+    private val JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}"
 
     @BeforeEach
-    public void setUp() {
-        journalpostService = new JournalpostService(journalpostMetadataService, journalpostapiConsumer, sedMetrikker);
+    fun setUp() {
+        journalpostService = JournalpostService(journalpostMetadataService, journalpostapiConsumer, sedMetrikker)
 
-        sedHendelse = random.nextObject(SedHendelse.class);
-        sak = random.nextObject(Sak.class);
-        objectMapper = new ObjectMapper();
+        sedHendelse = random.nextObject(SedHendelse::class.java)
+        sak = random.nextObject(Sak::class.java)
+        objectMapper = ObjectMapper()
 
-        when(journalpostMetadataService.hentJournalpostMetadata(anyString())).thenReturn(journalpostMetadata);
+        every { journalpostMetadataService.hentJournalpostMetadata(any()) } returns journalpostMetadata
     }
 
     @Test
-    void opprettInngaaendeJournalpost_verifiserEndeligJfr() {
-        when(journalpostapiConsumer.opprettJournalpost(any(), eq(false)))
-            .thenReturn(OpprettJournalpostResponse.builder().build());
+    fun opprettInngaaendeJournalpost_verifiserEndeligJfr() {
+        every { journalpostapiConsumer.opprettJournalpost(any(), eq(false)) } returns OpprettJournalpostResponse.builder().build()
 
-        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(ByteArray(0)), "123321")
 
-        verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false));
+        verify { journalpostapiConsumer.opprettJournalpost(any<OpprettJournalpostRequest>(), eq(false)) }
     }
 
     @Test
-    void opprettUtgaaendeJournalpost_verifiserEndeligJfr() {
-        when(journalpostapiConsumer.opprettJournalpost(any(), eq(true)))
-            .thenReturn(OpprettJournalpostResponse.builder().build());
+    fun opprettUtgaaendeJournalpost_verifiserEndeligJfr() {
+        every { journalpostapiConsumer.opprettJournalpost(any(), eq(true)) } returns OpprettJournalpostResponse.builder().build()
 
-        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
-        verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(true));
+        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(ByteArray(0)), "123321")
+        verify { journalpostapiConsumer.opprettJournalpost(any<OpprettJournalpostRequest>(), eq(true)) }
     }
 
     @Test
-    void opprettInngaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
-        when(journalpostapiConsumer.opprettJournalpost(any(), eq(false)))
-            .thenReturn(OpprettJournalpostResponse.builder().build());
+    fun opprettInngaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
+        every { journalpostapiConsumer.opprettJournalpost(any(), eq(false)) } returns OpprettJournalpostResponse.builder().build()
 
-        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
-        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
-        verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(false));
-        assertThat(captor.getValue())
-            .isNotNull()
-            .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
-            .containsExactly(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
+        journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(ByteArray(0)), "123321")
+        val captor = slot<OpprettJournalpostRequest>()
+        verify { journalpostapiConsumer.opprettJournalpost(capture(captor), eq(false)) }
+        captor.captured.let {
+            it shouldNotBe null
+            it.tittel shouldBe journalpostMetadata.dokumentTittel
+            it.behandlingstema shouldBe journalpostMetadata.behandlingstema
+        }
     }
 
     @Test
-    void opprettUtgaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
-        when(journalpostapiConsumer.opprettJournalpost(any(), eq(true)))
-            .thenReturn(OpprettJournalpostResponse.builder().build());
+    fun opprettUtgaaendeJournalpost_verifiserDokumentTittelOgBehandlingstema() {
+        every { journalpostapiConsumer.opprettJournalpost(any(), eq(true)) } returns OpprettJournalpostResponse.builder().build()
 
-        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
-        var captor = ArgumentCaptor.forClass(OpprettJournalpostRequest.class);
+        journalpostService.opprettUtgaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(ByteArray(0)), "123321")
+        val captor = slot<OpprettJournalpostRequest>()
 
-        verify(journalpostapiConsumer).opprettJournalpost(captor.capture(), eq(true));
-        assertThat(captor.getValue())
-            .isNotNull()
-            .extracting(OpprettJournalpostRequest::getTittel, OpprettJournalpostRequest::getBehandlingstema)
-            .containsExactly(journalpostMetadata.dokumentTittel(), journalpostMetadata.behandlingstema());
+        verify { journalpostapiConsumer.opprettJournalpost(capture(captor), eq(true)) }
+        captor.captured.let {
+            it shouldNotBe null
+            it.tittel shouldBe journalpostMetadata.dokumentTittel
+            it.behandlingstema shouldBe journalpostMetadata.behandlingstema
+        }
     }
 
     @Test
-    void opprettInngaaendeJournalpos_sedAlleredeJournalførtException_returnererOpprettJournalpostResponse() throws Exception {
-        HttpClientErrorException httpClientErrorException = new HttpClientErrorException(HttpStatus.CONFLICT, "", JOURNALPOST_RESPONSE.getBytes(), Charset.defaultCharset());
-        when(journalpostapiConsumer.opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false)))
-            .thenThrow(new SedAlleredeJournalførtException("Sed allerede journalført", "123", httpClientErrorException));
-        when(journalpostapiConsumer.henterJournalpostResponseFra409Exception(httpClientErrorException)).thenReturn(objectMapper.readValue(JOURNALPOST_RESPONSE, OpprettJournalpostResponse.class));
+    fun opprettInngaaendeJournalpos_sedAlleredeJournalførtException_returnererOpprettJournalpostResponse() {
+        val httpClientErrorException = HttpClientErrorException(HttpStatus.CONFLICT, "", JOURNALPOST_RESPONSE.toByteArray(), Charset.defaultCharset())
+        every {
+            journalpostapiConsumer.opprettJournalpost(any(), eq(false))
+        } throws SedAlleredeJournalførtException("Sed allerede journalført", "123", httpClientErrorException)
+        every {
+            journalpostapiConsumer.henterJournalpostResponseFra409Exception(httpClientErrorException)
+        } returns objectMapper.readValue(JOURNALPOST_RESPONSE, OpprettJournalpostResponse::class.java)
 
-        OpprettJournalpostResponse opprettJournalpostResponse = journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(new byte[0]), "123321");
+        val opprettJournalpostResponse = journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(ByteArray(0)), "123321")
 
-
-        assertThat(opprettJournalpostResponse.getJournalpostId()).isEqualTo("498371665");
-        verify(journalpostapiConsumer).opprettJournalpost(any(OpprettJournalpostRequest.class), eq(false));
+        opprettJournalpostResponse!!.journalpostId shouldBe "498371665"
+        verify { journalpostapiConsumer.opprettJournalpost(any<OpprettJournalpostRequest>(), eq(false)) }
     }
 
-    private SedMedVedlegg sedMedVedlegg(byte[] innhold) {
-        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("", "", innhold), Collections.emptyList());
+    private fun sedMedVedlegg(innhold: ByteArray): SedMedVedlegg {
+        return SedMedVedlegg(SedMedVedlegg.BinaerFil("", "", innhold), emptyList())
     }
 }
