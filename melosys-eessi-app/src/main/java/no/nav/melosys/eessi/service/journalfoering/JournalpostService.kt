@@ -18,7 +18,7 @@ class JournalpostService(
         sak: Sak?,
         sedMedVedlegg: SedMedVedlegg?,
         personIdent: String?
-    ): OpprettJournalpostResponse? {
+    ): OpprettJournalpostResponse {
         val journalpostMetadata = journalpostMetadataService.hentJournalpostMetadata(sedHendelse.sedType)
         val request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
             sedHendelse,

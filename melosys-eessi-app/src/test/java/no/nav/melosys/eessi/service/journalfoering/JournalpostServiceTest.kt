@@ -5,7 +5,6 @@ import io.github.benas.randombeans.api.EnhancedRandom
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.every
-import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
@@ -17,13 +16,11 @@ import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
 import java.nio.charset.Charset
 
-@ExtendWith(MockKExtension::class)
-internal class JournalpostServiceTest {
+class JournalpostServiceTest {
     private val journalpostapiConsumer: JournalpostapiConsumer = mockk()
     private val journalpostMetadataService: JournalpostMetadataService = mockk()
     private val sedMetrikker: SedMetrikker = mockk()
@@ -33,20 +30,15 @@ internal class JournalpostServiceTest {
 
     private lateinit var journalpostService: JournalpostService
 
-    private lateinit var sedHendelse: SedHendelse
-    private lateinit var sak: Sak
-    private lateinit var objectMapper: ObjectMapper
+    private var sedHendelse: SedHendelse  = random.nextObject(SedHendelse::class.java)
+    private var sak: Sak= random.nextObject(Sak::class.java)
+    private var objectMapper: ObjectMapper = ObjectMapper()
 
     private val JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}"
 
     @BeforeEach
     fun setUp() {
         journalpostService = JournalpostService(journalpostMetadataService, journalpostapiConsumer, sedMetrikker)
-
-        sedHendelse = random.nextObject(SedHendelse::class.java)
-        sak = random.nextObject(Sak::class.java)
-        objectMapper = ObjectMapper()
-
         every { journalpostMetadataService.hentJournalpostMetadata(any()) } returns journalpostMetadata
     }
 
@@ -108,7 +100,7 @@ internal class JournalpostServiceTest {
 
         val opprettJournalpostResponse = journalpostService.opprettInngaaendeJournalpost(sedHendelse, sak, sedMedVedlegg(ByteArray(0)), "123321")
 
-        opprettJournalpostResponse!!.journalpostId shouldBe "498371665"
+        opprettJournalpostResponse.journalpostId shouldBe "498371665"
         verify { journalpostapiConsumer.opprettJournalpost(any<OpprettJournalpostRequest>(), eq(false)) }
     }
 
