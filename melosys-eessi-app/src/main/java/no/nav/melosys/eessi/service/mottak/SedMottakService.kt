@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service
 private val log = KotlinLogging.logger {}
 
 @Service
-open class SedMottakService(
+class SedMottakService(
     private val euxService: EuxService,
     private val personFasade: PersonFasade,
     private val opprettInngaaendeJournalpostService: OpprettInngaaendeJournalpostService,
@@ -41,7 +41,7 @@ open class SedMottakService(
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
     @Transactional
-    open fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
+    fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
         if (sedMottattHendelse.sedHendelse.erX100()) {
             log.info("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av typen X100")
             return
