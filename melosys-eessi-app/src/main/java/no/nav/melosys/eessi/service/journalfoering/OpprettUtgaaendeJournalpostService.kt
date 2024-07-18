@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.journalfoering
 
+import mu.KotlinLogging
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.PersonFasade
 import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse
@@ -13,9 +14,9 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.apache.commons.lang3.StringUtils
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+
+private val log = KotlinLogging.logger {}
 
 @Service
 class OpprettUtgaaendeJournalpostService(
@@ -44,9 +45,9 @@ class OpprettUtgaaendeJournalpostService(
         }
     }
 
-    fun journalfoerTidligereSedDersomEksisterer(rinaSakId: String?) {
+    fun journalfoerTidligereSedDersomEksisterer(rinaSakId: String) {
         val sedSendtHendelser: List<SedSendtHendelse> = sedSendtHendelseRepository.findAllByRinaSaksnummerAndAndJournalpostIdIsNull(
-            rinaSakId!!
+            rinaSakId
         )
         for (sedSendtHendelse in sedSendtHendelser) {
             arkiverUtgaaendeSed(sedSendtHendelse.sedHendelse)
@@ -106,9 +107,5 @@ class OpprettUtgaaendeJournalpostService(
             if (StringUtils.isNotEmpty(navIdent)) personFasade.hentAktoerId(navIdent) else null,
             euxService.hentRinaUrl(sedSendt.rinaSakId)
         )
-    }
-
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(OpprettUtgaaendeJournalpostService::class.java)
     }
 }
