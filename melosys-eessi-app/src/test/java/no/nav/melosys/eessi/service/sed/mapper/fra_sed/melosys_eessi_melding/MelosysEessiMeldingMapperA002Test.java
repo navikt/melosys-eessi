@@ -10,7 +10,6 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MelosysEessiMeldingMapperA002Test {
 
     private SedHendelse sedHendelse;
-    private SakInformasjon sakInformasjon;
+    private MelosysEessiMeldingMapperStubs.SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapper mapper;
     private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 

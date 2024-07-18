@@ -11,7 +11,6 @@ import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
 import no.nav.melosys.eessi.models.sed.nav.Grunnlag;
 import no.nav.melosys.eessi.models.sed.nav.Land;
 import no.nav.melosys.eessi.models.sed.nav.Unntak;
-import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 import org.junit.jupiter.api.Test;
 
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
@@ -24,21 +23,21 @@ public class MelosysEessiMeldingMapperA001Test {
     public void mapA001_forventRettFelt() {
         SED sed = createSed(hentMedlemskap());
         SedHendelse sedHendelse = createSedHendelse();
-        SakInformasjon sakInformasjon = createSakInformasjon();
         MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001)
-                .map("123",
-                        sed,
-                        sedHendelse.getRinaDokumentId(),
-                        sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(),
-                        sedHendelse.getBucType(),
-                        sedHendelse.getAvsenderId(),
-                        "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(),
-                        sakInformasjon.getGsakSaksnummer(),
-                        false,
-                        "1"
-                );
+            .map("123",
+                sed,
+                sedHendelse.getRinaDokumentId(),
+                sedHendelse.getRinaSakId(),
+                sedHendelse.getSedType(),
+                sedHendelse.getBucType(),
+                sedHendelse.getAvsenderId(),
+                "landkode",
+                null,
+                null,
+                null,
+                false,
+                "1"
+            );
 
         assertThat(melosysEessiMelding).isNotNull();
         assertThat(melosysEessiMelding.getArtikkel()).isEqualTo("16_1");

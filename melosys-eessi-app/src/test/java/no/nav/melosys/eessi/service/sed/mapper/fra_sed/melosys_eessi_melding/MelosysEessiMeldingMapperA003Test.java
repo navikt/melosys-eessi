@@ -7,7 +7,6 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
-import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +18,7 @@ class MelosysEessiMeldingMapperA003Test {
 
     private static final String IKKE_OPPRINNELIG_VEDTAK = null;
     private SedHendelse sedHendelse;
-    private SakInformasjon sakInformasjon;
+    private MelosysEessiMeldingMapperStubs.SakInformasjon sakInformasjon;
     private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
 
     @BeforeEach
