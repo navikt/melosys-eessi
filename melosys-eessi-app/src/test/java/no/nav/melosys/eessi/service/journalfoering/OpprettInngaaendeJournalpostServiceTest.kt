@@ -4,7 +4,6 @@ import com.google.common.collect.Lists
 import io.github.benas.randombeans.api.EnhancedRandom
 import io.kotest.matchers.shouldBe
 import io.mockk.every
-import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.melosys.eessi.EnhancedRandomCreator
@@ -15,9 +14,7 @@ import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 
-@ExtendWith(MockKExtension::class)
 internal class OpprettInngaaendeJournalpostServiceTest {
 
     private val journalpostService: JournalpostService = mockk()
@@ -26,20 +23,19 @@ internal class OpprettInngaaendeJournalpostServiceTest {
     private lateinit var opprettInngaaendeJournalpostService: OpprettInngaaendeJournalpostService
 
     private val enhancedRandom: EnhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom()
-
-    private lateinit var sedMottatt: SedHendelse
-    private val JOURNALPOST_ID = "11223344"
+    private val sedMottatt = enhancedRandom.nextObject(SedHendelse::class.java).apply {
+        bucType = BucType.LA_BUC_01.name
+    }
 
     @BeforeEach
     fun setup() {
         opprettInngaaendeJournalpostService = OpprettInngaaendeJournalpostService(journalpostService, journalpostSedKoblingService)
-        sedMottatt = enhancedRandom.nextObject(SedHendelse::class.java).apply {
-            bucType = BucType.LA_BUC_01.name
-        }
 
-        val response = OpprettJournalpostResponse(JOURNALPOST_ID, Lists.newArrayList(
-            OpprettJournalpostResponse.Dokument("123")), null, null)
-        every { journalpostService.opprettInngaaendeJournalpost(any(), any(), any(), any()) } returns response
+        every { journalpostService.opprettInngaaendeJournalpost(any(), any(), any(), any()) } returns OpprettJournalpostResponse(
+            JOURNALPOST_ID, Lists.newArrayList(
+                OpprettJournalpostResponse.Dokument("123")
+            ), null, null
+        )
     }
 
     @Test
@@ -56,7 +52,11 @@ internal class OpprettInngaaendeJournalpostServiceTest {
         }
     }
 
-    private fun sedMedVedlegg(innhold: ByteArray): SedMedVedlegg {
-        return SedMedVedlegg(SedMedVedlegg.BinaerFil("", "", innhold), emptyList())
+    private fun sedMedVedlegg(innhold: ByteArray): SedMedVedlegg =
+        SedMedVedlegg(SedMedVedlegg.BinaerFil("", "", innhold), emptyList())
+
+    companion object {
+        private const val JOURNALPOST_ID = "123456789"
     }
+
 }
