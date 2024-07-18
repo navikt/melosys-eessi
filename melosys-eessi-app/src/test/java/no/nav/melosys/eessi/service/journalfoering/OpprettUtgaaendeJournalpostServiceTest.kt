@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.journalfoering
 import io.github.benas.randombeans.api.EnhancedRandom
 import io.kotest.matchers.shouldBe
 import io.mockk.*
-import io.mockk.junit5.MockKExtension
 import no.nav.melosys.eessi.EnhancedRandomCreator
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.PersonFasade
@@ -20,13 +19,9 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoSettings
-import org.mockito.quality.Strictness
 import java.util.*
 
-@ExtendWith(MockKExtension::class)
-internal class OpprettUtgaaendeJournalpostServiceTest {
+class OpprettUtgaaendeJournalpostServiceTest {
 
     private val JOURNALPOST_ID = "123"
 
@@ -41,20 +36,27 @@ internal class OpprettUtgaaendeJournalpostServiceTest {
 
     private lateinit var opprettUtgaaendeJournalpostService: OpprettUtgaaendeJournalpostService
 
-    private lateinit var sedSendt: SedHendelse
     private val enhancedRandom: EnhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom()
+    private val sedSendt: SedHendelse = enhancedRandom.nextObject(SedHendelse::class.java)
 
     @BeforeEach
     fun setup() {
         opprettUtgaaendeJournalpostService = OpprettUtgaaendeJournalpostService(
-            saksrelasjonService, journalpostService, euxService, personFasade, oppgaveService, sedMetrikker, personIdentifisering, sedSendtHendelseRepository)
+            saksrelasjonService,
+            journalpostService,
+            euxService,
+            personFasade,
+            oppgaveService,
+            sedMetrikker,
+            personIdentifisering,
+            sedSendtHendelseRepository
+        )
 
         every { euxService.hentSedMedVedlegg(any(), any()) } returns sedMedVedlegg(ByteArray(0))
 
-        val sak = enhancedRandom.nextObject(Sak::class.java)
-        every { saksrelasjonService.finnArkivsakForRinaSaksnummer(any()) } returns Optional.of(sak)
-
-        sedSendt = enhancedRandom.nextObject(SedHendelse::class.java)
+        every { saksrelasjonService.finnArkivsakForRinaSaksnummer(any()) } returns Optional.of(
+            enhancedRandom.nextObject(Sak::class.java)
+        )
     }
 
     @Test
@@ -122,7 +124,6 @@ internal class OpprettUtgaaendeJournalpostServiceTest {
     }
 
     @Test
-    @MockitoSettings(strictness = Strictness.LENIENT)
     fun behandleSedHendelse_harIkkePid_forventIkkeOpprettJfrOppgave() {
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
         every { sedSendtHendelseRepository.save(any<SedSendtHendelse>()) } returns SedSendtHendelse()
