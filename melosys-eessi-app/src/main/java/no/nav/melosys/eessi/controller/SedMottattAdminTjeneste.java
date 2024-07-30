@@ -16,7 +16,6 @@ import java.util.UUID;
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
 @Slf4j
-@Unprotected
 @RestController
 @RequestMapping("/admin/sedmottatt")
 public class SedMottattAdminTjeneste {

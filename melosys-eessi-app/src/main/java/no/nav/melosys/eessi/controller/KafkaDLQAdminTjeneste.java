@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Unprotected
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/kafka/dlq")
