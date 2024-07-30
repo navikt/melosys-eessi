@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 @Slf4j
-@Unprotected
 @RestController
 @RequestMapping("/admin")
 public class SedJournalføringAdminTjeneste {

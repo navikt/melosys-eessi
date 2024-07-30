@@ -19,7 +19,6 @@ import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
-@Unprotected
 @RestController
 @RequestMapping("/admin/kafka/consumers")
 @Profile("!local-q2")
