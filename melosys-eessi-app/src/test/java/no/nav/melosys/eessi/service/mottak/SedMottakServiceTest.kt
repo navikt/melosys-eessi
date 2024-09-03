@@ -11,8 +11,7 @@ import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
 import no.nav.melosys.eessi.integration.pdl.PDLService
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
-import no.nav.melosys.eessi.models.BucIdentifiseringOppg
-import no.nav.melosys.eessi.models.SedMottattHendelse
+import no.nav.melosys.eessi.models.*
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
 import no.nav.melosys.eessi.models.sed.nav.*
@@ -22,6 +21,7 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -60,6 +60,9 @@ class SedMottakServiceTest {
     @MockK(relaxed = true)
     private lateinit var sedMetrikker: SedMetrikker
 
+    @MockK
+    private lateinit var saksrelasjonService: SaksrelasjonService
+
     private lateinit var sedMottakService: SedMottakService
 
 
@@ -76,8 +79,11 @@ class SedMottakServiceTest {
             sedMetrikker,
             personIdentifisering,
             bucIdentifisertService,
+            saksrelasjonService,
             "1"
         )
+        val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()) } returns Optional.of(rinasakKobling)
     }
 
     @Test
@@ -181,6 +187,36 @@ class SedMottakServiceTest {
     }
 
     @Test
+    fun `behandleSed erHbuc behandlerVidere`() {
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build()
+        sedMottattHendelse.sedHendelse.bucType = BucType.H_BUC_02.name
+        sedMottattHendelse.sedHendelse.sektorKode = "H"
+
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify { personIdentifisering.identifiserPerson(any(), any()) }
+    }
+
+    @Test
+    fun `behandleSed erIkkeLaBucEllerHBuc behandlerIkkeVidere`() {
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build()
+        sedMottattHendelse.sedHendelse.sektorKode = "A"
+        every { sedMottattHendelseRepository.findBySedID(SED_ID) } returns Optional.of(sedMottattHendelse)
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify { euxService wasNot Called }
+        verify { personIdentifisering wasNot Called }
+        verify { opprettInngaaendeJournalpostService wasNot Called }
+        verify { oppgaveService wasNot Called }
+    }
+
+    @Test
     fun `behandleSed xSedUtenTilhørendeASed kasterException`() {
         val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
@@ -220,6 +256,7 @@ class SedMottakServiceTest {
         navBruker = IDENT
         sedId = SED_ID
         rinaSakId = RINA_SAKSNUMMER
+        bucType = BucType.LA_BUC_02.name
     }
 
     private fun sedHendelseUtenBruker() = SedHendelse().apply {
@@ -229,6 +266,8 @@ class SedMottakServiceTest {
         rinaDokumentId = "456"
         sedId = SED_ID
         sedType = "A009"
+        bucType = BucType.LA_BUC_02.name
+        sektorKode = "LA"
     }
 
     companion object {
