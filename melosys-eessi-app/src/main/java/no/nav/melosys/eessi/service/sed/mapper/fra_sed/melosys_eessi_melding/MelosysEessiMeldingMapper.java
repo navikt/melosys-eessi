@@ -29,7 +29,7 @@ public interface MelosysEessiMeldingMapper {
 
         if (inneholderStatsborgerskap(sed)) {
             melosysEessiMelding.setStatsborgerskap(
-                    mapStatsborgerskap(sed.getNav().getBruker().getPerson().hentStatsborgerksapsliste())
+                mapStatsborgerskap(sed.getNav().getBruker().getPerson().hentStatsborgerksapsliste())
             );
         }
 
@@ -48,9 +48,9 @@ public interface MelosysEessiMeldingMapper {
 
     default boolean inneholderStatsborgerskap(SED sed) {
         return sed.getNav() != null
-                && sed.getNav().getBruker() != null
-                && sed.getNav().getBruker().getPerson() != null
-                && sed.getNav().getBruker().getPerson().getStatsborgerskap() != null;
+            && sed.getNav().getBruker() != null
+            && sed.getNav().getBruker().getPerson() != null
+            && sed.getNav().getBruker().getPerson().getStatsborgerskap() != null;
     }
 
 

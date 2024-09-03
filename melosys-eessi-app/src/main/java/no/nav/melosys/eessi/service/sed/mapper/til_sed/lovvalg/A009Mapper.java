@@ -1,15 +1,18 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
+import java.util.Optional;
+
 import no.nav.melosys.eessi.controller.dto.Bestemmelse;
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
+import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
+import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-
-import java.util.Optional;
 
 public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
@@ -58,7 +61,7 @@ public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
 
     private boolean erGyldigLovvalgbestemmelse(Bestemmelse bestemmelse) {
         return bestemmelse == Bestemmelse.ART_12_1
-                || bestemmelse == Bestemmelse.ART_12_2;
+            || bestemmelse == Bestemmelse.ART_12_2;
     }
 
     private Utsendingsland getUtsendingsland(SedDataDto sedData) {

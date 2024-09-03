@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
-import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -17,14 +16,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 class SafConsumerTest {
 

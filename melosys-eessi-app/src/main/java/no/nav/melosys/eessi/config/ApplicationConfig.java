@@ -8,7 +8,7 @@ import org.springframework.retry.annotation.EnableRetry;
 
 @Configuration
 @EnableConfigurationProperties(AppCredentials.class)
-@EnableJwtTokenValidation(ignore={"org.springframework", "org.springdoc.webmvc"})
+@EnableJwtTokenValidation(ignore = {"org.springframework", "org.springdoc.webmvc"})
 @EnableRetry
 @EnableJpaAuditing
 public class ApplicationConfig {

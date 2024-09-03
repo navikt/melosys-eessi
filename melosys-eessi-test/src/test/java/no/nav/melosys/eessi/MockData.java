@@ -50,7 +50,7 @@ public class MockData {
 
         MedlemskapA003 medlemskap = new MedlemskapA003();
         medlemskap.setRelevantartikkelfor8832004eller9872009("13_1_a");
-        medlemskap.setIsDeterminationProvisional("nei");
+        medlemskap.setDeterminationProvisional("nei");
 
         PeriodeA010 periode = new PeriodeA010();
         periode.setStartdato("2019-06-01");
@@ -85,7 +85,7 @@ public class MockData {
 
         MedlemskapA003 medlemskap = new MedlemskapA003();
         medlemskap.setRelevantartikkelfor8832004eller9872009("13_1_a");
-        medlemskap.setIsDeterminationProvisional("nei");
+        medlemskap.setDeterminationProvisional("nei");
 
         PeriodeA010 periode = new PeriodeA010();
         periode.setStartdato("2019-06-01");

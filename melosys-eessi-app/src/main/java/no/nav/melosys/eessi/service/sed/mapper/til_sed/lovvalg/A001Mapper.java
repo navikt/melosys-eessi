@@ -86,9 +86,9 @@ public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
         }
 
         return tidligereLovvalgsperioder.stream()
-                .map(this::mapTilPeriodeDto)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+            .map(this::mapTilPeriodeDto)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     // Blir ikke implementert i denne versjonen av Melosys.

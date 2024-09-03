@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
 
+import java.util.Optional;
+
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.models.SedType;
@@ -7,8 +9,6 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
 import no.nav.melosys.eessi.models.sed.nav.Andreland;
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
-
-import java.util.Optional;
 
 public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
 

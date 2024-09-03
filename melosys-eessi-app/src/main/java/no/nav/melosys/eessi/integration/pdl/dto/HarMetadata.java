@@ -9,6 +9,6 @@ public interface HarMetadata {
 
     static <T extends HarMetadata> Optional<T> hentSisteOpplysning(Collection<T> opplysning) {
         return opplysning.stream()
-                .max(Comparator.comparing(harMetadata -> harMetadata.getMetadata().sisteDatoOpprettetEllerKorrigert()));
+            .max(Comparator.comparing(harMetadata -> harMetadata.getMetadata().sisteDatoOpprettetEllerKorrigert()));
     }
 }

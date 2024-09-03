@@ -12,7 +12,6 @@ import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.exception.MappingException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,5 +1,8 @@
 package no.nav.melosys.eessi.config.featuretoggle;
 
+import java.util.Collections;
+import java.util.List;
+
 import io.getunleash.DefaultUnleash;
 import io.getunleash.FakeUnleash;
 import io.getunleash.Unleash;
@@ -12,9 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
-
-import java.util.Collections;
-import java.util.List;
 
 @Configuration
 public class FeaturetoggleConfig {
@@ -29,7 +29,7 @@ public class FeaturetoggleConfig {
             var localUnleash = new LocalUnleash();
             localUnleash.enableAll();
             return localUnleash;
-        } else if(List.of(environment.getActiveProfiles()).contains("test")) {
+        } else if (List.of(environment.getActiveProfiles()).contains("test")) {
             var fakeUnleash = new FakeUnleash();
             fakeUnleash.enableAll();
             return fakeUnleash;

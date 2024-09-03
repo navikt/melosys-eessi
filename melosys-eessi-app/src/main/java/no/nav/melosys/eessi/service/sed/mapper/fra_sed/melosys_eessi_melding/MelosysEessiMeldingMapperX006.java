@@ -17,8 +17,8 @@ public class MelosysEessiMeldingMapperX006 implements MelosysEessiMeldingMapper 
                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer,
                                    boolean sedErEndring, String sedVersjon) {
         MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
-                rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
-                sedErEndring, sedVersjon);
+            rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
+            sedErEndring, sedVersjon);
 
         melosysEessiMelding.setX006NavErFjernet(inneholderOgErNorskInstitusjon(sed));
 
@@ -27,10 +27,10 @@ public class MelosysEessiMeldingMapperX006 implements MelosysEessiMeldingMapper 
 
     private boolean inneholderOgErNorskInstitusjon(SED sed) {
         return sed.getNav() != null
-                && sed.getNav().getSak() != null
-                && sed.getNav().getSak().getFjerninstitusjon() != null
-                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null
-                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId() != null
-                && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId().equals(rinaInstitusjonId);
+            && sed.getNav().getSak() != null
+            && sed.getNav().getSak().getFjerninstitusjon() != null
+            && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon() != null
+            && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId() != null
+            && sed.getNav().getSak().getFjerninstitusjon().getInstitusjon().getId().equals(rinaInstitusjonId);
     }
 }
