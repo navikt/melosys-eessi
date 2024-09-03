@@ -17,7 +17,6 @@ import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
-import static no.nav.melosys.eessi.models.BucType.H_BUC_02;
 
 @Component
 @Profile("!local-q2")
@@ -27,7 +26,6 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
     private final SedMottakService sedMottakService;
     private final SedMetrikker sedMetrikker;
     private final KafkaDLQService kafkaDLQService;
-    private final SaksrelasjonService saksrelasjonService;
 
     @KafkaListener(id = "sedMottatt", clientIdPrefix = "melosys-eessi-sedMottatt", topics = "${melosys.kafka.aiven.consumer.mottatt.topic}", containerFactory = "sedMottattHendelseListenerContainerFactory", groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}", errorHandler = "sedMottattErrorHandler")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
@@ -61,7 +59,6 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
         this.sedMottakService = sedMottakService;
         this.sedMetrikker = sedMetrikker;
         this.kafkaDLQService = kafkaDLQService;
-        this.saksrelasjonService = saksrelasjonService;
     }
 
 
