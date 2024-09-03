@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.SedAlleredeJournalførtEx
 import no.nav.melosys.eessi.integration.sak.Sak
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
+import no.nav.melosys.eessi.models.BucType.Companion.erHBucsomSkalKonsumeres
 import no.nav.melosys.eessi.models.SedSendtHendelse
 import no.nav.melosys.eessi.repository.SedSendtHendelseRepository
 import no.nav.melosys.eessi.service.eux.EuxService
@@ -30,6 +31,10 @@ class OpprettUtgaaendeJournalpostService(
     private val sedSendtHendelseRepository: SedSendtHendelseRepository
 ) {
     fun behandleSedSendtHendelse(sedSendt: SedHendelse) {
+        if (sedSendt.erIkkeLaBuc() && !erHBucFraMelosys(sedSendt)) {
+            return
+        }
+
         try {
             if (sedInneholderPersonId(sedSendt)) {
                 val journalpostId = arkiverUtgaaendeSed(sedSendt)
@@ -107,5 +112,13 @@ class OpprettUtgaaendeJournalpostService(
             if (StringUtils.isNotEmpty(navIdent)) personFasade.hentAktoerId(navIdent) else null,
             euxService.hentRinaUrl(sedSendt.rinaSakId)
         )
+    }
+
+    private fun erHBucFraMelosys(sedSendtHendelse: SedHendelse): Boolean {
+        return erHBucsomSkalKonsumeres(sedSendtHendelse.bucType) && erRinaSakIEessi(sedSendtHendelse.rinaSakId)
+    }
+
+    private fun erRinaSakIEessi(rinaSakId: String): Boolean {
+        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent
     }
 }

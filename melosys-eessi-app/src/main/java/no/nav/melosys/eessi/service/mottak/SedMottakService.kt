@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvis
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg
+import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
@@ -21,6 +22,7 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
@@ -38,10 +40,15 @@ class SedMottakService(
     private val sedMetrikker: SedMetrikker,
     private val personIdentifisering: PersonIdentifisering,
     private val bucIdentifisertService: BucIdentifisertService,
+    private val saksrelasjonService: SaksrelasjonService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
     @Transactional
     fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
+        if (sedMottattHendelse.sedHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedMottattHendelse)) {
+            return
+        }
+
         if (sedMottattHendelse.sedHendelse.erX100()) {
             log.info("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av typen X100")
             return
@@ -180,5 +187,13 @@ class SedMottakService(
         sedMottattHendelse.journalpostId = journalpostID
         sedMottattHendelseRepository.save(sedMottattHendelse)
         return journalpostID
+    }
+
+    private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean {
+        return BucType.H_BUC_02.name == sedMottattHendelse.sedHendelse.bucType && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
+    }
+
+    private fun erRinaSakIEessi(rinaSakId: String): Boolean {
+        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
     }
 }
