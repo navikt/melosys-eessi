@@ -10,6 +10,7 @@ import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostRespons
 import no.nav.melosys.eessi.integration.sak.Sak
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
+import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedSendtHendelse
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
@@ -37,7 +38,10 @@ class OpprettUtgaaendeJournalpostServiceTest {
     private lateinit var opprettUtgaaendeJournalpostService: OpprettUtgaaendeJournalpostService
 
     private val enhancedRandom: EnhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom()
-    private val sedSendt: SedHendelse = enhancedRandom.nextObject(SedHendelse::class.java)
+    private val sedSendt: SedHendelse = enhancedRandom.nextObject(SedHendelse::class.java).apply {
+        bucType = BucType.LA_BUC_01.name
+        sektorKode = "LA"
+    }
 
     @BeforeEach
     fun setup() {
