@@ -6,14 +6,12 @@ import java.util.List;
 
 import no.nav.melosys.eessi.controller.dto.Adressetype;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.nav.Adresse;
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsland;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 import no.nav.melosys.eessi.service.sed.SedDataStub;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

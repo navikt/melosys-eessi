@@ -18,7 +18,7 @@ public class RestStsConfig {
     @Bean(name = "restStsRestTemplate")
     public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder) {
         return restTemplateBuilder
-                .rootUri(uri)
-                .build();
+            .rootUri(uri)
+            .build();
     }
 }

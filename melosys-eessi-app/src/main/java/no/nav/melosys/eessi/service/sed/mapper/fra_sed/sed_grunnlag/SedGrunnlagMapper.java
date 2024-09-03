@@ -14,7 +14,7 @@ import no.nav.melosys.eessi.models.sed.nav.Selvstendig;
 import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
 
 public interface SedGrunnlagMapper {
-     default SedGrunnlagDto map(SED sed) {
+    default SedGrunnlagDto map(SED sed) {
         Nav nav = sed.getNav();
         SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagDto();
 
@@ -31,9 +31,9 @@ public interface SedGrunnlagMapper {
 
     default Adresse mapBosted(List<no.nav.melosys.eessi.models.sed.nav.Adresse> adresser) {
         return StreamUtils.nullableStream(adresser)
-                .filter(SedGrunnlagMapper::erBostedsadresse).findFirst()
-                .map(Adresse::av)
-                .orElse(mapAdresse(adresser));
+            .filter(SedGrunnlagMapper::erBostedsadresse).findFirst()
+            .map(Adresse::av)
+            .orElse(mapAdresse(adresser));
     }
 
     static boolean erBostedsadresse(no.nav.melosys.eessi.models.sed.nav.Adresse adresse) {
@@ -63,9 +63,9 @@ public interface SedGrunnlagMapper {
 
     default List<Virksomhet> mapSelvstendig(Selvstendig selvstendig) {
         return Optional.ofNullable(selvstendig).stream()
-                .map(Selvstendig::getArbeidsgiver)
-                .flatMap(Collection::stream)
-                .map(Virksomhet::av)
-                .collect(Collectors.toList());
+            .map(Selvstendig::getArbeidsgiver)
+            .flatMap(Collection::stream)
+            .map(Virksomhet::av)
+            .collect(Collectors.toList());
     }
 }

@@ -13,8 +13,8 @@ class MelosysEessiMeldingMapperA001 implements NyttLovvalgEessiMeldingMapper<Med
     @Override
     public Periode mapPeriode(MedlemskapA001 medlemskap) {
         return new Periode(
-                tilLocalDate(medlemskap.getSoeknadsperiode().getStartdato()),
-                tilLocalDate(medlemskap.getSoeknadsperiode().getSluttdato())
+            tilLocalDate(medlemskap.getSoeknadsperiode().getStartdato()),
+            tilLocalDate(medlemskap.getSoeknadsperiode().getSluttdato())
         );
     }
 

@@ -14,6 +14,7 @@ import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
 public interface NyttLovvalgSedMapper<T extends Medlemskap> {
 
     String hentLovvalgsland(T medlemskap);
+
     String hentLovvalgsbestemmelse(T medlemskap);
 
     default AnmodningUnntak hentAnmodningUnntak(T medlemskap) {
@@ -21,6 +22,7 @@ public interface NyttLovvalgSedMapper<T extends Medlemskap> {
     }
 
     Boolean sedErEndring(T medlemskap);
+
     T hentMedlemskap(SED sed);
 
     default boolean erMidlertidigBestemmelse(T medlemskap) {

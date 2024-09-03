@@ -22,7 +22,6 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -208,9 +207,7 @@ class BucControllerTest {
             sedDataDto.setOppholdsadresse(null);
         }
         opprettBucOgSedDto.setSedDataDto(sedDataDto);
-        SedVedlegg sedVedlegg = new SedVedlegg();
-        sedVedlegg.setTittel("Søknad om medlemskap");
-        sedVedlegg.setInnhold("ny søknad om vedlegg".getBytes());
+        SedVedlegg sedVedlegg = new SedVedlegg("Søknad om medlemskap", "ny søknad om vedlegg".getBytes());
         opprettBucOgSedDto.setVedlegg(List.of(sedVedlegg));
         return opprettBucOgSedDto;
     }

@@ -1,5 +1,11 @@
 package no.nav.melosys.eessi.integration.pdl;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import no.nav.melosys.eessi.integration.PersonFasade;
 import no.nav.melosys.eessi.integration.pdl.dto.*;
 import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvisisjonTilMellomlagring;
@@ -10,12 +16,6 @@ import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.HarMetadata.hentSisteOpplysning;
 import static no.nav.melosys.eessi.integration.pdl.dto.PDLSokCriterion.*;
@@ -49,18 +49,18 @@ public class PDLService implements PersonFasade {
         });
 
         hentSisteOpplysning(pdlPerson.getFoedsel())
-                .ifPresent(fødsel -> personModellBuilder.fødselsdato(fødsel.getFoedselsdato()));
+            .ifPresent(fødsel -> personModellBuilder.fødselsdato(fødsel.getFoedselsdato()));
         hentSisteOpplysning(pdlPerson.getFolkeregisterpersonstatus())
-                .ifPresent(status -> personModellBuilder.erOpphørt(status.statusErOpphørt()));
+            .ifPresent(status -> personModellBuilder.erOpphørt(status.statusErOpphørt()));
         hentSisteOpplysning(pdlPerson.getKjoenn())
-                .ifPresent(kjønn -> personModellBuilder.kjønn(kjønn.getKjoenn().tilDomene()));
+            .ifPresent(kjønn -> personModellBuilder.kjønn(kjønn.getKjoenn().tilDomene()));
 
         return personModellBuilder
             .statsborgerskapLandkodeISO2(
                 pdlPerson.getStatsborgerskap().stream()
-                .map(PDLStatsborgerskap::getLand)
-                .map(LandkodeMapper::mapTilLandkodeIso2)
-                .collect(Collectors.toSet()))
+                    .map(PDLStatsborgerskap::getLand)
+                    .map(LandkodeMapper::mapTilLandkodeIso2)
+                    .collect(Collectors.toSet()))
             .utenlandskId(pdlPerson.getUtenlandskIdentifikasjonsnummer()
                 .stream()
                 .map(p -> new UtenlandskId(p.getIdentifikasjonsnummer(), LandkodeMapper.mapTilLandkodeIso2(p.getUtstederland())))
@@ -71,21 +71,21 @@ public class PDLService implements PersonFasade {
     @Override
     public String hentAktoerId(String ident) {
         return pdlConsumer.hentIdenter(ident).getIdenter()
-                .stream()
-                .filter(PDLIdent::erAktørID)
-                .findFirst()
-                .map(PDLIdent::getIdent)
-                .orElseThrow(() -> new NotFoundException("Finner ikke aktørID!"));
+            .stream()
+            .filter(PDLIdent::erAktørID)
+            .findFirst()
+            .map(PDLIdent::getIdent)
+            .orElseThrow(() -> new NotFoundException("Finner ikke aktørID!"));
     }
 
     @Override
     public String hentNorskIdent(String aktoerID) {
         return pdlConsumer.hentIdenter(aktoerID).getIdenter()
-                .stream()
-                .filter(PDLIdent::erFolkeregisterIdent)
-                .findFirst()
-                .map(PDLIdent::getIdent)
-                .orElseThrow(() -> new NotFoundException("Finner ikke folkeregisterident!"));
+            .stream()
+            .filter(PDLIdent::erFolkeregisterIdent)
+            .findFirst()
+            .map(PDLIdent::getIdent)
+            .orElseThrow(() -> new NotFoundException("Finner ikke folkeregisterident!"));
     }
 
     @Override

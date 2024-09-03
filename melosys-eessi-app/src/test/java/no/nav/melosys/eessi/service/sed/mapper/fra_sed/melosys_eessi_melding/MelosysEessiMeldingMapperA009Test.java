@@ -4,10 +4,12 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.journalfoering.SakInformasjon;
-import org.junit.jupiter.api.Test;
+import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
+import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
+import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,7 +21,7 @@ class MelosysEessiMeldingMapperA009Test {
     private static final String IKKE_OPPRINNELIG_VEDTAK = null;
     private static final String OPPRINNELIG_VEDTAK = "ja";
     private SedHendelse sedHendelse;
-    private SakInformasjon sakInformasjon;
+    private MelosysEessiMeldingMapperStubs.SakInformasjon sakInformasjon;
 
     private final MelosysEessiMeldingMapperA009 mapper = new MelosysEessiMeldingMapperA009();
 

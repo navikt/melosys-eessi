@@ -25,10 +25,10 @@ public class A002Mapper implements LovvalgSedMapper<MedlemskapA002> {
 
         MedlemskapA002 medlemskapA002 = new MedlemskapA002();
         medlemskapA002.setUnntak(getUnntak(
-                svarAnmodningUnntak.getBegrunnelse(),
-                svarAnmodningUnntak.getBeslutning(),
-                svarAnmodningUnntak.getDelvisInnvilgetPeriode().getFom(),
-                svarAnmodningUnntak.getDelvisInnvilgetPeriode().getTom()
+            svarAnmodningUnntak.getBegrunnelse(),
+            svarAnmodningUnntak.getBeslutning(),
+            svarAnmodningUnntak.getDelvisInnvilgetPeriode().getFom(),
+            svarAnmodningUnntak.getDelvisInnvilgetPeriode().getTom()
         ));
 
         return medlemskapA002;

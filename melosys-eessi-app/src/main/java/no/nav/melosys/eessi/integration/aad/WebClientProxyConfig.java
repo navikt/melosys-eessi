@@ -1,13 +1,13 @@
 package no.nav.melosys.eessi.integration.aad;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 public class WebClientProxyConfig {
     private final Logger log = LoggerFactory.getLogger(WebClientProxyConfig.class);
