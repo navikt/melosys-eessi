@@ -10,7 +10,6 @@ import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvis
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.BucIdentifiseringOppg
-import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
@@ -191,7 +190,10 @@ class SedMottakService(
     }
 
     private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean {
-        return SedType.H002.name == sedMottattHendelse.sedHendelse.sedType && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
+        val aksepterteSedTyperForHBUC = listOf(SedType.H001.toString(), SedType.H002.toString(), SedType.H003.toString())
+
+        return aksepterteSedTyperForHBUC.contains(sedMottattHendelse.sedHendelse.sedType)
+            && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
     }
 
     private fun erRinaSakIEessi(rinaSakId: String): Boolean {
