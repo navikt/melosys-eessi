@@ -1,25 +1,14 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
-
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Adresse {
-
-    private String by;
-
-    private String bygning;
-
-    private String gate;
-
-    private String land;
-
-    private String postnummer;
-
-    private String region;
-
-    private String type;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Adresse(
+    var by: String? = null,
+    var bygning: String? = null,
+    var gate: String? = null,
+    var land: String? = null,
+    var postnummer: String? = null,
+    var region: String? = null,
+    var type: String? = null
+)

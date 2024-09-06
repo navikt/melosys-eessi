@@ -1,18 +1,10 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import java.util.List;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
-
-
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Andreland {
-
-    private List<Arbeidsgiver> arbeidsgiver;
-
-    //A003
-    private ArbeidsgiverAktivitet arbeidsgiveraktivitet;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Andreland(
+    var arbeidsgiver: List<Arbeidsgiver>? = null,
+    // A003
+    var arbeidsgiveraktivitet: ArbeidsgiverAktivitet? = null
+)

@@ -1,12 +1,7 @@
-package no.nav.melosys.eessi.models.exception;
+package no.nav.melosys.eessi.models.exception
 
-public class NotFoundException extends RuntimeException {
+class NotFoundException : RuntimeException {
+    constructor(message: String?) : super(message)
 
-    public NotFoundException(String message) {
-        super(message);
-    }
-
-    public NotFoundException(String message, Throwable e) {
-        super(message, e);
-    }
+    constructor(message: String?, e: Throwable?) : super(message, e)
 }

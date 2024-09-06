@@ -1,40 +1,35 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
-import java.util.regex.Pattern;
+import mu.KotlinLogging
+import no.nav.melosys.eessi.models.sed.SED
+import java.util.regex.Pattern
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER
 
-import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.models.sed.SED;
+private val log = KotlinLogging.logger {}
 
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
+object SedVersjonSjekker {
+    private val VERSJON_PATTERN = Pattern.compile("^v(\\d)\\.(\\d)$")
 
-@Slf4j
-public class SedVersjonSjekker {
-
-    private SedVersjonSjekker() {
-        throw new IllegalStateException("Utility");
-    }
-
-    private static final Pattern VERSJON_PATTERN = Pattern.compile("^v(\\d)\\.(\\d)$");
-
-    public static void verifiserSedVersjonErBucVersjon(BUC buc, SED sed) {
-        final var ønsketSedVersjon = String.format("v%s.%s", sed.getSedGVer(), sed.getSedVer());
-
-        if (!ønsketSedVersjon.equalsIgnoreCase(buc.getBucVersjon())) {
-            log.info("Rina-sak {} er på gammel versjon {}. Oppdaterer SED til å bruke gammel versjon", buc.getId(), buc.getBucVersjon());
-            sed.setSedGVer(SedVersjonSjekker.parseGVer(buc));
-            sed.setSedVer(SedVersjonSjekker.parseVer(buc));
+    @JvmStatic // TODO: fjern når filer som bruker er konvertert til Kotlin
+    fun verifiserSedVersjonErBucVersjon(buc: BUC, sed: SED) {
+        val ønsketSedVersjon = "v${sed.sedGVer}.${sed.sedVer}"
+        if (!ønsketSedVersjon.equals(buc.bucVersjon, ignoreCase = true)) {
+            log.info("Rina-sak {} er på gammel versjon {}. Oppdaterer SED til å bruke gammel versjon", buc.id, buc.bucVersjon)
+            sed.sedGVer = parseGVer(buc)
+            sed.sedVer = parseVer(buc)
         }
     }
 
-    static String parseGVer(BUC buc) {
-        var matcher = VERSJON_PATTERN.matcher(buc.getBucVersjon());
-        return matcher.find() ? matcher.group(1) : DEFAULT_SED_G_VER;
+    @JvmStatic // TODO: fjern når filer som bruker er konvertert til Kotlin
+    fun parseGVer(buc: BUC): String {
+        val matcher = VERSJON_PATTERN.matcher(buc.bucVersjon!!)
+        return if (matcher.find()) matcher.group(1) else DEFAULT_SED_G_VER
     }
 
-    static String parseVer(BUC buc) {
-        var matcher = VERSJON_PATTERN.matcher(buc.getBucVersjon());
-        return matcher.find() ? matcher.group(2) : DEFAULT_SED_VER;
+    @JvmStatic // TODO: fjern når filer som bruker er konvertert til Kotlin
+    fun parseVer(buc: BUC): String {
+        val matcher = VERSJON_PATTERN.matcher(buc.bucVersjon!!)
+        return if (matcher.find()) matcher.group(2) else DEFAULT_SED_VER
     }
-
 }

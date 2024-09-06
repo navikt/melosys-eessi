@@ -1,17 +1,10 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-@NoArgsConstructor
-@AllArgsConstructor
-public class InvalideringSed {
-
-    private String utstedelsesdato;
-    private String type;
-    private Grunn grunn;
-}
+data class InvalideringSed(
+    var utstedelsesdato: String? = null,
+    var type: String? = null,
+    var grunn: Grunn? = null
+)

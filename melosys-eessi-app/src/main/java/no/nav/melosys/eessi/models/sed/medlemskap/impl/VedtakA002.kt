@@ -1,14 +1,11 @@
-package no.nav.melosys.eessi.models.sed.medlemskap.impl;
+package no.nav.melosys.eessi.models.sed.medlemskap.impl
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
+import no.nav.melosys.eessi.models.sed.nav.Periode
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@Data
-public class VedtakA002 {
-
-    private Periode annenperiode;
-    private String begrunnelse;
+data class VedtakA002(
+    var annenperiode: Periode? = null,
+    var begrunnelse: String? = null,
     @JsonProperty("id")
-    private String resultat;
-}
+    var resultat: String? = null
+)

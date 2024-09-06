@@ -1,66 +1,48 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import java.time.LocalDateTime;
-import jakarta.persistence.*;
-
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import io.hypersistence.utils.hibernate.type.json.JsonBinaryType
+import jakarta.persistence.*
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import java.time.LocalDateTime
 
 @Entity(name = "sed_mottatt")
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode
-@Convert(attributeName = "jsonb", converter = JsonBinaryType.class)
-public class SedMottatt {
-
+@Convert(attributeName = "jsonb", converter = JsonBinaryType::class)
+@Deprecated("Kun brukt av SedMottattRepository, så kan vel slettes?")
+class SedMottatt(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    var id: Long = 0,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "sed_hendelse")
-    private SedHendelse sedHendelse;
+    @Column(name = "sed_hendelse", nullable = false)
+    var sedHendelse: SedHendelse,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "sed_kontekst")
-    private SedKontekst sedKontekst;
+    @Column(name = "sed_kontekst", nullable = false)
+    var sedKontekst: SedKontekst,
 
-    @Column(name = "versjon")
-    private int versjon = 1;
+    @Column(name = "versjon", nullable = false)
+    var versjon: Int = 1,
 
     @CreatedDate
     @Column(name = "mottatt_dato")
-    private LocalDateTime mottattDato;
+    var mottattDato: LocalDateTime? = null,
 
     @LastModifiedDate
     @Column(name = "endret_dato")
-    private LocalDateTime sistEndretDato;
+    var sistEndretDato: LocalDateTime? = null,
 
-    @Column(name = "feilede_forsok")
-    private int feiledeForsok;
+    @Column(name = "feilede_forsok", nullable = false)
+    var feiledeForsok: Int = 0,
 
-    @Column(name = "feilet")
-    private boolean feilet;
+    @Column(name = "feilet", nullable = false)
+    var feilet: Boolean = false,
 
-    @Column(name = "ferdig")
-    private boolean ferdig;
-
-    public static SedMottatt av(SedHendelse sedHendelse) {
-        SedMottatt sedMottatt = new SedMottatt();
-        sedMottatt.setSedHendelse(sedHendelse);
-        sedMottatt.setVersjon(1);
-        sedMottatt.setSedKontekst(new SedKontekst());
-        sedMottatt.setMottattDato(LocalDateTime.now());
-        sedMottatt.setSistEndretDato(LocalDateTime.now());
-
-        return sedMottatt;
-    }
-}
+    @Column(name = "ferdig", nullable = false)
+    var ferdig: Boolean = false
+)

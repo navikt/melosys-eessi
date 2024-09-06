@@ -1,16 +1,10 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Conversation {
-
-    private String id;
-    private String versionId;
-    private List<Participant> participants = new ArrayList<>();
-}
+data class Conversation(
+    var id: String? = null,
+    var versionId: String? = null,
+    var participants: List<Participant> = listOf()
+)

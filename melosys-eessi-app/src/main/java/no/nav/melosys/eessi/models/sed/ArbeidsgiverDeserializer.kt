@@ -1,41 +1,30 @@
-package no.nav.melosys.eessi.models.sed;
+package no.nav.melosys.eessi.models.sed
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
+import com.fasterxml.jackson.core.JsonParser
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.DeserializationContext
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
+class ArbeidsgiverDeserializer(vc: Class<*>?) : StdDeserializer<List<Arbeidsgiver>>(vc) {
 
-public class ArbeidsgiverDeserializer extends StdDeserializer<List<Arbeidsgiver>> {
+    @Suppress("unused")
+    constructor() : this(null)
 
-    private static final TypeReference<List<Arbeidsgiver >> LIST_TYPE_REFERENCE = new TypeReference<>(){};
+    override fun deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): List<Arbeidsgiver> {
+        val objectmapper = jsonParser.codec as ObjectMapper
+        val jsonNode = objectmapper.readTree<JsonNode>(jsonParser)
 
-    @SuppressWarnings("unused")
-    public ArbeidsgiverDeserializer() {
-        this(null);
-    }
-
-    private ArbeidsgiverDeserializer(Class<?> vc) {
-        super(vc);
-    }
-
-
-    @Override
-    public List<Arbeidsgiver> deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
-        ObjectMapper objectmapper = (ObjectMapper) jsonParser.getCodec();
-        JsonNode jsonNode = objectmapper.readTree(jsonParser);
-
-        if (jsonNode.isArray()) {
-            return objectmapper.readerFor(LIST_TYPE_REFERENCE).readValue(jsonNode);
+        return if (jsonNode.isArray) {
+            objectmapper.readerFor(LIST_TYPE_REFERENCE).readValue(jsonNode)
         } else {
-            Arbeidsgiver arbeidsgiver = objectmapper.treeToValue(jsonNode, Arbeidsgiver.class);
-            return Collections.singletonList(arbeidsgiver);
+            listOf(objectmapper.treeToValue(jsonNode, Arbeidsgiver::class.java))
         }
+    }
+
+    companion object {
+        private val LIST_TYPE_REFERENCE = object : TypeReference<List<Arbeidsgiver>>() {}
     }
 }

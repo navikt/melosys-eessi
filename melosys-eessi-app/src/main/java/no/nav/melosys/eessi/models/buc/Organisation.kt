@@ -1,16 +1,10 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Organisation {
-    private String name;
-    private String countryCode;
-    private String id;
-}
+data class Organisation(
+    var name: String? = null,
+    var countryCode: String? = null, // TODO: gjør denne none-nullable
+    var id: String? = null // TODO: gjør denne none-nullable
+)

@@ -1,14 +1,9 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-@JsonInclude(Include.NON_NULL)
-@Data
-public class SpesielleOmstendigheter {
-
-    private String type;
-
-    private String beskrivelseannensituasjon;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class SpesielleOmstendigheter(
+    var type: String? = null,
+    var beskrivelseannensituasjon: String? = null
+)

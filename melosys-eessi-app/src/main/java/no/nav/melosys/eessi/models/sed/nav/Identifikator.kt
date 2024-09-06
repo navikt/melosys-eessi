@@ -1,16 +1,9 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
-
-
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Identifikator {
-
-    private String id;
-
-    private String type;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Identifikator(
+    var id: String? = null,
+    var type: String? = null
+)

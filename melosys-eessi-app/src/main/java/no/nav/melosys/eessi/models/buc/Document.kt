@@ -1,55 +1,35 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.melosys.eessi.controller.dto.SedStatus
+import no.nav.melosys.eessi.models.SedType
+import java.time.ZonedDateTime
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import no.nav.melosys.eessi.controller.dto.SedStatus;
-import no.nav.melosys.eessi.models.SedType;
-
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Document {
+data class Document(
+    var id: String? = null,
+    var creationDate: ZonedDateTime? = null, // TODO: gjør denne none-nullable
+    var lastUpdate: ZonedDateTime? = null, // TODO: gjør denne none-nullable
+    var creator: Creator? = null,
+    var type: String? = null,
+    var status: String? = null,
+    var direction: String? = null,
+    var conversations: List<Conversation> = ArrayList()
+) {
+    fun sedErSendt(): Boolean = conversations.isNotEmpty() && conversations[0].versionId != null && SedType.erLovvalgSed(type)
 
-    private String id;
-    private ZonedDateTime creationDate;
-    private ZonedDateTime lastUpdate;
-    private Creator creator;
-    private String type;
-    private String status;
-    private String direction;
-    private List<Conversation> conversations = new ArrayList<>();
-
-    public boolean sedErSendt() {
-        return !getConversations().isEmpty()
-                && getConversations().get(0).getVersionId() != null
-                && SedType.erLovvalgSed(type);
+    fun erOpprettet(): Boolean {
+        return !SedStatus.TOM.engelskStatus.equals(status, ignoreCase = true)
     }
 
-    public boolean erOpprettet() {
-        return !SedStatus.TOM.getEngelskStatus().equalsIgnoreCase(status);
-    }
+    fun erX001(): Boolean = SedType.X001.name == type
 
-    public boolean erX001() {
-        return SedType.X001.name().equals(type);
-    }
+    fun erIkkeX100(): Boolean = SedType.X100.name != type
 
-    public boolean erIkkeX100() {
-        return !SedType.X100.name().equals(type);
-    }
+    fun erLovvalgSED(): Boolean = SedType.erLovvalgSed(type)
 
-    public boolean erLovvalgSED() {
-        return SedType.erLovvalgSed(type);
-    }
+    fun erAntallDagerSidenOppdatering(antallDagerSidenOppdatert: Long): Boolean =
+        ZonedDateTime.now().minusDays(antallDagerSidenOppdatert).isAfter(lastUpdate)
 
-    public boolean erAntallDagerSidenOppdatering(long antallDagerSidenOppdatert) {
-        return ZonedDateTime.now().minusDays(antallDagerSidenOppdatert).isAfter(getLastUpdate());
-    }
-
-    public boolean erInngående() {
-        return "IN".equalsIgnoreCase(direction);
-    }
+    fun erInngående(): Boolean = "IN".equals(direction, ignoreCase = true)
 }

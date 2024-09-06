@@ -1,14 +1,8 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
-
-
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Mor {
-
-    private Person person;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Mor (
+    var person: Person? = null
+)

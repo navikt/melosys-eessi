@@ -1,142 +1,105 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-import no.nav.melosys.eessi.controller.dto.SedStatus;
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import no.nav.melosys.eessi.controller.dto.SedStatus
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.SedType
+import java.time.ZonedDateTime
+import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
-public class BUC {
+data class BUC @JsonCreator constructor(
+    @JsonProperty("id") var id: String? = null,
+    @JsonProperty("startDate") var startDate: ZonedDateTime? = null,
+    @JsonProperty("lastUpdate") var lastUpdate: ZonedDateTime? = null,
+    @JsonProperty("status") var status: String? = null,
+    @JsonProperty("creator") var creator: Creator? = null, // TODO: gjør denne none-nullable
+    @JsonProperty("documents") var documents: List<Document> = listOf(),
+    @JsonProperty("actions") var actions: List<Action> = listOf(),
+    @JsonProperty("processDefinitionName") var bucType: String? = null, // TODO: gjør denne none-nullable
+    @JsonProperty("processDefinitionVersion") var bucVersjon: String? = null, // TODO: gjør denne none-nullable
+    @JsonProperty("participants") var participants: Collection<Participant> = listOf(),
+    @JsonProperty("internationalId") var internationalId: String? = null
+) {
+    fun hentAvsenderLand(): String = creator!!.organisation!!.countryCode!!
 
-    private String id;
-    private ZonedDateTime startDate;
-    private ZonedDateTime lastUpdate;
-    private String status;
-    private Creator creator;
-    private List<Document> documents = new ArrayList<>();
-    private List<Action> actions = new ArrayList<>();
-    @JsonProperty(value = "processDefinitionName")
-    private String bucType;
-    @JsonProperty(value = "processDefinitionVersion")
-    private String bucVersjon;
-    private Collection<Participant> participants = new ArrayList<>();
-    private String internationalId;
-
-    private static final Comparator<Document> sistOppdatert = Comparator.comparing(Document::getLastUpdate);
-    private static final Comparator<Document> sorterEtterStatus = Comparator.comparing(document -> SedStatus.fraEngelskStatus(document.getStatus()));
-
-    public String hentAvsenderLand() {
-        return creator.getOrganisation().getCountryCode();
+    fun kanOppretteEllerOppdatereSed(sedType: SedType): Boolean = actions.any {
+        it.documentType.equals(sedType.name, ignoreCase = true) &&
+            it.operation?.uppercase() in setOf("UPDATE", "CREATE")
     }
 
-    public boolean kanOppretteEllerOppdatereSed(SedType sedType) {
-        return actions.stream()
-            .filter(a -> sedType.name().equalsIgnoreCase(a.getDocumentType()))
-            .anyMatch(action -> "CREATE".equalsIgnoreCase(action.getOperation()) || "UPDATE".equalsIgnoreCase(action.getOperation()));
+    fun hentDokument(dokumentID: String): Document =
+        documents.firstOrNull { it.id.equals(dokumentID, ignoreCase = true) }
+            ?: throw NoSuchElementException("No document found with ID: $dokumentID")
+
+    fun hentSistOppdaterteDocument(): Document? {
+        return documents.filter { SedStatus.erGyldigEngelskStatus(it.status) }.maxWithOrNull(compareBy { it.lastUpdate })
     }
 
-    public Document hentDokument(String dokumentID) {
-        return documents.stream().filter(d -> d.getId().equalsIgnoreCase(dokumentID)).findAny().orElseThrow();
-    }
+    fun erÅpen(): Boolean = !"closed".equals(status, ignoreCase = true)
 
-    public Optional<Document> hentSistOppdaterteDocument() {
-        return documents.stream().filter(d -> SedStatus.erGyldigEngelskStatus(d.getStatus())).max(sistOppdatert);
-    }
+    fun finnDokumentVedSedType(sedType: String): Document? =
+        finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) })
 
-    public boolean erÅpen() {
-        return !"closed".equalsIgnoreCase(status);
-    }
+    fun sedKanOppdateres(id: String): Boolean = actions.filter { id == it.documentId }
+        .any { "Update".equals(it.operation, ignoreCase = true) }
 
+    fun kanLukkesAutomatisk(): Boolean = when (BucType.valueOf(bucType!!)) {
+        BucType.LA_BUC_06 ->
+            harMottattSedTypeAntallDagerSiden(SedType.A006, 30) && kanOppretteEllerOppdatereSed(SedType.X001)
 
-    public Optional<Document> finnDokumentVedSedType(String sedType) {
-        return finnDokumenterVedSedType(sedType).min(sorterEtterStatus);
-    }
+        BucType.LA_BUC_01 -> {
+            val harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60) ||
+                harMottattSedTypeAntallDagerSiden(SedType.A011, 60)
 
-    private Stream<Document> finnDokumenterVedSedType(String sedType) {
-        return documents.stream().filter(d -> sedType.equals(d.getType()));
-    }
-
-    public Optional<Document> finnDokumentVedTypeOgStatus(SedType sedType, SedStatus status) {
-        return finnDokumenterVedSedType(sedType.name())
-            .filter(d -> status.getEngelskStatus().equals(d.getStatus()))
-            .findFirst();
-    }
-
-    public boolean sedKanOppdateres(String id) {
-        return actions.stream()
-            .filter(action -> id.equals(action.getDocumentId()))
-            .anyMatch(action -> "Update".equalsIgnoreCase(action.getOperation()));
-    }
-
-    public boolean harMottattSedTypeAntallDagerSiden(SedType sedType, long minstAntallDagerSidenMottatt) {
-        return finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT)
-            .filter(d -> d.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt))
-            .isPresent();
-    }
-
-    public boolean harSendtSedTypeAntallDagerSiden(SedType sedType, long minstAntallDagerSidenMottatt) {
-        return finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT)
-            .filter(d -> d.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt))
-            .isPresent();
-    }
-
-    public boolean kanLukkesAutomatisk() {
-        var bucTypeEnum = BucType.valueOf(getBucType());
-
-        if (bucTypeEnum == BucType.LA_BUC_06) {
-            return harMottattSedTypeAntallDagerSiden(SedType.A006, 30)
-                && kanOppretteEllerOppdatereSed(SedType.X001);
-        } else if (bucTypeEnum == BucType.LA_BUC_01) {
-            boolean harMottattA002EllerA011 = harMottattSedTypeAntallDagerSiden(SedType.A002, 60)
-                || harMottattSedTypeAntallDagerSiden(SedType.A011, 60);
-
-            return harMottattA002EllerA011
-                && kanOppretteEllerOppdatereSed(SedType.X001)
-                && finnSistMottattSED(Document::erLovvalgSED)
-                .map(d -> d.erAntallDagerSidenOppdatering(60)).orElse(false);
-        } else if (bucTypeEnum == BucType.LA_BUC_03) {
-            boolean harMottattX012EllerSendtX013EllerA008 = (finnDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT).isEmpty() || harMottattSedTypeAntallDagerSiden(SedType.X012, 30))
-                && (finnDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT).isEmpty() || harSendtSedTypeAntallDagerSiden(SedType.X013, 30))
-                && harSendtSedTypeAntallDagerSiden(SedType.A008, 30);
-
-            return harMottattX012EllerSendtX013EllerA008
-                && kanOppretteEllerOppdatereSed(SedType.X001);
-
+            harMottattA002EllerA011 && kanOppretteEllerOppdatereSed(SedType.X001) && sisteMottattLovvalgSED()
         }
 
-        return kanOppretteEllerOppdatereSed(SedType.X001);
+        BucType.LA_BUC_03 -> {
+            val harMotattX012 = harIkkeDokumentVedTypeOgStatus(SedType.X012, SedStatus.MOTTATT) || harMottattSedTypeAntallDagerSiden(SedType.X012, 30)
+            val harSentX013 = harIkkeDokumentVedTypeOgStatus(SedType.X013, SedStatus.SENDT) || harSendtSedTypeAntallDagerSiden(SedType.X013, 30)
+            val harSentA008 = harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
+
+            harMotattX012 && harSentX013 && harSentA008 && kanOppretteEllerOppdatereSed(SedType.X001)
+        }
+
+        else -> kanOppretteEllerOppdatereSed(SedType.X001)
     }
 
-    private Optional<Document> finnSistMottattSED(Predicate<Document> documentPredicate) {
-        return documents.stream()
-            .filter(Document::erInngående)
-            .filter(Document::erOpprettet)
-            .filter(documentPredicate)
-            .max(Comparator.comparing(Document::getLastUpdate));
+    fun finnFørstMottatteSed(): Optional<Document> {
+        return documents
+            .filter { it.erInngående() }
+            .filter { it.erOpprettet() }
+            .filter { it.erIkkeX100() }
+            .minByOrNull { it.creationDate!! }
+            .let { Optional.ofNullable(it) } // Fjern Optional når vi kan har konvertert IdentifiseringKontrollService til Kotlin
     }
 
-    public Optional<Document> finnFørstMottatteSed() {
-        return documents.stream()
-            .filter(Document::erInngående)
-            .filter(Document::erOpprettet)
-            .filter(Document::erIkkeX100)
-            .min(Comparator.comparing(Document::getCreationDate));
-    }
+    fun hentMottakere(): Set<String> = participants
+        .filter { it.erMotpart() }
+        .map { it.organisation!!.id!! }
+        .toSet()
 
-    public Set<String> hentMottakere() {
-        return participants.stream()
-            .filter(Participant::erMotpart)
-            .map(p -> p.getOrganisation().getId())
-            .collect(Collectors.toSet());
-    }
+    private fun sisteMottattLovvalgSED(): Boolean = documents
+        .filter { it.erInngående() }
+        .filter { it.erOpprettet() }
+        .filter { it.erLovvalgSED() }
+        .maxByOrNull { it.lastUpdate!! }?.erAntallDagerSidenOppdatering(60) ?: false
+
+
+    private fun finnDokumenterVedSedType(sedType: String): List<Document> = documents.filter { d: Document -> sedType == d.type }
+
+    private fun finnDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Document? =
+        finnDokumenterVedSedType(sedType.name).firstOrNull { d: Document -> status.engelskStatus == d.status }
+
+    private fun harIkkeDokumentVedTypeOgStatus(sedType: SedType, status: SedStatus): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, status) == null
+
+    private fun harMottattSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.MOTTATT)?.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt) ?: false
+
+    private fun harSendtSedTypeAntallDagerSiden(sedType: SedType, minstAntallDagerSidenMottatt: Long): Boolean =
+        finnDokumentVedTypeOgStatus(sedType, SedStatus.SENDT)?.erAntallDagerSidenOppdatering(minstAntallDagerSidenMottatt) ?: false
 }

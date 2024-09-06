@@ -1,36 +1,23 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import no.nav.melosys.eessi.models.sed.ArbeidsgiverDeserializer
 
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import lombok.Data;
-import no.nav.melosys.eessi.models.sed.ArbeidsgiverDeserializer;
-
-
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
-public class Nav {
-    private List<Arbeidssted> arbeidssted;
-    private List<Arbeidsland> arbeidsland;
-    private String harfastarbeidssted;
-
-    private Bruker bruker;
-
-    private Selvstendig selvstendig;
-
-    private String ytterligereinformasjon;
+data class Nav(
+    var arbeidssted: List<Arbeidssted>? = null,
+    var arbeidsland: List<Arbeidsland>? = null,
+    var harfastarbeidssted: String? = null,
+    var bruker: Bruker? = null,
+    var selvstendig: Selvstendig? = null,
+    var ytterligereinformasjon: String? = null,
 
     //Kan forekomme som et enkelt objekt ved feks H001
-    @JsonDeserialize(using = ArbeidsgiverDeserializer.class)
-    private List<Arbeidsgiver> arbeidsgiver;
-
-    //Kun for X001, X006 og X008
-    private Sak sak;
-
-    private EessiSak eessisak;
-}
+    @JsonDeserialize(using = ArbeidsgiverDeserializer::class)
+    var arbeidsgiver: List<Arbeidsgiver>? = null,
+    var sak: Sak? = null,
+    var eessisak: EessiSak? = null
+)

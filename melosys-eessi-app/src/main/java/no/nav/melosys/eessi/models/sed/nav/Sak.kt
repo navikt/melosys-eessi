@@ -1,17 +1,11 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Sak {
-
-    private X001Anmodning anmodning;
-
-    private Kontekst kontekst;
-
-    private X006FjernInstitusjon fjerninstitusjon;
-
-    private Ugyldiggjoere ugyldiggjoere;
-}
+data class Sak(
+    var anmodning: X001Anmodning? = null,
+    var kontekst: Kontekst? = null,
+    var fjerninstitusjon: X006FjernInstitusjon? = null,
+    var ugyldiggjoere: Ugyldiggjoere? = null
+)

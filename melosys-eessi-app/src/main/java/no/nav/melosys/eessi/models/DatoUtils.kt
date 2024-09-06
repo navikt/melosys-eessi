@@ -1,24 +1,19 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import java.time.LocalDate;
+import java.time.LocalDate
+import javax.xml.datatype.XMLGregorianCalendar
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import lombok.experimental.UtilityClass;
+object DatoUtils {
+    private const val LOCAL_DATE_LENGTH = 10
 
-@UtilityClass
-public class DatoUtils {
+    @JvmStatic
+    fun tilLocalDate(dato: String): LocalDate = LocalDate.parse(
+        dato.substring(0, LOCAL_DATE_LENGTH)
+    )
 
-    private static final int LOCAL_DATE_LENGTH = 10;
-
-    public static LocalDate tilLocalDate(String dato) {
-        return LocalDate.parse(formaterDatoString(dato));
-    }
-
-    private static String formaterDatoString(String dato) {
-        return dato.substring(0, LOCAL_DATE_LENGTH);
-    }
-
-    public static LocalDate tilLocalDate(XMLGregorianCalendar xmlGregorianCalendar) {
-        return xmlGregorianCalendar != null ? LocalDate.of(xmlGregorianCalendar.getYear(), xmlGregorianCalendar.getMonth(), xmlGregorianCalendar.getDay()) : null;
-    }
+    @JvmStatic
+    fun tilLocalDate(xmlGregorianCalendar: XMLGregorianCalendar?): LocalDate? =
+        xmlGregorianCalendar?.let {
+            LocalDate.of(it.year, it.month, it.day)
+        }
 }

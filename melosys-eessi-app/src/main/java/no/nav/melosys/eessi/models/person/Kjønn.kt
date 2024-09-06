@@ -1,5 +1,5 @@
-package no.nav.melosys.eessi.models.person;
+package no.nav.melosys.eessi.models.person
 
-public enum Kjønn {
+enum class Kjønn {
     MANN, KVINNE, UKJENT
 }

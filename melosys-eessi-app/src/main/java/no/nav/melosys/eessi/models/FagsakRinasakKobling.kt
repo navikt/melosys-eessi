@@ -1,22 +1,17 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import jakarta.persistence.*;
+import jakarta.persistence.*
 
-import lombok.Data;
-
-@Data
 @Entity(name = "FAGSAK_RINASAK_KOBLING")
-public class FagsakRinasakKobling {
-
+class FagsakRinasakKobling(
     @Id
-    @Column(name = "rina_saksnummer")
-    private String rinaSaksnummer;
+    @Column(name = "rina_saksnummer", nullable = false)
+    var rinaSaksnummer: String,
 
-    @Column(name = "gsak_saksnummer")
-    private Long gsakSaksnummer;
+    @Column(name = "gsak_saksnummer", nullable = false)
+    var gsakSaksnummer: Long,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "buc_type")
-    private BucType bucType;
-
-}
+    @Column(name = "buc_type", nullable = false)
+    var bucType: BucType
+)

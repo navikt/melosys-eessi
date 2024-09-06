@@ -1,16 +1,9 @@
-package no.nav.melosys.eessi.models.exception;
+package no.nav.melosys.eessi.models.exception
 
-public class MappingException extends RuntimeException {
+class MappingException : RuntimeException {
+    constructor(message: String?) : super(message)
 
-    public MappingException(String message) {
-        super(message);
-    }
+    constructor() : super()
 
-    public MappingException() {
-        super();
-    }
-
-    public MappingException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
 }

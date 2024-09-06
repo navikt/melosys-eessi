@@ -1,22 +1,17 @@
-package no.nav.melosys.eessi.models.bucinfo;
+package no.nav.melosys.eessi.models.bucinfo
 
-import lombok.Data;
+data class BucInfo(
+    var applicationRoleId: String? = null,
+    var id: String? = null,
+    var processDefinitionId: String? = null,
+    var status: String? = null
+) {
+    fun norgeErCaseOwner(): Boolean = PROCESS_OWNER.equals(applicationRoleId, ignoreCase = true)
 
-@Data
-public class BucInfo {
+    // TODO: put "open" i en const eller bruke en hjelpe classe for disse statusene
+    fun bucErÅpen(): Boolean = "open".equals(status, ignoreCase = true)
 
-    private static final String PROCESS_OWNER = "PO";
-
-    private String applicationRoleId;
-    private String id;
-    private String processDefinitionId;
-    private String status;
-
-    public boolean norgeErCaseOwner() {
-        return PROCESS_OWNER.equalsIgnoreCase(applicationRoleId);
-    }
-
-    public boolean bucErÅpen() {
-        return "open".equalsIgnoreCase(status);
+    companion object {
+        private const val PROCESS_OWNER = "PO"
     }
 }
