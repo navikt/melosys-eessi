@@ -1,16 +1,9 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
-
-
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Fastperiode {
-
-    private String sluttdato;
-
-    private String startdato;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Fastperiode (
+    var sluttdato: String? = null,
+    var startdato: String? = null
+)

@@ -1,39 +1,31 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity(name = "JOURNALPOST_SED_KOBLING")
-public class JournalpostSedKobling {
-
+class JournalpostSedKobling(
     @Id
     @Column(name = "journalpost_id")
-    private String journalpostID;
+    var journalpostID: String,
 
-    @Column(name = "rina_saksnummer")
-    private String rinaSaksnummer;
+    @Column(name = "rina_saksnummer", nullable = false)
+    var rinaSaksnummer: String,
 
-    @Column(name = "sed_id")
-    private String sedId;
+    @Column(name = "sed_id", nullable = false)
+    var sedId: String,
 
-    @Column(name = "sed_versjon")
-    private String sedVersjon;
+    @Column(name = "sed_versjon", nullable = false)
+    var sedVersjon: String,
 
-    @Column(name = "buc_type")
-    private String bucType;
+    @Column(name = "buc_type", nullable = false)
+    var bucType: String,
 
-    @Column(name = "sed_type")
-    private String sedType;
-
-    public boolean erASed() {
-        return sedType.toUpperCase().startsWith("A");
+    @Column(name = "sed_type", nullable = false)
+    var sedType: String,
+) {
+    fun erASed(): Boolean {
+        return sedType.uppercase().startsWith("A")
     }
 }

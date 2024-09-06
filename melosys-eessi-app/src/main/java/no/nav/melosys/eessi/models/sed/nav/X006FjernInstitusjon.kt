@@ -1,12 +1,8 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class X006FjernInstitusjon {
-
-    private Institusjon institusjon;
-}
+data class X006FjernInstitusjon(
+    var institusjon: Institusjon? = null
+)

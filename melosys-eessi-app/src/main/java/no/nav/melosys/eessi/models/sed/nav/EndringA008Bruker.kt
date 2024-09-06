@@ -1,13 +1,10 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Data
-public class EndringA008Bruker {
+data class EndringA008Bruker (
+    var fornavn: String? = null,
+    var etternavn: String? = null
+)
 
-        private String fornavn;
-
-        private String etternavn;
-}

@@ -1,55 +1,25 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
+import java.util.*
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Person(
+    var etternavn: String? = null,
+    var etternavnvedfoedsel: String? = null,
+    var foedested: Foedested? = null,
+    var foedselsdato: String? = null,
+    var fornavn: String? = null,
+    var fornavnvedfoedsel: String? = null,
+    var kjoenn: Kjønn? = null,
+    var pin: Collection<Pin> = setOf(),
+    var statsborgerskap: Collection<Statsborgerskap?> = setOf()
+) {
+    fun finnNorskPin(): Optional<Pin> = pin.firstOrNull { it.land == "NO" }?.let { Optional.of(it) } ?: Optional.empty()
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
+    fun hentStatsborgerksapsliste(): Collection<String> = statsborgerskap.mapNotNull { it?.land }
 
+    fun harStatsborgerskap(land: String): Boolean = hentStatsborgerksapsliste().contains(land)
 
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Person {
-
-    private String etternavn;
-
-    private String etternavnvedfoedsel;
-
-    private Foedested foedested;
-
-    private String foedselsdato;
-
-    private String fornavn;
-
-    private String fornavnvedfoedsel;
-
-    private Kjønn kjoenn;
-
-    private Collection<Pin> pin = new HashSet<>();
-
-    private Collection<Statsborgerskap> statsborgerskap = new HashSet<>();
-
-    public Optional<Pin> finnNorskPin() {
-        return pin.stream().filter(p -> "NO".equals(p.getLand())).findFirst();
-    }
-
-    public Collection<String> hentStatsborgerksapsliste() {
-        return statsborgerskap.stream()
-                .filter(Objects::nonNull) //Kan av en mystisk grunn inneholde null-felter
-                .map(Statsborgerskap::getLand)
-                .collect(Collectors.toSet());
-    }
-
-    public boolean harStatsborgerskap(String land) {
-        return statsborgerskap.stream().anyMatch(s -> s.getLand().equals(land));
-    }
-
-    public Optional<Pin> finnUtenlandskIdFraLand(String land) {
-        return pin.stream().filter(p -> p.getLand().equals(land)).findFirst();
-    }
+    fun finnUtenlandskIdFraLand(land: String): Optional<Pin> = pin.firstOrNull { it.land == land }?.let { Optional.of(it) } ?: Optional.empty()
 }

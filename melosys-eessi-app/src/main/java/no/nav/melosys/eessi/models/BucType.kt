@@ -1,97 +1,53 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import java.util.Arrays;
-import java.util.Map;
+import mu.KotlinLogging
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import lombok.extern.slf4j.Slf4j;
+private val log = KotlinLogging.logger {}
 
-@Slf4j
-public enum BucType {
-    LA_BUC_01,
-    LA_BUC_02,
-    LA_BUC_03,
-    LA_BUC_04,
-    LA_BUC_05,
-    LA_BUC_06,
+enum class BucType {
+    LA_BUC_01, LA_BUC_02, LA_BUC_03, LA_BUC_04, LA_BUC_05, LA_BUC_06, H_BUC_01, H_BUC_02a, H_BUC_02b, H_BUC_02c, H_BUC_03a, H_BUC_03b, H_BUC_04, H_BUC_05, H_BUC_06, H_BUC_07, H_BUC_08, H_BUC_09, H_BUC_10, S_BUC_24, UB_BUC_01;
 
-    H_BUC_01,
-    H_BUC_02a,
-    H_BUC_02b,
-    H_BUC_02c,
-    H_BUC_03a,
-    H_BUC_03b,
-    H_BUC_04,
-    H_BUC_05,
-    H_BUC_06,
-    H_BUC_07,
-    H_BUC_08,
-    H_BUC_09,
-    H_BUC_10,
+    fun erLovvalgBuc(): Boolean = name.startsWith(LOVVALG_PREFIX)
 
-    S_BUC_24,
+    fun erMultilateralLovvalgBuc(): Boolean = this != LA_BUC_04
 
-    UB_BUC_01;
+    fun meddelerLovvalg(): Boolean = this in setOf(LA_BUC_01, LA_BUC_02, LA_BUC_04, LA_BUC_05)
 
-    private static final String LOVVALG_PREFIX = "LA";
+    fun hentFørsteLovligeSed(): SedType =
+        FØRSTE_LOVLIGE_SED_FRA_BUC_MAP[this] ?: throw IllegalStateException("Melosys-eessi støtter ikke buctype $this")
 
-    public boolean erLovvalgBuc() {
-        return this.name().startsWith(LOVVALG_PREFIX);
-    }
+    companion object {
+        private const val LOVVALG_PREFIX = "LA"
 
-    // Multilateral = kan være flere enn 2 deltakere
-    public boolean erMultilateralLovvalgBuc() {
-        return this != LA_BUC_04;
-    }
+        private val FØRSTE_LOVLIGE_SED_FRA_BUC_MAP = mapOf(
+            LA_BUC_01 to SedType.A001,
+            LA_BUC_02 to SedType.A003,
+            LA_BUC_03 to SedType.A008,
+            LA_BUC_04 to SedType.A009,
+            LA_BUC_05 to SedType.A010,
+            LA_BUC_06 to SedType.A005,
+            H_BUC_01 to SedType.H001,
+            H_BUC_02a to SedType.H005,
+            H_BUC_02b to SedType.H004,
+            H_BUC_02c to SedType.H003,
+            H_BUC_03a to SedType.H010,
+            H_BUC_03b to SedType.H011,
+            H_BUC_04 to SedType.H020,
+            H_BUC_05 to SedType.H061,
+            H_BUC_06 to SedType.H065,
+            H_BUC_07 to SedType.H070,
+            H_BUC_08 to SedType.H120,
+            H_BUC_09 to SedType.H121,
+            H_BUC_10 to SedType.H130
+        )
 
-    // Betyr at buc-en brukes til å meddele et lovvalg med andre myndigheter
-    public boolean meddelerLovvalg() {
-        return this == LA_BUC_01 || this == LA_BUC_02 || this == LA_BUC_04 || this == LA_BUC_05;
-    }
-
-    private static final Map<BucType, SedType> FØRSTE_LOVLIGE_SED_FRA_BUC_MAP =
-        Maps.immutableEnumMap(ImmutableMap.<BucType, SedType>builder()
-            .put(BucType.LA_BUC_01, SedType.A001)
-            .put(BucType.LA_BUC_02, SedType.A003)
-            .put(BucType.LA_BUC_03, SedType.A008)
-            .put(BucType.LA_BUC_04, SedType.A009)
-            .put(BucType.LA_BUC_05, SedType.A010)
-            .put(BucType.LA_BUC_06, SedType.A005)
-
-            .put(BucType.H_BUC_01, SedType.H001)
-            .put(BucType.H_BUC_02a, SedType.H005)
-            .put(BucType.H_BUC_02b, SedType.H004)
-            .put(BucType.H_BUC_02c, SedType.H003)
-            .put(BucType.H_BUC_03a, SedType.H010)
-            .put(BucType.H_BUC_03b, SedType.H011)
-            .put(BucType.H_BUC_04, SedType.H020)
-            .put(BucType.H_BUC_05, SedType.H061)
-            .put(BucType.H_BUC_06, SedType.H065)
-            .put(BucType.H_BUC_07, SedType.H070)
-            .put(BucType.H_BUC_08, SedType.H120)
-            .put(BucType.H_BUC_09, SedType.H121)
-            .put(BucType.H_BUC_10, SedType.H130)
-
-            .build());
-
-    public SedType hentFørsteLovligeSed() {
-        if (!FØRSTE_LOVLIGE_SED_FRA_BUC_MAP.containsKey(this)) {
-            throw new IllegalArgumentException("Melosys-eessi støtter ikke buctype " + this);
+        @JvmStatic
+        fun erHBucsomSkalKonsumeres(bucType: String): Boolean {
+            val type = runCatching { valueOf(bucType) }.getOrElse {
+                log.debug("Input buctype eksisterer ikke: $bucType")
+                return false
+            }
+            return type in setOf(H_BUC_01, H_BUC_02a, H_BUC_02b, H_BUC_02c, H_BUC_03a, H_BUC_03b)
         }
-
-        return FØRSTE_LOVLIGE_SED_FRA_BUC_MAP.get(this);
     }
-
-    public static boolean erHBucsomSkalKonsumeres(String bucType) {
-        BucType type;
-        try {
-            type = valueOf(bucType);
-        } catch (IllegalArgumentException e) {
-            log.debug("Input buctype eksisterer ikke: " + bucType);
-            return false;
-        }
-        return Arrays.asList(H_BUC_01, H_BUC_02a, H_BUC_02b, H_BUC_02c, H_BUC_03a, H_BUC_03b).contains(type);
-    }
-
 }

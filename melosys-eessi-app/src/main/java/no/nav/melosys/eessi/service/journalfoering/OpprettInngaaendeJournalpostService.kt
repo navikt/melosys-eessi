@@ -1,70 +1,39 @@
-package no.nav.melosys.eessi.service.journalfoering;
+package no.nav.melosys.eessi.service.journalfoering
 
-import java.util.Optional;
+import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
+import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
 
-import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
-import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-@Slf4j
 @Service
-public class OpprettInngaaendeJournalpostService {
-
-    private final SaksrelasjonService saksrelasjonService;
-    private final JournalpostService journalpostService;
-    private final JournalpostSedKoblingService journalpostSedKoblingService;
-
-    @Autowired
-    public OpprettInngaaendeJournalpostService(SaksrelasjonService saksrelasjonService,
-                                               JournalpostService journalpostService,
-                                               JournalpostSedKoblingService journalpostSedKoblingService) {
-        this.saksrelasjonService = saksrelasjonService;
-        this.journalpostService = journalpostService;
-        this.journalpostSedKoblingService = journalpostSedKoblingService;
+class OpprettInngaaendeJournalpostService @Autowired constructor(
+    private val journalpostService: JournalpostService,
+    private val journalpostSedKoblingService: JournalpostSedKoblingService
+) {
+    fun arkiverInngaaendeSedUtenBruker(sedHendelse: SedHendelse, sedMedVedlegg: SedMedVedlegg, personIdent: String?): String {
+        return opprettJournalpostLagreRelasjon(sedHendelse, sedMedVedlegg, personIdent).journalpostId
     }
 
-    public SakInformasjon arkiverInngaaendeSedHentSakinformasjon(
-            SedHendelse sedMottatt, SedMedVedlegg sedMedVedlegg, String personIdent) {
-
-        Optional<Sak> arkivsak = saksrelasjonService.finnArkivsakForRinaSaksnummer(sedMottatt.getRinaSakId());
-
-        log.info("Midlertidig journalfører rinaSak {}", sedMottatt.getRinaSakId());
-        OpprettJournalpostResponse response = opprettJournalpostLagreRelasjon(
-            sedMottatt, arkivsak.orElse(null), sedMedVedlegg, personIdent);
-        log.info("Midlertidig journalpost opprettet med id {}", response.getJournalpostId());
-
-        String dokumentId = response.getDokumenter() == null
-                ? "ukjent" : response.getDokumenter().get(0).getDokumentInfoId();
-
-        return SakInformasjon.builder().journalpostId(response.getJournalpostId())
-                .dokumentId(dokumentId)
-                .gsakSaksnummer(arkivsak.map(Sak::getId).orElse(null))
-                .build();
+    private fun opprettJournalpostLagreRelasjon(
+        sedMottatt: SedHendelse,
+        sedMedVedlegg: SedMedVedlegg,
+        personIdent: String?
+    ): OpprettJournalpostResponse {
+        val response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, null, sedMedVedlegg, personIdent)
+        lagreJournalpostRelasjon(sedMottatt, response)
+        return response
     }
 
-    public String arkiverInngaaendeSedUtenBruker(SedHendelse sedHendelse, SedMedVedlegg sedMedVedlegg, String personIdent) {
-        return opprettJournalpostLagreRelasjon(sedHendelse, null, sedMedVedlegg, personIdent).getJournalpostId();
-    }
-
-    private OpprettJournalpostResponse opprettJournalpostLagreRelasjon(
-            SedHendelse sedMottatt, Sak sak, SedMedVedlegg sedMedVedlegg, String personIdent) {
-        OpprettJournalpostResponse response = journalpostService.opprettInngaaendeJournalpost(sedMottatt, sak, sedMedVedlegg, personIdent);
-        lagreJournalpostRelasjon(sedMottatt, response);
-        return response;
-    }
-
-    private void lagreJournalpostRelasjon(
-            SedHendelse sedHendelse, OpprettJournalpostResponse opprettJournalpostResponse) {
+    private fun lagreJournalpostRelasjon(sedHendelse: SedHendelse, opprettJournalpostResponse: OpprettJournalpostResponse) {
         journalpostSedKoblingService.lagre(
-                opprettJournalpostResponse.getJournalpostId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getRinaDokumentId(), sedHendelse.getRinaDokumentVersjon(),
-                sedHendelse.getBucType(), sedHendelse.getSedType()
-        );
+            opprettJournalpostResponse.journalpostId,
+            sedHendelse.rinaSakId,
+            sedHendelse.rinaDokumentId,
+            sedHendelse.rinaDokumentVersjon,
+            sedHendelse.bucType,
+            sedHendelse.sedType
+        )
     }
 }

@@ -1,20 +1,11 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.Data;
-
-
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Periode {
-
-    private AapenPeriode aapenperiode;
-
-    private Fastperiode fastperiode;
-
-    public boolean erAapenPeriode() {
-        return aapenperiode != null && aapenperiode.getStartdato() != null;
-    }
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Periode(
+    var aapenperiode: AapenPeriode? = null,
+    var fastperiode: Fastperiode? = null
+) {
+    fun erAapenPeriode(): Boolean = aapenperiode != null && aapenperiode?.startdato != null
 }

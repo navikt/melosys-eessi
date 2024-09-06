@@ -1,9 +1,5 @@
-package no.nav.melosys.eessi.models.sed.medlemskap.impl;
+package no.nav.melosys.eessi.models.sed.medlemskap.impl
 
-import lombok.Data;
-
-@Data
-public class UnntakA002 {
-
-    private VedtakA002 vedtak;
-}
+data class UnntakA002(
+    var vedtak: VedtakA002? = null
+)

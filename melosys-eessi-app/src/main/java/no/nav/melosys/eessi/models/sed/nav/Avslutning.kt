@@ -1,15 +1,10 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Avslutning {
-
-    private String dato;
-
-    private Aarsak aarsak;
-
-    private String type;
-}
+data class Avslutning(
+    var dato: String? = null,
+    var aarsak: Aarsak? = null,
+    var type: String? = null
+)

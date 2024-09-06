@@ -1,14 +1,8 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Ugyldiggjoere {
-    private InvalideringSed sed;
-}
+data class Ugyldiggjoere(
+    var sed: InvalideringSed? = null
+)

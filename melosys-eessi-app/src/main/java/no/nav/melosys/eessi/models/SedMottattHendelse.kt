@@ -1,48 +1,67 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import java.time.LocalDateTime;
-import jakarta.persistence.*;
-
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import lombok.*;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.*
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.LocalDateTime
 
 @Entity(name = "sed_mottatt_hendelse")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode
-@Convert(attributeName = "jsonb", converter = JsonBinaryType.class)
-@EntityListeners(AuditingEntityListener.class)
-public class SedMottattHendelse {
-
+@EntityListeners(AuditingEntityListener::class)
+class SedMottattHendelse(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Long id;
+    var id: Long = 0,
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "sed_hendelse")
-    private SedHendelse sedHendelse;
+    @Column(name = "sed_hendelse", columnDefinition = "jsonb", nullable = false)
+    var sedHendelse: SedHendelse,
 
     @Column(name = "journalpost_id")
-    private String journalpostId;
+    var journalpostId: String? = null,
 
     @Column(name = "publisert_kafka")
-    private boolean publisertKafka;
+    var publisertKafka: Boolean = false,
 
     @CreatedDate
     @Column(name = "mottatt_dato")
-    private LocalDateTime mottattDato;
+    var mottattDato: LocalDateTime? = null,
 
     @LastModifiedDate
     @Column(name = "endret_dato")
-    private LocalDateTime sistEndretDato;
+    var sistEndretDato: LocalDateTime? = null
+) {
+    fun isPublisertKafka() = publisertKafka // mulig vi fjerner denne metoden når vi konverterer klasser som bruker dette til kotlin
 
+    class Builder { // Fjen builder når vi konverterer klasser som bruker dette til kotlin
+        private var sedHendelse: SedHendelse? = null
+        private var journalpostId: String? = null
+        private var publisertKafka: Boolean = false
+        private var mottattDato: LocalDateTime? = null
+        private var sistEndretDato: LocalDateTime? = null
+
+        fun sedHendelse(sedHendelse: SedHendelse?) = apply { this.sedHendelse = sedHendelse }
+        fun journalpostId(journalpostId: String?) = apply { this.journalpostId = journalpostId }
+        fun publisertKafka(publisertKafka: Boolean) = apply { this.publisertKafka = publisertKafka }
+        fun mottattDato(mottattDato: LocalDateTime?) = apply { this.mottattDato = mottattDato }
+        fun sistEndretDato(sistEndretDato: LocalDateTime?) = apply { this.sistEndretDato = sistEndretDato }
+
+        fun build() = SedMottattHendelse(
+            0,
+            sedHendelse ?: throw IllegalArgumentException("sedHendelse must be set"),
+            journalpostId,
+            publisertKafka,
+            mottattDato,
+            sistEndretDato
+        )
+    }
+
+    companion object {
+        @JvmStatic
+        fun builder() = Builder()
+    }
 }

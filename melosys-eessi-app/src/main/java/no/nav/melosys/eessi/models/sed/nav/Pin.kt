@@ -1,33 +1,21 @@
+package no.nav.melosys.eessi.models.sed.nav
 
-package no.nav.melosys.eessi.models.sed.nav;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-
-
-@JsonInclude(Include.NON_NULL)
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Pin {
-
-    public Pin(String identifikator, String land, String sektor) {
-        this.identifikator = identifikator;
-        this.land = land;
-        this.sektor = sektor;
-    }
-
-    private String identifikator;
-
-    private String land;
-
-    private String sektor;
-
-    private String institusjonsid;
-
-    private String institusjonsnavn;
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Pin(
+    var identifikator: String? = null,
+    var land: String? = null,
+    var sektor: String? = null,
+    var institusjonsid: String? = null,
+    var institusjonsnavn: String? = null
+) {
+    // Fjern nå vi har bruk fra kotlin
+    constructor(identifikator: String?, land: String?, sektor: String?) : this(
+        identifikator = identifikator,
+        land = land,
+        sektor = sektor,
+        institusjonsid = null,
+        institusjonsnavn = null
+    )
 }

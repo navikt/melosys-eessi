@@ -1,14 +1,10 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 
-@JsonInclude(Include.NON_NULL)
-@Data
-public class Land {
-
-    @JsonProperty("land")
-    private String landkode;
-}
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Land @JsonCreator constructor(
+    @JsonProperty("land") var landkode: String? = null
+)

@@ -1,18 +1,21 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Test
 
 class SedTypeTest {
 
     @Test
-    void kreverAdresse_verifiserer_ok() {
-        Stream.of(SedType.A001, SedType.A002, SedType.A003, SedType.A004, SedType.A007, SedType.A009, SedType.A010)
-            .forEach(sedType -> assertThat(sedType.kreverAdresse())
-                .withFailMessage("SedType krever ikke adresse: '%s'", sedType)
-                .isTrue());
+    fun kreverAdresse_verifiserer_ok() {
+        val sedTypes = listOf(SedType.A001, SedType.A002, SedType.A003, SedType.A004, SedType.A007, SedType.A009, SedType.A010)
+        sedTypes.forEach { sedType ->
+            assertSoftly {
+                withClue("SedType krever ikke adresse: '$sedType'") {
+                    sedType.kreverAdresse() shouldBe true
+                }
+            }
+        }
     }
 }

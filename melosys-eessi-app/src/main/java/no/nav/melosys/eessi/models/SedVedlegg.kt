@@ -1,13 +1,25 @@
-package no.nav.melosys.eessi.models;
+package no.nav.melosys.eessi.models
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+data class SedVedlegg(
+    val tittel: String,
+    val innhold: ByteArray
+) {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class SedVedlegg {
-    private String tittel;
-    private byte[] innhold;
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SedVedlegg) return false
+
+        if (tittel != other.tittel) return false
+        if (!innhold.contentEquals(other.innhold)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = tittel.hashCode()
+        result = 31 * result + (innhold.let { it.contentHashCode() })
+        return result
+    }
+
+    override fun toString(): String = "SedVedlegg(tittel=$tittel, innhold=${innhold.contentToString()})"
 }

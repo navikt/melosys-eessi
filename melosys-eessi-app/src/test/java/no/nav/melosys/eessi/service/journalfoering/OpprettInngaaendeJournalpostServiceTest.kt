@@ -1,89 +1,62 @@
-package no.nav.melosys.eessi.service.journalfoering;
+package no.nav.melosys.eessi.service.journalfoering
 
-import java.util.Collections;
-import java.util.Optional;
+import com.google.common.collect.Lists
+import io.github.benas.randombeans.api.EnhancedRandom
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import no.nav.melosys.eessi.EnhancedRandomCreator
+import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
+import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-import com.google.common.collect.Lists;
-import io.github.benas.randombeans.api.EnhancedRandom;
-import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.integration.journalpostapi.OpprettJournalpostResponse;
-import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
-import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+internal class OpprettInngaaendeJournalpostServiceTest {
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+    private val journalpostService: JournalpostService = mockk()
+    private val journalpostSedKoblingService: JournalpostSedKoblingService = mockk()
 
-@ExtendWith(MockitoExtension.class)
-class OpprettInngaaendeJournalpostServiceTest {
+    private lateinit var opprettInngaaendeJournalpostService: OpprettInngaaendeJournalpostService
 
-    @Mock
-    private JournalpostService journalpostService;
-    @Mock
-    private SaksrelasjonService saksrelasjonService;
-    @Mock
-    private JournalpostSedKoblingService journalpostSedKoblingService;
-
-    private OpprettInngaaendeJournalpostService opprettInngaaendeJournalpostService;
-
-    private final EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
-
-    private SedHendelse sedMottatt;
-    private static final String JOURNALPOST_ID = "11223344";
-    private static final String GSAK_SAKSNUMMER = "123";
+    private val enhancedRandom: EnhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom()
+    private val sedMottatt = enhancedRandom.nextObject(SedHendelse::class.java).apply {
+        bucType = BucType.LA_BUC_01.name
+    }
 
     @BeforeEach
-    public void setup() throws Exception {
+    fun setup() {
+        opprettInngaaendeJournalpostService = OpprettInngaaendeJournalpostService(journalpostService, journalpostSedKoblingService)
 
-        opprettInngaaendeJournalpostService = new OpprettInngaaendeJournalpostService(saksrelasjonService, journalpostService, journalpostSedKoblingService);
-        sedMottatt = enhancedRandom.nextObject(SedHendelse.class);
-        sedMottatt.setBucType(BucType.LA_BUC_01.name());
-
-        OpprettJournalpostResponse response = new OpprettJournalpostResponse(JOURNALPOST_ID, Lists.newArrayList(
-                new OpprettJournalpostResponse.Dokument("123")), null, null);
-        when(journalpostService.opprettInngaaendeJournalpost(any(), any(), any(), any())).thenReturn(response);
+        every { journalpostService.opprettInngaaendeJournalpost(any(), any(), any(), any()) } returns OpprettJournalpostResponse(
+            JOURNALPOST_ID, Lists.newArrayList(
+                OpprettJournalpostResponse.Dokument("123")
+            ), null, null
+        )
     }
 
     @Test
-    void arkiverInngaaendeSedHentSakinformasjon_journalpostOpprettet_forventMottattJournalpostID() {
-        var sak = enhancedRandom.nextObject(Sak.class);
-        sak.setId(GSAK_SAKSNUMMER);
-        when(saksrelasjonService.finnArkivsakForRinaSaksnummer(anyString())).thenReturn(Optional.of(sak));
+    fun arkiverInngaaendeSedUtenBruker_journalpostOpprettet_forventReturnerJournalpostID() {
+        every { journalpostSedKoblingService.lagre(any(), any(), any(), any(), any(), any()) } returns mockk()
 
-        SakInformasjon sakInformasjon = opprettInngaaendeJournalpostService.arkiverInngaaendeSedHentSakinformasjon(sedMottatt, sedMedVedlegg(new byte[0]), "123");
+        val journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, sedMedVedlegg(ByteArray(0)), "123321")
 
-        assertThat(sakInformasjon).isNotNull();
-        assertThat(sakInformasjon.getJournalpostId()).isEqualTo(JOURNALPOST_ID);
-        assertThat(sakInformasjon.getGsakSaksnummer()).isEqualTo(GSAK_SAKSNUMMER);
+        journalpostID shouldBe JOURNALPOST_ID
 
-        verify(journalpostService, times(1)).opprettInngaaendeJournalpost(any(), any(), any(), anyString());
-        verify(journalpostSedKoblingService).lagre(JOURNALPOST_ID, sedMottatt.getRinaSakId(),
-                sedMottatt.getRinaDokumentId(), sedMottatt.getRinaDokumentVersjon(),
-                sedMottatt.getBucType(), sedMottatt.getSedType());
+        verify {
+            journalpostSedKoblingService.lagre(any(), any(), any(), any(), any(), any())
+            journalpostService.opprettInngaaendeJournalpost(any(), isNull(), any(), any())
+        }
     }
 
-    @Test
-    void arkiverInngaaendeSedUtenBruker_journalpostOpprettet_forventReturnerJournalpostID() {
+    private fun sedMedVedlegg(innhold: ByteArray): SedMedVedlegg =
+        SedMedVedlegg(SedMedVedlegg.BinaerFil("", "", innhold), emptyList())
 
-        String journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(sedMottatt, sedMedVedlegg(new byte[0]), "123321");
-
-        assertThat(journalpostID).isEqualTo(JOURNALPOST_ID);
-
-        verify(journalpostSedKoblingService).lagre(anyString(), anyString(), anyString(), anyString(), anyString(), anyString());
-        verify(journalpostService).opprettInngaaendeJournalpost(any(), isNull(), any(), anyString());
+    companion object {
+        private const val JOURNALPOST_ID = "123456789"
     }
 
-    private SedMedVedlegg sedMedVedlegg(byte[] innhold) {
-        return new SedMedVedlegg(new SedMedVedlegg.BinaerFil("","", innhold), Collections.emptyList());
-    }
 }

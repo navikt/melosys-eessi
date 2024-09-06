@@ -1,53 +1,41 @@
-package no.nav.melosys.eessi.models.kafkadlq;
+package no.nav.melosys.eessi.models.kafkadlq
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-import jakarta.persistence.*;
+import jakarta.persistence.*
+import java.time.LocalDateTime
+import java.util.*
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "queue_type", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "kafka_dlq")
-public abstract class KafkaDLQ {
-
+abstract class KafkaDLQ(
     @Id
     @Column(name = "id")
-    private UUID id;
+    var id: UUID? = null,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "queue_type", insertable = false, updatable = false)
-    private QueueType queueType;
+    var queueType: QueueType? = null,
 
     @Column(name = "tid_registrert")
-    private LocalDateTime tidRegistrert;
+    var tidRegistrert: LocalDateTime = LocalDateTime.now(),
 
     @Column(name = "tid_sist_rekjort")
-    private LocalDateTime tidSistRekjort;
+    var tidSistRekjort: LocalDateTime? = null,
 
     @Column(name = "siste_feilmelding")
-    private String sisteFeilmelding;
+    var sisteFeilmelding: String? = null,
 
     @Column(name = "antall_rekjoringer")
-    private int antallRekjoringer;
+    var antallRekjoringer: Int = 0,
 
     @Column(name = "skip")
-    private Boolean skip = false;
+    var skip: Boolean = false
+) {
 
-    public void økAntallRekjøringerMed1() {
-        antallRekjoringer++;
+    fun økAntallRekjøringerMed1() {
+        antallRekjoringer++
     }
 
-    public abstract String hentMeldingSomStreng() throws JsonProcessingException;
+    abstract fun hentMeldingSomStreng(): String
 }
-
-

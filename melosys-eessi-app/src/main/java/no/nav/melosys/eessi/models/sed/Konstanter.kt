@@ -1,16 +1,14 @@
-package no.nav.melosys.eessi.models.sed;
+package no.nav.melosys.eessi.models.sed
 
-import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatter
 
-import lombok.experimental.UtilityClass;
+object Konstanter {
 
-@UtilityClass
-public class Konstanter {
-
-    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    @JvmField
+    val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     //Versjonen til SED'en. Generasjon og versjon (SED_G_VER.SED_VER = 4.2)
-    public static final String SED_VER_CDM_4_3 = "3";
-    public static final String DEFAULT_SED_VER = "2";
-    public static final String DEFAULT_SED_G_VER = "4";
+    const val SED_VER_CDM_4_3: String = "3"
+    const val DEFAULT_SED_VER: String = "2"
+    const val DEFAULT_SED_G_VER: String = "4"
 }

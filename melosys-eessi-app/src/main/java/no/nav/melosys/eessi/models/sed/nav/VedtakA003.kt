@@ -1,15 +1,7 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class VedtakA003 extends Vedtak {
-
-    private String gjeldervarighetyrkesaktivitet;
-
-    private PeriodeA010 gjelderperiode;
-
-    private String land;
-}
+data class VedtakA003(
+    var gjeldervarighetyrkesaktivitet: String? = null,
+    var gjelderperiode: PeriodeA010? = null,
+    var land: String? = null
+) : Vedtak()

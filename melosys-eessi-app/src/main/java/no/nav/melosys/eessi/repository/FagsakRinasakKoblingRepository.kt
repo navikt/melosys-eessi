@@ -1,18 +1,16 @@
-package no.nav.melosys.eessi.repository;
+package no.nav.melosys.eessi.repository
 
-import java.util.List;
-import java.util.Optional;
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import org.springframework.data.jpa.repository.JpaRepository;
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.FagsakRinasakKobling
+import org.springframework.data.jpa.repository.JpaRepository
+import java.util.*
 
-public interface FagsakRinasakKoblingRepository extends JpaRepository<FagsakRinasakKobling, Long> {
+interface FagsakRinasakKoblingRepository : JpaRepository<FagsakRinasakKobling, Long> {
+    fun findAllByGsakSaksnummer(gsakSaksnummer: Long): MutableList<FagsakRinasakKobling>
 
-    List<FagsakRinasakKobling> findAllByGsakSaksnummer(Long gsakSaksnummer);
+    fun findByRinaSaksnummer(rinaSaksnummer: String): Optional<FagsakRinasakKobling>
 
-    Optional<FagsakRinasakKobling> findByRinaSaksnummer(String rinaSaksnummer);
+    fun deleteByRinaSaksnummer(rinaSaksnummer: String)
 
-    void deleteByRinaSaksnummer(String rinaSaksnummer);
-
-    List<FagsakRinasakKobling> findAllByGsakSaksnummerAndBucType(Long gsakSaksnummer, BucType bucType);
+    fun findAllByGsakSaksnummerAndBucType(gsakSaksnummer: Long, bucType: BucType): MutableList<FagsakRinasakKobling>
 }

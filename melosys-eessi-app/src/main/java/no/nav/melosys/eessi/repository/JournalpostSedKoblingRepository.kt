@@ -1,13 +1,11 @@
-package no.nav.melosys.eessi.repository;
+package no.nav.melosys.eessi.repository
 
-import java.util.List;
-import java.util.Optional;
-import no.nav.melosys.eessi.models.JournalpostSedKobling;
-import org.springframework.data.jpa.repository.JpaRepository;
+import no.nav.melosys.eessi.models.JournalpostSedKobling
+import org.springframework.data.jpa.repository.JpaRepository
+import java.util.*
 
-public interface JournalpostSedKoblingRepository extends JpaRepository<JournalpostSedKobling, String> {
+interface JournalpostSedKoblingRepository : JpaRepository<JournalpostSedKobling, String> {
+    fun findByJournalpostID(journalpostID: String): Optional<JournalpostSedKobling>
 
-    Optional<JournalpostSedKobling> findByJournalpostID(String journalpostID);
-
-    List<JournalpostSedKobling> findByRinaSaksnummer(String rinaSaksnummer);
+    fun findByRinaSaksnummer(rinaSaksnummer: String): MutableList<JournalpostSedKobling>
 }

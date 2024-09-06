@@ -1,46 +1,28 @@
+package no.nav.melosys.eessi.models.sed
 
-package no.nav.melosys.eessi.models.sed;
+import com.fasterxml.jackson.annotation.*
+import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
+import no.nav.melosys.eessi.models.sed.nav.*
+import java.util.*
 
-
-import java.util.Optional;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
-import lombok.Data;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.models.sed.nav.*;
-
-@JsonInclude(Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
-public class SED {
-
+data class SED @JsonCreator constructor(
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "sed")
-    @JsonTypeIdResolver(MedlemskapTypeResolver.class)
-    private Medlemskap medlemskap;
-
-    private Nav nav;
-
-    @JsonProperty(value = "sed")
-    private String sedType;
-
-    private String sedVer;
-
-    private String sedGVer;
-
-    public Optional<Person> finnPerson() {
-        return erXSED()
-                ? Optional.ofNullable(nav.getSak()).map(Sak::getKontekst).map(Kontekst::getBruker).map(Bruker::getPerson)
-                : Optional.of(nav.getBruker().getPerson());
-
+    @JsonTypeIdResolver(MedlemskapTypeResolver::class)
+    @JsonProperty("medlemskap") var medlemskap: Medlemskap? = null,
+    @JsonProperty("nav") var nav: Nav? = null,
+    @JsonProperty("sed") var sedType: String? = null,
+    @JsonProperty("sedVer") var sedVer: String? = null,
+    @JsonProperty("sedGVer") var sedGVer: String? = null
+) {
+    fun finnPerson(): Optional<Person> = if (erXSED()) {
+        Optional.ofNullable(nav?.sak?.kontekst?.bruker?.person)
+    } else {
+        Optional.ofNullable(nav?.bruker?.person)
     }
 
-    public boolean erXSED() {
-        return SedType.valueOf(sedType).erXSED();
-    }
+    fun erXSED(): Boolean = SedType.valueOf(sedType ?: "").erXSED()
 }

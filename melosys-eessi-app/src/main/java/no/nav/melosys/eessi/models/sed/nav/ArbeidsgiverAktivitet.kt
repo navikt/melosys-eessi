@@ -1,8 +1,5 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import lombok.Data;
-
-@Data
-public class ArbeidsgiverAktivitet {
-    private String eraktivitetmarginal;
-}
+data class ArbeidsgiverAktivitet(
+    var eraktivitetmarginal: String? = null
+)

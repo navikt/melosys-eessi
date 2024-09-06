@@ -1,35 +1,40 @@
-package no.nav.melosys.eessi.models.vedlegg;
+package no.nav.melosys.eessi.models.vedlegg
 
-import java.util.Collections;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Value;
-
-@Value
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class SedMedVedlegg {
+data class SedMedVedlegg(
+    val sed: BinaerFil? = null,
+    val vedlegg: List<BinaerFil>? = emptyList()
+) {
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    data class BinaerFil(
+        val filnavn: String,
+        val mimeType: String?,
+        val innhold: ByteArray
+    ) {
+        // Trenger normalt ikke å implementere equals og hashCode med data class men pga ByteArray så må vi det
+        // Property with 'Array' type in a 'data' class: it is recommended to override 'equals()' and 'hashCode()
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is BinaerFil) return false
 
-  private final BinaerFil sed;
-  private List<BinaerFil> vedlegg;
+            if (filnavn != other.filnavn) return false
+            if (mimeType != other.mimeType) return false
+            if (!innhold.contentEquals(other.innhold)) return false
 
-  public SedMedVedlegg(BinaerFil sed, List<BinaerFil> vedlegg) {
-    this.sed = sed;
-    this.vedlegg = vedlegg != null ? vedlegg : Collections.emptyList();
-  }
+            return true
+        }
 
-  @Value
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  public static class BinaerFil {
+        override fun hashCode(): Int {
+            var result = filnavn.hashCode()
+            result = 31 * result + mimeType.hashCode()
+            result = 31 * result + innhold.contentHashCode()
+            return result
+        }
 
-    private String filnavn;
-    private String mimeType;
-    private byte[] innhold;
-
-    public BinaerFil(String filnavn, String mimeType, byte[] innhold) {
-      this.filnavn = filnavn;
-      this.mimeType = mimeType;
-      this.innhold = innhold;
+        override fun toString(): String {
+            return "BinaerFil(filnavn='$filnavn', mimeType='$mimeType', innhold=${innhold.contentToString()})"
+        }
     }
-  }
 }

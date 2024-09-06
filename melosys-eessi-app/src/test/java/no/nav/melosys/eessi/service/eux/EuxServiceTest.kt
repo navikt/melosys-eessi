@@ -1,375 +1,343 @@
-package no.nav.melosys.eessi.service.eux;
+package no.nav.melosys.eessi.service.eux
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.*;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.optional.shouldBeEmpty
+import io.mockk.*
+import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer
+import no.nav.melosys.eessi.integration.eux.rina_api.EuxRinasakerConsumer
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon
+import no.nav.melosys.eessi.metrikker.BucMetrikker
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.SedVedlegg
+import no.nav.melosys.eessi.models.buc.BUC
+import no.nav.melosys.eessi.models.buc.Conversation
+import no.nav.melosys.eessi.models.buc.Document
+import no.nav.melosys.eessi.models.exception.IntegrationException
+import no.nav.melosys.eessi.models.exception.NotFoundException
+import no.nav.melosys.eessi.models.exception.ValidationException
+import no.nav.melosys.eessi.models.sed.SED
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.io.File
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.SneakyThrows;
-import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner;
-import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.EuxRinasakerConsumer;
-import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
-import no.nav.melosys.eessi.metrikker.BucMetrikker;
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.SedVedlegg;
-import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Conversation;
-import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.ValidationException;
-import no.nav.melosys.eessi.models.sed.SED;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
 class EuxServiceTest {
 
-    @Mock
-    private EuxConsumer euxConsumer;
-
-    @Mock
-    private EuxRinasakerConsumer euxRinasakerConsumer;
-    @Mock
-    private BucMetrikker bucMetrikker;
-
-    private EuxService euxService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-
-    private final String opprettetBucID = "114433";
-    private final String opprettetSedID = "12222";
+    private val euxConsumer = mockk<EuxConsumer>()
+    private val euxRinasakerConsumer = mockk<EuxRinasakerConsumer>()
+    private val bucMetrikker = mockk<BucMetrikker>()
+    private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
+    private lateinit var euxService: EuxService
 
     @BeforeEach
-    public void setup() throws IOException, IntegrationException {
-        euxService = new EuxService(euxConsumer, bucMetrikker, euxRinasakerConsumer);
+    fun setup() {
+        euxService = EuxService(euxConsumer, bucMetrikker, euxRinasakerConsumer)
     }
 
     @Test
-    void hentSed_forventKonsumentKall() {
-        euxService.hentSed("123123123", "12345");
-        verify(euxConsumer).hentSed("123123123", "12345");
+    fun `hentSed forventKonsumentKall`() {
+        every { euxConsumer.hentSed("123123123", "12345") } returns SED()
+
+        euxService.hentSed("123123123", "12345")
+
+        verify { euxConsumer.hentSed("123123123", "12345") }
     }
 
     @Test
-    void hentBucer_forventKonsumentKall() {
-        BucSearch bucSearch = BucSearch.builder()
-            .bucType(BucType.LA_BUC_01.name())
-            .build();
+    fun `hentBucer forventKonsumentKall`() {
+        val bucSearch = BucSearch(bucType = BucType.LA_BUC_01.name)
+        every { euxConsumer.finnRinaSaker(BucType.LA_BUC_01.name, isNull()) } returns emptyList()
 
-        euxService.hentBucer(bucSearch);
+        euxService.hentBucer(bucSearch)
 
-        verify(euxConsumer).finnRinaSaker(eq(BucType.LA_BUC_01.name()), isNull());
+        verify { euxConsumer.finnRinaSaker(BucType.LA_BUC_01.name, isNull()) }
     }
 
     @Test
-    void hentBuc_forventKonsumentKall() {
-        euxService.hentBuc("123123123");
+    fun `hentBuc forventKonsumentKall`() {
+        every { euxConsumer.hentBUC(any()) } returns BUC()
 
-        verify(euxConsumer).hentBUC("123123123");
+        euxService.hentBuc("123123123")
+
+        verify { euxConsumer.hentBUC("123123123") }
     }
 
     @Test
-    void finnBuc_integrasjonsfeil_tomRespons() {
-        when(euxConsumer.hentBUC("123123123")).thenThrow(new IntegrationException("err"));
-        assertThat(euxService.finnBUC("123123123")).isEmpty();
+    fun `finnBuc integrasjonsfeil tomRespons`() {
+        every { euxConsumer.hentBUC("123123123") } throws IntegrationException("err")
+
+        val result = euxService.finnBUC("123123123")
+
+        result.shouldBeEmpty()
     }
 
     @Test
-    void genererPdfFraSed_forventKonsumentkall() {
-        euxService.genererPdfFraSed(new SED());
-        verify(euxConsumer).genererPdfFraSed(any());
+    fun `genererPdfFraSed forventKonsumentkall`() {
+        every { euxConsumer.genererPdfFraSed(any()) } returns "pdf".toByteArray()
+
+        euxService.genererPdfFraSed(SED())
+
+        verify { euxConsumer.genererPdfFraSed(any()) }
     }
 
     @Test
-    void opprettBucOgSed_forventRinaSaksnummer() {
-        when(euxConsumer.opprettBUC(anyString())).thenReturn(opprettetBucID);
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
+    fun `opprettBucOgSed forventRinaSaksnummer`() {
+        every { euxConsumer.opprettBUC(any()) } returns OPPRETTET_BUC_ID
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) } returns "123"
+        every { euxConsumer.settMottakere(any(), any()) } returns Unit
+        every { bucMetrikker.bucOpprettet(any()) } returns Unit
+        val bucType = BucType.LA_BUC_01
+        val mottakere = listOf("SE:123")
+        val sed = SED()
+        val vedlegg = setOf(SedVedlegg("filen min", "pdf".toByteArray()))
 
-        BucType bucType = BucType.LA_BUC_01;
-        Collection<String> mottakere = List.of("SE:123");
-        SED sed = new SED();
-        var vedlegg = Set.of(new SedVedlegg("filen min", "pdf".getBytes()));
+        val opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg)
 
-        OpprettBucOgSedResponse opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg);
-
-        verify(euxConsumer).opprettBUC(bucType.name());
-        verify(euxConsumer).opprettSed(opprettetBucID, sed);
-        verify(euxConsumer).leggTilVedlegg(eq(opprettetBucID), eq(opprettetSedID), eq("pdf"), any(SedVedlegg.class));
-
-        assertThat(opprettBucOgSedResponse.getRinaSaksnummer()).isEqualTo(opprettetBucID);
+        verify { euxConsumer.opprettBUC(bucType.name) }
+        verify { euxConsumer.opprettSed(OPPRETTET_BUC_ID, sed) }
+        verify { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) }
+        opprettBucOgSedResponse.rinaSaksnummer shouldBe OPPRETTET_BUC_ID
     }
 
     @Test
-    void opprettOgSendSed_medRinaSaksnummer_forventKonsumentKall() {
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
-            ));
-        when(euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID))
-            .thenReturn(Collections.singleton(Aksjoner.SEND.hentHandling()));
+    fun `opprettOgSendSed medRinaSaksnummer forventKonsumentKall`() {
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns setOf(Aksjoner.SEND.hentHandling())
+        every { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } just Runs
 
-        SED sed = new SED();
-        euxService.opprettOgSendSed(sed, opprettetBucID);
+        euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
 
-        verify(euxConsumer).sendSed(opprettetBucID, opprettetSedID);
+        verify { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) }
     }
 
     @Test
-    void opprettOgSendSedMedHandlingSjekk_medRinaSaksnummer_forventKonsumentKall() {
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
-            ));
-        when(euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID))
-            .thenReturn(Collections.singleton(Aksjoner.SEND.hentHandling()));
+    fun `opprettOgSendSedMedHandlingSjekk medIngenMuligBucHandlingCreate forventKasterException`() {
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
 
-        SED sed = new SED();
-        euxService.opprettOgSendSed(sed, opprettetBucID);
-
-        verify(euxConsumer).sendSed(opprettetBucID, opprettetSedID);
+        shouldThrow<ValidationException> {
+            euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
+        }.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
     }
 
     @Test
-    void opprettOgSendSedMedHandlingSjekk_medIngenMuligBucHandlingCreate_forventKasterException() {
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("SedId SedType " + Aksjoner.READ.hentHandling()
-            ));
+    fun `opprettOgSendSedMedHandlingSjekk medTomListeBucHandling forventKasterException`() {
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.READ.hentHandling()}")
 
-        SED sed = new SED();
-
-        assertThatExceptionOfType(ValidationException.class)
-            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
-            .withMessageContaining(String.format("Kan ikke gjøre handling %s på BUC %s, ugyldig handling i Rina",
-                Aksjoner.CREATE.hentHandling()
-                , opprettetBucID));
+        shouldThrow<ValidationException> {
+            euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
+        }.message shouldBe "Kan ikke gjøre handling ${Aksjoner.CREATE.hentHandling()} på BUC $OPPRETTET_BUC_ID, ugyldig handling i Rina"
     }
 
     @Test
-    void opprettOgSendSedMedHandlingSjekk_medTomListeBucHandling_forventKasterException() {
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("SedId SedType " + Aksjoner.READ.hentHandling()
-            ));
+    fun `opprettOgSendSedMedHandlingSjekk medTomtSedHandling forventKasterException`() {
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedId SedType ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns emptyList()
 
-        SED sed = new SED();
-
-        assertThatExceptionOfType(ValidationException.class)
-            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
-            .withMessageContaining(String.format("Kan ikke gjøre handling %s på BUC %s, ugyldig handling i Rina",
-                Aksjoner.CREATE.hentHandling()
-                , opprettetBucID));
+        val sed = SED()
+        val exception = shouldThrow<ValidationException> {
+            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
+        }
+        exception.message shouldBe "Kan ikke sende SED på BUC $OPPRETTET_BUC_ID, ugyldig handling ${Aksjoner.SEND.hentHandling()} i Rina"
     }
 
     @Test
-    void opprettOgSendSedMedHandlingSjekk_medTomtSedHandling_forventKasterException() {
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("SedId SedType " + Aksjoner.CREATE.hentHandling()
-            ));
+    fun `opprettOgSendSedMedHandlingSjekk medUgyldigSedHandling kasterIntegrationException`() {
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("SedID Sedtype ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns setOf(Aksjoner.READ.hentHandling())
 
-        when(euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID))
-            .thenReturn(Collections.emptyList());
-
-        SED sed = new SED();
-
-        assertThatExceptionOfType(ValidationException.class)
-            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
-            .withMessageContaining(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
-                opprettetBucID,
-                Aksjoner.SEND.hentHandling()));
-    }
-
-
-    @Test
-    void opprettOgSendSedMedHandlingSjekk_medUgyldigSedHandling_kasterIntegrationException() {
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("SedID Sedtype " + Aksjoner.CREATE.hentHandling()
-            ));
-
-        when(euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID))
-            .thenReturn(Collections.singleton(Aksjoner.READ.hentHandling()));
-        SED sed = new SED();
-
-        assertThatExceptionOfType(ValidationException.class)
-            .isThrownBy(() -> euxService.opprettOgSendSed(sed, opprettetBucID))
-            .withMessageContaining(String.format("Kan ikke sende SED på BUC %s, ugyldig handling %s i Rina",
-                opprettetBucID,
-                Aksjoner.SEND.hentHandling()));
-
+        val sed = SED()
+        val exception = shouldThrow<ValidationException> {
+            euxService.opprettOgSendSed(sed, OPPRETTET_BUC_ID)
+        }
+        exception.message shouldBe "Kan ikke sende SED på BUC $OPPRETTET_BUC_ID, ugyldig handling ${Aksjoner.SEND.hentHandling()} i Rina"
     }
 
     @Test
-    void opprettOgSendSedMedHandlingSjekk_medFlereHandlinger_forventKonsumentKall() {
-        when(euxConsumer.opprettSed(eq(opprettetBucID), any(SED.class))).thenReturn(opprettetSedID);
-        when(euxConsumer.hentBucHandlinger(opprettetBucID))
-            .thenReturn(List.of("test test " + Aksjoner.CREATE.hentHandling()
-            ));
-        when(euxConsumer.hentSedHandlinger(opprettetBucID, opprettetSedID))
-            .thenReturn(List.of(Aksjoner.CLOSE.hentHandling(),
-                Aksjoner.SEND.hentHandling(),
-                Aksjoner.SEND.hentHandling())
-            );
+    fun `opprettOgSendSedMedHandlingSjekk medFlereHandlinger forventKonsumentKall`() {
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.hentBucHandlinger(OPPRETTET_BUC_ID) } returns listOf("test test ${Aksjoner.CREATE.hentHandling()}")
+        every { euxConsumer.hentSedHandlinger(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } returns listOf(
+            Aksjoner.CLOSE.hentHandling(),
+            Aksjoner.SEND.hentHandling(),
+            Aksjoner.SEND.hentHandling()
+        )
+        every { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) } just Runs
 
-        SED sed = new SED();
-        euxService.opprettOgSendSed(sed, opprettetBucID);
+        euxService.opprettOgSendSed(SED(), OPPRETTET_BUC_ID)
 
-        verify(euxConsumer).sendSed(opprettetBucID, opprettetSedID);
-
+        verify { euxConsumer.sendSed(OPPRETTET_BUC_ID, OPPRETTET_SED_ID) }
     }
 
     @Test
-    void hentRinaUrl_medSaksnummer_verifiserEuxConsumerKall() {
-        euxService.hentRinaUrl("1234");
-        verify(euxConsumer).hentRinaUrl("1234");
+    fun `hentRinaUrl medSaksnummer verifiserEuxConsumerKall`() {
+        every { euxConsumer.hentRinaUrl("1234") } returns "https://rina-host-url.local/portal/#/caseManagement/1234"
+
+        euxService.hentRinaUrl("1234")
+
+        verify { euxConsumer.hentRinaUrl("1234") }
     }
 
     @Test
-    void hentRinaUrl_medRinaSaksnummer_forventUrl() {
-        String rinaSak = "12345";
-        String RINA_MOCK_URL = "https://rina-host-url.local";
-        when(euxConsumer.hentRinaUrl(rinaSak)).thenReturn(RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak);
+    fun `hentRinaUrl medRinaSaksnummer forventUrl`() {
+        val rinaSak = "12345"
+        val RINA_MOCK_URL = "https://rina-host-url.local"
+        every { euxConsumer.hentRinaUrl(rinaSak) } returns "$RINA_MOCK_URL/portal/#/caseManagement/$rinaSak"
+        val expectedUrl = "$RINA_MOCK_URL/portal/#/caseManagement/$rinaSak"
 
-        String expectedUrl = RINA_MOCK_URL + "/portal/#/caseManagement/" + rinaSak;
-        String resultUrl = euxService.hentRinaUrl(rinaSak);
+        val resultUrl = euxService.hentRinaUrl(rinaSak)
 
-        assertThat(resultUrl).isEqualTo(expectedUrl);
+        resultUrl shouldBe expectedUrl
     }
 
     @Test
-    void hentRinaUrl_utenRinaSaksnummer_forventException() {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> euxService.hentRinaUrl(null))
-            .withMessageContaining("Trenger rina-saksnummer");
+    fun `hentRinaUrl utenRinaSaksnummer forventException`() {
+        val exception = shouldThrow<IllegalArgumentException> {
+            euxService.hentRinaUrl(null)
+        }
+
+        exception.message shouldBe "Trenger rina-saksnummer for å opprette url til rina"
     }
 
     @Test
-    void sendSed_forventKonsumentKall() {
-        String rinaSaksnummer = "123";
-        String dokumentId = "332211";
-        String sedtype = SedType.A003.name();
-        when(euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId))
-            .thenReturn(Collections.singleton(Aksjoner.SEND.hentHandling()));
+    fun `sendSed forventKonsumentKall`() {
+        val rinaSaksnummer = "123"
+        val dokumentId = "332211"
+        val sedtype = SedType.A003.name
+        every { euxConsumer.hentSedHandlinger(rinaSaksnummer, dokumentId) } returns setOf(Aksjoner.SEND.hentHandling())
+        every { euxConsumer.sendSed(rinaSaksnummer, dokumentId) } just Runs
 
-        euxService.sendSed(rinaSaksnummer, dokumentId, sedtype);
+        euxService.sendSed(rinaSaksnummer, dokumentId, sedtype)
 
-
-        verify(euxConsumer).sendSed(rinaSaksnummer, dokumentId);
+        verify { euxConsumer.sendSed(rinaSaksnummer, dokumentId) }
     }
 
     @Test
-    void hentMottakerinstitusjoner_laBuc04LandSverige_forventEnInstitusjon() {
-        mockInstitusjoner();
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name(), List.of("SE"));
-        assertThat(institusjoner).hasSize(1);
-        assertThat(institusjoner.get(0).getAkronym()).isEqualTo("FK Sverige-TS70");
-        verify(euxConsumer).hentInstitusjoner(BucType.LA_BUC_04.name(), null);
+    fun `hentMottakerinstitusjoner laBuc04LandSverige forventEnInstitusjon`() {
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
+
+        val institusjoner = euxService.hentMottakerinstitusjoner(BucType.LA_BUC_04.name, listOf("SE"))
+
+        institusjoner.shouldHaveSize(1)
+        institusjoner[0].akronym shouldBe "FK Sverige-TS70"
+        verify { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) }
     }
 
     @Test
-    void hentMottakerinstitusjoner_sBuc18LandSverige_forventIngenInstitusjoner() {
-        mockInstitusjoner();
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", List.of("SE"));
-        assertThat(institusjoner).isEmpty();
+    fun `hentMottakerinstitusjoner sBuc18LandSverige forventIngenInstitusjoner`() {
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
+        every { euxConsumer.hentInstitusjoner("S_BUC_24", isNull()) } returns emptyList()
+
+        val institusjoner = euxService.hentMottakerinstitusjoner("S_BUC_24", listOf("SE"))
+
+        institusjoner.shouldBeEmpty()
     }
 
     @Test
-    void hentMottakerinstitusjoner_laBuc04LandGB_forventEnInstitusjon() {
-        mockInstitusjoner();
+    fun `hentMottakerinstitusjoner laBuc04LandGB forventEnInstitusjon`() {
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
 
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", List.of("GB"));
-        assertThat(institusjoner).hasSize(1);
+        val institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", listOf("GB"))
 
-        Institusjon institusjon = institusjoner.get(0);
-        assertThat(institusjon.getAkronym()).isEqualTo("FK UK-TITTEI");
-        assertThat(institusjon.getLandkode()).isEqualTo("GB");
+        institusjoner.shouldHaveSize(1)
+        institusjoner[0].akronym shouldBe "FK UK-TITTEI"
+        institusjoner[0].landkode shouldBe "GB"
     }
 
     @Test
-    void hentMottakerinstitusjoner_laBuc04LandGR_forventEnInstitusjon() {
-        mockInstitusjoner();
-        List<Institusjon> institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", List.of("GR"));
-        assertThat(institusjoner).hasSize(1);
+    fun `hentMottakerinstitusjoner laBuc04LandGR forventEnInstitusjon`() {
+        every { euxConsumer.hentInstitusjoner(BucType.LA_BUC_04.name, isNull()) } returns hentInstitusjoner()
 
-        Institusjon institusjon = institusjoner.get(0);
-        assertThat(institusjon.getAkronym()).isEqualTo("FK EL-TITTEI");
-        assertThat(institusjon.getLandkode()).isEqualTo("GR");
+        val institusjoner = euxService.hentMottakerinstitusjoner("LA_BUC_04", listOf("GR"))
+
+        institusjoner.shouldHaveSize(1)
+        institusjoner[0].akronym shouldBe "FK EL-TITTEI"
+        institusjoner[0].landkode shouldBe "GR"
     }
 
     @Test
-    void sedErEndring_medFlereConversations_forventTrue() {
-        String sedID = "3333";
-        String rinaSaksnummer = "333222111";
-        BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
-        buc.getDocuments().get(0).setConversations(Arrays.asList(new Conversation(), new Conversation()));
-        when(euxConsumer.hentBUC(rinaSaksnummer)).thenReturn(buc);
+    fun `sedErEndring medFlereConversations forventTrue`() {
+        val sedID = "3333"
+        val rinaSaksnummer = "333222111"
+        val buc = lagBucMedDocument(rinaSaksnummer, sedID).apply {
+            documents[0].conversations = listOf(Conversation(), Conversation())
+        }
+        every { euxConsumer.hentBUC(rinaSaksnummer) } returns buc
 
-        boolean erEndring = euxService.sedErEndring(sedID, rinaSaksnummer);
+        val erEndring = euxService.sedErEndring(sedID, rinaSaksnummer)
 
-        verify(euxConsumer).hentBUC(rinaSaksnummer);
-        assertThat(erEndring).isTrue();
+        verify { euxConsumer.hentBUC(rinaSaksnummer) }
+        erEndring shouldBe true
     }
 
     @Test
-    void sedErEndring_utenNoenConversations_forventFalse() {
-        final String sedID = "3556";
-        final String rinaSaksnummer = "54368";
-        BUC buc = lagBucMedDocument(rinaSaksnummer, sedID);
-        buc.getDocuments().get(0).setConversations(Collections.singletonList(new Conversation()));
-        when(euxConsumer.hentBUC(rinaSaksnummer)).thenReturn(buc);
+    fun `sedErEndring utenNoenConversations forventFalse`() {
+        val sedID = "3556"
+        val rinaSaksnummer = "54368"
+        val buc = lagBucMedDocument(rinaSaksnummer, sedID).apply {
+            documents[0].conversations = listOf(Conversation())
+        }
+        every { euxConsumer.hentBUC(rinaSaksnummer) } returns buc
 
-        boolean erEndring = euxService.sedErEndring(sedID, rinaSaksnummer);
+        val erEndring = euxService.sedErEndring(sedID, rinaSaksnummer)
 
-        verify(euxConsumer).hentBUC(rinaSaksnummer);
-        assertThat(erEndring).isFalse();
+        verify { euxConsumer.hentBUC(rinaSaksnummer) }
+        erEndring shouldBe false
     }
 
     @Test
-    void sedErEndring_utenSederForBuc_forventFalse() {
-        final String sedID = "33322";
-        BUC buc = new BUC();
-        Document document = new Document();
-        document.setId(sedID);
-        document.setConversations(Collections.singletonList(new Conversation()));
-        buc.setDocuments(Arrays.asList(document, document, document));
+    fun `sedErEndring utenSederForBuc forventFalse`() {
+        val sedID = "33322"
+        val buc = BUC(
+            documents = listOf(
+                Document(
+                    id = sedID,
+                    conversations = listOf(Conversation())
+                ),
+                Document(),
+                Document()
+            )
+        )
+        every { euxConsumer.hentBUC(any()) } returns buc
 
-        when(euxConsumer.hentBUC(anyString())).thenReturn(buc);
+        val erEndring = euxService.sedErEndring(sedID, "123")
 
-        boolean erEndring = euxService.sedErEndring(sedID, "123");
-        verify(euxConsumer).hentBUC("123");
-        assertThat(erEndring).isFalse();
+        verify { euxConsumer.hentBUC("123") }
+        erEndring shouldBe false
     }
 
+    private fun hentInstitusjoner(): List<Institusjon> =
+        objectMapper.readValue(
+            File(
+                javaClass.classLoader.getResource(INSTITUSJONER_JSON)?.toURI()
+                    ?: throw NotFoundException("Fant ikke $INSTITUSJONER_JSON")
+            )
+        )
 
-    @SneakyThrows
-    private void mockInstitusjoner() {
-        URL institusjonerJsonUrl = getClass().getClassLoader().getResource("institusjoner.json");
-        List<Institusjon> institusjoner = objectMapper.readValue(institusjonerJsonUrl, new TypeReference<>() {
-        });
-        when(euxConsumer.hentInstitusjoner(anyString(), any()))
-            .thenReturn(institusjoner);
-    }
+    private fun lagBucMedDocument(rinaSaksnummer: String, sedID: String) = BUC(
+        id = rinaSaksnummer,
+        documents = listOf(
+            Document(
+                id = sedID,
+                conversations = listOf(Conversation())
+            )
+        )
+    )
 
-    private BUC lagBucMedDocument(String rinaSaksnummer, String sedID) {
+    companion object {
+        private const val OPPRETTET_BUC_ID = "123456"
+        private const val OPPRETTET_SED_ID = "654321"
+        private const val INSTITUSJONER_JSON = "institusjoner.json"
 
-        BUC buc = new BUC();
-        buc.setId(rinaSaksnummer);
-        Document document = new Document();
-        document.setId(sedID);
-        document.setConversations(Collections.singletonList(new Conversation()));
-        buc.setDocuments(Collections.singletonList(document));
-
-        return buc;
     }
 }

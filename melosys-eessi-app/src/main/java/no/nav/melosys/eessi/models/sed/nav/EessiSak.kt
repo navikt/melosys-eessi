@@ -1,13 +1,9 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonInclude
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Data
-public class EessiSak {
-
-    private String institusjonsnummer;
-
-    private String institusjonsid;
-}
+data class EessiSak(
+    var institusjonsnummer: String? = null,
+    var institusjonsid: String? = null
+)

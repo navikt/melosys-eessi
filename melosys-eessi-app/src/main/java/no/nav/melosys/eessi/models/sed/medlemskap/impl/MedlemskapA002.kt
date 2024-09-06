@@ -1,12 +1,10 @@
-package no.nav.melosys.eessi.models.sed.medlemskap.impl;
+package no.nav.melosys.eessi.models.sed.medlemskap.impl
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Data
-public class MedlemskapA002 implements Medlemskap {
-
-    private UnntakA002 unntak;
-}
+data class MedlemskapA002(
+    var unntak: UnntakA002? = null
+) : Medlemskap

@@ -1,10 +1,8 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Creator {
-    private Organisation organisation;
-}
+data class Creator(
+    var organisation: Organisation? = null // TODO: gjør denne none-nullable
+)

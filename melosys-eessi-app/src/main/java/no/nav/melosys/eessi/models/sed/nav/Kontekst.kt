@@ -1,11 +1,8 @@
-package no.nav.melosys.eessi.models.sed.nav;
+package no.nav.melosys.eessi.models.sed.nav
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
-@Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Kontekst {
-
-    private Bruker bruker;
-}
+data class Kontekst (
+    var bruker: Bruker? = null
+)
