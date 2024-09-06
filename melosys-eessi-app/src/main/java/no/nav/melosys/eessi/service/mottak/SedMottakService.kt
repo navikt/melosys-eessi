@@ -46,6 +46,7 @@ class SedMottakService(
     @Transactional
     fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
         if (sedMottattHendelse.sedHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedMottattHendelse)) {
+            log.debug("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} BUC type ikke tilknyttet melosys")
             return
         }
 
@@ -190,7 +191,7 @@ class SedMottakService(
     }
 
     private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean {
-        return BucType.H_BUC_02.name == sedMottattHendelse.sedHendelse.bucType && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
+        return SedType.H002.name == sedMottattHendelse.sedHendelse.sedType && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
     }
 
     private fun erRinaSakIEessi(rinaSakId: String): Boolean {
