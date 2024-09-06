@@ -187,9 +187,10 @@ class SedMottakServiceTest {
     }
 
     @Test
-    fun `behandleSed erHbuc behandlerVidere`() {
+    fun `behandleSed erHbuc_sedTypeH002 behandlerVidere`() {
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseMedBruker()).build()
-        sedMottattHendelse.sedHendelse.bucType = BucType.H_BUC_02.name
+        sedMottattHendelse.sedHendelse.sedType = SedType.H002.name
+        sedMottattHendelse.sedHendelse.bucType = BucType.H_BUC_01.name
         sedMottattHendelse.sedHendelse.sektorKode = "H"
 
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
