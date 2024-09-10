@@ -21,6 +21,7 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
@@ -38,10 +39,16 @@ class SedMottakService(
     private val sedMetrikker: SedMetrikker,
     private val personIdentifisering: PersonIdentifisering,
     private val bucIdentifisertService: BucIdentifisertService,
+    private val saksrelasjonService: SaksrelasjonService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
     @Transactional
     fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
+        if (sedMottattHendelse.sedHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedMottattHendelse)) {
+            log.debug("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} BUC type ikke tilknyttet melosys")
+            return
+        }
+
         if (sedMottattHendelse.sedHendelse.erX100()) {
             log.info("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av typen X100")
             return
@@ -181,4 +188,14 @@ class SedMottakService(
         sedMottattHendelseRepository.save(sedMottattHendelse)
         return journalpostID
     }
+
+    private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean {
+        val aksepterteSedTyperForHBUC = listOf(SedType.H001.toString(), SedType.H002.toString(), SedType.H003.toString())
+
+        return aksepterteSedTyperForHBUC.contains(sedMottattHendelse.sedHendelse.sedType)
+            && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
+    }
+
+    private fun erRinaSakIEessi(rinaSakId: String): Boolean =
+        saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
 }

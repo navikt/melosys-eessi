@@ -8,6 +8,7 @@ import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -28,9 +29,7 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
     @KafkaListener(id = "sedMottatt", clientIdPrefix = "melosys-eessi-sedMottatt", topics = "${melosys.kafka.aiven.consumer.mottatt.topic}", containerFactory = "sedMottattHendelseListenerContainerFactory", groupId = "${melosys.kafka.aiven.consumer.mottatt.groupid}", errorHandler = "sedMottattErrorHandler")
     public void sedMottatt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedHendelse = consumerRecord.value();
-        if (sedHendelse.erIkkeLaBuc()) {
-            return;
-        }
+
         putToMDC(SED_ID, sedHendelse.getSedId());
         putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
         log.info("Mottatt melding om sed mottatt: {}, offset: {}", sedHendelse, consumerRecord.offset());
@@ -55,9 +54,11 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
     }
 
     @java.lang.SuppressWarnings("all")
-    public SedMottattConsumer(final SedMottakService sedMottakService, final SedMetrikker sedMetrikker, final KafkaDLQService kafkaDLQService) {
+    public SedMottattConsumer(final SedMottakService sedMottakService, final SedMetrikker sedMetrikker, final KafkaDLQService kafkaDLQService, final SaksrelasjonService saksrelasjonService) {
         this.sedMottakService = sedMottakService;
         this.sedMetrikker = sedMetrikker;
         this.kafkaDLQService = kafkaDLQService;
     }
+
+
 }
