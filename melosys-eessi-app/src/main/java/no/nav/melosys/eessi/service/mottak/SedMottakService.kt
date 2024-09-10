@@ -192,10 +192,10 @@ class SedMottakService(
         return journalpostID
     }
 
-    private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean {
-        return aksepterteSedTyperForHbuc.contains(sedMottattHendelse.sedHendelse.sedType)
+    private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean =
+        aksepterteSedTyperForHbuc.contains(sedMottattHendelse.sedHendelse.sedType)
             && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
-    }
+
 
     private fun erRinaSakIEessi(rinaSakId: String): Boolean =
         saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
