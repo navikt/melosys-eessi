@@ -42,6 +42,9 @@ class SedMottakService(
     private val saksrelasjonService: SaksrelasjonService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
+
+    val aksepterteSedTyperForHbuc = listOf(SedType.H001.toString(), SedType.H002.toString(), SedType.H003.toString(), SedType.X008.toString(), SedType.X006.toString())
+
     @Transactional
     fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
         if (sedMottattHendelse.sedHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedMottattHendelse)) {
@@ -190,9 +193,7 @@ class SedMottakService(
     }
 
     private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean {
-        val aksepterteSedTyperForHBUC = listOf(SedType.H001.toString(), SedType.H002.toString(), SedType.H003.toString())
-
-        return aksepterteSedTyperForHBUC.contains(sedMottattHendelse.sedHendelse.sedType)
+        return aksepterteSedTyperForHbuc.contains(sedMottattHendelse.sedHendelse.sedType)
             && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
     }
 
