@@ -114,11 +114,9 @@ class OpprettUtgaaendeJournalpostService(
         )
     }
 
-    private fun erHBucFraMelosys(sedSendtHendelse: SedHendelse): Boolean {
-        return erHBucsomSkalKonsumeres(sedSendtHendelse.bucType) && erRinaSakIEessi(sedSendtHendelse.rinaSakId)
-    }
+    private fun erHBucFraMelosys(sedSendtHendelse: SedHendelse): Boolean =
+        erHBucsomSkalKonsumeres(sedSendtHendelse.bucType) && erRinaSakIEessi(sedSendtHendelse.rinaSakId)
 
-    private fun erRinaSakIEessi(rinaSakId: String): Boolean {
-        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent
-    }
+    private fun erRinaSakIEessi(rinaSakId: String): Boolean =
+        saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent
 }

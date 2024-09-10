@@ -196,7 +196,6 @@ class SedMottakService(
             && erRinaSakIEessi(sedMottattHendelse.sedHendelse.rinaSakId)
     }
 
-    private fun erRinaSakIEessi(rinaSakId: String): Boolean {
-        return saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
-    }
+    private fun erRinaSakIEessi(rinaSakId: String): Boolean =
+        saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
 }
