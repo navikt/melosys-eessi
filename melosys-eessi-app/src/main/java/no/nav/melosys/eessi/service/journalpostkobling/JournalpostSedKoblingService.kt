@@ -6,6 +6,7 @@ import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
 import no.nav.melosys.eessi.models.FagsakRinasakKobling
 import no.nav.melosys.eessi.models.JournalpostSedKobling
 import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository
 import no.nav.melosys.eessi.service.eux.EuxService
@@ -58,16 +59,17 @@ class JournalpostSedKoblingService(
 
     private fun opprettEessiMelding(journalpostSedKobling: JournalpostSedKobling): MelosysEessiMelding {
         val buc = euxService.hentBuc(journalpostSedKobling.rinaSaksnummer)
-        val organisation = buc.hentDokument(journalpostSedKobling.sedId).creator!!.organisation
-        val sed = euxService.hentSed(journalpostSedKobling.rinaSaksnummer, journalpostSedKobling.sedId)
+        val organisation = buc.hentDokument(journalpostSedKobling.sedId).creator?.organisation
+            ?: throw IllegalStateException("Organisation er null")
+        val sed = hentSed(journalpostSedKobling.rinaSaksnummer, journalpostSedKobling.sedId)
         val gsakSaksnummer = finnVedRinaSaksnummer(journalpostSedKobling)?.gsakSaksnummer
         return opprettMelosysEessiMelding(
-            sed = sed!!,
+            sed = sed,
             sedId = journalpostSedKobling.sedId,
             rinaSaksnummer = journalpostSedKobling.rinaSaksnummer,
             sedType = journalpostSedKobling.sedType,
             bucType = journalpostSedKobling.bucType,
-            avsenderID = organisation!!.id,
+            avsenderID = organisation.id,
             landkode = organisation.countryCode,
             journalpostID = journalpostSedKobling.journalpostID,
             saksnummer = gsakSaksnummer?.toString(),
@@ -86,27 +88,30 @@ class JournalpostSedKoblingService(
             return null
         }
         val sedDocument = documentOptional
-        val sedID = sedDocument.id
+        val sedID = sedDocument.id ?: throw IllegalStateException("sedDocument er null")
         val sedType = sedDocument.type
-        val organisation = sedDocument.creator!!.organisation
-        val sed = euxService.hentSed(rinaSaksnummer, sedID)
-        val sedVersjon = "0" // har ikke sed-versjon
-        return sed?.let {
-            opprettMelosysEessiMelding(
-                sed = sed,
-                sedId = sedID,
-                rinaSaksnummer = rinaSaksnummer,
-                sedType = sedType,
-                bucType = buc.bucType,
-                avsenderID = organisation!!.id,
-                landkode = organisation.countryCode,
-                journalpostID = journalpostID,
-                saksnummer = null,
-                erEndring = false,
-                sedVersjon = sedVersjon
-            )
-        } ?: throw IllegalStateException("Sed er null - Kunne ikke opprette melding for rinasak: $rinaSaksnummer")
+        val organisation = sedDocument.creator?.organisation
+            ?: throw IllegalStateException("Organisation er null")
+        val sed = hentSed(rinaSaksnummer, sedID)
+        return opprettMelosysEessiMelding(
+            sed = sed,
+            sedId = sedID,
+            rinaSaksnummer = rinaSaksnummer,
+            sedType = sedType,
+            bucType = buc.bucType,
+            avsenderID = organisation.id,
+            landkode = organisation.countryCode,
+            journalpostID = journalpostID,
+            saksnummer = null,
+            erEndring = false,
+            sedVersjon = "0" // har ikke sed-versjon
+        ) ?: throw IllegalStateException("Kunne ikke opprette melding for rinasak: $rinaSaksnummer")
+
     }
+
+    private fun hentSed(rinaSaksnummer: String, dokumentId: String) =
+        euxService.hentSed(rinaSaksnummer, dokumentId)
+            ?: throw NotFoundException("Fant ikke SED med id $dokumentId i rinasak $rinaSaksnummer")
 
     private fun opprettMelosysEessiMelding(
         sed: SED,
@@ -120,8 +125,9 @@ class JournalpostSedKoblingService(
         saksnummer: String?,
         erEndring: Boolean,
         sedVersjon: String
-    ): MelosysEessiMelding? {
-        return melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType!!))
-            .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, null, saksnummer, erEndring, sedVersjon)
-    }
+    ): MelosysEessiMelding? =
+        sedType?.let {
+            melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
+                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, null, saksnummer, erEndring, sedVersjon)
+        } ?: log.warn("SedType er null for rinasak: $rinaSaksnummer").run { null }
 }
