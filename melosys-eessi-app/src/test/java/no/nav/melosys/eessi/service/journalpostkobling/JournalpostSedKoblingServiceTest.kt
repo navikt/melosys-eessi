@@ -1,90 +1,86 @@
-package no.nav.melosys.eessi.service.journalpostkobling;
+package no.nav.melosys.eessi.service.journalpostkobling
 
-import java.util.Collections;
-import java.util.Optional;
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import no.nav.melosys.eessi.controller.dto.SedStatus
+import no.nav.melosys.eessi.integration.saf.SafConsumer
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
+import no.nav.melosys.eessi.models.FagsakRinasakKobling
+import no.nav.melosys.eessi.models.JournalpostSedKobling
+import no.nav.melosys.eessi.models.buc.BUC
+import no.nav.melosys.eessi.models.buc.Creator
+import no.nav.melosys.eessi.models.buc.Document
+import no.nav.melosys.eessi.models.buc.Organisation
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.nav.Nav
+import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository
+import no.nav.melosys.eessi.service.eux.EuxService
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.util.*
 
-import io.github.benas.randombeans.api.EnhancedRandom;
-import no.nav.melosys.eessi.EnhancedRandomCreator;
-import no.nav.melosys.eessi.controller.dto.SedStatus;
-import no.nav.melosys.eessi.integration.saf.SafConsumer;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.JournalpostSedKobling;
-import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Creator;
-import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.buc.Organisation;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.Nav;
-import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository;
-import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockKExtension::class)
 class JournalpostSedKoblingServiceTest {
-    @Mock
-    private JournalpostSedKoblingRepository journalpostSedKoblingRepository;
-    @Mock
-    private EuxService euxService;
-    @Mock
-    private SaksrelasjonService saksrelasjonService;
-    @Mock
-    private SafConsumer safConsumer;
 
-    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
+    @MockK
+    private lateinit var journalpostSedKoblingRepository: JournalpostSedKoblingRepository
 
-    private JournalpostSedKoblingService journalpostSedKoblingService;
+    @MockK
+    private lateinit var euxService: EuxService
 
-    private BUC buc;
-    private SED sed;
-    private Document document;
-    private Organisation organisation;
-    private JournalpostSedKobling journalpostSedKobling;
+    @MockK
+    private lateinit var saksrelasjonService: SaksrelasjonService
+
+    private lateinit var journalpostSedKoblingService: JournalpostSedKoblingService
 
     @BeforeEach
-    public void setup() {
-        journalpostSedKoblingService = new JournalpostSedKoblingService(
-                journalpostSedKoblingRepository, euxService, saksrelasjonService,
-                safConsumer, melosysEessiMeldingMapperFactory);
-
-        EnhancedRandom enhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom();
-        buc = new BUC();
-        buc.setDocuments(Collections.singletonList(enhancedRandom.nextObject(Document.class)));
-        document = buc.getDocuments().get(0);
-        document.setId("sedID");
-        document.setType("A008");
-        document.setStatus(SedStatus.MOTTATT.getEngelskStatus());
-        Creator creator = new Creator();
-        organisation = new Organisation("org1", "DK", "mnb");
-        creator.setOrganisation(organisation);
-        document.setCreator(creator);
-        buc.setDocuments(Collections.singletonList(document));
-        sed = new SED();
-        sed.setNav(new Nav());
-        journalpostSedKobling = new JournalpostSedKobling("123", "321", "sedID", "1", "LA_BUC_03", "A008");
+    fun setup() {
+        journalpostSedKoblingService = JournalpostSedKoblingService(
+            journalpostSedKoblingRepository, euxService, saksrelasjonService, mockk<SafConsumer>(), MelosysEessiMeldingMapperFactory("dummy")
+        )
     }
 
     @Test
-    void finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIDB_forventMelosysEessiMelding() {
-        when(journalpostSedKoblingRepository.findByJournalpostID(anyString()))
-                .thenReturn(Optional.of(journalpostSedKobling));
-        when(euxService.hentBuc(anyString())).thenReturn(buc);
-        when(euxService.hentSed(anyString(), anyString())).thenReturn(sed);
+    fun finnVedJournalpostIDOpprettMelosysEessiMelding_sakEksistererIDB_forventMelosysEessiMelding() {
+        val fagsakRinasakKobling = mockk<FagsakRinasakKobling>()
+        every { fagsakRinasakKobling.gsakSaksnummer } returns 123L
 
-        Optional<MelosysEessiMelding> melosysEessiMelding = journalpostSedKoblingService
-                .finnVedJournalpostIDOpprettMelosysEessiMelding("123");
+        every { journalpostSedKoblingRepository.findByJournalpostID(any()) } returns Optional.of(
+            JournalpostSedKobling(
+                "123",
+                "321",
+                "sedID",
+                "1",
+                "LA_BUC_03",
+                "A008"
+            )
+        )
+        every { euxService.hentBuc(any()) } returns BUC(
+            documents = listOf(
+                Document(
+                    id = "sedID",
+                    type = "A008",
+                    status = SedStatus.MOTTATT.engelskStatus,
+                    creator = Creator(organisation = Organisation("org1", "DK", "mnb"))
+                )
+            )
+        )
+        every { euxService.hentSed(any(), any()) } returns SED(nav = Nav())
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()) } returns Optional.of(fagsakRinasakKobling)
 
-        assertThat(melosysEessiMelding).isPresent();
-        assertThat(melosysEessiMelding.get().getSedType()).isEqualTo("A008");
-        assertThat(melosysEessiMelding.get().getAvsender().getAvsenderID()).isEqualTo(organisation.getId());
+        val melosysEessiMelding: MelosysEessiMelding? =
+            journalpostSedKoblingService.finnVedJournalpostIDOpprettMelosysEessiMelding("123").orElse(null)
+
+        melosysEessiMelding.shouldNotBeNull().run {
+            sedType shouldBe "A008"
+            avsender.avsenderID shouldBe "mnb"
+        }
     }
 }
