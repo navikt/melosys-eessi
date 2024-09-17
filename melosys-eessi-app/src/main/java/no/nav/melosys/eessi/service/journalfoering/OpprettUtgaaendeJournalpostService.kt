@@ -115,8 +115,8 @@ class OpprettUtgaaendeJournalpostService(
     }
 
     private fun erHBucFraMelosys(sedSendtHendelse: SedHendelse): Boolean =
-        erHBucsomSkalKonsumeres(sedSendtHendelse.bucType) && erRinaSakIEessi(sedSendtHendelse.rinaSakId)
+        erHBucsomSkalKonsumeres(sedSendtHendelse.bucType) && harEksisterendeSaksRelasjon(sedSendtHendelse.rinaSakId)
 
-    private fun erRinaSakIEessi(rinaSakId: String): Boolean =
+    private fun harEksisterendeSaksRelasjon(rinaSakId: String): Boolean =
         saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent
 }
