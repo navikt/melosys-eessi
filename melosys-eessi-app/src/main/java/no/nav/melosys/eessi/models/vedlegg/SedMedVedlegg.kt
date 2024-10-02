@@ -9,7 +9,7 @@ data class SedMedVedlegg(
 ) {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     data class BinaerFil(
-        val filnavn: String,
+        val filnavn: String = "Vedlegg",
         val mimeType: String?,
         val innhold: ByteArray
     ) {
