@@ -1,6 +1,5 @@
-package no.nav.melosys.eessi.service.helpers;
+package no.nav.melosys.eessi.service.sed.helpers;
 
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
