@@ -12,15 +12,16 @@ import java.util.*
 object LandkodeMapper {
     private const val UKJENT_LANDKODE_ISO3 = "XUK"
     private const val UKJENT_LANDKODE_ISO2 = "XU"
-    private val ISO3_TIL_ISO2_LANDKODER_MAP = mutableMapOf<String, String>()
 
-    init {
-        Locale.getISOCountries().forEach { c ->
-            ISO3_TIL_ISO2_LANDKODER_MAP[Locale("", c).isO3Country] = c
-        }
-        ISO3_TIL_ISO2_LANDKODER_MAP["XXX"] = "XS"
-        ISO3_TIL_ISO2_LANDKODER_MAP[UKJENT_LANDKODE_ISO3] = UKJENT_LANDKODE_ISO2
-    }
+    private const val STATSLØS_LANDKODE_ISO3 = "XXX"
+    private const val STATSLØS_LANDKODE_ISO2 = "XS"
+
+    private val ISO3_TIL_ISO2_LANDKODER_MAP = Locale.getISOCountries()
+        .associateBy { Locale.Builder().setRegion(it).build().isO3Country }.toMap() +
+        mapOf(
+            STATSLØS_LANDKODE_ISO3 to STATSLØS_LANDKODE_ISO2, //Statsløs
+            UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2
+        )
 
     @JvmStatic
     fun mapTilLandkodeIso2(landkodeIso3: String?): String =
