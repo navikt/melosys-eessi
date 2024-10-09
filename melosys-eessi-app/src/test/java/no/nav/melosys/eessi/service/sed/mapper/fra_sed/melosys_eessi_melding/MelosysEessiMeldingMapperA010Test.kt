@@ -1,5 +1,8 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
+import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010
 import no.nav.melosys.eessi.models.sed.nav.AapenPeriode
@@ -10,128 +13,128 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.Mel
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSakInformasjon
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
-import org.assertj.core.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 
 class MelosysEessiMeldingMapperA010Test {
-    private var sedHendelse: SedHendelse? = null
-    private var sakInformasjon: SakInformasjon? = null
 
-    @BeforeEach
-    fun setup() {
-        sedHendelse = createSedHendelse()
-        sakInformasjon = createSakInformasjon()
-    }
+    private val sedHendelse: SedHendelse = createSedHendelse()
+    private val sakInformasjon: SakInformasjon = createSakInformasjon()
 
     @Test
     fun mapA010_fastPeriode_verifiserPeriode() {
         val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
 
-        val sed = createSed(hentMedlemskap(true))
-        sed.sedType = "A010"
+        val sed = createSed(hentMedlemskap(true)).apply {
+            sedType = "A010"
+        }
+
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
-            sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
-            sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
         )
 
-        Assertions.assertThat(melding).isNotNull()
-        Assertions.assertThat(melding.gsakSaksnummer).isNotNull()
-        Assertions.assertThat(melding.artikkel).isEqualTo("11_4")
-        Assertions.assertThat(melding.periode.tom).isNotNull()
-        Assertions.assertThat(melding.statsborgerskap).isNotEmpty()
-        Assertions.assertThat(melding.journalpostId).isEqualTo("journalpost")
-        Assertions.assertThat(melding.aktoerId).isEqualTo("aktørid")
-        Assertions.assertThat(melding.rinaSaksnummer).isEqualTo("rinasak")
-        Assertions.assertThat(melding.dokumentId).isEqualTo("dokument")
-        Assertions.assertThat(melding.lovvalgsland).isEqualTo("SE")
-        Assertions.assertThat(melding.gsakSaksnummer).isEqualTo(123L)
-        Assertions.assertThat(melding.isErEndring).isFalse()
+        melding.shouldNotBeNull().run {
+            gsakSaksnummer.shouldNotBeNull()
+            artikkel shouldBe "11_4"
+            periode.tom.shouldNotBeNull()
+            statsborgerskap.shouldNotBeEmpty()
+            journalpostId shouldBe "journalpost"
+            aktoerId shouldBe "aktørid"
+            rinaSaksnummer shouldBe "rinasak"
+            dokumentId shouldBe "dokument"
+            lovvalgsland shouldBe "SE"
+            gsakSaksnummer shouldBe 123L
+            isErEndring shouldBe false
+        }
     }
 
     @Test
     fun mapA010_aapenPeriode_verifiserPeriode() {
         val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
 
-        val sed = createSed(hentMedlemskap(false))
-        sed.sedType = "A009"
+        val sed = createSed(hentMedlemskap(false)).apply {
+            sedType = "A010"
+        }
+
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
-            sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
-            sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
         )
 
-        Assertions.assertThat(melding).isNotNull()
-        Assertions.assertThat(melding.gsakSaksnummer).isNotNull()
-        Assertions.assertThat(melding.artikkel).isEqualTo("11_4")
-        Assertions.assertThat(melding.periode.tom).isNull()
-        Assertions.assertThat(melding.statsborgerskap).isNotEmpty()
-        Assertions.assertThat(melding.journalpostId).isEqualTo("journalpost")
-        Assertions.assertThat(melding.aktoerId).isEqualTo("aktørid")
-        Assertions.assertThat(melding.rinaSaksnummer).isEqualTo("rinasak")
-        Assertions.assertThat(melding.dokumentId).isEqualTo("dokument")
-        Assertions.assertThat(melding.lovvalgsland).isEqualTo("SE")
-        Assertions.assertThat(melding.gsakSaksnummer).isEqualTo(123L)
-        Assertions.assertThat(melding.isErEndring).isFalse()
+        melding.shouldNotBeNull().run {
+            gsakSaksnummer.shouldNotBeNull()
+            artikkel shouldBe "11_4"
+            periode.tom shouldBe null
+            statsborgerskap.shouldNotBeEmpty()
+            journalpostId shouldBe "journalpost"
+            aktoerId shouldBe "aktørid"
+            rinaSaksnummer shouldBe "rinasak"
+            dokumentId shouldBe "dokument"
+            lovvalgsland shouldBe "SE"
+            gsakSaksnummer shouldBe 123L
+            isErEndring shouldBe false
+        }
     }
 
     @Test
     fun mapA010_medErOpprinneligvedtak_forventAtSpesifikkRegelOverskriver() {
         val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
 
-        val sed = createSed(hentMedlemskap(true))
-        sed.sedType = "A010"
-        (sed.medlemskap as MedlemskapA010).vedtak!!.eropprinneligvedtak = "nei"
+        val sed = createSed(hentMedlemskap(true)).apply {
+            sedType = "A010"
+            (medlemskap as MedlemskapA010).vedtak!!.eropprinneligvedtak = "nei"
+        }
+
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
-            sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
-            sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
         )
 
-        Assertions.assertThat(melding).isNotNull()
-        Assertions.assertThat(melding.isErEndring).isTrue()
+        melding.shouldNotBeNull().run {
+            isErEndring shouldBe true
+        }
     }
 
     @Test
     fun mapA010_utenErOpprinneligvedtak_forventAtResultatFraEuxOverskriver() {
         val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
 
-        val sed = createSed(hentMedlemskap(true))
-        sed.sedType = "A010"
+        val sed = createSed(hentMedlemskap(true)).apply {
+            sedType = "A010"
+        }
+
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
-            sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
-            sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, true, "1"
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, true, "1"
         )
 
-        Assertions.assertThat(melding).isNotNull()
-        Assertions.assertThat(melding.isErEndring).isTrue()
+        melding.shouldNotBeNull().run {
+            isErEndring shouldBe true
+        }
     }
 
-    private fun hentMedlemskap(fastperiode: Boolean): MedlemskapA010 {
-        val medlemskapA010 = MedlemskapA010()
-
-        val vedtak = VedtakA010()
-        medlemskapA010.vedtak = vedtak
-
-        val periode = PeriodeA010()
-        if (fastperiode) {
-            periode.sluttdato = "2019-12-01"
-            periode.startdato = "2019-05-01"
-        } else {
-            periode.aapenperiode = AapenPeriode()
-            periode.aapenperiode!!.startdato = "2019-05-01"
+    private fun hentMedlemskap(fastperiode: Boolean): MedlemskapA010 = MedlemskapA010().apply {
+        vedtak = VedtakA010().apply {
+            gjelderperiode = PeriodeA010().apply {
+                if (fastperiode) {
+                    sluttdato = "2019-12-01"
+                    startdato = "2019-05-01"
+                } else {
+                    aapenperiode = AapenPeriode().apply {
+                        startdato = "2019-05-01"
+                    }
+                }
+            }
+            land = "SE"
+            eropprinneligvedtak = "ja"
         }
-        vedtak.gjelderperiode = periode
-
-        vedtak.land = "SE"
-        vedtak.eropprinneligvedtak = "ja"
-
-        medlemskapA010.meldingomlovvalg = MeldingOmLovvalg()
-        medlemskapA010.meldingomlovvalg!!.artikkel = "11_4"
-
-        return medlemskapA010
+        meldingomlovvalg = MeldingOmLovvalg().apply {
+            artikkel = "11_4"
+        }
     }
 }

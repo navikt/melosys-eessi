@@ -1,5 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
@@ -9,11 +11,12 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.Mel
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSakInformasjon
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
-internal class MelosysEessiMeldingMapperA003Test {
+class MelosysEessiMeldingMapperA003Test {
+
     private var sedHendelse: SedHendelse? = null
     private var sakInformasjon: SakInformasjon? = null
     private val melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory("dummy")
@@ -34,24 +37,22 @@ internal class MelosysEessiMeldingMapperA003Test {
                 sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
             )
 
-        Assertions.assertThat(melosysEessiMelding).isNotNull()
-        Assertions.assertThat(melosysEessiMelding.periode.fom).isEqualTo("2000-12-12")
-        Assertions.assertThat(melosysEessiMelding.isErEndring).isTrue()
-        Assertions.assertThat(melosysEessiMelding.artikkel).isEqualTo("13_1_b_i")
+        melosysEessiMelding.shouldNotBeNull().run {
+            periode.fom shouldBe LocalDate.of(2000, 12, 12)
+            isErEndring shouldBe true
+            artikkel shouldBe "13_1_b_i"
+        }
     }
 
-    private fun hentMedlemskap(): MedlemskapA003 {
-        val medlemskap = MedlemskapA003()
-        medlemskap.vedtak = VedtakA003()
-        medlemskap.vedtak!!.eropprinneligvedtak = IKKE_OPPRINNELIG_VEDTAK
-
-        val periodeA010 = PeriodeA010()
-        periodeA010.startdato = "2000-12-12"
-        periodeA010.sluttdato = "2000-12-12"
-        medlemskap.vedtak!!.gjelderperiode = periodeA010
-        medlemskap.relevantartikkelfor8832004eller9872009 = "13_1_b_i"
-
-        return medlemskap
+    private fun hentMedlemskap(): MedlemskapA003 = MedlemskapA003().apply {
+        vedtak = VedtakA003().apply {
+            eropprinneligvedtak = IKKE_OPPRINNELIG_VEDTAK
+            gjelderperiode = PeriodeA010().apply {
+                startdato = "2000-12-12"
+                sluttdato = "2000-12-12"
+            }
+        }
+        relevantartikkelfor8832004eller9872009 = "13_1_b_i"
     }
 
     companion object {

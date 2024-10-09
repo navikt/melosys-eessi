@@ -1,8 +1,6 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
 import no.nav.melosys.eessi.models.SedType
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperA009
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperA010
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 

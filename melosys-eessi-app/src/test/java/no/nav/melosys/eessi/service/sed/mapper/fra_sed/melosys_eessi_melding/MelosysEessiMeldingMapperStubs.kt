@@ -10,7 +10,6 @@ import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap
 
 object MelosysEessiMeldingMapperStubs {
 
-    @JvmStatic
     fun createSed(medlemskap: Medlemskap?): SED {
         val sed = SED().apply {
             this.medlemskap = medlemskap
@@ -25,7 +24,6 @@ object MelosysEessiMeldingMapperStubs {
         return sed
     }
 
-    @JvmStatic
     fun createSedHendelse(): SedHendelse {
         return SedHendelse.builder()
             .navBruker("navbruker")
@@ -39,7 +37,6 @@ object MelosysEessiMeldingMapperStubs {
             .build()
     }
 
-    @JvmStatic
     fun createSakInformasjon(): SakInformasjon {
         return SakInformasjon("journalpost", "dokument", "123")
     }
