@@ -1,94 +1,90 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
+import no.nav.melosys.eessi.controller.dto.Periode
+import no.nav.melosys.eessi.controller.dto.SedGrunnlagA003Dto
+import no.nav.melosys.eessi.controller.dto.Virksomhet
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
+import no.nav.melosys.eessi.models.sed.nav.Nav
+import no.nav.melosys.eessi.service.sed.helpers.StreamUtils
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper
+import org.springframework.util.CollectionUtils
+import java.util.stream.Collectors
+import java.util.stream.Stream
 
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.controller.dto.Periode;
-import no.nav.melosys.eessi.controller.dto.SedGrunnlagA003Dto;
-import no.nav.melosys.eessi.controller.dto.Virksomhet;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
-import no.nav.melosys.eessi.models.sed.nav.Nav;
-import no.nav.melosys.eessi.service.sed.helpers.StreamUtils;
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.FraSedA003Mapper;
-import org.springframework.util.CollectionUtils;
+class SedGrunnlagMapperA003 : FraSedA003Mapper(), NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
+    override fun map(sed: SED): SedGrunnlagA003Dto {
+        val medlemskap = hentMedlemskap(sed)
 
-public class SedGrunnlagMapperA003 extends FraSedA003Mapper implements NyttLovvalgSedGrunnlagMapper<MedlemskapA003> {
+        val sedGrunnlagDto = SedGrunnlagA003Dto(super<NyttLovvalgSedGrunnlagMapper>.map(sed))
+        sedGrunnlagDto.sedType = SedType.A003.name
+        sedGrunnlagDto.lovvalgsperioder = java.util.List.of(hentLovvalgsperiode(medlemskap))
+        sedGrunnlagDto.overgangsregelbestemmelser = mapOvergangsregelbestemmelse(medlemskap)
 
-    @Override
-    public SedGrunnlagA003Dto map(SED sed) {
-        MedlemskapA003 medlemskap = hentMedlemskap(sed);
+        val arbeidsgivere = hentArbeidsgivere(sed)
+        val norskeVirksomheter = arbeidsgivere.stream()
+            .filter { arbeidsgiver: Arbeidsgiver -> erNorskArbeidsgiver(arbeidsgiver) }
+            .map { arbeidsgiver: Arbeidsgiver? -> Virksomhet.av(arbeidsgiver) }
+            .collect(Collectors.toList())
+        sedGrunnlagDto.norskeArbeidsgivendeVirksomheter = norskeVirksomheter
 
-        SedGrunnlagA003Dto sedGrunnlagDto = new SedGrunnlagA003Dto(NyttLovvalgSedGrunnlagMapper.super.map(sed));
-        sedGrunnlagDto.setSedType(SedType.A003.name());
-        sedGrunnlagDto.setLovvalgsperioder(List.of(hentLovvalgsperiode(medlemskap)));
-        sedGrunnlagDto.setOvergangsregelbestemmelser(mapOvergangsregelbestemmelse(medlemskap));
+        val utenlandskeVirksomheter = arbeidsgivere.stream()
+            .filter { arbeidsgiver: Arbeidsgiver -> erUtenlandskArbeidsgiver(arbeidsgiver) }
+            .map { arbeidsgiver: Arbeidsgiver? -> Virksomhet.av(arbeidsgiver) }
+            .collect(Collectors.toList())
+        sedGrunnlagDto.arbeidsgivendeVirksomheter = utenlandskeVirksomheter
 
-        List<Arbeidsgiver> arbeidsgivere = hentArbeidsgivere(sed);
-        List<Virksomhet> norskeVirksomheter = arbeidsgivere.stream()
-            .filter(SedGrunnlagMapperA003::erNorskArbeidsgiver)
-            .map(Virksomhet::av)
-            .collect(Collectors.toList());
-        sedGrunnlagDto.setNorskeArbeidsgivendeVirksomheter(norskeVirksomheter);
-
-        List<Virksomhet> utenlandskeVirksomheter = arbeidsgivere.stream()
-            .filter(SedGrunnlagMapperA003::erUtenlandskArbeidsgiver)
-            .map(Virksomhet::av)
-            .collect(Collectors.toList());
-        sedGrunnlagDto.setArbeidsgivendeVirksomheter(utenlandskeVirksomheter);
-
-        return sedGrunnlagDto;
+        return sedGrunnlagDto
     }
 
-    private List<Bestemmelse> mapOvergangsregelbestemmelse(MedlemskapA003 medlemskap) {
-        return StreamUtils.nullableStream(medlemskap.getGjeldendereglerEC883())
-            .map(Bestemmelse::fraString).collect(Collectors.toList());
+    private fun mapOvergangsregelbestemmelse(medlemskap: MedlemskapA003): List<Bestemmelse> {
+        return StreamUtils.nullableStream(medlemskap.gjeldendereglerEC883)
+            .map { bestemmelse: String? -> Bestemmelse.fraString(bestemmelse) }.collect(Collectors.toList())
     }
 
-    private List<Arbeidsgiver> hentArbeidsgivere(SED sed) {
+    private fun hentArbeidsgivere(sed: SED): List<Arbeidsgiver> {
         return Stream.concat(
-            hentArbeidsgivere(sed.getNav()).stream(),
-            hentAndrelandArbeidsgivere(hentMedlemskap(sed)).stream()
-        ).collect(Collectors.toList());
+            hentArbeidsgivere(sed.nav!!)!!.stream(),
+            hentAndrelandArbeidsgivere(hentMedlemskap(sed))!!.stream()
+        ).collect(Collectors.toList())
     }
 
-    private static List<Arbeidsgiver> hentArbeidsgivere(Nav nav) {
-        if (nav.getArbeidsgiver() != null) {
-            return nav.getArbeidsgiver();
-        }
-        return Collections.emptyList();
+    override fun hentPeriode(medlemskap: MedlemskapA003): Periode {
+        return hentPeriode(medlemskap.vedtak!!.gjelderperiode!!)
     }
 
-    private static List<Arbeidsgiver> hentAndrelandArbeidsgivere(MedlemskapA003 medlemskap) {
-        if (medlemskap.getAndreland() != null && !CollectionUtils.isEmpty(medlemskap.getAndreland().getArbeidsgiver())) {
-            return medlemskap.getAndreland().getArbeidsgiver();
-        }
-        return Collections.emptyList();
-    }
-
-    private static boolean erNorskArbeidsgiver(Arbeidsgiver arbeidsgiver) {
-        return "NO".equalsIgnoreCase(hentArbeidsgiverLand(arbeidsgiver));
-    }
-
-    private static boolean erUtenlandskArbeidsgiver(Arbeidsgiver arbeidsgiver) {
-        return !erNorskArbeidsgiver(arbeidsgiver);
-    }
-
-    private static String hentArbeidsgiverLand(Arbeidsgiver arbeidsgiver) {
-        if (arbeidsgiver == null || arbeidsgiver.getAdresse() == null) {
-            return null;
+    companion object {
+        private fun hentArbeidsgivere(nav: Nav): List<Arbeidsgiver>? {
+            if (nav.arbeidsgiver != null) {
+                return nav.arbeidsgiver
+            }
+            return emptyList()
         }
 
-        return arbeidsgiver.getAdresse().getLand();
-    }
+        private fun hentAndrelandArbeidsgivere(medlemskap: MedlemskapA003): List<Arbeidsgiver>? {
+            if (medlemskap.andreland != null && !CollectionUtils.isEmpty(medlemskap.andreland!!.arbeidsgiver)) {
+                return medlemskap.andreland!!.arbeidsgiver
+            }
+            return emptyList()
+        }
 
-    @Override
-    public Periode hentPeriode(MedlemskapA003 medlemskap) {
-        return hentPeriode(medlemskap.getVedtak().getGjelderperiode());
+        private fun erNorskArbeidsgiver(arbeidsgiver: Arbeidsgiver): Boolean {
+            return "NO".equals(hentArbeidsgiverLand(arbeidsgiver), ignoreCase = true)
+        }
+
+        private fun erUtenlandskArbeidsgiver(arbeidsgiver: Arbeidsgiver): Boolean {
+            return !erNorskArbeidsgiver(arbeidsgiver)
+        }
+
+        private fun hentArbeidsgiverLand(arbeidsgiver: Arbeidsgiver?): String? {
+            if (arbeidsgiver?.adresse == null) {
+                return null
+            }
+
+            return arbeidsgiver.adresse!!.land
+        }
     }
 }

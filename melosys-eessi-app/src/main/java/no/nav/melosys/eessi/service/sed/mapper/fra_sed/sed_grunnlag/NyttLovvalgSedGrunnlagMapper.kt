@@ -1,34 +1,33 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.Periode;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper;
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
+import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode
+import no.nav.melosys.eessi.controller.dto.Periode
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 
-public interface NyttLovvalgSedGrunnlagMapper<T extends Medlemskap> extends NyttLovvalgSedMapper<T>, SedGrunnlagMapper {
+interface NyttLovvalgSedGrunnlagMapper<T : Medlemskap?> : NyttLovvalgSedMapper<T>, SedGrunnlagMapper {
+    fun hentPeriode(medlemskap: T): Periode
 
-    Periode hentPeriode(T medlemskap);
-
-    default String hentUnntakFraLovvalgsland(T medlemskap) {
-        return null;
+    fun hentUnntakFraLovvalgsland(medlemskap: T): String? {
+        return null
     }
 
-    default String hentUnntakFraLovvalgsbestemmelse(T medlemskap) {
-        return null;
+    fun hentUnntakFraLovvalgsbestemmelse(medlemskap: T): String? {
+        return null
     }
 
-    default Lovvalgsperiode hentLovvalgsperiode(T medlemskap) {
-        Periode periode = hentPeriode(medlemskap);
+    fun hentLovvalgsperiode(medlemskap: T): Lovvalgsperiode {
+        val periode = hentPeriode(medlemskap)
 
-        Lovvalgsperiode lovvalgsperiode = new Lovvalgsperiode();
-        lovvalgsperiode.setFom(periode.getFom());
-        lovvalgsperiode.setTom(periode.getTom());
-        lovvalgsperiode.setLovvalgsland(hentLovvalgsland(medlemskap));
-        lovvalgsperiode.setBestemmelse(Bestemmelse.fraString(hentLovvalgsbestemmelse(medlemskap)));
-        lovvalgsperiode.setUnntakFraLovvalgsland(hentUnntakFraLovvalgsland(medlemskap));
-        lovvalgsperiode.setUnntakFraBestemmelse(Bestemmelse.fraString(hentUnntakFraLovvalgsbestemmelse(medlemskap)));
+        val lovvalgsperiode = Lovvalgsperiode()
+        lovvalgsperiode.fom = periode.fom
+        lovvalgsperiode.tom = periode.tom
+        lovvalgsperiode.lovvalgsland = hentLovvalgsland(medlemskap)
+        lovvalgsperiode.bestemmelse = Bestemmelse.fraString(hentLovvalgsbestemmelse(medlemskap))
+        lovvalgsperiode.unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap)
+        lovvalgsperiode.unntakFraBestemmelse = Bestemmelse.fraString(hentUnntakFraLovvalgsbestemmelse(medlemskap))
 
-        return lovvalgsperiode;
+        return lovvalgsperiode
     }
 }
