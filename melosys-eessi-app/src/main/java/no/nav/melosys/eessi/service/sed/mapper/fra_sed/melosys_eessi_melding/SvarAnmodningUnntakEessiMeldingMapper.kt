@@ -12,7 +12,7 @@ abstract class SvarAnmodningUnntakEessiMeldingMapper<T : Medlemskap?> : MelosysE
         aktoerId: String?, sed: SED?, rinaDokumentID: String?, rinaSaksnummer: String?,
         sedType: String?, bucType: String?, avsenderID: String?,
         landkode: String?, journalpostID: String?, dokumentID: String?, gsakSaksnummer: String?,
-        sedErEndring: Boolean, sedVersjon: String
+        sedErEndring: Boolean?, sedVersjon: String?
     ): MelosysEessiMelding {
         val melosysEessiMelding = super.map(
             aktoerId, sed, rinaDokumentID,

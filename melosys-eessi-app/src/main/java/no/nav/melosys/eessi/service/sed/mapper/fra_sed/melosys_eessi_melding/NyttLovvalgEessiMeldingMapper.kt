@@ -11,9 +11,9 @@ interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<
         aktoerId: String?, sed: SED?, rinaDokumentID: String?, rinaSaksnummer: String?,
         sedType: String?, bucType: String?, avsenderID: String?,
         landkode: String?, journalpostID: String?, dokumentID: String?, gsakSaksnummer: String?,
-        sedErEndring: Boolean, sedVersjon: String
+        sedErEndring: Boolean?, sedVersjon: String?
     ): MelosysEessiMelding {
-        val melosysEessiMelding = super<MelosysEessiMeldingMapper>.map(
+        val melosysEessiMelding = super.map(
             aktoerId, sed, rinaDokumentID,
             rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
             sedErEndring, sedVersjon
@@ -25,7 +25,7 @@ interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<
 
         melosysEessiMelding.lovvalgsland = hentLovvalgsland(medlemskap)
         melosysEessiMelding.artikkel = hentLovvalgsbestemmelse(medlemskap)
-        melosysEessiMelding.isErEndring = sedErEndring || sedErEndring(medlemskap)
+        melosysEessiMelding.isErEndring = sedErEndring ?: false || sedErEndring(medlemskap)
         melosysEessiMelding.isMidlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
         melosysEessiMelding.anmodningUnntak = hentAnmodningUnntak(medlemskap)
 

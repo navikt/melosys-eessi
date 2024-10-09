@@ -17,8 +17,8 @@ interface MelosysEessiMeldingMapper {
         journalpostID: String?,
         dokumentID: String?,
         gsakSaksnummer: String?,
-        sedErEndring: Boolean,
-        sedVersjon: String
+        sedErEndring: Boolean?, // må være non-null pga. med mock som. TODO: fiks dette
+        sedVersjon: String? // samme som over
     ): MelosysEessiMelding {
         return MelosysEessiMelding().apply {
             sedId = rinaDokumentID
@@ -45,7 +45,7 @@ interface MelosysEessiMeldingMapper {
                     arbeidsland = arbeidslandList.map(::Arbeidsland)
                 }
             }
-            this.isErEndring = sedErEndring
+            this.isErEndring = sedErEndring!!
             this.sedVersjon = sedVersjon
         }
     }
