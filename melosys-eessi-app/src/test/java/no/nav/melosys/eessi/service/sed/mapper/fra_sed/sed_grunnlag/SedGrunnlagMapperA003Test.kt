@@ -1,222 +1,232 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.controller.dto.*
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import java.io.IOException
-import java.util.List
-import java.util.function.Consumer
-import java.util.function.Function
 
 internal class SedGrunnlagMapperA003Test {
     private val sedGrunnlagMapper = SedGrunnlagMapperA003()
 
     @Test
-    @Throws(IOException::class)
     fun map_medUtfyltNav_forventVerdier() {
-        val sedGrunnlagDto: SedGrunnlagDto = sedGrunnlagMapper.map(hentSed())
+        val sedGrunnlagDto = sedGrunnlagMapper.map(hentSed())
 
+        sedGrunnlagDto.shouldNotBeNull()
+        sedGrunnlagDto.sedType shouldBe "A003"
 
-        Assertions.assertThat(sedGrunnlagDto).isNotNull()
-        Assertions.assertThat(sedGrunnlagDto.sedType).isEqualTo("A003")
-        Assertions.assertThat(sedGrunnlagDto.utenlandskIdent)
-            .`as`("Utenlandsk ident har rett felt")
-            .extracting(
-                Function<Ident, Any> { obj: Ident -> obj.ident },
-                Function<Ident, Any> { obj: Ident -> obj.landkode },
-                Function<Ident, Any> { obj: Ident -> obj.erUtenlandsk() })
-            .containsExactlyInAnyOrder(Assertions.tuple("15225345345", "BG", true))
+        withClue("Utenlandsk ident har rett felt") {
+            sedGrunnlagDto.utenlandskIdent.shouldNotBeNull().single().run {
+                ident shouldBe "15225345345"
+                landkode shouldBe "BG"
+                erUtenlandsk() shouldBe true
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.bostedsadresse)
-            .`as`("Bostedsadresse har rett felt")
-            .extracting(
-                Function<Adresse, Any> { obj: Adresse -> obj.adressetype },
-                Function<Adresse, Any> { obj: Adresse -> obj.land },
-                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
-            .containsExactlyInAnyOrder(Adressetype.BOSTEDSADRESSE, "BE", "Testgate Testbyggnavn")
+        withClue("Bostedsadresse har rett felt") {
+            sedGrunnlagDto.bostedsadresse.shouldNotBeNull().run {
+                adressetype shouldBe Adressetype.BOSTEDSADRESSE
+                land shouldBe "BE"
+                gateadresse shouldBe "Testgate Testbyggnavn"
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.arbeidssteder)
-            .`as`("Arbeidssteder har rett info")
-            .extracting(
-                Function<Arbeidssted, Any> { obj: Arbeidssted -> obj.navn },
-                Function<Arbeidssted, Any> { obj: Arbeidssted -> obj.isFysisk },
-                Function<Arbeidssted, Any> { obj: Arbeidssted -> obj.hjemmebase })
-            .containsExactlyInAnyOrder(
-                Assertions.tuple("Testarbeidsstednavn", false, "Testarbeidsstedbase"),
-                Assertions.tuple("Testarbeidsstednavn2", true, "Testarbeidsstedbase2")
-            )
+        withClue("Arbeidssteder har rett info") {
+            sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).run {
+                first().run {
+                    navn shouldBe "Testarbeidsstednavn"
+                    isFysisk shouldBe false
+                    hjemmebase shouldBe "Testarbeidsstedbase"
+                }
+                last().run {
+                    navn shouldBe "Testarbeidsstednavn2"
+                    isFysisk shouldBe true
+                    hjemmebase shouldBe "Testarbeidsstedbase2"
+                }
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.arbeidssteder)
-            .`as`("Arbeidssteder har rette adresser")
-            .extracting<Adresse, RuntimeException> { obj: Arbeidssted -> obj.adresse }
-            .extracting(
-                Function<Adresse, Any> { obj: Adresse -> obj.land },
-                Function<Adresse, Any> { obj: Adresse -> obj.postnr },
-                Function<Adresse, Any> { obj: Adresse -> obj.poststed },
-                Function<Adresse, Any> { obj: Adresse -> obj.region },
-                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
-            .containsExactlyInAnyOrder(
-                Assertions.tuple(
-                    "EE",
-                    "Testarbeidsstedpostkode",
-                    "Testarbeidsstedby",
-                    "Testarbeidsstedregion",
-                    "Testarbeidsstedgate Testarbeidsstedbygning"
-                ),
-                Assertions.tuple("CY", null, "Testarbeidsstedby2", null, "Testarbeidsstedgate2 Testarbeidsstedbygning2")
-            )
+        withClue("Arbeidssteder har rette adresser") {
+            sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).run {
+                first().run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "EE"
+                        postnr shouldBe "Testarbeidsstedpostkode"
+                        poststed shouldBe "Testarbeidsstedby"
+                        region shouldBe "Testarbeidsstedregion"
+                        gateadresse shouldBe "Testarbeidsstedgate Testarbeidsstedbygning"
+                    }
+                }
+                last().run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "CY"
+                        postnr.shouldBeNull()
+                        poststed shouldBe "Testarbeidsstedby2"
+                        region.shouldBeNull()
+                        gateadresse shouldBe "Testarbeidsstedgate2 Testarbeidsstedbygning2"
+                    }
+                }
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.arbeidsgivendeVirksomheter)
-            .`as`("Arbeidsgivende virksomheter har rett info")
-            .extracting(
-                Function<Virksomhet, Any> { obj: Virksomhet -> obj.navn },
-                Function<Virksomhet, Any> { obj: Virksomhet -> obj.orgnr })
-            .containsExactlyInAnyOrder(
-                Assertions.tuple("EQUINOR ASA", "923609016"),
-                Assertions.tuple("adf", "123321"),
-                Assertions.tuple("swe", "123")
-            )
+        withClue("Arbeidsgivende virksomheter har rett info") {
+            sedGrunnlagDto.arbeidsgivendeVirksomheter.shouldNotBeNull().shouldHaveSize(3).toList().run {
+                get(0).run {
+                    navn shouldBe "EQUINOR ASA"
+                    orgnr shouldBe "923609016"
+                }
+                get(1).run {
+                    navn shouldBe "adf"
+                    orgnr shouldBe "123321"
+                }
+                get(2).run {
+                    navn shouldBe "swe"
+                    orgnr shouldBe "123"
+                }
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.arbeidsgivendeVirksomheter)
-            .`as`("Arbeidsgivende virksomheter har rette adresser")
-            .extracting<Adresse, RuntimeException> { obj: Virksomhet -> obj.adresse }
-            .extracting(
-                Function<Adresse, Any> { obj: Adresse -> obj.land },
-                Function<Adresse, Any> { obj: Adresse -> obj.postnr },
-                Function<Adresse, Any> { obj: Adresse -> obj.poststed },
-                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
-            .containsExactlyInAnyOrder(
-                Assertions.tuple("BE", "4035", "STAVANGER", "Forusbeen 50"),
-                Assertions.tuple("BE", null, "by", ""),
-                Assertions.tuple("SE", null, "stck", "")
-            )
+        withClue("Arbeidsgivende virksomheter har rette adresser") {
+            sedGrunnlagDto.arbeidsgivendeVirksomheter.shouldNotBeNull().shouldHaveSize(3).toList().run {
+                get(0).run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "BE"
+                        postnr shouldBe "4035"
+                        poststed shouldBe "STAVANGER"
+                        gateadresse shouldBe "Forusbeen 50"
+                    }
+                }
+                get(1).run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "BE"
+                        postnr.shouldBeNull()
+                        poststed shouldBe "by"
+                        gateadresse shouldBe ""
+                    }
+                }
+                get(2).run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "SE"
+                        postnr.shouldBeNull()
+                        poststed shouldBe "stck"
+                        gateadresse shouldBe ""
+                    }
+                }
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.selvstendigeVirksomheter)
-            .`as`("Selvstendige virksomheter har rett info")
-            .extracting(
-                Function<Virksomhet, Any> { obj: Virksomhet -> obj.navn },
-                Function<Virksomhet, Any> { obj: Virksomhet -> obj.orgnr })
-            .containsExactlyInAnyOrder(Assertions.tuple("Testselvstendignavn", "Testselvstendignummer"))
+        withClue("Selvstendige virksomheter har rett info") {
+            sedGrunnlagDto.selvstendigeVirksomheter.shouldNotBeNull().single().run {
+                navn shouldBe "Testselvstendignavn"
+                orgnr shouldBe "Testselvstendignummer"
+            }
+        }
 
-        Assertions.assertThat(sedGrunnlagDto.selvstendigeVirksomheter)
-            .`as`("Selvstendige virksomheter har rette adresser")
-            .extracting<Adresse, RuntimeException> { obj: Virksomhet -> obj.adresse }
-            .extracting(
-                Function<Adresse, Any> { obj: Adresse -> obj.land },
-                Function<Adresse, Any> { obj: Adresse -> obj.postnr },
-                Function<Adresse, Any> { obj: Adresse -> obj.poststed },
-                Function<Adresse, Any> { obj: Adresse -> obj.region },
-                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
-            .containsExactlyInAnyOrder(
-                Assertions.tuple(
-                    "BG",
-                    "Testselvstendigpostkode",
-                    "Testselvstendigby",
-                    "Testselvstendigregion",
-                    "Testselvstendiggate Testselvstendigbygning"
-                )
-            )
+        withClue("Selvstendige virksomheter har rette adresser") {
+            sedGrunnlagDto.selvstendigeVirksomheter.shouldNotBeNull().single().run {
+                adresse.shouldNotBeNull().run {
+                    land shouldBe "BG"
+                    postnr shouldBe "Testselvstendigpostkode"
+                    poststed shouldBe "Testselvstendigby"
+                    region shouldBe "Testselvstendigregion"
+                    gateadresse shouldBe "Testselvstendiggate Testselvstendigbygning"
+                }
+            }
+        }
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_ingenBostedsadresse_forventPostadresse() {
         val sed = hentSed()
         val adresse = sed.nav!!.bruker!!.adresse!![0]
         adresse.type = Adressetype.POSTADRESSE.adressetypeRina
-        sed.nav!!.bruker!!.adresse = List.of(adresse)
+        sed.nav!!.bruker!!.adresse = listOf(adresse)
 
         val bostedsadresse = sedGrunnlagMapper.map(sed).bostedsadresse
 
-        Assertions.assertThat(bostedsadresse)
-            .extracting(
-                Function<Adresse, Any> { obj: Adresse -> obj.adressetype },
-                Function<Adresse, Any> { obj: Adresse -> obj.land },
-                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
-            .containsExactlyInAnyOrder(Adressetype.POSTADRESSE, "BE", "Testgate Testbyggnavn")
+        bostedsadresse.shouldNotBeNull().run {
+            adressetype shouldBe Adressetype.POSTADRESSE
+            land shouldBe "BE"
+            gateadresse shouldBe "Testgate Testbyggnavn"
+        }
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_ingenAdresse_forventTomAdresse() {
         val sed = hentSed()
         sed.nav!!.bruker!!.adresse = listOf()
 
         val bostedsadresse = sedGrunnlagMapper.map(sed).bostedsadresse
 
-        Assertions.assertThat(bostedsadresse).isEqualTo(Adresse())
+        bostedsadresse shouldBe Adresse()
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() {
         val sed = hentSed()
         val pin = sed.nav!!.bruker!!.person!!.pin.iterator().next()
         pin.land = "NO"
-        sed.nav!!.bruker!!.person!!.pin = List.of(pin)
+        sed.nav!!.bruker!!.person!!.pin = listOf(pin)
 
         val utenlandskIdent = sedGrunnlagMapper.map(sed).utenlandskIdent
 
-        Assertions.assertThat(utenlandskIdent).isEmpty()
+        utenlandskIdent.shouldBeEmpty()
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_ingenGate_forventKunBygning() {
         val sed = hentSed()
         val adresse = sed.nav!!.bruker!!.adresse!![0]
         adresse.gate = null
-        sed.nav!!.bruker!!.adresse = List.of(adresse)
+        sed.nav!!.bruker!!.adresse = listOf(adresse)
 
         val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse.gateadresse
 
-        Assertions.assertThat(gateadresse).isEqualTo("Testbyggnavn")
+        gateadresse shouldBe "Testbyggnavn"
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_ingenBygning_forventKunGate() {
         val sed = hentSed()
         val adresse = sed.nav!!.bruker!!.adresse!![0]
         adresse.bygning = null
-        sed.nav!!.bruker!!.adresse = List.of(adresse)
+        sed.nav!!.bruker!!.adresse = listOf(adresse)
 
         val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse.gateadresse
 
-        Assertions.assertThat(gateadresse).isEqualTo("Testgate")
+        gateadresse shouldBe "Testgate"
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_ingenArbeidsgiverAdresse_forventIkkeNorskArbeidsgiver() {
-        val settTomAdresse =
-            Consumer { arbeidsgiver: Arbeidsgiver -> arbeidsgiver.adresse = null }
+        val settTomAdresse = { arbeidsgiver: Arbeidsgiver -> arbeidsgiver.adresse = null }
 
         val sed = hentSed()
         sed.nav!!.arbeidsgiver!!.forEach(settTomAdresse)
         (sed.medlemskap as MedlemskapA003).andreland!!.arbeidsgiver!!.forEach(settTomAdresse)
 
-
         val norskeArbeidsgivendeVirksomheter = sedGrunnlagMapper.map(sed).norskeArbeidsgivendeVirksomheter
 
-
-        Assertions.assertThat(norskeArbeidsgivendeVirksomheter).isEmpty()
+        norskeArbeidsgivendeVirksomheter.shouldBeEmpty()
     }
 
     @Test
-    @Throws(IOException::class)
     fun map_norskArbeidsgiverNullIdentifikator_forventIngenIdentifikator() {
         val sed = hentSed()
         (sed.medlemskap as MedlemskapA003).andreland!!.arbeidsgiver!!.iterator().next().identifikator = null
 
         val orgnr = sedGrunnlagMapper.map(sed).norskeArbeidsgivendeVirksomheter.iterator().next().orgnr
 
-        Assertions.assertThat(orgnr).isNull()
+        orgnr.shouldBeNull()
     }
 
     @Test
@@ -225,7 +235,7 @@ internal class SedGrunnlagMapperA003Test {
 
         val erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003)
 
-        org.junit.jupiter.api.Assertions.assertTrue(erEndring)
+        erEndring shouldBe true
     }
 
     @Test
@@ -234,24 +244,23 @@ internal class SedGrunnlagMapperA003Test {
 
         val erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003)
 
-        org.junit.jupiter.api.Assertions.assertFalse(erEndring)
+        erEndring shouldBe false
     }
 
     companion object {
         private val IKKE_OPPRINNELIG_VEDTAK: String? = null
         private const val OPPRINNELIG_VEDTAK = "ja"
-        private fun lagA003MedlemskapForSedErEndringTest(opprinneligVedtak: String?): MedlemskapA003 {
-            val vedtakA003 = VedtakA003()
-            vedtakA003.eropprinneligvedtak = opprinneligVedtak
-            val medlemskapA003 = MedlemskapA003()
-            medlemskapA003.vedtak = vedtakA003
-            return medlemskapA003
+
+        private fun lagA003MedlemskapForSedErEndringTest(opprinneligVedtak: String?): MedlemskapA003 = MedlemskapA003().apply {
+            vedtak = VedtakA003().apply {
+                eropprinneligvedtak = opprinneligVedtak
+            }
         }
 
-        @Throws(IOException::class)
-        private fun hentSed(): SED {
-            val jsonUrl = SedGrunnlagMapperA003Test::class.java.classLoader.getResource("mock/sedA003.json")
-            return ObjectMapper().readValue(jsonUrl, SED::class.java)
-        }
+        private fun hentSed(): SED =
+            ObjectMapper().readValue(
+                SedGrunnlagMapperA003Test::class.java.classLoader.getResource("mock/sedA003.json"),
+                SED::class.java
+            )
     }
 }
