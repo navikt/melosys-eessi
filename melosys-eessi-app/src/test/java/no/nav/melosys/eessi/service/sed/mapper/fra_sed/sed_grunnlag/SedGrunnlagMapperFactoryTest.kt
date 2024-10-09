@@ -1,30 +1,32 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import org.junit.jupiter.api.Test;
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag.SedGrunnlagMapperA003
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag.SedGrunnlagMapperFactory.Companion.getMapper
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+internal class SedGrunnlagMapperFactoryTest {
+    @get:Test
+    val mapper_returnsCorrectMapper_A001: Unit
+        get() {
+            Assertions.assertThat(getMapper(SedType.A001))
+                .isInstanceOf(SedGrunnlagMapperA001::class.java)
+        }
 
-class SedGrunnlagMapperFactoryTest {
+    @get:Test
+    val mapper_returnsCorrectMapper_A003: Unit
+        get() {
+            Assertions.assertThat(getMapper(SedType.A003))
+                .isInstanceOf(SedGrunnlagMapperA003::class.java)
+        }
 
-    @Test
-    void getMapper_returnsCorrectMapper_A001() {
-        assertThat(SedGrunnlagMapperFactory.getMapper(SedType.A001))
-            .isInstanceOf(SedGrunnlagMapperA001.class);
-    }
-
-    @Test
-    void getMapper_returnsCorrectMapper_A003() {
-        assertThat(SedGrunnlagMapperFactory.getMapper(SedType.A003))
-            .isInstanceOf(SedGrunnlagMapperA003.class);
-    }
-
-    @Test
-    void getMapper_returnsMappingExceptionOnNonExistingMapper() {
-        assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> SedGrunnlagMapperFactory.getMapper(SedType.A005))
-            .withMessage("Sed-type A005 støttes ikke");
-    }
+    @get:Test
+    val mapper_returnsMappingExceptionOnNonExistingMapper: Unit
+        get() {
+            Assertions.assertThatExceptionOfType(MappingException::class.java)
+                .isThrownBy { getMapper(SedType.A005) }
+                .withMessage("Sed-type A005 støttes ikke")
+        }
 }

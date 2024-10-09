@@ -1,57 +1,75 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import java.io.IOException;
-import java.net.URL;
+import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.melosys.eessi.controller.dto.*
+import no.nav.melosys.eessi.models.sed.SED
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
+import java.io.IOException
+import java.util.function.Function
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.controller.dto.*;
-import no.nav.melosys.eessi.models.sed.SED;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-
-class SedGrunnlagMapperA001Test {
-
+internal class SedGrunnlagMapperA001Test {
     @Test
-    void map_forventetVerdier() throws IOException {
-        SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagMapperA001().map(hentSed());
+    @Throws(IOException::class)
+    fun map_forventetVerdier() {
+        val sedGrunnlagDto = SedGrunnlagMapperA001().map(hentSed())
 
-        assertThat(sedGrunnlagDto).isNotNull();
-        assertThat(sedGrunnlagDto.getSedType()).isEqualTo("A001");
+        Assertions.assertThat(sedGrunnlagDto).isNotNull()
+        Assertions.assertThat(sedGrunnlagDto.sedType).isEqualTo("A001")
 
-        assertThat(sedGrunnlagDto.getUtenlandskIdent())
-            .as("Utenlandsk ident har rett felt")
-            .extracting(Ident::getIdent, Ident::getLandkode, Ident::erUtenlandsk)
-            .containsExactlyInAnyOrder(tuple("15225345345", "BG", true));
+        Assertions.assertThat(sedGrunnlagDto.utenlandskIdent)
+            .`as`("Utenlandsk ident har rett felt")
+            .extracting(
+                Function<Ident, Any> { obj: Ident -> obj.ident },
+                Function<Ident, Any> { obj: Ident -> obj.landkode },
+                Function<Ident, Any> { obj: Ident -> obj.erUtenlandsk() })
+            .containsExactlyInAnyOrder(Assertions.tuple("15225345345", "BG", true))
 
-        assertThat(sedGrunnlagDto.getBostedsadresse())
-            .as("Bostedsadresse har rett felt")
-            .extracting(Adresse::getAdressetype, Adresse::getLand, Adresse::getGateadresse)
-            .containsExactlyInAnyOrder(Adressetype.BOSTEDSADRESSE, "BE", "Testgate Testbyggnavn");
+        Assertions.assertThat(sedGrunnlagDto.bostedsadresse)
+            .`as`("Bostedsadresse har rett felt")
+            .extracting(
+                Function<Adresse, Any> { obj: Adresse -> obj.adressetype },
+                Function<Adresse, Any> { obj: Adresse -> obj.land },
+                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
+            .containsExactlyInAnyOrder(Adressetype.BOSTEDSADRESSE, "BE", "Testgate Testbyggnavn")
 
-        assertThat(sedGrunnlagDto.getArbeidssteder())
-            .as("Arbeidssteder har rett info")
-            .extracting(Arbeidssted::getNavn, Arbeidssted::isFysisk, Arbeidssted::getHjemmebase)
+        Assertions.assertThat(sedGrunnlagDto.arbeidssteder)
+            .`as`("Arbeidssteder har rett info")
+            .extracting(
+                Function<Arbeidssted, Any> { obj: Arbeidssted -> obj.navn },
+                Function<Arbeidssted, Any> { obj: Arbeidssted -> obj.isFysisk },
+                Function<Arbeidssted, Any> { obj: Arbeidssted -> obj.hjemmebase })
             .containsExactlyInAnyOrder(
-                tuple("Testarbeidsstednavn", false, "Testarbeidsstedbase"),
-                tuple("Testarbeidsstednavn2", true, "Testarbeidsstedbase2")
-            );
+                Assertions.tuple("Testarbeidsstednavn", false, "Testarbeidsstedbase"),
+                Assertions.tuple("Testarbeidsstednavn2", true, "Testarbeidsstedbase2")
+            )
 
-        assertThat(sedGrunnlagDto.getArbeidssteder())
-            .as("Arbeidssteder har rette adresser")
-            .extracting(Arbeidssted::getAdresse)
-            .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getRegion, Adresse::getGateadresse)
+        Assertions.assertThat(sedGrunnlagDto.arbeidssteder)
+            .`as`("Arbeidssteder har rette adresser")
+            .extracting<Adresse, RuntimeException> { obj: Arbeidssted -> obj.adresse }
+            .extracting(
+                Function<Adresse, Any> { obj: Adresse -> obj.land },
+                Function<Adresse, Any> { obj: Adresse -> obj.postnr },
+                Function<Adresse, Any> { obj: Adresse -> obj.poststed },
+                Function<Adresse, Any> { obj: Adresse -> obj.region },
+                Function<Adresse, Any> { obj: Adresse -> obj.gateadresse })
             .containsExactlyInAnyOrder(
-                tuple("EE", "Testarbeidsstedpostkode", "Testarbeidsstedby", "Testarbeidsstedregion", "Testarbeidsstedgate Testarbeidsstedbygning"),
-                tuple("CY", null, "Testarbeidsstedby2", null, "Testarbeidsstedgate2 Testarbeidsstedbygning2")
-            );
-
-
+                Assertions.tuple(
+                    "EE",
+                    "Testarbeidsstedpostkode",
+                    "Testarbeidsstedby",
+                    "Testarbeidsstedregion",
+                    "Testarbeidsstedgate Testarbeidsstedbygning"
+                ),
+                Assertions.tuple("CY", null, "Testarbeidsstedby2", null, "Testarbeidsstedgate2 Testarbeidsstedbygning2")
+            )
     }
 
-    private static SED hentSed() throws IOException {
-        URL jsonUrl = SedGrunnlagMapperA001Test.class.getClassLoader().getResource("mock/sedA001.json");
-        return new ObjectMapper().readValue(jsonUrl, SED.class);
+    companion object {
+        @Throws(IOException::class)
+        private fun hentSed(): SED {
+            val jsonUrl = SedGrunnlagMapperA001Test::class.java.classLoader.getResource("mock/sedA001.json")
+            return ObjectMapper().readValue(jsonUrl, SED::class.java)
+        }
     }
 }
