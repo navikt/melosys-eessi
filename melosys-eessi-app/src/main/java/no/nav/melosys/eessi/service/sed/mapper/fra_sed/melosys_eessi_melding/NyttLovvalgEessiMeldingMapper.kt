@@ -19,7 +19,7 @@ interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<
             sedErEndring, sedVersjon
         )
 
-        val medlemskap = hentMedlemskap(sed)
+        val medlemskap = hentMedlemskap(sed!!)
 
         melosysEessiMelding.periode = mapPeriode(medlemskap)
 

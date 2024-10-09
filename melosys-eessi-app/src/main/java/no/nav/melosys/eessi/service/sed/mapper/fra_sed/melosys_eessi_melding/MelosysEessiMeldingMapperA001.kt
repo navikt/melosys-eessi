@@ -45,8 +45,8 @@ internal class MelosysEessiMeldingMapperA001 : NyttLovvalgEessiMeldingMapper<Med
         return "ja".equals(medlemskap.anmodning!!.erendring, ignoreCase = true)
     }
 
-    override fun hentMedlemskap(sed: SED): MedlemskapA001? {
-        return sed.medlemskap as MedlemskapA001?
+    override fun hentMedlemskap(sed: SED): MedlemskapA001 {
+        return sed.medlemskap as MedlemskapA001
     }
 
     companion object {

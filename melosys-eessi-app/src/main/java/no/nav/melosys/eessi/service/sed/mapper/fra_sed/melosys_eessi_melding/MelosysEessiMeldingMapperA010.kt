@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 
 internal class MelosysEessiMeldingMapperA010 : NyttLovvalgEessiMeldingMapper<MedlemskapA010> {
     override fun mapPeriode(medlemskap: MedlemskapA010?): Periode {
-        val periode = hentPeriode(medlemskap!!.vedtak!!.gjelderperiode)
+        val periode = hentPeriode(medlemskap!!.vedtak!!.gjelderperiode!!)
         return Periode(periode.fom, periode.tom)
     }
 
@@ -31,8 +31,8 @@ internal class MelosysEessiMeldingMapperA010 : NyttLovvalgEessiMeldingMapper<Med
         return erEndring
     }
 
-    override fun hentMedlemskap(sed: SED): MedlemskapA010? {
-        return sed.medlemskap as MedlemskapA010?
+    override fun hentMedlemskap(sed: SED): MedlemskapA010 {
+        return sed.medlemskap as MedlemskapA010
     }
 
     companion object {

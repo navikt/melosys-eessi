@@ -20,8 +20,8 @@ internal class MelosysEessiMeldingMapperA009 : NyttLovvalgEessiMeldingMapper<Med
         return erEndring
     }
 
-    override fun hentMedlemskap(sed: SED): MedlemskapA009? {
-        return sed.medlemskap as MedlemskapA009?
+    override fun hentMedlemskap(sed: SED): MedlemskapA009 {
+        return sed.medlemskap as MedlemskapA009
     }
 
     override fun hentLovvalgsbestemmelse(medlemskap: MedlemskapA009): String? {
