@@ -20,9 +20,7 @@ object LandkodeMapper {
         .associateBy { Locale.Builder().setRegion(it).build().isO3Country }.toMap() +
         mapOf(
             STATSLØS_LANDKODE_ISO3 to STATSLØS_LANDKODE_ISO2,
-            UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2,
-            "XKK" to "XK", //Kosovo
-        )
+            UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2)
 
     @JvmStatic
     fun mapTilLandkodeIso2(landkodeIso3: String?): String =
