@@ -19,8 +19,9 @@ object LandkodeMapper {
     private val ISO3_TIL_ISO2_LANDKODER_MAP = Locale.getISOCountries()
         .associateBy { Locale.Builder().setRegion(it).build().isO3Country }.toMap() +
         mapOf(
-            STATSLØS_LANDKODE_ISO3 to STATSLØS_LANDKODE_ISO2, //Statsløs
-            UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2
+            STATSLØS_LANDKODE_ISO3 to STATSLØS_LANDKODE_ISO2,
+            UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2,
+            "XKK" to "XK", //Kosovo
         )
 
     @JvmStatic
@@ -46,8 +47,8 @@ object LandkodeMapper {
         }
 
     @JvmStatic
-    fun mapTilNavLandkode(landkode: String): String =
-        when (landkode.uppercase()) {
+    fun mapTilNavLandkode(landkode: String?): String? =
+        when (landkode?.uppercase()) {
             "UK" -> "GB"
             "EL" -> "GR"
             else -> landkode
