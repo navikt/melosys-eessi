@@ -1,99 +1,100 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
+
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002
+import no.nav.melosys.eessi.models.sed.nav.Fastperiode
+import no.nav.melosys.eessi.models.sed.nav.Periode
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.SakInformasjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSakInformasjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.AVSLAG;
-import static no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.DELVIS_INNVILGELSE;
-import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class MelosysEessiMeldingMapperA002Test {
-
-    private SedHendelse sedHendelse;
-    private MelosysEessiMeldingMapperStubs.SakInformasjon sakInformasjon;
-    private MelosysEessiMeldingMapper mapper;
-    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
+class MelosysEessiMeldingMapperA002Test {
+    private var sedHendelse: SedHendelse? = null
+    private var sakInformasjon: SakInformasjon? = null
+    private var mapper: MelosysEessiMeldingMapper? = null
+    private val melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory("dummy")
 
     @BeforeEach
-    public void setup() {
-        sedHendelse = createSedHendelse();
-        sakInformasjon = createSakInformasjon();
-        mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A002);
+    fun setup() {
+        sedHendelse = createSedHendelse()
+        sakInformasjon = createSakInformasjon()
+        mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A002)
     }
 
     @Test
-    public void mapA002_delvisInnvilget_verifiserDataSatt() {
-        SED sed = createSed(hentMedlemskap(false));
+    fun mapA002_delvisInnvilget_verifiserDataSatt() {
+        val sed = createSed(hentMedlemskap(false))
 
 
-        MelosysEessiMelding melosysEessiMelding = mapper
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
+        val melosysEessiMelding = mapper!!.map(
+                "123", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
+                sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
+                sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            )
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak()).isNotNull();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getBeslutning()).isEqualTo(
-                DELVIS_INNVILGELSE);
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getBegrunnelse()).isNotEmpty();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getDelvisInnvilgetPeriode()).isNotNull();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getDelvisInnvilgetPeriode().getFom()).isEqualTo("2000-12-12");
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getDelvisInnvilgetPeriode().getTom()).isEqualTo("2000-12-12");
+        Assertions.assertThat(melosysEessiMelding).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.beslutning).isEqualTo(
+            SvarAnmodningUnntakBeslutning.DELVIS_INNVILGELSE
+        )
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.begrunnelse).isNotEmpty()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.delvisInnvilgetPeriode).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.delvisInnvilgetPeriode.fom).isEqualTo("2000-12-12")
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.delvisInnvilgetPeriode.tom).isEqualTo("2000-12-12")
     }
 
     @Test
-    public void mapA002_avslag_verifiserDataSatt() {
-        SED sed = createSed(hentMedlemskap(true));
+    fun mapA002_avslag_verifiserDataSatt() {
+        val sed = createSed(hentMedlemskap(true))
 
-        MelosysEessiMelding melosysEessiMelding = mapper
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
+        val melosysEessiMelding = mapper!!.map(
+                "123", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
+                sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
+                sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            )
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak()).isNotNull();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getBeslutning()).isEqualTo(
-                AVSLAG);
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getBegrunnelse()).isNotEmpty();
-        assertThat(melosysEessiMelding.getSvarAnmodningUnntak().getDelvisInnvilgetPeriode()).isNull();
+        Assertions.assertThat(melosysEessiMelding).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.beslutning).isEqualTo(
+            SvarAnmodningUnntakBeslutning.AVSLAG
+        )
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.begrunnelse).isNotEmpty()
+        Assertions.assertThat(melosysEessiMelding.svarAnmodningUnntak.delvisInnvilgetPeriode).isNull()
     }
 
-    private MedlemskapA002 hentMedlemskap(boolean avslag) {
-        MedlemskapA002 medlemskap = new MedlemskapA002();
+    private fun hentMedlemskap(avslag: Boolean): MedlemskapA002 {
+        val medlemskap = MedlemskapA002()
 
-        UnntakA002 unntak = new UnntakA002();
+        val unntak = UnntakA002()
 
-        VedtakA002 vedtak = new VedtakA002();
+        val vedtak = VedtakA002()
 
         if (!avslag) {
-            Periode periode = new Periode();
+            val periode = Periode()
 
-            Fastperiode fastperiode = new Fastperiode();
-            fastperiode.setStartdato("2000-12-12");
-            fastperiode.setSluttdato("2000-12-12");
+            val fastperiode = Fastperiode()
+            fastperiode.startdato = "2000-12-12"
+            fastperiode.sluttdato = "2000-12-12"
 
-            periode.setFastperiode(fastperiode);
-            vedtak.setAnnenperiode(periode);
+            periode.fastperiode = fastperiode
+            vedtak.annenperiode = periode
         }
 
-        vedtak.setResultat(avslag ? "ikke_godkjent" : "godkjent_for_annen_periode");
-        vedtak.setBegrunnelse("tadadada fritekst");
+        vedtak.resultat = if (avslag) "ikke_godkjent" else "godkjent_for_annen_periode"
+        vedtak.begrunnelse = "tadadada fritekst"
 
-        unntak.setVedtak(vedtak);
-        medlemskap.setUnntak(unntak);
+        unntak.vedtak = vedtak
+        medlemskap.unntak = unntak
 
-        return medlemskap;
+        return medlemskap
     }
-
 }

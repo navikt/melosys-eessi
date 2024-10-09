@@ -1,127 +1,134 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.Institusjon;
-import no.nav.melosys.eessi.models.sed.nav.Sak;
-import no.nav.melosys.eessi.models.sed.nav.X006FjernInstitusjon;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.nav.Institusjon
+import no.nav.melosys.eessi.models.sed.nav.Sak
+import no.nav.melosys.eessi.models.sed.nav.X006FjernInstitusjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.SakInformasjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSakInformasjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
-import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class MelosysEessiMeldingMapperX006Test {
-
-    private SedHendelse sedHendelse;
-    private SakInformasjon sakInformasjon;
-    private MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory;
-
-    private static final String NORSK_INSTITUSJONS_ID = "NO:NAVAT07";
+class MelosysEessiMeldingMapperX006Test {
+    private var sedHendelse: SedHendelse? = null
+    private var sakInformasjon: SakInformasjon? = null
+    private var melosysEessiMeldingMapperFactory: MelosysEessiMeldingMapperFactory? = null
 
     @BeforeEach
-    public void setup() {
-        sedHendelse = createSedHendelse();
-        sakInformasjon = createSakInformasjon();
-        melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory(NORSK_INSTITUSJONS_ID);
+    fun setup() {
+        sedHendelse = createSedHendelse()
+        sakInformasjon = createSakInformasjon()
+        melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory(NORSK_INSTITUSJONS_ID)
     }
 
     @Test
-    public void mapX006_norskInsitutsjonErMottaker_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggSatt() {
-        SED sed = createSed(null);
-        lagNavSak(sed);
+    fun mapX006_norskInsitutsjonErMottaker_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggSatt() {
+        val sed = createSed(null)
+        lagNavSak(sed)
 
-        Institusjon institusjon = lagInstitusjon(NORSK_INSTITUSJONS_ID, "NO:NAVAT07 Norge nav");
+        val institusjon = lagInstitusjon(NORSK_INSTITUSJONS_ID, "NO:NAVAT07 Norge nav")
 
-        X006FjernInstitusjon fjernInstitusjon = new X006FjernInstitusjon();
-        fjernInstitusjon.setInstitusjon(institusjon);
-        sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
-                );
+        val fjernInstitusjon = X006FjernInstitusjon()
+        fjernInstitusjon.institusjon = institusjon
+        sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
+        val melosysEessiMelding = melosysEessiMeldingMapperFactory!!.getMapper(SedType.X006)
+            .map(
+                "123", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
+                sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
+                sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            )
 
-        assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isX006NavErFjernet)
-                .isEqualTo(true);
+        Assertions.assertThat(melosysEessiMelding)
+            .extracting { obj: MelosysEessiMelding -> obj.isX006NavErFjernet }
+            .isEqualTo(true)
     }
 
     @Test
-    public void mapX006_norskInsitutsjonErIkkeMottaker_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggIkkeSatt() {
-        SED sed = createSed(null);
-        lagNavSak(sed);
-        Institusjon institusjon = lagInstitusjon("DE:DENMARK09", "DE:DENMARK09 Danmark");
+    fun mapX006_norskInsitutsjonErIkkeMottaker_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggIkkeSatt() {
+        val sed = createSed(null)
+        lagNavSak(sed)
+        val institusjon = lagInstitusjon("DE:DENMARK09", "DE:DENMARK09 Danmark")
 
-        X006FjernInstitusjon fjernInstitusjon = new X006FjernInstitusjon();
-        fjernInstitusjon.setInstitusjon(institusjon);
+        val fjernInstitusjon = X006FjernInstitusjon()
+        fjernInstitusjon.institusjon = institusjon
 
-        sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
-                );
+        sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
+        val melosysEessiMelding = melosysEessiMeldingMapperFactory!!.getMapper(SedType.X006)
+            .map(
+                "123", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
+                sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
+                sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            )
 
-        assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isX006NavErFjernet)
-                .isEqualTo(false);
+        Assertions.assertThat(melosysEessiMelding)
+            .extracting { obj: MelosysEessiMelding -> obj.isX006NavErFjernet }
+            .isEqualTo(false)
     }
 
     @Test
-    public void mapX006_institusjonIDSattNull_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggIkkeSatt() {
-        SED sed = createSed(null);
-        lagNavSak(sed);
-        Institusjon institusjon = lagInstitusjon(null, null);
+    fun mapX006_institusjonIDSattNull_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggIkkeSatt() {
+        val sed = createSed(null)
+        lagNavSak(sed)
+        val institusjon = lagInstitusjon(null, null)
 
-        X006FjernInstitusjon fjernInstitusjon = new X006FjernInstitusjon();
-        fjernInstitusjon.setInstitusjon(institusjon);
+        val fjernInstitusjon = X006FjernInstitusjon()
+        fjernInstitusjon.institusjon = institusjon
 
-        sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
-                );
+        sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
+        val melosysEessiMelding = melosysEessiMeldingMapperFactory!!.getMapper(SedType.X006)
+            .map(
+                "123", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
+                sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
+                sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            )
 
-        assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isX006NavErFjernet)
-                .isEqualTo(false);
+        Assertions.assertThat(melosysEessiMelding)
+            .extracting { obj: MelosysEessiMelding -> obj.isX006NavErFjernet }
+            .isEqualTo(false)
     }
 
     @Test
-    public void mapX006_institusjonIDSattTom_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggIkkeSatt() {
-        SED sed = createSed(null);
-        lagNavSak(sed);
-        Institusjon institusjon = lagInstitusjon("", "");
+    fun mapX006_institusjonIDSattTom_oppdatererMelosysEessiMeldingOpprettetMedInstitusjonFlaggIkkeSatt() {
+        val sed = createSed(null)
+        lagNavSak(sed)
+        val institusjon = lagInstitusjon("", "")
 
-        X006FjernInstitusjon fjernInstitusjon = new X006FjernInstitusjon();
-        fjernInstitusjon.setInstitusjon(institusjon);
+        val fjernInstitusjon = X006FjernInstitusjon()
+        fjernInstitusjon.institusjon = institusjon
 
-        sed.getNav().getSak().setFjerninstitusjon(fjernInstitusjon);
-        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006)
-                .map("123", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                        sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                        sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1"
-                );
+        sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
+        val melosysEessiMelding = melosysEessiMeldingMapperFactory!!.getMapper(SedType.X006)
+            .map(
+                "123", sed, sedHendelse!!.rinaDokumentId, sedHendelse!!.rinaSakId,
+                sedHendelse!!.sedType, sedHendelse!!.bucType, sedHendelse!!.avsenderId, "landkode", sakInformasjon!!.journalpostId,
+                sakInformasjon!!.dokumentId, sakInformasjon!!.gsakSaksnummer, false, "1"
+            )
 
-        assertThat(melosysEessiMelding)
-                .extracting(MelosysEessiMelding::isX006NavErFjernet)
-                .isEqualTo(false);
+        Assertions.assertThat(melosysEessiMelding)
+            .extracting { obj: MelosysEessiMelding -> obj.isX006NavErFjernet }
+            .isEqualTo(false)
     }
 
-    private Institusjon lagInstitusjon(String id, String navn) {
-        Institusjon institusjon = new Institusjon();
-        institusjon.setId(id);
-        institusjon.setNavn(navn);
-        return institusjon;
+    private fun lagInstitusjon(id: String?, navn: String?): Institusjon {
+        val institusjon = Institusjon()
+        institusjon.id = id
+        institusjon.navn = navn
+        return institusjon
     }
 
-    private void lagNavSak(SED sed) {
-        if (sed.getNav() != null) {
-            sed.getNav().setSak(new Sak());
+    private fun lagNavSak(sed: SED) {
+        if (sed.nav != null) {
+            sed.nav!!.sak = Sak()
         }
+    }
+
+    companion object {
+        private const val NORSK_INSTITUSJONS_ID = "NO:NAVAT07"
     }
 }

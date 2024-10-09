@@ -1,74 +1,70 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
-import java.util.Collections;
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001
+import no.nav.melosys.eessi.models.sed.nav.Fastperiode
+import no.nav.melosys.eessi.models.sed.nav.Grunnlag
+import no.nav.melosys.eessi.models.sed.nav.Land
+import no.nav.melosys.eessi.models.sed.nav.Unntak
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Grunnlag;
-import no.nav.melosys.eessi.models.sed.nav.Land;
-import no.nav.melosys.eessi.models.sed.nav.Unntak;
-import org.junit.jupiter.api.Test;
-
-import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class MelosysEessiMeldingMapperA001Test {
-    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
+class MelosysEessiMeldingMapperA001Test {
+    private val melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory("dummy")
 
     @Test
-    public void mapA001_forventRettFelt() {
-        SED sed = createSed(hentMedlemskap());
-        SedHendelse sedHendelse = createSedHendelse();
-        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001)
-            .map("123",
+    fun mapA001_forventRettFelt() {
+        val sed = createSed(hentMedlemskap())
+        val sedHendelse = createSedHendelse()
+        val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001)
+            .map(
+                "123",
                 sed,
-                sedHendelse.getRinaDokumentId(),
-                sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(),
-                sedHendelse.getBucType(),
-                sedHendelse.getAvsenderId(),
+                sedHendelse.rinaDokumentId,
+                sedHendelse.rinaSakId,
+                sedHendelse.sedType,
+                sedHendelse.bucType,
+                sedHendelse.avsenderId,
                 "landkode",
                 null,
                 null,
                 null,
                 false,
                 "1"
-            );
+            )
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.getArtikkel()).isEqualTo("16_1");
-        assertThat(melosysEessiMelding.getLovvalgsland()).isEqualTo("NO");
-        assertThat(melosysEessiMelding.getAnmodningUnntak()).isNotNull();
-        assertThat(melosysEessiMelding.getAnmodningUnntak().getUnntakFraLovvalgsbestemmelse()).isEqualTo("12_1");
-        assertThat(melosysEessiMelding.getAnmodningUnntak().getUnntakFraLovvalgsland()).isEqualTo("SE");
+        Assertions.assertThat(melosysEessiMelding).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.artikkel).isEqualTo("16_1")
+        Assertions.assertThat(melosysEessiMelding.lovvalgsland).isEqualTo("NO")
+        Assertions.assertThat(melosysEessiMelding.anmodningUnntak).isNotNull()
+        Assertions.assertThat(melosysEessiMelding.anmodningUnntak.unntakFraLovvalgsbestemmelse).isEqualTo("12_1")
+        Assertions.assertThat(melosysEessiMelding.anmodningUnntak.unntakFraLovvalgsland).isEqualTo("SE")
     }
 
-    private MedlemskapA001 hentMedlemskap() {
-        MedlemskapA001 medlemskap = new MedlemskapA001();
+    private fun hentMedlemskap(): MedlemskapA001 {
+        val medlemskap = MedlemskapA001()
 
-        Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setSluttdato("2019-12-01");
-        fastperiode.setStartdato("2019-05-01");
-        medlemskap.setSoeknadsperiode(fastperiode);
+        val fastperiode = Fastperiode()
+        fastperiode.sluttdato = "2019-12-01"
+        fastperiode.startdato = "2019-05-01"
+        medlemskap.soeknadsperiode = fastperiode
 
-        Land sverige = new Land();
-        sverige.setLandkode("SE");
-        medlemskap.setNaavaerendemedlemskap(Collections.singletonList(sverige));
+        val sverige = Land()
+        sverige.landkode = "SE"
+        medlemskap.naavaerendemedlemskap = mutableListOf(sverige)
 
-        Land norge = new Land();
-        norge.setLandkode("NO");
-        medlemskap.setForespurtmedlemskap(Collections.singletonList(norge));
+        val norge = Land()
+        norge.landkode = "NO"
+        medlemskap.forespurtmedlemskap = mutableListOf(norge)
 
-        Unntak unntak = new Unntak();
-        Grunnlag grunnlag = new Grunnlag();
-        grunnlag.setArtikkel("12_1");
-        unntak.setGrunnlag(grunnlag);
-        medlemskap.setUnntak(unntak);
+        val unntak = Unntak()
+        val grunnlag = Grunnlag()
+        grunnlag.artikkel = "12_1"
+        unntak.grunnlag = grunnlag
+        medlemskap.unntak = unntak
 
-        return medlemskap;
+        return medlemskap
     }
 }

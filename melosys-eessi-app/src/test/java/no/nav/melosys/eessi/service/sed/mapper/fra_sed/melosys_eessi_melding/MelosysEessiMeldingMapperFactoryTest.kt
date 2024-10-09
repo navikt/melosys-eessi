@@ -1,41 +1,41 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
-import no.nav.melosys.eessi.models.SedType;
-import org.junit.jupiter.api.Test;
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperA009
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperA010
+import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.Test
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class MelosysEessiMeldingMapperFactoryTest {
-
-    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
+class MelosysEessiMeldingMapperFactoryTest {
+    private val melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory("dummy")
 
     @Test
-    public void hentA002Mapper() {
-        MelosysEessiMeldingMapper mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A002);
-        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA002.class);
+    fun hentA002Mapper() {
+        val mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A002)
+        Assertions.assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA002::class.java)
     }
 
     @Test
-    public void hentA003Mapper() {
-        MelosysEessiMeldingMapper mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A003);
-        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA003.class);
+    fun hentA003Mapper() {
+        val mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A003)
+        Assertions.assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA003::class.java)
     }
 
     @Test
-    public void hentA009Mapper() {
-        MelosysEessiMeldingMapper mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A009);
-        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA009.class);
+    fun hentA009Mapper() {
+        val mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A009)
+        Assertions.assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA009::class.java)
     }
 
     @Test
-    public void hentA010Mapper() {
-        MelosysEessiMeldingMapper mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A010);
-        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA010.class);
+    fun hentA010Mapper() {
+        val mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A010)
+        Assertions.assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA010::class.java)
     }
 
     @Test
-    public void hentA011Mapper() {
-        MelosysEessiMeldingMapper mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A011);
-        assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA011.class);
+    fun hentA011Mapper() {
+        val mapper = melosysEessiMeldingMapperFactory.getMapper(SedType.A011)
+        Assertions.assertThat(mapper).isInstanceOf(MelosysEessiMeldingMapperA011::class.java)
     }
 }
