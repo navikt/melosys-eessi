@@ -1,36 +1,30 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
+import mu.KotlinLogging
 import no.nav.melosys.eessi.kafka.producers.model.Periode
 import no.nav.melosys.eessi.models.DatoUtils.tilLocalDate
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.time.LocalDate
+
+private val log = KotlinLogging.logger { }
 
 internal class MelosysEessiMeldingMapperA009 : NyttLovvalgEessiMeldingMapper<MedlemskapA009> {
     override fun sedErEndring(medlemskap: MedlemskapA009): Boolean {
         val erEndring = !"ja".equals(medlemskap.vedtak!!.eropprinneligvedtak, ignoreCase = true)
         log.info(
-            "sedErEndring i A009 er {}, med erendringsvedtak: {} og eropprinneligvedtak: {}",
-            erEndring,
-            medlemskap.vedtak!!.erendringsvedtak,
-            medlemskap.vedtak!!.eropprinneligvedtak
+            "sedErEndring i A009 er $erEndring, med erendringsvedtak: ${
+                medlemskap.vedtak!!.erendringsvedtak
+            } og eropprinneligvedtak: ${medlemskap.vedtak!!.eropprinneligvedtak}",
         )
         return erEndring
     }
 
-    override fun hentMedlemskap(sed: SED): MedlemskapA009 {
-        return sed.medlemskap as MedlemskapA009
-    }
+    override fun hentMedlemskap(sed: SED): MedlemskapA009 = sed.medlemskap as MedlemskapA009
 
-    override fun hentLovvalgsbestemmelse(medlemskap: MedlemskapA009): String? {
-        return medlemskap.vedtak!!.artikkelforordning
-    }
+    override fun hentLovvalgsbestemmelse(medlemskap: MedlemskapA009): String? = medlemskap.vedtak!!.artikkelforordning
 
-    override fun hentLovvalgsland(medlemskap: MedlemskapA009): String? {
-        return medlemskap.vedtak!!.land
-    }
+    override fun hentLovvalgsland(medlemskap: MedlemskapA009): String? = medlemskap.vedtak!!.land
 
     override fun mapPeriode(medlemskap: MedlemskapA009?): Periode {
         val fom: LocalDate
@@ -46,9 +40,5 @@ internal class MelosysEessiMeldingMapperA009 : NyttLovvalgEessiMeldingMapper<Med
             tom = tilLocalDate(fastperiode.sluttdato!!)
         }
         return Periode(fom, tom)
-    }
-
-    companion object {
-        private val log: Logger = LoggerFactory.getLogger(MelosysEessiMeldingMapperA009::class.java)
     }
 }

@@ -3,25 +3,23 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 import no.nav.melosys.eessi.models.SedType
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import java.util.*
 
 @Component
 class MelosysEessiMeldingMapperFactory(
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonId: String
 ) {
 
-    private val mappers: MutableMap<SedType, MelosysEessiMeldingMapper> = EnumMap(SedType::class.java)
-    private val defaultMapper: MelosysEessiMeldingMapper = DefaultMapper()
+    private val mappers: Map<SedType, MelosysEessiMeldingMapper> = mapOf(
+        SedType.A001 to MelosysEessiMeldingMapperA001(),
+        SedType.A002 to MelosysEessiMeldingMapperA002(),
+        SedType.A003 to MelosysEessiMeldingMapperA003(),
+        SedType.A009 to MelosysEessiMeldingMapperA009(),
+        SedType.A010 to MelosysEessiMeldingMapperA010(),
+        SedType.A011 to MelosysEessiMeldingMapperA011(),
+        SedType.X006 to MelosysEessiMeldingMapperX006(rinaInstitusjonId)
+    )
 
-    init {
-        mappers[SedType.A001] = MelosysEessiMeldingMapperA001()
-        mappers[SedType.A002] = MelosysEessiMeldingMapperA002()
-        mappers[SedType.A003] = MelosysEessiMeldingMapperA003()
-        mappers[SedType.A009] = MelosysEessiMeldingMapperA009()
-        mappers[SedType.A010] = MelosysEessiMeldingMapperA010()
-        mappers[SedType.A011] = MelosysEessiMeldingMapperA011()
-        mappers[SedType.X006] = MelosysEessiMeldingMapperX006(rinaInstitusjonId)
-    }
+    private val defaultMapper: MelosysEessiMeldingMapper = DefaultMapper()
 
     fun getMapper(sedType: SedType): MelosysEessiMeldingMapper {
         return mappers[sedType] ?: defaultMapper
