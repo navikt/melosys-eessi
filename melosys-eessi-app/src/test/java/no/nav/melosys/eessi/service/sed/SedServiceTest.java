@@ -78,7 +78,7 @@ class SedServiceTest {
 
         Exception exception = null;
         try {
-            sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true, false);
+            sendSedService.opprettBucOgSed(sedData, Collections.emptyList(), BucType.LA_BUC_02, true, false);
         } catch (IntegrationException e) {
             exception = e;
         }
@@ -96,7 +96,7 @@ class SedServiceTest {
             .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
 
-        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true, false);
+        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, Collections.emptyList(), BucType.LA_BUC_02, true, false);
 
         assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
         verify(euxService).settSakSensitiv(RINA_ID);
@@ -146,7 +146,7 @@ class SedServiceTest {
 
         when(euxService.finnBUC(RINA_ID)).thenReturn(Optional.of(buc));
 
-        sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_02, true, true);
+        sendSedService.opprettBucOgSed(sedDataDto, Collections.emptyList(), BucType.LA_BUC_02, true, true);
 
         verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
         verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
@@ -169,7 +169,7 @@ class SedServiceTest {
             .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
         when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
 
-        BucOgSedOpprettetDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false, false);
+        BucOgSedOpprettetDto response = sendSedService.opprettBucOgSed(sedData, Collections.emptyList(), BucType.LA_BUC_01, false, false);
 
         verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
         verify(euxService).hentRinaUrl(RINA_ID);
