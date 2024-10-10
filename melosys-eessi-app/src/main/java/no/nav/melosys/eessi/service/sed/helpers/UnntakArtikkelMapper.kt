@@ -1,29 +1,22 @@
-package no.nav.melosys.eessi.service.sed.helpers;
+package no.nav.melosys.eessi.service.sed.helpers
 
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
 
 // Mappes til verdier som finnes i 'medlemskapsunntakartikkelkoder.properties' i eux-prosjektet.
-public final class UnntakArtikkelMapper {
+object UnntakArtikkelMapper {
+    private const val BESTEMMELSE_11_4 = "11_4"
+    const val BESTEMMELSE_OTHER: String = "annet"
 
-    private UnntakArtikkelMapper() {
-    }
-
-    private static final String BESTEMMELSE_11_4 = "11_4";
-    public static final String BESTEMMELSE_OTHER = "annet";
-
-    public static String mapFromBestemmelse(Bestemmelse bestemmelse) {
+    @JvmStatic
+    fun mapFromBestemmelse(bestemmelse: Bestemmelse?): String? {
         if (bestemmelse == null) {
-            return null;
+            return null
         }
 
-        switch (bestemmelse) {
-            case ART_11_4:
-                return BESTEMMELSE_11_4;
-            case ART_11_1:
-            case ART_11_2:
-                return BESTEMMELSE_OTHER;
-            default:
-                return bestemmelse.getValue();
+        return when (bestemmelse) {
+            Bestemmelse.ART_11_4 -> BESTEMMELSE_11_4
+            Bestemmelse.ART_11_1, Bestemmelse.ART_11_2 -> BESTEMMELSE_OTHER
+            else -> bestemmelse.value
         }
     }
 }
