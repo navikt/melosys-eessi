@@ -158,7 +158,7 @@ class SedServiceTest {
         SedDataDto sedData = SedDataStub.getStub();
         sedData.setGsakSaksnummer(null);
         assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true, false))
+            .isThrownBy(() -> sendSedService.opprettBucOgSed(sedData, Collections.emptyList(), BucType.LA_BUC_04, true, false))
             .withMessageContaining("GsakId er påkrevd");
     }
 
