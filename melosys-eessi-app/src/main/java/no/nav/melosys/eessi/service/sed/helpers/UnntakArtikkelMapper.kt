@@ -8,15 +8,11 @@ object UnntakArtikkelMapper {
     const val BESTEMMELSE_OTHER: String = "annet"
 
     @JvmStatic
-    fun mapFromBestemmelse(bestemmelse: Bestemmelse?): String? {
-        if (bestemmelse == null) {
-            return null
-        }
-
-        return when (bestemmelse) {
+    fun mapFromBestemmelse(bestemmelse: Bestemmelse?): String? =
+        when (bestemmelse) {
+            null -> null
             Bestemmelse.ART_11_4 -> BESTEMMELSE_11_4
             Bestemmelse.ART_11_1, Bestemmelse.ART_11_2 -> BESTEMMELSE_OTHER
             else -> bestemmelse.value
         }
-    }
 }
