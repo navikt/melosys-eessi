@@ -13,17 +13,13 @@ interface NyttLovvalgSedMapper<T : Medlemskap?> {
 
     fun hentLovvalgsbestemmelse(medlemskap: T): String?
 
-    fun hentAnmodningUnntak(medlemskap: T): AnmodningUnntak? {
-        return null
-    }
+    fun hentAnmodningUnntak(medlemskap: T): AnmodningUnntak? = null
 
     fun sedErEndring(medlemskap: T): Boolean
 
     fun hentMedlemskap(sed: SED): T
 
-    fun erMidlertidigBestemmelse(medlemskap: T): Boolean {
-        return false
-    }
+    fun erMidlertidigBestemmelse(medlemskap: T): Boolean = false
 
     fun hentPeriode(periode: PeriodeA010): Periode {
         val fom: LocalDate

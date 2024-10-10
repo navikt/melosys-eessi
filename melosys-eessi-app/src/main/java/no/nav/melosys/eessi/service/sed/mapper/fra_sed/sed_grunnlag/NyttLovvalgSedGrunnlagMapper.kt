@@ -9,25 +9,20 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 interface NyttLovvalgSedGrunnlagMapper<T : Medlemskap?> : NyttLovvalgSedMapper<T>, SedGrunnlagMapper {
     fun hentPeriode(medlemskap: T): Periode
 
-    fun hentUnntakFraLovvalgsland(medlemskap: T): String? {
-        return null
-    }
+    fun hentUnntakFraLovvalgsland(medlemskap: T): String? = null
 
-    fun hentUnntakFraLovvalgsbestemmelse(medlemskap: T): String? {
-        return null
-    }
+    fun hentUnntakFraLovvalgsbestemmelse(medlemskap: T): String? = null
 
     fun hentLovvalgsperiode(medlemskap: T): Lovvalgsperiode {
         val periode = hentPeriode(medlemskap)
 
-        val lovvalgsperiode = Lovvalgsperiode()
-        lovvalgsperiode.fom = periode.fom
-        lovvalgsperiode.tom = periode.tom
-        lovvalgsperiode.lovvalgsland = hentLovvalgsland(medlemskap)
-        lovvalgsperiode.bestemmelse = Bestemmelse.fraString(hentLovvalgsbestemmelse(medlemskap))
-        lovvalgsperiode.unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap)
-        lovvalgsperiode.unntakFraBestemmelse = Bestemmelse.fraString(hentUnntakFraLovvalgsbestemmelse(medlemskap))
-
-        return lovvalgsperiode
+        return Lovvalgsperiode().apply {
+            fom = periode.fom
+            tom = periode.tom
+            lovvalgsland = hentLovvalgsland(medlemskap)
+            bestemmelse = Bestemmelse.fraString(hentLovvalgsbestemmelse(medlemskap))
+            unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap)
+            unntakFraBestemmelse = Bestemmelse.fraString(hentUnntakFraLovvalgsbestemmelse(medlemskap))
+        }
     }
 }

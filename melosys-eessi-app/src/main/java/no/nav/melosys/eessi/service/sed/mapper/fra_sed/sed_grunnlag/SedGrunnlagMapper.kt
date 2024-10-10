@@ -6,75 +6,46 @@ import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto
 import no.nav.melosys.eessi.controller.dto.Virksomhet
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
-import no.nav.melosys.eessi.service.sed.helpers.StreamUtils
-import java.util.*
-import java.util.stream.Collectors
 
 interface SedGrunnlagMapper {
-    fun map(sed: SED): SedGrunnlagDto {
-        val nav = sed.nav
-        val sedGrunnlagDto = SedGrunnlagDto()
-
-        sedGrunnlagDto.bostedsadresse = mapBosted(nav!!.bruker!!.adresse)
-        sedGrunnlagDto.utenlandskIdent = mapUtenlandskIdent(nav.bruker!!.person!!.pin)
-        sedGrunnlagDto.arbeidssteder = mapArbeidssteder(nav.arbeidssted)
-        sedGrunnlagDto.arbeidsland = mapArbeidsland(nav.arbeidsland)
-        sedGrunnlagDto.arbeidsgivendeVirksomheter = mapVirksomheter(nav.arbeidsgiver)
-        sedGrunnlagDto.selvstendigeVirksomheter = mapSelvstendig(nav.selvstendig)
-        sedGrunnlagDto.ytterligereInformasjon = nav.ytterligereinformasjon
-
-        return sedGrunnlagDto
+    fun map(sed: SED): SedGrunnlagDto = SedGrunnlagDto().apply {
+        val nav = sed.nav ?: throw NullPointerException("sed.nav kan ikke være null")
+        val bruker = nav.bruker ?: throw NullPointerException("sed.nav.bruker kan ikke være null")
+        val person = bruker.person ?: throw NullPointerException("sed.nav.bruker.person kan ikke være null")
+        bostedsadresse = mapBosted(bruker.adresse)
+        utenlandskIdent = mapUtenlandskIdent(person.pin)
+        arbeidssteder = mapArbeidssteder(nav.arbeidssted)
+        arbeidsland = mapArbeidsland(nav.arbeidsland)
+        arbeidsgivendeVirksomheter = mapVirksomheter(nav.arbeidsgiver)
+        selvstendigeVirksomheter = mapSelvstendig(nav.selvstendig)
+        ytterligereInformasjon = nav.ytterligereinformasjon
     }
 
-    fun mapBosted(adresser: List<Adresse>?): no.nav.melosys.eessi.controller.dto.Adresse {
-        return StreamUtils.nullableStream(adresser)
-            .filter { adresse: Adresse -> erBostedsadresse(adresse) }.findFirst()
-            .map { adresseFraRina: Adresse? ->
-                no.nav.melosys.eessi.controller.dto.Adresse.av(
-                    adresseFraRina
-                )
-            }
-            .orElse(mapAdresse(adresser))
-    }
+    fun mapBosted(adresser: List<Adresse>?): no.nav.melosys.eessi.controller.dto.Adresse = adresser?.firstOrNull { erBostedsadresse(it) }
+        ?.let { no.nav.melosys.eessi.controller.dto.Adresse.av(it) }
+        ?: mapAdresse(adresser)
 
-    fun mapAdresse(adresser: List<Adresse>?): no.nav.melosys.eessi.controller.dto.Adresse {
-        return StreamUtils.nullableStream(adresser).findFirst()
-            .map { adresseFraRina: Adresse? ->
-                no.nav.melosys.eessi.controller.dto.Adresse.av(
-                    adresseFraRina
-                )
-            }.orElseGet { no.nav.melosys.eessi.controller.dto.Adresse() }
-    }
+    fun mapAdresse(adresser: List<Adresse>?): no.nav.melosys.eessi.controller.dto.Adresse = adresser?.firstOrNull()
+        ?.let { no.nav.melosys.eessi.controller.dto.Adresse.av(it) }
+        ?: no.nav.melosys.eessi.controller.dto.Adresse()
 
-    fun mapUtenlandskIdent(pins: Collection<Pin>?): List<Ident> {
-        return StreamUtils.nullableStream(pins).map { pin: Pin? -> Ident.av(pin) }.filter { obj: Ident -> obj.erUtenlandsk() }
-            .collect(Collectors.toList())
-    }
+    fun mapUtenlandskIdent(pins: Collection<Pin>?): List<Ident> =
+        pins?.mapNotNull { pin -> Ident.av(pin).takeIf { it.erUtenlandsk() } } ?: emptyList()
 
     fun mapArbeidssteder(arbeidssted: List<Arbeidssted>?): List<no.nav.melosys.eessi.controller.dto.Arbeidssted> {
-        return StreamUtils.nullableStream(arbeidssted)
-            .map { arbeidsstedFraRina: Arbeidssted? -> no.nav.melosys.eessi.controller.dto.Arbeidssted.av(arbeidsstedFraRina) }
-            .collect(Collectors.toList())
+        return arbeidssted?.map { no.nav.melosys.eessi.controller.dto.Arbeidssted.av(it) } ?: emptyList()
     }
 
     fun mapArbeidsland(arbeidsland: List<Arbeidsland>?): List<no.nav.melosys.eessi.controller.dto.Arbeidsland> {
-        return StreamUtils.nullableStream(arbeidsland)
-            .map { arbeidslandFraRina: Arbeidsland? -> no.nav.melosys.eessi.controller.dto.Arbeidsland.av(arbeidslandFraRina) }
-            .collect(Collectors.toList())
+        return arbeidsland?.map { no.nav.melosys.eessi.controller.dto.Arbeidsland.av(it) } ?: emptyList()
     }
 
-
     fun mapVirksomheter(arbeidsgivere: List<Arbeidsgiver>?): List<Virksomhet> {
-        return StreamUtils.nullableStream(arbeidsgivere).map { arbeidsgiver: Arbeidsgiver? -> Virksomhet.av(arbeidsgiver) }
-            .collect(Collectors.toList())
+        return arbeidsgivere?.map { Virksomhet.av(it) } ?: emptyList()
     }
 
     fun mapSelvstendig(selvstendig: Selvstendig?): List<Virksomhet> {
-        return Optional.ofNullable(selvstendig).stream()
-            .map<List<Arbeidsgiver?>>(Selvstendig::arbeidsgiver)
-            .flatMap { obj: List<Arbeidsgiver?> -> obj.stream() }
-            .map { arbeidsgiver: Arbeidsgiver? -> Virksomhet.av(arbeidsgiver) }
-            .collect(Collectors.toList())
+        return selvstendig?.arbeidsgiver?.map { Virksomhet.av(it) } ?: emptyList()
     }
 
     companion object {
