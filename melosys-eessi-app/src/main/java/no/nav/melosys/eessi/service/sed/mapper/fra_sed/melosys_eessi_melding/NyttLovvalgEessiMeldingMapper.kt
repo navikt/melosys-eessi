@@ -6,7 +6,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 
-interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
+interface NyttLovvalgEessiMeldingMapper<T : Medlemskap> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
     override fun map(
         aktoerId: String?,
         sed: SED?,
@@ -41,5 +41,5 @@ interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<
         return melosysEessiMelding
     }
 
-    fun mapPeriode(medlemskap: T?): Periode
+    fun mapPeriode(medlemskap: T): Periode
 }

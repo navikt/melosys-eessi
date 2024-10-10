@@ -26,10 +26,10 @@ internal class MelosysEessiMeldingMapperA009 : NyttLovvalgEessiMeldingMapper<Med
 
     override fun hentLovvalgsland(medlemskap: MedlemskapA009): String? = medlemskap.vedtak!!.land
 
-    override fun mapPeriode(medlemskap: MedlemskapA009?): Periode {
+    override fun mapPeriode(medlemskap: MedlemskapA009): Periode {
         val fom: LocalDate
         val tom: LocalDate?
-        val periode = medlemskap?.vedtak!!.gjelderperiode
+        val periode = medlemskap.vedtak!!.gjelderperiode
         if (periode!!.erAapenPeriode()) {
             val aapenPeriode = periode.aapenperiode
             fom = tilLocalDate(aapenPeriode!!.startdato!!)

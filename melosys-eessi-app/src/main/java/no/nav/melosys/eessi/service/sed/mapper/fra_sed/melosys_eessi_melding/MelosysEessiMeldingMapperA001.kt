@@ -7,8 +7,8 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001
 
 internal class MelosysEessiMeldingMapperA001 : NyttLovvalgEessiMeldingMapper<MedlemskapA001> {
-    override fun mapPeriode(medlemskap: MedlemskapA001?) = Periode(
-        tilLocalDate(medlemskap!!.soeknadsperiode!!.startdato!!),
+    override fun mapPeriode(medlemskap: MedlemskapA001) = Periode(
+        tilLocalDate(medlemskap.soeknadsperiode!!.startdato!!),
         tilLocalDate(medlemskap.soeknadsperiode!!.sluttdato!!)
     )
 

@@ -8,8 +8,8 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010
 private val log = KotlinLogging.logger { }
 
 internal class MelosysEessiMeldingMapperA010 : NyttLovvalgEessiMeldingMapper<MedlemskapA010> {
-    override fun mapPeriode(medlemskap: MedlemskapA010?): Periode {
-        val periode = hentPeriode(medlemskap!!.vedtak!!.gjelderperiode!!)
+    override fun mapPeriode(medlemskap: MedlemskapA010): Periode {
+        val periode = hentPeriode(medlemskap.vedtak!!.gjelderperiode!!)
         return Periode(periode.fom, periode.tom)
     }
 
