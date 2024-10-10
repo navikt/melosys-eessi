@@ -8,10 +8,19 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 
 interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
     override fun map(
-        aktoerId: String?, sed: SED?, rinaDokumentID: String?, rinaSaksnummer: String?,
-        sedType: String?, bucType: String?, avsenderID: String?,
-        landkode: String?, journalpostID: String?, dokumentID: String?, gsakSaksnummer: String?,
-        sedErEndring: Boolean?, sedVersjon: String?
+        aktoerId: String?,
+        sed: SED?,
+        rinaDokumentID: String?,
+        rinaSaksnummer: String?,
+        sedType: String?,
+        bucType: String?,
+        avsenderID: String?,
+        landkode: String?,
+        journalpostID: String?,
+        dokumentID: String?,
+        gsakSaksnummer: String?,
+        sedErEndring: Boolean,
+        sedVersjon: String?
     ): MelosysEessiMelding {
         val melosysEessiMelding = super.map(
             aktoerId, sed, rinaDokumentID,
@@ -25,7 +34,7 @@ interface NyttLovvalgEessiMeldingMapper<T : Medlemskap?> : NyttLovvalgSedMapper<
 
         melosysEessiMelding.lovvalgsland = hentLovvalgsland(medlemskap)
         melosysEessiMelding.artikkel = hentLovvalgsbestemmelse(medlemskap)
-        melosysEessiMelding.isErEndring = sedErEndring ?: false || sedErEndring(medlemskap)
+        melosysEessiMelding.isErEndring = sedErEndring || sedErEndring(medlemskap)
         melosysEessiMelding.isMidlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
         melosysEessiMelding.anmodningUnntak = hentAnmodningUnntak(medlemskap)
 

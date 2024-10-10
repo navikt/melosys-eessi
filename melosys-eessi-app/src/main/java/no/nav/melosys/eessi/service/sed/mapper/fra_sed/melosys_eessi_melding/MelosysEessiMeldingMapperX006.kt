@@ -16,7 +16,7 @@ class MelosysEessiMeldingMapperX006(private val rinaInstitusjonId: String) : Mel
         journalpostID: String?,
         dokumentID: String?,
         gsakSaksnummer: String?,
-        sedErEndring: Boolean?,
+        sedErEndring: Boolean,
         sedVersjon: String?
     ): MelosysEessiMelding {
         val melosysEessiMelding = super.map(

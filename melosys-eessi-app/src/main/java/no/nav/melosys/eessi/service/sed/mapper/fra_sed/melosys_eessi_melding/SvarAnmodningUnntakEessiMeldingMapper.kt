@@ -9,10 +9,19 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslut
 
 abstract class SvarAnmodningUnntakEessiMeldingMapper<T : Medlemskap?> : MelosysEessiMeldingMapper {
     override fun map(
-        aktoerId: String?, sed: SED?, rinaDokumentID: String?, rinaSaksnummer: String?,
-        sedType: String?, bucType: String?, avsenderID: String?,
-        landkode: String?, journalpostID: String?, dokumentID: String?, gsakSaksnummer: String?,
-        sedErEndring: Boolean?, sedVersjon: String?
+        aktoerId: String?,
+        sed: SED?,
+        rinaDokumentID: String?,
+        rinaSaksnummer: String?,
+        sedType: String?,
+        bucType: String?,
+        avsenderID: String?,
+        landkode: String?,
+        journalpostID: String?,
+        dokumentID: String?,
+        gsakSaksnummer: String?,
+        sedErEndring: Boolean,
+        sedVersjon: String?
     ): MelosysEessiMelding {
         val melosysEessiMelding = super.map(
             aktoerId, sed, rinaDokumentID,
