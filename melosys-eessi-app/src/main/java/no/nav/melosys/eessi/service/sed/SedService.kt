@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed
 
 import io.getunleash.Unleash
+import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto
 import no.nav.melosys.eessi.controller.dto.SedDataDto
@@ -19,10 +20,11 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.TimeUnit
+
+private val log = KotlinLogging.logger {}
 
 @Service
 class SedService(
@@ -30,7 +32,6 @@ class SedService(
     private val saksrelasjonService: SaksrelasjonService,
     private val unleash: Unleash
 ) {
-    private val log = LoggerFactory.getLogger(SedService::class.java)
 
     fun opprettBucOgSed(
         sedDataDto: SedDataDto,
@@ -67,17 +68,14 @@ class SedService(
             .build()
     }
 
-    private fun tilUUIDMedBindestreker(uuidString: String): String {
-        return UUID.fromString(
-            uuidString.substring(0, 8) + "-" +
-                uuidString.substring(8, 12) + "-" +
-                uuidString.substring(12, 16) + "-" +
-                uuidString.substring(16, 20) + "-" +
-                uuidString.substring(20)
-        ).toString()
-    }
+    private fun tilUUIDMedBindestreker(uuidString: String): String = UUID.fromString(
+        uuidString.substring(0, 8) + "-" +
+            uuidString.substring(8, 12) + "-" +
+            uuidString.substring(12, 16) + "-" +
+            uuidString.substring(16, 20) + "-" +
+            uuidString.substring(20)
+    ).toString()
 
-    @Throws(ValidationException::class)
     private fun validerMottakerInstitusjoner(bucType: BucType, mottakere: Collection<String>) {
         if (mottakere.isEmpty()) {
             throw ValidationException("Mottakere er påkrevd")
@@ -169,7 +167,5 @@ class SedService(
         return opprettBucOgSedResponse
     }
 
-    private fun hentGsakSaksnummer(sedDataDto: SedDataDto): Long {
-        return sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
-    }
+    private fun hentGsakSaksnummer(sedDataDto: SedDataDto): Long = sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
 }
