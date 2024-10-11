@@ -1,6 +1,7 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.helpers
 
 import io.kotest.matchers.shouldBe
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import org.junit.jupiter.api.Test
 
 class LandkodeMapperTest {
