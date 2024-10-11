@@ -20,6 +20,7 @@ import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -30,7 +31,8 @@ private val log = KotlinLogging.logger {}
 class SedService(
     private val euxService: EuxService,
     private val saksrelasjonService: SaksrelasjonService,
-    private val unleash: Unleash
+    private val unleash: Unleash,
+    @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long
 ) {
 
     fun opprettBucOgSed(
@@ -70,10 +72,10 @@ class SedService(
 
     private fun tilUUIDMedBindestreker(uuidString: String): String = UUID.fromString(
         uuidString.substring(0, 8) + "-" +
-            uuidString.substring(8, 12) + "-" +
-            uuidString.substring(12, 16) + "-" +
-            uuidString.substring(16, 20) + "-" +
-            uuidString.substring(20)
+                uuidString.substring(8, 12) + "-" +
+                uuidString.substring(12, 16) + "-" +
+                uuidString.substring(16, 20) + "-" +
+                uuidString.substring(20)
     ).toString()
 
     private fun validerMottakerInstitusjoner(bucType: BucType, mottakere: Collection<String>) {
@@ -84,9 +86,18 @@ class SedService(
         }
     }
 
+    /*
+     NB! Må legge inn en sleep grunnet problematikk i RINA.
+     Ved opprettelse av SED og umiddelbar sending rett etter, *kan* Rina-saken bli "skadd" ved opprettelse.
+     Det kan videre føre til at vi ikke kan se svar-SEDer vi mottar fra utlandet, som vil påvirke tiden det tar før vi får ut vedtak til bruker
+      */
+    private fun pauseGrunnetProblematikkiRINA() {
+        TimeUnit.SECONDS.sleep(pauseFørSendingAvSed)
+    }
+
     private fun sendSed(rinaSaksnummer: String, dokumentId: String, sedType: String) {
         try {
-            TimeUnit.SECONDS.sleep(10L)
+            pauseGrunnetProblematikkiRINA()
             euxService.sendSed(rinaSaksnummer, dokumentId, sedType)
         } catch (e: IntegrationException) {
             log.error("Feil ved oppretting og/eller sending av buc og sed. Exception fanges for å slette saksrelasjon.")

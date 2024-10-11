@@ -42,7 +42,7 @@ class SedServiceTest {
 
     @BeforeEach
     fun setup() {
-        sendSedService = SedService(euxService, saksrelasjonService, fakeUnleash)
+        sendSedService = SedService(euxService, saksrelasjonService, fakeUnleash, 0L)
     }
 
     @Test
