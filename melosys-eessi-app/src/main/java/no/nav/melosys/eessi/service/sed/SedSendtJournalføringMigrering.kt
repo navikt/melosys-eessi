@@ -1,8 +1,7 @@
-package no.nav.melosys.eessi.service.sed;
+package no.nav.melosys.eessi.service.sed
 
-public record SedSendtJournalføringMigrering(
-    String sedId,
-    String rinaSakId,
-    String rinaDokumentId
-) {
-}
+data class SedSendtJournalføringMigrering(
+    val sedId: String?,
+    val rinaSakId: String?,
+    val rinaDokumentId: String?
+)

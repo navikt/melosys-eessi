@@ -1,130 +1,140 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
+
+import io.kotest.matchers.collections.shouldNotBeEmpty
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import no.nav.melosys.eessi.kafka.consumers.SedHendelse
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010
+import no.nav.melosys.eessi.models.sed.nav.AapenPeriode
+import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg
+import no.nav.melosys.eessi.models.sed.nav.PeriodeA010
+import no.nav.melosys.eessi.models.sed.nav.VedtakA010
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.SakInformasjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSakInformasjon
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
+import org.junit.jupiter.api.Test
 
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA010;
-import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
-import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg;
-import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA010;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+class MelosysEessiMeldingMapperA010Test {
 
-import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class MelosysEessiMeldingMapperA010Test {
-
-    private SedHendelse sedHendelse;
-    private MelosysEessiMeldingMapperStubs.SakInformasjon sakInformasjon;
-
-    @BeforeEach
-    public void setup() {
-        sedHendelse = createSedHendelse();
-        sakInformasjon = createSakInformasjon();
-    }
+    private val sedHendelse: SedHendelse = createSedHendelse()
+    private val sakInformasjon: SakInformasjon = createSakInformasjon()
 
     @Test
-    public void mapA010_fastPeriode_verifiserPeriode() {
-        MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA010();
+    fun mapA010_fastPeriode_verifiserPeriode() {
+        val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
 
-        SED sed = createSed(hentMedlemskap(true));
-        sed.setSedType("A010");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
-
-        assertThat(melding).isNotNull();
-        assertThat(melding.getGsakSaksnummer()).isNotNull();
-        assertThat(melding.getArtikkel()).isEqualTo("11_4");
-        assertThat(melding.getPeriode().getTom()).isNotNull();
-        assertThat(melding.getStatsborgerskap()).isNotEmpty();
-        assertThat(melding.getJournalpostId()).isEqualTo("journalpost");
-        assertThat(melding.getAktoerId()).isEqualTo("aktørid");
-        assertThat(melding.getRinaSaksnummer()).isEqualTo("rinasak");
-        assertThat(melding.getDokumentId()).isEqualTo("dokument");
-        assertThat(melding.getLovvalgsland()).isEqualTo("SE");
-        assertThat(melding.getGsakSaksnummer()).isEqualTo(123L);
-        assertThat(melding.isErEndring()).isFalse();
-    }
-
-    @Test
-    public void mapA010_aapenPeriode_verifiserPeriode() {
-        MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA010();
-
-        SED sed = createSed(hentMedlemskap(false));
-        sed.setSedType("A009");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
-
-        assertThat(melding).isNotNull();
-        assertThat(melding.getGsakSaksnummer()).isNotNull();
-        assertThat(melding.getArtikkel()).isEqualTo("11_4");
-        assertThat(melding.getPeriode().getTom()).isNull();
-        assertThat(melding.getStatsborgerskap()).isNotEmpty();
-        assertThat(melding.getJournalpostId()).isEqualTo("journalpost");
-        assertThat(melding.getAktoerId()).isEqualTo("aktørid");
-        assertThat(melding.getRinaSaksnummer()).isEqualTo("rinasak");
-        assertThat(melding.getDokumentId()).isEqualTo("dokument");
-        assertThat(melding.getLovvalgsland()).isEqualTo("SE");
-        assertThat(melding.getGsakSaksnummer()).isEqualTo(123L);
-        assertThat(melding.isErEndring()).isFalse();
-    }
-
-    @Test
-    public void mapA010_medErOpprinneligvedtak_forventAtSpesifikkRegelOverskriver() {
-        MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA010();
-
-        SED sed = createSed(hentMedlemskap(true));
-        sed.setSedType("A010");
-        ((MedlemskapA010) sed.getMedlemskap()).getVedtak().setEropprinneligvedtak("nei");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), false, "1");
-
-        assertThat(melding).isNotNull();
-        assertThat(melding.isErEndring()).isTrue();
-    }
-
-    @Test
-    public void mapA010_utenErOpprinneligvedtak_forventAtResultatFraEuxOverskriver() {
-        MelosysEessiMeldingMapper mapper = new MelosysEessiMeldingMapperA010();
-
-        SED sed = createSed(hentMedlemskap(true));
-        sed.setSedType("A010");
-        MelosysEessiMelding melding = mapper.map("aktørid", sed, sedHendelse.getRinaDokumentId(), sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(), sedHendelse.getBucType(), sedHendelse.getAvsenderId(), "landkode", sakInformasjon.getJournalpostId(),
-                sakInformasjon.getDokumentId(), sakInformasjon.getGsakSaksnummer(), true, "1");
-
-        assertThat(melding).isNotNull();
-        assertThat(melding.isErEndring()).isTrue();
-    }
-
-    private MedlemskapA010 hentMedlemskap(boolean fastperiode) {
-        MedlemskapA010 medlemskapA010 = new MedlemskapA010();
-
-        VedtakA010 vedtak = new VedtakA010();
-        medlemskapA010.setVedtak(vedtak);
-
-        PeriodeA010 periode = new PeriodeA010();
-        if (fastperiode) {
-            periode.setSluttdato("2019-12-01");
-            periode.setStartdato("2019-05-01");
-        } else {
-            periode.setAapenperiode(new AapenPeriode());
-            periode.getAapenperiode().setStartdato("2019-05-01");
+        val sed = createSed(hentMedlemskap(true)).apply {
+            sedType = "A010"
         }
-        vedtak.setGjelderperiode(periode);
 
-        vedtak.setLand("SE");
-        vedtak.setEropprinneligvedtak("ja");
+        val melding = mapper.map(
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+        )
 
-        medlemskapA010.setMeldingomlovvalg(new MeldingOmLovvalg());
-        medlemskapA010.getMeldingomlovvalg().setArtikkel("11_4");
+        melding.shouldNotBeNull().run {
+            gsakSaksnummer.shouldNotBeNull()
+            artikkel shouldBe "11_4"
+            periode.tom.shouldNotBeNull()
+            statsborgerskap.shouldNotBeEmpty()
+            journalpostId shouldBe "journalpost"
+            aktoerId shouldBe "aktørid"
+            rinaSaksnummer shouldBe "rinasak"
+            dokumentId shouldBe "dokument"
+            lovvalgsland shouldBe "SE"
+            gsakSaksnummer shouldBe 123L
+            isErEndring shouldBe false
+        }
+    }
 
-        return medlemskapA010;
+    @Test
+    fun mapA010_aapenPeriode_verifiserPeriode() {
+        val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
+
+        val sed = createSed(hentMedlemskap(false)).apply {
+            sedType = "A010"
+        }
+
+        val melding = mapper.map(
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+        )
+
+        melding.shouldNotBeNull().run {
+            gsakSaksnummer.shouldNotBeNull()
+            artikkel shouldBe "11_4"
+            periode.tom shouldBe null
+            statsborgerskap.shouldNotBeEmpty()
+            journalpostId shouldBe "journalpost"
+            aktoerId shouldBe "aktørid"
+            rinaSaksnummer shouldBe "rinasak"
+            dokumentId shouldBe "dokument"
+            lovvalgsland shouldBe "SE"
+            gsakSaksnummer shouldBe 123L
+            isErEndring shouldBe false
+        }
+    }
+
+    @Test
+    fun mapA010_medErOpprinneligvedtak_forventAtSpesifikkRegelOverskriver() {
+        val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
+
+        val sed = createSed(hentMedlemskap(true)).apply {
+            sedType = "A010"
+            (medlemskap as MedlemskapA010).vedtak!!.eropprinneligvedtak = "nei"
+        }
+
+        val melding = mapper.map(
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+        )
+
+        melding.shouldNotBeNull().run {
+            isErEndring shouldBe true
+        }
+    }
+
+    @Test
+    fun mapA010_utenErOpprinneligvedtak_forventAtResultatFraEuxOverskriver() {
+        val mapper: MelosysEessiMeldingMapper = MelosysEessiMeldingMapperA010()
+
+        val sed = createSed(hentMedlemskap(true)).apply {
+            sedType = "A010"
+        }
+
+        val melding = mapper.map(
+            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
+            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
+            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, true, "1"
+        )
+
+        melding.shouldNotBeNull().run {
+            isErEndring shouldBe true
+        }
+    }
+
+    private fun hentMedlemskap(fastperiode: Boolean): MedlemskapA010 = MedlemskapA010().apply {
+        vedtak = VedtakA010().apply {
+            gjelderperiode = PeriodeA010().apply {
+                if (fastperiode) {
+                    sluttdato = "2019-12-01"
+                    startdato = "2019-05-01"
+                } else {
+                    aapenperiode = AapenPeriode().apply {
+                        startdato = "2019-05-01"
+                    }
+                }
+            }
+            land = "SE"
+            eropprinneligvedtak = "ja"
+        }
+        meldingomlovvalg = MeldingOmLovvalg().apply {
+            artikkel = "11_4"
+        }
     }
 }

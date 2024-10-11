@@ -1,33 +1,45 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.kafka.producers.model.Periode;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper;
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
+import no.nav.melosys.eessi.kafka.producers.model.Periode
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 
-public interface NyttLovvalgEessiMeldingMapper<T extends Medlemskap> extends NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
-    @Override
-    default MelosysEessiMelding map(String aktoerId, SED sed, String rinaDokumentID, String rinaSaksnummer,
-                                    String sedType, String bucType, String avsenderID,
-                                    String landkode, String journalpostID, String dokumentID, String gsakSaksnummer,
-                                    boolean sedErEndring, String sedVersjon) {
-        MelosysEessiMelding melosysEessiMelding = MelosysEessiMeldingMapper.super.map(aktoerId, sed, rinaDokumentID,
+interface NyttLovvalgEessiMeldingMapper<T : Medlemskap> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
+    override fun map(
+        aktoerId: String?,
+        sed: SED?,
+        rinaDokumentID: String?,
+        rinaSaksnummer: String?,
+        sedType: String?,
+        bucType: String?,
+        avsenderID: String?,
+        landkode: String?,
+        journalpostID: String?,
+        dokumentID: String?,
+        gsakSaksnummer: String?,
+        sedErEndring: Boolean,
+        sedVersjon: String?
+    ): MelosysEessiMelding {
+        val melosysEessiMelding = super.map(
+            aktoerId, sed, rinaDokumentID,
             rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
-            sedErEndring, sedVersjon);
+            sedErEndring, sedVersjon
+        )
 
-        T medlemskap = hentMedlemskap(sed);
+        val medlemskap = hentMedlemskap(sed!!)
 
-        melosysEessiMelding.setPeriode(mapPeriode(medlemskap));
+        melosysEessiMelding.periode = mapPeriode(medlemskap)
 
-        melosysEessiMelding.setLovvalgsland(hentLovvalgsland(medlemskap));
-        melosysEessiMelding.setArtikkel(hentLovvalgsbestemmelse(medlemskap));
-        melosysEessiMelding.setErEndring(sedErEndring || sedErEndring(medlemskap));
-        melosysEessiMelding.setMidlertidigBestemmelse(erMidlertidigBestemmelse(medlemskap));
-        melosysEessiMelding.setAnmodningUnntak(hentAnmodningUnntak(medlemskap));
+        melosysEessiMelding.lovvalgsland = hentLovvalgsland(medlemskap)
+        melosysEessiMelding.artikkel = hentLovvalgsbestemmelse(medlemskap)
+        melosysEessiMelding.isErEndring = sedErEndring || sedErEndring(medlemskap)
+        melosysEessiMelding.isMidlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
+        melosysEessiMelding.anmodningUnntak = hentAnmodningUnntak(medlemskap)
 
-        return melosysEessiMelding;
+        return melosysEessiMelding
     }
 
-    Periode mapPeriode(T medlemskap);
+    fun mapPeriode(medlemskap: T): Periode
 }

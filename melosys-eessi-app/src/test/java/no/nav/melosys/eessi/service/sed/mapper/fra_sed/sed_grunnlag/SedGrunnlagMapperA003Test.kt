@@ -1,212 +1,266 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.List;
-import java.util.function.Consumer;
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import no.nav.melosys.eessi.controller.dto.*
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
+import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
+import no.nav.melosys.eessi.models.sed.nav.VedtakA003
+import org.junit.jupiter.api.Test
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.controller.dto.*;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver;
-import no.nav.melosys.eessi.models.sed.nav.Pin;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class SedGrunnlagMapperA003Test {
-
-    private static final String IKKE_OPPRINNELIG_VEDTAK = null;
-    private static final String OPPRINNELIG_VEDTAK = "ja";
-    private final SedGrunnlagMapperA003 sedGrunnlagMapper = new SedGrunnlagMapperA003();
+internal class SedGrunnlagMapperA003Test {
+    private val sedGrunnlagMapper = SedGrunnlagMapperA003()
 
     @Test
-    void map_medUtfyltNav_forventVerdier() throws IOException {
-        SedGrunnlagDto sedGrunnlagDto = sedGrunnlagMapper.map(hentSed());
+    fun map_medUtfyltNav_forventVerdier() {
+        val sedGrunnlagDto = sedGrunnlagMapper.map(hentSed())
 
+        sedGrunnlagDto.shouldNotBeNull()
+        sedGrunnlagDto.sedType shouldBe "A003"
 
-        assertThat(sedGrunnlagDto).isNotNull();
-        assertThat(sedGrunnlagDto.getSedType()).isEqualTo("A003");
-        assertThat(sedGrunnlagDto.getUtenlandskIdent())
-                .as("Utenlandsk ident har rett felt")
-                .extracting(Ident::getIdent, Ident::getLandkode, Ident::erUtenlandsk)
-                .containsExactlyInAnyOrder(tuple("15225345345", "BG", true));
+        withClue("Utenlandsk ident har rett felt") {
+            sedGrunnlagDto.utenlandskIdent.shouldNotBeNull().single().run {
+                ident shouldBe "15225345345"
+                landkode shouldBe "BG"
+                erUtenlandsk() shouldBe true
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getBostedsadresse())
-                .as("Bostedsadresse har rett felt")
-                .extracting(Adresse::getAdressetype, Adresse::getLand, Adresse::getGateadresse)
-                .containsExactlyInAnyOrder(Adressetype.BOSTEDSADRESSE, "BE", "Testgate Testbyggnavn");
+        withClue("Bostedsadresse har rett felt") {
+            sedGrunnlagDto.bostedsadresse.shouldNotBeNull().run {
+                adressetype shouldBe Adressetype.BOSTEDSADRESSE
+                land shouldBe "BE"
+                gateadresse shouldBe "Testgate Testbyggnavn"
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getArbeidssteder())
-                .as("Arbeidssteder har rett info")
-                .extracting(Arbeidssted::getNavn, Arbeidssted::isFysisk, Arbeidssted::getHjemmebase)
-                .containsExactlyInAnyOrder(
-                        tuple("Testarbeidsstednavn", false, "Testarbeidsstedbase"),
-                        tuple("Testarbeidsstednavn2", true, "Testarbeidsstedbase2")
-                );
+        withClue("Arbeidssteder har rett info") {
+            sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).run {
+                first().run {
+                    navn shouldBe "Testarbeidsstednavn"
+                    isFysisk shouldBe false
+                    hjemmebase shouldBe "Testarbeidsstedbase"
+                }
+                last().run {
+                    navn shouldBe "Testarbeidsstednavn2"
+                    isFysisk shouldBe true
+                    hjemmebase shouldBe "Testarbeidsstedbase2"
+                }
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getArbeidssteder())
-                .as("Arbeidssteder har rette adresser")
-                .extracting(Arbeidssted::getAdresse)
-                .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getRegion, Adresse::getGateadresse)
-                .containsExactlyInAnyOrder(
-                        tuple("EE", "Testarbeidsstedpostkode", "Testarbeidsstedby", "Testarbeidsstedregion", "Testarbeidsstedgate Testarbeidsstedbygning"),
-                        tuple("CY", null, "Testarbeidsstedby2", null, "Testarbeidsstedgate2 Testarbeidsstedbygning2")
-                );
+        withClue("Arbeidssteder har rette adresser") {
+            sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).run {
+                first().run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "EE"
+                        postnr shouldBe "Testarbeidsstedpostkode"
+                        poststed shouldBe "Testarbeidsstedby"
+                        region shouldBe "Testarbeidsstedregion"
+                        gateadresse shouldBe "Testarbeidsstedgate Testarbeidsstedbygning"
+                    }
+                }
+                last().run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "CY"
+                        postnr.shouldBeNull()
+                        poststed shouldBe "Testarbeidsstedby2"
+                        region.shouldBeNull()
+                        gateadresse shouldBe "Testarbeidsstedgate2 Testarbeidsstedbygning2"
+                    }
+                }
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getArbeidsgivendeVirksomheter())
-                .as("Arbeidsgivende virksomheter har rett info")
-                .extracting(Virksomhet::getNavn, Virksomhet::getOrgnr)
-                .containsExactlyInAnyOrder(
-                        tuple("EQUINOR ASA", "923609016"),
-                        tuple("adf", "123321"),
-                        tuple("swe", "123")
-                );
+        withClue("Arbeidsgivende virksomheter har rett info") {
+            sedGrunnlagDto.arbeidsgivendeVirksomheter.shouldNotBeNull().shouldHaveSize(3).toList().run {
+                get(0).run {
+                    navn shouldBe "EQUINOR ASA"
+                    orgnr shouldBe "923609016"
+                }
+                get(1).run {
+                    navn shouldBe "adf"
+                    orgnr shouldBe "123321"
+                }
+                get(2).run {
+                    navn shouldBe "swe"
+                    orgnr shouldBe "123"
+                }
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getArbeidsgivendeVirksomheter())
-                .as("Arbeidsgivende virksomheter har rette adresser")
-                .extracting(Virksomhet::getAdresse)
-                .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getGateadresse)
-                .containsExactlyInAnyOrder(
-                        tuple("BE", "4035", "STAVANGER", "Forusbeen 50"),
-                        tuple("BE", null, "by", ""),
-                        tuple("SE", null, "stck", "")
-                );
+        withClue("Arbeidsgivende virksomheter har rette adresser") {
+            sedGrunnlagDto.arbeidsgivendeVirksomheter.shouldNotBeNull().shouldHaveSize(3).toList().run {
+                get(0).run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "BE"
+                        postnr shouldBe "4035"
+                        poststed shouldBe "STAVANGER"
+                        gateadresse shouldBe "Forusbeen 50"
+                    }
+                }
+                get(1).run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "BE"
+                        postnr.shouldBeNull()
+                        poststed shouldBe "by"
+                        gateadresse shouldBe ""
+                    }
+                }
+                get(2).run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "SE"
+                        postnr.shouldBeNull()
+                        poststed shouldBe "stck"
+                        gateadresse shouldBe ""
+                    }
+                }
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getSelvstendigeVirksomheter())
-                .as("Selvstendige virksomheter har rett info")
-                .extracting(Virksomhet::getNavn, Virksomhet::getOrgnr)
-                .containsExactlyInAnyOrder(tuple("Testselvstendignavn", "Testselvstendignummer"));
+        withClue("Selvstendige virksomheter har rett info") {
+            sedGrunnlagDto.selvstendigeVirksomheter.shouldNotBeNull().single().run {
+                navn shouldBe "Testselvstendignavn"
+                orgnr shouldBe "Testselvstendignummer"
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getSelvstendigeVirksomheter())
-                .as("Selvstendige virksomheter har rette adresser")
-                .extracting(Virksomhet::getAdresse)
-                .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getRegion, Adresse::getGateadresse)
-                .containsExactlyInAnyOrder(
-                        tuple("BG", "Testselvstendigpostkode", "Testselvstendigby", "Testselvstendigregion", "Testselvstendiggate Testselvstendigbygning")
-                );
-    }
-
-    @Test
-    void map_ingenBostedsadresse_forventPostadresse() throws IOException {
-        SED sed = hentSed();
-        var adresse = sed.getNav().getBruker().getAdresse().get(0);
-        adresse.setType(Adressetype.POSTADRESSE.getAdressetypeRina());
-        sed.getNav().getBruker().setAdresse(List.of(adresse));
-
-        Adresse bostedsadresse = sedGrunnlagMapper.map(sed).getBostedsadresse();
-
-        assertThat(bostedsadresse)
-                .extracting(Adresse::getAdressetype, Adresse::getLand, Adresse::getGateadresse)
-                .containsExactlyInAnyOrder(Adressetype.POSTADRESSE, "BE", "Testgate Testbyggnavn");
-    }
-
-    @Test
-    void map_ingenAdresse_forventTomAdresse() throws IOException {
-        SED sed = hentSed();
-        sed.getNav().getBruker().setAdresse(List.of());
-
-        Adresse bostedsadresse = sedGrunnlagMapper.map(sed).getBostedsadresse();
-
-        assertThat(bostedsadresse).isEqualTo(new Adresse());
-    }
-
-    @Test
-    void map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() throws IOException {
-        SED sed = hentSed();
-        Pin pin = sed.getNav().getBruker().getPerson().getPin().iterator().next();
-        pin.setLand("NO");
-        sed.getNav().getBruker().getPerson().setPin(List.of(pin));
-
-        List<Ident> utenlandskIdent = sedGrunnlagMapper.map(sed).getUtenlandskIdent();
-
-        assertThat(utenlandskIdent).isEmpty();
-    }
-
-    @Test
-    void map_ingenGate_forventKunBygning() throws IOException {
-        SED sed = hentSed();
-        var adresse = sed.getNav().getBruker().getAdresse().get(0);
-        adresse.setGate(null);
-        sed.getNav().getBruker().setAdresse(List.of(adresse));
-
-        String gateadresse = sedGrunnlagMapper.map(sed).getBostedsadresse().getGateadresse();
-
-        assertThat(gateadresse).isEqualTo("Testbyggnavn");
-    }
-
-    @Test
-    void map_ingenBygning_forventKunGate() throws IOException {
-        SED sed = hentSed();
-        var adresse = sed.getNav().getBruker().getAdresse().get(0);
-        adresse.setBygning(null);
-        sed.getNav().getBruker().setAdresse(List.of(adresse));
-
-        String gateadresse = sedGrunnlagMapper.map(sed).getBostedsadresse().getGateadresse();
-
-        assertThat(gateadresse).isEqualTo("Testgate");
+        withClue("Selvstendige virksomheter har rette adresser") {
+            sedGrunnlagDto.selvstendigeVirksomheter.shouldNotBeNull().single().run {
+                adresse.shouldNotBeNull().run {
+                    land shouldBe "BG"
+                    postnr shouldBe "Testselvstendigpostkode"
+                    poststed shouldBe "Testselvstendigby"
+                    region shouldBe "Testselvstendigregion"
+                    gateadresse shouldBe "Testselvstendiggate Testselvstendigbygning"
+                }
+            }
+        }
     }
 
     @Test
-    void map_ingenArbeidsgiverAdresse_forventIkkeNorskArbeidsgiver() throws IOException {
-        Consumer<Arbeidsgiver> settTomAdresse = (Arbeidsgiver arbeidsgiver) -> arbeidsgiver.setAdresse(null);
+    fun map_ingenBostedsadresse_forventPostadresse() {
+        val sed = hentSed()
+        val adresse = sed.nav!!.bruker!!.adresse!![0]
+        adresse.type = Adressetype.POSTADRESSE.adressetypeRina
+        sed.nav!!.bruker!!.adresse = listOf(adresse)
 
-        SED sed = hentSed();
-        sed.getNav().getArbeidsgiver().forEach(settTomAdresse);
-        ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().forEach(settTomAdresse);
+        val bostedsadresse = sedGrunnlagMapper.map(sed).bostedsadresse
 
-
-        List<Virksomhet> norskeArbeidsgivendeVirksomheter = sedGrunnlagMapper.map(sed).getNorskeArbeidsgivendeVirksomheter();
-
-
-        assertThat(norskeArbeidsgivendeVirksomheter).isEmpty();
+        bostedsadresse.shouldNotBeNull().run {
+            adressetype shouldBe Adressetype.POSTADRESSE
+            land shouldBe "BE"
+            gateadresse shouldBe "Testgate Testbyggnavn"
+        }
     }
 
     @Test
-    void map_norskArbeidsgiverNullIdentifikator_forventIngenIdentifikator() throws IOException {
-        SED sed = hentSed();
-        ((MedlemskapA003) sed.getMedlemskap()).getAndreland().getArbeidsgiver().iterator().next().setIdentifikator(null);
+    fun map_ingenAdresse_forventTomAdresse() {
+        val sed = hentSed()
+        sed.nav!!.bruker!!.adresse = listOf()
 
-        String orgnr = sedGrunnlagMapper.map(sed).getNorskeArbeidsgivendeVirksomheter().iterator().next().getOrgnr();
+        val bostedsadresse = sedGrunnlagMapper.map(sed).bostedsadresse
 
-        assertThat(orgnr).isNull();
+        bostedsadresse shouldBe Adresse()
     }
 
     @Test
-    void sedErEndring_ikkeOpprinneligVedtak_forventerErEndring_true() {
-        var medlemskapA003 = lagA003MedlemskapForSedErEndringTest(IKKE_OPPRINNELIG_VEDTAK);
+    fun map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() {
+        val sed = hentSed()
+        val pin = sed.nav!!.bruker!!.person!!.pin.iterator().next()
+        pin.land = "NO"
+        sed.nav!!.bruker!!.person!!.pin = listOf(pin)
 
-        var erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003);
+        val utenlandskIdent = sedGrunnlagMapper.map(sed).utenlandskIdent
 
-        assertTrue(erEndring);
+        utenlandskIdent.shouldBeEmpty()
     }
 
     @Test
-    void sedErEndring_opprinneligVedtak_forventerErEndring_true() {
-        var medlemskapA003 = lagA003MedlemskapForSedErEndringTest(OPPRINNELIG_VEDTAK);
+    fun map_ingenGate_forventKunBygning() {
+        val sed = hentSed()
+        val adresse = sed.nav!!.bruker!!.adresse!![0]
+        adresse.gate = null
+        sed.nav!!.bruker!!.adresse = listOf(adresse)
 
-        var erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003);
+        val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse.gateadresse
 
-        assertFalse(erEndring);
+        gateadresse shouldBe "Testbyggnavn"
     }
 
-    @NotNull
-    private static MedlemskapA003 lagA003MedlemskapForSedErEndringTest(String opprinneligVedtak) {
-        var vedtakA003 = new VedtakA003();
-        vedtakA003.setEropprinneligvedtak(opprinneligVedtak);
-        var medlemskapA003 = new MedlemskapA003();
-        medlemskapA003.setVedtak(vedtakA003);
-        return medlemskapA003;
+    @Test
+    fun map_ingenBygning_forventKunGate() {
+        val sed = hentSed()
+        val adresse = sed.nav!!.bruker!!.adresse!![0]
+        adresse.bygning = null
+        sed.nav!!.bruker!!.adresse = listOf(adresse)
+
+        val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse.gateadresse
+
+        gateadresse shouldBe "Testgate"
     }
 
-    private static SED hentSed() throws IOException {
-        URL jsonUrl = SedGrunnlagMapperA003Test.class.getClassLoader().getResource("mock/sedA003.json");
-        return new ObjectMapper().readValue(jsonUrl, SED.class);
+    @Test
+    fun map_ingenArbeidsgiverAdresse_forventIkkeNorskArbeidsgiver() {
+        val settTomAdresse = { arbeidsgiver: Arbeidsgiver -> arbeidsgiver.adresse = null }
+
+        val sed = hentSed()
+        sed.nav!!.arbeidsgiver!!.forEach(settTomAdresse)
+        (sed.medlemskap as MedlemskapA003).andreland!!.arbeidsgiver!!.forEach(settTomAdresse)
+
+        val norskeArbeidsgivendeVirksomheter = sedGrunnlagMapper.map(sed).norskeArbeidsgivendeVirksomheter
+
+        norskeArbeidsgivendeVirksomheter.shouldBeEmpty()
+    }
+
+    @Test
+    fun map_norskArbeidsgiverNullIdentifikator_forventIngenIdentifikator() {
+        val sed = hentSed()
+        (sed.medlemskap as MedlemskapA003).andreland!!.arbeidsgiver!!.iterator().next().identifikator = null
+
+        val orgnr = sedGrunnlagMapper.map(sed).norskeArbeidsgivendeVirksomheter.iterator().next().orgnr
+
+        orgnr.shouldBeNull()
+    }
+
+    @Test
+    fun sedErEndring_ikkeOpprinneligVedtak_forventerErEndring_true() {
+        val medlemskapA003 = lagA003MedlemskapForSedErEndringTest(IKKE_OPPRINNELIG_VEDTAK)
+
+        val erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003)
+
+        erEndring shouldBe true
+    }
+
+    @Test
+    fun sedErEndring_opprinneligVedtak_forventerErEndring_true() {
+        val medlemskapA003 = lagA003MedlemskapForSedErEndringTest(OPPRINNELIG_VEDTAK)
+
+        val erEndring = sedGrunnlagMapper.sedErEndring(medlemskapA003)
+
+        erEndring shouldBe false
+    }
+
+    companion object {
+        private val IKKE_OPPRINNELIG_VEDTAK: String? = null
+        private const val OPPRINNELIG_VEDTAK = "ja"
+
+        private fun lagA003MedlemskapForSedErEndringTest(opprinneligVedtak: String?): MedlemskapA003 = MedlemskapA003().apply {
+            vedtak = VedtakA003().apply {
+                eropprinneligvedtak = opprinneligVedtak
+            }
+        }
+
+        private fun hentSed(): SED =
+            ObjectMapper().readValue(
+                SedGrunnlagMapperA003Test::class.java.classLoader.getResource("mock/sedA003.json"),
+                SED::class.java
+            )
     }
 }

@@ -1,30 +1,30 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.MappingException
+import org.junit.jupiter.api.Test
 
 class SedGrunnlagMapperFactoryTest {
 
     @Test
-    void getMapper_returnsCorrectMapper_A001() {
-        assertThat(SedGrunnlagMapperFactory.getMapper(SedType.A001))
-            .isInstanceOf(SedGrunnlagMapperA001.class);
+    fun getMapper_returnsCorrectMapper_A001() {
+        SedGrunnlagMapperFactory.getMapper(SedType.A001)
+            .shouldBeInstanceOf<SedGrunnlagMapperA001>()
     }
 
     @Test
-    void getMapper_returnsCorrectMapper_A003() {
-        assertThat(SedGrunnlagMapperFactory.getMapper(SedType.A003))
-            .isInstanceOf(SedGrunnlagMapperA003.class);
+    fun getMapper_returnsCorrectMapper_A003() {
+        SedGrunnlagMapperFactory.getMapper(SedType.A003)
+            .shouldBeInstanceOf<SedGrunnlagMapperA003>()
     }
 
     @Test
-    void getMapper_returnsMappingExceptionOnNonExistingMapper() {
-        assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> SedGrunnlagMapperFactory.getMapper(SedType.A005))
-            .withMessage("Sed-type A005 støttes ikke");
+    fun getMapper_returnsMappingExceptionOnNonExistingMapper() {
+        shouldThrow<MappingException> {
+            SedGrunnlagMapperFactory.getMapper(SedType.A005)
+        }.message shouldBe "Sed-type A005 støttes ikke"
     }
 }
