@@ -1,47 +1,39 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed
 
-import java.time.LocalDate;
+import no.nav.melosys.eessi.controller.dto.Periode
+import no.nav.melosys.eessi.kafka.producers.model.AnmodningUnntak
+import no.nav.melosys.eessi.models.DatoUtils.tilLocalDate
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
+import no.nav.melosys.eessi.models.sed.nav.PeriodeA010
+import java.time.LocalDate
 
-import no.nav.melosys.eessi.controller.dto.Periode;
-import no.nav.melosys.eessi.kafka.producers.model.AnmodningUnntak;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap;
-import no.nav.melosys.eessi.models.sed.nav.AapenPeriode;
-import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
+interface NyttLovvalgSedMapper<T : Medlemskap?> {
+    fun hentLovvalgsland(medlemskap: T): String?
 
-import static no.nav.melosys.eessi.models.DatoUtils.tilLocalDate;
+    fun hentLovvalgsbestemmelse(medlemskap: T): String?
 
-public interface NyttLovvalgSedMapper<T extends Medlemskap> {
+    fun hentAnmodningUnntak(medlemskap: T): AnmodningUnntak? = null
 
-    String hentLovvalgsland(T medlemskap);
+    fun sedErEndring(medlemskap: T): Boolean
 
-    String hentLovvalgsbestemmelse(T medlemskap);
+    fun hentMedlemskap(sed: SED): T
 
-    default AnmodningUnntak hentAnmodningUnntak(T medlemskap) {
-        return null;
-    }
+    fun erMidlertidigBestemmelse(medlemskap: T): Boolean = false
 
-    Boolean sedErEndring(T medlemskap);
-
-    T hentMedlemskap(SED sed);
-
-    default boolean erMidlertidigBestemmelse(T medlemskap) {
-        return false;
-    }
-
-    default Periode hentPeriode(PeriodeA010 periode) {
-        LocalDate fom;
-        LocalDate tom;
+    fun hentPeriode(periode: PeriodeA010): Periode {
+        val fom: LocalDate
+        val tom: LocalDate?
 
         if (periode.erAapenPeriode()) {
-            AapenPeriode aapenPeriode = periode.getAapenperiode();
-            fom = tilLocalDate(aapenPeriode.getStartdato());
-            tom = null;
+            val aapenPeriode = periode.aapenperiode
+            fom = tilLocalDate(aapenPeriode!!.startdato!!)
+            tom = null
         } else {
-            fom = tilLocalDate(periode.getStartdato());
-            tom = tilLocalDate(periode.getSluttdato());
+            fom = tilLocalDate(periode.startdato!!)
+            tom = tilLocalDate(periode.sluttdato!!)
         }
 
-        return new Periode(fom, tom);
+        return Periode(fom, tom)
     }
 }

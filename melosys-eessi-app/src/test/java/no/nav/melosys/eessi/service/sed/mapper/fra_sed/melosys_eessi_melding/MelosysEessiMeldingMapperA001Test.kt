@@ -1,74 +1,61 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
-import java.util.Collections;
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001
+import no.nav.melosys.eessi.models.sed.nav.Fastperiode
+import no.nav.melosys.eessi.models.sed.nav.Grunnlag
+import no.nav.melosys.eessi.models.sed.nav.Land
+import no.nav.melosys.eessi.models.sed.nav.Unntak
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSed
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.createSedHendelse
+import org.junit.jupiter.api.Test
 
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Grunnlag;
-import no.nav.melosys.eessi.models.sed.nav.Land;
-import no.nav.melosys.eessi.models.sed.nav.Unntak;
-import org.junit.jupiter.api.Test;
+class MelosysEessiMeldingMapperA001Test {
 
-import static no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperStubs.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class MelosysEessiMeldingMapperA001Test {
-    private final MelosysEessiMeldingMapperFactory melosysEessiMeldingMapperFactory = new MelosysEessiMeldingMapperFactory("dummy");
+    private val melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory("dummy")
 
     @Test
-    public void mapA001_forventRettFelt() {
-        SED sed = createSed(hentMedlemskap());
-        SedHendelse sedHendelse = createSedHendelse();
-        MelosysEessiMelding melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001)
-            .map("123",
-                sed,
-                sedHendelse.getRinaDokumentId(),
-                sedHendelse.getRinaSakId(),
-                sedHendelse.getSedType(),
-                sedHendelse.getBucType(),
-                sedHendelse.getAvsenderId(),
-                "landkode",
-                null,
-                null,
-                null,
-                false,
-                "1"
-            );
+    fun mapA001_forventRettFelt() {
+        val sed = createSed(hentMedlemskap())
+        val sedHendelse = createSedHendelse()
 
-        assertThat(melosysEessiMelding).isNotNull();
-        assertThat(melosysEessiMelding.getArtikkel()).isEqualTo("16_1");
-        assertThat(melosysEessiMelding.getLovvalgsland()).isEqualTo("NO");
-        assertThat(melosysEessiMelding.getAnmodningUnntak()).isNotNull();
-        assertThat(melosysEessiMelding.getAnmodningUnntak().getUnntakFraLovvalgsbestemmelse()).isEqualTo("12_1");
-        assertThat(melosysEessiMelding.getAnmodningUnntak().getUnntakFraLovvalgsland()).isEqualTo("SE");
+        val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001).map(
+            "123",
+            sed,
+            sedHendelse.rinaDokumentId,
+            sedHendelse.rinaSakId,
+            sedHendelse.sedType,
+            sedHendelse.bucType,
+            sedHendelse.avsenderId,
+            "landkode",
+            null,
+            null,
+            null,
+            false,
+            "1"
+        )
+
+        melosysEessiMelding.shouldNotBeNull().run {
+            artikkel shouldBe "16_1"
+            lovvalgsland shouldBe "NO"
+            anmodningUnntak shouldNotBe null
+            anmodningUnntak?.unntakFraLovvalgsbestemmelse shouldBe "12_1"
+            anmodningUnntak?.unntakFraLovvalgsland shouldBe "SE"
+        }
     }
 
-    private MedlemskapA001 hentMedlemskap() {
-        MedlemskapA001 medlemskap = new MedlemskapA001();
-
-        Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setSluttdato("2019-12-01");
-        fastperiode.setStartdato("2019-05-01");
-        medlemskap.setSoeknadsperiode(fastperiode);
-
-        Land sverige = new Land();
-        sverige.setLandkode("SE");
-        medlemskap.setNaavaerendemedlemskap(Collections.singletonList(sverige));
-
-        Land norge = new Land();
-        norge.setLandkode("NO");
-        medlemskap.setForespurtmedlemskap(Collections.singletonList(norge));
-
-        Unntak unntak = new Unntak();
-        Grunnlag grunnlag = new Grunnlag();
-        grunnlag.setArtikkel("12_1");
-        unntak.setGrunnlag(grunnlag);
-        medlemskap.setUnntak(unntak);
-
-        return medlemskap;
+    private fun hentMedlemskap(): MedlemskapA001 = MedlemskapA001().apply {
+        soeknadsperiode = Fastperiode().apply {
+            sluttdato = "2019-12-01"
+            startdato = "2019-05-01"
+        }
+        naavaerendemedlemskap = mutableListOf(Land().apply { landkode = "SE" })
+        forespurtmedlemskap = mutableListOf(Land().apply { landkode = "NO" })
+        unntak = Unntak().apply {
+            grunnlag = Grunnlag().apply { artikkel = "12_1" }
+        }
     }
 }

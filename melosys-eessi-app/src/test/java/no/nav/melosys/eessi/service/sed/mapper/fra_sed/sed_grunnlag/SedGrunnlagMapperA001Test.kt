@@ -1,57 +1,82 @@
-package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag;
+package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import java.io.IOException;
-import java.net.URL;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.controller.dto.*;
-import no.nav.melosys.eessi.models.sed.SED;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
+import com.fasterxml.jackson.databind.ObjectMapper
+import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import no.nav.melosys.eessi.controller.dto.Adressetype
+import no.nav.melosys.eessi.models.sed.SED
+import org.junit.jupiter.api.Test
 
 class SedGrunnlagMapperA001Test {
 
     @Test
-    void map_forventetVerdier() throws IOException {
-        SedGrunnlagDto sedGrunnlagDto = new SedGrunnlagMapperA001().map(hentSed());
+    fun map_forventetVerdier() {
+        val sedGrunnlagDto = SedGrunnlagMapperA001().map(hentSed())
 
-        assertThat(sedGrunnlagDto).isNotNull();
-        assertThat(sedGrunnlagDto.getSedType()).isEqualTo("A001");
+        sedGrunnlagDto.shouldNotBeNull()
+            .sedType shouldBe "A001"
 
-        assertThat(sedGrunnlagDto.getUtenlandskIdent())
-            .as("Utenlandsk ident har rett felt")
-            .extracting(Ident::getIdent, Ident::getLandkode, Ident::erUtenlandsk)
-            .containsExactlyInAnyOrder(tuple("15225345345", "BG", true));
+        withClue("Utenlandsk ident har rett felt") {
+            sedGrunnlagDto.utenlandskIdent.shouldNotBeNull().single().run {
+                ident shouldBe "15225345345"
+                landkode shouldBe "BG"
+                erUtenlandsk() shouldBe true
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getBostedsadresse())
-            .as("Bostedsadresse har rett felt")
-            .extracting(Adresse::getAdressetype, Adresse::getLand, Adresse::getGateadresse)
-            .containsExactlyInAnyOrder(Adressetype.BOSTEDSADRESSE, "BE", "Testgate Testbyggnavn");
+        withClue("Bostedsadresse har rett felt") {
+            sedGrunnlagDto.bostedsadresse.shouldNotBeNull().run {
+                adressetype shouldBe Adressetype.BOSTEDSADRESSE
+                land shouldBe "BE"
+                gateadresse shouldBe "Testgate Testbyggnavn"
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getArbeidssteder())
-            .as("Arbeidssteder har rett info")
-            .extracting(Arbeidssted::getNavn, Arbeidssted::isFysisk, Arbeidssted::getHjemmebase)
-            .containsExactlyInAnyOrder(
-                tuple("Testarbeidsstednavn", false, "Testarbeidsstedbase"),
-                tuple("Testarbeidsstednavn2", true, "Testarbeidsstedbase2")
-            );
+        withClue("Arbeidssteder har rett info") {
+            sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).apply {
+                first().run {
+                    navn shouldBe "Testarbeidsstednavn"
+                    isFysisk shouldBe false
+                    hjemmebase shouldBe "Testarbeidsstedbase"
+                }
+                last().run {
+                    navn shouldBe "Testarbeidsstednavn2"
+                    isFysisk shouldBe true
+                    hjemmebase shouldBe "Testarbeidsstedbase2"
+                }
+            }
+        }
 
-        assertThat(sedGrunnlagDto.getArbeidssteder())
-            .as("Arbeidssteder har rette adresser")
-            .extracting(Arbeidssted::getAdresse)
-            .extracting(Adresse::getLand, Adresse::getPostnr, Adresse::getPoststed, Adresse::getRegion, Adresse::getGateadresse)
-            .containsExactlyInAnyOrder(
-                tuple("EE", "Testarbeidsstedpostkode", "Testarbeidsstedby", "Testarbeidsstedregion", "Testarbeidsstedgate Testarbeidsstedbygning"),
-                tuple("CY", null, "Testarbeidsstedby2", null, "Testarbeidsstedgate2 Testarbeidsstedbygning2")
-            );
-
-
+        withClue("Arbeidssteder har rette adresser") {
+            sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).apply {
+                first().run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "EE"
+                        postnr shouldBe "Testarbeidsstedpostkode"
+                        poststed shouldBe "Testarbeidsstedby"
+                        region shouldBe "Testarbeidsstedregion"
+                        gateadresse shouldBe "Testarbeidsstedgate Testarbeidsstedbygning"
+                    }
+                }
+                last().run {
+                    adresse.shouldNotBeNull().run {
+                        land shouldBe "CY"
+                        postnr shouldBe null
+                        poststed shouldBe "Testarbeidsstedby2"
+                        region shouldBe null
+                        gateadresse shouldBe "Testarbeidsstedgate2 Testarbeidsstedbygning2"
+                    }
+                }
+            }
+        }
     }
 
-    private static SED hentSed() throws IOException {
-        URL jsonUrl = SedGrunnlagMapperA001Test.class.getClassLoader().getResource("mock/sedA001.json");
-        return new ObjectMapper().readValue(jsonUrl, SED.class);
+    companion object {
+        private fun hentSed(): SED {
+            val jsonUrl = SedGrunnlagMapperA001Test::class.java.classLoader.getResource("mock/sedA001.json")
+            return ObjectMapper().readValue(jsonUrl, SED::class.java)
+        }
     }
 }
