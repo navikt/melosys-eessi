@@ -1,217 +1,200 @@
-package no.nav.melosys.eessi.service.sed;
+package no.nav.melosys.eessi.service.sed
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-import java.util.*;
+import io.getunleash.FakeUnleash
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import no.nav.melosys.eessi.models.BucType
+import no.nav.melosys.eessi.models.FagsakRinasakKobling
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.SedVedlegg
+import no.nav.melosys.eessi.models.buc.Action
+import no.nav.melosys.eessi.models.buc.BUC
+import no.nav.melosys.eessi.models.buc.Document
+import no.nav.melosys.eessi.models.exception.IntegrationException
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.service.eux.EuxService
+import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
+import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.util.*
 
-import io.getunleash.FakeUnleash;
-import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto;
-import no.nav.melosys.eessi.controller.dto.Periode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
-import no.nav.melosys.eessi.models.BucType;
-import no.nav.melosys.eessi.models.FagsakRinasakKobling;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.SedVedlegg;
-import no.nav.melosys.eessi.models.buc.Action;
-import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.exception.IntegrationException;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
-import no.nav.melosys.eessi.service.eux.EuxService;
-import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse;
-import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockKExtension::class)
 class SedServiceTest {
 
-    @Mock
-    private EuxService euxService;
-    @Mock
-    private SaksrelasjonService saksrelasjonService;
+    @MockK
+    lateinit var euxService: EuxService
 
-    private SedService sendSedService;
-    private FakeUnleash fakeUnleash = new FakeUnleash();
+    @MockK
+    lateinit var saksrelasjonService: SaksrelasjonService
 
-    private final String RINA_ID = "aabbcc";
+    lateinit var sendSedService: SedService
+    private val fakeUnleash = FakeUnleash()
+
+    private val RINA_ID = "aabbcc"
 
     @BeforeEach
-    public void setup() {
-        sendSedService = new SedService(euxService, saksrelasjonService, fakeUnleash);
+    fun setup() {
+        sendSedService = SedService(euxService, saksrelasjonService, fakeUnleash, 0L)
     }
 
     @Test
-    void opprettBucOgSed_forventRinacaseId() throws Exception {
-        SedDataDto sedData = SedDataStub.getStub();
-        final BucType bucType = BucType.LA_BUC_01;
-        final Collection<SedVedlegg> vedlegg = Set.of(new SedVedlegg("tittei", "pdf".getBytes()));
+    fun opprettBucOgSed_forventRinacaseId() {
+        val sedData = SedDataStub.getStub()
+        val bucType = BucType.LA_BUC_01
+        val vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray()))
 
-        when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
-            .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
-        when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.hentRinaUrl(any()) } returns "URL"
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
+        every { euxService.sendSed(any(), any(), any()) } returns Unit
 
-        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true, false);
-        verify(euxService).opprettBucOgSed(eq(bucType), eq(sedData.getMottakerIder()), any(SED.class), eq(vedlegg));
-        assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
+        val sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true, false)
+
+        verify { euxService.opprettBucOgSed(bucType, sedData.mottakerIder, any(), vedlegg) }
+        sedDto.rinaSaksnummer shouldBe RINA_ID
     }
 
     @Test
-    void opprettBucOgSed_sendSedKasterException_forventSlettBucOgSakrelasjon() throws Exception {
-        SedDataDto sedData = SedDataStub.getStub();
-        when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
-            .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
-        doThrow(IntegrationException.class).when(euxService).sendSed(anyString(), anyString(), anyString());
+    fun opprettBucOgSed_sendSedKasterException_forventSlettBucOgSakrelasjon() {
+        val sedData = SedDataStub.getStub()
 
-        Exception exception = null;
-        try {
-            sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true, false);
-        } catch (IntegrationException e) {
-            exception = e;
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.sendSed(any(), any(), any()) } throws IntegrationException("")
+        every { euxService.slettBUC(RINA_ID) } returns Unit
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
+        every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
+
+        shouldThrow<IntegrationException> {
+            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
         }
 
-        assertThat(exception).isNotNull().isInstanceOf(IntegrationException.class);
-        verify(euxService).slettBUC(RINA_ID);
-        verify(saksrelasjonService).slettVedRinaId(RINA_ID);
+        verify { euxService.slettBUC(RINA_ID) }
+        verify { saksrelasjonService.slettVedRinaId(RINA_ID) }
     }
 
     @Test
-    void opprettBucOgSed_brukerMedSensitiveOpplysninger_forventSettSakSensitiv() throws Exception {
-        SedDataDto sedData = SedDataStub.getStub();
-        sedData.getBruker().setHarSensitiveOpplysninger(true);
-        when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
-            .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
-        when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
+    fun opprettBucOgSed_brukerMedSensitiveOpplysninger_forventSettSakSensitiv() {
+        val sedData = SedDataStub.getStub().apply {
+            bruker.isHarSensitiveOpplysninger = true
+        }
 
-        BucOgSedOpprettetDto sedDto = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_02, true, false);
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.hentRinaUrl(any()) } returns "URL"
+        every { saksrelasjonService.lagreKobling(123, RINA_ID, BucType.LA_BUC_02) } returns mockk<FagsakRinasakKobling>()
+        every { euxService.settSakSensitiv(RINA_ID) } returns Unit
+        every { euxService.sendSed(RINA_ID, "123", SedType.A003.name) } returns Unit
 
-        assertThat(sedDto.getRinaSaksnummer()).isEqualTo(RINA_ID);
-        verify(euxService).settSakSensitiv(RINA_ID);
+        val sedDto = sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+
+        sedDto.rinaSaksnummer shouldBe RINA_ID
+        verify { euxService.settSakSensitiv(RINA_ID) }
     }
 
     @Test
-    void opprettBucOgSed_sedEksistererPaaBuc_forventOppdaterEksisterendeSed() throws Exception {
-        Long gsakSaksnummer = 123L;
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        sedDataDto.setGsakSaksnummer(gsakSaksnummer);
+    fun opprettBucOgSed_sedEksistererPaaBuc_forventOppdaterEksisterendeSed() {
+        val gsakSaksnummer = 123L
+        val sedDataDto = SedDataStub.getStub().apply { this.gsakSaksnummer = gsakSaksnummer }
 
-        FagsakRinasakKobling fagsakRinasakKobling = new FagsakRinasakKobling();
-        fagsakRinasakKobling.setBucType(BucType.LA_BUC_02);
-        fagsakRinasakKobling.setRinaSaksnummer(RINA_ID);
-        fagsakRinasakKobling.setGsakSaksnummer(gsakSaksnummer);
-        when(saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, BucType.LA_BUC_02))
-            .thenReturn(Collections.singletonList(fagsakRinasakKobling));
+        val fagsakRinasakKobling = FagsakRinasakKobling(
+            rinaSaksnummer = RINA_ID,
+            gsakSaksnummer = gsakSaksnummer,
+            bucType = BucType.LA_BUC_02
+        )
 
-        BUC buc = new BUC();
-        buc.setId(RINA_ID);
-        buc.setBucVersjon("v4.1");
-        buc.setStatus("open");
+        every { saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, BucType.LA_BUC_02) } returns listOf(fagsakRinasakKobling)
 
-        String emptyDocumentId = "docid12314";
-        Document emptyDocument = new Document();
-        emptyDocument.setStatus("empty");
-        emptyDocument.setId(emptyDocumentId);
-        emptyDocument.setType(SedType.A003.name());
+        val buc = BUC().apply {
+            id = RINA_ID
+            bucVersjon = "v4.1"
+            status = "open"
+            documents = listOf(
+                Document(id = "docid12314", status = "empty", type = SedType.A003.name),
+                Document(id = "docid321", status = "sent", type = SedType.A003.name)
+            )
+            actions = listOf(
+                Action(documentId = "docid12314", operation = "update"),
+                Action(documentId = "docid321", operation = "update")
+            )
+        }
 
-        String sentDocumentId = "docid321";
-        Document sentDocument = new Document();
-        sentDocument.setStatus("sent");
-        sentDocument.setId(sentDocumentId);
-        sentDocument.setType(SedType.A003.name());
+        every { euxService.finnBUC(RINA_ID) } returns Optional.of(buc)
+        every { euxService.oppdaterSed(RINA_ID, "docid321", any()) } returns Unit
+        every { euxService.sendSed(RINA_ID, "docid321", SedType.A003.name) } returns Unit
+        every { euxService.hentRinaUrl(RINA_ID) } returns "URL"
 
-        buc.setDocuments(List.of(emptyDocument, sentDocument));
 
-        Action emptyDocAction = new Action();
-        emptyDocAction.setDocumentId(emptyDocumentId);
-        emptyDocAction.setOperation("update");
+        sendSedService.opprettBucOgSed(sedDataDto, emptyList(), BucType.LA_BUC_02, true, true)
 
-        Action sentDocAction = new Action();
-        sentDocAction.setDocumentId(sentDocumentId);
-        sentDocAction.setOperation("update");
-
-        buc.setActions(List.of(emptyDocAction, sentDocAction));
-
-        when(euxService.finnBUC(RINA_ID)).thenReturn(Optional.of(buc));
-
-        sendSedService.opprettBucOgSed(sedDataDto, null, BucType.LA_BUC_02, true, true);
-
-        verify(euxService).oppdaterSed(eq(RINA_ID), eq(sentDocumentId), any(SED.class));
-        verify(euxService, never()).opprettBucOgSed(any(), any(), any(), any());
-        verify(euxService).sendSed(anyString(), anyString(), anyString());
+        verify { euxService.oppdaterSed(eq(RINA_ID), eq("docid321"), any()) }
+        verify(exactly = 0) { euxService.opprettBucOgSed(any(), any(), any(), any()) }
+        verify { euxService.sendSed(any(), any(), any()) }
     }
 
     @Test
-    void opprettBucOgSed_ingenGsakSaksnummer_forventMappingException() throws Exception {
-        SedDataDto sedData = SedDataStub.getStub();
-        sedData.setGsakSaksnummer(null);
-        assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_04, true, false))
-            .withMessageContaining("GsakId er påkrevd");
+    fun opprettBucOgSed_ingenGsakSaksnummer_forventMappingException() {
+        val sedData = SedDataStub.getStub().apply { gsakSaksnummer = null }
+
+        shouldThrow<MappingException> {
+            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_04, true, false)
+        }.message shouldContain "GsakId er påkrevd"
     }
 
     @Test
-    void opprettBucOgSed_LABUC01_forventOpprettNyBucOgSedMedUrl() throws Exception {
-        SedDataDto sedData = SedDataStub.getStub();
-        when(euxService.opprettBucOgSed(any(BucType.class), anyCollection(), any(SED.class), any()))
-            .thenReturn(new OpprettBucOgSedResponse(RINA_ID, "123"));
-        when(euxService.hentRinaUrl(anyString())).thenReturn("URL");
+    fun opprettBucOgSed_LABUC01_forventOpprettNyBucOgSedMedUrl() {
+        val sedData = SedDataStub.getStub()
 
-        BucOgSedOpprettetDto response = sendSedService.opprettBucOgSed(sedData, null, BucType.LA_BUC_01, false, false);
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.hentRinaUrl(any()) } returns "URL"
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
 
-        verify(euxService).opprettBucOgSed(any(BucType.class), anyCollection(), any(), any());
-        verify(euxService).hentRinaUrl(RINA_ID);
-        verify(euxService, never()).sendSed(anyString(), anyString(), anyString());
-        assertThat(response.getRinaSaksnummer()).isEqualTo(RINA_ID);
-        assertThat(response.getRinaUrl()).isEqualTo("URL");
+        val response = sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_01, false, false)
+
+        verify { euxService.opprettBucOgSed(any(), any(), any(), any()) }
+        verify { euxService.hentRinaUrl(RINA_ID) }
+        verify(exactly = 0) { euxService.sendSed(any(), any(), any()) }
+
+        response.rinaSaksnummer shouldBe RINA_ID
+        response.rinaUrl shouldBe "URL"
     }
 
     @Test
-    void sendPåEksisterendeBuc_forventMetodekall() throws IOException, URISyntaxException, IntegrationException, NotFoundException, MappingException {
-        BUC buc = new BUC();
-        buc.setBucVersjon("v4.1");
-        buc.setActions(Arrays.asList(
-            new Action("A001", "A001", "111", "Read"),
-            new Action("A009", "A009", "222", "Create")
-        ));
-        when(euxService.hentBuc(anyString())).thenReturn(buc);
+    fun sendPåEksisterendeBuc_forventMetodekall() {
+        val buc = BUC().apply {
+            bucVersjon = "v4.1"
+            actions = listOf(
+                Action("A001", "A001", "111", "Read"),
+                Action("A009", "A009", "222", "Create")
+            )
+        }
 
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A009);
+        every { euxService.hentBuc(any()) } returns buc
+        every { euxService.opprettOgSendSed(any(), any()) } returns Unit
 
-        verify(euxService).hentBuc(anyString());
-        verify(euxService).opprettOgSendSed(any(SED.class), anyString());
+        val sedDataDto = SedDataStub.getStub()
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A009)
+
+        verify { euxService.hentBuc(any()) }
+        verify { euxService.opprettOgSendSed(any(), any()) }
     }
 
     @Test
-    void genererPdfFraSed_forventKall() throws Exception {
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        final byte[] MOCK_PDF = "vi later som om dette er en pdf".getBytes();
+    fun genererPdfFraSed_forventKall() {
+        val sedDataDto = SedDataStub.getStub()
+        val mockPdf = "vi later som om dette er en pdf".toByteArray()
 
-        when(euxService.genererPdfFraSed(any(SED.class))).thenReturn(MOCK_PDF);
-        byte[] pdf = sendSedService.genererPdfFraSed(sedDataDto, SedType.A001);
+        every { euxService.genererPdfFraSed(any()) } returns mockPdf
 
-        verify(euxService).genererPdfFraSed(any(SED.class));
-        assertThat(pdf).isEqualTo(MOCK_PDF);
-    }
+        val pdf = sendSedService.genererPdfFraSed(sedDataDto, SedType.A001)
 
-    private SvarAnmodningUnntakDto lagSvarAnmodningUnntakDto(SvarAnmodningUnntakBeslutning beslutning) {
-        return new SvarAnmodningUnntakDto(
-            beslutning,
-            "begrunnelse",
-            new Periode(LocalDate.now(), LocalDate.now().plusDays(1L))
-        );
+        verify { euxService.genererPdfFraSed(any()) }
+        pdf shouldBe mockPdf
     }
 }
