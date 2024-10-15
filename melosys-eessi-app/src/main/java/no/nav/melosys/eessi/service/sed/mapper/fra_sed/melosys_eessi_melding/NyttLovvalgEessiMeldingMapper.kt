@@ -34,8 +34,8 @@ interface NyttLovvalgEessiMeldingMapper<T : Medlemskap> : NyttLovvalgSedMapper<T
 
         melosysEessiMelding.lovvalgsland = hentLovvalgsland(medlemskap)
         melosysEessiMelding.artikkel = hentLovvalgsbestemmelse(medlemskap)
-        melosysEessiMelding.isErEndring = sedErEndring || sedErEndring(medlemskap)
-        melosysEessiMelding.isMidlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
+        melosysEessiMelding.erEndring = sedErEndring || sedErEndring(medlemskap)
+        melosysEessiMelding.midlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
         melosysEessiMelding.anmodningUnntak = hentAnmodningUnntak(medlemskap)
 
         return melosysEessiMelding
