@@ -80,7 +80,8 @@ class JournalpostSedKoblingServiceTest {
 
         melosysEessiMelding.shouldNotBeNull().run {
             sedType shouldBe "A008"
-            avsender.avsenderID shouldBe "mnb"
+            avsender.shouldNotBeNull()
+                .avsenderID shouldBe "mnb"
         }
     }
 }

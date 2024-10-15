@@ -38,7 +38,8 @@ class MelosysEessiMeldingMapperA010Test {
         melding.shouldNotBeNull().run {
             gsakSaksnummer.shouldNotBeNull()
             artikkel shouldBe "11_4"
-            periode.tom.shouldNotBeNull()
+            periode.shouldNotBeNull()
+                .tom.shouldNotBeNull()
             statsborgerskap.shouldNotBeEmpty()
             journalpostId shouldBe "journalpost"
             aktoerId shouldBe "aktørid"
@@ -46,7 +47,7 @@ class MelosysEessiMeldingMapperA010Test {
             dokumentId shouldBe "dokument"
             lovvalgsland shouldBe "SE"
             gsakSaksnummer shouldBe 123L
-            isErEndring shouldBe false
+            erEndring shouldBe false
         }
     }
 
@@ -67,7 +68,8 @@ class MelosysEessiMeldingMapperA010Test {
         melding.shouldNotBeNull().run {
             gsakSaksnummer.shouldNotBeNull()
             artikkel shouldBe "11_4"
-            periode.tom shouldBe null
+            periode.shouldNotBeNull()
+                .tom shouldBe null
             statsborgerskap.shouldNotBeEmpty()
             journalpostId shouldBe "journalpost"
             aktoerId shouldBe "aktørid"
@@ -75,7 +77,7 @@ class MelosysEessiMeldingMapperA010Test {
             dokumentId shouldBe "dokument"
             lovvalgsland shouldBe "SE"
             gsakSaksnummer shouldBe 123L
-            isErEndring shouldBe false
+            erEndring shouldBe false
         }
     }
 
@@ -95,7 +97,7 @@ class MelosysEessiMeldingMapperA010Test {
         )
 
         melding.shouldNotBeNull().run {
-            isErEndring shouldBe true
+            erEndring shouldBe true
         }
     }
 
@@ -114,7 +116,7 @@ class MelosysEessiMeldingMapperA010Test {
         )
 
         melding.shouldNotBeNull().run {
-            isErEndring shouldBe true
+            erEndring shouldBe true
         }
     }
 

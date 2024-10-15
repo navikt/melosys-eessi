@@ -25,7 +25,7 @@ class MelosysEessiMeldingMapperX006(private val rinaInstitusjonId: String) : Mel
             sedErEndring, sedVersjon
         )
 
-        melosysEessiMelding.isX006NavErFjernet = inneholderOgErNorskInstitusjon(sed!!)
+        melosysEessiMelding.x006NavErFjernet = inneholderOgErNorskInstitusjon(sed!!)
 
         return melosysEessiMelding
     }

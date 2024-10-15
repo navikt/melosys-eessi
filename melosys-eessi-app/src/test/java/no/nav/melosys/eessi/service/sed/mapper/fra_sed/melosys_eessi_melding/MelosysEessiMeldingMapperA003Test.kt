@@ -38,8 +38,9 @@ class MelosysEessiMeldingMapperA003Test {
             )
 
         melosysEessiMelding.shouldNotBeNull().run {
-            periode.fom shouldBe LocalDate.of(2000, 12, 12)
-            isErEndring shouldBe true
+            periode.shouldNotBeNull()
+                .fom shouldBe LocalDate.of(2000, 12, 12)
+            erEndring shouldBe true
             artikkel shouldBe "13_1_b_i"
         }
     }

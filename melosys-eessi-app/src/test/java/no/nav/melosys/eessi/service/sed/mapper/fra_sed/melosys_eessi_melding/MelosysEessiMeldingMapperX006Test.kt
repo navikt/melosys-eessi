@@ -43,7 +43,7 @@ class MelosysEessiMeldingMapperX006Test {
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
-            isX006NavErFjernet shouldBe true
+            x006NavErFjernet shouldBe true
         }
     }
 
@@ -62,7 +62,7 @@ class MelosysEessiMeldingMapperX006Test {
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
-            isX006NavErFjernet shouldBe false
+            x006NavErFjernet shouldBe false
         }
     }
 
@@ -81,7 +81,7 @@ class MelosysEessiMeldingMapperX006Test {
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
-            isX006NavErFjernet shouldBe false
+            x006NavErFjernet shouldBe false
         }
     }
 
@@ -100,7 +100,7 @@ class MelosysEessiMeldingMapperX006Test {
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
-            isX006NavErFjernet shouldBe false
+            x006NavErFjernet shouldBe false
         }
     }
 

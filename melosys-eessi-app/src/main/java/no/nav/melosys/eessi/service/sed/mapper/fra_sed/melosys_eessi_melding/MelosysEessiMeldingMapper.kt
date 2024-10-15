@@ -45,7 +45,7 @@ interface MelosysEessiMeldingMapper {
                     arbeidsland = arbeidslandList.map(::Arbeidsland)
                 }
             }
-            this.isErEndring = sedErEndring
+            this.erEndring = sedErEndring
             this.sedVersjon = sedVersjon
         }
     }
