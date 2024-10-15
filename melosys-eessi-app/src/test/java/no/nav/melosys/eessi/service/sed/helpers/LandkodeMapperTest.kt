@@ -1,7 +1,6 @@
-package no.nav.melosys.eessi.service.helpers
+package no.nav.melosys.eessi.service.sed.helpers
 
 import io.kotest.matchers.shouldBe
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import org.junit.jupiter.api.Test
 
 class LandkodeMapperTest {
@@ -80,5 +79,10 @@ class LandkodeMapperTest {
     @Test
     fun `skal returnere GR sin ISO3 i for EL`() {
         LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("EL", false) shouldBe "GRC"
+    }
+
+    @Test
+    fun `skal returnere kosovo`() {
+        LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("XK", true) shouldBe "XKK"
     }
 }
