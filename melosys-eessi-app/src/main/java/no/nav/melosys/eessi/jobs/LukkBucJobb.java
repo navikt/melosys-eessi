@@ -6,6 +6,7 @@ import java.util.Arrays;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.service.buc.LukkBucService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -15,12 +16,13 @@ public class LukkBucJobb {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(LukkBucJobb.class);
     private final LukkBucService lukkBucService;
 
-    public LukkBucJobb(LukkBucService lukkBucService) {
+    public LukkBucJobb(LukkBucService lukkBucService, @Value("${cron.job.lukk-buc}") String cronExpression) {
         this.lukkBucService = lukkBucService;
+        log.info("LukkBucJobb cron expression: {}", cronExpression);
     }
 
     //00:00 hver dag
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "${cron.job.lukk-buc}")
     @SchedulerLock(name = "closeBuc", lockAtLeastFor = "10m", lockAtMostFor = "120m")
     public void lukkBuc() {
         Arrays.stream(BucType.values()).filter(this::bucKanLukkes).forEach(lukkBucService::lukkBucerAvType);
