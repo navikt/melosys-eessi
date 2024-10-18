@@ -18,7 +18,7 @@ public class LukkBucJobb {
 
     public LukkBucJobb(LukkBucService lukkBucService, @Value("${cron.job.lukk-buc}") String cronExpression) {
         this.lukkBucService = lukkBucService;
-        log.info("LukkBucJobb expression: {}", cronExpression);
+        log.info("LukkBucJobb cron expression: {}", cronExpression);
     }
 
     //00:00 hver dag
