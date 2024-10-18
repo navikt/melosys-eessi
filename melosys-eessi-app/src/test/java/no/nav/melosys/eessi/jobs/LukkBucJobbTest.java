@@ -20,7 +20,7 @@ class LukkBucJobbTest {
 
     @BeforeEach
     void setup() {
-        lukkBucJobb = new LukkBucJobb(lukkBucService);
+        lukkBucJobb = new LukkBucJobb(lukkBucService, "0 0 0 * * 3");
     }
 
     @Test
