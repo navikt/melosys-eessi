@@ -1,55 +1,46 @@
-package no.nav.melosys.eessi.models.buc;
+package no.nav.melosys.eessi.models.buc
 
+import io.kotest.matchers.shouldBe
+import no.nav.melosys.eessi.models.sed.Konstanter
+import no.nav.melosys.eessi.models.sed.SED
+import org.junit.jupiter.api.Test
 
-import no.nav.melosys.eessi.models.sed.Konstanter;
-import no.nav.melosys.eessi.models.sed.SED;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class SedVersjonSjekkerTest {
 
-    private final BUC buc = new BUC();
-    private final SED sed = new SED();
-
     @Test
-    void verifiserSedVersjonErBucVersjon_erLikVersjon_oppdateresIkke() {
+    fun `verifiserSedVersjonErBucVersjon - er lik versjon, oppdateres ikke`() {
+        val buc = BUC(bucVersjon = "v4.1")
+        val sed = SED(sedGVer = "4", sedVer = "1")
 
-        buc.setBucVersjon("v4.1");
-        sed.setSedGVer("4");
-        sed.setSedVer("1");
-
-        SedVersjonSjekker.verifiserSedVersjonErBucVersjon(buc, sed);
-        assertThat(sed.getSedGVer()).isEqualTo("4");
-        assertThat(sed.getSedVer()).isEqualTo("1");
+        SedVersjonSjekker.verifiserSedVersjonErBucVersjon(buc, sed)
+        sed.sedGVer shouldBe "4"
+        sed.sedVer shouldBe "1"
     }
 
     @Test
-    void verifiserSedVersjonErBucVersjon_erForskjelligVersjon_oppdateres() {
+    fun `verifiserSedVersjonErBucVersjon - er forskjellig versjon, oppdateres`() {
+        val buc = BUC(bucVersjon = "v5.4")
+        val sed = SED(sedGVer = "4", sedVer = "1")
 
-        buc.setBucVersjon("v5.4");
-        sed.setSedGVer("4");
-        sed.setSedVer("1");
-
-        SedVersjonSjekker.verifiserSedVersjonErBucVersjon(buc, sed);
-        assertThat(sed.getSedGVer()).isEqualTo("5");
-        assertThat(sed.getSedVer()).isEqualTo("4");
+        SedVersjonSjekker.verifiserSedVersjonErBucVersjon(buc, sed)
+        sed.sedGVer shouldBe "5"
+        sed.sedVer shouldBe "4"
     }
 
     @Test
-    void hentBucVersjon_riktigFormat_fungerer() {
-        buc.setBucVersjon("v4.0");
+    fun `hentBucVersjon - riktig format, fungerer`() {
+        val buc = BUC(bucVersjon = "v4.0")
 
-        assertThat(SedVersjonSjekker.parseGVer(buc)).isEqualTo("4");
-        assertThat(SedVersjonSjekker.parseVer(buc)).isEqualTo("0");
+        SedVersjonSjekker.parseGVer(buc) shouldBe "4"
+        SedVersjonSjekker.parseVer(buc) shouldBe "0"
     }
 
     @Test
-    void hentBucVersjon_uventetFormat_fårDefault() {
-        buc.setBucVersjon("v21");
+    fun `hentBucVersjon - uventet format, får default`() {
+        val buc = BUC(bucVersjon = "v21")
 
-        assertThat(SedVersjonSjekker.parseGVer(buc)).isEqualTo(Konstanter.DEFAULT_SED_G_VER);
-        assertThat(SedVersjonSjekker.parseVer(buc)).isEqualTo(Konstanter.DEFAULT_SED_VER);
+        SedVersjonSjekker.parseGVer(buc) shouldBe Konstanter.DEFAULT_SED_G_VER
+        SedVersjonSjekker.parseVer(buc) shouldBe Konstanter.DEFAULT_SED_VER
     }
-
 }
