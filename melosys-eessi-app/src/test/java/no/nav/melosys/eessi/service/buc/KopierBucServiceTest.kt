@@ -1,5 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -27,7 +28,7 @@ class KopierBucServiceTest {
 
     private val euxService: EuxService = mockk()
     private val saksrelasjonService: SaksrelasjonService = mockk()
-    private val objectMapper = ObjectMapper().apply {
+    private val objectMapper = jacksonObjectMapper().apply {
         registerModule(JavaTimeModule())
     }
     private lateinit var kopierBucService: KopierBucService

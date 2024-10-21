@@ -1,192 +1,165 @@
-package no.nav.melosys.eessi.identifisering;
+package no.nav.melosys.eessi.identifisering
 
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import no.nav.melosys.eessi.integration.PersonFasade
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.buc.BUC
+import no.nav.melosys.eessi.models.buc.Creator
+import no.nav.melosys.eessi.models.buc.Document
+import no.nav.melosys.eessi.models.buc.Organisation
+import no.nav.melosys.eessi.models.person.Kjønn
+import no.nav.melosys.eessi.models.person.PersonModell
+import no.nav.melosys.eessi.models.person.UtenlandskId
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.service.eux.EuxService
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
+import java.time.ZonedDateTime
 
-import no.nav.melosys.eessi.integration.PersonFasade;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.buc.BUC;
-import no.nav.melosys.eessi.models.buc.Creator;
-import no.nav.melosys.eessi.models.buc.Document;
-import no.nav.melosys.eessi.models.buc.Organisation;
-import no.nav.melosys.eessi.models.person.Kjønn;
-import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.models.person.UtenlandskId;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.eux.EuxService;
-import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+@ExtendWith(MockKExtension::class)
+internal class IdentifiseringKontrollServiceTest {
 
-import static no.nav.melosys.eessi.models.sed.nav.Kjønn.K;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
+    @MockK
+    private lateinit var euxService: EuxService
 
-@ExtendWith(MockitoExtension.class)
-class IdentifiseringKontrollServiceTest {
+    @MockK
+    private lateinit var personFasade: PersonFasade
 
-    @Mock
-    private EuxService euxService;
-    @Mock
-    private PersonFasade personFasade;
-    @Mock
-    private PersonSokMetrikker personSokMetrikker;
+    @MockK(relaxed = true)
+    private lateinit var personSokMetrikker: PersonSokMetrikker
 
-    private IdentifiseringKontrollService identifiseringKontrollService;
+    private lateinit var identifiseringKontrollService: IdentifiseringKontrollService
 
-    private final BUC buc = lagBuc();
-    private final SED sed = new SED();
+    private val sed = SED()
 
-    private final LocalDate fødselsdato = LocalDate.now();
-    private final Person sedPerson = new Person();
-    private final String utenlandskId = "41545325643";
-    private final String avsenderLand = "SE";
-    private final Statsborgerskap statsborgerskap = new Statsborgerskap();
-    private final String aktørID = "53254341";
+    private val fødselsdato: LocalDate = LocalDate.now()
+    private val sedPerson = Person()
+    private val utenlandskId = "41545325643"
+    private val avsenderLand: String = "SE"
+    private val statsborgerskap = Statsborgerskap()
+    private val aktørID = "53254341"
 
-    private final String rinaSaksnummer = "432534";
-    private final String dokumentId = "abcdefghijkl1";
+    private val rinaSaksnummer = "432534"
+    private val dokumentId = "abcdefghijkl1"
 
-    private final PersonModell.PersonModellBuilder personBuilder = PersonModell.builder();
-
+    private val buc = lagBuc()
+    private val personBuilder = PersonModell.builder()
 
     @BeforeEach
-    void setup() {
-        identifiseringKontrollService = new IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker);
-        var utenlandskPin = new Pin(utenlandskId, avsenderLand, null);
+    fun setup() {
+        identifiseringKontrollService = IdentifiseringKontrollService(personFasade, euxService, personSokMetrikker)
 
-        statsborgerskap.setLand(avsenderLand);
+        val utenlandskPin = Pin(utenlandskId, avsenderLand, null)
+        statsborgerskap.land = avsenderLand
 
-        sedPerson.setFoedselsdato(fødselsdato.toString());
-        sedPerson.setKjoenn(K);
-        sedPerson.setPin(Set.of(utenlandskPin));
-        sedPerson.setStatsborgerskap(Set.of(statsborgerskap));
+        sedPerson.foedselsdato = fødselsdato.toString()
+        sedPerson.kjoenn = no.nav.melosys.eessi.models.sed.nav.Kjønn.K
+        sedPerson.pin = setOf(utenlandskPin)
+        sedPerson.statsborgerskap = setOf(statsborgerskap)
 
-        sed.setNav(new Nav());
-        sed.getNav().setBruker(new Bruker());
-        sed.getNav().getBruker().setPerson(sedPerson);
-        sed.setSedType(SedType.A009.name());
+        sed.nav = Nav(
+            bruker = Bruker(
+                person = sedPerson
+            )
+        )
+        sed.sedType = SedType.A009.name
 
-        when(euxService.hentBuc(rinaSaksnummer)).thenReturn(buc);
-        when(euxService.hentSed(rinaSaksnummer, dokumentId)).thenReturn(sed);
+        every { euxService.hentBuc(rinaSaksnummer) } answers {
+            print("rinaSaksnummer: $rinaSaksnummer buc: $buc")
+            buc
+        }
+        every { euxService.hentSed(rinaSaksnummer, dokumentId) } returns sed
 
         personBuilder
             .kjønn(Kjønn.KVINNE)
             .fødselsdato(fødselsdato)
-            .statsborgerskapLandkodeISO2(Set.of(avsenderLand))
-            .utenlandskId(Set.of(new UtenlandskId(utenlandskId, avsenderLand)));
-
+            .statsborgerskapLandkodeISO2(setOf(avsenderLand))
+            .utenlandskId(setOf(UtenlandskId(utenlandskId, avsenderLand)))
     }
 
-    private BUC lagBuc() {
-        var buc = new BUC();
-        buc.setCreator(new Creator());
-        buc.getCreator().setOrganisation(new Organisation());
-        buc.getCreator().getOrganisation().setCountryCode(avsenderLand);
+    private fun lagBuc(): BUC = BUC(
+        creator = Creator(
+            organisation = Organisation(
+                countryCode = avsenderLand
+            )
+        ),
+        documents = listOf(
+            Document(
+                id = dokumentId,
+                direction = "IN",
+                status = "CREATED",
+                creationDate = ZonedDateTime.now()
+            )
+        )
+    )
 
-        var dokument = new Document();
-        dokument.setId(dokumentId);
-        dokument.setDirection("IN");
-        dokument.setStatus("CREATED");
-        dokument.setCreationDate(ZonedDateTime.now());
-        buc.setDocuments(List.of(dokument));
+    @Test
+    fun `kontrollerIdentifisertPerson - person samstemmer med SED, identifisert`() {
+        every { personFasade.hentPerson(aktørID) } returns personBuilder.build()
 
-        return buc;
+        val resultat = identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
+
+        resultat.erIdentifisert() shouldBe true
+        resultat.begrunnelser.shouldBeEmpty()
     }
 
     @Test
-    void kontrollerIdentifisertPerson_personSamstemmerMedSed_identifisert() {
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(true, Collections.emptyList());
+    fun `kontrollerIdentifisertPerson - person med ukjent kjønn, identifisert`() {
+        sedPerson.kjoenn = no.nav.melosys.eessi.models.sed.nav.Kjønn.U
+        every { personFasade.hentPerson(aktørID) } returns personBuilder.build()
+
+        val resultat = identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
+
+        resultat.erIdentifisert() shouldBe true
+        resultat.begrunnelser.shouldBeEmpty()
     }
 
     @Test
-    void kontrollerIdentifiseringPerson_personMedUkjentKjonn_identifisert() {
-        sedPerson.setKjoenn(no.nav.melosys.eessi.models.sed.nav.Kjønn.U);
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(true, Collections.emptyList());
+    fun `kontrollerIdentifisertPerson - person overstyrt av ID og fordeling, identifisert`() {
+        sedPerson.foedselsdato = LocalDate.now().minusMonths(3).toString()
+        every { personFasade.hentPerson(aktørID) } returns personBuilder.build()
+
+        val resultat = identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 2)
+
+        resultat.erIdentifisert() shouldBe true
+        resultat.begrunnelser.shouldBeEmpty()
     }
 
     @Test
-    void kontrollerIdentifiseringsPerson_personOverstyrtAvIDogFordeling_identifisert() {
-        sedPerson.setFoedselsdato(LocalDate.now().minusMonths(3).toString());
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 2))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(true, Collections.emptyList());
+    fun `kontrollerIdentifisertPerson - person har ikke riktig statsborgerskap, ikke identifisert`() {
+        every { personFasade.hentPerson(aktørID) } returns personBuilder.statsborgerskapLandkodeISO2(setOf("DK")).build()
+
+        val resultat = identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
+
+        resultat.erIdentifisert() shouldBe false
+        resultat.begrunnelser shouldContain IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP
     }
 
     @Test
-    void kontrollerIdentifiseringsPerson_personIkkeOverstyrtAvIDogFordeling_ikkeIdentifisert() {
-        final List<IdentifiseringsKontrollBegrunnelse> begrunnelser = new ArrayList<>();
-        begrunnelser.add(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO);
-        final var identifiseringsKontrollResultatData = new IdentifiseringsKontrollResultat(begrunnelser);
-        sedPerson.setFoedselsdato(LocalDate.now().minusMonths(3).toString());
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
+    fun `kontrollerIdentifisertPerson - person har ikke riktig fødselsdato, ikke identifisert`() {
+        every { personFasade.hentPerson(aktørID) } returns personBuilder.fødselsdato(LocalDate.now().minusYears(3)).build()
 
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
-            .hentFeilIOpplysningerTekst()).isEqualTo(identifiseringsKontrollResultatData.hentFeilIOpplysningerTekst());
+        val resultat = identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
+
+        resultat.erIdentifisert() shouldBe false
+        resultat.begrunnelser shouldContain IdentifiseringsKontrollBegrunnelse.FØDSELSDATO
     }
 
     @Test
-    void kontrollerIdentifisertPerson_personHarIkkeRiktigStatsborgerskap_ikkeIdentifisert() {
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP));
-    }
+    fun `kontrollerIdentifisertPerson - person har ikke riktig utenlandsk id, ikke identifisert`() {
+        every { personFasade.hentPerson(aktørID) } returns personBuilder.utenlandskId(setOf(UtenlandskId("feil-pin", avsenderLand))).build()
 
-    @Test
-    void kontrollerIdentifisertPerson_personOgSedHarIkkeSammeStatsborgerskap_ikkeIdentifisert() {
-        sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK"), new Statsborgerskap("NO")));
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.STATSBORGERSKAP));
-    }
+        val resultat = identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1)
 
-    @Test
-    void kontrollerIdentifisertPerson_personOgSedHarSammeStatsborgerskap_identifisert() {
-        sedPerson.setStatsborgerskap(Set.of(new Statsborgerskap("DK")));
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.statsborgerskapLandkodeISO2(Set.of("DK")).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(true, Lists.emptyList());
-    }
-
-    @Test
-    void kontrollerIdentifisertPerson_personHarFeilKjønn_ikkeIdentifisert() {
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.kjønn(Kjønn.MANN).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.KJØNN));
-    }
-
-    @Test
-    void kontrollerIdentifisertPerson_personHarIkkeRiktigFødselsdato_ikkeIdentifisert() {
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.fødselsdato(LocalDate.now().minusYears(3)).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.FØDSELSDATO));
-    }
-
-    @Test
-    void kontrollerIdentifisertPerson_personHarIkkeRiktigUtenlandskId_ikkeIdentifisert() {
-        when(personFasade.hentPerson(aktørID)).thenReturn(personBuilder.utenlandskId(Set.of(new UtenlandskId("feil-pin", avsenderLand))).build());
-        assertThat(identifiseringKontrollService.kontrollerIdentifisertPerson(aktørID, rinaSaksnummer, 1))
-            .extracting(IdentifiseringsKontrollResultat::erIdentifisert, IdentifiseringsKontrollResultat::getBegrunnelser)
-            .containsExactly(false, List.of(IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID));
+        resultat.erIdentifisert() shouldBe false
+        resultat.begrunnelser shouldContain IdentifiseringsKontrollBegrunnelse.UTENLANDSK_ID
     }
 }

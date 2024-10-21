@@ -46,9 +46,8 @@ class SedServiceTest {
     }
 
     @Test
-    fun opprettBucOgSed_forventRinacaseId() {
+    fun `opprettBucOgSed - forvent Rina case id`() {
         val sedData = SedDataStub.getStub()
-        val bucType = BucType.LA_BUC_01
         val vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray()))
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
@@ -58,12 +57,12 @@ class SedServiceTest {
 
         val sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true, false)
 
-        verify { euxService.opprettBucOgSed(bucType, sedData.mottakerIder, any(), vedlegg) }
+        verify { euxService.opprettBucOgSed(BucType.LA_BUC_01, sedData.mottakerIder, any(), vedlegg) }
         sedDto.rinaSaksnummer shouldBe RINA_ID
     }
 
     @Test
-    fun opprettBucOgSed_sendSedKasterException_forventSlettBucOgSakrelasjon() {
+    fun `opprettBucOgSed - send Sed kaster exception, forvent slett Buc og Sakrelasjon`() {
         val sedData = SedDataStub.getStub()
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
@@ -81,7 +80,7 @@ class SedServiceTest {
     }
 
     @Test
-    fun opprettBucOgSed_brukerMedSensitiveOpplysninger_forventSettSakSensitiv() {
+    fun `opprettBucOgSed - bruker med sensitive opplysninger, forvent sett SakSensitiv`() {
         val sedData = SedDataStub.getStub().apply {
             bruker.isHarSensitiveOpplysninger = true
         }
@@ -99,7 +98,7 @@ class SedServiceTest {
     }
 
     @Test
-    fun opprettBucOgSed_sedEksistererPaaBuc_forventOppdaterEksisterendeSed() {
+    fun `opprettBucOgSed - Sed eksisterer på Buc, forvent oppdater eksisterende Sed`() {
         val gsakSaksnummer = 123L
         val sedDataDto = SedDataStub.getStub().apply { this.gsakSaksnummer = gsakSaksnummer }
 
@@ -111,25 +110,24 @@ class SedServiceTest {
 
         every { saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, BucType.LA_BUC_02) } returns listOf(fagsakRinasakKobling)
 
-        val buc = BUC().apply {
-            id = RINA_ID
-            bucVersjon = "v4.1"
-            status = "open"
+        val buc = BUC(
+            id = RINA_ID,
+            bucVersjon = "v4.",
+            status = "open",
             documents = listOf(
                 Document(id = "docid12314", status = "empty", type = SedType.A003.name),
                 Document(id = "docid321", status = "sent", type = SedType.A003.name)
-            )
+            ),
             actions = listOf(
                 Action(documentId = "docid12314", operation = "update"),
                 Action(documentId = "docid321", operation = "update")
             )
-        }
+        )
 
         every { euxService.finnBUC(RINA_ID) } returns Optional.of(buc)
         every { euxService.oppdaterSed(RINA_ID, "docid321", any()) } returns Unit
         every { euxService.sendSed(RINA_ID, "docid321", SedType.A003.name) } returns Unit
         every { euxService.hentRinaUrl(RINA_ID) } returns "URL"
-
 
         sendSedService.opprettBucOgSed(sedDataDto, emptyList(), BucType.LA_BUC_02, true, true)
 
@@ -139,7 +137,7 @@ class SedServiceTest {
     }
 
     @Test
-    fun opprettBucOgSed_ingenGsakSaksnummer_forventMappingException() {
+    fun `opprettBucOgSed - ingen Gsak Saksnummer, forvent MappingException`() {
         val sedData = SedDataStub.getStub().apply { gsakSaksnummer = null }
 
         shouldThrow<MappingException> {
@@ -148,7 +146,7 @@ class SedServiceTest {
     }
 
     @Test
-    fun opprettBucOgSed_LABUC01_forventOpprettNyBucOgSedMedUrl() {
+    fun `opprettBucOgSed - LA_BUC_01, forvent opprett ny Buc og Sed med URL`() {
         val sedData = SedDataStub.getStub()
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
@@ -166,14 +164,14 @@ class SedServiceTest {
     }
 
     @Test
-    fun sendPåEksisterendeBuc_forventMetodekall() {
-        val buc = BUC().apply {
-            bucVersjon = "v4.1"
+    fun `send på eksisterende Buc, forvent metodekall`() {
+        val buc = BUC(
+            bucVersjon = "v4.1",
             actions = listOf(
                 Action("A001", "A001", "111", "Read"),
                 Action("A009", "A009", "222", "Create")
             )
-        }
+        )
 
         every { euxService.hentBuc(any()) } returns buc
         every { euxService.opprettOgSendSed(any(), any()) } returns Unit
@@ -186,7 +184,7 @@ class SedServiceTest {
     }
 
     @Test
-    fun genererPdfFraSed_forventKall() {
+    fun `genererPdfFraSed, forvent kall`() {
         val sedDataDto = SedDataStub.getStub()
         val mockPdf = "vi later som om dette er en pdf".toByteArray()
 

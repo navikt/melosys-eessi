@@ -133,23 +133,36 @@ public class MockData {
     }
 
     BUC buc(String id) {
-        BUC buc = new BUC();
-        buc.setId(id);
-
+        // Create a document with conversations
         Document document = new Document();
         document.setConversations(Arrays.asList(new Conversation(), new Conversation()));
         document.setId(id);
         document.setStatus("CREATED");
         document.setDirection("IN");
-        buc.setDocuments(Collections.singletonList(document));
+        List<Document> documents = Collections.singletonList(document);
 
+        // Create organisation and creator
         Organisation organisation = new Organisation();
         organisation.setCountryCode("SE");
-        buc.setCreator(new Creator());
-        buc.getCreator().setOrganisation(organisation);
-        return buc;
-    }
 
+        Creator creator = new Creator();
+        creator.setOrganisation(organisation);
+
+        // Construct the BUC object with documents and creator
+        return new BUC(
+            id, // id
+            null, // startDate
+            null, // lastUpdate
+            null, // status
+            creator, // creator
+            documents, // documents
+            Collections.emptyList(), // actions
+            null, // bucType
+            null, // bucVersion
+            Collections.emptyList(), // participants
+            null // internationalId
+        );
+    }
     public PDLPerson pdlPerson(LocalDate fødselsdato, String statsborgerskapLandkode) {
         var pdlPerson = new PDLPerson();
 

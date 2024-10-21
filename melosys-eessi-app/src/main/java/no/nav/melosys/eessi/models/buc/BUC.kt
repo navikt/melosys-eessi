@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.models.buc
 
-import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import no.nav.melosys.eessi.controller.dto.SedStatus
@@ -10,18 +9,18 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class BUC @JsonCreator constructor(
-    @JsonProperty("id") var id: String? = null,
-    @JsonProperty("startDate") var startDate: ZonedDateTime? = null,
-    @JsonProperty("lastUpdate") var lastUpdate: ZonedDateTime? = null,
-    @JsonProperty("status") var status: String? = null,
-    @JsonProperty("creator") var creator: Creator? = null, // TODO: gjør denne none-nullable
-    @JsonProperty("documents") var documents: List<Document> = listOf(),
-    @JsonProperty("actions") var actions: List<Action> = listOf(),
-    @JsonProperty("processDefinitionName") var bucType: String? = null, // TODO: gjør denne none-nullable
-    @JsonProperty("processDefinitionVersion") var bucVersjon: String? = null, // TODO: gjør denne none-nullable
-    @JsonProperty("participants") var participants: Collection<Participant> = listOf(),
-    @JsonProperty("internationalId") var internationalId: String? = null
+data class BUC (
+    val id: String? = null,
+    val startDate: ZonedDateTime? = null,
+    val lastUpdate: ZonedDateTime? = null,
+    val status: String? = null,
+    val creator: Creator? = null, // TODO: gjør denne none-nullable
+    val documents: List<Document> = listOf(),
+    val actions: List<Action> = listOf(),
+    @JsonProperty("processDefinitionName") val bucType: String? = null, // TODO: gjør denne none-nullable
+    @JsonProperty("processDefinitionVersion") val bucVersjon: String? = null, // TODO: gjør denne none-nullable
+    val participants: Collection<Participant> = listOf(),
+    val internationalId: String? = null
 ) {
     fun hentAvsenderLand(): String = creator!!.organisation!!.countryCode!!
 
