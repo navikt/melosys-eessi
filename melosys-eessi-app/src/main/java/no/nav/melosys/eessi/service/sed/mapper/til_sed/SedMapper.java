@@ -52,11 +52,13 @@ public interface SedMapper {
         var nav = new Nav();
         var sedType = getSedType();
 
+        boolean harFastArbeidssted = sedData.getHarFastArbeidssted() != null && sedData.getHarFastArbeidssted();
+
         if (erCDM4_3) {
             switch (sedType) {
                 case A001, A002, A003, A008, A009, A010 -> {
                     nav.setArbeidsland(hentArbeidsland(sedData));
-                    nav.setHarfastarbeidssted(sedData.getHarFastArbeidssted() ? "ja" : "nei");
+                    nav.setHarfastarbeidssted(harFastArbeidssted ? "ja" : "nei");
                 }
                 default -> nav.setArbeidssted(hentArbeidssted(sedData));
             }
