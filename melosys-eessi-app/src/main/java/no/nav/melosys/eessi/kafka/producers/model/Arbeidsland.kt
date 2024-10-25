@@ -6,6 +6,6 @@ data class Arbeidsland(
 ) {
     constructor(arbeidsland: no.nav.melosys.eessi.models.sed.nav.Arbeidsland) : this(
         arbeidsland.land,
-        arbeidsland.arbeidssted?.map { Arbeidssted(it) }
+        arbeidsland.arbeidssted.map { Arbeidssted(it) }
     )
 }

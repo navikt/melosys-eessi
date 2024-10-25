@@ -2,6 +2,8 @@ package no.nav.melosys.eessi.models.buc
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import no.nav.melosys.eessi.controller.dto.SedStatus
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedType
@@ -15,10 +17,13 @@ data class BUC (
     val lastUpdate: ZonedDateTime? = null,
     val status: String? = null,
     val creator: Creator? = null, // TODO: gjør denne none-nullable
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     val documents: List<Document> = listOf(),
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     val actions: List<Action> = listOf(),
     @JsonProperty("processDefinitionName") val bucType: String? = null, // TODO: gjør denne none-nullable
     @JsonProperty("processDefinitionVersion") val bucVersjon: String? = null, // TODO: gjør denne none-nullable
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     val participants: Collection<Participant> = listOf(),
     val internationalId: String? = null
 ) {
