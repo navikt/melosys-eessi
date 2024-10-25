@@ -70,4 +70,29 @@ class EuxConsumerSpringTest(
             documents = listOf(),
         )
     }
+
+    @Test
+    fun `skal håntere null verdier ved henting av BUC`() {
+        mockServer.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(
+                    """{
+                    "actions": null,
+                    "documents": null,
+                    "participants": null
+            }""""
+                )
+                .addHeader("Content-Type", "application/json")
+        )
+
+        val response: BUC = euxConsumer.hentBUC("1234")
+
+        response shouldBe BUC(
+            actions = listOf(),
+            participants = listOf(),
+            documents = listOf(),
+        )
+    }
+
 }
