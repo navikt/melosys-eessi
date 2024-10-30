@@ -57,8 +57,11 @@ public interface SedMapper {
         if (erCDM4_3) {
             switch (sedType) {
                 case A001, A002, A003, A008, A009, A010 -> {
-                    nav.setArbeidsland(hentArbeidsland(sedData));
-                    nav.setHarfastarbeidssted(harFastArbeidssted ? "ja" : "nei");
+                    List<Arbeidsland> arbeidsland = hentArbeidsland(sedData);
+                    if (!arbeidsland.isEmpty()) {
+                        nav.setArbeidsland(arbeidsland);
+                        nav.setHarfastarbeidssted(harFastArbeidssted ? "ja" : "nei");
+                    }
                 }
                 default -> nav.setArbeidssted(hentArbeidssted(sedData));
             }
