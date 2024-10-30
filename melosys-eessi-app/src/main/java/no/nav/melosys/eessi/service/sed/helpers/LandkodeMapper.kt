@@ -21,7 +21,7 @@ object LandkodeMapper {
         mapOf(
             STATSLØS_LANDKODE_ISO3 to STATSLØS_LANDKODE_ISO2,
             UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2,
-            "XKK" to "XK", // Kosovo
+            "XXK" to "XK", // Kosovo - XXK brukes i Nav kodeverk
         )
 
     @JvmStatic

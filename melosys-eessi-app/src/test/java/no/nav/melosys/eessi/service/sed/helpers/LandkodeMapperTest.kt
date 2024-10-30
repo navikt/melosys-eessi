@@ -83,6 +83,6 @@ class LandkodeMapperTest {
 
     @Test
     fun `skal returnere kosovo`() {
-        LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("XK", true) shouldBe "XKK"
+        LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon("XK", true) shouldBe "XXK"
     }
 }
