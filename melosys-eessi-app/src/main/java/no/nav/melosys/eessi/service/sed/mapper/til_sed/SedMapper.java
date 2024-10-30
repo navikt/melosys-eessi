@@ -220,9 +220,9 @@ public interface SedMapper {
             arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
             arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
 
-            if (arbStd.isFysisk()) {
+            if (arbStd.getFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
+            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.getFysisk()) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 
@@ -242,9 +242,9 @@ public interface SedMapper {
             arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
             arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
 
-            if (arbStd.isFysisk()) {
+            if (arbStd.getFysisk()) {
                 arbeidssted.setErikkefastadresse("nei");
-            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.isFysisk()) {
+            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.getFysisk()) {
                 arbeidssted.setErikkefastadresse("ja");
             }
 

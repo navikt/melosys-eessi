@@ -38,12 +38,12 @@ class SedGrunnlagMapperA001Test {
             sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).apply {
                 first().run {
                     navn shouldBe "Testarbeidsstednavn"
-                    isFysisk shouldBe false
+                    fysisk shouldBe false
                     hjemmebase shouldBe "Testarbeidsstedbase"
                 }
                 last().run {
                     navn shouldBe "Testarbeidsstednavn2"
-                    isFysisk shouldBe true
+                    fysisk shouldBe true
                     hjemmebase shouldBe "Testarbeidsstedbase2"
                 }
             }

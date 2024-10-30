@@ -45,7 +45,7 @@ data class BUC (
     fun erÅpen(): Boolean = !"closed".equals(status, ignoreCase = true)
 
     fun finnDokumentVedSedType(sedType: String): Document? =
-        finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) })
+        finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) ?: SedStatus.TOM })
 
     fun sedKanOppdateres(id: String): Boolean = actions.filter { id == it.documentId }
         .any { "Update".equals(it.operation, ignoreCase = true) }

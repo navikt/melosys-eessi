@@ -29,7 +29,7 @@ class SedGrunnlagMapperA003 : FraSedA003Mapper(), NyttLovvalgSedGrunnlagMapper<M
     }
 
     private fun mapOvergangsregelbestemmelse(medlemskap: MedlemskapA003): List<Bestemmelse> =
-        medlemskap.gjeldendereglerEC883?.map { Bestemmelse.fraString(it) } ?: emptyList()
+        medlemskap.gjeldendereglerEC883?.map { Bestemmelse.fraString(it)!! } ?: emptyList()
 
     private fun hentArbeidsgivere(sed: SED): List<Arbeidsgiver> =
         hentArbeidsgivere(sed.nav!!) + hentAndrelandArbeidsgivere(hentMedlemskap(sed))

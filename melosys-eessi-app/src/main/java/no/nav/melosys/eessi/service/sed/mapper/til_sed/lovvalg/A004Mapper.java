@@ -20,7 +20,7 @@ public class A004Mapper implements LovvalgSedMapper<MedlemskapA004> {
 
         MedlemskapA004 medlemskap = new MedlemskapA004();
         medlemskap.setAvslag(getAvslag(
-            utpekingAvvis.isVilSendeAnmodningOmMerInformasjon(),
+            utpekingAvvis.getVilSendeAnmodningOmMerInformasjon(),
             utpekingAvvis.getNyttLovvalgsland(),
             utpekingAvvis.getBegrunnelseUtenlandskMyndighet()
         ));

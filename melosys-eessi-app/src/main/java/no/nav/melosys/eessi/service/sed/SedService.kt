@@ -48,9 +48,9 @@ class SedService(
         val sedType = bucType!!.hentFørsteLovligeSed()
         val sedMapper = SedMapperFactory.sedMapper(sedType)
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
-        validerMottakerInstitusjoner(bucType, mottakere)
-        val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder, forsøkOppdaterEksisterende)
-        if (sedDataDto.bruker.isHarSensitiveOpplysninger) {
+        validerMottakerInstitusjoner(bucType, mottakere!!)
+        val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
+        if (sedDataDto.bruker!!.harSensitiveOpplysninger) {
             euxService.settSakSensitiv(response.rinaSaksnummer!!)
         }
         if (sedType.name.startsWith("H")) {
@@ -64,18 +64,18 @@ class SedService(
         if (sendAutomatisk) {
             sendSed(response.rinaSaksnummer!!, response.dokumentId!!, sed.sedType!!)
         }
-        return BucOgSedOpprettetDto.builder()
-            .rinaSaksnummer(response.rinaSaksnummer)
-            .rinaUrl(euxService.hentRinaUrl(response.rinaSaksnummer))
-            .build()
+        return BucOgSedOpprettetDto(
+            rinaSaksnummer = response.rinaSaksnummer,
+            rinaUrl = euxService.hentRinaUrl(response.rinaSaksnummer)
+        )
     }
 
     private fun tilUUIDMedBindestreker(uuidString: String): String = UUID.fromString(
         uuidString.substring(0, 8) + "-" +
-                uuidString.substring(8, 12) + "-" +
-                uuidString.substring(12, 16) + "-" +
-                uuidString.substring(16, 20) + "-" +
-                uuidString.substring(20)
+            uuidString.substring(8, 12) + "-" +
+            uuidString.substring(12, 16) + "-" +
+            uuidString.substring(16, 20) + "-" +
+            uuidString.substring(20)
     ).toString()
 
     private fun validerMottakerInstitusjoner(bucType: BucType, mottakere: Collection<String>) {

@@ -16,13 +16,15 @@ interface NyttLovvalgSedGrunnlagMapper<T : Medlemskap?> : NyttLovvalgSedMapper<T
     fun hentLovvalgsperiode(medlemskap: T): Lovvalgsperiode {
         val periode = hentPeriode(medlemskap)
 
-        return Lovvalgsperiode().apply {
-            fom = periode.fom
-            tom = periode.tom
-            lovvalgsland = hentLovvalgsland(medlemskap)
-            bestemmelse = Bestemmelse.fraString(hentLovvalgsbestemmelse(medlemskap))
-            unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap)
-            unntakFraBestemmelse = Bestemmelse.fraString(hentUnntakFraLovvalgsbestemmelse(medlemskap))
-        }
+        return Lovvalgsperiode(
+            fom = periode.fom,
+            tom = periode.tom,
+            lovvalgsland = hentLovvalgsland(medlemskap),
+            bestemmelse = Bestemmelse.fraString(hentLovvalgsbestemmelse(medlemskap)),
+            unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap),
+            unntakFraBestemmelse = Bestemmelse.fraString(hentUnntakFraLovvalgsbestemmelse(medlemskap)),
+            tilleggsBestemmelse = null,
+            unntaksBegrunnelse = null
+        )
     }
 }

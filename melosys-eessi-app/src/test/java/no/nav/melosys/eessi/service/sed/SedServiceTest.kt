@@ -57,7 +57,7 @@ class SedServiceTest {
 
         val sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true, false)
 
-        verify { euxService.opprettBucOgSed(BucType.LA_BUC_01, sedData.mottakerIder, any(), vedlegg) }
+        verify { euxService.opprettBucOgSed(BucType.LA_BUC_01, sedData.mottakerIder!!, any(), vedlegg) }
         sedDto.rinaSaksnummer shouldBe RINA_ID
     }
 
@@ -82,7 +82,7 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - bruker med sensitive opplysninger, forvent sett SakSensitiv`() {
         val sedData = SedDataStub.getStub().apply {
-            bruker.isHarSensitiveOpplysninger = true
+            bruker!!.harSensitiveOpplysninger = true
         }
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
