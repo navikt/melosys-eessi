@@ -44,12 +44,12 @@ internal class SedGrunnlagMapperA003Test {
             sedGrunnlagDto.arbeidssteder.shouldNotBeNull().shouldHaveSize(2).run {
                 first().run {
                     navn shouldBe "Testarbeidsstednavn"
-                    isFysisk shouldBe false
+                    fysisk shouldBe false
                     hjemmebase shouldBe "Testarbeidsstedbase"
                 }
                 last().run {
                     navn shouldBe "Testarbeidsstednavn2"
-                    isFysisk shouldBe true
+                    fysisk shouldBe true
                     hjemmebase shouldBe "Testarbeidsstedbase2"
                 }
             }
@@ -189,7 +189,7 @@ internal class SedGrunnlagMapperA003Test {
         adresse.gate = null
         sed.nav!!.bruker!!.adresse = listOf(adresse)
 
-        val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse.gateadresse
+        val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse!!.gateadresse
 
         gateadresse shouldBe "Testbyggnavn"
     }
@@ -201,7 +201,7 @@ internal class SedGrunnlagMapperA003Test {
         adresse.bygning = null
         sed.nav!!.bruker!!.adresse = listOf(adresse)
 
-        val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse.gateadresse
+        val gateadresse = sedGrunnlagMapper.map(sed).bostedsadresse!!.gateadresse
 
         gateadresse shouldBe "Testgate"
     }
@@ -224,7 +224,7 @@ internal class SedGrunnlagMapperA003Test {
         val sed = hentSed()
         (sed.medlemskap as MedlemskapA003).andreland!!.arbeidsgiver!!.iterator().next().identifikator = null
 
-        val orgnr = sedGrunnlagMapper.map(sed).norskeArbeidsgivendeVirksomheter.iterator().next().orgnr
+        val orgnr = sedGrunnlagMapper.map(sed).norskeArbeidsgivendeVirksomheter!!.iterator().next().orgnr
 
         orgnr.shouldBeNull()
     }

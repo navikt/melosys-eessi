@@ -49,7 +49,7 @@ class KafkaAdminTjenesteTestIT extends ComponentTestBase {
             }).getBody();
 
         assertThat(kafkaConsumerResponseStop).isNotNull();
-        assertThat(kafkaConsumerResponseStop.isActive())
+        assertThat(kafkaConsumerResponseStop.getActive())
             .isFalse();
 
         KafkaConsumerResponse kafkaConsumerResponseStart = testRestTemplate.exchange(
@@ -60,7 +60,7 @@ class KafkaAdminTjenesteTestIT extends ComponentTestBase {
             }).getBody();
 
         assertThat(kafkaConsumerResponseStart).isNotNull();
-        assertThat(kafkaConsumerResponseStart.isActive())
+        assertThat(kafkaConsumerResponseStart.getActive())
             .isTrue();
     }
 
