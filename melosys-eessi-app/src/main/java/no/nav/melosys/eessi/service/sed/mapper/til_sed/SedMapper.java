@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Predicate;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.controller.dto.*;
@@ -102,8 +103,8 @@ public interface SedMapper {
             .map(this::lagStatsborgerskap)
             .toList();
         if (statsborgerskapList.isEmpty()) {
-            String a = String.join(", ", statsborgerskap);
-            throw new MappingException("Statsborgerskap mangler eller er ugyldig. statsborgerskap fra sedData:" + a);
+            throw new MappingException("Statsborgerskap mangler eller er ugyldig. statsborgerskap fra sedData:" +
+                String.join(", ", statsborgerskap));
         }
         return statsborgerskapList;
     }
