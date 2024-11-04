@@ -42,7 +42,7 @@ class SedService(
         sendAutomatisk: Boolean,
         forsøkOppdaterEksisterende: Boolean
     ): BucOgSedOpprettetDto {
-        val gsakSaksnummer = hentGsakSaksnummer(sedDataDto)
+        val gsakSaksnummer = sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer)
         val mottakere = sedDataDto.mottakerIder
         val sedType = bucType!!.hentFørsteLovligeSed()
@@ -177,6 +177,4 @@ class SedService(
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.rinaSaksnummer)
         return opprettBucOgSedResponse
     }
-
-    private fun hentGsakSaksnummer(sedDataDto: SedDataDto): Long = sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
 }
