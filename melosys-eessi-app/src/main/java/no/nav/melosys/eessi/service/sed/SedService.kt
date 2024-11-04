@@ -1,9 +1,5 @@
 package no.nav.melosys.eessi.service.sed
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.getunleash.Unleash
 import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName
@@ -23,6 +19,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -51,12 +48,14 @@ class SedService(
         val mottakere = sedDataDto.mottakerIder
         val sedType = bucType!!.hentFørsteLovligeSed()
         val sedMapper = SedMapperFactory.sedMapper(sedType)
-        log.info(
-            "sedMappper:${sedMapper.javaClass.simpleName}\n" +
-                "sedDataDto:${sedDataDto.toJsonNode.toPrettyString()}\n"
-        )
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
-        log.info("mapTilSed sed:${sed.toJsonNode.toPrettyString()}")
+        sed.nav?.bruker?.person?.statsborgerskap?.let { statsborgerskap ->
+            statsborgerskap.filterNotNull().filter { it.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2 }.forEach {
+                it.land = LandkodeMapper.UKJENT_LANDKODE_ISO2
+                log.info { "Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: $gsakSaksnummer" }
+            }
+        }
+
         validerMottakerInstitusjoner(bucType, mottakere!!)
         val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
         if (sedDataDto.bruker!!.harSensitiveOpplysninger) {
@@ -189,11 +188,3 @@ class SedService(
 
     private fun hentGsakSaksnummer(sedDataDto: SedDataDto): Long = sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
 }
-
-private val Any.toJsonNode: JsonNode
-    get() {
-        return jacksonObjectMapper()
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            .registerModule(JavaTimeModule())
-            .valueToTree(this)
-    }

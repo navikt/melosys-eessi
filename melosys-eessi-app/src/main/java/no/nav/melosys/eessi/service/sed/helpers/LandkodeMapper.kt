@@ -10,8 +10,11 @@ import java.util.*
  * men er valgt på grunn av at de er i bruk i PDL og Rina. Disse gjenbruker vi i Melosys for å unngå å måtte lage egne.
  */
 object LandkodeMapper {
-    private const val UKJENT_LANDKODE_ISO3 = "XUK"
-    private const val UKJENT_LANDKODE_ISO2 = "XU"
+    const val UKJENT_LANDKODE_ISO3 = "XUK"
+    const val UKJENT_LANDKODE_ISO2 = "XU"
+
+    const val KOSOVO_LANDKODE_ISO3 = "XXK" // Kosovo - XXK brukes i Nav kodeverk
+    const val KOSOVO_LANDKODE_ISO2 = "XK"
 
     private const val STATSLØS_LANDKODE_ISO3 = "XXX"
     private const val STATSLØS_LANDKODE_ISO2 = "XS"
@@ -21,7 +24,7 @@ object LandkodeMapper {
         mapOf(
             STATSLØS_LANDKODE_ISO3 to STATSLØS_LANDKODE_ISO2,
             UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2,
-            "XXK" to "XK", // Kosovo - XXK brukes i Nav kodeverk
+            KOSOVO_LANDKODE_ISO3 to KOSOVO_LANDKODE_ISO2,
         )
 
     @JvmStatic
