@@ -104,20 +104,20 @@ public interface SedMapper {
     }
 
     default List<Statsborgerskap> hentStatsborgerskap(SedDataDto sedDataDto) {
-        Collection<String> statsborgerskap = sedDataDto.getBruker().getStatsborgerskap();
-        final List<Statsborgerskap> statsborgerskapList = statsborgerskap.stream()
+        Collection<String> statsborgerskapStringListe = sedDataDto.getBruker().getStatsborgerskap();
+        final List<Statsborgerskap> statsborgerskapList = statsborgerskapStringListe.stream()
             .filter(landkodeIso3 -> LandkodeMapper.finnLandkodeIso2(landkodeIso3).isPresent())
             .map(this::lagStatsborgerskap)
             .toList();
-        for (Statsborgerskap statsborgerskap1 : statsborgerskapList) {
-            if (statsborgerskap1.getLand() != null && statsborgerskap1.getLand().equals(LandkodeMapper.KOSOVO_LANDKODE_ISO2)) {
-                statsborgerskap1.setLand(LandkodeMapper.UKJENT_LANDKODE_ISO2);
+        for (Statsborgerskap statsborgerskap : statsborgerskapList) {
+            if (statsborgerskap.getLand() != null && statsborgerskap.getLand().equals(LandkodeMapper.KOSOVO_LANDKODE_ISO2)) {
+                statsborgerskap.setLand(LandkodeMapper.UKJENT_LANDKODE_ISO2);
                 log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: {}", sedDataDto.getGsakSaksnummer());
             }
         }
         if (statsborgerskapList.isEmpty()) {
             throw new MappingException("Statsborgerskap mangler eller er ugyldig. statsborgerskap fra sedData:" +
-                String.join(", ", statsborgerskap));
+                String.join(", ", statsborgerskapStringListe));
         }
         return statsborgerskapList;
     }
