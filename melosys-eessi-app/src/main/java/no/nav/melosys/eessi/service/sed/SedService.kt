@@ -53,7 +53,7 @@ class SedService(
         val sedMapper = SedMapperFactory.sedMapper(sedType)
         log.info(
             "sedMappper:${sedMapper.javaClass.simpleName}\n" +
-                "sedDataDto:${sedMapper.toJsonNode.toPrettyString()}\n"
+                "sedDataDto:${sedDataDto.toJsonNode.toPrettyString()}\n"
         )
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
         log.info("mapTilSed sed:${sed.toJsonNode.toPrettyString()}")
