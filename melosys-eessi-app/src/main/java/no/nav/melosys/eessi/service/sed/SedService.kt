@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.service.sed
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.getunleash.Unleash
 import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName
@@ -47,7 +51,12 @@ class SedService(
         val mottakere = sedDataDto.mottakerIder
         val sedType = bucType!!.hentFørsteLovligeSed()
         val sedMapper = SedMapperFactory.sedMapper(sedType)
+        log.info(
+            "sedMappper:${sedMapper.javaClass.simpleName}\n" +
+                "sedDataDto:${sedMapper.toJsonNode.toPrettyString()}\n"
+        )
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
+        log.info("mapTilSed sed:${sed.toJsonNode.toPrettyString()}")
         validerMottakerInstitusjoner(bucType, mottakere!!)
         val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
         if (sedDataDto.bruker!!.harSensitiveOpplysninger) {
@@ -180,3 +189,11 @@ class SedService(
 
     private fun hentGsakSaksnummer(sedDataDto: SedDataDto): Long = sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
 }
+
+private val Any.toJsonNode: JsonNode
+    get() {
+        return jacksonObjectMapper()
+            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+            .registerModule(JavaTimeModule())
+            .valueToTree(this)
+    }
