@@ -18,6 +18,8 @@ import no.nav.melosys.eessi.models.sed.nav.Bruker;
 import no.nav.melosys.eessi.models.sed.nav.Periode;
 import no.nav.melosys.eessi.models.sed.nav.*;
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import static no.nav.melosys.eessi.models.sed.Konstanter.*;
@@ -27,6 +29,8 @@ import static no.nav.melosys.eessi.models.sed.Konstanter.*;
  * å plukke ut nødvendig informasjon for en angitt SED.
  */
 public interface SedMapper {
+    Logger log = LoggerFactory.getLogger(SedMapper.class);
+
     default SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
         var sed = new SED();
         sed.setNav(prefillNav(sedData, erCDM4_3));
@@ -105,6 +109,12 @@ public interface SedMapper {
             .filter(landkodeIso3 -> LandkodeMapper.finnLandkodeIso2(landkodeIso3).isPresent())
             .map(this::lagStatsborgerskap)
             .toList();
+        for (Statsborgerskap statsborgerskap1 : statsborgerskapList) {
+            if (statsborgerskap1.getLand() != null && statsborgerskap1.getLand().equals(LandkodeMapper.KOSOVO_LANDKODE_ISO2)) {
+                statsborgerskap1.setLand(LandkodeMapper.UKJENT_LANDKODE_ISO2);
+                log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: {}", sedDataDto.getGsakSaksnummer());
+            }
+        }
         if (statsborgerskapList.isEmpty()) {
             throw new MappingException("Statsborgerskap mangler eller er ugyldig. statsborgerskap fra sedData:" +
                 String.join(", ", statsborgerskap));
