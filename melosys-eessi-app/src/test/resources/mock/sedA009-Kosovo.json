@@ -1,0 +1,99 @@
+{
+    "bruker" : {
+        "fornavn" : "TREKANTET",
+        "etternavn" : "ARM",
+        "foedseldato" : "1967-01-26",
+        "kjoenn" : "K",
+        "statsborgerskap" : [ "XXK" ],
+        "fnr" : "12345678901",
+        "harSensitiveOpplysninger" : false
+    },
+    "kontaktadresse" : null,
+    "oppholdsadresse" : null,
+    "familieMedlem" : [ ],
+    "søknadsperiode" : {
+        "fom" : "2024-10-05",
+        "tom" : "2024-10-06"
+    },
+    "avklartBostedsland" : "NO",
+    "vedtakDto" : {
+        "datoForrigeVedtak" : null,
+        "erFørstegangsvedtak" : true
+    },
+    "invalideringSedDto" : null,
+    "tidligereLovvalgsperioder" : [ ],
+    "gsakSaksnummer" : 140309382,
+    "mottakerIder" : [ "DK:0997" ],
+    "ytterligereInformasjon" : "test",
+    "svarAnmodningUnntak" : null,
+    "utpekingAvvis" : null,
+    "sedType" : "N/A",
+    "utenlandskIdent" : [ ],
+    "bostedsadresse" : {
+        "poststed" : "NOTODDEN",
+        "postnr" : "3675",
+        "land" : "NOR",
+        "gateadresse" : "Anundskåsveien 43 A",
+        "tilleggsnavn" : null,
+        "region" : null,
+        "adressetype" : "BOSTEDSADRESSE"
+    },
+    "arbeidsgivendeVirksomheter" : [ {
+        "navn" : "BESK KAFFE",
+        "adresse" : {
+            "poststed" : "ELVERUM",
+            "postnr" : "2408",
+            "land" : "NO",
+            "gateadresse" : "STENSLANDSFJELL 94",
+            "tilleggsnavn" : null,
+            "region" : null,
+            "adressetype" : null
+        },
+        "orgnr" : "963743254",
+        "type" : null
+    } ],
+    "selvstendigeVirksomheter" : [ ],
+    "arbeidssteder" : [ {
+        "navn" : "No fixed address",
+        "adresse" : {
+            "poststed" : "No fixed address",
+            "postnr" : null,
+            "land" : "DK",
+            "gateadresse" : null,
+            "tilleggsnavn" : null,
+            "region" : null,
+            "adressetype" : null
+        },
+        "fysisk" : false,
+        "hjemmebase" : null
+    } ],
+    "arbeidsland" : [ {
+        "land" : "DK",
+        "arbeidssted" : [ {
+            "navn" : "No fixed address",
+            "adresse" : {
+                "poststed" : "No fixed address",
+                "postnr" : null,
+                "land" : "DK",
+                "gateadresse" : null,
+                "tilleggsnavn" : null,
+                "region" : null,
+                "adressetype" : null
+            },
+            "fysisk" : false,
+            "hjemmebase" : null
+        } ]
+    } ],
+    "harFastArbeidssted" : false,
+    "lovvalgsperioder" : [ {
+        "lovvalgsland" : "NO",
+        "unntakFraLovvalgsland" : null,
+        "bestemmelse" : "ART_12_1",
+        "tilleggsBestemmelse" : null,
+        "fom" : "2024-10-05",
+        "tom" : "2024-10-06",
+        "unntaksBegrunnelse" : null,
+        "unntakFraBestemmelse" : null
+    } ],
+    "gjeldenderegler" : null
+}

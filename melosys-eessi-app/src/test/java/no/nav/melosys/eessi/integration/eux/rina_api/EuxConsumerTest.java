@@ -77,7 +77,7 @@ class EuxConsumerTest {
         RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
 
 
-        euxConsumer = new EuxConsumer(restTemplate, objectMapper);
+        euxConsumer = new EuxConsumer(restTemplate, objectMapper, null);
         server = MockRestServiceServer.createServer(restTemplate);
         when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken("accesstoken").build());
     }

@@ -1,14 +1,21 @@
 package no.nav.melosys.eessi.service.sed
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
+import io.mockk.CapturingSlot
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.FagsakRinasakKobling
 import no.nav.melosys.eessi.models.SedType
@@ -18,12 +25,16 @@ import no.nav.melosys.eessi.models.buc.BUC
 import no.nav.melosys.eessi.models.buc.Document
 import no.nav.melosys.eessi.models.exception.IntegrationException
 import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
@@ -59,6 +70,30 @@ class SedServiceTest {
 
         verify { euxService.opprettBucOgSed(BucType.LA_BUC_01, sedData.mottakerIder!!, any(), vedlegg) }
         sedDto.rinaSaksnummer shouldBe RINA_ID
+    }
+
+    @Test
+    fun `opprettBucOgSed - Kosovo statsborgerskap skal mappes til ukjent`() {
+        val sedCapturingSlot = CapturingSlot<SED>()
+        every { euxService.opprettBucOgSed(any(), any(), capture(sedCapturingSlot), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.hentRinaUrl(any()) } returns "URL"
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
+        every { euxService.sendSed(any(), any(), any()) } returns Unit
+
+        sendSedService.opprettBucOgSed(
+            sedDataDto = sedDataDto("mock/sedA009-Kosovo.json"),
+            vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray())),
+            bucType = BucType.LA_BUC_01,
+            sendAutomatisk = true,
+            forsøkOppdaterEksisterende = false
+        )
+
+        sedCapturingSlot.captured.nav
+            .shouldNotBeNull()
+            .bruker.shouldNotBeNull()
+            .person.shouldNotBeNull()
+            .statsborgerskap.shouldHaveSize(1).single().shouldNotBeNull()
+            .land shouldBe LandkodeMapper.UKJENT_LANDKODE_ISO2
     }
 
     @Test
@@ -195,4 +230,15 @@ class SedServiceTest {
         verify { euxService.genererPdfFraSed(any()) }
         pdf shouldBe mockPdf
     }
+
+    private fun sedDataDto(jsonFile: String): SedDataDto =
+        jacksonObjectMapper().apply {
+            registerModule(JavaTimeModule())
+        }.readValue<SedDataDto>(
+            Files.readString(
+                Paths.get(
+                    requireNotNull(SedDataStub::class.java.classLoader.getResource(jsonFile)).toURI()
+                )
+            )
+        )
 }

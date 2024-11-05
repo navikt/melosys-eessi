@@ -12,6 +12,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -30,9 +31,9 @@ public class EuxConsumerProducer {
     @Bean
     @Primary
     public EuxConsumer euxConsumer(RestTemplateBuilder builder, ClientConfigurationProperties clientConfigurationProperties,
-                                   OAuth2AccessTokenService oAuth2AccessTokenService, ObjectMapper objectMapper) {
+                                   OAuth2AccessTokenService oAuth2AccessTokenService, ObjectMapper objectMapper, Environment environment) {
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
-        return new EuxConsumer(lagRestTemplate(builder, interceptor), objectMapper);
+        return new EuxConsumer(lagRestTemplate(builder, interceptor), objectMapper, environment);
     }
 
     private RestTemplate lagRestTemplate(RestTemplateBuilder restTemplateBuilder,

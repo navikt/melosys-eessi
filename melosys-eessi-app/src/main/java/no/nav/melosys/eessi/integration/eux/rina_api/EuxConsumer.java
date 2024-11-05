@@ -22,6 +22,7 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -50,10 +51,12 @@ public class EuxConsumer implements RestConsumer {
     private static final String SED_HANDLINGER = "/buc/{rinaSaksnummer}/sed/{sedId}/handlinger";
     private static final String BUC_HANDLINGER = "/buc/{rinaSaksnummer}/muligeaksjoner";
     private static final String RINA_LENKE_PATH = "/url/buc/{rinaSaksnummer}";
+    private final Environment environment;
 
-    public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper) {
+    public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper, Environment environment) {
         this.euxRestTemplate = restTemplate;
         this.objectMapper = objectMapper;
+        this.environment = environment;
     }
 
     public BUC hentBUC(String rinaSaksnummer) {
@@ -239,6 +242,15 @@ public class EuxConsumer implements RestConsumer {
         } catch (HttpClientErrorException.NotFound e) {
             throw new NotFoundException("404 fra eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
+            try {
+                String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
+                if (appEnvironment != null && appEnvironment.equals("dev")) {
+                    String value = objectMapper.writeValueAsString(entity.getBody());
+                    log.info("Feil ved kall mot eux: {} sed:\n{}", e.getMessage(), value);
+                }
+            } catch (JsonProcessingException jsonProcessingException) {
+                log.error("Unable to serialize entity to JSON", jsonProcessingException);
+            }
             throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         }
     }
