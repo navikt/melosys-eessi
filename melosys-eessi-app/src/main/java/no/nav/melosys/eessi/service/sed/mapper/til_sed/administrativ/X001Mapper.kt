@@ -1,63 +1,52 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ
 
-import java.time.LocalDate;
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.Konstanter
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.nav.*
+import java.time.LocalDate
 
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.Konstanter;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.*;
+class X001Mapper : AdministrativSedMapper {
 
-import static no.nav.melosys.eessi.models.sed.Konstanter.*;
-
-
-public class X001Mapper implements AdministrativSedMapper {
-
-    public SED mapFraSed(SED sed, String aarsak, Boolean erCDM4_3) {
-        SED x001 = new SED();
-        x001.setSedType(SedType.X001.toString());
-        x001.setSedGVer(DEFAULT_SED_G_VER);
-        x001.setSedVer(erCDM4_3 ? SED_VER_CDM_4_3 : DEFAULT_SED_VER);
-        x001.setNav(mapNav(sed, aarsak));
-
-        return x001;
+    fun mapFraSed(sed: SED, aarsak: String, erCDM4_3: Boolean): SED {
+        return SED(
+            sedType = SedType.X001.toString(),
+            sedGVer = Konstanter.DEFAULT_SED_G_VER,
+            sedVer = if (erCDM4_3) Konstanter.SED_VER_CDM_4_3 else Konstanter.DEFAULT_SED_VER,
+            nav = mapNav(sed, aarsak)
+        )
     }
 
-    private Nav mapNav(SED sed, String aarsak) {
-        Nav nav = new Nav();
-        nav.setSak(mapSak(sed, aarsak));
-        return nav;
+    private fun mapNav(sed: SED, aarsak: String): Nav {
+        return Nav(
+            sak = mapSak(sed, aarsak)
+        )
     }
 
-    private Sak mapSak(SED sed, String aarsak) {
-        Sak sak = new Sak();
-        sak.setAnmodning(mapAnmodning(aarsak));
-        sak.setKontekst(mapKontekst(sed));
-        return sak;
+    private fun mapSak(sed: SED, aarsak: String): Sak {
+        return Sak(
+            anmodning = mapAnmodning(aarsak),
+            kontekst = mapKontekst(sed)
+        )
     }
 
-    private Kontekst mapKontekst(SED sed) {
-        Kontekst kontekst = new Kontekst();
-        kontekst.setBruker(sed.getNav().getBruker());
-        return kontekst;
+    private fun mapKontekst(sed: SED): Kontekst {
+        return Kontekst(
+            bruker = sed.nav?.bruker
+        )
     }
 
-    private X001Anmodning mapAnmodning(String aarsakType) {
-        X001Anmodning anmodning = new X001Anmodning();
-
-        Aarsak aarsak = new Aarsak();
-        aarsak.setType(aarsakType);
-
-        Avslutning avslutning = new Avslutning();
-        avslutning.setDato(LocalDate.now().format(Konstanter.dateTimeFormatter));
-        avslutning.setAarsak(aarsak);
-        avslutning.setType("automatisk");
-
-        anmodning.setAvslutning(avslutning);
-        return anmodning;
+    private fun mapAnmodning(aarsakType: String): X001Anmodning {
+        val aarsak = Aarsak(type = aarsakType)
+        val avslutning = Avslutning(
+            dato = LocalDate.now().format(Konstanter.dateTimeFormatter),
+            aarsak = aarsak,
+            type = "automatisk"
+        )
+        return X001Anmodning(avslutning = avslutning)
     }
 
-    @Override
-    public SedType getSedType() {
-        return SedType.X001;
+    override fun getSedType(): SedType {
+        return SedType.X001
     }
 }

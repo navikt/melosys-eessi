@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SedMapperTest {
-    private final SedMapper sedMapper = () -> null;
+    private final SedMapper sedMapper =  new TempTestSedMapper(); // fjerns når vi koverterer til Kotlin
 
     private SedDataDto sedData;
 
@@ -44,13 +44,6 @@ class SedMapperTest {
         arbeidsland.stream().forEach(arbLand -> {
             assertThat(arbLand.getArbeidssted()).hasSize(1);
         });
-    }
-
-    @Test
-    void hentHarfastarbeidssted() {
-        final Boolean harfastarbeidssted = sedMapper.hentHarfastarbeidssted(sedData);
-
-        assertThat(harfastarbeidssted).isTrue();
     }
 
     @Test

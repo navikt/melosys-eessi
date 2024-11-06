@@ -1,85 +1,78 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.util.Optional;
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
+import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
+import no.nav.melosys.eessi.models.sed.nav.Fastperiode
+import no.nav.melosys.eessi.models.sed.nav.Periode
+import no.nav.melosys.eessi.models.sed.nav.Utsendingsland
+import no.nav.melosys.eessi.models.sed.nav.VedtakA009
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.mapTilLandkodeIso2
 
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.models.sed.nav.Fastperiode;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.models.sed.nav.Utsendingsland;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA009;
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+class A009Mapper : LovvalgSedMapper<MedlemskapA009> {
+    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA009 {
+        val medlemskapA009 = MedlemskapA009()
+        medlemskapA009.vedtak = getVedtak(sedData)
+        medlemskapA009.andreland = getAndreland(sedData)
+        medlemskapA009.utsendingsland = getUtsendingsland(sedData)
 
-public class A009Mapper implements LovvalgSedMapper<MedlemskapA009> {
-
-    @Override
-    public MedlemskapA009 getMedlemskap(SedDataDto sedData) {
-
-        final MedlemskapA009 medlemskapA009 = new MedlemskapA009();
-        medlemskapA009.setVedtak(getVedtak(sedData));
-        medlemskapA009.setAndreland(getAndreland(sedData));
-        medlemskapA009.setUtsendingsland(getUtsendingsland(sedData));
-
-        return medlemskapA009;
+        return medlemskapA009
     }
 
-    private VedtakA009 getVedtak(SedDataDto sedDataDto) {
-        VedtakA009 vedtak = new VedtakA009();
-        final Optional<Lovvalgsperiode> lovvalgsperiode = sedDataDto.finnLovvalgsperiode();
-        Periode gjelderperiode = new Periode();
+    private fun getVedtak(sedDataDto: SedDataDto): VedtakA009 {
+        val vedtak = VedtakA009()
+        val lovvalgsperiode = sedDataDto.finnLovvalgsperiode()
+        val gjelderperiode = Periode()
 
-        if (lovvalgsperiode.isPresent()) {
-            vedtak.setLand(LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.get().getLovvalgsland()));
+        if (lovvalgsperiode.isPresent) {
+            vedtak.land = mapTilLandkodeIso2(lovvalgsperiode.get().lovvalgsland)
 
             //Vil alltid være fast periode
-            gjelderperiode.setFastperiode(lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode.get()));
+            gjelderperiode.fastperiode = lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode.get())
 
-            if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.get().getBestemmelse())) {
-                throw new MappingException("Lovvalgsbestemmelse er ikke av artikkel 12!");
+            if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.get().bestemmelse)) {
+                throw MappingException("Lovvalgsbestemmelse er ikke av artikkel 12!")
             }
-            vedtak.setArtikkelforordning(lovvalgsperiode.get().getBestemmelse().getValue());
-
+            vedtak.artikkelforordning = lovvalgsperiode.get().bestemmelse!!.value
         }
 
-        setVedtaksdata(vedtak, sedDataDto.getVedtakDto());
-        vedtak.setGjeldervarighetyrkesaktivitet("nei");
-        vedtak.setGjelderperiode(gjelderperiode);
-        return vedtak;
+        setVedtaksdata(vedtak, sedDataDto.vedtakDto)
+        vedtak.gjeldervarighetyrkesaktivitet = "nei"
+        vedtak.gjelderperiode = gjelderperiode
+        return vedtak
     }
 
 
-    private Fastperiode lagFastPeriodeFraLovvalgsPeriode(Lovvalgsperiode lovvalgsperiode) {
-        Fastperiode fastperiode = new Fastperiode();
-        fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
-        fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
-        return fastperiode;
+    private fun lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode: Lovvalgsperiode): Fastperiode {
+        val fastperiode = Fastperiode()
+        fastperiode.startdato = formaterDato(lovvalgsperiode.fom!!)
+        fastperiode.sluttdato = formaterDato(lovvalgsperiode.tom!!)
+        return fastperiode
     }
 
-    private boolean erGyldigLovvalgbestemmelse(Bestemmelse bestemmelse) {
+    private fun erGyldigLovvalgbestemmelse(bestemmelse: Bestemmelse?): Boolean {
         return bestemmelse == Bestemmelse.ART_12_1
-            || bestemmelse == Bestemmelse.ART_12_2;
+                || bestemmelse == Bestemmelse.ART_12_2
     }
 
-    private Utsendingsland getUtsendingsland(SedDataDto sedData) {
-        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
-        Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
-        return utsendingsland;
+    private fun getUtsendingsland(sedData: SedDataDto): Utsendingsland {
+        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
+        val utsendingsland = Utsendingsland()
+        utsendingsland.arbeidsgiver = hentArbeidsgivereILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
+        return utsendingsland
     }
 
-    private Utsendingsland getAndreland(SedDataDto sedData) {
-        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
-        Utsendingsland utsendingsland = new Utsendingsland();
-        utsendingsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
-        return utsendingsland;
+    private fun getAndreland(sedData: SedDataDto): Utsendingsland {
+        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
+        val utsendingsland = Utsendingsland()
+        utsendingsland.arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
+        return utsendingsland
     }
 
 
-    public SedType getSedType() {
-        return SedType.A009;
-    }
+    override fun getSedType() = SedType.A009
+
 }

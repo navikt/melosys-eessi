@@ -1,33 +1,28 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011;
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011
 
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER;
-import static no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER;
+class A011Mapper : LovvalgSedMapper<MedlemskapA011> {
+    fun mapFraSed(sed: SED): SED {
+        val a011 = SED()
+        a011.sedType = SedType.A011.toString()
+        a011.sedGVer = DEFAULT_SED_G_VER
+        a011.sedVer = DEFAULT_SED_VER
+        a011.nav = sed.nav
+        a011.medlemskap = MedlemskapA011()
 
-public class A011Mapper implements LovvalgSedMapper<MedlemskapA011> {
-
-    public SED mapFraSed(SED sed) {
-        SED a011 = new SED();
-        a011.setSedType(SedType.A011.toString());
-        a011.setSedGVer(DEFAULT_SED_G_VER);
-        a011.setSedVer(DEFAULT_SED_VER);
-        a011.setNav(sed.getNav());
-        a011.setMedlemskap(new MedlemskapA011());
-
-        return a011;
+        return a011
     }
 
-    @Override
-    public MedlemskapA011 getMedlemskap(SedDataDto sedData) {
-        return new MedlemskapA011();
+    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA011 {
+        return MedlemskapA011()
     }
 
-    @Override
-    public SedType getSedType() {
-        return SedType.A011;
-    }
+    override fun getSedType() = SedType.A011
 }
+

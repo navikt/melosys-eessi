@@ -1,46 +1,42 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ
 
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper;
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 
-public class X008Mapper implements SedMapper {
+class X008Mapper : SedMapper {
+    override fun mapTilSed(sedData: SedDataDto, erCDM4_3: Boolean): SED {
+        val sed = super.mapTilSed(sedData, erCDM4_3)
 
-    @Override
-    public SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
-        var sed = SedMapper.super.mapTilSed(sedData, erCDM4_3);
+        val sakForSed = mapSak(sedData, sed!!)
+        sed.nav!!.sak = sakForSed
 
-        Sak sakForSed = mapSak(sedData, sed);
-        sed.getNav().setSak(sakForSed);
-
-        return sed;
+        return sed
     }
 
-    public Sak mapSak(SedDataDto sedData, SED sed) {
-        var sak = new Sak();
-        var invalideringSed = new InvalideringSed();
+    fun mapSak(sedData: SedDataDto, sed: SED): Sak {
+        val sak = Sak()
+        val invalideringSed = InvalideringSed()
 
-        invalideringSed.setType(sedData.getInvalideringSedDto().getSedTypeSomSkalInvalideres());
-        invalideringSed.setUtstedelsesdato(sedData.getInvalideringSedDto().getUtstedelsedato());
+        invalideringSed.type = sedData.invalideringSedDto!!.sedTypeSomSkalInvalideres
+        invalideringSed.utstedelsesdato = sedData.invalideringSedDto!!.utstedelsedato
         // 04  = The case was reconsidered and the grounds for the invalidated SED are no longer valid
-        invalideringSed.setGrunn(new Grunn("04", ""));
+        invalideringSed.grunn = Grunn("04", "")
 
-        sak.setUgyldiggjoere(new Ugyldiggjoere(invalideringSed));
-        sak.setKontekst(mapKontekst(sed));
+        sak.ugyldiggjoere = Ugyldiggjoere(invalideringSed)
+        sak.kontekst = mapKontekst(sed)
 
-        return sak;
+        return sak
     }
 
-    @Override
-    public SedType getSedType() {
-        return SedType.X008;
+    override fun getSedType(): SedType {
+        return SedType.X008
     }
-
-    private Kontekst mapKontekst(SED sed) {
-        Kontekst kontekst = new Kontekst();
-        kontekst.setBruker(sed.getNav().getBruker());
-        return kontekst;
+    private fun mapKontekst(sed: SED): Kontekst {
+        val kontekst = Kontekst()
+        kontekst.bruker = sed.nav!!.bruker
+        return kontekst
     }
 }
