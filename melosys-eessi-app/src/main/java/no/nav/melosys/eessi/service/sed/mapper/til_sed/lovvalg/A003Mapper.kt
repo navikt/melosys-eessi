@@ -1,64 +1,56 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.util.Optional;
+import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
+import no.nav.melosys.eessi.models.sed.nav.Andreland
+import no.nav.melosys.eessi.models.sed.nav.PeriodeA010
+import no.nav.melosys.eessi.models.sed.nav.VedtakA003
 
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003;
-import no.nav.melosys.eessi.models.sed.nav.Andreland;
-import no.nav.melosys.eessi.models.sed.nav.PeriodeA010;
-import no.nav.melosys.eessi.models.sed.nav.VedtakA003;
+class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
+    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA003 {
+        val medlemskap = MedlemskapA003()
 
-public class A003Mapper implements LovvalgSedMapper<MedlemskapA003> {
+        medlemskap.vedtak = getVedtak(sedData)
+        medlemskap.andreland = getAndreLand(sedData)
 
-    @Override
-    public MedlemskapA003 getMedlemskap(SedDataDto sedData) {
-
-        MedlemskapA003 medlemskap = new MedlemskapA003();
-
-        medlemskap.setVedtak(getVedtak(sedData));
-        medlemskap.setAndreland(getAndreLand(sedData));
-
-        if (!sedData.getLovvalgsperioder().isEmpty()) {
-            medlemskap.setRelevantartikkelfor8832004eller9872009(sedData.getLovvalgsperioder().get(0).getBestemmelse().getValue());
+        if (!sedData.lovvalgsperioder!!.isEmpty()) {
+            medlemskap.relevantartikkelfor8832004eller9872009 = sedData.lovvalgsperioder!![0].bestemmelse!!.value
         }
 
-        return medlemskap;
+        return medlemskap
     }
 
-    private VedtakA003 getVedtak(SedDataDto sedData) {
-        VedtakA003 vedtak = new VedtakA003();
-        final Optional<Lovvalgsperiode> lovvalgsperiode = sedData.finnLovvalgsperiode();
+    private fun getVedtak(sedData: SedDataDto): VedtakA003 {
+        val vedtak = VedtakA003()
+        val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
-        if (lovvalgsperiode.isPresent()) {
-            vedtak.setLand(lovvalgsperiode.get().getLovvalgsland());
-            vedtak.setGjelderperiode(getPeriode(lovvalgsperiode.get()));
+        if (lovvalgsperiode.isPresent) {
+            vedtak.land = lovvalgsperiode.get().lovvalgsland
+            vedtak.gjelderperiode = getPeriode(lovvalgsperiode.get())
         }
 
-        vedtak.setGjeldervarighetyrkesaktivitet("ja");
-        setVedtaksdata(vedtak, sedData.getVedtakDto());
+        vedtak.gjeldervarighetyrkesaktivitet = "ja"
+        setVedtaksdata(vedtak, sedData.vedtakDto)
 
-        return vedtak;
+        return vedtak
     }
 
-    private PeriodeA010 getPeriode(Lovvalgsperiode lovvalgsperiode) {
-        PeriodeA010 periode = new PeriodeA010();
-        periode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
-        periode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
-        return periode;
+    private fun getPeriode(lovvalgsperiode: Lovvalgsperiode): PeriodeA010 {
+        val periode = PeriodeA010()
+        periode.startdato = formaterDato(lovvalgsperiode.fom!!)
+        periode.sluttdato = formaterDato(lovvalgsperiode.tom!!)
+        return periode
     }
 
 
-    private Andreland getAndreLand(SedDataDto sedData) {
-        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
-        Andreland andreland = new Andreland();
-        andreland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
-        return andreland;
+    private fun getAndreLand(sedData: SedDataDto): Andreland {
+        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
+        val andreland = Andreland()
+        andreland.arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
+        return andreland
     }
 
-    @Override
-    public SedType getSedType() {
-        return SedType.A003;
-    }
+    override fun getSedType() = SedType.A003
 }

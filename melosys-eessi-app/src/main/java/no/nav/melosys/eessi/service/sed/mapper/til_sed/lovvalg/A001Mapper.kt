@@ -1,106 +1,86 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001
+import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper
 
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper;
+class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
 
-public class A001Mapper implements LovvalgSedMapper<MedlemskapA001> {
+    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA001 {
+        val medlemskap = MedlemskapA001()
+        val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
-    @Override
-    public MedlemskapA001 getMedlemskap(SedDataDto sedData) {
-
-        final MedlemskapA001 medlemskap = new MedlemskapA001();
-        final Optional<Lovvalgsperiode> lovvalgsperiode = sedData.finnLovvalgsperiode();
-
-        if (lovvalgsperiode.isPresent()) {
-            medlemskap.setUnntak(getUnntak(lovvalgsperiode.get()));
-            medlemskap.setNaavaerendemedlemskap(getUnntakFraLovvalgsland(lovvalgsperiode.get()));
-            medlemskap.setForespurtmedlemskap(getLovvalgsland(lovvalgsperiode.get()));
-            medlemskap.setSoeknadsperiode(getSoeknadsperiode(lovvalgsperiode.get()));
-            medlemskap.setTidligereperiode(getTidligerePeriode(sedData.getTidligereLovvalgsperioder()));
+        if (lovvalgsperiode.isPresent) {
+            medlemskap.unntak = getUnntak(lovvalgsperiode.get())
+            medlemskap.naavaerendemedlemskap = getUnntakFraLovvalgsland(lovvalgsperiode.get()).toMutableList()
+            medlemskap.forespurtmedlemskap = getLovvalgsland(lovvalgsperiode.get()).toMutableList()
+            medlemskap.soeknadsperiode = getSoeknadsperiode(lovvalgsperiode.get())
+            medlemskap.tidligereperiode = getTidligerePeriode(sedData.tidligereLovvalgsperioder).toMutableList()
         }
 
-        medlemskap.setVertsland(getVertsland(sedData));
-        medlemskap.setAnmodning(getAnmodning());
+        medlemskap.vertsland = getVertsland(sedData)
+        medlemskap.anmodning = getAnmodning()
 
-        return medlemskap;
+        return medlemskap
     }
 
-    private Unntak getUnntak(Lovvalgsperiode lovvalgsperiode) {
-        Unntak unntak = new Unntak();
+    private fun getUnntak(lovvalgsperiode: Lovvalgsperiode): Unntak {
+        val unntak = Unntak()
+        unntak.begrunnelse = lovvalgsperiode.unntaksBegrunnelse
 
-        // Hent fast tekst (samme som i brev), denne kan overskrives av saksbehandler (særlig grunn)
-        unntak.setBegrunnelse(lovvalgsperiode.getUnntaksBegrunnelse());
+        val grunnlag = Grunnlag()
+        grunnlag.artikkel = UnntakArtikkelMapper.mapFromBestemmelse(lovvalgsperiode.unntakFraBestemmelse)
 
-        Grunnlag grunnlag = new Grunnlag();
-        grunnlag.setArtikkel(UnntakArtikkelMapper.mapFromBestemmelse(lovvalgsperiode.getUnntakFraBestemmelse()));
-
-        if (UnntakArtikkelMapper.BESTEMMELSE_OTHER.equals(grunnlag.getAnnet())) {
-            // Støttes ikke i denne versjonen av melosys
-            grunnlag.setAnnet(""); // maks 255 tegn
+        if (UnntakArtikkelMapper.BESTEMMELSE_OTHER == grunnlag.annet) {
+            grunnlag.annet = ""
         }
-        unntak.setGrunnlag(grunnlag);
+        unntak.grunnlag = grunnlag
 
-        return unntak;
+        return unntak
     }
 
-    private Vertsland getVertsland(SedDataDto sedData) {
-        final String lovvalgsland = sedData.finnLovvalgslandDefaultNO();
-        Vertsland vertsland = new Vertsland();
-        vertsland.setArbeidsgiver(hentArbeidsgivereIkkeILand(sedData.getArbeidsgivendeVirksomheter(), lovvalgsland));
+    private fun getVertsland(sedData: SedDataDto): Vertsland {
+        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
+        val vertsland = Vertsland()
+        vertsland.arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
 
-        return vertsland;
+        return vertsland
     }
 
-    private List<Land> getUnntakFraLovvalgsland(Lovvalgsperiode lovvalgsperiode) {
-        Land land = new Land();
-        land.setLandkode(LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.getUnntakFraLovvalgsland()));
+    private fun getUnntakFraLovvalgsland(lovvalgsperiode: Lovvalgsperiode): List<Land> {
+        val land = Land()
+        land.landkode = LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.unntakFraLovvalgsland)
 
-        return Collections.singletonList(land);
+        return listOf(land)
     }
 
-    private List<Land> getLovvalgsland(Lovvalgsperiode lovvalgsperiode) {
-        Land land = new Land();
-        land.setLandkode(LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.getLovvalgsland()));
+    private fun getLovvalgsland(lovvalgsperiode: Lovvalgsperiode): List<Land> {
+        val land = Land()
+        land.landkode = LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.lovvalgsland)
 
-        return Collections.singletonList(land);
+        return listOf(land)
     }
 
-    private Fastperiode getSoeknadsperiode(Lovvalgsperiode lovvalgsperiode) {
-        return mapTilPeriodeDto(lovvalgsperiode).getFastperiode();
+    private fun getSoeknadsperiode(lovvalgsperiode: Lovvalgsperiode): Fastperiode {
+        return mapTilPeriodeDto(lovvalgsperiode)!!.fastperiode!!
     }
 
-    private List<Periode> getTidligerePeriode(List<Lovvalgsperiode> tidligereLovvalgsperioder) {
-        if (tidligereLovvalgsperioder == null) {
-            return Collections.emptyList();
-        }
-
-        return tidligereLovvalgsperioder.stream()
-            .map(this::mapTilPeriodeDto)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+    private fun getTidligerePeriode(tidligereLovvalgsperioder: List<Lovvalgsperiode>?): List<Periode> {
+        return tidligereLovvalgsperioder?.mapNotNull { mapTilPeriodeDto(it) } ?: emptyList()
     }
 
-    // Blir ikke implementert i denne versjonen av Melosys.
-    private Anmodning getAnmodning() {
-        Anmodning anmodning = new Anmodning();
-        anmodning.setErendring("nei"); // Hardkodes til "nei" inntil videre
+    private fun getAnmodning(): Anmodning {
+        val anmodning = Anmodning()
+        anmodning.erendring = "nei"
 
-        return anmodning;
+        return anmodning
     }
 
-    @Override
-    public SedType getSedType() {
-        return SedType.A001;
+    override fun getSedType(): SedType {
+        return SedType.A001
     }
 }
