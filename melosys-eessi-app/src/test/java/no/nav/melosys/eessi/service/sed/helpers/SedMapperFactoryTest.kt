@@ -56,7 +56,7 @@ class SedMapperFactoryTest {
 
         for (sedType in sedTyperMedMapper) {
             val sedMapper = sedMapper(sedType)
-            sedMapper.sedType shouldBe sedType
+            sedMapper.getSedType() shouldBe sedType
         }
     }
 }

@@ -1,371 +1,383 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed
 
-import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Predicate;
-
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
-import no.nav.melosys.eessi.controller.dto.*;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.Konstanter;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.Adresse;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidsland;
-import no.nav.melosys.eessi.models.sed.nav.Arbeidssted;
-import no.nav.melosys.eessi.models.sed.nav.Bruker;
-import no.nav.melosys.eessi.models.sed.nav.Periode;
-import no.nav.melosys.eessi.models.sed.nav.*;
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
-import static no.nav.melosys.eessi.models.sed.Konstanter.*;
+import com.google.common.base.Objects
+import com.google.common.collect.Lists
+import no.nav.melosys.eessi.controller.dto.*
+import no.nav.melosys.eessi.controller.dto.Adresse
+import no.nav.melosys.eessi.controller.dto.Arbeidsland
+import no.nav.melosys.eessi.controller.dto.Arbeidssted
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.Konstanter
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER
+import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.models.sed.nav.Bruker
+import no.nav.melosys.eessi.models.sed.nav.Periode
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.finnLandkodeIso2
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.mapTilLandkodeIso2
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.util.StringUtils
+import java.time.LocalDate
+import java.util.function.Predicate
 
 /**
  * Felles mapper-interface for alle typer SED. Mapper NAV-objektet i NAV-SED, som brukes av eux for
  * å plukke ut nødvendig informasjon for en angitt SED.
  */
-public interface SedMapper {
-    Logger log = LoggerFactory.getLogger(SedMapper.class);
-
-    default SED mapTilSed(SedDataDto sedData, Boolean erCDM4_3) {
-        var sed = new SED();
-        sed.setNav(prefillNav(sedData, erCDM4_3));
-        sed.setSedType(getSedType().name());
-        sed.setSedGVer(DEFAULT_SED_G_VER);
+interface SedMapper {
+    fun mapTilSed(sedData: SedDataDto, erCDM4_3: Boolean): SED {
+        val sed = SED()
+        sed.nav = prefillNav(sedData, erCDM4_3)
+        sed.sedType = getSedType().name
+        sed.sedGVer = DEFAULT_SED_G_VER
 
         if (erCDM4_3) {
-            sed.setSedVer(SED_VER_CDM_4_3);
+            sed.sedVer = SED_VER_CDM_4_3
         } else {
-            sed.setSedVer(DEFAULT_SED_VER);
+            sed.sedVer = DEFAULT_SED_VER
         }
 
 
-        return sed;
+        return sed
     }
 
-    SedType getSedType();
+    fun getSedType(): SedType
 
-    default Nav prefillNav(SedDataDto sedData, boolean erCDM4_3) {
-        var nav = new Nav();
-        var sedType = getSedType();
+    fun prefillNav(sedData: SedDataDto, erCDM4_3: Boolean): Nav {
+        val nav = Nav()
+        val sedType = getSedType()
 
-        boolean harFastArbeidssted = sedData.getHarFastArbeidssted() != null && sedData.getHarFastArbeidssted();
+        val harFastArbeidssted = sedData.harFastArbeidssted != null && sedData.harFastArbeidssted!!
 
         if (erCDM4_3) {
-            switch (sedType) {
-                case A001, A002, A003, A008, A009, A010 -> {
-                    List<Arbeidsland> arbeidsland = hentArbeidsland(sedData);
+            when (sedType) {
+                SedType.A001, SedType.A002, SedType.A003, SedType.A008, SedType.A009, SedType.A010 -> {
+                    val arbeidsland = hentArbeidsland(sedData)
                     if (!arbeidsland.isEmpty()) {
-                        nav.setArbeidsland(arbeidsland);
-                        nav.setHarfastarbeidssted(harFastArbeidssted ? "ja" : "nei");
+                        nav.arbeidsland = arbeidsland
+                        nav.harfastarbeidssted = if (harFastArbeidssted) "ja" else "nei"
                     }
                 }
-                default -> nav.setArbeidssted(hentArbeidssted(sedData));
+
+                else -> nav.arbeidssted = hentArbeidssted(sedData)
             }
         } else {
-            nav.setArbeidssted(hentArbeidssted(sedData));
+            nav.arbeidssted = hentArbeidssted(sedData)
         }
 
-        nav.setBruker(hentBruker(sedData));
-        nav.setArbeidsgiver(hentArbeidsgivereILand(sedData.getArbeidsgivendeVirksomheter(), sedData.finnLovvalgslandDefaultNO()));
-        nav.setYtterligereinformasjon(sedData.getYtterligereInformasjon());
+        nav.bruker = hentBruker(sedData)
+        nav.arbeidsgiver = hentArbeidsgivereILand(sedData.arbeidsgivendeVirksomheter!!, sedData.finnLovvalgslandDefaultNO())
+        nav.ytterligereinformasjon = sedData.ytterligereInformasjon
 
-        if (!sedData.getSelvstendigeVirksomheter().isEmpty()) {
-            nav.setSelvstendig(hentSelvstendig(sedData));
+        if (!sedData.selvstendigeVirksomheter!!.isEmpty()) {
+            nav.selvstendig = hentSelvstendig(sedData)
         }
 
-        return nav;
+        return nav
     }
 
-    default Bruker hentBruker(SedDataDto sedDataDto) {
-        var bruker = new Bruker();
-        bruker.setPerson(hentPerson(sedDataDto));
-        bruker.setAdresse(hentAdresser(sedDataDto));
-        setFamiliemedlemmer(sedDataDto, bruker);
-        return bruker;
+    fun hentBruker(sedDataDto: SedDataDto): Bruker {
+        val bruker = Bruker()
+        bruker.person = hentPerson(sedDataDto)
+        bruker.adresse = hentAdresser(sedDataDto)
+        setFamiliemedlemmer(sedDataDto, bruker)
+        return bruker
     }
 
-    default Person hentPerson(SedDataDto sedData) {
-        var person = new Person();
+    fun hentPerson(sedData: SedDataDto): Person {
+        val person = Person()
 
-        person.setFornavn(sedData.getBruker().getFornavn());
-        person.setEtternavn(sedData.getBruker().getEtternavn());
-        person.setFoedselsdato(formaterDato(sedData.getBruker().getFoedseldato()));
-        person.setFoedested(null); //det antas at ikke trengs når NAV fyller ut.
-        person.setKjoenn(Kjønn.valueOf(sedData.getBruker().getKjoenn()));
-        person.setStatsborgerskap(hentStatsborgerskap(sedData));
-        person.setPin(hentPin(sedData));
+        person.fornavn = sedData.bruker!!.fornavn
+        person.etternavn = sedData.bruker!!.etternavn
+        person.foedselsdato = formaterDato(sedData.bruker!!.foedseldato!!)
+        person.foedested = null //det antas at ikke trengs når NAV fyller ut.
+        person.kjoenn = Kjønn.valueOf(sedData.bruker!!.kjoenn!!)
+        person.statsborgerskap = hentStatsborgerskap(sedData)
+        person.pin = hentPin(sedData)
 
-        return person;
+        return person
     }
 
-    default List<Statsborgerskap> hentStatsborgerskap(SedDataDto sedDataDto) {
-        Collection<String> statsborgerskapStringListe = sedDataDto.getBruker().getStatsborgerskap();
-        final List<Statsborgerskap> statsborgerskapList = statsborgerskapStringListe.stream()
-            .filter(landkodeIso3 -> LandkodeMapper.finnLandkodeIso2(landkodeIso3).isPresent())
-            .map(this::lagStatsborgerskap)
-            .toList();
-        for (Statsborgerskap statsborgerskap : statsborgerskapList) {
-            if (statsborgerskap.getLand() != null && statsborgerskap.getLand().equals(LandkodeMapper.KOSOVO_LANDKODE_ISO2)) {
-                statsborgerskap.setLand(LandkodeMapper.UKJENT_LANDKODE_ISO2);
-                log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: {}", sedDataDto.getGsakSaksnummer());
+    fun hentStatsborgerskap(sedDataDto: SedDataDto): List<Statsborgerskap?> {
+        val statsborgerskapStringListe = sedDataDto.bruker!!.statsborgerskap
+        val statsborgerskapList = statsborgerskapStringListe!!.stream()
+            .filter { landkodeIso3: String? -> finnLandkodeIso2(landkodeIso3).isPresent }
+            .map { landkode: String -> this.lagStatsborgerskap(landkode) }
+            .toList()
+        for (statsborgerskap in statsborgerskapList) {
+            if (statsborgerskap.land != null && statsborgerskap.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2) {
+                statsborgerskap.land = LandkodeMapper.UKJENT_LANDKODE_ISO2
+                log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: {}", sedDataDto.gsakSaksnummer)
             }
         }
         if (statsborgerskapList.isEmpty()) {
-            throw new MappingException("Statsborgerskap mangler eller er ugyldig. statsborgerskap fra sedData:" +
-                String.join(", ", statsborgerskapStringListe));
+            throw MappingException(
+                "Statsborgerskap mangler eller er ugyldig. statsborgerskap fra sedData:" +
+                    java.lang.String.join(", ", statsborgerskapStringListe)
+            )
         }
-        return statsborgerskapList;
+        return statsborgerskapList
     }
 
-    private Statsborgerskap lagStatsborgerskap(String landkode) {
-        return new Statsborgerskap(LandkodeMapper.mapTilLandkodeIso2(landkode));
+    private fun lagStatsborgerskap(landkode: String): Statsborgerskap {
+        return Statsborgerskap(mapTilLandkodeIso2(landkode))
     }
 
-    default List<Pin> hentPin(SedDataDto sedData) {
-        List<Pin> pins = Lists.newArrayList();
+    fun hentPin(sedData: SedDataDto): List<Pin> {
+        val pins: MutableList<Pin> = Lists.newArrayList()
 
-        pins.add(new Pin(
-            sedData.getBruker().getFnr(), "NO",
-            null)); //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
+        pins.add(
+            Pin(
+                sedData.bruker!!.fnr, "NO",
+                null
+            )
+        ) //null settes for sektor per nå. Ikke påkrevd. Evt hardkode 'alle'
 
-        for (Ident utenlandskIdent : sedData.getUtenlandskIdent()) {
+        for ((ident, landkode) in sedData.utenlandskIdent!!) {
             pins.add(
-                new Pin(utenlandskIdent.getIdent(),
-                    LandkodeMapper.mapTilLandkodeIso2(utenlandskIdent.getLandkode()), null)
-            );
+                Pin(
+                    ident,
+                    mapTilLandkodeIso2(landkode), null
+                )
+            )
         }
 
-        return pins;
+        return pins
     }
 
-    default List<Adresse> hentAdresser(SedDataDto sedDataDto) {
-        List<Adresse> adresser = new ArrayList<>();
-        if (sedDataDto.getBostedsadresse() != null) {
-            adresser.add(mapBostedsadresse(sedDataDto.getBostedsadresse()));
+    fun hentAdresser(sedDataDto: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Adresse> {
+        val adresser: MutableList<no.nav.melosys.eessi.models.sed.nav.Adresse> = ArrayList()
+        if (sedDataDto.bostedsadresse != null) {
+            adresser.add(mapBostedsadresse(sedDataDto.bostedsadresse!!))
         }
-        if (sedDataDto.getKontaktadresse() != null) {
-            adresser.add(mapAdresse(sedDataDto.getKontaktadresse()));
+        if (sedDataDto.kontaktadresse != null) {
+            adresser.add(mapAdresse(sedDataDto.kontaktadresse!!))
         }
-        if (sedDataDto.getOppholdsadresse() != null) {
-            adresser.add(mapAdresse(sedDataDto.getOppholdsadresse()));
+        if (sedDataDto.oppholdsadresse != null) {
+            adresser.add(mapAdresse(sedDataDto.oppholdsadresse!!))
         }
-        return adresser;
+        return adresser
     }
 
-    private Adresse mapBostedsadresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
-        var bostedsadresse = mapAdresse(adresse);
-        if (adresse.getAdressetype() == Adressetype.BOSTEDSADRESSE) {
-            bostedsadresse.setType(Adressetype.BOSTEDSADRESSE.getAdressetypeRina());
+    private fun mapBostedsadresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
+        val bostedsadresse = mapAdresse(adresse)
+        if (adresse.adressetype == Adressetype.BOSTEDSADRESSE) {
+            bostedsadresse.type = Adressetype.BOSTEDSADRESSE.adressetypeRina
         }
-        return bostedsadresse;
+        return bostedsadresse
     }
 
-    private Adresse mapAdresse(no.nav.melosys.eessi.controller.dto.Adresse adresse) {
-        var bostedsadresse = new Adresse();
-        bostedsadresse.setType(adresse.getAdressetype().getAdressetypeRina());
-        bostedsadresse.setGate(adresse.getGateadresse());
-        bostedsadresse.setBy(adresse.getPoststed());
-        bostedsadresse.setPostnummer(adresse.getPostnr());
-        bostedsadresse.setRegion(adresse.getRegion());
-        bostedsadresse.setLand(LandkodeMapper.mapTilLandkodeIso2(adresse.getLand()));
-        return bostedsadresse;
+    private fun mapAdresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
+        val bostedsadresse = no.nav.melosys.eessi.models.sed.nav.Adresse()
+        bostedsadresse.type = adresse.adressetype!!.adressetypeRina
+        bostedsadresse.gate = adresse.gateadresse
+        bostedsadresse.by = adresse.poststed
+        bostedsadresse.postnummer = adresse.postnr
+        bostedsadresse.region = adresse.region
+        bostedsadresse.land = mapTilLandkodeIso2(adresse.land)
+        return bostedsadresse
     }
 
-    default void setFamiliemedlemmer(SedDataDto sedData, Bruker bruker) {
-
+    fun setFamiliemedlemmer(sedData: SedDataDto, bruker: Bruker) {
         //Splitter per nå navnet etter første mellomrom
-        Optional<FamilieMedlem> optionalFar = sedData.getFamilieMedlem().stream()
-            .filter(f -> f.getRelasjon().equalsIgnoreCase("FAR")).findFirst();
 
-        if (optionalFar.isPresent()) {
-            var far = new Far();
-            var person = new Person();
-            person.setEtternavnvedfoedsel(optionalFar.get().getEtternavn());
-            person.setFornavn(optionalFar.get().getFornavn());
+        val optionalFar = sedData.familieMedlem!!.stream()
+            .filter { f: FamilieMedlem -> f.relasjon.equals("FAR", ignoreCase = true) }.findFirst()
 
-            far.setPerson(person);
-            bruker.setFar(far);
+        if (optionalFar.isPresent) {
+            val far = Far()
+            val person = Person()
+            person.etternavnvedfoedsel = optionalFar.get().etternavn
+            person.fornavn = optionalFar.get().fornavn
+
+            far.person = person
+            bruker.far = far
         }
 
-        Optional<FamilieMedlem> optionalMor = sedData.getFamilieMedlem().stream()
-            .filter(f -> f.getRelasjon().equalsIgnoreCase("MOR")).findFirst();
+        val optionalMor = sedData.familieMedlem!!.stream()
+            .filter { f: FamilieMedlem -> f.relasjon.equals("MOR", ignoreCase = true) }.findFirst()
 
-        if (optionalMor.isPresent()) {
-            var mor = new Mor();
-            var person = new Person();
-            person.setEtternavnvedfoedsel(optionalMor.get().getEtternavn());
-            person.setFornavn(optionalMor.get().getFornavn());
+        if (optionalMor.isPresent) {
+            val mor = Mor()
+            val person = Person()
+            person.etternavnvedfoedsel = optionalMor.get().etternavn
+            person.fornavn = optionalMor.get().fornavn
 
-            mor.setPerson(person);
-            bruker.setMor(mor);
+            mor.person = person
+            bruker.mor = mor
         }
     }
 
-    default List<Arbeidsland> hentArbeidsland(SedDataDto sedData) {
-        return sedData.getArbeidsland().stream().map(arbeidsland -> {
-            var arbeidslandSed = new Arbeidsland();
-            arbeidslandSed.setLand(arbeidsland.getLand());
-            arbeidslandSed.setArbeidssted(hentArbeidssted4_3(arbeidsland.getArbeidssted()));
-            return arbeidslandSed;
-        }).toList();
+    fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> {
+        return sedData.arbeidsland!!.stream().map { arbeidsland: Arbeidsland ->
+            val arbeidslandSed = no.nav.melosys.eessi.models.sed.nav.Arbeidsland()
+            arbeidslandSed.land = arbeidsland.land
+            arbeidslandSed.arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted)
+            arbeidslandSed
+        }.toList()
     }
 
 
-    default Boolean hentHarfastarbeidssted(SedDataDto sedData) {
-        return sedData.getHarFastArbeidssted();
+    fun hentHarfastarbeidssted(sedData: SedDataDto): Boolean? {
+        return sedData.harFastArbeidssted
     }
 
-    default List<Arbeidssted> hentArbeidssted4_3(List<no.nav.melosys.eessi.controller.dto.Arbeidssted> arbeidssteder) {
+    fun hentArbeidssted4_3(arbeidssteder: List<Arbeidssted>): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> {
+        val arbeidsstedList: MutableList<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> = Lists.newArrayList()
 
-        List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
+        for ((navn, adresse, fysisk, hjemmebase) in arbeidssteder) {
+            val arbeidssted = no.nav.melosys.eessi.models.sed.nav.Arbeidssted()
+            arbeidssted.navn = navn
+            arbeidssted.adresse = hentAdresseFraDtoAdresse(adresse!!)
+            arbeidssted.hjemmebase = landkodeIso2EllerNull(hjemmebase)
 
-        for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : arbeidssteder) {
-            var arbeidssted = new Arbeidssted();
-            arbeidssted.setNavn(arbStd.getNavn());
-            arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
-            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
-
-            if (arbStd.getFysisk()) {
-                arbeidssted.setErikkefastadresse("nei");
-            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.getFysisk()) {
-                arbeidssted.setErikkefastadresse("ja");
+            if (fysisk) {
+                arbeidssted.erikkefastadresse = "nei"
+            } else if (StringUtils.hasText(arbeidssted.hjemmebase) || !fysisk) {
+                arbeidssted.erikkefastadresse = "ja"
             }
 
-            arbeidsstedList.add(arbeidssted);
+            arbeidsstedList.add(arbeidssted)
         }
 
-        return arbeidsstedList;
+        return arbeidsstedList
     }
 
-    default List<Arbeidssted> hentArbeidssted(SedDataDto sedData) {
+    fun hentArbeidssted(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> {
+        val arbeidsstedList: MutableList<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> = Lists.newArrayList()
 
-        List<Arbeidssted> arbeidsstedList = Lists.newArrayList();
+        for ((navn, adresse, fysisk, hjemmebase) in sedData.arbeidssteder!!) {
+            val arbeidssted = no.nav.melosys.eessi.models.sed.nav.Arbeidssted()
+            arbeidssted.navn = navn
+            arbeidssted.adresse = hentAdresseFraDtoAdresse(adresse!!)
+            arbeidssted.hjemmebase = landkodeIso2EllerNull(hjemmebase)
 
-        for (no.nav.melosys.eessi.controller.dto.Arbeidssted arbStd : sedData.getArbeidssteder()) {
-            var arbeidssted = new Arbeidssted();
-            arbeidssted.setNavn(arbStd.getNavn());
-            arbeidssted.setAdresse(hentAdresseFraDtoAdresse(arbStd.getAdresse()));
-            arbeidssted.setHjemmebase(landkodeIso2EllerNull(arbStd.getHjemmebase()));
-
-            if (arbStd.getFysisk()) {
-                arbeidssted.setErikkefastadresse("nei");
-            } else if (StringUtils.hasText(arbeidssted.getHjemmebase()) || !arbStd.getFysisk()) {
-                arbeidssted.setErikkefastadresse("ja");
+            if (fysisk) {
+                arbeidssted.erikkefastadresse = "nei"
+            } else if (StringUtils.hasText(arbeidssted.hjemmebase) || !fysisk) {
+                arbeidssted.erikkefastadresse = "ja"
             }
 
-            arbeidsstedList.add(arbeidssted);
+            arbeidsstedList.add(arbeidssted)
         }
 
-        return arbeidsstedList;
+        return arbeidsstedList
     }
 
-    default List<Arbeidsgiver> hentArbeidsgivereILand(List<Virksomhet> virksomheter, String landkode) {
-        return hentArbeidsgiver(virksomheter, v -> Objects.equal(v.getAdresse().getLand(), landkode));
+    fun hentArbeidsgivereILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> {
+        return hentArbeidsgiver(
+            virksomheter
+        ) { v: Virksomhet -> Objects.equal(v.adresse!!.land, landkode) }
     }
 
-    default List<Arbeidsgiver> hentArbeidsgivereIkkeILand(List<Virksomhet> virksomheter, String landkode) {
-        return hentArbeidsgiver(virksomheter, v -> !Objects.equal(v.getAdresse().getLand(), landkode));
+    fun hentArbeidsgivereIkkeILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> {
+        return hentArbeidsgiver(
+            virksomheter
+        ) { v: Virksomhet -> !Objects.equal(v.adresse!!.land, landkode) }
     }
 
-    default List<Arbeidsgiver> hentArbeidsgiver(List<Virksomhet> virksomheter, Predicate<Virksomhet> virksomhetPredicate) {
+    fun hentArbeidsgiver(virksomheter: List<Virksomhet>, virksomhetPredicate: Predicate<Virksomhet>?): List<Arbeidsgiver> {
         return virksomheter.stream()
             .filter(virksomhetPredicate)
-            .map(this::hentArbeidsgiver)
-            .toList();
+            .map { virksomhet: Virksomhet -> this.hentArbeidsgiver(virksomhet) }
+            .toList()
     }
 
-    default Arbeidsgiver hentArbeidsgiver(Virksomhet virksomhet) {
-        var arbeidsgiver = new Arbeidsgiver();
-        arbeidsgiver.setNavn(virksomhet.getNavn());
-        arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(virksomhet.getAdresse()));
-        arbeidsgiver.setIdentifikator(lagIdentifikator(virksomhet.getOrgnr()));
-        return arbeidsgiver;
+    fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver {
+        val arbeidsgiver = Arbeidsgiver()
+        arbeidsgiver.navn = virksomhet.navn
+        arbeidsgiver.adresse = hentAdresseFraDtoAdresse(virksomhet.adresse!!)
+        arbeidsgiver.identifikator = lagIdentifikator(virksomhet.orgnr)
+        return arbeidsgiver
     }
 
-    default Selvstendig hentSelvstendig(SedDataDto sedData) {
+    fun hentSelvstendig(sedData: SedDataDto): Selvstendig {
+        val selvstendig = Selvstendig()
+        val arbeidsgiverList: MutableList<Arbeidsgiver> = Lists.newArrayList()
 
-        var selvstendig = new Selvstendig();
-        List<Arbeidsgiver> arbeidsgiverList = Lists.newArrayList();
+        for ((navn, adresse, orgnr) in sedData.selvstendigeVirksomheter!!) {
+            val arbeidsgiver = Arbeidsgiver()
 
-        for (Virksomhet v : sedData.getSelvstendigeVirksomheter()) {
-            var arbeidsgiver = new Arbeidsgiver();
+            arbeidsgiver.identifikator = lagIdentifikator(orgnr)
+            arbeidsgiver.adresse = hentAdresseFraDtoAdresse(adresse!!)
+            arbeidsgiver.navn = navn
 
-            arbeidsgiver.setIdentifikator(lagIdentifikator(v.getOrgnr()));
-            arbeidsgiver.setAdresse(hentAdresseFraDtoAdresse(v.getAdresse()));
-            arbeidsgiver.setNavn(v.getNavn());
-
-            arbeidsgiverList.add(arbeidsgiver);
+            arbeidsgiverList.add(arbeidsgiver)
         }
 
-        selvstendig.setArbeidsgiver(arbeidsgiverList);
+        selvstendig.arbeidsgiver = arbeidsgiverList
 
-        return selvstendig;
+        return selvstendig
     }
 
-    default String formaterDato(LocalDate dato) {
-        return Konstanter.dateTimeFormatter.format(dato);
+    fun formaterDato(dato: LocalDate): String {
+        return Konstanter.dateTimeFormatter.format(dato)
     }
 
-    default Adresse hentAdresseFraDtoAdresse(no.nav.melosys.eessi.controller.dto.Adresse sAdresse) {
-        var adresse = new Adresse();
-        adresse.setGate(sAdresse.getGateadresse());
-        adresse.setPostnummer(sAdresse.getPostnr());
-        adresse.setBy(sAdresse.getPoststed());
-        adresse.setLand(LandkodeMapper.mapTilLandkodeIso2(sAdresse.getLand()));
-        adresse.setBygning(sAdresse.getTilleggsnavn());
-        adresse.setRegion(sAdresse.getRegion());
+    fun hentAdresseFraDtoAdresse(sAdresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
+        val adresse = no.nav.melosys.eessi.models.sed.nav.Adresse()
+        adresse.gate = sAdresse.gateadresse
+        adresse.postnummer = sAdresse.postnr
+        adresse.by = sAdresse.poststed
+        adresse.land = mapTilLandkodeIso2(sAdresse.land)
+        adresse.bygning = sAdresse.tilleggsnavn
+        adresse.region = sAdresse.region
 
-        if (!StringUtils.hasText(adresse.getBy()) || !StringUtils.hasText(adresse.getLand())) {
-            throw new MappingException("Felter 'poststed' og 'land' er påkrevd for adresser");
+        if (!StringUtils.hasText(adresse.by) || !StringUtils.hasText(adresse.land)) {
+            throw MappingException("Felter 'poststed' og 'land' er påkrevd for adresser")
         }
 
-        return adresse;
+        return adresse
     }
 
-    default List<Identifikator> lagIdentifikator(String orgnr) {
+    fun lagIdentifikator(orgnr: String?): List<Identifikator> {
         if (!StringUtils.hasText(orgnr)) {
-            return Collections.emptyList();
+            return emptyList()
         }
 
-        var orgNr = new Identifikator();
-        orgNr.setId(orgnr);
-        orgNr.setType("registrering");
-        return List.of(orgNr);
+        val orgNr = Identifikator()
+        orgNr.id = orgnr
+        orgNr.type = "registrering"
+        return java.util.List.of(orgNr)
     }
 
-    default Periode mapTilPeriodeDto(Lovvalgsperiode lovvalgsperiode) {
-        var periode = new Periode();
+    fun mapTilPeriodeDto(lovvalgsperiode: Lovvalgsperiode): Periode? {
+        val periode = Periode()
 
-        if (lovvalgsperiode.getFom() != null) {
-            if (lovvalgsperiode.getTom() != null) {
-                var fastperiode = new Fastperiode();
-                fastperiode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
-                fastperiode.setSluttdato(formaterDato(lovvalgsperiode.getTom()));
-                periode.setFastperiode(fastperiode);
+        if (lovvalgsperiode.fom != null) {
+            if (lovvalgsperiode.tom != null) {
+                val fastperiode = Fastperiode()
+                fastperiode.startdato = formaterDato(lovvalgsperiode.fom!!)
+                fastperiode.sluttdato = formaterDato(lovvalgsperiode.tom!!)
+                periode.fastperiode = fastperiode
             } else {
-                var aapenPeriode = new AapenPeriode();
-                aapenPeriode.setStartdato(formaterDato(lovvalgsperiode.getFom()));
-                periode.setAapenperiode(aapenPeriode);
+                val aapenPeriode = AapenPeriode()
+                aapenPeriode.startdato = formaterDato(lovvalgsperiode.fom!!)
+                periode.aapenperiode = aapenPeriode
             }
         } else {
-            return null;
+            return null
         }
 
-        return periode;
+        return periode
     }
 
-    default String landkodeIso2EllerNull(String iso3) {
-        if (iso3 == null) {
-            return null;
-        } else if (iso3.length() == 2) {
-            return iso3;
+    fun landkodeIso2EllerNull(iso3: String?): String? {
+        return if (iso3 == null) {
+            null
+        } else if (iso3.length == 2) {
+            iso3
         } else {
-            return LandkodeMapper.mapTilLandkodeIso2(iso3);
+            mapTilLandkodeIso2(iso3)
         }
+    }
+
+    companion object {
+        val log: Logger = LoggerFactory.getLogger(SedMapper::class.java)
     }
 }

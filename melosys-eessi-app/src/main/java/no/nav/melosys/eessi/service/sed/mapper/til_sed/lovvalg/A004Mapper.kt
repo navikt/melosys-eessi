@@ -1,47 +1,39 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.UtpekingAvvisDto;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA004;
-import no.nav.melosys.eessi.models.sed.nav.Avslag;
-import no.nav.melosys.eessi.models.sed.nav.Land;
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA004
+import no.nav.melosys.eessi.models.sed.nav.Avslag
+import no.nav.melosys.eessi.models.sed.nav.Land
 
-public class A004Mapper implements LovvalgSedMapper<MedlemskapA004> {
+class A004Mapper : LovvalgSedMapper<MedlemskapA004> {
+    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA004 {
+        val utpekingAvvis = sedData.utpekingAvvis
+            ?: throw MappingException("Trenger UtpekingAvvis for å opprette A004")
 
-    @Override
-    public MedlemskapA004 getMedlemskap(SedDataDto sedData) {
-        UtpekingAvvisDto utpekingAvvis = sedData.getUtpekingAvvis();
+        val medlemskap = MedlemskapA004()
+        medlemskap.avslag = getAvslag(
+            utpekingAvvis.vilSendeAnmodningOmMerInformasjon,
+            utpekingAvvis.nyttLovvalgsland,
+            utpekingAvvis.begrunnelseUtenlandskMyndighet
+        )
 
-        if (utpekingAvvis == null) {
-            throw new MappingException("Trenger UtpekingAvvis for å opprette A004");
-        }
-
-        MedlemskapA004 medlemskap = new MedlemskapA004();
-        medlemskap.setAvslag(getAvslag(
-            utpekingAvvis.getVilSendeAnmodningOmMerInformasjon(),
-            utpekingAvvis.getNyttLovvalgsland(),
-            utpekingAvvis.getBegrunnelseUtenlandskMyndighet()
-        ));
-
-        return medlemskap;
+        return medlemskap
     }
 
-    private Avslag getAvslag(boolean vilSendeAnmodningOmMerInformasjon, String nyttLovvalgsland, String begrunnelseUtenlandskMyndighet) {
-        Avslag avslag = new Avslag();
-        avslag.setErbehovformerinformasjon(vilSendeAnmodningOmMerInformasjon ? "ja" : "nei");
+    private fun getAvslag(vilSendeAnmodningOmMerInformasjon: Boolean, nyttLovvalgsland: String?, begrunnelseUtenlandskMyndighet: String?): Avslag {
+        val avslag = Avslag()
+        avslag.erbehovformerinformasjon = if (vilSendeAnmodningOmMerInformasjon) "ja" else "nei"
         if (nyttLovvalgsland != null) {
-            Land lovvalgsland = new Land();
-            lovvalgsland.setLandkode(nyttLovvalgsland);
-            avslag.setForslagformedlemskap(lovvalgsland);
+            val lovvalgsland = Land()
+            lovvalgsland.landkode = nyttLovvalgsland
+            avslag.forslagformedlemskap = lovvalgsland
         }
-        avslag.setBegrunnelse(begrunnelseUtenlandskMyndighet);
-        return avslag;
+        avslag.begrunnelse = begrunnelseUtenlandskMyndighet
+        return avslag
     }
 
-    @Override
-    public SedType getSedType() {
-        return SedType.A004;
-    }
+    override fun getSedType() = SedType.A004
+
 }
