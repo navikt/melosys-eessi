@@ -23,14 +23,14 @@ data class KafkaDLQDto(
         private var melding: String? = null
         private var skip: Boolean? = null
 
-        fun id(id: String) = apply { this.id = id }
+        fun id(id: String?) = apply { this.id = id }
         fun queueType(queueType: QueueType) = apply { this.queueType = queueType }
-        fun tidRegistrert(tidRegistrert: LocalDateTime) = apply { this.tidRegistrert = tidRegistrert }
-        fun tidSistRekjort(tidSistRekjort: LocalDateTime) = apply { this.tidSistRekjort = tidSistRekjort }
-        fun sisteFeilmelding(sisteFeilmelding: String) = apply { this.sisteFeilmelding = sisteFeilmelding }
+        fun tidRegistrert(tidRegistrert: LocalDateTime?) = apply { this.tidRegistrert = tidRegistrert }
+        fun tidSistRekjort(tidSistRekjort: LocalDateTime?) = apply { this.tidSistRekjort = tidSistRekjort }
+        fun sisteFeilmelding(sisteFeilmelding: String?) = apply { this.sisteFeilmelding = sisteFeilmelding }
         fun antallRekjoringer(antallRekjoringer: Int) = apply { this.antallRekjoringer = antallRekjoringer }
-        fun melding(melding: String) = apply { this.melding = melding }
-        fun skip(skip: Boolean) = apply { this.skip = skip }
+        fun melding(melding: String?) = apply { this.melding = melding }
+        fun skip(skip: Boolean?) = apply { this.skip = skip }
 
         fun build() = KafkaDLQDto(
             id = id,
