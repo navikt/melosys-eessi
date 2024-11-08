@@ -117,7 +117,7 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - bruker med sensitive opplysninger, forvent sett SakSensitiv`() {
         val sedData = SedDataStub.getStub().apply {
-            bruker!!.harSensitiveOpplysninger = true
+            bruker.harSensitiveOpplysninger = true
         }
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")

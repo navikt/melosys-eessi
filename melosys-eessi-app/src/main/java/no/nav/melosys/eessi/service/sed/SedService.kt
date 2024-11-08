@@ -50,7 +50,7 @@ class SedService(
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
         validerMottakerInstitusjoner(bucType, mottakere!!)
         val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
-        if (sedDataDto.bruker!!.harSensitiveOpplysninger) {
+        if (sedDataDto.bruker.harSensitiveOpplysninger) {
             euxService.settSakSensitiv(response.rinaSaksnummer!!)
         }
         if (sedType.name.startsWith("H")) {

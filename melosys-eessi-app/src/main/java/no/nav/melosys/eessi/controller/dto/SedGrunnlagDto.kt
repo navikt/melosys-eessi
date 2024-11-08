@@ -1,16 +1,21 @@
 package no.nav.melosys.eessi.controller.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class SedGrunnlagDto(
     var sedType: String? = null,
-    var utenlandskIdent: List<Ident>? = null,
+    var utenlandskIdent: List<Ident>? = null, // kaster NullPointerException i Java kode om null TODO: fiks arv så den kan være non-null
     var bostedsadresse: Adresse? = null,
     var arbeidsgivendeVirksomheter: List<Virksomhet>? = null,
-    var selvstendigeVirksomheter: List<Virksomhet>? = null,
-    var arbeidssteder: List<Arbeidssted>? = null,
-    var arbeidsland: List<Arbeidsland>? = null,
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var selvstendigeVirksomheter: List<Virksomhet> = emptyList(), // kaster NullPointerException i Java kode om null
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var arbeidssteder: List<Arbeidssted> = emptyList(), // kaster NullPointerException i Java kode om null
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var arbeidsland: List<Arbeidsland> = emptyList(), // kaster NullPointerException i Java kode om null
     var harFastArbeidssted: Boolean? = null,
     var lovvalgsperioder: List<Lovvalgsperiode>? = null,
     open var ytterligereInformasjon: String? = null,

@@ -1,14 +1,17 @@
 package no.nav.melosys.eessi.controller.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SedDataDto(
-    var bruker: Bruker? = null,
+    var bruker: Bruker, // kaster NullPointerException i Java kode om null
     var kontaktadresse: Adresse? = null,
     var oppholdsadresse: Adresse? = null,
-    var familieMedlem: List<FamilieMedlem>? = null,
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var familieMedlem: List<FamilieMedlem>, // kaster NullPointerException i Java kode om null
     var søknadsperiode: Periode? = null,
     var avklartBostedsland: String? = null,
     var vedtakDto: VedtakDto? = null,
