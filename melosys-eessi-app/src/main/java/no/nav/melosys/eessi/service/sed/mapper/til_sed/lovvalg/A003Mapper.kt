@@ -9,48 +9,36 @@ import no.nav.melosys.eessi.models.sed.nav.PeriodeA010
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003
 
 class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
-    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA003 {
-        val medlemskap = MedlemskapA003()
+    override fun getSedType() = SedType.A003
 
-        medlemskap.vedtak = getVedtak(sedData)
-        medlemskap.andreland = getAndreLand(sedData)
-
-        if (!sedData.lovvalgsperioder!!.isEmpty()) {
-            medlemskap.relevantartikkelfor8832004eller9872009 = sedData.lovvalgsperioder!![0].bestemmelse!!.value
-        }
-
-        return medlemskap
-    }
+    override fun getMedlemskap(sedData: SedDataDto) = MedlemskapA003(
+        vedtak = getVedtak(sedData),
+        andreland = getAndreLand(sedData),
+        relevantartikkelfor8832004eller9872009 = sedData.lovvalgsperioder
+            ?.firstOrNull()?.bestemmelse?.value
+    )
 
     private fun getVedtak(sedData: SedDataDto): VedtakA003 {
-        val vedtak = VedtakA003()
-        val lovvalgsperiode = sedData.finnLovvalgsperiode()
+        val lovvalgsperiode = sedData.finnLovvalgsperiode().orElse(null)
 
-        if (lovvalgsperiode.isPresent) {
-            vedtak.land = lovvalgsperiode.get().lovvalgsland
-            vedtak.gjelderperiode = getPeriode(lovvalgsperiode.get())
+        return VedtakA003(
+            land = lovvalgsperiode?.lovvalgsland,
+            gjelderperiode = lovvalgsperiode?.let { getPeriode(it) },
+            gjeldervarighetyrkesaktivitet = "ja"
+        ).also {
+            setVedtaksdata(it, sedData.vedtakDto)
         }
-
-        vedtak.gjeldervarighetyrkesaktivitet = "ja"
-        setVedtaksdata(vedtak, sedData.vedtakDto)
-
-        return vedtak
     }
 
-    private fun getPeriode(lovvalgsperiode: Lovvalgsperiode): PeriodeA010 {
-        val periode = PeriodeA010()
-        periode.startdato = formaterDato(lovvalgsperiode.fom!!)
-        periode.sluttdato = formaterDato(lovvalgsperiode.tom!!)
-        return periode
-    }
+    private fun getPeriode(lovvalgsperiode: Lovvalgsperiode) = PeriodeA010(
+        startdato = formaterDato(lovvalgsperiode.fom ?: throw IllegalArgumentException("lovvalgsperiode.fom kan ikke være null")),
+        sluttdato = formaterDato(lovvalgsperiode.tom ?: throw IllegalArgumentException("lovvalgsperiode.tom kan ikke være null"))
+    )
 
-
-    private fun getAndreLand(sedData: SedDataDto): Andreland {
-        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
-        val andreland = Andreland()
-        andreland.arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
-        return andreland
-    }
-
-    override fun getSedType() = SedType.A003
+    private fun getAndreLand(sedData: SedDataDto) = Andreland(
+        arbeidsgiver = hentArbeidsgivereIkkeILand(
+            virksomheter = sedData.arbeidsgivendeVirksomheter.orEmpty(),
+            landkode = sedData.finnLovvalgslandDefaultNO()
+        )
+    )
 }
