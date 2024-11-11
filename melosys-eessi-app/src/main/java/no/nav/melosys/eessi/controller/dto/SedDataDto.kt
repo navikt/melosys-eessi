@@ -28,14 +28,9 @@ data class SedDataDto(
     var utpekingAvvis: UtpekingAvvisDto? = null
 ) : SedGrunnlagDto() {
 
-    fun finnLovvalgsland(): Optional<String> =
-        lovvalgsperioder!!.firstOrNull { it.lovvalgsland != null }?.lovvalgsland?.let { Optional.of(it) }
-            ?: Optional.empty()
+    fun finnLovvalgslandDefaultNO(): String = lovvalgsperioder?.firstOrNull { it.lovvalgsland != null }?.lovvalgsland ?: "NO"
 
-    fun finnLovvalgslandDefaultNO(): String = finnLovvalgsland().orElse("NO")
-
-    fun finnLovvalgsperiode(): Optional<Lovvalgsperiode> =
-        lovvalgsperioder?.maxByOrNull { it.fom!! }?.let { Optional.of(it) } ?: Optional.empty()
+    fun finnLovvalgsperiode(): Lovvalgsperiode? = lovvalgsperioder?.maxByOrNull { it.fom!! }
 
     fun manglerAdresser(): Boolean =
         bostedsadresse == null && kontaktadresse == null && oppholdsadresse == null

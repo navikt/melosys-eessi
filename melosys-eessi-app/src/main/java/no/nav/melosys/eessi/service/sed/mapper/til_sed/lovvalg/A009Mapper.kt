@@ -23,7 +23,7 @@ class A009Mapper : LovvalgSedMapper<MedlemskapA009> {
     )
 
     private fun getVedtak(sedDataDto: SedDataDto): VedtakA009 {
-        val lovvalgsperiode = sedDataDto.finnLovvalgsperiode().orElse(null)
+        val lovvalgsperiode = sedDataDto.finnLovvalgsperiode()
 
         val gjelderperiode = Periode(
             //Vil alltid være fast periode

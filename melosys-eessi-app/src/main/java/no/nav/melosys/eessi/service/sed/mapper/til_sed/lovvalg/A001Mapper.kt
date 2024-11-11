@@ -12,7 +12,7 @@ class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
     override fun getSedType(): SedType = SedType.A001
 
     override fun getMedlemskap(sedData: SedDataDto): MedlemskapA001 {
-        val lovvalgsperiode = sedData.finnLovvalgsperiode().orElse(null)
+        val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
         return MedlemskapA001(
             unntak = lovvalgsperiode?.let { getUnntak(it) },

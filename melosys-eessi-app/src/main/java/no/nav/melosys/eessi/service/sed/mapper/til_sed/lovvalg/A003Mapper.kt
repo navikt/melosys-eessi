@@ -19,7 +19,7 @@ class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
     )
 
     private fun getVedtak(sedData: SedDataDto): VedtakA003 {
-        val lovvalgsperiode = sedData.finnLovvalgsperiode().orElse(null)
+        val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
         return VedtakA003(
             land = lovvalgsperiode?.lovvalgsland,

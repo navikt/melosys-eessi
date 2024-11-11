@@ -18,10 +18,10 @@ class A010Mapper : LovvalgSedMapper<MedlemskapA010> {
 
     override fun getMedlemskap(sedData: SedDataDto): MedlemskapA010 {
         val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
-        val lovvalgsperiode = sedData.finnLovvalgsperiode().getOrNull()
+        val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
         return MedlemskapA010(
-            meldingomlovvalg = sedData.finnLovvalgsperiode().getOrNull()?.let {
+            meldingomlovvalg = sedData.finnLovvalgsperiode()?.let {
                 MeldingOmLovvalg(artikkel = tilA010Bestemmelse(it))
             },
             vedtak = VedtakA010(
