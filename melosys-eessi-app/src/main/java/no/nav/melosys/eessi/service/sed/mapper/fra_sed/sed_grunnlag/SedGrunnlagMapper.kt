@@ -8,17 +8,19 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
 
 interface SedGrunnlagMapper {
-    fun map(sed: SED): SedGrunnlagDto = SedGrunnlagDto().apply {
+    fun map(sed: SED): SedGrunnlagDto {
         val nav = sed.nav ?: throw NullPointerException("sed.nav kan ikke være null")
         val bruker = nav.bruker ?: throw NullPointerException("sed.nav.bruker kan ikke være null")
         val person = bruker.person ?: throw NullPointerException("sed.nav.bruker.person kan ikke være null")
-        bostedsadresse = mapBosted(bruker.adresse)
-        utenlandskIdent = mapUtenlandskIdent(person.pin)
-        arbeidssteder = mapArbeidssteder(nav.arbeidssted)
-        arbeidsland = mapArbeidsland(nav.arbeidsland)
-        arbeidsgivendeVirksomheter = mapVirksomheter(nav.arbeidsgiver)
-        selvstendigeVirksomheter = mapSelvstendig(nav.selvstendig)
-        ytterligereInformasjon = nav.ytterligereinformasjon
+        return SedGrunnlagDto(
+            bostedsadresse = mapBosted(bruker.adresse),
+            utenlandskIdent = mapUtenlandskIdent(person.pin),
+            arbeidssteder = mapArbeidssteder(nav.arbeidssted),
+            arbeidsland = mapArbeidsland(nav.arbeidsland),
+            arbeidsgivendeVirksomheter = mapVirksomheter(nav.arbeidsgiver),
+            selvstendigeVirksomheter = mapSelvstendig(nav.selvstendig),
+            ytterligereInformasjon = nav.ytterligereinformasjon
+        )
     }
 
     fun mapBosted(adresser: List<Adresse>?): no.nav.melosys.eessi.controller.dto.Adresse = adresser?.firstOrNull { erBostedsadresse(it) }
@@ -32,25 +34,15 @@ interface SedGrunnlagMapper {
     fun mapUtenlandskIdent(pins: Collection<Pin>?): List<Ident> =
         pins?.mapNotNull { pin -> Ident.av(pin).takeIf { it.erUtenlandsk() } } ?: emptyList()
 
-    fun mapArbeidssteder(arbeidssted: List<Arbeidssted>?): List<no.nav.melosys.eessi.controller.dto.Arbeidssted> {
-        return arbeidssted?.map { no.nav.melosys.eessi.controller.dto.Arbeidssted.av(it) } ?: emptyList()
-    }
+    fun mapArbeidssteder(arbeidssted: List<Arbeidssted>?): List<no.nav.melosys.eessi.controller.dto.Arbeidssted> =
+        arbeidssted?.map { no.nav.melosys.eessi.controller.dto.Arbeidssted.av(it) } ?: emptyList()
 
-    fun mapArbeidsland(arbeidsland: List<Arbeidsland>?): List<no.nav.melosys.eessi.controller.dto.Arbeidsland> {
-        return arbeidsland?.map { no.nav.melosys.eessi.controller.dto.Arbeidsland.av(it) } ?: emptyList()
-    }
+    fun mapArbeidsland(arbeidsland: List<Arbeidsland>?): List<no.nav.melosys.eessi.controller.dto.Arbeidsland> =
+        arbeidsland?.map { no.nav.melosys.eessi.controller.dto.Arbeidsland.av(it) } ?: emptyList()
 
-    fun mapVirksomheter(arbeidsgivere: List<Arbeidsgiver>?): List<Virksomhet> {
-        return arbeidsgivere?.map { Virksomhet.av(it) } ?: emptyList()
-    }
+    fun mapVirksomheter(arbeidsgivere: List<Arbeidsgiver>?): List<Virksomhet> = arbeidsgivere?.map { Virksomhet.av(it) } ?: emptyList()
 
-    fun mapSelvstendig(selvstendig: Selvstendig?): List<Virksomhet> {
-        return selvstendig?.arbeidsgiver?.map { Virksomhet.av(it) } ?: emptyList()
-    }
+    fun mapSelvstendig(selvstendig: Selvstendig?): List<Virksomhet> = selvstendig?.arbeidsgiver?.map { Virksomhet.av(it) } ?: emptyList()
 
-    companion object {
-        fun erBostedsadresse(adresse: Adresse): Boolean {
-            return Adressetype.BOSTEDSADRESSE.adressetypeRina.equals(adresse.type, ignoreCase = true)
-        }
-    }
+    fun erBostedsadresse(adresse: Adresse): Boolean = Adressetype.BOSTEDSADRESSE.adressetypeRina.equals(adresse.type, ignoreCase = true)
 }
