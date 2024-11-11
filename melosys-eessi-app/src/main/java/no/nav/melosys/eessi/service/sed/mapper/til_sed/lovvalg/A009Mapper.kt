@@ -56,14 +56,14 @@ class A009Mapper : LovvalgSedMapper<MedlemskapA009> {
 
     private fun getUtsendingsland(sedData: SedDataDto) = Utsendingsland(
         arbeidsgiver = hentArbeidsgivereILand(
-            sedData.arbeidsgivendeVirksomheter.orEmpty(),
+            sedData.arbeidsgivendeVirksomheter,
             landkode = sedData.finnLovvalgslandDefaultNO()
         )
     )
 
     private fun getAndreland(sedData: SedDataDto) = Utsendingsland(
         arbeidsgiver = hentArbeidsgivereIkkeILand(
-            sedData.arbeidsgivendeVirksomheter.orEmpty(),
+            sedData.arbeidsgivendeVirksomheter,
             landkode = sedData.finnLovvalgslandDefaultNO()
         )
     )

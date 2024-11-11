@@ -14,8 +14,7 @@ class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
     override fun getMedlemskap(sedData: SedDataDto) = MedlemskapA003(
         vedtak = getVedtak(sedData),
         andreland = getAndreLand(sedData),
-        relevantartikkelfor8832004eller9872009 = sedData.lovvalgsperioder
-            ?.firstOrNull()?.bestemmelse?.value
+        relevantartikkelfor8832004eller9872009 = sedData.lovvalgsperioder.firstOrNull()?.bestemmelse?.value
     )
 
     private fun getVedtak(sedData: SedDataDto): VedtakA003 {
@@ -37,10 +36,8 @@ class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
 
     private fun getAndreLand(sedData: SedDataDto) = Andreland(
         arbeidsgiver = hentArbeidsgivereIkkeILand(
-            virksomheter = sedData.arbeidsgivendeVirksomheter.orEmpty(),
+            virksomheter = sedData.arbeidsgivendeVirksomheter,
             landkode = sedData.finnLovvalgslandDefaultNO()
         )
     )
-
 }
-

@@ -19,7 +19,7 @@ class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
             naavaerendemedlemskap = lovvalgsperiode?.let { getUnntakFraLovvalgsland(it) }.orEmpty().toMutableList(),
             forespurtmedlemskap = lovvalgsperiode?.let { getLovvalgsland(it) }.orEmpty().toMutableList(),
             soeknadsperiode = lovvalgsperiode?.let { getSoeknadsperiode(it) },
-            tidligereperiode = sedData.tidligereLovvalgsperioder?.mapNotNull { mapTilPeriodeDto(it) }.orEmpty().toMutableList(),
+            tidligereperiode = sedData.tidligereLovvalgsperioder.mapNotNull { mapTilPeriodeDto(it) }.toMutableList(),
             vertsland = getVertsland(sedData),
             anmodning = getAnmodning()
         )
@@ -36,7 +36,7 @@ class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
 
     private fun getVertsland(sedData: SedDataDto) = Vertsland(
         arbeidsgiver = hentArbeidsgivereIkkeILand(
-            virksomheter = sedData.arbeidsgivendeVirksomheter.orEmpty(),
+            virksomheter = sedData.arbeidsgivendeVirksomheter,
             landkode = sedData.finnLovvalgslandDefaultNO()
         )
     )

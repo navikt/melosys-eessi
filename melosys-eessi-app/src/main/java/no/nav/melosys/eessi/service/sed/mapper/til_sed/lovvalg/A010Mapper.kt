@@ -10,7 +10,6 @@ import no.nav.melosys.eessi.models.sed.nav.MeldingOmLovvalg
 import no.nav.melosys.eessi.models.sed.nav.PeriodeA010
 import no.nav.melosys.eessi.models.sed.nav.Utsendingsland
 import no.nav.melosys.eessi.models.sed.nav.VedtakA010
-import kotlin.jvm.optionals.getOrNull
 
 class A010Mapper : LovvalgSedMapper<MedlemskapA010> {
 
@@ -32,7 +31,7 @@ class A010Mapper : LovvalgSedMapper<MedlemskapA010> {
                 setVedtaksdata(it, sedData.vedtakDto)
             },
             andreland = Utsendingsland(
-                arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter.orEmpty(), lovvalgsland)
+                arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter, lovvalgsland)
             )
         )
     }

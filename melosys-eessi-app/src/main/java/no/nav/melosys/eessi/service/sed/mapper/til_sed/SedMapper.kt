@@ -50,7 +50,7 @@ interface SedMapper {
             harfastarbeidssted = if (erCDM4_3 && sedData.harFastArbeidssted == true) "ja" else "nei",
             bruker = hentBruker(sedData),
             arbeidsgiver = hentArbeidsgivereILand(
-                sedData.arbeidsgivendeVirksomheter.orEmpty(),
+                sedData.arbeidsgivendeVirksomheter,
                 sedData.finnLovvalgslandDefaultNO()
             ),
             ytterligereinformasjon = sedData.ytterligereInformasjon,
@@ -146,7 +146,7 @@ interface SedMapper {
             sektor = null // Sektor settes til null per nå. Ikke påkrevd.
         )
 
-        val utenlandskIdent = sedData.utenlandskIdent ?: throw MappingException("Utenlandsk utenlandskIdent mangler")
+        val utenlandskIdent = sedData.utenlandskIdent
         val utenlandskPins = utenlandskIdent.map { (ident, landkode) ->
             Pin(
                 identifikator = ident,
