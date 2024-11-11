@@ -60,26 +60,6 @@ interface SedMapper {
         )
     }
 
-    fun hentBruker(sedDataDto: SedDataDto) = Bruker(
-        person = hentPerson(sedDataDto),
-        adresse = hentAdresser(sedDataDto)
-    ).apply {
-        setFamiliemedlemmer(sedDataDto, this)
-    }
-
-    fun hentPerson(sedData: SedDataDto): Person {
-        val bruker = sedData.bruker
-        return Person(
-            fornavn = bruker.fornavn,
-            etternavn = bruker.etternavn,
-            foedselsdato = formaterDato(bruker.foedseldato),
-            foedested = null, //det antas at ikke trengs når NAV fyller ut.
-            kjoenn = Kjønn.valueOf(bruker.kjoenn),
-            statsborgerskap = hentStatsborgerskap(sedData),
-            pin = hentPin(sedData)
-        )
-    }
-
     fun hentStatsborgerskap(sedDataDto: SedDataDto): List<Statsborgerskap> =
         sedDataDto.bruker.statsborgerskap
             .filter { finnLandkodeIso2(it).isPresent }
@@ -97,9 +77,69 @@ interface SedMapper {
                 }
             }
 
+    fun hentAdresser(sedDataDto: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Adresse> =
+        listOfNotNull(
+            sedDataDto.bostedsadresse?.let { mapBostedsadresse(it) },
+            sedDataDto.kontaktadresse?.let { mapAdresse(it) },
+            sedDataDto.oppholdsadresse?.let { mapAdresse(it) }
+        )
+
+    fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> =
+        sedData.arbeidsland.map { arbeidsland ->
+            no.nav.melosys.eessi.models.sed.nav.Arbeidsland(
+                land = arbeidsland.land,
+                arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted)
+            )
+        }
+
+    fun hentArbeidsgivereILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> =
+        hentArbeidsgiver(virksomheter) { it.adresse.land == landkode }
+
+    fun hentArbeidsgivereIkkeILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> {
+        return hentArbeidsgiver(virksomheter) { it.adresse.land != landkode }
+    }
+
+    fun mapTilPeriodeDto(lovvalgsperiode: Lovvalgsperiode): Periode? {
+        val fom = lovvalgsperiode.fom ?: return null
+
+        return Periode(
+            fastperiode = lovvalgsperiode.tom?.let {
+                Fastperiode(
+                    startdato = fom.formater(),
+                    sluttdato = it.formater()
+                )
+            },
+            aapenperiode = if (lovvalgsperiode.tom == null) {
+                AapenPeriode(
+                    startdato = formaterDato(fom)
+                )
+            } else null
+        )
+    }
+
+    private fun hentBruker(sedDataDto: SedDataDto) = Bruker(
+        person = hentPerson(sedDataDto),
+        adresse = hentAdresser(sedDataDto)
+    ).apply {
+        setFamiliemedlemmer(sedDataDto, this)
+    }
+
+    private fun hentPerson(sedData: SedDataDto): Person {
+        val bruker = sedData.bruker
+        return Person(
+            fornavn = bruker.fornavn,
+            etternavn = bruker.etternavn,
+            foedselsdato = formaterDato(bruker.foedseldato),
+            foedested = null, //det antas at ikke trengs når NAV fyller ut.
+            kjoenn = Kjønn.valueOf(bruker.kjoenn),
+            statsborgerskap = hentStatsborgerskap(sedData),
+            pin = hentPin(sedData)
+        )
+    }
+
     private fun lagStatsborgerskap(landkode: String): Statsborgerskap = Statsborgerskap(mapTilLandkodeIso2(landkode))
 
-    fun hentPin(sedData: SedDataDto): List<Pin> {
+    private fun hentPin(sedData: SedDataDto): List<Pin> {
         val brukerPin = Pin(
             identifikator = sedData.bruker.fnr,
             land = "NO",
@@ -117,13 +157,6 @@ interface SedMapper {
 
         return listOf(brukerPin) + utenlandskPins
     }
-
-    fun hentAdresser(sedDataDto: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Adresse> =
-        listOfNotNull(
-            sedDataDto.bostedsadresse?.let { mapBostedsadresse(it) },
-            sedDataDto.kontaktadresse?.let { mapAdresse(it) },
-            sedDataDto.oppholdsadresse?.let { mapAdresse(it) }
-        )
 
     private fun mapBostedsadresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
         mapAdresse(adresse).apply {
@@ -146,7 +179,7 @@ interface SedMapper {
         )
     }
 
-    fun setFamiliemedlemmer(sedData: SedDataDto, bruker: Bruker) {
+    private fun setFamiliemedlemmer(sedData: SedDataDto, bruker: Bruker) {
         //Splitter per nå navnet etter første mellomrom
 
         sedData.familieMedlem.find { it.relasjon.equals("FAR", ignoreCase = true) }?.let { farMedlem ->
@@ -158,15 +191,7 @@ interface SedMapper {
         }
     }
 
-    fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> =
-        sedData.arbeidsland.map { arbeidsland ->
-            no.nav.melosys.eessi.models.sed.nav.Arbeidsland(
-                land = arbeidsland.land,
-                arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted)
-            )
-        }
-
-    fun hentArbeidssted4_3(arbeidssteder: List<Arbeidssted>): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> =
+    private fun hentArbeidssted4_3(arbeidssteder: List<Arbeidssted>): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> =
         arbeidssteder.map {
             no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
                 navn = it.navn,
@@ -180,7 +205,7 @@ interface SedMapper {
             )
         }
 
-    fun hentArbeidssted(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> =
+    private fun hentArbeidssted(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> =
         sedData.arbeidssteder.map { (navn, adresse, fysisk, hjemmebase) ->
             no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
                 navn = navn,
@@ -190,19 +215,12 @@ interface SedMapper {
             )
         }
 
-    fun hentArbeidsgivereILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> =
-        hentArbeidsgiver(virksomheter) { it.adresse.land == landkode }
-
-    fun hentArbeidsgivereIkkeILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> {
-        return hentArbeidsgiver(virksomheter) { it.adresse.land != landkode }
-    }
-
-    fun hentArbeidsgiver(virksomheter: List<Virksomhet>, virksomhetPredicate: (Virksomhet) -> Boolean): List<Arbeidsgiver> =
+    private fun hentArbeidsgiver(virksomheter: List<Virksomhet>, virksomhetPredicate: (Virksomhet) -> Boolean): List<Arbeidsgiver> =
         virksomheter
             .filter(virksomhetPredicate)
             .map { hentArbeidsgiver(it) }
 
-    fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver {
+    private fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver {
         return Arbeidsgiver(
             navn = virksomhet.navn,
             adresse = hentAdresseFraDtoAdresse(virksomhet.adresse),
@@ -210,7 +228,7 @@ interface SedMapper {
         )
     }
 
-    fun hentSelvstendig(sedData: SedDataDto) = Selvstendig(arbeidsgiver = sedData.selvstendigeVirksomheter.map {
+    private fun hentSelvstendig(sedData: SedDataDto) = Selvstendig(arbeidsgiver = sedData.selvstendigeVirksomheter.map {
         Arbeidsgiver(
             identifikator = lagIdentifikator(it.orgnr),
             adresse = hentAdresseFraDtoAdresse(it.adresse),
@@ -218,7 +236,7 @@ interface SedMapper {
         )
     })
 
-    fun hentAdresseFraDtoAdresse(sAdresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
+    private fun hentAdresseFraDtoAdresse(sAdresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
         gate = sAdresse.gateadresse,
         postnummer = sAdresse.postnr,
         by = sAdresse.poststed,
@@ -231,7 +249,7 @@ interface SedMapper {
         }
     }
 
-    fun lagIdentifikator(orgnr: String?): List<Identifikator> {
+    private fun lagIdentifikator(orgnr: String?): List<Identifikator> {
         return if (orgnr.isNullOrBlank()) {
             emptyList()
         } else {
@@ -239,25 +257,7 @@ interface SedMapper {
         }
     }
 
-    fun mapTilPeriodeDto(lovvalgsperiode: Lovvalgsperiode): Periode? {
-        val fom = lovvalgsperiode.fom ?: return null
-
-        return Periode(
-            fastperiode = lovvalgsperiode.tom?.let {
-                Fastperiode(
-                    startdato = fom.formater(),
-                    sluttdato = it.formater()
-                )
-            },
-            aapenperiode = if (lovvalgsperiode.tom == null) {
-                AapenPeriode(
-                    startdato = formaterDato(fom)
-                )
-            } else null
-        )
-    }
-
-    fun landkodeIso2EllerNull(iso3: String?): String? {
+    private fun landkodeIso2EllerNull(iso3: String?): String? {
         return when {
             iso3 == null -> null
             iso3.length == 2 -> iso3
