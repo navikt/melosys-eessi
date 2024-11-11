@@ -8,7 +8,6 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.UnntakA002
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.VedtakA002
 import no.nav.melosys.eessi.models.sed.nav.Fastperiode
 import no.nav.melosys.eessi.models.sed.nav.Periode
-import java.time.LocalDate
 
 class A002Mapper : LovvalgSedMapper<MedlemskapA002> {
 
@@ -25,10 +24,8 @@ class A002Mapper : LovvalgSedMapper<MedlemskapA002> {
                 vedtak = VedtakA002(
                     annenperiode = Periode(
                         fastperiode = Fastperiode(
-                            startdato = formaterDatoEllerNull(svarAnmodningUnntak.delvisInnvilgetPeriode?.fom),
-                            sluttdato = formaterDatoEllerNull(
-                                svarAnmodningUnntak.delvisInnvilgetPeriode?.tom
-                            )
+                            startdato = svarAnmodningUnntak.delvisInnvilgetPeriode?.fom.formaterEllerNull(),
+                            sluttdato = svarAnmodningUnntak.delvisInnvilgetPeriode?.tom.formaterEllerNull()
                         )
                     ),
                     begrunnelse = svarAnmodningUnntak.begrunnelse,
@@ -36,9 +33,5 @@ class A002Mapper : LovvalgSedMapper<MedlemskapA002> {
                 )
             )
         )
-    }
-
-    private fun formaterDatoEllerNull(dato: LocalDate?): String? {
-        return dato?.let { formaterDato(it) }
     }
 }

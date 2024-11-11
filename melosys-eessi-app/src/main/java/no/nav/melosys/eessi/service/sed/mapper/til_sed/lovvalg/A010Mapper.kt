@@ -53,8 +53,8 @@ class A010Mapper : LovvalgSedMapper<MedlemskapA010> {
     }
 
     private fun hentPeriode(lovvalgsperiode: Lovvalgsperiode) = PeriodeA010(
-        startdato = formaterDato(lovvalgsperiode.fom ?: throw IllegalArgumentException("lovvalgsperiode.fom kan ikke være null")),
-        sluttdato = formaterDato(lovvalgsperiode.tom ?: throw IllegalArgumentException("lovvalgsperiode.fom kan ikke være null"))
+        startdato = lovvalgsperiode.fom.formater(),
+        sluttdato = lovvalgsperiode.tom.formater()
     )
 
     companion object {

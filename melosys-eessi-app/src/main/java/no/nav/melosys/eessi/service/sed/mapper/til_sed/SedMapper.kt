@@ -218,8 +218,6 @@ interface SedMapper {
         )
     })
 
-    fun formaterDato(dato: LocalDate): String = Konstanter.dateTimeFormatter.format(dato)
-
     fun hentAdresseFraDtoAdresse(sAdresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
         gate = sAdresse.gateadresse,
         postnummer = sAdresse.postnr,
@@ -247,8 +245,8 @@ interface SedMapper {
         return Periode(
             fastperiode = lovvalgsperiode.tom?.let {
                 Fastperiode(
-                    startdato = formaterDato(fom),
-                    sluttdato = formaterDato(it)
+                    startdato = fom.formater(),
+                    sluttdato = it.formater()
                 )
             },
             aapenperiode = if (lovvalgsperiode.tom == null) {
@@ -266,4 +264,10 @@ interface SedMapper {
             else -> mapTilLandkodeIso2(iso3)
         }
     }
+
+    private fun formaterDato(dato: LocalDate): String = Konstanter.dateTimeFormatter.format(dato)
+
+    fun LocalDate?.formater(): String = this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
+
+    fun LocalDate?.formaterEllerNull(): String? = this?.let { formaterDato(it) }
 }

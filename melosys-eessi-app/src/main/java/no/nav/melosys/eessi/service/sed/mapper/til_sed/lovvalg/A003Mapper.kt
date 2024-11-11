@@ -31,8 +31,8 @@ class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
     }
 
     private fun getPeriode(lovvalgsperiode: Lovvalgsperiode) = PeriodeA010(
-        startdato = formaterDato(lovvalgsperiode.fom ?: throw IllegalArgumentException("lovvalgsperiode.fom kan ikke være null")),
-        sluttdato = formaterDato(lovvalgsperiode.tom ?: throw IllegalArgumentException("lovvalgsperiode.tom kan ikke være null"))
+        startdato = lovvalgsperiode.fom.formater(),
+        sluttdato = lovvalgsperiode.tom.formater()
     )
 
     private fun getAndreLand(sedData: SedDataDto) = Andreland(
@@ -41,4 +41,6 @@ class A003Mapper : LovvalgSedMapper<MedlemskapA003> {
             landkode = sedData.finnLovvalgslandDefaultNO()
         )
     )
+
 }
+

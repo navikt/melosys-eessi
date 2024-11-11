@@ -21,7 +21,7 @@ class A008Mapper : LovvalgSedMapper<MedlemskapA008> {
             arbeidiflereland = ArbeidIFlereLand(
                 bosted = Bosted(sedData.avklartBostedsland),
                 yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
-                    Yrkesaktivitet(startdato = formaterDato(søknadsperiodeFom))
+                    Yrkesaktivitet(startdato = søknadsperiodeFom.formaterEllerNull())
                 }
             ))
 }

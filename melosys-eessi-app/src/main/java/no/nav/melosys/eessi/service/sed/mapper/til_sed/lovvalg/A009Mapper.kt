@@ -47,8 +47,8 @@ class A009Mapper : LovvalgSedMapper<MedlemskapA009> {
     }
 
     private fun lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode: Lovvalgsperiode) = Fastperiode(
-        startdato = formaterDato(lovvalgsperiode.fom ?: throw IllegalArgumentException("lovvalgsperiode.fom kan ikke være null")),
-        sluttdato = formaterDato(lovvalgsperiode.tom ?: throw IllegalArgumentException("lovvalgsperiode.fom kan ikke være null"))
+        startdato = lovvalgsperiode.fom.formater(),
+        sluttdato = lovvalgsperiode.tom.formater()
     )
 
     private fun erGyldigLovvalgbestemmelse(bestemmelse: Bestemmelse?): Boolean =
