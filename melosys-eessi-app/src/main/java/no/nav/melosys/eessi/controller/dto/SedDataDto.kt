@@ -22,11 +22,23 @@ data class SedDataDto(
     var tidligereLovvalgsperioder: List<Lovvalgsperiode>? = null,
     var gsakSaksnummer: Long? = null,
     var mottakerIder: List<String>? = null,
-    override var ytterligereInformasjon: String? = null,
+    var ytterligereInformasjon: String? = null,
     var svarAnmodningUnntak: SvarAnmodningUnntakDto? = null,
-    var utpekingAvvis: UtpekingAvvisDto? = null
-) : SedGrunnlagDto() {
-
+    var utpekingAvvis: UtpekingAvvisDto? = null,
+    var sedType: String? = null,
+    var utenlandskIdent: List<Ident>? = null, // kaster NullPointerException i Java kode om null TODO: fiks arv så den kan være non-null
+    var bostedsadresse: Adresse? = null,
+    var arbeidsgivendeVirksomheter: List<Virksomhet>? = null,
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var selvstendigeVirksomheter: List<Virksomhet> = emptyList(), // kaster NullPointerException i Java kode om null
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var arbeidssteder: List<Arbeidssted> = emptyList(), // kaster NullPointerException i Java kode om null
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var arbeidsland: List<Arbeidsland> = emptyList(), // kaster NullPointerException i Java kode om null
+    var harFastArbeidssted: Boolean? = null,
+    var lovvalgsperioder: List<Lovvalgsperiode>? = null,
+    var gjeldenderegler: String? = null
+) {
     fun finnLovvalgslandDefaultNO(): String = (lovvalgsperioder ?: throw NullPointerException("lovvalgsperioder kan ikke være null"))
         .firstOrNull { it.lovvalgsland != null }?.lovvalgsland ?: "NO"
 
