@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.controller.dto
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.Nulls
-import java.util.*
 
 /**
  * bruke for å overføre SED-data fra melosys-api
@@ -28,7 +27,8 @@ data class SedDataDto(
     var utpekingAvvis: UtpekingAvvisDto? = null
 ) : SedGrunnlagDto() {
 
-    fun finnLovvalgslandDefaultNO(): String = lovvalgsperioder?.firstOrNull { it.lovvalgsland != null }?.lovvalgsland ?: "NO"
+    fun finnLovvalgslandDefaultNO(): String = (lovvalgsperioder ?: throw NullPointerException("lovvalgsperioder kan ikke være null"))
+        .firstOrNull { it.lovvalgsland != null }?.lovvalgsland ?: "NO"
 
     fun finnLovvalgsperiode(): Lovvalgsperiode? = lovvalgsperioder?.maxByOrNull { it.fom!! }
 
