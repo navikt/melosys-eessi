@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonSetter
 import com.fasterxml.jackson.annotation.Nulls
 import java.util.*
 
+/**
+ * bruke for å overføre SED-data fra melosys-api
+ * Deserialiserer JSON til objekt. Serialiserer ikke objekt til JSON
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SedDataDto(
     var bruker: Bruker, // kaster NullPointerException i Java kode om null
