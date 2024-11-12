@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils
 data class Adresse(
     var poststed: String? = null,
     var postnr: String? = null,
-    var land: String? = null,
+    var land: String? = null, // kaster NullPointerException i java kode, men av må kunne lage object med null-verdier
     var gateadresse: String? = null,
     var tilleggsnavn: String? = null,
     var region: String? = null,

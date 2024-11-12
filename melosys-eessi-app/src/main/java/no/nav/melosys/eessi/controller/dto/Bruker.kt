@@ -13,9 +13,9 @@ data class Bruker(
     @JsonDeserialize(using = LocalDateDeserializer::class)
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    var foedseldato: LocalDate? = null,
-    var kjoenn: String? = null,
-    var statsborgerskap: Collection<String>? = null,
+    var foedseldato: LocalDate, // kaster NullPointerException i Java kode om null
+    var kjoenn: String, // kaster NullPointerException i Java kode om null
+    var statsborgerskap: Collection<String>, // kaster NullPointerException i Java kode om null
     var fnr: String? = null,
     var harSensitiveOpplysninger: Boolean = false
 )

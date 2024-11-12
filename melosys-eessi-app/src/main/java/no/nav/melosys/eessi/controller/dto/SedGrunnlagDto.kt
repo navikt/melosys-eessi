@@ -2,20 +2,24 @@ package no.nav.melosys.eessi.controller.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
+/**
+ * Dto for å hente SedGrunnlag fra eux-rina
+ * SedGrunnlagDto lages av SedGrunnlagMapper og serialiserer til JSON. Deserialiserer ikke JSON til SedGrunnlagDto.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 open class SedGrunnlagDto(
     var sedType: String? = null,
-    var utenlandskIdent: List<Ident>? = null,
+    var utenlandskIdent: List<Ident> = emptyList(),
     var bostedsadresse: Adresse? = null,
-    var arbeidsgivendeVirksomheter: List<Virksomhet>? = null,
-    var selvstendigeVirksomheter: List<Virksomhet>? = null,
-    var arbeidssteder: List<Arbeidssted>? = null,
-    var arbeidsland: List<Arbeidsland>? = null,
+    var arbeidsgivendeVirksomheter: List<Virksomhet> = emptyList(),
+    var selvstendigeVirksomheter: List<Virksomhet> = emptyList(),
+    var arbeidssteder: List<Arbeidssted> = emptyList(),
+    var arbeidsland: List<Arbeidsland> = emptyList(),
     var harFastArbeidssted: Boolean? = null,
     var lovvalgsperioder: List<Lovvalgsperiode>? = null,
-    open var ytterligereInformasjon: String? = null,
+    var ytterligereInformasjon: String? = null,
     var gjeldenderegler: String? = null
-) {
+)  {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is SedGrunnlagDto) return false
