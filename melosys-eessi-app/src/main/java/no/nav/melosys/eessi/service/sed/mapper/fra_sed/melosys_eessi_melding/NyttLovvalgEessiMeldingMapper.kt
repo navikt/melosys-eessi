@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 interface NyttLovvalgEessiMeldingMapper<T : Medlemskap> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
     override fun map(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding =
         super.map(eessiMeldingQuery).apply {
-            val medlemskap = hentMedlemskap(eessiMeldingQuery.sed!!)
+            val medlemskap = hentMedlemskap(eessiMeldingQuery.sed)
 
             periode = mapPeriode(medlemskap)
 

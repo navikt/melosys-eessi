@@ -4,7 +4,7 @@ import no.nav.melosys.eessi.models.sed.SED
 
 class EessiMeldingQuery(
     val aktoerId: String? = null,
-    val sed: SED? = null,
+    val sed: SED,
     var rinaDokumentID: String? = null,
     var rinaSaksnummer: String? = null,
     var sedType: String? = null,
@@ -33,7 +33,7 @@ class EessiMeldingQuery(
         private var sedVersjon: String? = null
 
         fun aktoerId(aktoerId: String?) = apply { this.aktoerId = aktoerId }
-        fun sed(sed: SED?) = apply { this.sed = sed }
+        fun sed(sed: SED) = apply { this.sed = sed }
         fun rinaDokumentID(rinaDokumentID: String?) = apply { this.rinaDokumentID = rinaDokumentID }
         fun rinaSaksnummer(rinaSaksnummer: String?) = apply { this.rinaSaksnummer = rinaSaksnummer }
         fun sedType(sedType: String?) = apply { this.sedType = sedType }
@@ -48,7 +48,7 @@ class EessiMeldingQuery(
 
         fun build() = EessiMeldingQuery(
             aktoerId,
-            sed,
+            sed ?: throw IllegalArgumentException("sed er påkrevd"),
             rinaDokumentID,
             rinaSaksnummer,
             sedType,

@@ -7,7 +7,7 @@ class MelosysEessiMeldingMapperX006(private val rinaInstitusjonId: String) : Mel
 
     override fun map(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding =
         super.map(eessiMeldingQuery).apply {
-            x006NavErFjernet = inneholderOgErNorskInstitusjon(eessiMeldingQuery.sed!!)
+            x006NavErFjernet = inneholderOgErNorskInstitusjon(eessiMeldingQuery.sed)
         }
 
     private fun inneholderOgErNorskInstitusjon(sed: SED): Boolean =

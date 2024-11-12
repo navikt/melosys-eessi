@@ -13,7 +13,7 @@ interface MelosysEessiMeldingMapper {
         dokumentId = eessiMeldingQuery.dokumentID,
         gsakSaksnummer = eessiMeldingQuery.gsakSaksnummer?.toLongOrNull(),
         aktoerId = eessiMeldingQuery.aktoerId,
-        ytterligereInformasjon = eessiMeldingQuery.sed?.nav?.ytterligereinformasjon,
+        ytterligereInformasjon = eessiMeldingQuery.sed.nav?.ytterligereinformasjon,
         sedType = eessiMeldingQuery.sedType,
         bucType = eessiMeldingQuery.bucType,
         erEndring = eessiMeldingQuery.sedErEndring,
@@ -21,10 +21,10 @@ interface MelosysEessiMeldingMapper {
     ).apply {
         if (inneholderStatsborgerskap(eessiMeldingQuery.sed)) {
             statsborgerskap = mapStatsborgerskap(
-                eessiMeldingQuery.sed?.nav?.bruker?.person?.hentStatsborgerksapsliste() ?: emptyList()
+                eessiMeldingQuery.sed.nav?.bruker?.person?.hentStatsborgerksapsliste() ?: emptyList()
             )
         }
-        eessiMeldingQuery.sed?.nav?.let { nav ->
+        eessiMeldingQuery.sed.nav?.let { nav ->
             nav.arbeidssted?.let { arbeidsstedList ->
                 arbeidssteder = arbeidsstedList.map(::Arbeidssted)
             }
