@@ -9,78 +9,53 @@ import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper
 
 class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
+    override fun getSedType(): SedType = SedType.A001
 
     override fun getMedlemskap(sedData: SedDataDto): MedlemskapA001 {
-        val medlemskap = MedlemskapA001()
         val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
-        if (lovvalgsperiode.isPresent) {
-            medlemskap.unntak = getUnntak(lovvalgsperiode.get())
-            medlemskap.naavaerendemedlemskap = getUnntakFraLovvalgsland(lovvalgsperiode.get()).toMutableList()
-            medlemskap.forespurtmedlemskap = getLovvalgsland(lovvalgsperiode.get()).toMutableList()
-            medlemskap.soeknadsperiode = getSoeknadsperiode(lovvalgsperiode.get())
-            medlemskap.tidligereperiode = getTidligerePeriode(sedData.tidligereLovvalgsperioder).toMutableList()
-        }
-
-        medlemskap.vertsland = getVertsland(sedData)
-        medlemskap.anmodning = getAnmodning()
-
-        return medlemskap
+        return MedlemskapA001(
+            unntak = lovvalgsperiode?.let { getUnntak(it) },
+            naavaerendemedlemskap = lovvalgsperiode?.let { getUnntakFraLovvalgsland(it) }.orEmpty().toMutableList(),
+            forespurtmedlemskap = lovvalgsperiode?.let { getLovvalgsland(it) }.orEmpty().toMutableList(),
+            soeknadsperiode = lovvalgsperiode?.let { getSoeknadsperiode(it) },
+            tidligereperiode = sedData.tidligereLovvalgsperioder.mapNotNull { mapTilPeriodeDto(it) }.toMutableList(),
+            vertsland = getVertsland(sedData),
+            anmodning = getAnmodning()
+        )
     }
 
-    private fun getUnntak(lovvalgsperiode: Lovvalgsperiode): Unntak {
-        val unntak = Unntak()
-        unntak.begrunnelse = lovvalgsperiode.unntaksBegrunnelse
+    private fun getUnntak(lovvalgsperiode: Lovvalgsperiode) = Unntak(
+        begrunnelse = lovvalgsperiode.unntaksBegrunnelse,
+        // Hent fast tekst (samme som i brev), denne kan overskrives av saksbehandler (særlig grunn)
+        grunnlag = Grunnlag(
+            artikkel = UnntakArtikkelMapper.mapFromBestemmelse(lovvalgsperiode.unntakFraBestemmelse),
+            annet = if (UnntakArtikkelMapper.BESTEMMELSE_OTHER == lovvalgsperiode.unntakFraBestemmelse.toString()) "" else null
+        )
+    )
 
-        val grunnlag = Grunnlag()
-        grunnlag.artikkel = UnntakArtikkelMapper.mapFromBestemmelse(lovvalgsperiode.unntakFraBestemmelse)
+    private fun getVertsland(sedData: SedDataDto) = Vertsland(
+        arbeidsgiver = hentArbeidsgivereIkkeILand(
+            virksomheter = sedData.arbeidsgivendeVirksomheter,
+            landkode = sedData.finnLovvalgslandDefaultNO()
+        )
+    )
 
-        if (UnntakArtikkelMapper.BESTEMMELSE_OTHER == grunnlag.annet) {
-            grunnlag.annet = ""
-        }
-        unntak.grunnlag = grunnlag
+    private fun getUnntakFraLovvalgsland(lovvalgsperiode: Lovvalgsperiode) = listOf(
+        Land(
+            landkode = LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.unntakFraLovvalgsland)
+        )
+    )
 
-        return unntak
-    }
+    private fun getLovvalgsland(lovvalgsperiode: Lovvalgsperiode) = listOf(
+        Land(
+            landkode = LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.lovvalgsland)
+        )
+    )
 
-    private fun getVertsland(sedData: SedDataDto): Vertsland {
-        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
-        val vertsland = Vertsland()
-        vertsland.arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
+    private fun getSoeknadsperiode(lovvalgsperiode: Lovvalgsperiode): Fastperiode? =
+        mapTilPeriodeDto(lovvalgsperiode)?.fastperiode
 
-        return vertsland
-    }
-
-    private fun getUnntakFraLovvalgsland(lovvalgsperiode: Lovvalgsperiode): List<Land> {
-        val land = Land()
-        land.landkode = LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.unntakFraLovvalgsland)
-
-        return listOf(land)
-    }
-
-    private fun getLovvalgsland(lovvalgsperiode: Lovvalgsperiode): List<Land> {
-        val land = Land()
-        land.landkode = LandkodeMapper.mapTilLandkodeIso2(lovvalgsperiode.lovvalgsland)
-
-        return listOf(land)
-    }
-
-    private fun getSoeknadsperiode(lovvalgsperiode: Lovvalgsperiode): Fastperiode {
-        return mapTilPeriodeDto(lovvalgsperiode)!!.fastperiode!!
-    }
-
-    private fun getTidligerePeriode(tidligereLovvalgsperioder: List<Lovvalgsperiode>?): List<Periode> {
-        return tidligereLovvalgsperioder?.mapNotNull { mapTilPeriodeDto(it) } ?: emptyList()
-    }
-
-    private fun getAnmodning(): Anmodning {
-        val anmodning = Anmodning()
-        anmodning.erendring = "nei"
-
-        return anmodning
-    }
-
-    override fun getSedType(): SedType {
-        return SedType.A001
-    }
+    // Blir ikke implementert i denne versjonen av Melosys.
+    private fun getAnmodning() = Anmodning(erendring = "nei")  // Hardkodes til "nei" inntil videre
 }

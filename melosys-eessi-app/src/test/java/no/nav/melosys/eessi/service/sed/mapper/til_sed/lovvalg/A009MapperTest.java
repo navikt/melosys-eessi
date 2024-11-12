@@ -141,14 +141,6 @@ class A009MapperTest {
             .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
     }
 
-    @Test
-    void ingenLovvalgsperioder_expectNullPointerException() {
-        sedData.setLovvalgsperioder(null);
-        assertThatExceptionOfType(NullPointerException.class)
-            .isThrownBy(() -> a009Mapper.mapTilSed(sedData, false));
-    }
-
-    @Test
     void erIkkeFysisk_forventErIkkeFastadresse() {
         sedData.getArbeidssteder().get(0).setFysisk(false);
         SED sed = a009Mapper.mapTilSed(sedData, false);

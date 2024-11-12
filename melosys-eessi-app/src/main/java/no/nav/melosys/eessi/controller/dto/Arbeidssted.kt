@@ -5,7 +5,7 @@ import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 
 data class Arbeidssted(
     var navn: String? = null,
-    var adresse: Adresse? = null,
+    var adresse: Adresse, // kaster NullPointerException i Java kode om null
     var fysisk: Boolean = false,
     var hjemmebase: String? = null
 ) {

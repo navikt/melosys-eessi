@@ -13,66 +13,58 @@ import no.nav.melosys.eessi.models.sed.nav.VedtakA009
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.mapTilLandkodeIso2
 
 class A009Mapper : LovvalgSedMapper<MedlemskapA009> {
-    override fun getMedlemskap(sedData: SedDataDto): MedlemskapA009 {
-        val medlemskapA009 = MedlemskapA009()
-        medlemskapA009.vedtak = getVedtak(sedData)
-        medlemskapA009.andreland = getAndreland(sedData)
-        medlemskapA009.utsendingsland = getUtsendingsland(sedData)
-
-        return medlemskapA009
-    }
-
-    private fun getVedtak(sedDataDto: SedDataDto): VedtakA009 {
-        val vedtak = VedtakA009()
-        val lovvalgsperiode = sedDataDto.finnLovvalgsperiode()
-        val gjelderperiode = Periode()
-
-        if (lovvalgsperiode.isPresent) {
-            vedtak.land = mapTilLandkodeIso2(lovvalgsperiode.get().lovvalgsland)
-
-            //Vil alltid være fast periode
-            gjelderperiode.fastperiode = lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode.get())
-
-            if (!erGyldigLovvalgbestemmelse(lovvalgsperiode.get().bestemmelse)) {
-                throw MappingException("Lovvalgsbestemmelse er ikke av artikkel 12!")
-            }
-            vedtak.artikkelforordning = lovvalgsperiode.get().bestemmelse!!.value
-        }
-
-        setVedtaksdata(vedtak, sedDataDto.vedtakDto)
-        vedtak.gjeldervarighetyrkesaktivitet = "nei"
-        vedtak.gjelderperiode = gjelderperiode
-        return vedtak
-    }
-
-
-    private fun lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode: Lovvalgsperiode): Fastperiode {
-        val fastperiode = Fastperiode()
-        fastperiode.startdato = formaterDato(lovvalgsperiode.fom!!)
-        fastperiode.sluttdato = formaterDato(lovvalgsperiode.tom!!)
-        return fastperiode
-    }
-
-    private fun erGyldigLovvalgbestemmelse(bestemmelse: Bestemmelse?): Boolean {
-        return bestemmelse == Bestemmelse.ART_12_1
-                || bestemmelse == Bestemmelse.ART_12_2
-    }
-
-    private fun getUtsendingsland(sedData: SedDataDto): Utsendingsland {
-        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
-        val utsendingsland = Utsendingsland()
-        utsendingsland.arbeidsgiver = hentArbeidsgivereILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
-        return utsendingsland
-    }
-
-    private fun getAndreland(sedData: SedDataDto): Utsendingsland {
-        val lovvalgsland = sedData.finnLovvalgslandDefaultNO()
-        val utsendingsland = Utsendingsland()
-        utsendingsland.arbeidsgiver = hentArbeidsgivereIkkeILand(sedData.arbeidsgivendeVirksomheter!!, lovvalgsland)
-        return utsendingsland
-    }
-
 
     override fun getSedType() = SedType.A009
 
+    override fun getMedlemskap(sedData: SedDataDto) = MedlemskapA009(
+        vedtak = getVedtak(sedData),
+        andreland = getAndreland(sedData),
+        utsendingsland = getUtsendingsland(sedData)
+    )
+
+    private fun getVedtak(sedDataDto: SedDataDto): VedtakA009 {
+        val lovvalgsperiode = sedDataDto.finnLovvalgsperiode()
+
+        val gjelderperiode = Periode(
+            //Vil alltid være fast periode
+            fastperiode = lovvalgsperiode?.let { lagFastPeriodeFraLovvalgsPeriode(it) }
+        )
+
+        lovvalgsperiode?.let {
+            if (!erGyldigLovvalgbestemmelse(it.bestemmelse)) {
+                throw MappingException("Lovvalgsbestemmelse er ikke av artikkel 12!")
+            }
+        }
+
+        return VedtakA009(
+            land = lovvalgsperiode?.lovvalgsland?.let { mapTilLandkodeIso2(it) },
+            artikkelforordning = lovvalgsperiode?.bestemmelse?.value,
+            gjelderperiode = gjelderperiode,
+            gjeldervarighetyrkesaktivitet = "nei"
+        ).also {
+            setVedtaksdata(it, sedDataDto.vedtakDto)
+        }
+    }
+
+    private fun lagFastPeriodeFraLovvalgsPeriode(lovvalgsperiode: Lovvalgsperiode) = Fastperiode(
+        startdato = lovvalgsperiode.fom.formater(),
+        sluttdato = lovvalgsperiode.tom.formater()
+    )
+
+    private fun erGyldigLovvalgbestemmelse(bestemmelse: Bestemmelse?): Boolean =
+        bestemmelse in listOf(Bestemmelse.ART_12_1, Bestemmelse.ART_12_2)
+
+    private fun getUtsendingsland(sedData: SedDataDto) = Utsendingsland(
+        arbeidsgiver = hentArbeidsgivereILand(
+            sedData.arbeidsgivendeVirksomheter,
+            landkode = sedData.finnLovvalgslandDefaultNO()
+        )
+    )
+
+    private fun getAndreland(sedData: SedDataDto) = Utsendingsland(
+        arbeidsgiver = hentArbeidsgivereIkkeILand(
+            sedData.arbeidsgivendeVirksomheter,
+            landkode = sedData.finnLovvalgslandDefaultNO()
+        )
+    )
 }
