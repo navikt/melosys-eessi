@@ -5,48 +5,32 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 
 interface MelosysEessiMeldingMapper {
-    fun map(
-        aktoerId: String?,
-        sed: SED?,
-        rinaDokumentID: String?,
-        rinaSaksnummer: String?,
-        sedType: String?,
-        bucType: String?,
-        avsenderID: String?,
-        landkode: String?,
-        journalpostID: String?,
-        dokumentID: String?,
-        gsakSaksnummer: String?,
-        sedErEndring: Boolean,
-        sedVersjon: String?
-    ): MelosysEessiMelding {
-        return MelosysEessiMelding().apply {
-            sedId = rinaDokumentID
-            this.rinaSaksnummer = rinaSaksnummer
-            avsender = Avsender(avsenderID, LandkodeMapper.mapTilNavLandkode(landkode))
-            journalpostId = journalpostID
-            dokumentId = dokumentID
-            this.gsakSaksnummer = gsakSaksnummer?.toLongOrNull()
-            this.aktoerId = aktoerId
-            ytterligereInformasjon = sed?.nav?.ytterligereinformasjon
-
-            this.sedType = sedType
-            this.bucType = bucType
-
-            if (inneholderStatsborgerskap(sed)) {
-                statsborgerskap = mapStatsborgerskap(sed?.nav?.bruker?.person?.hentStatsborgerksapsliste() ?: emptyList())
+    fun map(eessiMeldingParams: EessiMeldingParams) = MelosysEessiMelding(
+        sedId = eessiMeldingParams.rinaDokumentID,
+        rinaSaksnummer = eessiMeldingParams.rinaSaksnummer,
+        avsender = Avsender(eessiMeldingParams.avsenderID, LandkodeMapper.mapTilNavLandkode(eessiMeldingParams.landkode)),
+        journalpostId = eessiMeldingParams.journalpostID,
+        dokumentId = eessiMeldingParams.dokumentID,
+        gsakSaksnummer = eessiMeldingParams.gsakSaksnummer?.toLongOrNull(),
+        aktoerId = eessiMeldingParams.aktoerId,
+        ytterligereInformasjon = eessiMeldingParams.sed.nav?.ytterligereinformasjon,
+        sedType = eessiMeldingParams.sedType,
+        bucType = eessiMeldingParams.bucType,
+        erEndring = eessiMeldingParams.sedErEndring,
+        sedVersjon = eessiMeldingParams.sedVersjon
+    ).apply {
+        if (inneholderStatsborgerskap(eessiMeldingParams.sed)) {
+            statsborgerskap = mapStatsborgerskap(
+                eessiMeldingParams.sed.nav?.bruker?.person?.hentStatsborgerksapsliste() ?: emptyList()
+            )
+        }
+        eessiMeldingParams.sed.nav?.let { nav ->
+            nav.arbeidssted?.let { arbeidsstedList ->
+                arbeidssteder = arbeidsstedList.map(::Arbeidssted)
             }
-
-            sed?.nav?.let { nav ->
-                nav.arbeidssted?.let { arbeidsstedList ->
-                    arbeidssteder = arbeidsstedList.map(::Arbeidssted)
-                }
-                nav.arbeidsland?.let { arbeidslandList ->
-                    arbeidsland = arbeidslandList.map(::Arbeidsland)
-                }
+            nav.arbeidsland?.let { arbeidslandList ->
+                arbeidsland = arbeidslandList.map(::Arbeidsland)
             }
-            this.erEndring = sedErEndring
-            this.sedVersjon = sedVersjon
         }
     }
 

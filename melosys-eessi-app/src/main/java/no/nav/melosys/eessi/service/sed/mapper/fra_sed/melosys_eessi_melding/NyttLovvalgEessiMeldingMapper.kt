@@ -2,44 +2,22 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
 import no.nav.melosys.eessi.kafka.producers.model.Periode
-import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 
 interface NyttLovvalgEessiMeldingMapper<T : Medlemskap> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
-    override fun map(
-        aktoerId: String?,
-        sed: SED?,
-        rinaDokumentID: String?,
-        rinaSaksnummer: String?,
-        sedType: String?,
-        bucType: String?,
-        avsenderID: String?,
-        landkode: String?,
-        journalpostID: String?,
-        dokumentID: String?,
-        gsakSaksnummer: String?,
-        sedErEndring: Boolean,
-        sedVersjon: String?
-    ): MelosysEessiMelding {
-        val melosysEessiMelding = super.map(
-            aktoerId, sed, rinaDokumentID,
-            rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
-            sedErEndring, sedVersjon
-        )
+    override fun map(eessiMeldingParams: EessiMeldingParams): MelosysEessiMelding =
+        super.map(eessiMeldingParams).apply {
+            val medlemskap = hentMedlemskap(eessiMeldingParams.sed)
 
-        val medlemskap = hentMedlemskap(sed!!)
+            periode = mapPeriode(medlemskap)
 
-        melosysEessiMelding.periode = mapPeriode(medlemskap)
-
-        melosysEessiMelding.lovvalgsland = hentLovvalgsland(medlemskap)
-        melosysEessiMelding.artikkel = hentLovvalgsbestemmelse(medlemskap)
-        melosysEessiMelding.erEndring = sedErEndring || sedErEndring(medlemskap)
-        melosysEessiMelding.midlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
-        melosysEessiMelding.anmodningUnntak = hentAnmodningUnntak(medlemskap)
-
-        return melosysEessiMelding
-    }
+            lovvalgsland = hentLovvalgsland(medlemskap)
+            artikkel = hentLovvalgsbestemmelse(medlemskap)
+            erEndring = eessiMeldingParams.sedErEndring || sedErEndring(medlemskap)
+            midlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
+            anmodningUnntak = hentAnmodningUnntak(medlemskap)
+        }
 
     fun mapPeriode(medlemskap: T): Periode
 }

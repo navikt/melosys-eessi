@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.EessiMeldingParams;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,22 @@ public class BehandleBucIdentifisertService {
         final var sedErEndring = euxService.sedErEndring(sedMottattHendelse.getSedHendelse().getRinaDokumentId(), sedMottattHendelse.getSedHendelse().getRinaSakId());
         final var arkivsakID = saksrelasjonService.finnVedRinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId()).map(FagsakRinasakKobling::getGsakSaksnummer).map(Object::toString).orElse(null);
         log.info("Publiserer melding om SED mottatt. SED: {}", sedMottattHendelse.getSedHendelse().getSedId());
-        MelosysEessiMelding melosysEessiMelding = mapper.map(aktørID, sed, sedMottattHendelse.getSedHendelse().getRinaDokumentId(), sedMottattHendelse.getSedHendelse().getRinaSakId(), sedMottattHendelse.getSedHendelse().getSedType(), sedMottattHendelse.getSedHendelse().getBucType(), sedMottattHendelse.getSedHendelse().getAvsenderId(), sedMottattHendelse.getSedHendelse().getLandkode(), sedMottattHendelse.getJournalpostId(), null, arkivsakID, sedErEndring, sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon());
+        MelosysEessiMelding melosysEessiMelding = mapper
+            .map(new EessiMeldingParams.Builder()
+                .aktoerId(aktørID)
+                .sed(sed)
+                .rinaDokumentID(sedMottattHendelse.getSedHendelse().getRinaDokumentId())
+                .rinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId())
+                .sedType(sedMottattHendelse.getSedHendelse().getSedType())
+                .bucType(sedMottattHendelse.getSedHendelse().getBucType())
+                .avsenderID(sedMottattHendelse.getSedHendelse().getAvsenderId())
+                .landkode(sedMottattHendelse.getSedHendelse().getLandkode())
+                .journalpostID(sedMottattHendelse.getJournalpostId())
+                .gsakSaksnummer(arkivsakID)
+                .sedErEndring(sedErEndring)
+                .sedVersjon(sedMottattHendelse.getSedHendelse().getRinaDokumentVersjon())
+                .build()
+            );
         log.info("Publiserer eessiMelding melding på aiven");
         melosysEessiAivenProducer.publiserMelding(melosysEessiMelding);
         sedMottattHendelse.setPublisertKafka(true);

@@ -23,19 +23,18 @@ class MelosysEessiMeldingMapperA001Test {
         val sedHendelse = createSedHendelse()
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001).map(
-            "123",
-            sed,
-            sedHendelse.rinaDokumentId,
-            sedHendelse.rinaSakId,
-            sedHendelse.sedType,
-            sedHendelse.bucType,
-            sedHendelse.avsenderId,
-            "landkode",
-            null,
-            null,
-            null,
-            false,
-            "1"
+            EessiMeldingParams(
+                aktoerId = "123",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melosysEessiMelding.shouldNotBeNull().run {
