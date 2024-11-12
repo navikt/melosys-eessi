@@ -113,10 +113,8 @@ class JournalpostSedKoblingService(
         euxService.hentSed(rinaSaksnummer, dokumentId)
             ?: throw NotFoundException("Fant ikke SED med id $dokumentId i rinasak $rinaSaksnummer")
 
-    private fun opprettMelosysEessiMelding(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding? {
-        val sedType = eessiMeldingQuery.sedType
-        return sedType?.let {
+    private fun opprettMelosysEessiMelding(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding? =
+        eessiMeldingQuery.sedType?.let { sedType ->
             melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType)).map(eessiMeldingQuery)
         } ?: log.warn("SedType er null for rinasak: ${eessiMeldingQuery.rinaSaksnummer}").run { null }
-    }
 }
