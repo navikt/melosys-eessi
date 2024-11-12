@@ -37,7 +37,7 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -68,7 +68,7 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -99,7 +99,7 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -130,7 +130,7 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,

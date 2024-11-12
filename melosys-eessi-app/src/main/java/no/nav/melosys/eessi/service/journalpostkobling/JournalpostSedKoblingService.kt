@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.EessiMeldingQuery
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.EessiMeldingParams
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -64,7 +64,7 @@ class JournalpostSedKoblingService(
         val sed = hentSed(journalpostSedKobling.rinaSaksnummer, journalpostSedKobling.sedId)
         val gsakSaksnummer = finnVedRinaSaksnummer(journalpostSedKobling)?.gsakSaksnummer
         return opprettMelosysEessiMelding(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 sed = sed,
                 rinaDokumentID = journalpostSedKobling.sedId,
                 rinaSaksnummer = journalpostSedKobling.rinaSaksnummer,
@@ -94,7 +94,7 @@ class JournalpostSedKoblingService(
         val organisation = sedDocument.creator?.organisation ?: throw IllegalStateException("Organisation er null")
         val sed = hentSed(rinaSaksnummer, sedID)
         return opprettMelosysEessiMelding(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 sed = sed,
                 rinaDokumentID = sedID,
                 rinaSaksnummer = rinaSaksnummer,
@@ -113,8 +113,8 @@ class JournalpostSedKoblingService(
         euxService.hentSed(rinaSaksnummer, dokumentId)
             ?: throw NotFoundException("Fant ikke SED med id $dokumentId i rinasak $rinaSaksnummer")
 
-    private fun opprettMelosysEessiMelding(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding? =
-        eessiMeldingQuery.sedType?.let { sedType ->
-            melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType)).map(eessiMeldingQuery)
-        } ?: log.warn("SedType er null for rinasak: ${eessiMeldingQuery.rinaSaksnummer}").run { null }
+    private fun opprettMelosysEessiMelding(eessiMeldingParams: EessiMeldingParams): MelosysEessiMelding? =
+        eessiMeldingParams.sedType?.let { sedType ->
+            melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType)).map(eessiMeldingParams)
+        } ?: log.warn("SedType er null for rinasak: ${eessiMeldingParams.rinaSaksnummer}").run { null }
 }

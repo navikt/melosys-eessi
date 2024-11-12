@@ -27,7 +27,7 @@ class MelosysEessiMeldingMapperA009Test {
         sed.sedType = "A009"
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "aktørid",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -66,7 +66,7 @@ class MelosysEessiMeldingMapperA009Test {
         sed.sedType = "A009"
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "aktørid",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -105,7 +105,7 @@ class MelosysEessiMeldingMapperA009Test {
         (sed.medlemskap as MedlemskapA009).vedtak!!.eropprinneligvedtak = null
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -133,7 +133,7 @@ class MelosysEessiMeldingMapperA009Test {
         sed.sedType = "A009"
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,

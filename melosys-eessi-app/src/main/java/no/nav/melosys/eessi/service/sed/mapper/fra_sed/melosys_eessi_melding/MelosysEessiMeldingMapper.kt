@@ -5,26 +5,26 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 
 interface MelosysEessiMeldingMapper {
-    fun map(eessiMeldingQuery: EessiMeldingQuery) = MelosysEessiMelding(
-        sedId = eessiMeldingQuery.rinaDokumentID,
-        rinaSaksnummer = eessiMeldingQuery.rinaSaksnummer,
-        avsender = Avsender(eessiMeldingQuery.avsenderID, LandkodeMapper.mapTilNavLandkode(eessiMeldingQuery.landkode)),
-        journalpostId = eessiMeldingQuery.journalpostID,
-        dokumentId = eessiMeldingQuery.dokumentID,
-        gsakSaksnummer = eessiMeldingQuery.gsakSaksnummer?.toLongOrNull(),
-        aktoerId = eessiMeldingQuery.aktoerId,
-        ytterligereInformasjon = eessiMeldingQuery.sed.nav?.ytterligereinformasjon,
-        sedType = eessiMeldingQuery.sedType,
-        bucType = eessiMeldingQuery.bucType,
-        erEndring = eessiMeldingQuery.sedErEndring,
-        sedVersjon = eessiMeldingQuery.sedVersjon
+    fun map(eessiMeldingParams: EessiMeldingParams) = MelosysEessiMelding(
+        sedId = eessiMeldingParams.rinaDokumentID,
+        rinaSaksnummer = eessiMeldingParams.rinaSaksnummer,
+        avsender = Avsender(eessiMeldingParams.avsenderID, LandkodeMapper.mapTilNavLandkode(eessiMeldingParams.landkode)),
+        journalpostId = eessiMeldingParams.journalpostID,
+        dokumentId = eessiMeldingParams.dokumentID,
+        gsakSaksnummer = eessiMeldingParams.gsakSaksnummer?.toLongOrNull(),
+        aktoerId = eessiMeldingParams.aktoerId,
+        ytterligereInformasjon = eessiMeldingParams.sed.nav?.ytterligereinformasjon,
+        sedType = eessiMeldingParams.sedType,
+        bucType = eessiMeldingParams.bucType,
+        erEndring = eessiMeldingParams.sedErEndring,
+        sedVersjon = eessiMeldingParams.sedVersjon
     ).apply {
-        if (inneholderStatsborgerskap(eessiMeldingQuery.sed)) {
+        if (inneholderStatsborgerskap(eessiMeldingParams.sed)) {
             statsborgerskap = mapStatsborgerskap(
-                eessiMeldingQuery.sed.nav?.bruker?.person?.hentStatsborgerksapsliste() ?: emptyList()
+                eessiMeldingParams.sed.nav?.bruker?.person?.hentStatsborgerksapsliste() ?: emptyList()
             )
         }
-        eessiMeldingQuery.sed.nav?.let { nav ->
+        eessiMeldingParams.sed.nav?.let { nav ->
             nav.arbeidssted?.let { arbeidsstedList ->
                 arbeidssteder = arbeidsstedList.map(::Arbeidssted)
             }

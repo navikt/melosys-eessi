@@ -32,7 +32,7 @@ class MelosysEessiMeldingMapperA003Test {
         val sed = createSed(hentMedlemskap())
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A003)
             .map(
-                EessiMeldingQuery(
+                EessiMeldingParams(
                     aktoerId = "123",
                     sed = sed,
                     rinaDokumentID = sedHendelse!!.rinaDokumentId,

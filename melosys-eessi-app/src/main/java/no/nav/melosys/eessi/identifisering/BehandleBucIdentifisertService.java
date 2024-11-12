@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
-import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.EessiMeldingQuery;
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.EessiMeldingParams;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -63,7 +63,7 @@ public class BehandleBucIdentifisertService {
         final var arkivsakID = saksrelasjonService.finnVedRinaSaksnummer(sedMottattHendelse.getSedHendelse().getRinaSakId()).map(FagsakRinasakKobling::getGsakSaksnummer).map(Object::toString).orElse(null);
         log.info("Publiserer melding om SED mottatt. SED: {}", sedMottattHendelse.getSedHendelse().getSedId());
         MelosysEessiMelding melosysEessiMelding = mapper
-            .map(new EessiMeldingQuery.Builder()
+            .map(new EessiMeldingParams.Builder()
                 .aktoerId(aktørID)
                 .sed(sed)
                 .rinaDokumentID(sedMottattHendelse.getSedHendelse().getRinaDokumentId())

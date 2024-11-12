@@ -30,7 +30,7 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "aktørid",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -72,7 +72,7 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "aktørid",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -115,7 +115,7 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "aktørid",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
@@ -146,7 +146,7 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "aktørid",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,

@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
 import no.nav.melosys.eessi.models.sed.SED
 
-class EessiMeldingQuery(
+class EessiMeldingParams(
     val aktoerId: String? = null,
     val sed: SED,
     var rinaDokumentID: String? = null,
@@ -46,7 +46,7 @@ class EessiMeldingQuery(
         fun sedErEndring(sedErEndring: Boolean) = apply { this.sedErEndring = sedErEndring }
         fun sedVersjon(sedVersjon: String?) = apply { this.sedVersjon = sedVersjon }
 
-        fun build() = EessiMeldingQuery(
+        fun build() = EessiMeldingParams(
             aktoerId,
             sed ?: throw IllegalArgumentException("sed er påkrevd"),
             rinaDokumentID,

@@ -8,9 +8,9 @@ import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning
 
 abstract class SvarAnmodningUnntakEessiMeldingMapper<T : Medlemskap?> : MelosysEessiMeldingMapper {
-    override fun map(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding =
-        super.map(eessiMeldingQuery).apply {
-            val medlemskap = hentMedlemskap(eessiMeldingQuery.sed)
+    override fun map(eessiMeldingParams: EessiMeldingParams): MelosysEessiMelding =
+        super.map(eessiMeldingParams).apply {
+            val medlemskap = hentMedlemskap(eessiMeldingParams.sed)
 
             this.svarAnmodningUnntak = SvarAnmodningUnntak(
                 beslutning = hentBeslutning(medlemskap),

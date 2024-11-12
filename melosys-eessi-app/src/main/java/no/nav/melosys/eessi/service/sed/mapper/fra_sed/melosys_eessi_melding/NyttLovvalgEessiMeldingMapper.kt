@@ -6,15 +6,15 @@ import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.NyttLovvalgSedMapper
 
 interface NyttLovvalgEessiMeldingMapper<T : Medlemskap> : NyttLovvalgSedMapper<T>, MelosysEessiMeldingMapper {
-    override fun map(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding =
-        super.map(eessiMeldingQuery).apply {
-            val medlemskap = hentMedlemskap(eessiMeldingQuery.sed)
+    override fun map(eessiMeldingParams: EessiMeldingParams): MelosysEessiMelding =
+        super.map(eessiMeldingParams).apply {
+            val medlemskap = hentMedlemskap(eessiMeldingParams.sed)
 
             periode = mapPeriode(medlemskap)
 
             lovvalgsland = hentLovvalgsland(medlemskap)
             artikkel = hentLovvalgsbestemmelse(medlemskap)
-            erEndring = eessiMeldingQuery.sedErEndring || sedErEndring(medlemskap)
+            erEndring = eessiMeldingParams.sedErEndring || sedErEndring(medlemskap)
             midlertidigBestemmelse = erMidlertidigBestemmelse(medlemskap)
             anmodningUnntak = hentAnmodningUnntak(medlemskap)
         }

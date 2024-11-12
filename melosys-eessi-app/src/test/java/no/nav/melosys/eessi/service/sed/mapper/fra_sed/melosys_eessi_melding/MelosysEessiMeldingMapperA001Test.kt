@@ -23,7 +23,7 @@ class MelosysEessiMeldingMapperA001Test {
         val sedHendelse = createSedHendelse()
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.A001).map(
-            EessiMeldingQuery(
+            EessiMeldingParams(
                 aktoerId = "123",
                 sed = sed,
                 rinaDokumentID = sedHendelse.rinaDokumentId,
