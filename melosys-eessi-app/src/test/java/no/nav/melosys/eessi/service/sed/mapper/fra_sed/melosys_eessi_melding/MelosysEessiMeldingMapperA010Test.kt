@@ -30,9 +30,21 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "aktørid",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melding.shouldNotBeNull().run {
@@ -60,9 +72,21 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "aktørid",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melding.shouldNotBeNull().run {
@@ -91,9 +115,21 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "aktørid",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melding.shouldNotBeNull().run {
@@ -110,9 +146,21 @@ class MelosysEessiMeldingMapperA010Test {
         }
 
         val melding = mapper.map(
-            "aktørid", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, true, "1"
+            EessiMeldingQuery(
+                aktoerId = "aktørid",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = true,
+                sedVersjon = "1"
+            )
         )
 
         melding.shouldNotBeNull().run {

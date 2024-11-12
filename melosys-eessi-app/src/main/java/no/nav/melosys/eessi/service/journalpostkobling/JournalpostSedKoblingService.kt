@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.JournalpostSedKoblingRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.EessiMeldingQuery
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding.MelosysEessiMeldingMapperFactory
 import org.springframework.stereotype.Service
 import java.util.*
@@ -127,7 +128,20 @@ class JournalpostSedKoblingService(
         sedVersjon: String
     ): MelosysEessiMelding? =
         sedType?.let {
-            melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType))
-                .map(null, sed, sedId, rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, null, saksnummer, erEndring, sedVersjon)
+            melosysEessiMeldingMapperFactory.getMapper(SedType.valueOf(sedType)).map(
+                EessiMeldingQuery(
+                    sed = sed,
+                    rinaDokumentID = sedId,
+                    rinaSaksnummer = rinaSaksnummer,
+                    sedType = sedType,
+                    bucType = bucType,
+                    avsenderID = avsenderID,
+                    landkode = landkode,
+                    journalpostID = journalpostID,
+                    gsakSaksnummer = saksnummer,
+                    sedErEndring = erEndring,
+                    sedVersjon = sedVersjon
+                )
+            )
         } ?: log.warn("SedType er null for rinasak: $rinaSaksnummer").run { null }
 }

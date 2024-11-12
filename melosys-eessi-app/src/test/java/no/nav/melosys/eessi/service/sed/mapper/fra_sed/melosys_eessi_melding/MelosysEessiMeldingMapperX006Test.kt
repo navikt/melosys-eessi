@@ -37,9 +37,21 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            "123", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "123",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
@@ -56,9 +68,21 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            "123", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "123",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
@@ -75,9 +99,21 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            "123", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "123",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {
@@ -94,9 +130,21 @@ class MelosysEessiMeldingMapperX006Test {
         sed.nav!!.sak!!.fjerninstitusjon = fjernInstitusjon
 
         val melosysEessiMelding = melosysEessiMeldingMapperFactory.getMapper(SedType.X006).map(
-            "123", sed, sedHendelse.rinaDokumentId, sedHendelse.rinaSakId,
-            sedHendelse.sedType, sedHendelse.bucType, sedHendelse.avsenderId, "landkode", sakInformasjon.journalpostId,
-            sakInformasjon.dokumentId, sakInformasjon.gsakSaksnummer, false, "1"
+            EessiMeldingQuery(
+                aktoerId = "123",
+                sed = sed,
+                rinaDokumentID = sedHendelse.rinaDokumentId,
+                rinaSaksnummer = sedHendelse.rinaSakId,
+                sedType = sedHendelse.sedType,
+                bucType = sedHendelse.bucType,
+                avsenderID = sedHendelse.avsenderId,
+                landkode = "landkode",
+                journalpostID = sakInformasjon.journalpostId,
+                dokumentID = sakInformasjon.dokumentId,
+                gsakSaksnummer = sakInformasjon.gsakSaksnummer,
+                sedErEndring = false,
+                sedVersjon = "1"
+            )
         )
 
         melosysEessiMelding.shouldNotBeNull().apply {

@@ -8,37 +8,16 @@ import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning
 
 abstract class SvarAnmodningUnntakEessiMeldingMapper<T : Medlemskap?> : MelosysEessiMeldingMapper {
-    override fun map(
-        aktoerId: String?,
-        sed: SED?,
-        rinaDokumentID: String?,
-        rinaSaksnummer: String?,
-        sedType: String?,
-        bucType: String?,
-        avsenderID: String?,
-        landkode: String?,
-        journalpostID: String?,
-        dokumentID: String?,
-        gsakSaksnummer: String?,
-        sedErEndring: Boolean,
-        sedVersjon: String?
-    ): MelosysEessiMelding {
-        val melosysEessiMelding = super.map(
-            aktoerId, sed, rinaDokumentID,
-            rinaSaksnummer, sedType, bucType, avsenderID, landkode, journalpostID, dokumentID, gsakSaksnummer,
-            sedErEndring, sedVersjon
-        )
+    override fun map(eessiMeldingQuery: EessiMeldingQuery): MelosysEessiMelding =
+        super.map(eessiMeldingQuery).apply {
+            val medlemskap = hentMedlemskap(eessiMeldingQuery.sed)
 
-        val medlemskap = hentMedlemskap(sed)
-
-        val svarAnmodningUnntak = SvarAnmodningUnntak()
-        svarAnmodningUnntak.beslutning = hentBeslutning(medlemskap)
-        svarAnmodningUnntak.begrunnelse = hentBegrunnelse(medlemskap)
-        svarAnmodningUnntak.delvisInnvilgetPeriode = hentDelvisInnvilgetPeriode(medlemskap)
-
-        melosysEessiMelding.svarAnmodningUnntak = svarAnmodningUnntak
-        return melosysEessiMelding
-    }
+            this.svarAnmodningUnntak = SvarAnmodningUnntak(
+                beslutning = hentBeslutning(medlemskap),
+                begrunnelse = hentBegrunnelse(medlemskap),
+                delvisInnvilgetPeriode = hentDelvisInnvilgetPeriode(medlemskap)
+            )
+        }
 
     abstract fun hentMedlemskap(sed: SED?): T
 
