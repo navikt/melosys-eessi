@@ -19,7 +19,7 @@ abstract class SvarAnmodningUnntakEessiMeldingMapper<T : Medlemskap?> : MelosysE
             )
         }
 
-    abstract fun hentMedlemskap(sed: SED?): T
+    abstract fun hentMedlemskap(sed: SED): T
 
     abstract fun hentBeslutning(medlemskap: T): SvarAnmodningUnntakBeslutning?
 

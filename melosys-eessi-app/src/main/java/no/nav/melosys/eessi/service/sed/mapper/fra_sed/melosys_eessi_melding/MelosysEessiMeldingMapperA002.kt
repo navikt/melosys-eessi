@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslut
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning.Companion.fraRinaKode
 
 internal class MelosysEessiMeldingMapperA002 : SvarAnmodningUnntakEessiMeldingMapper<MedlemskapA002?>() {
-    override fun hentMedlemskap(sed: SED?): MedlemskapA002? = sed?.medlemskap as MedlemskapA002?
+    override fun hentMedlemskap(sed: SED): MedlemskapA002? = sed.medlemskap as MedlemskapA002?
 
     override fun hentBeslutning(medlemskap: MedlemskapA002?): SvarAnmodningUnntakBeslutning? {
         val resultat = medlemskap?.unntak!!.vedtak!!.resultat
