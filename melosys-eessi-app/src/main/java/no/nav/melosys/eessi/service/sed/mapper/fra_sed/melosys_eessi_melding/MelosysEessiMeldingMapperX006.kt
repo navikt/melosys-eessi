@@ -11,10 +11,4 @@ class MelosysEessiMeldingMapperX006(private val rinaInstitusjonId: String) : Mel
         }
 
     private fun inneholderOgErNorskInstitusjon(sed: SED): Boolean =
-        sed.nav != null
-            && sed.nav!!.sak != null
-            && sed.nav!!.sak!!.fjerninstitusjon != null
-            && sed.nav!!.sak!!.fjerninstitusjon!!.institusjon != null
-            && sed.nav!!.sak!!.fjerninstitusjon!!.institusjon!!.id != null
-            && sed.nav!!.sak!!.fjerninstitusjon!!.institusjon!!.id == rinaInstitusjonId
-}
+        sed.nav?.sak?.fjerninstitusjon?.institusjon?.id == rinaInstitusjonId}
