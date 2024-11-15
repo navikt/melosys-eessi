@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
+            <version>9.22.3</version>
         </dependency>
         <dependency>
             <groupId>no.nav</groupId>
