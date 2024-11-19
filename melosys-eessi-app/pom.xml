@@ -80,7 +80,6 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>9.22.3</version>
         </dependency>
         <dependency>
             <groupId>no.nav</groupId>
@@ -216,6 +215,12 @@
             <groupId>io.kotest</groupId>
             <artifactId>kotest-assertions-json-jvm</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.flywaydb/flyway-database-postgresql -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.mockk</groupId>
