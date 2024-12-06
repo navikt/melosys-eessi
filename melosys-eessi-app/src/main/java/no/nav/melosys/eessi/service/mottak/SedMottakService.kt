@@ -67,6 +67,9 @@ class SedMottakService(
             } har ikke tilhørende A sed behandlet"
         }
 
+        sjekkSedMottakerOgAvsenderID(sedMottattHendelse.sedHendelse)
+        sjekkSedMottakerOgAvsenderNavn(sedMottattHendelse.sedHendelse)
+
         val lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse)
 
         val sed = euxService.hentSedMedRetry(
@@ -87,6 +90,34 @@ class SedMottakService(
             )
 
         sedMetrikker.sedMottatt(sedMottattHendelse.sedHendelse.sedType)
+    }
+
+    private fun sjekkSedMottakerOgAvsenderID(sedHendelse: SedHendelse){
+        if (sedHendelse.avsenderId.isNullOrEmpty() && sedHendelse.mottakerId.isNullOrEmpty()){
+            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderId og mottakerId")
+        }
+
+        if (sedHendelse.mottakerId.isNullOrEmpty()){
+            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler mottakerId")
+        }
+
+        if (sedHendelse.avsenderId.isNullOrEmpty()){
+            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderId")
+        }
+    }
+
+    private fun sjekkSedMottakerOgAvsenderNavn(sedHendelse: SedHendelse){
+        if (sedHendelse.avsenderNavn.isNullOrEmpty() && sedHendelse.mottakerNavn.isNullOrEmpty()){
+            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn og mottakerNavn")
+        }
+
+        if (sedHendelse.mottakerNavn.isNullOrEmpty()){
+            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn")
+        }
+
+        if (sedHendelse.avsenderNavn.isNullOrEmpty()){
+            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn")
+        }
     }
 
     private fun erXSedBehandletUtenASed(sedHendelse: SedHendelse): Boolean {

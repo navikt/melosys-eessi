@@ -228,6 +228,122 @@ class SedMottakServiceTest {
         }.message shouldBe "Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet"
     }
 
+    @Test
+    fun `behandleSed hvis avsenderId og mottakerId ikke er satt kasterException`() {
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
+            mottakerNavn = "321";
+            avsenderNavn = "123";
+        }
+
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler avsenderId og mottakerId"
+    }
+
+    @Test
+    fun `behandleSed hvis avsenderId ikke er satt kasterException`() {
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+            mottakerId = "123";
+            mottakerNavn = "321";
+            avsenderNavn = "123";
+        }
+
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler avsenderId"
+    }
+
+    @Test
+    fun `behandleSed hvis mottakerId ikke er satt kasterException`() {
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+            avsenderId = "123";
+            mottakerNavn = "321";
+            avsenderNavn = "123";
+        }
+
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler mottakerId"
+    }
+
+    @Test
+    fun `behandleSed hvis avsenderNavn og mottakerNavn ikke er satt kasterException`() {
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
+            avsenderId = "123";
+            mottakerId = "321";
+        }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn og mottakerNavn"
+    }
+
+    @Test
+    fun `behandleSed hvis avsenderNavn ikke er satt kasterException`() {
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+            mottakerNavn = "123";
+            avsenderId = "123";
+            mottakerId = "321";
+        }
+
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn"
+    }
+
+    @Test
+    fun `behandleSed hvis mottakerNavn ikke er satt kasterException`() {
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+            avsenderNavn = "123";
+            avsenderId = "123";
+            mottakerId = "321";
+        }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn"
+    }
+
     private fun opprettSED() = SED().apply {
         nav = Nav().apply {
             bruker = Bruker().apply {
@@ -254,6 +370,8 @@ class SedMottakServiceTest {
 
     private fun sedHendelseMedBruker() = sedHendelseUtenBruker().apply {
         avsenderId = "SE:12345"
+        mottakerNavn = "ukjent"
+        avsenderNavn = "ukjent"
         navBruker = IDENT
         sedId = SED_ID
         rinaSakId = RINA_SAKSNUMMER
@@ -263,6 +381,9 @@ class SedMottakServiceTest {
     private fun sedHendelseUtenBruker() = SedHendelse().apply {
         navBruker = "ukjent"
         avsenderId = "SE:12345"
+        mottakerId = "SE:12345"
+        mottakerNavn = "ukjent"
+        avsenderNavn = "ukjent"
         rinaSakId = RINA_SAKSNUMMER
         rinaDokumentId = "456"
         sedId = SED_ID
@@ -270,6 +391,22 @@ class SedMottakServiceTest {
         bucType = BucType.LA_BUC_02.name
         sektorKode = "LA"
     }
+
+    private fun sedHendelseUtenAvsenderOgMottakerDetaljer() = SedHendelse().apply {
+        id = 0;
+        sedId = "10977943_389501f50fba4af7a4228fa41b8ee71d_1";
+        sektorKode = "LA";
+        bucType = "LA_BUC_02";
+        rinaSakId = "10977943";
+        avsenderId = null;
+        avsenderNavn = null;
+        mottakerId = null;
+        mottakerNavn = null;
+        rinaDokumentId = "389501f50fba4af7a4228fa41b8ee71d";
+        rinaDokumentVersjon = "1";
+        sedType = "X005";
+    }
+
 
     companion object {
         private const val IDENT = "1122334455"
