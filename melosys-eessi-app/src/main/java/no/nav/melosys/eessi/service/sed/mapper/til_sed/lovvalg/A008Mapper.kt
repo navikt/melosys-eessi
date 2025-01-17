@@ -3,10 +3,7 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
-import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand
-import no.nav.melosys.eessi.models.sed.nav.Bosted
-import no.nav.melosys.eessi.models.sed.nav.MedlemskapA008Bruker
-import no.nav.melosys.eessi.models.sed.nav.Yrkesaktivitet
+import no.nav.melosys.eessi.models.sed.nav.*
 
 class A008Mapper : LovvalgSedMapper<MedlemskapA008> {
 
@@ -15,6 +12,14 @@ class A008Mapper : LovvalgSedMapper<MedlemskapA008> {
     override fun getMedlemskap(sedData: SedDataDto) = MedlemskapA008(
         bruker = hentA008Bruker(sedData)
     )
+
+    override fun prefillNav(sedData: SedDataDto, erCDM4_3: Boolean): Nav {
+        return super.prefillNav(sedData, erCDM4_3).apply {
+            if (arbeidsland == null) {
+                harfastarbeidssted = null
+            }
+        }
+    }
 
     private fun hentA008Bruker(sedData: SedDataDto) =
         MedlemskapA008Bruker(
