@@ -1,45 +1,35 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA005;
-import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA005
+import no.nav.melosys.eessi.service.sed.SedDataStub
+import org.junit.jupiter.api.Test
 
 class A005MapperTest {
 
-    private final A005Mapper sedMapper = new A005Mapper();
-
     @Test
-    void mapTilSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        SED sed = sedMapper.mapTilSed(sedDataDto, false);
+    fun `map til SED version 3`() {
+        val sed = SedDataStub.mapTilSed<A005Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json")
 
-        assertThat(sed).isNotNull();
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA005.class);
-        assertThat(sed.getNav().getArbeidsland()).isNull();
-        assertThat(sed.getSedVer()).isEqualTo("2");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA005>()
+            nav.shouldNotBeNull().arbeidsland shouldBe null
+            sedVer shouldBe "2"
+            sedGVer shouldBe "4"
+        }
     }
 
-
     @Test
-    void mapTilSed4_3_skalIkkeBliPåvirketAvToggleCDM4_3() throws IOException, URISyntaxException, MappingException, NotFoundException {
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        SED sed = sedMapper.mapTilSed(sedDataDto, true);
+    fun `map til SED version 4`() {
+        val sed = SedDataStub.mapTilSed<A005Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json")
 
-        assertThat(sed).isNotNull();
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA005.class);
-        assertThat(sed.getNav().getArbeidsland()).isNull();
-        assertThat(sed.getSedVer()).isEqualTo("3");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
-
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA005>()
+            nav.shouldNotBeNull().arbeidsland shouldBe null
+            sedVer shouldBe "3"
+            sedGVer shouldBe "4"
+        }
     }
 }

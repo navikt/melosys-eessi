@@ -13,13 +13,12 @@ class A008Mapper : LovvalgSedMapper<MedlemskapA008> {
         bruker = hentA008Bruker(sedData)
     )
 
-    override fun prefillNav(sedData: SedDataDto, erCDM4_3: Boolean): Nav {
-        return super.prefillNav(sedData, erCDM4_3).apply {
+    override fun prefillNav(sedData: SedDataDto, erCDM4_3: Boolean): Nav =
+        super.prefillNav(sedData, erCDM4_3).apply {
             if (arbeidsland == null) {
                 harfastarbeidssted = null
             }
         }
-    }
 
     private fun hentA008Bruker(sedData: SedDataDto) =
         MedlemskapA008Bruker(

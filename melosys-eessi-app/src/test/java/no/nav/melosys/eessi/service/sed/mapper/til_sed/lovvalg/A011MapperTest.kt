@@ -1,36 +1,43 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URL;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import java.io.IOException
+import java.net.URL
 
 class A011MapperTest {
 
-    private final A011Mapper a011Mapper = new A011Mapper();
-
-    private SED a001;
+    private val a011Mapper = A011Mapper()
+    private lateinit var a001: SED
 
     @BeforeEach
-    public void setup() throws IOException {
-        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA001.json");
-        a001 = new ObjectMapper().readValue(jsonUrl, SED.class);
+    fun setup() {
+        val jsonUrl: URL = this::class.java.classLoader.getResource("mock/sedA001.json")
+            ?: throw IOException("File not found: mock/sedA001.json")
+        a001 = jacksonObjectMapper().readValue<SED>(jsonUrl)
     }
 
     @Test
-    void mapFraEksisterendeSedA001() {
-        SED a011 = a011Mapper.mapFraSed(a001);
+    fun `map fra eksisterende SED A001 forvent korrekt SED A011`() {
+        val a011 = a011Mapper.mapFraSed(a001)
 
-        assertThat(a011.getSedType()).isEqualToIgnoringCase(SedType.A011.toString());
-        assertThat(a011.getNav().getBruker().getPerson().getFornavn()).isEqualToIgnoringCase("Testfornavn1");
-        assertThat(a011.getMedlemskap()).isInstanceOf(MedlemskapA011.class);
-        assertThat(a011.getMedlemskap()).isNotNull();
+        a011.shouldNotBeNull().run {
+            sedType shouldBe SedType.A011.toString()
+
+            nav.shouldNotBeNull()
+                .bruker.shouldNotBeNull()
+                .person.shouldNotBeNull()
+                .fornavn shouldBe "Testfornavn1"
+
+            medlemskap.shouldNotBeNull().shouldBeInstanceOf<MedlemskapA011>()
+        }
     }
 }

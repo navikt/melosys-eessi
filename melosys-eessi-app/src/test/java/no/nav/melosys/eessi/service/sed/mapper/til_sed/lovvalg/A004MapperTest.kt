@@ -1,82 +1,79 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.UtpekingAvvisDto;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA004;
-import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.assertj.core.api.AssertionsForClassTypes;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.controller.dto.UtpekingAvvisDto
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA004
+import no.nav.melosys.eessi.models.sed.nav.Avslag
+import no.nav.melosys.eessi.models.sed.nav.Land
+import no.nav.melosys.eessi.service.sed.SedDataStub
+import org.junit.jupiter.api.Test
 
 class A004MapperTest {
-    private final A004Mapper a004Mapper = new A004Mapper();
-
     @Test
-    void mapTilSed() throws IOException, URISyntaxException, MappingException, NotFoundException {
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        UtpekingAvvisDto utpekingAvvisDto = new UtpekingAvvisDto(
-            "DK",
-            "begrunnelse",
-            false
-        );
-        sedDataDto.setUtpekingAvvis(utpekingAvvisDto);
-        SED sed = a004Mapper.mapTilSed(sedDataDto, false);
+    fun `map til SED med version 2`() {
+        val sed = SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
+            utpekingAvvis = UtpekingAvvisDto(
+                nyttLovvalgsland = "DK",
+                begrunnelseUtenlandskMyndighet = "begrunnelse",
+                vilSendeAnmodningOmMerInformasjon = false
+            )
+        }
 
-        AssertionsForClassTypes.assertThat(sed).isNotNull();
-        AssertionsForClassTypes.assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA004.class);
-        AssertionsForClassTypes.assertThat(sed.getNav().getArbeidsland()).isNull();
-        AssertionsForClassTypes.assertThat(sed.getSedVer()).isEqualTo("2");
-        AssertionsForClassTypes.assertThat(sed.getSedGVer()).isEqualTo("4");
-    }
-
-
-    @Test
-    void mapTilSed4_3_skalIkkeBliPåvirketAvToggleCDM4_3() throws IOException, URISyntaxException, MappingException, NotFoundException {
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        UtpekingAvvisDto utpekingAvvisDto = new UtpekingAvvisDto(
-            "DK",
-            "begrunnelse",
-            false
-        );
-        sedDataDto.setUtpekingAvvis(utpekingAvvisDto);
-
-        SED sed = a004Mapper.mapTilSed(sedDataDto, true);
-
-        AssertionsForClassTypes.assertThat(sed).isNotNull();
-        AssertionsForClassTypes.assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA004.class);
-        AssertionsForClassTypes.assertThat(sed.getNav().getArbeidsland()).isNull();
-        AssertionsForClassTypes.assertThat(sed.getSedVer()).isEqualTo("3");
-        AssertionsForClassTypes.assertThat(sed.getSedGVer()).isEqualTo("4");
-
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA004>()
+            nav.shouldNotBeNull().arbeidsland shouldBe null
+            sedVer shouldBe "2"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed_forventSed() throws IOException, URISyntaxException {
-        SedDataDto sedData = SedDataStub.getStub();
-        UtpekingAvvisDto utpekingAvvisDto = new UtpekingAvvisDto(
-            "DK",
-            "begrunnelse",
-            false
-        );
-        sedData.setUtpekingAvvis(utpekingAvvisDto);
+    fun `map til SED version 3`() {
+        val sed = SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+            utpekingAvvis = UtpekingAvvisDto(
+                nyttLovvalgsland = "DK",
+                begrunnelseUtenlandskMyndighet = "begrunnelse",
+                vilSendeAnmodningOmMerInformasjon = false
+            )
+        }
 
-        SED a004 = a004Mapper.mapTilSed(sedData, false);
-        assertThat(a004).isNotNull();
-        assertThat(a004.getMedlemskap()).isInstanceOf(MedlemskapA004.class);
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA004>()
+            nav.shouldNotBeNull().arbeidsland shouldBe null
+            sedVer shouldBe "3"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed_utenUtpekingAvvis_forventException() throws IOException, URISyntaxException {
-        SedDataDto sedData = SedDataStub.getStub();
-        assertThatExceptionOfType(MappingException.class)
-                .isThrownBy(() -> a004Mapper.mapTilSed(sedData, false))
-                .withMessageContaining("Trenger UtpekingAvvis for å opprette A004");
-    }}
+    fun `map til SED forvent MedlemskapA004`() {
+        val sed = SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
+            utpekingAvvis = UtpekingAvvisDto(
+                nyttLovvalgsland = "DK",
+                begrunnelseUtenlandskMyndighet = "begrunnelse",
+                vilSendeAnmodningOmMerInformasjon = false
+            )
+        }
+
+        sed.shouldNotBeNull()
+            .medlemskap.shouldBeInstanceOf<MedlemskapA004>()
+            .avslag shouldBe Avslag(
+            begrunnelse = "begrunnelse",
+            erbehovformerinformasjon = "nei",
+            forslagformedlemskap = Land("DK")
+        )
+    }
+
+    @Test
+    fun `map til SED uten UtpekingAvvis forvent Exception`() {
+        val exception = shouldThrow<MappingException> {
+            SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json")
+        }
+        exception.message.shouldNotBeNull().shouldContain("Trenger UtpekingAvvis for å opprette A004")
+    }
+}
