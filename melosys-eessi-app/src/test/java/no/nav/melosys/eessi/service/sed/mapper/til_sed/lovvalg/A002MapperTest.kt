@@ -1,66 +1,65 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-
-import no.nav.melosys.eessi.controller.dto.Periode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning;
-import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.controller.dto.Periode
+import no.nav.melosys.eessi.controller.dto.SvarAnmodningUnntakDto
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA002
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.SvarAnmodningUnntakBeslutning
+import no.nav.melosys.eessi.service.sed.SedDataStub
+import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class A002MapperTest {
-    private final A002Mapper a002Mapper = new A002Mapper();
-
     @Test
-    void mapTilSed_forventSed() throws IOException, URISyntaxException {
-        SedDataDto sedData = SedDataStub.getStub();
-        SvarAnmodningUnntakDto svarAnmodningUnntakDto = new SvarAnmodningUnntakDto(
+    fun `map til SED med version 2`() {
+        val sed = SedDataStub.mapTilSed<A002Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
+            svarAnmodningUnntak = SvarAnmodningUnntakDto(
                 SvarAnmodningUnntakBeslutning.AVSLAG,
                 "begrunnelse",
-                new Periode(LocalDate.now(), LocalDate.now().plusDays(1L))
-        );
-        sedData.setSvarAnmodningUnntak(svarAnmodningUnntakDto);
+                Periode(LocalDate.now(), LocalDate.now().plusDays(1))
+            )
+        }
 
-        SED a002 = a002Mapper.mapTilSed(sedData, false);
-        assertThat(a002).isNotNull();
-        assertThat(a002.getMedlemskap()).isInstanceOf(MedlemskapA002.class);
-        assertThat(a002.getNav().getArbeidsland()).isNull();
-        assertThat(a002.getSedVer()).isEqualTo("2");
-        assertThat(a002.getSedGVer()).isEqualTo("4");
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA002>()
+            nav.shouldNotBeNull().run {
+                arbeidsland shouldBe null
+            }
+            sedVer shouldBe "2"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed_forventSed4_3() throws IOException, URISyntaxException {
-        SedDataDto sedData = SedDataStub.getStub();
-        SvarAnmodningUnntakDto svarAnmodningUnntakDto = new SvarAnmodningUnntakDto(
-            SvarAnmodningUnntakBeslutning.AVSLAG,
-            "begrunnelse",
-            new Periode(LocalDate.now(), LocalDate.now().plusDays(1L))
-        );
-        sedData.setSvarAnmodningUnntak(svarAnmodningUnntakDto);
+    fun `map til SED med version 3`() {
+        val sed = SedDataStub.mapTilSed<A002Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+            svarAnmodningUnntak = SvarAnmodningUnntakDto(
+                SvarAnmodningUnntakBeslutning.AVSLAG,
+                "begrunnelse",
+                Periode(LocalDate.now(), LocalDate.now().plusDays(1))
+            )
+        }
 
-        SED a002 = a002Mapper.mapTilSed(sedData, true);
-        assertThat(a002).isNotNull();
-        assertThat(a002.getMedlemskap()).isInstanceOf(MedlemskapA002.class);
-        assertThat(a002.getNav().getArbeidsland()).hasSize(1);
-        assertThat(a002.getSedVer()).isEqualTo("3");
-        assertThat(a002.getSedGVer()).isEqualTo("4");
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA002>()
+            nav.shouldNotBeNull().run {
+                arbeidsland.shouldNotBeNull().size shouldBe 1
+            }
+            sedVer shouldBe "3"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed_utenSvarAnmodningUnntak_forventException() throws IOException, URISyntaxException {
-        SedDataDto sedData = SedDataStub.getStub();
-        assertThatExceptionOfType(MappingException.class)
-                .isThrownBy(() -> a002Mapper.mapTilSed(sedData, false))
-                .withMessageContaining("Trenger SvarAnmodningUnntak");
+    fun `map til SED uten SvarAnmodningUnntak forvent Exception`() {
+        val exception = shouldThrow<MappingException> {
+            SedDataStub.mapTilSed<A002Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json")
+        }
+        exception.message.shouldNotBeNull().shouldContain("Trenger SvarAnmodningUnntak")
     }
 }

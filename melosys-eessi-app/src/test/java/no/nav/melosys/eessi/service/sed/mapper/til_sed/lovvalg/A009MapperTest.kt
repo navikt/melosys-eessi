@@ -1,149 +1,161 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.controller.dto.VedtakDto;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009;
-import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
+import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.controller.dto.VedtakDto
+import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
+import no.nav.melosys.eessi.service.sed.SedDataStub
+import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class A009MapperTest {
 
-    private final A009Mapper a009Mapper = new A009Mapper();
+    private val lovvalgsland = "NO"
 
-    private SedDataDto sedData;
+    private fun mapTilA009(
+        erCDM4_3: Boolean,
+        block: SedDataDto.() -> Unit = {}
+    ): SED =
+        SedDataStub.mapTilSed<A009Mapper>(erCDM4_3, "mock/sedDataDtoStub.json") {
+            lovvalgsperioder.first().apply {
+                bestemmelse = Bestemmelse.ART_12_1
+                fom = LocalDate.now()
+                tom = LocalDate.now().plusYears(1)
+                lovvalgsland = this@A009MapperTest.lovvalgsland
+            }
+            block()
+        }
 
-    private final String lovvalgsland = "NO";
+    @Test
+    fun `map til SED version 2`() {
+        val sed = mapTilA009(false) {
+            avklartBostedsland = "SE"
+        }
 
-    @BeforeEach
-    public void setup() throws IOException, URISyntaxException {
-        sedData = SedDataStub.getStub();
-
-        Lovvalgsperiode lovvalgsperiode = sedData.getLovvalgsperioder().get(0);
-        lovvalgsperiode.setBestemmelse(Bestemmelse.ART_12_1);
-        lovvalgsperiode.setFom(LocalDate.now());
-        lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLovvalgsland(lovvalgsland);
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA009>()
+            nav.shouldNotBeNull().arbeidsland shouldBe null
+            sedVer shouldBe "2"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed() throws MappingException, NotFoundException {
-        sedData.setAvklartBostedsland("SE");
-        SED sed = a009Mapper.mapTilSed(sedData, false);
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA009.class);
+    fun `map til SED version 3`() {
+        val sed = mapTilA009(true) {
+            avklartBostedsland = "SE"
+        }
 
-        assertThat(sed.getNav().getArbeidsland()).isNull();
-        assertThat(sed.getSedVer()).isEqualTo("2");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+        sed.shouldNotBeNull().run {
+            medlemskap.shouldBeInstanceOf<MedlemskapA009>()
+
+            nav.shouldNotBeNull()
+                .arbeidsland.shouldNotBeNull().shouldHaveSize(1).single()
+                .land shouldBe lovvalgsland
+
+            sedVer shouldBe "3"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed4_3() throws MappingException, NotFoundException {
-        sedData.setAvklartBostedsland("SE");
-        SED sed = a009Mapper.mapTilSed(sedData, true);
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA009.class);
+    fun `medlemskap ikke selvstendig og artikkel 12_1 forvent gyldig medlemskap`() {
+        val sed = mapTilA009(false)
 
-        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
-        assertThat(sed.getSedVer()).isEqualTo("3");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA009>().run {
+            utsendingsland.shouldNotBeNull().arbeidsgiver.shouldNotBeNull()
+                .shouldHaveSize(1).single()
+                .adresse.shouldNotBeNull()
+                .land shouldBe lovvalgsland
+
+            andreland.shouldNotBeNull()
+                .arbeidsgiver.shouldNotBeNull()
+                .shouldHaveSize(1).single()
+                .adresse.shouldNotBeNull()
+                .land shouldNotBe lovvalgsland
+
+            vedtak.shouldNotBeNull().run {
+                artikkelforordning shouldBe "12_1"
+                gjelderperiode.shouldNotBeNull().fastperiode.shouldNotBeNull()
+                gjelderperiode.shouldNotBeNull().aapenperiode shouldBe null
+            }
+        }
     }
 
     @Test
-    void getMedlemskapIkkeSelvstendigOg12_1_expectGyldigMedlemskap() {
-        SED sed = a009Mapper.mapTilSed(sedData, false);
+    fun `er ikke opprinnelig vedtak forvent korrekt verdier`() {
+        val sed = mapTilA009(false) {
+            vedtakDto = VedtakDto(
+                erFørstegangsvedtak = false,
+                datoForrigeVedtak = LocalDate.now()
 
-        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
+            )
+        }
 
-        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
-
-        assertThat(medlemskapA009).isNotNull();
-        assertThat(medlemskapA009.getUtsendingsland()).isNotNull();
-        assertThat(medlemskapA009.getUtsendingsland().getArbeidsgiver()).allMatch(a -> a.getAdresse().getLand().equals(lovvalgsland));
-        assertThat(medlemskapA009.getAndreland().getArbeidsgiver()).noneMatch(a -> a.getAdresse().getLand().equals(lovvalgsland));
-
-        assertThat(medlemskapA009.getVedtak()).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getArtikkelforordning()).isEqualTo("12_1");
-        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode()).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA009>().run {
+            vedtak.shouldNotBeNull().run {
+                eropprinneligvedtak shouldBe null
+                erendringsvedtak shouldBe "nei"
+                datoforrigevedtak.shouldNotBeNull() shouldBe LocalDate.now().toString()
+            }
+        }
     }
 
     @Test
-    void erIkkeOpprinneligVedtak_ErOpprinneligVedtakOgErEndringsvedtakSattKorrektOgDatoForrigeVedtakIkkeNull() {
-        VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setErFørstegangsvedtak(false);
-        vedtakDto.setDatoForrigeVedtak(LocalDate.now());
-        sedData.setVedtakDto(vedtakDto);
+    fun `er opprinnelig vedtak forvent korrekt verdier`() {
+        val sed = mapTilA009(false) {
+            vedtakDto = VedtakDto(erFørstegangsvedtak = true)
+        }
 
-
-        SED sed = a009Mapper.mapTilSed(sedData, false);
-
-
-        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
-        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
-        assertThat(medlemskapA009).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isNull();
-        assertThat(medlemskapA009.getVedtak().getErendringsvedtak()).isEqualTo("nei");
-        assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isEqualTo(LocalDate.now().toString());
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA009>().run {
+            vedtak.shouldNotBeNull().run {
+                eropprinneligvedtak shouldBe "ja"
+                erendringsvedtak shouldBe null
+                datoforrigevedtak shouldBe null
+            }
+        }
     }
 
     @Test
-    void erOpprinneligVedtak_ErOpprinneligVedtakOgErEndringsvedtakSattKorrektOgDatoForrigeVedtakNull() {
-        VedtakDto vedtakDto = new VedtakDto();
-        vedtakDto.setErFørstegangsvedtak(true);
-        sedData.setVedtakDto(vedtakDto);
+    fun `medlemskap er selvstendig og artikkel 12_2 forvent gyldig medlemskap`() {
+        val sed = mapTilA009(false) {
+            lovvalgsperioder.first().bestemmelse = Bestemmelse.ART_12_2
+        }
 
-
-        SED sed = a009Mapper.mapTilSed(sedData, false);
-
-
-        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
-        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
-        assertThat(medlemskapA009).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getEropprinneligvedtak()).isEqualTo("ja");
-        assertThat(medlemskapA009.getVedtak().getErendringsvedtak()).isNull();
-        assertThat(medlemskapA009.getVedtak().getDatoforrigevedtak()).isNull();
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA009>().run {
+            vedtak.shouldNotBeNull().run {
+                artikkelforordning shouldBe "12_2"
+                gjelderperiode.shouldNotBeNull().fastperiode.shouldNotBeNull()
+                gjelderperiode.shouldNotBeNull().aapenperiode shouldBe null
+            }
+        }
     }
 
     @Test
-    void getMedlemskapErSelvstendigOg12_2_expectGyldigMedlemskap() {
-        sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_12_2);
-        SED sed = a009Mapper.mapTilSed(sedData, false);
-
-        assertThat(sed.getMedlemskap().getClass()).isEqualTo(MedlemskapA009.class);
-
-        MedlemskapA009 medlemskapA009 = (MedlemskapA009) sed.getMedlemskap();
-
-        assertThat(medlemskapA009).isNotNull();
-
-        assertThat(medlemskapA009.getVedtak()).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getArtikkelforordning()).isEqualTo("12_2");
-        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getFastperiode()).isNotNull();
-        assertThat(medlemskapA009.getVedtak().getGjelderperiode().getAapenperiode()).isNull();
+    fun `medlemskap feil lovvalgs bestemmelse forvent MappingException`() {
+        val exception = shouldThrow<MappingException> {
+            mapTilA009(false) {
+                lovvalgsperioder.first().bestemmelse = Bestemmelse.ART_13_4
+            }
+        }
+        exception.message.shouldContain("Lovvalgsbestemmelse er ikke av artikkel 12!")
     }
 
     @Test
-    void getMedlemskapFeilLovvalgsBestemmelse_expectMappingException() {
-        sedData.getLovvalgsperioder().get(0).setBestemmelse(Bestemmelse.ART_13_4);
-        assertThatExceptionOfType(MappingException.class)
-            .isThrownBy(() -> a009Mapper.mapTilSed(sedData, false))
-            .withMessageContaining("Lovvalgsbestemmelse er ikke av artikkel 12!");
-    }
+    fun `er ikke fysisk forvent er ikke fastadresse`() {
+        val sed = mapTilA009(false) {
+            arbeidssteder.first().fysisk = false
+        }
 
-    void erIkkeFysisk_forventErIkkeFastadresse() {
-        sedData.getArbeidssteder().get(0).setFysisk(false);
-        SED sed = a009Mapper.mapTilSed(sedData, false);
-        assertThat(sed.getNav().getArbeidssted().get(0).getErikkefastadresse()).isEqualTo("ja");
+        sed.nav.shouldNotBeNull().arbeidssted.shouldNotBeNull().first().erikkefastadresse shouldBe "ja"
     }
 }

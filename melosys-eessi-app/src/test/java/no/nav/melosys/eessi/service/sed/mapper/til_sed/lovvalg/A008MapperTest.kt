@@ -1,59 +1,73 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008;
-import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand;
-import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
+import no.nav.melosys.eessi.service.sed.SedDataStub
+import org.junit.jupiter.api.Test
 
 class A008MapperTest {
 
-    private final A008Mapper a008Mapper = new A008Mapper();
+    @Test
+    fun `arbeid i flere land ukjent hvilke`() {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+            harFastArbeidssted = false
+            arbeidsland = listOf()
+        }
 
-    private SedDataDto sedData;
-
-    @BeforeEach
-    public void setup() throws IOException, URISyntaxException {
-        sedData = SedDataStub.getStub();
+        sed.nav.shouldNotBeNull().run {
+            arbeidssted.shouldBeNull()
+            harfastarbeidssted.shouldBeNull()
+        }
     }
 
     @Test
-    void mapTilSed() throws MappingException, NotFoundException {
-        sedData.setAvklartBostedsland("SE");
-        SED sed = a008Mapper.mapTilSed(sedData, false);
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA008.class);
+    fun `map til SED med version 2`() {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().run {
+                arbeidiflereland.shouldNotBeNull().run {
+                    yrkesaktivitet.shouldNotBeNull()
+                        .startdato shouldBe "2020-01-01"
+                    bosted.shouldNotBeNull()
+                        .land shouldBe "SE"
+                }
+            }
+        }
 
-        MedlemskapA008 medlemskap = (MedlemskapA008) sed.getMedlemskap();
-        ArbeidIFlereLand arbeidIFlereLand = medlemskap.getBruker().getArbeidiflereland();
-        assertThat(arbeidIFlereLand.getYrkesaktivitet().getStartdato()).isEqualTo("2020-01-01");
-        assertThat(arbeidIFlereLand.getBosted().getLand()).isEqualTo("SE");
-        assertThat(sed.getNav().getArbeidsland()).isNull();
-        assertThat(sed.getSedVer()).isEqualTo("2");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+        sed.nav.shouldNotBeNull().arbeidsland.shouldBeNull()
+
+        sed.run {
+            sedVer shouldBe "2"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed4_3() throws MappingException, NotFoundException {
-        sedData.setAvklartBostedsland("SE");
-        SED sed = a008Mapper.mapTilSed(sedData, true);
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA008.class);
+    fun `map til SED med version 3`() {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().run {
+                arbeidiflereland.shouldNotBeNull().run {
+                    yrkesaktivitet.shouldNotBeNull()
+                        .startdato shouldBe "2020-01-01"
+                    bosted.shouldNotBeNull()
+                        .land shouldBe "SE"
+                }
+            }
 
-        MedlemskapA008 medlemskap = (MedlemskapA008) sed.getMedlemskap();
-        ArbeidIFlereLand arbeidIFlereLand = medlemskap.getBruker().getArbeidiflereland();
-        assertThat(arbeidIFlereLand.getYrkesaktivitet().getStartdato()).isEqualTo("2020-01-01");
-        assertThat(arbeidIFlereLand.getBosted().getLand()).isEqualTo("SE");
-        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
-        assertThat(sed.getSedVer()).isEqualTo("3");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+            sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
+
+            sed.run {
+                sedVer shouldBe "3"
+                sedGVer shouldBe "4"
+            }
+        }
     }
-
 }

@@ -1,75 +1,89 @@
-package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg;
+package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.time.LocalDate;
-
-import no.nav.melosys.eessi.controller.dto.Bestemmelse;
-import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode;
-import no.nav.melosys.eessi.controller.dto.SedDataDto;
-import no.nav.melosys.eessi.models.exception.MappingException;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001;
-import no.nav.melosys.eessi.service.sed.SedDataStub;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.kotest.matchers.types.shouldBeInstanceOf
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001
+import no.nav.melosys.eessi.service.sed.SedDataStub
+import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class A001MapperTest {
-
-    private final A001Mapper a001Mapper = new A001Mapper();
-
-    private SedDataDto sedData;
-
-    @BeforeEach
-    public void setup() throws IOException, URISyntaxException {
-        sedData = SedDataStub.getStub();
-
-        Lovvalgsperiode lovvalgsperiode = sedData.getLovvalgsperioder().get(0);
-        lovvalgsperiode.setBestemmelse(Bestemmelse.ART_16_1);
-        lovvalgsperiode.setFom(LocalDate.now());
-        lovvalgsperiode.setTom(LocalDate.now().plusYears(1L));
-        lovvalgsperiode.setLovvalgsland("NO");
-        lovvalgsperiode.setUnntakFraLovvalgsland("SE");
-        lovvalgsperiode.setUnntakFraBestemmelse(Bestemmelse.ART_16_1);
+    private fun mapTilA001(erCDM4_3: Boolean): SED {
+        return SedDataStub.mapTilSed<A001Mapper>(erCDM4_3 = erCDM4_3, testData = "mock/sedDataDtoStub.json") {
+            lovvalgsperioder.first().apply {
+                bestemmelse = Bestemmelse.ART_16_1
+                fom = LocalDate.now()
+                tom = LocalDate.now().plusYears(1)
+                lovvalgsland = "NO"
+                unntakFraLovvalgsland = "SE"
+                unntakFraBestemmelse = Bestemmelse.ART_16_1
+            }
+        }
     }
 
     @Test
-    void mapTilSed() throws MappingException, NotFoundException {
-        SED sed = a001Mapper.mapTilSed(sedData, false);
+    fun `map til SED med version 2`() {
+        val sed = mapTilA001(false)
 
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA001.class);
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
+            vertsland.shouldNotBeNull()
+                .arbeidsgiver.shouldNotBeNull().single()
+                .adresse.shouldNotBeNull()
+                .land shouldNotBe "NO"
 
-        assertThat(sed.getMedlemskap()).isNotNull().isInstanceOf(MedlemskapA001.class);
+            naavaerendemedlemskap.shouldNotBeNull().single().shouldNotBeNull()
+                .landkode shouldBe "SE"
 
-        MedlemskapA001 medlemskapA001 = (MedlemskapA001) sed.getMedlemskap();
-        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
-        assertThat(medlemskapA001.getVertsland().getArbeidsgiver()).noneMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
-        assertThat(medlemskapA001.getNaavaerendemedlemskap()).allMatch(medlemskap -> "SE".equalsIgnoreCase(medlemskap.getLandkode()));
-        assertThat(medlemskapA001.getForespurtmedlemskap()).allMatch(medlemskap -> "NO".equalsIgnoreCase(medlemskap.getLandkode()));
-        assertThat(sed.getNav().getArbeidsland()).isNull();
-        assertThat(sed.getSedVer()).isEqualTo("2");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+            forespurtmedlemskap.shouldNotBeNull().single().shouldNotBeNull()
+                .landkode shouldBe "NO"
+        }
+
+        sed.nav.shouldNotBeNull().run {
+            arbeidsgiver.shouldNotBeNull().single()
+                .adresse.shouldNotBeNull()
+                .land shouldBe "NO"
+            arbeidsland.shouldBeNull()
+        }
+
+        sed.run {
+            sedVer shouldBe "2"
+            sedGVer shouldBe "4"
+        }
     }
 
     @Test
-    void mapTilSed4_3() throws MappingException, NotFoundException {
-        SED sed = a001Mapper.mapTilSed(sedData, true);
+    fun `map til SED med version 3`() {
+        val sed = mapTilA001(true)
 
-        assertThat(sed.getMedlemskap()).isInstanceOf(MedlemskapA001.class);
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
+            vertsland.shouldNotBeNull()
+                .arbeidsgiver.shouldNotBeNull().single()
+                .adresse.shouldNotBeNull()
+                .land shouldNotBe "NO"
 
-        assertThat(sed.getMedlemskap()).isNotNull().isInstanceOf(MedlemskapA001.class);
+            naavaerendemedlemskap.shouldNotBeNull().single().shouldNotBeNull()
+                .landkode shouldBe "SE"
 
-        MedlemskapA001 medlemskapA001 = (MedlemskapA001) sed.getMedlemskap();
-        assertThat(sed.getNav().getArbeidsgiver()).allMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
-        assertThat(medlemskapA001.getVertsland().getArbeidsgiver()).noneMatch(a -> "NO".equalsIgnoreCase(a.getAdresse().getLand()));
-        assertThat(medlemskapA001.getNaavaerendemedlemskap()).allMatch(medlemskap -> "SE".equalsIgnoreCase(medlemskap.getLandkode()));
-        assertThat(medlemskapA001.getForespurtmedlemskap()).allMatch(medlemskap -> "NO".equalsIgnoreCase(medlemskap.getLandkode()));
-        assertThat(sed.getNav().getArbeidsland()).hasSize(1);
-        assertThat(sed.getSedVer()).isEqualTo("3");
-        assertThat(sed.getSedGVer()).isEqualTo("4");
+            forespurtmedlemskap.shouldNotBeNull().single().shouldNotBeNull()
+                .landkode shouldBe "NO"
+        }
+
+        sed.nav.shouldNotBeNull().run {
+            arbeidsgiver.shouldNotBeNull().single()
+                .adresse.shouldNotBeNull()
+                .land shouldBe "NO"
+            arbeidsland.shouldNotBeNull().shouldHaveSize(1).single().land shouldBe "NO"
+        }
+
+        sed.run {
+            sedVer shouldBe "3"
+            sedGVer shouldBe "4"
+        }
     }
 }
-
