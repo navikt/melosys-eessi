@@ -14,7 +14,7 @@ class JsonFieldMaskerTest {
     })
 
     @Test
-    fun test() {
+    fun `alt som ikke er i whitelist eller er boolean, float eller null skal maskeres`() {
         val json = """
              {
                  "key1": "value1",
@@ -47,9 +47,9 @@ class JsonFieldMaskerTest {
                     "a" : true,
                     "b" : false,
                     "c" : null,
-                    "list" : [ "x", "x", "x" ],
+                    "list" : [ "n", "n", "n" ],
                     "list2" : [ "x", "x", "x" ],
-                    "number" : "xxx",
+                    "number" : "nnn",
                     "m2" : [ {
                       "a" : "xxx",
                       "b" : 1.2
@@ -60,7 +60,7 @@ class JsonFieldMaskerTest {
     }
 
     @Test
-    fun testSedDataDto() {
+    fun `skal maskere felter i sedDataDto`() {
         val sedDataDto = SedDataStub.getStub("mock/sedDataDtoStub.json")
         val expectedJson = readFile("mock/sedDataDtoStubMasked.json")
 

@@ -12,20 +12,16 @@ import org.springframework.stereotype.Component
 @Component
 class JsonFieldMasker(private val mapper: ObjectMapper) {
 
-    fun sanitizeJson(json: String, keep: Set<String>): String {
+    fun sanitizeJson(json: String, whitelist: Set<String>): String {
 
         @Suppress("kotlin:S6518")
         fun sanitizeNode(node: JsonNode, keep: Set<String>): JsonNode {
-            fun maskPrimitive(node: JsonNode): TextNode {
-                return TextNode("x".repeat(node.asText().length))
-            }
-
             fun sanitizeArrayNode(node: JsonNode, keep: Set<String>): ArrayNode {
                 val sanitizedArray = node.deepCopy<ArrayNode>()
                 node.forEachIndexed { index, element ->
                     val sanitizedElement: JsonNode = when {
                         element.isTextual -> TextNode("x".repeat(element.asText().length))
-                        element.isInt || element.isLong -> TextNode("x".repeat(element.asText().length))
+                        element.isInt || element.isLong -> TextNode("n".repeat(element.asText().length))
                         else -> sanitizeNode(element, keep) // Recursively sanitize
                     }
                     sanitizedArray.set(index, sanitizedElement) // Ensure sanitizedElement is JsonNode
@@ -43,8 +39,8 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
                         // Mask text and numbers, sanitize nested objects and arrays
                         sanitizedObject.set<JsonNode>(
                             field, when {
-                                fieldValue.isTextual -> maskPrimitive(fieldValue)
-                                fieldValue.isInt || fieldValue.isLong -> maskPrimitive(fieldValue)
+                                fieldValue.isTextual -> TextNode("x".repeat(fieldValue.asText().length))
+                                fieldValue.isInt || fieldValue.isLong -> TextNode("n".repeat(fieldValue.asText().length))
                                 else -> sanitizeNode(fieldValue, keep)
                             }
                         )
@@ -57,42 +53,37 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
                 node.isObject -> sanitizeObjectNode(node, keep)
                 node.isArray -> sanitizeArrayNode(node, keep)
                 node.isBoolean -> node // Preserve boolean values
-                node.isInt || node.isLong -> maskPrimitive(node) // Mask integer/long values
+                node.isInt || node.isLong -> TextNode("n".repeat(node.asText().length)) // Mask integer/long values
                 else -> node // Return other types (e.g., null, floats) as-is
             }
         }
 
-        return sanitizeNode(mapper.readTree(json), keep).toPrettyString()
+        return sanitizeNode(mapper.readTree(json), whitelist).toPrettyString()
     }
 
     fun toMaskedJson(sedDataDto: SedDataDto): String =
-        try {
-            mapper.writeValueAsString(sedDataDto).let {
-                sanitizeJson(
-                    it, keep = setOf(
-                        "sedType", "kjoenn", "adressetype", "land", "relasjon",
-                        "fom", "tom", "avklartBostedsland", "datoForrigeVedtak",
-                        "gsakSaksnummer", "mottakerIder", "beslutning", "nyttLovvalgsland",
-                        "sedType", "lovvalgsland", "unntakFraBestemmelse", "bestemmelse", "tilleggsBestemmelse",
-                        "statsborgerskap"
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            "Failed to mask JSON: ${e.message}"
-        }
+        toMaskedJson(
+            sedDataDto, setOf(
+                "sedType", "kjoenn", "adressetype", "land", "relasjon",
+                "fom", "tom", "avklartBostedsland", "datoForrigeVedtak",
+                "gsakSaksnummer", "mottakerIder", "beslutning", "nyttLovvalgsland",
+                "sedType", "lovvalgsland", "unntakFraBestemmelse", "bestemmelse", "tilleggsBestemmelse",
+                "statsborgerskap"
+            )
+        )
 
     fun toMaskedJson(sed: SED): String =
+        toMaskedJson(
+            sed, setOf(
+                "sedVer", "sedGVer", "sedType", "sedId", "sedDokumentType", "sedGVer",
+                "land", "type", "gjeldendereglerEC883", "gjeldervarighetyrkesaktivitet", "datoforrigevedtak",
+                "eropprinneligvedtak", "erendringsvedtak", "sed", "startdato", "sluttdato"
+            )
+        )
+
+    private fun <T> toMaskedJson(data: T, keepFields: Set<String>): String =
         try {
-            mapper.writeValueAsString(sed).let {
-                sanitizeJson(
-                    it, keep = setOf(
-                        "sedVer", "sedGVer", "sedType", "sedId", "sedDokumentType", "sedGVer",
-                        "land", "type", "gjeldendereglerEC883", "gjeldervarighetyrkesaktivitet", "datoforrigevedtak",
-                        "eropprinneligvedtak", "erendringsvedtak", "sed", "startdato", "sluttdato"
-                    )
-                )
-            }
+            sanitizeJson(mapper.writeValueAsString(data), keepFields)
         } catch (e: Exception) {
             "Failed to mask JSON: ${e.message}"
         }
