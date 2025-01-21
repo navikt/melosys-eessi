@@ -53,7 +53,11 @@ class SedServiceTest {
 
     @BeforeEach
     fun setup() {
-        sendSedService = SedService(euxService, saksrelasjonService, fakeUnleash, 0L)
+        sendSedService = SedService(
+            euxService, saksrelasjonService, fakeUnleash, 0L, JsonFieldMasker(
+                jacksonObjectMapper().registerModule(JavaTimeModule())
+            )
+        )
     }
 
     @Test
@@ -75,7 +79,14 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - Kosovo statsborgerskap skal mappes til ukjent`() {
         val sedCapturingSlot = CapturingSlot<SED>()
-        every { euxService.opprettBucOgSed(any(), any(), capture(sedCapturingSlot), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every {
+            euxService.opprettBucOgSed(
+                any(),
+                any(),
+                capture(sedCapturingSlot),
+                any()
+            )
+        } returns OpprettBucOgSedResponse(RINA_ID, "123")
         every { euxService.hentRinaUrl(any()) } returns "URL"
         every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
         every { euxService.sendSed(any(), any(), any()) } returns Unit
@@ -122,7 +133,13 @@ class SedServiceTest {
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
         every { euxService.hentRinaUrl(any()) } returns "URL"
-        every { saksrelasjonService.lagreKobling(123, RINA_ID, BucType.LA_BUC_02) } returns mockk<FagsakRinasakKobling>()
+        every {
+            saksrelasjonService.lagreKobling(
+                123,
+                RINA_ID,
+                BucType.LA_BUC_02
+            )
+        } returns mockk<FagsakRinasakKobling>()
         every { euxService.settSakSensitiv(RINA_ID) } returns Unit
         every { euxService.sendSed(RINA_ID, "123", SedType.A003.name) } returns Unit
 
@@ -143,7 +160,9 @@ class SedServiceTest {
             bucType = BucType.LA_BUC_02
         )
 
-        every { saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, BucType.LA_BUC_02) } returns listOf(fagsakRinasakKobling)
+        every { saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, BucType.LA_BUC_02) } returns listOf(
+            fagsakRinasakKobling
+        )
 
         val buc = BUC(
             id = RINA_ID,

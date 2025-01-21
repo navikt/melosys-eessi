@@ -32,7 +32,8 @@ class SedService(
     private val euxService: EuxService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleash: Unleash,
-    @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long
+    @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long,
+    private val JsonFieldMasker: JsonFieldMasker
 ) {
 
     fun opprettBucOgSed(
@@ -49,7 +50,16 @@ class SedService(
         val sedMapper = SedMapperFactory.sedMapper(sedType)
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
         validerMottakerInstitusjoner(bucType, mottakere!!)
-        val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
+        val response = try {
+            opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
+        } catch (e: Exception) {
+            log.error {
+                "opprettEllerOppdaterBucOgSed feilet: ${e.message}\n" +
+                "SedDataDto:\n${JsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
+                    "SED:\n${JsonFieldMasker.toMaskedJson(sed)}"
+            }
+            throw e
+        }
         if (sedDataDto.bruker.harSensitiveOpplysninger) {
             euxService.settSakSensitiv(response.rinaSaksnummer!!)
         }
@@ -62,7 +72,16 @@ class SedService(
             )
         }
         if (sendAutomatisk) {
-            sendSed(response.rinaSaksnummer!!, response.dokumentId!!, sed.sedType!!)
+            try {
+                sendSed(response.rinaSaksnummer!!, response.dokumentId!!, sed.sedType!!)
+            } catch (e: Exception) {
+                log.error {
+                    "Feil ved sendSed: ${e.message}\n" +
+                        "SedDataDto:\n${JsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
+                        "SED:\n${JsonFieldMasker.toMaskedJson(sed)}"
+                }
+                throw e
+            }
         }
         return BucOgSedOpprettetDto(
             rinaSaksnummer = response.rinaSaksnummer,
