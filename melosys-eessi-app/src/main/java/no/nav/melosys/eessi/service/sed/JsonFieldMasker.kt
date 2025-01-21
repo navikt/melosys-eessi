@@ -89,7 +89,7 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
                     it, keep = setOf(
                         "sedVer", "sedGVer", "sedType", "sedId", "sedDokumentType", "sedGVer",
                         "land", "type", "gjeldendereglerEC883", "gjeldervarighetyrkesaktivitet", "datoforrigevedtak",
-                        "eropprinneligvedtak", "erendringsvedtak", "sed"
+                        "eropprinneligvedtak", "erendringsvedtak", "sed", "startdato", "sluttdato"
                     )
                 )
             }
