@@ -16,7 +16,7 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
 
         // Writen with help of ChatGTP
         @Suppress("kotlin:S6518")
-        fun sanitizeNode(node: JsonNode, keep: Set<String>, fieldName: String? = null): JsonNode {
+        fun sanitizeNode(node: JsonNode, keep: Set<String>): JsonNode {
             return when {
                 node.isObject -> {
                     val sanitizedObject = node.deepCopy<ObjectNode>()
@@ -33,7 +33,7 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
                                 }
 
                                 else -> {
-                                    sanitizedObject.set(field, sanitizeNode(fieldValue, keep, field))
+                                    sanitizedObject.set(field, sanitizeNode(fieldValue, keep))
                                 }
                             }
                         } else {
