@@ -3,7 +3,7 @@
         "fornavn" : "xxxxxxxxxxx",
         "etternavn" : "xxxxxxxxx",
         "foedseldato" : "xxxxxxxxxx",
-        "kjoenn" : "M",
+        "kjoenn" : "x",
         "statsborgerskap" : [ "NO", "SWE", "SCG" ],
         "fnr" : "xxxxxxxxxxx",
         "harSensitiveOpplysninger" : false
@@ -27,11 +27,11 @@
         "adressetype" : "POSTADRESSE"
     },
     "familieMedlem" : [ {
-        "relasjon" : "far",
+        "relasjon" : "xxx",
         "fornavn" : "xxxxxx",
         "etternavn" : "xxxxx"
     }, {
-        "relasjon" : "mor",
+        "relasjon" : "xxx",
         "fornavn" : "xxxxxx",
         "etternavn" : "xxxx"
     } ],
