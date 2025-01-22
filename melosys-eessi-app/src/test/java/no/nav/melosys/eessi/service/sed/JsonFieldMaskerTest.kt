@@ -26,7 +26,7 @@ class JsonFieldMaskerTest {
                     "c": null,
                     "list": [1, 2, 3],
                     "list2": ["1", "2", "3"],
-                    "number": 123,
+                    "number": 456,
                     "m2": [{
                         "a": "lla",
                         "b": 1.2
@@ -47,9 +47,9 @@ class JsonFieldMaskerTest {
                     "a" : true,
                     "b" : false,
                     "c" : null,
-                    "list" : [ "n", "n", "n" ],
+                    "list" : [ 1, 1, 1 ],
                     "list2" : [ "x", "x", "x" ],
-                    "number" : "nnn",
+                    "number" : 123,
                     "m2" : [ {
                       "a" : "xxx",
                       "b" : 1.2

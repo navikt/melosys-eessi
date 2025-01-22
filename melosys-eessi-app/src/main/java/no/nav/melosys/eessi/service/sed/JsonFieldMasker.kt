@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.sed
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.LongNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import no.nav.melosys.eessi.controller.dto.SedDataDto
@@ -16,12 +17,23 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
 
         @Suppress("kotlin:S6518")
         fun sanitizeNode(node: JsonNode, keep: Set<String>): JsonNode {
+            fun maskPrimitive(node: JsonNode): JsonNode {
+                return if (node.isNumber) {
+                    // Mask numbers as their size-based numeric value
+                    val size = node.asText().length
+                    val maskedNumber = (1..size).joinToString("") { it.toString() }.toInt()
+                    LongNode(maskedNumber.toLong()) // Ensure it's treated as a number
+                } else {
+                    // Mask text values as 'xxxx...'
+                    TextNode("x".repeat(node.asText().length))
+                }
+            }
             fun sanitizeArrayNode(node: JsonNode, keep: Set<String>): ArrayNode {
                 val sanitizedArray = node.deepCopy<ArrayNode>()
                 node.forEachIndexed { index, element ->
                     val sanitizedElement: JsonNode = when {
-                        element.isTextual -> TextNode("x".repeat(element.asText().length))
-                        element.isInt || element.isLong -> TextNode("n".repeat(element.asText().length))
+                        element.isTextual -> maskPrimitive(element)
+                        element.isInt || element.isLong -> maskPrimitive(element)
                         else -> sanitizeNode(element, keep) // Recursively sanitize
                     }
                     sanitizedArray.set(index, sanitizedElement) // Ensure sanitizedElement is JsonNode
@@ -39,8 +51,8 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
                         // Mask text and numbers, sanitize nested objects and arrays
                         sanitizedObject.set<JsonNode>(
                             field, when {
-                                fieldValue.isTextual -> TextNode("x".repeat(fieldValue.asText().length))
-                                fieldValue.isInt || fieldValue.isLong -> TextNode("n".repeat(fieldValue.asText().length))
+                                fieldValue.isTextual -> maskPrimitive(fieldValue)
+                                fieldValue.isInt || fieldValue.isLong -> maskPrimitive(fieldValue)
                                 else -> sanitizeNode(fieldValue, keep)
                             }
                         )
