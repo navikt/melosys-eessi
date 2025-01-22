@@ -76,7 +76,7 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
     fun toMaskedJson(sedDataDto: SedDataDto): String =
         toMaskedJson(
             sedDataDto, setOf(
-                "sedType", "kjoenn", "adressetype", "land", "relasjon",
+                "sedType", "adressetype", "land",
                 "fom", "tom", "avklartBostedsland", "datoForrigeVedtak",
                 "gsakSaksnummer", "mottakerIder", "beslutning", "nyttLovvalgsland",
                 "sedType", "lovvalgsland", "unntakFraBestemmelse", "bestemmelse", "tilleggsBestemmelse",
