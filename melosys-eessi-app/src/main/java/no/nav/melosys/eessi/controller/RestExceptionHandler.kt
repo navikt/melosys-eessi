@@ -16,29 +16,19 @@ private val log = KotlinLogging.logger {}
 @ControllerAdvice
 class RestExceptionHandler {
     @ExceptionHandler(NotFoundException::class)
-    fun handle(e: NotFoundException): ResponseEntity<*> {
-        return handle(e, HttpStatus.NOT_FOUND)
-    }
+    fun handle(e: NotFoundException): ResponseEntity<*> = handle(e, HttpStatus.NOT_FOUND)
 
     @ExceptionHandler(MappingException::class)
-    fun handle(e: MappingException): ResponseEntity<*> {
-        return handle(e, HttpStatus.BAD_REQUEST)
-    }
+    fun handle(e: MappingException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
 
     @ExceptionHandler(ValidationException::class)
-    fun handle(e: ValidationException): ResponseEntity<*> {
-        return handle(e, HttpStatus.BAD_REQUEST)
-    }
+    fun handle(e: ValidationException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
 
     @ExceptionHandler(IntegrationException::class)
-    fun handle(e: IntegrationException): ResponseEntity<*> {
-        return handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+    fun handle(e: IntegrationException): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
 
     @ExceptionHandler(Exception::class)
-    fun handle(e: Exception): ResponseEntity<*> {
-        return handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
-    }
+    fun handle(e: Exception): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
 
     private fun handle(e: Exception, httpStatus: HttpStatus): ResponseEntity<Map<String, String?>> {
         val message = e.message ?: e.javaClass.simpleName
