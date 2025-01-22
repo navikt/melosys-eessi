@@ -1,0 +1,149 @@
+{
+    "bruker" : {
+        "fornavn" : "xxxxxxxxxxx",
+        "etternavn" : "xxxxxxxxx",
+        "foedseldato" : "xxxxxxxxxx",
+        "kjoenn" : "x",
+        "statsborgerskap" : [ "NO", "SWE", "SCG" ],
+        "fnr" : "xxxxxxxxxxx",
+        "harSensitiveOpplysninger" : false
+    },
+    "kontaktadresse" : {
+        "poststed" : "xxxx",
+        "postnr" : "xxxx",
+        "land" : "NO",
+        "gateadresse" : "xxxxxxxxxxxxxxx",
+        "tilleggsnavn" : null,
+        "region" : null,
+        "adressetype" : "KONTAKTADRESSE"
+    },
+    "oppholdsadresse" : {
+        "poststed" : "xxxxxxxx",
+        "postnr" : "xxx",
+        "land" : "NZ",
+        "gateadresse" : "xxxxxxxxxxxxx",
+        "tilleggsnavn" : null,
+        "region" : null,
+        "adressetype" : "POSTADRESSE"
+    },
+    "familieMedlem" : [ {
+        "relasjon" : "xxx",
+        "fornavn" : "xxxxxx",
+        "etternavn" : "xxxxx"
+    }, {
+        "relasjon" : "xxx",
+        "fornavn" : "xxxxxx",
+        "etternavn" : "xxxx"
+    } ],
+    "søknadsperiode" : {
+        "fom" : "2020-01-01",
+        "tom" : "2021-01-01"
+    },
+    "avklartBostedsland" : null,
+    "vedtakDto" : null,
+    "invalideringSedDto" : null,
+    "tidligereLovvalgsperioder" : [ ],
+    "gsakSaksnummer" : 123,
+    "mottakerIder" : [ "SE:123", "BE:312" ],
+    "ytterligereInformasjon" : null,
+    "svarAnmodningUnntak" : null,
+    "utpekingAvvis" : null,
+    "sedType" : null,
+    "utenlandskIdent" : [ {
+        "ident" : "xxxxxxxxxxx",
+        "landkode" : "xx"
+    } ],
+    "bostedsadresse" : {
+        "poststed" : "xxx",
+        "postnr" : "xxxx",
+        "land" : "NO",
+        "gateadresse" : "xxxxxx",
+        "tilleggsnavn" : null,
+        "region" : null,
+        "adressetype" : "BOSTEDSADRESSE"
+    },
+    "arbeidsgivendeVirksomheter" : [ {
+        "navn" : "xxxxxxx",
+        "adresse" : {
+            "poststed" : "xxxxxxxx",
+            "postnr" : "xxxx",
+            "land" : "NO",
+            "gateadresse" : "xxxxxxxxxxx",
+            "tilleggsnavn" : null,
+            "region" : null,
+            "adressetype" : null
+        },
+        "orgnr" : "xxxxxxxx",
+        "type" : "xxxx"
+    }, {
+        "navn" : "xx",
+        "adresse" : {
+            "poststed" : "xxxxxxxx",
+            "postnr" : "xxxx",
+            "land" : "SE",
+            "gateadresse" : "xxxxxxxxxxx",
+            "tilleggsnavn" : null,
+            "region" : null,
+            "adressetype" : null
+        },
+        "orgnr" : "xxxxxxxx",
+        "type" : "xxx"
+    } ],
+    "selvstendigeVirksomheter" : [ {
+        "navn" : "xxxx",
+        "adresse" : {
+            "poststed" : "xxxxxxxx",
+            "postnr" : "xxxx",
+            "land" : "NO",
+            "gateadresse" : "xxxxxxxxxxx",
+            "tilleggsnavn" : null,
+            "region" : null,
+            "adressetype" : null
+        },
+        "orgnr" : "xxxxxxxx",
+        "type" : "xxx"
+    } ],
+    "arbeidssteder" : [ {
+        "navn" : "xxxxxxx",
+        "adresse" : {
+            "poststed" : "xxxxxxxx",
+            "postnr" : "xxxx",
+            "land" : "NO",
+            "gateadresse" : "xxxxxxxxxxx",
+            "tilleggsnavn" : null,
+            "region" : null,
+            "adressetype" : null
+        },
+        "fysisk" : true,
+        "hjemmebase" : null
+    } ],
+    "arbeidsland" : [ {
+        "land" : "NO",
+        "arbeidssted" : [ {
+            "navn" : "xxxxxxx",
+            "adresse" : {
+                "poststed" : "xxxxxxxx",
+                "postnr" : "xxxx",
+                "land" : null,
+                "gateadresse" : "xxxxxxxxxxx",
+                "tilleggsnavn" : null,
+                "region" : null,
+                "adressetype" : null
+            },
+            "fysisk" : true,
+            "hjemmebase" : null
+        } ]
+    } ],
+    "harFastArbeidssted" : true,
+    "lovvalgsperioder" : [ {
+        "lovvalgsland" : "NO",
+        "unntakFraLovvalgsland" : "xx",
+        "bestemmelse" : "ART_12_1",
+        "tilleggsBestemmelse" : null,
+        "fom" : "2020-01-01",
+        "tom" : "2020-01-01",
+        "unntaksBegrunnelse" : null,
+        "unntakFraBestemmelse" : null
+    } ],
+    "gjeldenderegler" : null
+}

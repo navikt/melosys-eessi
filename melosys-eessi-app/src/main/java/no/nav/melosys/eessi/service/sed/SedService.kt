@@ -32,7 +32,8 @@ class SedService(
     private val euxService: EuxService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleash: Unleash,
-    @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long
+    @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long,
+    private val JsonFieldMasker: JsonFieldMasker
 ) {
 
     fun opprettBucOgSed(
@@ -49,7 +50,18 @@ class SedService(
         val sedMapper = SedMapperFactory.sedMapper(sedType)
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
         validerMottakerInstitusjoner(bucType, mottakere!!)
-        val response = opprettEllerOppdaterBucOgSed(sed, vedlegg, bucType, gsakSaksnummer, sedDataDto.mottakerIder!!, forsøkOppdaterEksisterende)
+        val response = executeWithSedLogging(
+            "opprettEllerOppdaterBucOgSed feilet", sedDataDto, sed
+        ) {
+            opprettEllerOppdaterBucOgSed(
+                sed,
+                vedlegg,
+                bucType,
+                gsakSaksnummer,
+                sedDataDto.mottakerIder!!,
+                forsøkOppdaterEksisterende
+            )
+        }
         if (sedDataDto.bruker.harSensitiveOpplysninger) {
             euxService.settSakSensitiv(response.rinaSaksnummer!!)
         }
@@ -62,7 +74,9 @@ class SedService(
             )
         }
         if (sendAutomatisk) {
-            sendSed(response.rinaSaksnummer!!, response.dokumentId!!, sed.sedType!!)
+            executeWithSedLogging("Feil ved sendSed", sedDataDto, sed) {
+                sendSed(response.rinaSaksnummer!!, response.dokumentId!!, sed.sedType!!)
+            }
         }
         return BucOgSedOpprettetDto(
             rinaSaksnummer = response.rinaSaksnummer,
@@ -119,14 +133,19 @@ class SedService(
     fun genererPdfFraSed(sedDataDto: SedDataDto, sedType: SedType): ByteArray? {
         val sedMapper = SedMapperFactory.sedMapper(sedType)
         val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
-        return euxService.genererPdfFraSed(sed)
+        return executeWithSedLogging("Feil ved genererPdfFraSed", sedDataDto, sed) {
+            euxService.genererPdfFraSed(sed)
+        }
     }
 
     fun sendPåEksisterendeBuc(sedDataDto: SedDataDto, rinaSaksnummer: String, sedType: SedType) {
         val buc = euxService.hentBuc(rinaSaksnummer)
         val sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
         verifiserSedVersjonErBucVersjon(buc, sed)
-        euxService.opprettOgSendSed(sed, rinaSaksnummer)
+
+        return executeWithSedLogging("Feil ved sendPåEksisterendeBuc", sedDataDto, sed) {
+            euxService.opprettOgSendSed(sed, rinaSaksnummer)
+        }
     }
 
     private fun opprettEllerOppdaterBucOgSed(
@@ -138,7 +157,8 @@ class SedService(
         forsøkOppdaterEksisterende: Boolean
     ): OpprettBucOgSedResponse {
         if (forsøkOppdaterEksisterende && bucType.meddelerLovvalg()) {
-            val eksisterendeSak = finnAapenEksisterendeSak(saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType))
+            val eksisterendeSak =
+                finnAapenEksisterendeSak(saksrelasjonService.finnVedGsakSaksnummerOgBucType(gsakSaksnummer, bucType))
             if (eksisterendeSak.isPresent && eksisterendeSak.get().erÅpen()) {
                 val buc = eksisterendeSak.get()
                 val document = buc.finnDokumentVedSedType(sed.sedType!!)
@@ -177,4 +197,16 @@ class SedService(
         log.info("gsakSaksnummer {} lagret med rinaId {}", gsakSaksnummer, opprettBucOgSedResponse.rinaSaksnummer)
         return opprettBucOgSedResponse
     }
+
+    private fun <T> executeWithSedLogging(description: String, sedDataDto: SedDataDto, sed: SED, action: () -> T): T =
+        try {
+            action()
+        } catch (e: Exception) {
+            log.error {
+                "$description: ${e.message}\n" +
+                    "SedDataDto:\n${JsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
+                    "SED:\n${JsonFieldMasker.toMaskedJson(sed)}"
+            }
+            throw e
+        }
 }
