@@ -1,8 +1,6 @@
 package no.nav.melosys.eessi.service.buc
 
-import io.getunleash.Unleash
 import mu.KotlinLogging
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName
 import no.nav.melosys.eessi.metrikker.BucMetrikker
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.SedType
@@ -22,7 +20,6 @@ private val log = KotlinLogging.logger {}
 class LukkBucService(
     private val euxService: EuxService,
     private val bucMetrikker: BucMetrikker,
-    private val unleash: Unleash
 ) {
     private val x001Mapper = X001Mapper()
 
@@ -85,8 +82,7 @@ class LukkBucService(
     private fun opprettX001(buc: BUC, aarsak: String): SED =
         x001Mapper.mapFraSed(
             hentSisteLovvalgSed(buc),
-            aarsak,
-            unleash.isEnabled(ToggleName.CDM_4_3)
+            aarsak
         )
 
     private fun hentSisteLovvalgSed(buc: BUC): SED =

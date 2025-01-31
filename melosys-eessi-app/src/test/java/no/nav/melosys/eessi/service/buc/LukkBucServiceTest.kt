@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.buc
 
-import io.getunleash.FakeUnleash
 import io.github.benas.randombeans.api.EnhancedRandom
 import io.mockk.every
 import io.mockk.mockk
@@ -32,12 +31,11 @@ class LukkBucServiceTest {
     private val euxService: EuxService = mockk()
     private val bucMetrikker: BucMetrikker = mockk()
     private val enhancedRandom: EnhancedRandom = EnhancedRandomCreator.defaultEnhancedRandom()
-    private val fakeUnleash = FakeUnleash()
     private lateinit var lukkBucService: LukkBucService
 
     @BeforeEach
     fun setup() {
-        lukkBucService = LukkBucService(euxService, bucMetrikker, fakeUnleash)
+        lukkBucService = LukkBucService(euxService, bucMetrikker)
     }
 
     @Test

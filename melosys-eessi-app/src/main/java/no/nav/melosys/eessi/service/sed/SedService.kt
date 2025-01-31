@@ -1,8 +1,6 @@
 package no.nav.melosys.eessi.service.sed
 
-import io.getunleash.Unleash
 import mu.KotlinLogging
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus
@@ -31,7 +29,6 @@ private val log = KotlinLogging.logger {}
 class SedService(
     private val euxService: EuxService,
     private val saksrelasjonService: SaksrelasjonService,
-    private val unleash: Unleash,
     @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long,
     private val JsonFieldMasker: JsonFieldMasker
 ) {
@@ -48,7 +45,7 @@ class SedService(
         val mottakere = sedDataDto.mottakerIder
         val sedType = bucType!!.hentFørsteLovligeSed()
         val sedMapper = SedMapperFactory.sedMapper(sedType)
-        val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
+        val sed = sedMapper.mapTilSed(sedDataDto)
         validerMottakerInstitusjoner(bucType, mottakere!!)
         val response = executeWithSedLogging(
             "opprettEllerOppdaterBucOgSed feilet", sedDataDto, sed
@@ -132,7 +129,7 @@ class SedService(
 
     fun genererPdfFraSed(sedDataDto: SedDataDto, sedType: SedType): ByteArray? {
         val sedMapper = SedMapperFactory.sedMapper(sedType)
-        val sed = sedMapper.mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
+        val sed = sedMapper.mapTilSed(sedDataDto)
         return executeWithSedLogging("Feil ved genererPdfFraSed", sedDataDto, sed) {
             euxService.genererPdfFraSed(sed)
         }
@@ -140,7 +137,7 @@ class SedService(
 
     fun sendPåEksisterendeBuc(sedDataDto: SedDataDto, rinaSaksnummer: String, sedType: SedType) {
         val buc = euxService.hentBuc(rinaSaksnummer)
-        val sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto, unleash.isEnabled(ToggleName.CDM_4_3))
+        val sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto)
         verifiserSedVersjonErBucVersjon(buc, sed)
 
         return executeWithSedLogging("Feil ved sendPåEksisterendeBuc", sedDataDto, sed) {
