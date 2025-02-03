@@ -12,7 +12,7 @@ class A008MapperTest {
 
     @Test
     fun `arbeid i flere land ukjent hvilke`() {
-        val sed = SedDataStub.mapTilSed<A008Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(testData = "mock/sedDataDtoStub.json") {
             harFastArbeidssted = false
             arbeidsland = listOf()
         }
@@ -24,32 +24,8 @@ class A008MapperTest {
     }
 
     @Test
-    fun `map til SED med version 2`() {
-        val sed = SedDataStub.mapTilSed<A008Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-        }
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull().run {
-                    yrkesaktivitet.shouldNotBeNull()
-                        .startdato shouldBe "2020-01-01"
-                    bosted.shouldNotBeNull()
-                        .land shouldBe "SE"
-                }
-            }
-        }
-
-        sed.nav.shouldNotBeNull().arbeidsland.shouldBeNull()
-
-        sed.run {
-            sedVer shouldBe "2"
-            sedGVer shouldBe "4"
-        }
-    }
-
-    @Test
     fun `map til SED med version 3`() {
-        val sed = SedDataStub.mapTilSed<A008Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(testData = "mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
         }
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {

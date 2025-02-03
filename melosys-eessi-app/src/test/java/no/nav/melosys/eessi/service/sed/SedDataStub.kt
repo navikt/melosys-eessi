@@ -24,10 +24,9 @@ object SedDataStub {
     }
 
     inline fun <reified T : SedMapper> mapTilSed(
-        erCDM4_3: Boolean,
         testData: String,
         noinline block: SedDataDto.() -> Unit = {}
     ): SED = T::class.java.getDeclaredConstructor().newInstance().mapTilSed(getStub(testData).apply {
         block()
-    }, erCDM4_3)
+    })
 }

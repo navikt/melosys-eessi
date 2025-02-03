@@ -15,29 +15,10 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
 class A002MapperTest {
-    @Test
-    fun `map til SED med version 2`() {
-        val sed = SedDataStub.mapTilSed<A002Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
-            svarAnmodningUnntak = SvarAnmodningUnntakDto(
-                SvarAnmodningUnntakBeslutning.AVSLAG,
-                "begrunnelse",
-                Periode(LocalDate.now(), LocalDate.now().plusDays(1))
-            )
-        }
-
-        sed.shouldNotBeNull().run {
-            medlemskap.shouldBeInstanceOf<MedlemskapA002>()
-            nav.shouldNotBeNull().run {
-                arbeidsland shouldBe null
-            }
-            sedVer shouldBe "2"
-            sedGVer shouldBe "4"
-        }
-    }
 
     @Test
     fun `map til SED med version 3`() {
-        val sed = SedDataStub.mapTilSed<A002Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+        val sed = SedDataStub.mapTilSed<A002Mapper>(testData = "mock/sedDataDtoStub.json") {
             svarAnmodningUnntak = SvarAnmodningUnntakDto(
                 SvarAnmodningUnntakBeslutning.AVSLAG,
                 "begrunnelse",
@@ -58,7 +39,7 @@ class A002MapperTest {
     @Test
     fun `map til SED uten SvarAnmodningUnntak forvent Exception`() {
         val exception = shouldThrow<MappingException> {
-            SedDataStub.mapTilSed<A002Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json")
+            SedDataStub.mapTilSed<A002Mapper>(testData = "mock/sedDataDtoStub.json")
         }
         exception.message.shouldNotBeNull().shouldContain("Trenger SvarAnmodningUnntak")
     }

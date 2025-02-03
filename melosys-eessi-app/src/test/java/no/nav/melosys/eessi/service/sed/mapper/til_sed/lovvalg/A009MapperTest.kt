@@ -22,10 +22,9 @@ class A009MapperTest {
     private val lovvalgsland = "NO"
 
     private fun mapTilA009(
-        erCDM4_3: Boolean,
         block: SedDataDto.() -> Unit = {}
     ): SED =
-        SedDataStub.mapTilSed<A009Mapper>(erCDM4_3, "mock/sedDataDtoStub.json") {
+        SedDataStub.mapTilSed<A009Mapper>( "mock/sedDataDtoStub.json") {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_12_1
                 fom = LocalDate.now()
@@ -36,22 +35,8 @@ class A009MapperTest {
         }
 
     @Test
-    fun `map til SED version 2`() {
-        val sed = mapTilA009(false) {
-            avklartBostedsland = "SE"
-        }
-
-        sed.shouldNotBeNull().run {
-            medlemskap.shouldBeInstanceOf<MedlemskapA009>()
-            nav.shouldNotBeNull().arbeidsland shouldBe null
-            sedVer shouldBe "2"
-            sedGVer shouldBe "4"
-        }
-    }
-
-    @Test
     fun `map til SED version 3`() {
-        val sed = mapTilA009(true) {
+        val sed = mapTilA009 {
             avklartBostedsland = "SE"
         }
 
@@ -69,7 +54,7 @@ class A009MapperTest {
 
     @Test
     fun `medlemskap ikke selvstendig og artikkel 12_1 forvent gyldig medlemskap`() {
-        val sed = mapTilA009(false)
+        val sed = mapTilA009()
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA009>().run {
             utsendingsland.shouldNotBeNull().arbeidsgiver.shouldNotBeNull()
@@ -93,7 +78,7 @@ class A009MapperTest {
 
     @Test
     fun `er ikke opprinnelig vedtak forvent korrekt verdier`() {
-        val sed = mapTilA009(false) {
+        val sed = mapTilA009() {
             vedtakDto = VedtakDto(
                 erFørstegangsvedtak = false,
                 datoForrigeVedtak = LocalDate.now()
@@ -112,7 +97,7 @@ class A009MapperTest {
 
     @Test
     fun `er opprinnelig vedtak forvent korrekt verdier`() {
-        val sed = mapTilA009(false) {
+        val sed = mapTilA009() {
             vedtakDto = VedtakDto(erFørstegangsvedtak = true)
         }
 
@@ -127,7 +112,7 @@ class A009MapperTest {
 
     @Test
     fun `medlemskap er selvstendig og artikkel 12_2 forvent gyldig medlemskap`() {
-        val sed = mapTilA009(false) {
+        val sed = mapTilA009() {
             lovvalgsperioder.first().bestemmelse = Bestemmelse.ART_12_2
         }
 
@@ -143,7 +128,7 @@ class A009MapperTest {
     @Test
     fun `medlemskap feil lovvalgs bestemmelse forvent MappingException`() {
         val exception = shouldThrow<MappingException> {
-            mapTilA009(false) {
+            mapTilA009() {
                 lovvalgsperioder.first().bestemmelse = Bestemmelse.ART_13_4
             }
         }
@@ -152,10 +137,10 @@ class A009MapperTest {
 
     @Test
     fun `er ikke fysisk forvent er ikke fastadresse`() {
-        val sed = mapTilA009(false) {
-            arbeidssteder.first().fysisk = false
+        val sed = mapTilA009() {
+            arbeidsland.first().arbeidssted.first().fysisk = false
         }
 
-        sed.nav.shouldNotBeNull().arbeidssted.shouldNotBeNull().first().erikkefastadresse shouldBe "ja"
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().arbeidssted.first().erikkefastadresse shouldBe "ja"
     }
 }
