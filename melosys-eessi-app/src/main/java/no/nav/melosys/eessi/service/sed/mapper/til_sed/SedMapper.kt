@@ -40,7 +40,7 @@ interface SedMapper {
 
     fun prefillNav(sedData: SedDataDto): Nav {
         val erSedMatch = getSedType() in setOf(
-            SedType.A001, SedType.A002, SedType.A003,
+            SedType.A001, SedType.A003,
             SedType.A008, SedType.A009, SedType.A010
         )
         return Nav(
