@@ -11,10 +11,10 @@ class X001Mapper : AdministrativSedMapper {
 
     override fun getSedType(): SedType = SedType.X001
 
-    fun mapFraSed(sed: SED, aarsak: String, erCDM4_3: Boolean) = SED(
+    fun mapFraSed(sed: SED, aarsak: String) = SED(
         sedType = SedType.X001.toString(),
         sedGVer = Konstanter.DEFAULT_SED_G_VER,
-        sedVer = if (erCDM4_3) Konstanter.SED_VER_CDM_4_3 else Konstanter.DEFAULT_SED_VER,
+        sedVer = Konstanter.SED_VER_CDM_4_3,
         nav = mapNav(sed, aarsak)
     )
 

@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.service.sed
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -47,14 +46,13 @@ class SedServiceTest {
     lateinit var saksrelasjonService: SaksrelasjonService
 
     lateinit var sendSedService: SedService
-    private val fakeUnleash = FakeUnleash()
 
     private val RINA_ID = "aabbcc"
 
     @BeforeEach
     fun setup() {
         sendSedService = SedService(
-            euxService, saksrelasjonService, fakeUnleash, 0L, JsonFieldMasker(
+            euxService, saksrelasjonService, 0L, JsonFieldMasker(
                 jacksonObjectMapper().registerModule(JavaTimeModule())
             )
         )

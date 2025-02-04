@@ -21,10 +21,9 @@ import java.time.LocalDate
 class A010MapperTest {
 
     private fun mapTilA010(
-        erCDM4_3: Boolean,
         block: SedDataDto.() -> Unit = {}
     ): SED =
-        SedDataStub.mapTilSed<A010Mapper>(erCDM4_3, "mock/sedDataDtoStub.json") {
+        SedDataStub.mapTilSed<A010Mapper>("mock/sedDataDtoStub.json") {
             lovvalgsperioder.first().apply {
                 lovvalgsland = "NO"
             }
@@ -33,26 +32,8 @@ class A010MapperTest {
 
 
     @Test
-    fun `map til SED version 2`() {
-        val sed = mapTilA010(erCDM4_3 = false) {
-            lovvalgsperioder.first().apply {
-                bestemmelse = Bestemmelse.ART_11_3_b
-                tilleggsBestemmelse = Bestemmelse.ART_11_3_c
-            }
-            avklartBostedsland = "SE"
-        }
-
-        sed.shouldNotBeNull().run {
-            medlemskap.shouldBeInstanceOf<MedlemskapA010>()
-            nav.shouldNotBeNull().arbeidsland shouldBe null
-            sedVer shouldBe "2"
-            sedGVer shouldBe "4"
-        }
-    }
-
-    @Test
     fun `map til SED version 3`() {
-        val sed = mapTilA010(erCDM4_3 = true) {
+        val sed = mapTilA010 {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_11_3_b
                 tilleggsBestemmelse = Bestemmelse.ART_11_3_c
@@ -72,7 +53,7 @@ class A010MapperTest {
 
     @Test
     fun `map til SED med tilleggsbestemmelse forvent korrekt SED`() {
-        val sed = mapTilA010(erCDM4_3 = false) {
+        val sed = mapTilA010 {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_11_3_b
                 tilleggsBestemmelse = Bestemmelse.ART_11_3_c
@@ -97,7 +78,7 @@ class A010MapperTest {
 
     @Test
     fun `map til SED med ulovlig bestemmelse forvent korrekt SED`() {
-        val sed = mapTilA010(erCDM4_3 = false) {
+        val sed = mapTilA010 {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_11_3_a
                 tilleggsBestemmelse = Bestemmelse.ART_11_3_b
@@ -116,7 +97,7 @@ class A010MapperTest {
     @Test
     fun `map til SED med ulovlig bestemmelse forvent exception`() {
         val exception = shouldThrow<MappingException> {
-            mapTilA010(erCDM4_3 = false) {
+            mapTilA010 {
                 lovvalgsperioder.first().apply {
                     bestemmelse = Bestemmelse.ART_11_3_a
                     tilleggsBestemmelse = Bestemmelse.ART_12_1
@@ -129,7 +110,7 @@ class A010MapperTest {
 
     @Test
     fun `map til SED er ikke opprinnelig vedtak forvent korrekt verdier`() {
-        val sed = mapTilA010(erCDM4_3 = false) {
+        val sed = mapTilA010 {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_11_3_a
                 tilleggsBestemmelse = Bestemmelse.ART_11_3_b
@@ -151,7 +132,7 @@ class A010MapperTest {
 
     @Test
     fun `map til SED er opprinnelig vedtak forvent korrekt verdier`() {
-        val sed = mapTilA010(erCDM4_3 = false) {
+        val sed = mapTilA010 {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_11_3_a
                 tilleggsBestemmelse = Bestemmelse.ART_11_3_b

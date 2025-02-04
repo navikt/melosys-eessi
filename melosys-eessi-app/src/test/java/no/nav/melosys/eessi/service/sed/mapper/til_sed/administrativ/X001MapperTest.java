@@ -23,30 +23,7 @@ class X001MapperTest {
         SED fraSed = new ObjectMapper().readValue(sedString, SED.class);
 
         X001Mapper mapper = new X001Mapper();
-        SED x001 = mapper.mapFraSed(fraSed, "aarsaken", false);
-
-        assertThat(x001).extracting(SED::getSedType, SED::getMedlemskap, SED::getSedGVer, SED::getSedVer)
-                .containsExactly(SedType.X001.name(), null, "4", "2");
-
-        //Påkrevde felter
-        assertThat(x001.getNav().getSak().getKontekst().getBruker().getPerson().getFornavn()).isNotNull();
-        assertThat(x001.getNav().getSak().getKontekst().getBruker().getPerson().getEtternavn()).isNotNull();
-        assertThat(x001.getNav().getSak().getKontekst().getBruker().getPerson().getFoedselsdato()).isNotNull();
-        assertThat(x001.getNav().getSak().getAnmodning().getAvslutning().getDato()).isNotNull();
-        assertThat(x001.getNav().getSak().getAnmodning().getAvslutning().getType()).isEqualTo("automatisk");
-        assertThat(x001.getNav().getSak().getAnmodning().getAvslutning().getAarsak().getType()).isEqualTo("aarsaken");
-    }
-
-    @Test
-    void mapFraSed4_3() throws Exception {
-
-        URL jsonUrl = getClass().getClassLoader().getResource("mock/sedA009.json");
-
-        String sedString = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
-        SED fraSed = new ObjectMapper().readValue(sedString, SED.class);
-
-        X001Mapper mapper = new X001Mapper();
-        SED x001 = mapper.mapFraSed(fraSed, "aarsaken", true);
+        SED x001 = mapper.mapFraSed(fraSed, "aarsaken");
 
         assertThat(x001).extracting(SED::getSedType, SED::getMedlemskap, SED::getSedGVer, SED::getSedVer)
             .containsExactly(SedType.X001.name(), null, "4", "3");

@@ -14,8 +14,8 @@ import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 interface LovvalgSedMapper<T : Medlemskap> : SedMapper {
     fun getMedlemskap(sedData: SedDataDto): T
 
-    override fun mapTilSed(sedData: SedDataDto, erCDM4_3: Boolean): SED =
-        super.mapTilSed(sedData, erCDM4_3).apply {
+    override fun mapTilSed(sedData: SedDataDto): SED =
+        super.mapTilSed(sedData).apply {
             medlemskap = getMedlemskap(sedData)
         }
 

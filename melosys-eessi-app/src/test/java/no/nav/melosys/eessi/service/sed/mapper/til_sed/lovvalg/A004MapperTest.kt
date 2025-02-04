@@ -15,26 +15,8 @@ import org.junit.jupiter.api.Test
 
 class A004MapperTest {
     @Test
-    fun `map til SED med version 2`() {
-        val sed = SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
-            utpekingAvvis = UtpekingAvvisDto(
-                nyttLovvalgsland = "DK",
-                begrunnelseUtenlandskMyndighet = "begrunnelse",
-                vilSendeAnmodningOmMerInformasjon = false
-            )
-        }
-
-        sed.shouldNotBeNull().run {
-            medlemskap.shouldBeInstanceOf<MedlemskapA004>()
-            nav.shouldNotBeNull().arbeidsland shouldBe null
-            sedVer shouldBe "2"
-            sedGVer shouldBe "4"
-        }
-    }
-
-    @Test
     fun `map til SED version 3`() {
-        val sed = SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = true, testData = "mock/sedDataDtoStub.json") {
+        val sed = SedDataStub.mapTilSed<A004Mapper>(testData = "mock/sedDataDtoStub.json") {
             utpekingAvvis = UtpekingAvvisDto(
                 nyttLovvalgsland = "DK",
                 begrunnelseUtenlandskMyndighet = "begrunnelse",
@@ -52,7 +34,7 @@ class A004MapperTest {
 
     @Test
     fun `map til SED forvent MedlemskapA004`() {
-        val sed = SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json") {
+        val sed = SedDataStub.mapTilSed<A004Mapper>(testData = "mock/sedDataDtoStub.json") {
             utpekingAvvis = UtpekingAvvisDto(
                 nyttLovvalgsland = "DK",
                 begrunnelseUtenlandskMyndighet = "begrunnelse",
@@ -72,7 +54,7 @@ class A004MapperTest {
     @Test
     fun `map til SED uten UtpekingAvvis forvent Exception`() {
         val exception = shouldThrow<MappingException> {
-            SedDataStub.mapTilSed<A004Mapper>(erCDM4_3 = false, testData = "mock/sedDataDtoStub.json")
+            SedDataStub.mapTilSed<A004Mapper>(testData = "mock/sedDataDtoStub.json")
         }
         exception.message.shouldNotBeNull().shouldContain("Trenger UtpekingAvvis for å opprette A004")
     }

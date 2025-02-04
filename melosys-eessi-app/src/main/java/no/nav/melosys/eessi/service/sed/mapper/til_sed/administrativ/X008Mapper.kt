@@ -10,8 +10,8 @@ import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 class X008Mapper : SedMapper {
     override fun getSedType(): SedType = SedType.X008
 
-    override fun mapTilSed(sedData: SedDataDto, erCDM4_3: Boolean): SED =
-        super.mapTilSed(sedData, erCDM4_3).also { sed ->
+    override fun mapTilSed(sedData: SedDataDto): SED =
+        super.mapTilSed(sedData).also { sed ->
             sed.nav?.let { nav ->
                 nav.sak = mapSak(sedData, sed)
             } ?: throw MappingException("nav.sak er påkrevd for X008")

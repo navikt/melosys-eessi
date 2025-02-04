@@ -8,7 +8,6 @@ import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.Konstanter
 import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
-import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_VER
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
@@ -30,24 +29,24 @@ interface SedMapper {
 
     fun getSedType(): SedType
 
-    fun mapTilSed(sedData: SedDataDto, erCDM4_3: Boolean): SED {
+    fun mapTilSed(sedData: SedDataDto): SED {
         return SED(
-            nav = prefillNav(sedData, erCDM4_3),
+            nav = prefillNav(sedData),
             sedType = getSedType().name,
             sedGVer = DEFAULT_SED_G_VER,
-            sedVer = if (erCDM4_3) SED_VER_CDM_4_3 else DEFAULT_SED_VER
+            sedVer = SED_VER_CDM_4_3
         )
     }
 
-    fun prefillNav(sedData: SedDataDto, erCDM4_3: Boolean): Nav {
+    fun prefillNav(sedData: SedDataDto): Nav {
         val erSedMatch = getSedType() in setOf(
             SedType.A001, SedType.A002, SedType.A003,
             SedType.A008, SedType.A009, SedType.A010
         )
         return Nav(
-            arbeidssted = if (!erCDM4_3 && erSedMatch) hentArbeidssted(sedData) else null,
-            arbeidsland = if (erCDM4_3 && erSedMatch) hentArbeidsland(sedData).takeIf { it.isNotEmpty() } else null,
-            harfastarbeidssted = if (erCDM4_3 && sedData.harFastArbeidssted == true) "ja" else "nei",
+            arbeidssted = null,
+            arbeidsland = if (erSedMatch) hentArbeidsland(sedData).takeIf { it.isNotEmpty() } else null,
+            harfastarbeidssted = if (sedData.harFastArbeidssted == true) "ja" else "nei",
             bruker = hentBruker(sedData),
             arbeidsgiver = hentArbeidsgivereILand(
                 sedData.arbeidsgivendeVirksomheter,

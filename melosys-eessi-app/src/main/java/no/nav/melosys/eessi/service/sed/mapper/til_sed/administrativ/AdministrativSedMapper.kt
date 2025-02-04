@@ -6,7 +6,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 
 interface AdministrativSedMapper : SedMapper {
-    override fun mapTilSed(sedData: SedDataDto, erCDM4_3: Boolean): SED {
+    override fun mapTilSed(sedData: SedDataDto): SED {
         throw MappingException("Kan ikke mappe Administrativ SED fra SedDataDto")
     }
 }
