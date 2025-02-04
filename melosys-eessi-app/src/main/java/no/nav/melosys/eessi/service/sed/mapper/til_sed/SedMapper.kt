@@ -46,7 +46,7 @@ interface SedMapper {
         return Nav(
             arbeidssted = null,
             arbeidsland = if (erSedMatch) hentArbeidsland(sedData).takeIf { it.isNotEmpty() } else null,
-            harfastarbeidssted = if (sedData.harFastArbeidssted == true) "ja" else "nei",
+            harfastarbeidssted = if (!erSedMatch) null else if (sedData.harFastArbeidssted == true) "ja" else "nei",
             bruker = hentBruker(sedData),
             arbeidsgiver = hentArbeidsgivereILand(
                 sedData.arbeidsgivendeVirksomheter,
@@ -71,7 +71,11 @@ interface SedMapper {
             }.apply {
                 if (isEmpty()) {
                     throw MappingException(
-                        "Statsborgerskap mangler eller er ugyldig. Statsborgerskap fra sedData: ${sedDataDto.bruker.statsborgerskap.joinToString(", ")}"
+                        "Statsborgerskap mangler eller er ugyldig. Statsborgerskap fra sedData: ${
+                            sedDataDto.bruker.statsborgerskap.joinToString(
+                                ", "
+                            )
+                        }"
                     )
                 }
             }
@@ -214,7 +218,10 @@ interface SedMapper {
             )
         }
 
-    private fun hentArbeidsgiver(virksomheter: List<Virksomhet>, virksomhetPredicate: (Virksomhet) -> Boolean): List<Arbeidsgiver> =
+    private fun hentArbeidsgiver(
+        virksomheter: List<Virksomhet>,
+        virksomhetPredicate: (Virksomhet) -> Boolean
+    ): List<Arbeidsgiver> =
         virksomheter
             .filter(virksomhetPredicate)
             .map { hentArbeidsgiver(it) }
@@ -266,7 +273,8 @@ interface SedMapper {
 
     private fun formaterDato(dato: LocalDate): String = Konstanter.dateTimeFormatter.format(dato)
 
-    fun LocalDate?.formater(): String = this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
+    fun LocalDate?.formater(): String =
+        this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
 
     fun LocalDate?.formaterEllerNull(): String? = this?.let { formaterDato(it) }
 }
