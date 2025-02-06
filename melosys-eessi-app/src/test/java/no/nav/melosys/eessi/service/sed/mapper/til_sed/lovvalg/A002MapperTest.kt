@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
@@ -29,7 +30,8 @@ class A002MapperTest {
         sed.shouldNotBeNull().run {
             medlemskap.shouldBeInstanceOf<MedlemskapA002>()
             nav.shouldNotBeNull().run {
-                arbeidsland.shouldNotBeNull().size shouldBe 1
+                arbeidsland.shouldBeNull()
+                harfastarbeidssted.shouldBeNull()
             }
             sedVer shouldBe "3"
             sedGVer shouldBe "4"
