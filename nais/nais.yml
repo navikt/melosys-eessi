@@ -51,9 +51,6 @@ spec:
   webproxy: true
   vault:
     enabled: true
-    paths:
-      - mountPath: /var/run/secrets/nais.io/serviceuser
-        kvPath: /serviceuser/data/{{VAULT_CLUSTER}}/srvmelosys-eessi
   prometheus:
     enabled: true
     path: /internal/prometheus
@@ -63,6 +60,7 @@ spec:
     - name: APP_NAME
       value: {{APP_NAME}}
   envFrom:
+    - secret: {{APP_NAME}}
     - secret: {{APP_NAME}}-unleash-api-token
   ingresses:
     - {{INGRESS}}
