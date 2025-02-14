@@ -98,6 +98,9 @@ management:
       exposure:
         include: health,prometheus,logging
       base-path: /internal
+  health:
+    diskspace:
+      enabled: false
 
 #Token-validering
 no.nav.security.jwt.issuer:
