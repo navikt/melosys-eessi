@@ -13,7 +13,7 @@ permissions:
     contents: write
     packages: write
 env:
-  image: ghcr.io/${{ github.repository }}/melosys-eessi:${{ github.sha }}
+  image: ghcr.io/${{ github.repository }}/melosys-eessi
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   build:
@@ -74,7 +74,7 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-fss
           RESOURCE: nais/nais.yml
-          VAR: image=${{ env.image }}
+          VAR: image=${{env.image}}:${{ github.sha }}
           VARS: nais/vars-q2.json
 
 #      - name: post-deploy
