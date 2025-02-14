@@ -8,6 +8,7 @@ on:
       - "CODEOWNERS"
     branches:
       - master
+      - MELOSYS-6952-7135_distroless
 permissions:
     contents: write
     packages: write
@@ -75,20 +76,19 @@ jobs:
           RESOURCE: nais/nais.yml
           VAR: image=${{ env.image }}
           VARS: nais/vars-q2.json
-      - name: post-deploy
-        uses: navikt/digihot-deploy/actions/post-deploy@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: draft release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION_TAG }}
-          name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
-          body: ${{ env.CHANGE_LOG }}
-          draft: true
-          prerelease: false
+
+#      - name: post-deploy
+#        uses: navikt/digihot-deploy/actions/post-deploy@v2
+#
+#      - name: draft release
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          tag_name: ${{ env.VERSION_TAG }}
+#          name: ${{ env.APPLICATION }} ${{ env.VERSION_TAG }}
+#          body: ${{ env.CHANGE_LOG }}
+#          draft: true
+#          prerelease: false
+
       - run: |
           echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification (deploy success)
