@@ -13,6 +13,7 @@ permissions:
     packages: write
 env:
   image: ghcr.io/${{ github.repository }}/melosys-eessi:${{ github.sha }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   build:
     name: Build, deploy to q2, and make draft release
@@ -44,17 +45,28 @@ jobs:
             ${{ runner.os }}-maven-
       - name: Build and Run tests
         run: mvn clean package -B -e -U
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u THIS_IS_NOT_USED --password-stdin
+
+      - name: Build and push multi-arch Docker image
+        run: |
+            versioned_image="${image}:${{ github.sha }}"
+            latest_image="${image}:latest"
+
+            # Build and push multi-architecture image
+            docker buildx build --platform linux/amd64,linux/arm64 \
+              --push \
+              --tag "$versioned_image" \
+              --tag "$latest_image" \
+              .
+
       - name: pre-deploy
         uses: navikt/digihot-deploy/actions/pre-deploy@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and publish Docker image
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          docker build --tag ${image} .
-          docker login docker.pkg.github.com -u ${GITHUB_REPOSITORY} -p ${GITHUB_TOKEN}
-          docker push ${image}
+
       - name: Deploy til dev (Q2)
         uses: nais/deploy/actions/deploy@v1
         env:
