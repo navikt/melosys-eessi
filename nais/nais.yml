@@ -59,6 +59,8 @@ spec:
       value: nais
     - name: APP_NAME
       value: {{APP_NAME}}
+    - name: JDK_JAVA_OPTIONS
+      value: "$(JAVA_PROXY_OPTIONS)"
   envFrom:
     - secret: {{APP_NAME}}
     - secret: {{APP_NAME}}-unleash-api-token
