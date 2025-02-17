@@ -60,8 +60,7 @@ spec:
     - name: APP_NAME
       value: {{APP_NAME}}
     - name: JDK_JAVA_OPTIONS
-      value: "$(JAVA_PROXY_OPTIONS)"
-  envFrom:
+      value: "$(JAVA_PROXY_OPTIONS) ${JDK_JAVA_OPTIONS:-}"
     - secret: {{APP_NAME}}
     - secret: {{APP_NAME}}-unleash-api-token
   ingresses:
