@@ -16,25 +16,16 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   build:
-    name: Build, deploy to q2, and make draft release
+    name: Build
     runs-on: ubuntu-latest
-    environment: dev-fss-q2:teammelosys
+    outputs:
+      image: ${{ steps.docker-push.outputs.image }}
+      telemetry: ${{ steps.docker-push.outputs.telemetry }}
     steps:
-      - name: Checkout latest code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: deploy new Unleash Apikey to ${{github.event.inputs.environment}}
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-fss
-          RESOURCE: nais/unleash-apitoken.yml
-          VARS: nais/vars-q2.json
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
       - name: Setup Maven
         uses: actions/cache@v4
         with:
@@ -42,9 +33,13 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Build and Run tests
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Build and test
         run: mvn clean package -B -e -U
-
       - name: Build and publish Docker images (multi-arch)
         id: docker-push
         uses: nais/docker-build-push@v0
@@ -56,25 +51,55 @@ jobs:
           platforms: linux/amd64,linux/arm64
           salsa: true
 
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout latest code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: pre-deploy
         uses: navikt/digihot-deploy/actions/pre-deploy@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: deploy new Unleash Apikey to ${{github.event.inputs.environment}}
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-fss
+          RESOURCE: nais/unleash-apitoken.yml
+          VARS: nais/vars-q2.json
       - name: Deploy til dev (Q2)
         uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-fss
           RESOURCE: nais/nais.yml
-          IMAGE: ${{ steps.docker-push.outputs.image }}
+          IMAGE: ${{ needs.build.outputs.image }}
           VARS: nais/vars-q2.json
-          TELEMETRY: ${{ steps.docker-push.outputs.telemetry }}
-
+          TELEMETRY: ${{ needs.build.outputs.telemetry }}
+      - name: Deploy til dev (Q1)
+        uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: dev-fss
+          RESOURCE: nais/nais.yml
+          IMAGE: ${{ needs.build.outputs.image }}
+          VARS: nais/vars-q1.json
+          TELEMETRY: ${{ needs.build.outputs.telemetry }}
+      - name: Get commit message
+        run: echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: "${{ job.status == 'success' && 'good' || 'danger' }}"
+          SLACK_USERNAME: Github Actions
+          SLACK_ICON: https://github.com/github.png?size=48
+          SLACK_TITLE: "melosys-eessi ${{ job.status == 'success' && 'ble deployet' || 'kunne ikke deployes' }} til q1 og q2"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
       - name: post-deploy
         uses: navikt/digihot-deploy/actions/post-deploy@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: draft release
         uses: softprops/action-gh-release@v2
         env:
@@ -85,26 +110,3 @@ jobs:
           body: ${{ env.CHANGE_LOG }}
           draft: true
           prerelease: false
-
-      - run: |
-          echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
-      - name: Slack Notification (deploy success)
-        if: success()
-        uses: rtCamp/action-slack-notify@v2.2.1
-        env:
-          SLACK_COLOR: good
-          SLACK_USERNAME: Github Actions
-          SLACK_ICON: https://github.com/github.png?size=48
-          SLACK_TITLE: ':clap: melosys-eessi ble deployet til dev :rocket:'
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
-      - name: Slack Notification (deploy failure)
-        if: failure()
-        uses: rtCamp/action-slack-notify@v2.2.1
-        env:
-          SLACK_COLOR: danger
-          SLACK_USERNAME: Github Actions
-          SLACK_ICON: https://github.com/github.png?size=48
-          SLACK_TITLE: ':crying_cat_face: melosys-eessi kunne ikke deployes til dev!'
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
