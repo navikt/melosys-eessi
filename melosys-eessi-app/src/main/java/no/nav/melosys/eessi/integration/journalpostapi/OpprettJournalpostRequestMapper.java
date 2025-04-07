@@ -96,26 +96,20 @@ public final class OpprettJournalpostRequestMapper {
     }
 
     private static byte[] getPdfByteArray(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
-        if (filtype != PDF) log.info("Konverter fra {} til PDF", filtype);
-        switch (filtype) {
-            case PDF: {
-                return binaerFil.getInnhold();
-            }
-            case DOCX: {
-                return konverterWordTilPdf(binaerFil).toByteArray();
-            }
-            case TIFF:
-            case JPEG: {
-                return konverterBildeTilPdf(binaerFil, filtype).toByteArray();
-            }
-            default:
-                return binaerFil.getInnhold();
+        if (filtype == PDF) {
+            return binaerFil.getInnhold() != null ? binaerFil.getInnhold() : new byte[0];
         }
+        log.info("Konverter fra {} til PDF", filtype);
+        return switch (filtype) {
+            case DOCX -> konverterWordTilPdf(binaerFil).toByteArray();
+            case JPEG, TIFF -> konverterBildeTilPdf(binaerFil, filtype).toByteArray();
+            default -> binaerFil.getInnhold() != null ? binaerFil.getInnhold() : new byte[0];
+        };
     }
 
     private static ByteArrayOutputStream konverterWordTilPdf(SedMedVedlegg.BinaerFil binaerFil) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InputStream is = new ByteArrayInputStream(binaerFil.getInnhold());
+        InputStream is = binaerFil.getInnhold() != null ? new ByteArrayInputStream(binaerFil.getInnhold()) : InputStream.nullInputStream();
         ZipSecureFile.setMinInflateRatio(MIN_INFLATE_RATIO);
         XWPFDocument document = new XWPFDocument(is);
         PdfOptions options = PdfOptions.create();
@@ -126,7 +120,7 @@ public final class OpprettJournalpostRequestMapper {
     private static ByteArrayOutputStream konverterBildeTilPdf(SedMedVedlegg.BinaerFil binaerFil, JournalpostFiltype filtype) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         PDDocument doc = new PDDocument();
-        InputStream in = new ByteArrayInputStream(binaerFil.getInnhold());
+        InputStream in = binaerFil.getInnhold() != null ? new ByteArrayInputStream(binaerFil.getInnhold()) : InputStream.nullInputStream();
         BufferedImage bImageFromConvert = ImageIO.read(in);
         PDImageXObject pdImage;
         if (filtype == JournalpostFiltype.JPEG) {
