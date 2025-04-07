@@ -76,6 +76,10 @@ public final class OpprettJournalpostRequestMapper {
     private static List<Dokument> vedlegg(final SedHendelse sedHendelse, final List<SedMedVedlegg.BinaerFil> vedleggListe, SedMetrikker sedMetrikker) {
         List<Dokument> vedlegg = new ArrayList<>();
         for (SedMedVedlegg.BinaerFil binaerFil : vedleggListe) {
+            if (binaerFil.getInnhold() == null || binaerFil.getInnhold().length == 0) {
+                log.warn("Vedlegg %s har ingen innhold og blir ikke journalført for RINA saksnummer %s".formatted(binaerFil.getFilnavn(), sedHendelse.getRinaSakId()));
+                continue;
+            }
             try {
                 JournalpostFiltype opprinneligFiltype = JournalpostFiltype.fraMimeOgFilnavn(binaerFil.getMimeType(), binaerFil.getFilnavn()).orElseThrow(MappingException::new);
                 vedlegg.add(dokument(sedHendelse.getSedType(), isEmpty(binaerFil.getFilnavn()) ? "Vedlegg" : binaerFil.getFilnavn(), PDF, getPdfByteArray(binaerFil, opprinneligFiltype)));
