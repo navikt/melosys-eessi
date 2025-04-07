@@ -13,8 +13,9 @@ data class SedMedVedlegg(
         val mimeType: String?,
         val innhold: ByteArray?
     ) {
-        // Trenger normalt ikke å implementere equals og hashCode med data class men pga ByteArray så må vi det
-        // Property with 'Array' type in a 'data' class: it is recommended to override 'equals()' and 'hashCode()
+        // Pga. ByteArray anbefales det å overstyre equals og hashCode, i tilfelle disse skal brukes.
+        // "Property with 'Array' type in a 'data' class: it is recommended to override 'equals()' and 'hashCode()"
+        // (https://www.jetbrains.com/help/inspectopedia/ArrayInDataClass.html)
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
