@@ -17,9 +17,32 @@ class OpprettJournalpostRequestMapperTest {
     private final String ident = "123123123123";
 
     @Test
-    void opprettInngaaendeJournalpost_medPdfVedlegg_validerFelterSatt() {
-        final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.pdf", null, new byte[0]);
+    void opprettInngaaendeJournalpost_medTomtVedlegg_vedleggIkkeJournalfoert() {
+        final var tomtVedlegg = new SedMedVedlegg.BinaerFil("tomtVedlegg.pdf", "application/pdf", new byte[0]);
         final var sedHendelse = sedHendelse();
+
+
+        OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
+            sedHendelse,
+            sedMedVedlegg(List.of(tomtVedlegg)),
+            null,
+            "dokumenttittel",
+            "behandlingstema",
+            ident,
+            sedMetrikker
+        );
+
+
+        assertThat(request.getDokumenter()).hasSize(1)
+            .flatExtracting(OpprettJournalpostRequest.Dokument::getTittel)
+            .containsExactly("dokumenttittel");
+    }
+
+    @Test
+    void opprettInngaaendeJournalpost_medPdfVedlegg_validerFelterSatt() {
+        final var vedlegg = new SedMedVedlegg.BinaerFil("vedlegg123.pdf", null, new byte[1]);
+        final var sedHendelse = sedHendelse();
+
 
         OpprettJournalpostRequest request = OpprettJournalpostRequestMapper.opprettInngaaendeJournalpost(
             sedHendelse,
@@ -30,6 +53,7 @@ class OpprettJournalpostRequestMapperTest {
             ident,
             sedMetrikker
         );
+
 
         assertThat(request.getDokumenter()).hasSize(2)
             .flatExtracting(OpprettJournalpostRequest.Dokument::getTittel)
