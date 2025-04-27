@@ -43,6 +43,9 @@ spec:
     inbound:
       rules:
         - application: {{APP_NAME_MELOSYS_API}}
+        - application: {{APP_NAME_MELOSYS_CONSOLE}}
+          namespace: teammelosys
+          cluster: {{NAIS_CLUSTER_NAME_GCP}}
     outbound:
       external:
         - host: "melosys-unleash-api.nav.cloud.nais.io"
@@ -66,6 +69,7 @@ spec:
     - secret: {{APP_NAME}}-unleash-api-token
   ingresses:
     - {{INGRESS}}
+    - {{GCP_REACHABLE_INGRESS}}
   kafka:
     pool: {{ KAFKA_POOL }}
 
