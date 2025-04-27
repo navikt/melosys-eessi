@@ -102,6 +102,16 @@ management:
     diskspace:
       enabled: false
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+  group-configs:
+    - group: admin
+      paths-to-match: /admin/**,/api/admin/**
+      display-name: melosys-eessi Admin API
+
 #Token-validering
 no.nav.security.jwt.issuer:
   reststs:
