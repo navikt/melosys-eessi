@@ -1,10 +1,10 @@
 package no.nav.melosys.eessi.integration.pdl.dto
 
 data class PDLPerson(
-    var navn: List<PDLNavn>? = null,
-    var foedselsdato: List<PDLFoedsel>? = null,
-    var statsborgerskap: List<PDLStatsborgerskap>? = null,
-    var folkeregisterpersonstatus: List<PDLFolkeregisterPersonstatus>? = null,
-    var utenlandskIdentifikasjonsnummer: List<PDLUtenlandskIdentifikator>? = null,
-    var kjoenn: List<PDLKjoenn>? = null
+    var navn: List<PDLNavn> = emptyList(),
+    var foedselsdato: List<PDLFoedsel> = emptyList(),
+    var statsborgerskap: List<PDLStatsborgerskap> = emptyList(),
+    var folkeregisterpersonstatus: List<PDLFolkeregisterPersonstatus> = emptyList(),
+    var utenlandskIdentifikasjonsnummer: List<PDLUtenlandskIdentifikator> = emptyList(),
+    var kjoenn: List<PDLKjoenn> = emptyList()
 )
