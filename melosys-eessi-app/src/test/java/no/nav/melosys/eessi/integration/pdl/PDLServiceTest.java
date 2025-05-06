@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import no.nav.melosys.eessi.integration.pdl.dto.*;
@@ -40,7 +41,7 @@ class PDLServiceTest {
     private PDLService pdlService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         pdlService = new PDLService(pdlConsumer, pdlWebConsumer);
     }
 
@@ -125,12 +126,12 @@ class PDLServiceTest {
             new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0)))
         );
 
-        pdlPerson.setNavn(Set.of(gammeltPdlNavn, nyttPdlNavn));
-        pdlPerson.setFoedsel(Set.of(pdlFødsel));
-        pdlPerson.setStatsborgerskap(Set.of(norskStatsborgerskap, svenskStatsborgerskap, polskStatsborgerskap));
-        pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
-        pdlPerson.setUtenlandskIdentifikasjonsnummer(Set.of(pdlUtenlandskIdentifikator));
-        pdlPerson.setKjoenn(Set.of(pdlKjønn));
+        pdlPerson.setNavn(List.of(gammeltPdlNavn, nyttPdlNavn));
+        pdlPerson.setFoedselsdato(List.of(pdlFødsel));
+        pdlPerson.setStatsborgerskap(List.of(norskStatsborgerskap, svenskStatsborgerskap, polskStatsborgerskap));
+        pdlPerson.setFolkeregisterpersonstatus(List.of(pdlPersonstatus));
+        pdlPerson.setUtenlandskIdentifikasjonsnummer(List.of(pdlUtenlandskIdentifikator));
+        pdlPerson.setKjoenn(List.of(pdlKjønn));
         return pdlPerson;
     }
 
