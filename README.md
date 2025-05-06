@@ -34,7 +34,7 @@ mock/src/main/resources/eux:
 - [sedHendelse_A009_over2aar1dag.json](../melosys-docker-compose/mock/src/main/resources/eux/sedHendelse_A009_over2aar1dag.json)
 
 
-## Spørsmål knyttet til koden eller prosjektet kan rettes mot:
+## Spørsmål knyttet til koden eller prosjektet kan rettes mot
 
 * [Team Melosys](https://github.com/orgs/navikt/teams/melosys)
 
