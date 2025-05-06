@@ -203,12 +203,12 @@ public class MockData {
         pdlUtenlandskId.setIdentifikasjonsnummer("Ikke-brukt-enda-123");
         pdlUtenlandskId.setUtstederland("SE");
 
-        pdlPerson.setNavn(Set.of(pdlNavn));
-        pdlPerson.setFoedsel(Set.of(pdlFødsel));
-        pdlPerson.setStatsborgerskap(Set.of(pdlStatsborgerskap));
-        pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
-        pdlPerson.setKjoenn(Set.of(pdlKjønn));
-        pdlPerson.setUtenlandskIdentifikasjonsnummer(Set.of(pdlUtenlandskId));
+        pdlPerson.setNavn(List.of(pdlNavn));
+        pdlPerson.setFoedselsdato(List.of(pdlFødsel));
+        pdlPerson.setStatsborgerskap(List.of(pdlStatsborgerskap));
+        pdlPerson.setFolkeregisterpersonstatus(List.of(pdlPersonstatus));
+        pdlPerson.setKjoenn(List.of(pdlKjønn));
+        pdlPerson.setUtenlandskIdentifikasjonsnummer(List.of(pdlUtenlandskId));
         return pdlPerson;
     }
 
