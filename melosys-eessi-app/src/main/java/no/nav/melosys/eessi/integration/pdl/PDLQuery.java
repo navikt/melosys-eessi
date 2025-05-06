@@ -19,19 +19,21 @@ final class PDLQuery {
                      }
                  }
              }
-             foedsel {
-                 foedselsdato
-                 metadata {
-                     master
-                     endringer {
-                         registrert
-                         type
-                     }
-                 }
-             }
-             statsborgerskap {
-                 land
-             }
+            foedselsdato {
+                foedselsdato
+                foedselsaar
+                metadata {
+                    master
+                    endringer {
+                        registrert
+                        type
+                        kilde
+                    }
+                }
+            }
+            statsborgerskap {
+                land
+            }
              folkeregisterpersonstatus {
                  status
                  metadata {

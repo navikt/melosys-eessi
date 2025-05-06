@@ -1,74 +1,75 @@
 {
-  "data": {
-    "hentPerson": {
-      "navn": [
-        {
-          "fornavn": "RASK",
-          "etternavn": "MASKIN",
-          "metadata": {
-            "master": "FREG",
-            "endringer": [
-              {
-                "registrert": "2020-06-04T18:50:15",
-                "type": "OPPRETT"
-              }
+    "data": {
+        "hentPerson": {
+            "navn": [
+                {
+                    "fornavn": "RASK",
+                    "etternavn": "MASKIN",
+                    "metadata": {
+                        "master": "FREG",
+                        "endringer": [
+                            {
+                                "registrert": "2020-06-04T18:50:15",
+                                "type": "OPPRETT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "foedselsdato": [
+                {
+                    "foedselsdato": "1984-06-25",
+                    "foedselsaar": 1984,
+                    "metadata": {
+                        "master": "FREG",
+                        "endringer": [
+                            {
+                                "registrert": "2021-05-07T10:04:51",
+                                "type": "OPPRETT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "statsborgerskap": [
+                {
+                    "land": "NOR"
+                }
+            ],
+            "kjoenn": [
+                {
+                    "kjoenn": "KVINNE",
+                    "metadata": {
+                        "master": "FREG",
+                        "endringer": [
+                            {
+                                "registrert": "2021-08-10T16:09:13",
+                                "type": "OPPRETT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "folkeregisterpersonstatus": [
+                {
+                    "status": "bosatt",
+                    "metadata": {
+                        "master": "FREG",
+                        "endringer": [
+                            {
+                                "registrert": "2021-08-10T16:09:13",
+                                "type": "OPPRETT"
+                            }
+                        ]
+                    }
+                }
+            ],
+            "utenlandskIdentifikasjonsnummer": [
+                {
+                    "identifikasjonsnummer": "212121-9944332",
+                    "utstederland": "SWE"
+                }
             ]
-          }
         }
-      ],
-      "foedsel": [
-        {
-          "foedselsdato": "1984-06-25",
-          "metadata": {
-            "master": "FREG",
-            "endringer": [
-              {
-                "registrert": "2021-08-10T16:09:12",
-                "type": "OPPRETT"
-              }
-            ]
-          }
-        }
-      ],
-      "statsborgerskap": [
-        {
-          "land": "NOR"
-        }
-      ],
-      "kjoenn": [
-        {
-          "kjoenn": "KVINNE",
-          "metadata": {
-            "master": "FREG",
-            "endringer": [
-              {
-                "registrert": "2021-08-10T16:09:13",
-                "type": "OPPRETT"
-              }
-            ]
-          }
-        }
-      ],
-      "folkeregisterpersonstatus": [
-        {
-          "status": "bosatt",
-          "metadata": {
-            "master": "FREG",
-            "endringer": [
-              {
-                "registrert": "2021-08-10T16:09:13",
-                "type": "OPPRETT"
-              }
-            ]
-          }
-        }
-      ],
-      "utenlandskIdentifikasjonsnummer": [
-        {
-          "identifikasjonsnummer": "212121-9944332",
-          "utstederland": "SWE"
-        }
-      ]
     }
-  }
 }

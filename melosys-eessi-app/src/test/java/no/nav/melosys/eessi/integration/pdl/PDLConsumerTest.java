@@ -33,7 +33,7 @@ class PDLConsumerTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         pdlConsumer = new PDLConsumer(WebClient.builder().baseUrl(String.format("http://localhost:%s", mockServer.getPort())).build());
     }
 
@@ -42,7 +42,7 @@ class PDLConsumerTest {
         mockServer.enqueue(new MockResponse().setBody(hentFil("mock/pdl_hent_person.json")).addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
         var res = pdlConsumer.hentPerson("123123123");
         assertThat(res.getNavn()).flatExtracting(PDLNavn::getFornavn, PDLNavn::getEtternavn).containsExactly("RASK", "MASKIN");
-        assertThat(res.getFoedsel()).flatExtracting(PDLFoedsel::getFoedselsdato).containsExactly(LocalDate.of(1984, 6, 25));
+        assertThat(res.getFoedselsdato()).flatExtracting(PDLFoedsel::getFoedselsdato).containsExactly(LocalDate.of(1984, 6, 25));
         assertThat(res.getStatsborgerskap()).flatExtracting(PDLStatsborgerskap::getLand).containsExactly("NOR");
         assertThat(res.getFolkeregisterpersonstatus()).flatExtracting(PDLFolkeregisterPersonstatus::getStatus).containsExactly("bosatt");
         assertThat(res.getUtenlandskIdentifikasjonsnummer()).flatExtracting(PDLUtenlandskIdentifikator::getIdentifikasjonsnummer, PDLUtenlandskIdentifikator::getUtstederland).containsExactly("212121-9944332", "SWE");

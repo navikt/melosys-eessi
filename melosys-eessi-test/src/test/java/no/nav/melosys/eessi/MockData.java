@@ -164,7 +164,6 @@ public class MockData {
         );
     }
     public PDLPerson pdlPerson(LocalDate fødselsdato, String statsborgerskapLandkode) {
-        var pdlPerson = new PDLPerson();
 
         var pdlNavn = new PDLNavn();
         pdlNavn.setFornavn("NyttFornavn");
@@ -203,13 +202,14 @@ public class MockData {
         pdlUtenlandskId.setIdentifikasjonsnummer("Ikke-brukt-enda-123");
         pdlUtenlandskId.setUtstederland("SE");
 
-        pdlPerson.setNavn(Set.of(pdlNavn));
-        pdlPerson.setFoedsel(Set.of(pdlFødsel));
-        pdlPerson.setStatsborgerskap(Set.of(pdlStatsborgerskap));
-        pdlPerson.setFolkeregisterpersonstatus(Set.of(pdlPersonstatus));
-        pdlPerson.setKjoenn(Set.of(pdlKjønn));
-        pdlPerson.setUtenlandskIdentifikasjonsnummer(Set.of(pdlUtenlandskId));
-        return pdlPerson;
+        return new PDLPerson(
+            List.of(pdlNavn) ,
+            List.of(pdlFødsel),
+            List.of(pdlStatsborgerskap),
+            List.of(pdlPersonstatus),
+            List.of(pdlUtenlandskId),
+            List.of(pdlKjønn)
+        );
     }
 
 

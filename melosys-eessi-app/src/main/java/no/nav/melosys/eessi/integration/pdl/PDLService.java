@@ -1,9 +1,6 @@
 package no.nav.melosys.eessi.integration.pdl;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import no.nav.melosys.eessi.integration.PersonFasade;
@@ -43,12 +40,12 @@ public class PDLService implements PersonFasade {
 
         var personModellBuilder = PersonModell.builder().ident(ident);
 
-        hentSisteOpplysning(pdlPerson.getNavn()).ifPresent(navn -> {
-            personModellBuilder.fornavn(navn.getFornavn());
-            personModellBuilder.etternavn(navn.getEtternavn());
-        });
-
-        hentSisteOpplysning(pdlPerson.getFoedsel())
+        hentSisteOpplysning(pdlPerson.getNavn())
+            .ifPresent(navn -> {
+                personModellBuilder.fornavn(navn.getFornavn());
+                personModellBuilder.etternavn(navn.getEtternavn());
+            });
+        hentSisteOpplysning(pdlPerson.getFoedselsdato())
             .ifPresent(fødsel -> personModellBuilder.fødselsdato(fødsel.getFoedselsdato()));
         hentSisteOpplysning(pdlPerson.getFolkeregisterpersonstatus())
             .ifPresent(status -> personModellBuilder.erOpphørt(status.statusErOpphørt()));
