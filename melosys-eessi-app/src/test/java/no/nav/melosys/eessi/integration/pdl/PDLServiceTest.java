@@ -73,7 +73,6 @@ class PDLServiceTest {
     }
 
     private PDLPerson lagPersonMedFlereEndringer() {
-        var pdlPerson = new PDLPerson();
 
         var gammeltPdlNavn = new PDLNavn();
         gammeltPdlNavn.setFornavn("GammeltFornavn");
@@ -126,13 +125,14 @@ class PDLServiceTest {
             new PDLEndring("OPPRETT", LocalDateTime.of(2009, 1, 1, 0, 0)))
         );
 
-        pdlPerson.setNavn(List.of(gammeltPdlNavn, nyttPdlNavn));
-        pdlPerson.setFoedselsdato(List.of(pdlFødsel));
-        pdlPerson.setStatsborgerskap(List.of(norskStatsborgerskap, svenskStatsborgerskap, polskStatsborgerskap));
-        pdlPerson.setFolkeregisterpersonstatus(List.of(pdlPersonstatus));
-        pdlPerson.setUtenlandskIdentifikasjonsnummer(List.of(pdlUtenlandskIdentifikator));
-        pdlPerson.setKjoenn(List.of(pdlKjønn));
-        return pdlPerson;
+        return new PDLPerson(
+            List.of(gammeltPdlNavn, nyttPdlNavn) ,
+            List.of(pdlFødsel),
+            List.of(norskStatsborgerskap, svenskStatsborgerskap, polskStatsborgerskap),
+            List.of(pdlPersonstatus),
+            List.of(pdlUtenlandskIdentifikator),
+            List.of(pdlKjønn)
+        );
     }
 
     @Test
