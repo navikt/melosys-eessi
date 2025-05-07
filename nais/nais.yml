@@ -52,6 +52,11 @@ spec:
       rules:
         - application: {{APP_NAME_EUX_RINA_API}}
   webproxy: true
+  observability:
+    logging:
+      destinations:
+        - id: elastic
+        - id: loki
   vault:
     enabled: true
   prometheus:
