@@ -173,11 +173,12 @@ interface SedMapper {
         val landkodeIso3 = adresse.land ?: throw MappingException("Adresse.land kan ikke være null")
 
         return no.nav.melosys.eessi.models.sed.nav.Adresse(
+            bygning = adresse.tilleggsnavn.tilEESSIMediumString(), // Tenker vi bør ta dette med?
             type = adressetype.adressetypeRina,
-            gate = adresse.gateadresse,
-            by = adresse.poststed,
-            postnummer = adresse.postnr,
-            region = adresse.region,
+            gate = adresse.gateadresse.tilEESSIMediumString(),
+            by = adresse.poststed.tilEESSIMediumString(),
+            postnummer = adresse.postnr.tilEESSIMediumString(),
+            region = adresse.region.tilEESSIMediumString(),
             land = mapTilLandkodeIso2(landkodeIso3)
         )
     }
@@ -208,16 +209,6 @@ interface SedMapper {
             )
         }
 
-    private fun hentArbeidssted(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> =
-        sedData.arbeidssteder.map { (navn, adresse, fysisk, hjemmebase) ->
-            no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
-                navn = navn,
-                adresse = hentAdresseFraDtoAdresse(adresse),
-                hjemmebase = landkodeIso2EllerNull(hjemmebase),
-                erikkefastadresse = if (fysisk) "nei" else "ja"
-            )
-        }
-
     private fun hentArbeidsgiver(
         virksomheter: List<Virksomhet>,
         virksomhetPredicate: (Virksomhet) -> Boolean
@@ -242,13 +233,13 @@ interface SedMapper {
         )
     })
 
-    private fun hentAdresseFraDtoAdresse(sAdresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
-        gate = sAdresse.gateadresse,
-        postnummer = sAdresse.postnr,
-        by = sAdresse.poststed,
-        land = mapTilLandkodeIso2(sAdresse.land),
-        bygning = sAdresse.tilleggsnavn,
-        region = sAdresse.region
+    private fun hentAdresseFraDtoAdresse(adresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
+        gate = adresse.gateadresse.tilEESSIMediumString(),
+        postnummer = adresse.postnr.tilEESSIMediumString(),
+        by = adresse.poststed,
+        land = mapTilLandkodeIso2(adresse.land).tilEESSIMediumString(),
+        bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
+        region = adresse.region.tilEESSIMediumString()
     ).also {
         if (it.by.isNullOrBlank() || it.land.isNullOrBlank()) {
             throw MappingException("Felter 'poststed' og 'land' er påkrevd for adresser")
@@ -277,4 +268,29 @@ interface SedMapper {
         this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
 
     fun LocalDate?.formaterEllerNull(): String? = this?.let { formaterDato(it) }
+
+    /**
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIMediumStringType krav.
+     * Returnerer null hvis strengen er null, blank eller blir tom etter trimming.
+     * Ellers returneres den trimmede strengen, forkortet til maksLengde om nødvendig.
+     */
+    fun String?.tilEESSIMediumString(maksLengde: Int = 155): String? {
+        if (this.isNullOrBlank()) {
+            return null
+        }
+
+        val trimmetVerdi = this.trim()
+
+        if (trimmetVerdi.isEmpty()) {
+            log.warn { "Strengen '${this}' er blank og blir ikke med i SED." }
+            return null
+        }
+
+        return if (trimmetVerdi.length > maksLengde) {
+            log.warn { "Strengen '${this}' er for lang og blir trimmet til $maksLengde tegn." }
+            trimmetVerdi.substring(0, maksLengde)
+        } else {
+            trimmetVerdi
+        }
+    }
 }

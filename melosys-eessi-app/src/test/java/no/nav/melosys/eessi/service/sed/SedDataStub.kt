@@ -26,7 +26,12 @@ object SedDataStub {
     inline fun <reified T : SedMapper> mapTilSed(
         testData: String,
         noinline block: SedDataDto.() -> Unit = {}
-    ): SED = T::class.java.getDeclaredConstructor().newInstance().mapTilSed(getStub(testData).apply {
-        block()
-    })
+    ): SED = T::class.java.getDeclaredConstructor().newInstance().mapTilSed(getStub(testData, block))
+
+    fun getStub(
+        fileName: String = "mock/sedDataDtoStub.json",
+        block: SedDataDto.() -> Unit
+    ): SedDataDto = getStub(fileName).apply {
+            block()
+        }
 }
