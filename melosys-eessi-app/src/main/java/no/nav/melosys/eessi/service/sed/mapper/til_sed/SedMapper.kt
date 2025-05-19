@@ -173,7 +173,7 @@ interface SedMapper {
         val landkodeIso3 = adresse.land ?: throw MappingException("Adresse.land kan ikke være null")
 
         return no.nav.melosys.eessi.models.sed.nav.Adresse(
-            bygning = adresse.tilleggsnavn.tilEESSIMediumString(), // Tenker vi bør ta dette med?
+            bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
             type = adressetype.adressetypeRina,
             gate = adresse.gateadresse.tilEESSIMediumString(),
             by = adresse.poststed.tilEESSIMediumString(),
@@ -236,7 +236,7 @@ interface SedMapper {
     private fun hentAdresseFraDtoAdresse(adresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
         gate = adresse.gateadresse.tilEESSIMediumString(),
         postnummer = adresse.postnr.tilEESSIMediumString(),
-        by = adresse.poststed,
+        by = adresse.poststed.tilEESSIMediumString(),
         land = mapTilLandkodeIso2(adresse.land).tilEESSIMediumString(),
         bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
         region = adresse.region.tilEESSIMediumString()
