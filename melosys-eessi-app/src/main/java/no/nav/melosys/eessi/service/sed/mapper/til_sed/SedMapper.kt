@@ -83,8 +83,8 @@ interface SedMapper {
     fun hentAdresser(sedDataDto: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Adresse> =
         listOfNotNull(
             sedDataDto.bostedsadresse?.let { mapBostedsadresse(it) },
-            sedDataDto.kontaktadresse?.let { mapAdresse(it) },
-            sedDataDto.oppholdsadresse?.let { mapAdresse(it) }
+            sedDataDto.kontaktadresse?.let { mapAdresseForPerson(it) },
+            sedDataDto.oppholdsadresse?.let { mapAdresseForPerson(it) }
         )
 
     fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> =
@@ -162,26 +162,31 @@ interface SedMapper {
     }
 
     private fun mapBostedsadresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
-        mapAdresse(adresse).apply {
+        mapAdresseForPerson(adresse).apply {
             if (adresse.adressetype == Adressetype.BOSTEDSADRESSE) {
                 type = Adressetype.BOSTEDSADRESSE.adressetypeRina
             }
         }
 
-    private fun mapAdresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
-        val adressetype = adresse.adressetype ?: throw MappingException("Adresse.adressetype kan ikke være null")
-        val landkodeIso3 = adresse.land ?: throw MappingException("Adresse.land kan ikke være null")
+    private fun mapAdresseForPerson(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
+        adresse.adressetype ?: throw MappingException("adressetype kan ikke være null ved mapping av adresse for person")
+        adresse.land ?: throw MappingException("land kan ikke være null ved mapping av adresse for person")
+        return mapAdresse(adresse)
+    }
 
-        return no.nav.melosys.eessi.models.sed.nav.Adresse(
+    private fun mapAdresseForBedrift(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
+        mapAdresse(adresse)
+
+    private fun mapAdresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
+        no.nav.melosys.eessi.models.sed.nav.Adresse(
             bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
-            type = adressetype.adressetypeRina,
+            type = adresse.adressetype?.adressetypeRina,
             gate = adresse.gateadresse.tilEESSIMediumString(),
-            by = adresse.poststed.tilEESSIMediumString(),
+            by = adresse.poststed.tilEESSIMediumString() ?: throw MappingException("Adresse.poststed kan ikke være null"),
             postnummer = adresse.postnr.tilEESSIMediumString(),
             region = adresse.region.tilEESSIMediumString(),
-            land = mapTilLandkodeIso2(landkodeIso3)
+            land = mapTilLandkodeIso2(adresse.land)
         )
-    }
 
     private fun setFamiliemedlemmer(sedData: SedDataDto, bruker: Bruker) {
         //Splitter per nå navnet etter første mellomrom
@@ -199,7 +204,7 @@ interface SedMapper {
         arbeidssteder.map {
             no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
                 navn = it.navn,
-                adresse = hentAdresseFraDtoAdresse(it.adresse),
+                adresse = mapAdresseForBedrift(it.adresse),
                 hjemmebase = landkodeIso2EllerNull(it.hjemmebase),
                 erikkefastadresse = when {
                     it.fysisk -> "nei"
@@ -220,7 +225,7 @@ interface SedMapper {
     private fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver {
         return Arbeidsgiver(
             navn = virksomhet.navn,
-            adresse = hentAdresseFraDtoAdresse(virksomhet.adresse),
+            adresse = mapAdresseForBedrift(virksomhet.adresse),
             identifikator = lagIdentifikator(virksomhet.orgnr)
         )
     }
@@ -228,23 +233,10 @@ interface SedMapper {
     private fun hentSelvstendig(sedData: SedDataDto) = Selvstendig(arbeidsgiver = sedData.selvstendigeVirksomheter.map {
         Arbeidsgiver(
             identifikator = lagIdentifikator(it.orgnr),
-            adresse = hentAdresseFraDtoAdresse(it.adresse),
+            adresse = mapAdresseForBedrift(it.adresse),
             navn = it.navn
         )
     })
-
-    private fun hentAdresseFraDtoAdresse(adresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
-        gate = adresse.gateadresse.tilEESSIMediumString(),
-        postnummer = adresse.postnr.tilEESSIMediumString(),
-        by = adresse.poststed.tilEESSIMediumString(),
-        land = mapTilLandkodeIso2(adresse.land).tilEESSIMediumString(),
-        bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
-        region = adresse.region.tilEESSIMediumString()
-    ).also {
-        if (it.by.isNullOrBlank() || it.land.isNullOrBlank()) {
-            throw MappingException("Felter 'poststed' og 'land' er påkrevd for adresser")
-        }
-    }
 
     private fun lagIdentifikator(orgnr: String?): List<Identifikator> {
         return if (orgnr.isNullOrBlank()) {
