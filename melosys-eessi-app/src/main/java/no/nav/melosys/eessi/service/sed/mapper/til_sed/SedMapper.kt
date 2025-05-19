@@ -82,7 +82,7 @@ interface SedMapper {
 
     fun hentAdresser(sedDataDto: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Adresse> =
         listOfNotNull(
-            sedDataDto.bostedsadresse?.let { mapBostedsadresse(it) },
+            sedDataDto.bostedsadresse?.let { mapAdresseForPerson(it) },
             sedDataDto.kontaktadresse?.let { mapAdresseForPerson(it) },
             sedDataDto.oppholdsadresse?.let { mapAdresseForPerson(it) }
         )
@@ -160,13 +160,6 @@ interface SedMapper {
 
         return listOf(brukerPin) + utenlandskPins
     }
-
-    private fun mapBostedsadresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
-        mapAdresseForPerson(adresse).apply {
-            if (adresse.adressetype == Adressetype.BOSTEDSADRESSE) {
-                type = Adressetype.BOSTEDSADRESSE.adressetypeRina
-            }
-        }
 
     private fun mapAdresseForPerson(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
         adresse.adressetype ?: throw MappingException("adressetype kan ikke være null ved mapping av adresse for person")
