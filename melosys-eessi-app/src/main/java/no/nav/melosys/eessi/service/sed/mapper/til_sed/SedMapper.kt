@@ -29,14 +29,12 @@ interface SedMapper {
 
     fun getSedType(): SedType
 
-    fun mapTilSed(sedData: SedDataDto): SED {
-        return SED(
-            nav = prefillNav(sedData),
-            sedType = getSedType().name,
-            sedGVer = DEFAULT_SED_G_VER,
-            sedVer = SED_VER_CDM_4_3
-        )
-    }
+    fun mapTilSed(sedData: SedDataDto) = SED(
+        nav = prefillNav(sedData),
+        sedType = getSedType().name,
+        sedGVer = DEFAULT_SED_G_VER,
+        sedVer = SED_VER_CDM_4_3
+    )
 
     fun prefillNav(sedData: SedDataDto): Nav {
         val erSedMatch = getSedType() in setOf(
@@ -127,18 +125,15 @@ interface SedMapper {
         setFamiliemedlemmer(sedDataDto, this)
     }
 
-    private fun hentPerson(sedData: SedDataDto): Person {
-        val bruker = sedData.bruker
-        return Person(
-            fornavn = bruker.fornavn,
-            etternavn = bruker.etternavn,
-            foedselsdato = formaterDato(bruker.foedseldato),
-            foedested = null, //det antas at ikke trengs når NAV fyller ut.
-            kjoenn = Kjønn.valueOf(bruker.kjoenn),
-            statsborgerskap = hentStatsborgerskap(sedData),
-            pin = hentPin(sedData)
-        )
-    }
+    private fun hentPerson(sedData: SedDataDto) = Person(
+        fornavn = sedData.bruker.fornavn,
+        etternavn = sedData.bruker.etternavn,
+        foedselsdato = formaterDato(sedData.bruker.foedseldato),
+        foedested = null, //det antas at ikke trengs når NAV fyller ut.
+        kjoenn = Kjønn.valueOf(sedData.bruker.kjoenn),
+        statsborgerskap = hentStatsborgerskap(sedData),
+        pin = hentPin(sedData)
+    )
 
     private fun lagStatsborgerskap(landkode: String): Statsborgerskap = Statsborgerskap(mapTilLandkodeIso2(landkode))
 
@@ -215,13 +210,11 @@ interface SedMapper {
             .filter(virksomhetPredicate)
             .map { hentArbeidsgiver(it) }
 
-    private fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver {
-        return Arbeidsgiver(
-            navn = virksomhet.navn,
-            adresse = mapAdresseForBedrift(virksomhet.adresse),
-            identifikator = lagIdentifikator(virksomhet.orgnr)
-        )
-    }
+    private fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver = Arbeidsgiver(
+        navn = virksomhet.navn,
+        adresse = mapAdresseForBedrift(virksomhet.adresse),
+        identifikator = lagIdentifikator(virksomhet.orgnr)
+    )
 
     private fun hentSelvstendig(sedData: SedDataDto) = Selvstendig(arbeidsgiver = sedData.selvstendigeVirksomheter.map {
         Arbeidsgiver(
@@ -231,26 +224,21 @@ interface SedMapper {
         )
     })
 
-    private fun lagIdentifikator(orgnr: String?): List<Identifikator> {
-        return if (orgnr.isNullOrBlank()) {
-            emptyList()
-        } else {
-            listOf(Identifikator(id = orgnr, type = "registrering"))
-        }
+    private fun lagIdentifikator(orgnr: String?): List<Identifikator> = if (orgnr.isNullOrBlank()) {
+        emptyList()
+    } else {
+        listOf(Identifikator(id = orgnr, type = "registrering"))
     }
 
-    private fun landkodeIso2EllerNull(iso3: String?): String? {
-        return when {
-            iso3 == null -> null
-            iso3.length == 2 -> iso3
-            else -> mapTilLandkodeIso2(iso3)
-        }
+    private fun landkodeIso2EllerNull(iso3: String?): String? = when {
+        iso3 == null -> null
+        iso3.length == 2 -> iso3
+        else -> mapTilLandkodeIso2(iso3)
     }
 
     private fun formaterDato(dato: LocalDate): String = Konstanter.dateTimeFormatter.format(dato)
 
-    fun LocalDate?.formater(): String =
-        this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
+    fun LocalDate?.formater(): String = this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
 
     fun LocalDate?.formaterEllerNull(): String? = this?.let { formaterDato(it) }
 
