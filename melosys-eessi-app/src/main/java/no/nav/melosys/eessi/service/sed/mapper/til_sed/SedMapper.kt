@@ -170,9 +170,9 @@ interface SedMapper {
             bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
             type = adresse.adressetype?.adressetypeRina,
             gate = adresse.gateadresse.tilEESSIMediumString(),
-            by = adresse.poststed.tilEESSIMediumString() ?: throw MappingException("Adresse.poststed kan ikke være null"),
-            postnummer = adresse.postnr.tilEESSIMediumString(),
-            region = adresse.region.tilEESSIMediumString(),
+            by = adresse.poststed.tilEESSIShortString() ?: throw MappingException("Adresse.poststed kan ikke være null"),
+            postnummer = adresse.postnr.tilEESSITinyString(),
+            region = adresse.region.tilEESSIShortString(),
             land = mapTilLandkodeIso2(adresse.land)
         )
 
@@ -243,11 +243,25 @@ interface SedMapper {
     fun LocalDate?.formaterEllerNull(): String? = this?.let { formaterDato(it) }
 
     /**
-     * Forbereder en streng for EESSI-overføring i henhold til EESSIMediumStringType krav.
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIShortStringType krav fra 4.3.0-20210819T130918.xsd.
+     */
+
+    fun String?.tilEESSITinyString(): String? = tilEESSIString(65)
+    /**
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIShortStringType krav fra 4.3.0-20210819T130918.xsd.
+     */
+    fun String?.tilEESSIShortString(): String? = tilEESSIString(65)
+
+    /**
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIMediumStringType krav fra 4.3.0-20210819T130918.xsd.
+     */
+    fun String?.tilEESSIMediumString(): String? = tilEESSIString(155)
+
+    /**
      * Returnerer null hvis strengen er null, blank eller blir tom etter trimming.
      * Ellers returneres den trimmede strengen, forkortet til maksLengde om nødvendig.
      */
-    fun String?.tilEESSIMediumString(maksLengde: Int = 155): String? {
+    fun String?.tilEESSIString(maksLengde: Int): String? {
         if (this.isNullOrBlank()) {
             return null
         }
