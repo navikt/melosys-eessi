@@ -29,14 +29,12 @@ interface SedMapper {
 
     fun getSedType(): SedType
 
-    fun mapTilSed(sedData: SedDataDto): SED {
-        return SED(
-            nav = prefillNav(sedData),
-            sedType = getSedType().name,
-            sedGVer = DEFAULT_SED_G_VER,
-            sedVer = SED_VER_CDM_4_3
-        )
-    }
+    fun mapTilSed(sedData: SedDataDto) = SED(
+        nav = prefillNav(sedData),
+        sedType = getSedType().name,
+        sedGVer = DEFAULT_SED_G_VER,
+        sedVer = SED_VER_CDM_4_3
+    )
 
     fun prefillNav(sedData: SedDataDto): Nav {
         val erSedMatch = getSedType() in setOf(
@@ -82,9 +80,9 @@ interface SedMapper {
 
     fun hentAdresser(sedDataDto: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Adresse> =
         listOfNotNull(
-            sedDataDto.bostedsadresse?.let { mapBostedsadresse(it) },
-            sedDataDto.kontaktadresse?.let { mapAdresse(it) },
-            sedDataDto.oppholdsadresse?.let { mapAdresse(it) }
+            sedDataDto.bostedsadresse?.let { mapAdresseForPerson(it) },
+            sedDataDto.kontaktadresse?.let { mapAdresseForPerson(it) },
+            sedDataDto.oppholdsadresse?.let { mapAdresseForPerson(it) }
         )
 
     fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> =
@@ -127,18 +125,15 @@ interface SedMapper {
         setFamiliemedlemmer(sedDataDto, this)
     }
 
-    private fun hentPerson(sedData: SedDataDto): Person {
-        val bruker = sedData.bruker
-        return Person(
-            fornavn = bruker.fornavn,
-            etternavn = bruker.etternavn,
-            foedselsdato = formaterDato(bruker.foedseldato),
-            foedested = null, //det antas at ikke trengs når NAV fyller ut.
-            kjoenn = Kjønn.valueOf(bruker.kjoenn),
-            statsborgerskap = hentStatsborgerskap(sedData),
-            pin = hentPin(sedData)
-        )
-    }
+    private fun hentPerson(sedData: SedDataDto) = Person(
+        fornavn = sedData.bruker.fornavn,
+        etternavn = sedData.bruker.etternavn,
+        foedselsdato = formaterDato(sedData.bruker.foedseldato),
+        foedested = null, //det antas at ikke trengs når NAV fyller ut.
+        kjoenn = Kjønn.valueOf(sedData.bruker.kjoenn),
+        statsborgerskap = hentStatsborgerskap(sedData),
+        pin = hentPin(sedData)
+    )
 
     private fun lagStatsborgerskap(landkode: String): Statsborgerskap = Statsborgerskap(mapTilLandkodeIso2(landkode))
 
@@ -161,26 +156,25 @@ interface SedMapper {
         return listOf(brukerPin) + utenlandskPins
     }
 
-    private fun mapBostedsadresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
-        mapAdresse(adresse).apply {
-            if (adresse.adressetype == Adressetype.BOSTEDSADRESSE) {
-                type = Adressetype.BOSTEDSADRESSE.adressetypeRina
-            }
-        }
-
-    private fun mapAdresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
-        val adressetype = adresse.adressetype ?: throw MappingException("Adresse.adressetype kan ikke være null")
-        val landkodeIso3 = adresse.land ?: throw MappingException("Adresse.land kan ikke være null")
-
-        return no.nav.melosys.eessi.models.sed.nav.Adresse(
-            type = adressetype.adressetypeRina,
-            gate = adresse.gateadresse,
-            by = adresse.poststed,
-            postnummer = adresse.postnr,
-            region = adresse.region,
-            land = mapTilLandkodeIso2(landkodeIso3)
-        )
+    private fun mapAdresseForPerson(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse {
+        adresse.adressetype ?: throw MappingException("adressetype kan ikke være null ved mapping av adresse for person")
+        adresse.land ?: throw MappingException("land kan ikke være null ved mapping av adresse for person")
+        return mapAdresse(adresse)
     }
+
+    private fun mapAdresseForBedrift(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
+        mapAdresse(adresse)
+
+    private fun mapAdresse(adresse: Adresse): no.nav.melosys.eessi.models.sed.nav.Adresse =
+        no.nav.melosys.eessi.models.sed.nav.Adresse(
+            bygning = adresse.tilleggsnavn.tilEESSIMediumString(),
+            type = adresse.adressetype?.adressetypeRina,
+            gate = adresse.gateadresse.tilEESSIMediumString(),
+            by = adresse.poststed.tilEESSIShortString() ?: throw MappingException("Adresse.poststed kan ikke være null"),
+            postnummer = adresse.postnr.tilEESSITinyString(),
+            region = adresse.region.tilEESSIShortString(),
+            land = mapTilLandkodeIso2(adresse.land)
+        )
 
     private fun setFamiliemedlemmer(sedData: SedDataDto, bruker: Bruker) {
         //Splitter per nå navnet etter første mellomrom
@@ -198,23 +192,13 @@ interface SedMapper {
         arbeidssteder.map {
             no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
                 navn = it.navn,
-                adresse = hentAdresseFraDtoAdresse(it.adresse),
+                adresse = mapAdresseForBedrift(it.adresse),
                 hjemmebase = landkodeIso2EllerNull(it.hjemmebase),
                 erikkefastadresse = when {
                     it.fysisk -> "nei"
                     StringUtils.hasText(it.hjemmebase) || !it.fysisk -> "ja"
                     else -> null
                 }
-            )
-        }
-
-    private fun hentArbeidssted(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidssted> =
-        sedData.arbeidssteder.map { (navn, adresse, fysisk, hjemmebase) ->
-            no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
-                navn = navn,
-                adresse = hentAdresseFraDtoAdresse(adresse),
-                hjemmebase = landkodeIso2EllerNull(hjemmebase),
-                erikkefastadresse = if (fysisk) "nei" else "ja"
             )
         }
 
@@ -226,55 +210,74 @@ interface SedMapper {
             .filter(virksomhetPredicate)
             .map { hentArbeidsgiver(it) }
 
-    private fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver {
-        return Arbeidsgiver(
-            navn = virksomhet.navn,
-            adresse = hentAdresseFraDtoAdresse(virksomhet.adresse),
-            identifikator = lagIdentifikator(virksomhet.orgnr)
-        )
-    }
+    private fun hentArbeidsgiver(virksomhet: Virksomhet): Arbeidsgiver = Arbeidsgiver(
+        navn = virksomhet.navn,
+        adresse = mapAdresseForBedrift(virksomhet.adresse),
+        identifikator = lagIdentifikator(virksomhet.orgnr)
+    )
 
     private fun hentSelvstendig(sedData: SedDataDto) = Selvstendig(arbeidsgiver = sedData.selvstendigeVirksomheter.map {
         Arbeidsgiver(
             identifikator = lagIdentifikator(it.orgnr),
-            adresse = hentAdresseFraDtoAdresse(it.adresse),
+            adresse = mapAdresseForBedrift(it.adresse),
             navn = it.navn
         )
     })
 
-    private fun hentAdresseFraDtoAdresse(sAdresse: Adresse) = no.nav.melosys.eessi.models.sed.nav.Adresse(
-        gate = sAdresse.gateadresse,
-        postnummer = sAdresse.postnr,
-        by = sAdresse.poststed,
-        land = mapTilLandkodeIso2(sAdresse.land),
-        bygning = sAdresse.tilleggsnavn,
-        region = sAdresse.region
-    ).also {
-        if (it.by.isNullOrBlank() || it.land.isNullOrBlank()) {
-            throw MappingException("Felter 'poststed' og 'land' er påkrevd for adresser")
-        }
+    private fun lagIdentifikator(orgnr: String?): List<Identifikator> = if (orgnr.isNullOrBlank()) {
+        emptyList()
+    } else {
+        listOf(Identifikator(id = orgnr, type = "registrering"))
     }
 
-    private fun lagIdentifikator(orgnr: String?): List<Identifikator> {
-        return if (orgnr.isNullOrBlank()) {
-            emptyList()
-        } else {
-            listOf(Identifikator(id = orgnr, type = "registrering"))
-        }
-    }
-
-    private fun landkodeIso2EllerNull(iso3: String?): String? {
-        return when {
-            iso3 == null -> null
-            iso3.length == 2 -> iso3
-            else -> mapTilLandkodeIso2(iso3)
-        }
+    private fun landkodeIso2EllerNull(iso3: String?): String? = when {
+        iso3 == null -> null
+        iso3.length == 2 -> iso3
+        else -> mapTilLandkodeIso2(iso3)
     }
 
     private fun formaterDato(dato: LocalDate): String = Konstanter.dateTimeFormatter.format(dato)
 
-    fun LocalDate?.formater(): String =
-        this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
+    fun LocalDate?.formater(): String = this?.let { formaterDato(it) } ?: throw MappingException("dato kan ikke være null")
 
     fun LocalDate?.formaterEllerNull(): String? = this?.let { formaterDato(it) }
+
+    /**
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIShortStringType krav fra 4.3.0-20210819T130918.xsd.
+     */
+
+    fun String?.tilEESSITinyString(): String? = tilEESSIString(65)
+    /**
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIShortStringType krav fra 4.3.0-20210819T130918.xsd.
+     */
+    fun String?.tilEESSIShortString(): String? = tilEESSIString(65)
+
+    /**
+     * Forbereder en streng for EESSI-overføring i henhold til EESSIMediumStringType krav fra 4.3.0-20210819T130918.xsd.
+     */
+    fun String?.tilEESSIMediumString(): String? = tilEESSIString(155)
+
+    /**
+     * Returnerer null hvis strengen er null, blank eller blir tom etter trimming.
+     * Ellers returneres den trimmede strengen, forkortet til maksLengde om nødvendig.
+     */
+    fun String?.tilEESSIString(maksLengde: Int): String? {
+        if (this.isNullOrBlank()) {
+            return null
+        }
+
+        val trimmetVerdi = this.trim()
+
+        if (trimmetVerdi.isEmpty()) {
+            log.warn { "Strengen '${this}' er blank og blir ikke med i SED." }
+            return null
+        }
+
+        return if (trimmetVerdi.length > maksLengde) {
+            log.warn { "Strengen '${this}' er for lang og blir trimmet til $maksLengde tegn." }
+            trimmetVerdi.substring(0, maksLengde)
+        } else {
+            trimmetVerdi
+        }
+    }
 }
