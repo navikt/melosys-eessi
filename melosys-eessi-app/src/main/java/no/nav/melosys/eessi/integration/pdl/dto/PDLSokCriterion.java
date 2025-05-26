@@ -17,7 +17,7 @@ public final class PDLSokCriterion {
     }
 
     public static Builder fødselsdato() {
-        return new Builder("person.foedsel.foedselsdato");
+        return new Builder("person.foedselsdato.foedselsdato");
     }
 
     public static Builder statsborgerskap() {
