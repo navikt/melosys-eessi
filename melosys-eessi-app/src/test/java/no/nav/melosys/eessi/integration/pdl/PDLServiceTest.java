@@ -188,7 +188,7 @@ class PDLServiceTest {
             .containsExactlyInAnyOrder(
                 "person.navn.fornavn",
                 "person.navn.etternavn",
-                "person.foedsel.foedselsdato"
+                "person.foedselsdato.foedselsdato"
             );
     }
 
