@@ -81,7 +81,7 @@ public class KafkaDLQService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void rekjørKafkaMeldingIsolert(UUID uuid) {
-        rekjørKafkaMelding(uuid); // Your existing logic
+        rekjørKafkaMelding(uuid);
     }
 
     @Transactional
