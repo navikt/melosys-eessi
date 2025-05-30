@@ -4,7 +4,6 @@ package no.nav.melosys.eessi.service.kafkadlq;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import jakarta.transaction.Transactional;
 
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
@@ -16,6 +15,8 @@ import no.nav.melosys.eessi.service.journalfoering.OpprettUtgaaendeJournalpostSe
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
@@ -71,13 +72,19 @@ public class KafkaDLQService {
     public void rekjørAlleKafkaMeldinger() {
         kafkaDLQRepository.findAll().stream().filter(a -> !a.getSkip()).forEach(kafkaMelding -> {
             try {
-                rekjørKafkaMelding(kafkaMelding.getId());
+                rekjørKafkaMeldingIsolert(kafkaMelding.getId());
             } catch (Exception e) {
                 log.error("Rekjøring av melding feilet, uuid=" + kafkaMelding.getId().toString(), e);
             }
         });
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void rekjørKafkaMeldingIsolert(UUID uuid) {
+        rekjørKafkaMelding(uuid); // Your existing logic
+    }
+
+    @Transactional
     public void rekjørKafkaMelding(UUID uuid) {
         KafkaDLQ kafkaDLQMelding = kafkaDLQRepository.findById(uuid).orElseThrow(() -> new NotFoundException("Kunne ikke finne KafkaDLQ-melding basert, uuid=" + uuid));
         if (kafkaDLQMelding instanceof SedMottattHendelseKafkaDLQ sedMottattHendelse) {
