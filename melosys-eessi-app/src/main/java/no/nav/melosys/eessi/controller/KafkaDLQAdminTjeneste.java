@@ -41,7 +41,7 @@ public class KafkaDLQAdminTjeneste {
     @PostMapping("/restart/alle")
     public ResponseEntity<Void> rekjørAlleKafkaMelding(@RequestHeader(API_KEY_HEADER) String apiKey) {
         validerApikey(apiKey);
-        kafkaDLQService.rekjørAlleKafkaMeldinger();
+        kafkaDLQService.hentFeiledeKafkaMeldinger().stream().forEach(kafkaDLQ -> kafkaDLQService.rekjørKafkaMelding(kafkaDLQ.getId()));
         return ResponseEntity.ok().build();
     }
 
