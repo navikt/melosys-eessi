@@ -65,14 +65,13 @@ melosys:
     username: ${SRV_USERNAME}
     password: ${SRV_PASSWORD}
   integrations:
-    euxapp-url: ${EUXAPP_URL}
     euxapp-rinasaker-url: ${EUXAPP_RINASAKER_URL}
     reststs-url: ${RESTSTS_URL}
     rina-host-url: ${RINA_HOST_URL}
     journalpostapi-url: ${JOURNALPOSTAPI_URL}
-
     saf-url: ${SAF_URL}
     pdl-url: ${PDL_URL}
+    eux-rina-api-url: ${EUX_RINA_API_URL}
     pdl-web-url: ${PDL_WEB_URL}
     gsak:
       sak-url: ${SAK_URL}

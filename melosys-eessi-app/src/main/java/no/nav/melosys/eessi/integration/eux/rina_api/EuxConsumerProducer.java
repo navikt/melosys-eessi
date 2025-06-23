@@ -24,8 +24,8 @@ public class EuxConsumerProducer {
 
     private final String uri;
 
-    public EuxConsumerProducer(@Value("${melosys.integrations.euxapp-url}") String uri) {
-        this.uri = uri;
+    public EuxConsumerProducer(@Value("${melosys.integrations.eux-rina-api-url}") String uri) {
+        this.uri = uri + "/cpi";
     }
 
     @Bean
