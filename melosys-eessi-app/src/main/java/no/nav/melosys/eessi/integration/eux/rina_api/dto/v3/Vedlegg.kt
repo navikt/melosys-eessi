@@ -4,4 +4,4 @@ data class Vedlegg(
     val id: String? = null,
     val navn: String? = null,
     val sensitivt: Boolean? = null
-) 
+)

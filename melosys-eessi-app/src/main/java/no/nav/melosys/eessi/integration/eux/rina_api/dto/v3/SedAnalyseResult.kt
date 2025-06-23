@@ -18,4 +18,4 @@ data class ManglendeSed(
     val status: SedStatus,
     val dokumentId: String? = null,
     val beskrivelse: String? = null
-) 
+)

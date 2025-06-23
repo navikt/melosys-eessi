@@ -6,4 +6,4 @@ data class Motpart(
     val motpartNavn: String? = null,
     val motpartLand: String? = null,
     val motpartLandkode: String? = null
-) 
+)

@@ -12,4 +12,4 @@ data class SedOversikt(
     val sedHandlinger: List<String>? = null,
     val vedlegg: List<Vedlegg>? = null,
     val leveranseStatus: String? = null
-) 
+)

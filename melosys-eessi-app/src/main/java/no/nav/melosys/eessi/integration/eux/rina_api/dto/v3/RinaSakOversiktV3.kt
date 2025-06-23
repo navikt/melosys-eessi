@@ -20,4 +20,4 @@ data class RinaSakOversiktV3(
     val sedListe: List<SedOversikt>? = null,
     val sensitiv: Boolean? = null,
     val cdmVersjon: String? = null
-) 
+)
