@@ -23,6 +23,26 @@ Dokumentasjon hvordan det gjøres finnes her: https://github.com/navikt/utviklin
 melosys-eessi kan kjøres opp som en ren Spring-applikasjon, appen heter "MelosysEessiApplication". <br>
 For å kjøre applikasjonen lokalt er det viktig at du setter profilen til `local-mock`.
 
+# Kjøre applikasjonen lokalt mot q2
+For å kjøre applikasjonen mot q2 må du sette profilen til `local-q2". <br>
+Du må også være på naisdevice, hvor du har autentisert Kubernetes med kube-login. Du kan gjøre det med følgende kommando:
+```
+kubectl config use-context dev-fss
+kubectl get pods -n teammelosys
+```
+Dersom du får liste over pods i teammelosys, er du autentisert.
+
+Du må også sette opp en `.env`-fil i rotmappen med følgende innhold:
+```
+DATABASE_USERNAME={KAN HENTES FRA VAULT}
+DATABASE_PASSWORD={KAN HENTES FRA VAULT}
+SRV_USERNAME=srvmelosys-eessi
+SRV_PASSWORD={KAN HENTES FRA NAIS-SECRETS}
+KUBELOGIN_PATH=/home/linuxbrew/.linuxbrew/bin #Eller hvor du har installert kube-login
+KUBECTL_PATH=/usr/local/bin #Eller hvor du har installert kubectl
+```
+
+
 ## Test av mottak av SED-er på topic fra EUX
 For å teste mottak av SED-er på topic fra EUX kan du benytte deg av `lag-sed-controller` som kan kjøres via
 http://localhost:8083/swagger-ui/#/lag-sed-controller/lagSakUsingPOST. <br>
