@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.integration.eux.rina_api.dto
 
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.Motpart
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.Organisasjon
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.SedOversikt
+
 data class RinaSakOversiktV3(
     val fnr: String? = null,
     val fornavn: String? = null,
