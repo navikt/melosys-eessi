@@ -41,10 +41,35 @@ class KafkaDLQAdminTjeneste(
     }
 
     @PostMapping("/restart/alle")
-    fun rekjørAlleKafkaMeldinger(@RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
+    fun rekjørAlleKafkaMeldinger(@RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Map<String, Any>> {
         validerApikey(apiKey)
-        kafkaDLQService.rekjørAlleKafkaMeldinger()
-        return ResponseEntity.ok().build()
+
+        val vellykket = mutableListOf<UUID>()
+        val feilet = mutableListOf<String>()
+
+        kafkaDLQService.hentFeiledeKafkaMeldinger().forEach { kafkaDLQ ->
+            kafkaDLQ.id?.let { id ->
+                try {
+                    kafkaDLQService.rekjørKafkaMelding(id)
+                    vellykket.add(id)
+                } catch (e: Exception) {
+                    feilet.add("$id: ${e.message}")
+                    log.error("Feil ved rekjøring av melding med ID {}: {}", id, e.message, e)
+                }
+            } ?: run {
+                feilet.add("Melding uten ID")
+                log.error("Fant melding uten ID")
+            }
+        }
+
+        val resultat = mapOf(
+            "antallVellykket" to vellykket.size,
+            "antallFeilet" to feilet.size,
+            "vellykkedeMeldinger" to vellykket,
+            "feiledeMeldinger" to feilet
+        )
+
+        return ResponseEntity.ok(resultat)
     }
 
     @GetMapping("/buc/analyse/{rinaSaksnummer}")
