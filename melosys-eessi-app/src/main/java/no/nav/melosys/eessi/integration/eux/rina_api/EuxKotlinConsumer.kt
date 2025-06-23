@@ -50,16 +50,23 @@ class EuxKotlinConsumer(
     }
 
     fun resendSed(rinaSaksnummer: String, dokumentId: String) {
+        val uri = "/cpi/resend/buc/{rinaSaksnummer}/sed/{dokumentId}"
         euxRinaWebClient.post()
-            .uri("/cpi/resend/buc/{rinaSaksnummer}/sed/{dokumentId}", rinaSaksnummer, dokumentId)
+            .uri(uri, rinaSaksnummer, dokumentId)
             .retrieve()
             .onStatus(HttpStatusCode::isError) { response ->
                 response.bodyToMono(String::class.java)
                     .flatMap { errorBody ->
                         val errorMessage = parseErrorMessage(errorBody, response.statusCode())
+                        val actualUri = uri.replace("{rinaSaksnummer}", rinaSaksnummer).replace("{dokumentId}", dokumentId)
                         Mono.error(
                             IntegrationException(
-                                "Feil ved gjensending av SED fra EUX Rina API. Status: ${response.statusCode()}, Feil: $errorMessage"
+                                "Feil ved gjensending av SED fra EUX Rina API. " +
+                                "URI: $actualUri, " +
+                                "RinaSaksnummer: $rinaSaksnummer, " +
+                                "DokumentId: $dokumentId, " +
+                                "Status: ${response.statusCode()}, " +
+                                "Feil: $errorMessage"
                             )
                         )
                     }
