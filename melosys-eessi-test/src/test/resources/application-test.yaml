@@ -2,7 +2,7 @@ server:
     port: 8081
 
 # Integrations
-EUXAPP_URL: dummy
+EUX_RINA_API_URL: dummy
 EUXAPP_RINASAKER_URL: dummy
 RESTSTS_URL: http://localhost:${mock-oauth2-server.port}/rest-sts
 SAK_URL: dummy

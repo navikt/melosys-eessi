@@ -25,3 +25,6 @@ target/
 /.nb-gradle/
 /build/
 /q2.env
+
+### Env Files ###
+/.env
