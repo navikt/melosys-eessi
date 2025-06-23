@@ -34,7 +34,6 @@ Dersom du får liste over pods i teammelosys, er du autentisert.
 
 Du må også sette opp en `.env`-fil i rotmappen med følgende innhold:
 ```
-AZURE_APP_CLIENT_ID=b3f18fee-fb20-47a2-a7ec-60e4321221ed
 DATABASE_USERNAME={KAN HENTES FRA VAULT}
 DATABASE_PASSWORD={KAN HENTES FRA VAULT}
 SRV_USERNAME=srvmelosys-eessi
