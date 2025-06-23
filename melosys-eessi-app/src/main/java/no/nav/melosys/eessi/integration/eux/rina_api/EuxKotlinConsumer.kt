@@ -1,0 +1,70 @@
+package no.nav.melosys.eessi.integration.eux.rina_api
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.RinaSakOversiktV3
+import no.nav.melosys.eessi.models.exception.IntegrationException
+import org.springframework.http.HttpStatusCode
+import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Mono
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class EuxApiErrorResponse(
+    val status: String? = null,
+    val messages: String? = null,
+    val timestamp: String? = null
+)
+
+class EuxKotlinConsumer(
+    private val euxRinaWebClient: WebClient,
+) {
+    private val objectMapper = ObjectMapper()
+
+    private fun parseErrorMessage(errorBody: String, statusCode: HttpStatusCode): String {
+        return try {
+            val errorResponse = objectMapper.readValue(errorBody, EuxApiErrorResponse::class.java)
+            errorResponse.messages ?: "Ukjent feil fra EUX Rina API"
+        } catch (e: Exception) {
+            // Fall tilbake til opprinnelig feilmelding hvis JSON-parsing feiler
+            errorBody
+        }
+    }
+
+    fun hentBucOversiktV3(rinaSaksnummer: String): RinaSakOversiktV3 {
+        return euxRinaWebClient.get()
+            .uri("/v3/buc/{rinaSaksnummer}/oversikt", rinaSaksnummer)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                response.bodyToMono(String::class.java)
+                    .flatMap { errorBody ->
+                        val errorMessage = parseErrorMessage(errorBody, response.statusCode())
+                        Mono.error(
+                            IntegrationException(
+                                "Feil ved henting av BUC-oversikt V3 fra EUX Rina API. Status: ${response.statusCode()}, Feil: $errorMessage"
+                            )
+                        )
+                    }
+            }
+            .bodyToMono(RinaSakOversiktV3::class.java)
+            .block() ?: throw IntegrationException("Tomt svar fra EUX Rina API ved henting av BUC-oversikt V3")
+    }
+
+    fun resendSed(rinaSaksnummer: String, dokumentId: String) {
+        euxRinaWebClient.post()
+            .uri("/cpi/resend/buc/{rinaSaksnummer}/sed/{dokumentId}", rinaSaksnummer, dokumentId)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                response.bodyToMono(String::class.java)
+                    .flatMap { errorBody ->
+                        val errorMessage = parseErrorMessage(errorBody, response.statusCode())
+                        Mono.error(
+                            IntegrationException(
+                                "Feil ved gjensending av SED fra EUX Rina API. Status: ${response.statusCode()}, Feil: $errorMessage"
+                            )
+                        )
+                    }
+            }
+            .bodyToMono(Void::class.java)
+            .block()
+    }
+}

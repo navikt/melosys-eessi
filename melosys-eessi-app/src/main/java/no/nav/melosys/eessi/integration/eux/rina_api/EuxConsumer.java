@@ -38,6 +38,7 @@ import org.springframework.web.client.RestTemplate;
 
 import static no.nav.melosys.eessi.integration.RestUtils.hentFeilmeldingForEux;
 
+@Deprecated // Bruk EuxKotlinConsumer.kt i stedet
 public class EuxConsumer implements RestConsumer {
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EuxConsumer.class);
