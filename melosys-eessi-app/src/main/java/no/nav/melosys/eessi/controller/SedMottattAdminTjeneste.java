@@ -8,14 +8,14 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
-import no.nav.security.token.support.core.api.Unprotected;
+import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
-@Unprotected
+@Protected
 @RestController
 @RequestMapping("/admin/sedmottatt")
 public class SedMottattAdminTjeneste {
