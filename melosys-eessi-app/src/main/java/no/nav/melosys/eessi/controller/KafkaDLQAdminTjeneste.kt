@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ
 import no.nav.melosys.eessi.models.kafkadlq.SedMottattHendelseKafkaDLQ
 import no.nav.melosys.eessi.service.buc.BucAdminService
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService
-import no.nav.security.token.support.core.api.Unprotected
+import no.nav.security.token.support.core.api.Protected
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -16,7 +16,7 @@ import java.util.*
 
 private val log = KotlinLogging.logger { }
 
-@Unprotected
+@Protected
 @RestController
 @RequestMapping("/admin/kafka/dlq")
 class KafkaDLQAdminTjeneste(

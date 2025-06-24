@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
 import no.nav.melosys.eessi.kafka.consumers.OppgaveHendelseConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
-import no.nav.security.token.support.core.api.Unprotected;
+import no.nav.security.token.support.core.api.Protected;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -18,7 +18,7 @@ import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.web.bind.annotation.*;
 
-@Unprotected
+@Protected
 @RestController
 @RequestMapping("/admin/kafka/consumers")
 @Profile("!local-q2")

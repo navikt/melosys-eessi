@@ -6,12 +6,12 @@ import java.net.URISyntaxException;
 
 import no.nav.melosys.eessi.service.sed.SedJournalføringMigreringRapportDto;
 import no.nav.melosys.eessi.service.sed.SedJournalføringMigreringService;
-import no.nav.security.token.support.core.api.Unprotected;
+import no.nav.security.token.support.core.api.Protected;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Unprotected
+@Protected
 @RestController
 @RequestMapping("/admin")
 public class SedJournalføringAdminTjeneste {
