@@ -33,7 +33,12 @@ final class ContextHolder {
         return instans;
     }
 
-    boolean canExchangeOBOToken() {
+        boolean canExchangeOBOToken() {
+        // Sjekk om vi skal bruke systemtoken basert på thread-local kontekst
+        if (ThreadLocalAccessInfo.Companion.skalBrukeSystemToken()) {
+            return false;
+        }
+        
         TokenValidationContext tokenValidationContext = getTokenContext();
         if (tokenValidationContext != null) {
             JwtToken jwtToken = tokenValidationContext.getJwtToken(AAD);
