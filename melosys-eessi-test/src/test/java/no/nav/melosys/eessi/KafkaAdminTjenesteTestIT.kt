@@ -1,112 +1,148 @@
-package no.nav.melosys.eessi;
+package no.nav.melosys.eessi
 
-import java.util.List;
-import java.util.Random;
-
-import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.test.annotation.DirtiesContext;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
+import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
+import org.junit.jupiter.api.Test
+import org.mockito.Mockito.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.http.HttpHeaders
+import org.springframework.http.MediaType
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import kotlin.random.Random
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
-class KafkaAdminTjenesteTestIT extends ComponentTestBase {
+@AutoConfigureMockMvc
+class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
-    @LocalServerPort
-    private int port;
+    companion object {
+        private const val API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY"
+        private const val GYLDIG_API_NOKKEL = "dummy"
+    }
 
     @Autowired
-    private TestRestTemplate testRestTemplate;
+    private lateinit var mockMvc: MockMvc
 
-    @Test
-    void hentKafkaConsumers_returnerInformasjonOmAlleConsumere() {
-        List<KafkaConsumerResponse> kafkaConsumerResponses = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers",
-            HttpMethod.GET,
-            lagStringHttpEntity(),
-            new ParameterizedTypeReference<List<KafkaConsumerResponse>>() {
-            }).getBody();
+    @Autowired
+    private lateinit var mockOAuth2Server: MockOAuth2Server
 
-        assertThat(kafkaConsumerResponses)
-            .hasSize(4);
+    @Autowired
+    private lateinit var objectMapper: ObjectMapper
+
+    private fun hentBearerToken(): String {
+        return mockOAuth2Server.issueToken(
+            issuerId = "issuer1",
+            subject = "testbruker",
+            audience = "dumbdumb",
+            claims = mapOf(
+                "oid" to "test-oid",
+                "azp" to "test-azp",
+                "NAVident" to "test123"
+            )
+        ).serialize()
     }
 
     @Test
-    void stoppOgStartConsumer_consumerStoppedOgStartes() {
-        KafkaConsumerResponse kafkaConsumerResponseStop = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveHendelse/stop",
-            HttpMethod.POST,
-            lagStringHttpEntity(),
-            new ParameterizedTypeReference<KafkaConsumerResponse>() {
-            }).getBody();
+    fun `hentKafkaConsumers returner informasjon om alle consumere`() {
+        val result = mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/admin/kafka/consumers")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andReturn()
 
-        assertThat(kafkaConsumerResponseStop).isNotNull();
-        assertThat(kafkaConsumerResponseStop.getActive())
-            .isFalse();
+        val jsonResponse = result.response.contentAsString
+        val kafkaConsumerResponses: List<KafkaConsumerResponse> = objectMapper.readValue(
+            jsonResponse, object : TypeReference<List<KafkaConsumerResponse>>() {}
+        )
 
-        KafkaConsumerResponse kafkaConsumerResponseStart = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveHendelse/start",
-            HttpMethod.POST,
-            lagStringHttpEntity(),
-            new ParameterizedTypeReference<KafkaConsumerResponse>() {
-            }).getBody();
-
-        assertThat(kafkaConsumerResponseStart).isNotNull();
-        assertThat(kafkaConsumerResponseStart.getActive())
-            .isTrue();
+        assertThat(kafkaConsumerResponses).hasSize(4)
     }
 
     @Test
-    void settOffset_senderInnOffset2_consumerLeserPåNyttFraOffset2() throws Exception {
-        final var rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveID1 = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveID2 = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveID3 = Integer.toString(new Random().nextInt(100000));
+    fun `stoppOgStartConsumer consumer stopped og startes`() {
+        // Test stop
+        val stopResult = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/stop")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andReturn()
 
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
-        final var oppgaveDto1 = new HentOppgaveDto(oppgaveID1, "AAPEN", 1);
-        final var oppgaveDto2 = new HentOppgaveDto(oppgaveID2, "AAPEN", 1);
-        final var oppgaveDto3 = new HentOppgaveDto(oppgaveID3, "AAPEN", 1);
+        val stopJsonResponse = stopResult.response.contentAsString
+        val kafkaConsumerResponseStop: KafkaConsumerResponse = objectMapper.readValue(
+            stopJsonResponse, KafkaConsumerResponse::class.java
+        )
 
-        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
-        when(oppgaveConsumer.hentOppgave(oppgaveID1)).thenReturn(oppgaveDto1);
-        when(oppgaveConsumer.hentOppgave(oppgaveID2)).thenReturn(oppgaveDto2);
-        when(oppgaveConsumer.hentOppgave(oppgaveID3)).thenReturn(oppgaveDto3);
+        assertThat(kafkaConsumerResponseStop).isNotNull
+        assertThat(kafkaConsumerResponseStop.active).isFalse
 
-        String VERSJON = "1";
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, VERSJON, rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID1, VERSJON, rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, VERSJON, rinaSaksnummer)).get();
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, VERSJON, rinaSaksnummer)).get();
+        // Test start
+        val startResult = mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/start")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andReturn()
 
-        verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString());
+        val startJsonResponse = startResult.response.contentAsString
+        val kafkaConsumerResponseStart: KafkaConsumerResponse = objectMapper.readValue(
+            startJsonResponse, KafkaConsumerResponse::class.java
+        )
 
-        ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-            "http://localhost:" + port + "/api/admin/kafka/consumers/oppgaveHendelse/seek/2",
-            HttpMethod.POST,
-            lagStringHttpEntity(),
-            new ParameterizedTypeReference<>() {
-            });
+        assertThat(kafkaConsumerResponseStart).isNotNull
+        assertThat(kafkaConsumerResponseStart.active).isTrue
+    }
 
-        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+    @Test
+    fun `settOffset sender inn offset2 consumer leser på nytt fra offset2`() {
+        val rinaSaksnummer = Random.nextInt(100000).toString()
+        val oppgaveID = Random.nextInt(100000).toString()
+        val oppgaveID1 = Random.nextInt(100000).toString()
+        val oppgaveID2 = Random.nextInt(100000).toString()
+        val oppgaveID3 = Random.nextInt(100000).toString()
+
+        val oppgaveDto = HentOppgaveDto(oppgaveID, "AAPEN", 1)
+        val oppgaveDto1 = HentOppgaveDto(oppgaveID1, "AAPEN", 1)
+        val oppgaveDto2 = HentOppgaveDto(oppgaveID2, "AAPEN", 1)
+        val oppgaveDto3 = HentOppgaveDto(oppgaveID3, "AAPEN", 1)
+
+        `when`(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto)
+        `when`(oppgaveConsumer.hentOppgave(oppgaveID1)).thenReturn(oppgaveDto1)
+        `when`(oppgaveConsumer.hentOppgave(oppgaveID2)).thenReturn(oppgaveDto2)
+        `when`(oppgaveConsumer.hentOppgave(oppgaveID3)).thenReturn(oppgaveDto3)
+
+        val versjon = "1"
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, versjon, rinaSaksnummer)).get()
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID1, versjon, rinaSaksnummer)).get()
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, versjon, rinaSaksnummer)).get()
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, versjon, rinaSaksnummer)).get()
+
+        verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString())
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/seek/2")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
 
         // Vi sender 4 meldinger, resetter til offset 2, melding med offset 2 og 3 leses på nytt, totalt hentes oppgave 6 ganger.
-        verify(oppgaveConsumer, timeout(6_000).times(6)).hentOppgave(anyString());
+        verify(oppgaveConsumer, timeout(6_000).times(6)).hentOppgave(anyString())
     }
 
-    @NotNull
-    private HttpEntity<String> lagStringHttpEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("X-MELOSYS-ADMIN-APIKEY", "dummy");
-        return new HttpEntity<>(headers);
-    }
 }
