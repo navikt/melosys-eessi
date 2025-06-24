@@ -13,9 +13,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 
 /**
  * Tester for admin-kontroller autentisering som krever både API-nøkkel og bearer token.
- *
- * Disse testene verifiserer at alle admin-endepunkter krever korrekt autentisering
- * etter at de ble endret fra @Unprotected til @Protected.
  */
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @AutoConfigureMockMvc
