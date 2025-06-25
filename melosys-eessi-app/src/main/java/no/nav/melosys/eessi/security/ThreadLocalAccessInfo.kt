@@ -44,9 +44,7 @@ class ThreadLocalAccessInfo {
             }
         }
 
-        fun hentInfo(): String {
-            return threadLocalLagring.get().toString()
-        }
+        fun hentInfo(): String = threadLocalLagring.get().toString()
     }
 
     override fun toString(): String {

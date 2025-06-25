@@ -1,15 +1,17 @@
 package no.nav.melosys.eessi.security
 
-import org.assertj.core.api.Assertions.assertThat
+import io.kotest.matchers.collections.shouldContainExactly
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.assertions.throwables.shouldThrow
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class ThreadLocalAccessInfoTest {
 
     @Test
     fun `skalBrukeSystemToken - standard tilstand skal returnere false`() {
         // Standard tilstand skal ikke være admin-forespørsel
-        assertThat(ThreadLocalAccessInfo.skalBrukeSystemToken()).isFalse()
+        ThreadLocalAccessInfo.skalBrukeSystemToken() shouldBe false
     }
 
     @Test
@@ -20,9 +22,9 @@ class ThreadLocalAccessInfoTest {
             systemTokenBrukt = ThreadLocalAccessInfo.skalBrukeSystemToken()
         }
         
-        assertThat(systemTokenBrukt).isTrue()
+        systemTokenBrukt shouldBe true
         // Etter utførelse skal det være tilbake til normalt
-        assertThat(ThreadLocalAccessInfo.skalBrukeSystemToken()).isFalse()
+        ThreadLocalAccessInfo.skalBrukeSystemToken() shouldBe false
     }
 
     @Test
@@ -31,20 +33,20 @@ class ThreadLocalAccessInfoTest {
             "test-resultat"
         }
         
-        assertThat(resultat).isEqualTo("test-resultat")
+        resultat shouldBe "test-resultat"
     }
 
     @Test
     fun `utførSomAdminForespørsel - skal håndtere exceptions riktig`() {
-        val exception = assertThrows<RuntimeException> {
+        val exception = shouldThrow<RuntimeException> {
             ThreadLocalAccessInfo.utførSomAdminForespørsel {
                 throw RuntimeException("Test exception")
             }
         }
         
-        assertThat(exception.message).isEqualTo("Test exception")
+        exception.message shouldBe "Test exception"
         // Skal være ryddet opp etter exception
-        assertThat(ThreadLocalAccessInfo.skalBrukeSystemToken()).isFalse()
+        ThreadLocalAccessInfo.skalBrukeSystemToken() shouldBe false
     }
 
     @Test
@@ -61,21 +63,21 @@ class ThreadLocalAccessInfoTest {
             resultater.add(ThreadLocalAccessInfo.skalBrukeSystemToken()) // Skal fortsatt være true
         }
         
-        assertThat(resultater).containsExactly(true, true, true)
+        resultater shouldContainExactly listOf(true, true, true)
         // Etter alle nestede kall skal det være tilbake til normalt
-        assertThat(ThreadLocalAccessInfo.skalBrukeSystemToken()).isFalse()
+        ThreadLocalAccessInfo.skalBrukeSystemToken() shouldBe false
     }
 
     @Test
     fun `hentBrukerId - skal returnere null som standard`() {
-        assertThat(ThreadLocalAccessInfo.hentBrukerId()).isNull()
+        ThreadLocalAccessInfo.hentBrukerId() shouldBe null
     }
 
     @Test
     fun `hentInfo - skal returnere string-representasjon`() {
         val info = ThreadLocalAccessInfo.hentInfo()
-        assertThat(info).contains("ThreadLocalAccessInfo")
-        assertThat(info).contains("erAdminForespørsel=false")
+        info shouldContain "ThreadLocalAccessInfo"
+        info shouldContain "erAdminForespørsel=false"
     }
 
     @Test
@@ -86,6 +88,6 @@ class ThreadLocalAccessInfoTest {
             infoStreng = ThreadLocalAccessInfo.hentInfo()
         }
         
-        assertThat(infoStreng).contains("erAdminForespørsel=true")
+        infoStreng shouldContain "erAdminForespørsel=true"
     }
 } 
