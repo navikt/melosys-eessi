@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.controller
 
+import io.swagger.v3.oas.annotations.Operation
 import mu.KotlinLogging
 import no.nav.melosys.eessi.controller.dto.KafkaDLQDto
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.RinaSakOversiktV3
@@ -97,14 +98,22 @@ class KafkaDLQAdminTjeneste(
         }
     }
 
+    @Operation(
+        summary = "Resend SED",
+        description = "Resend en SED for en gitt rinasak og sedId/dokumentId. eux-rina-api sender inn i sedMottatt-køen sin igjen."
+    )
     @PostMapping("/buc/resend/{rinaSaksnummer}/{dokumentId}")
-    fun resendSed(@PathVariable rinaSaksnummer: String, @PathVariable dokumentId: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
+    fun resendSed(
+        @PathVariable rinaSaksnummer: String,
+        @PathVariable dokumentId: String,
+        @RequestHeader(API_KEY_HEADER) apiKey: String
+    ): ResponseEntity<Void> {
         validerApikey(apiKey)
+
         log.info { "Sender SED $dokumentId på nytt for sak $rinaSaksnummer" }
-        return ThreadLocalAccessInfo.utførSomAdminForespørsel {
-            bucAdminService.resendSed(rinaSaksnummer, dokumentId)
-            ResponseEntity.ok().build()
-        }
+        bucAdminService.resendSed(rinaSaksnummer, dokumentId)
+
+        return ResponseEntity.ok().build()
     }
 
     @GetMapping("/buc/analyse/alle")
@@ -156,7 +165,6 @@ class KafkaDLQAdminTjeneste(
             throw SecurityException("Ugyldig API-nøkkel")
         }
     }
-
 
 
     companion object {
