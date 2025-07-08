@@ -97,30 +97,32 @@ class SedMottakService(
     }
 
     private fun sjekkSedMottakerOgAvsenderID(sedHendelse: SedHendelse) {
-        check(sedHendelse.avsenderId.isNullOrEmpty() && sedHendelse.mottakerId.isNullOrEmpty()) {
-            "Mottatt SED ${sedHendelse.sedId} mangler avsenderId og mottakerId"
-        }
+        sedHendelse.run {
+            when {
+                avsenderId.isNullOrEmpty() && mottakerId.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderId og mottakerId")
 
-        check(sedHendelse.mottakerId.isNullOrEmpty()) {
-            "Mottatt SED ${sedHendelse.sedId} mangler mottakerId"
-        }
+                mottakerId.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler mottakerId")
 
-        check(sedHendelse.avsenderId.isNullOrEmpty()) {
-            "Mottatt SED ${sedHendelse.sedId} mangler avsenderId"
+                avsenderId.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderId")
+            }
         }
     }
 
     private fun sjekkSedMottakerOgAvsenderNavn(sedHendelse: SedHendelse) {
-        check(sedHendelse.avsenderNavn.isNullOrEmpty() && sedHendelse.mottakerNavn.isNullOrEmpty()) {
-            "Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn og mottakerNavn"
-        }
+        sedHendelse.run {
+            when {
+                avsenderNavn.isNullOrEmpty() && mottakerNavn.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderNavn og mottakerNavn")
 
-        check(sedHendelse.mottakerNavn.isNullOrEmpty()) {
-            "Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn"
-        }
+                mottakerNavn.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler mottakerNavn")
 
-        check(sedHendelse.avsenderNavn.isNullOrEmpty()) {
-            "Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn"
+                avsenderNavn.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderNavn")
+            }
         }
     }
 
@@ -173,6 +175,11 @@ class SedMottakService(
         if (person.statsborgerskap.any { LandkodeMapper.erEøsLand(it?.land) }) return false // personen det gjelder er EØS-borger
 
         if (sed.erNorgeNevntSomArbeidsSted()) return false// Sjekk: Norge er nevnt som arbeidssted
+
+        val avsenderLand = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
+
+        if (UfmRegler.erTredjelandsborgerIkkeAvtaleland(avsenderLand, person.statsborgerskap.mapNotNull { it?.land }))
+            return false // Sjekk: Avsender er tredjelandsborger uten arbeidssted i Norge
 
         log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
         return true
