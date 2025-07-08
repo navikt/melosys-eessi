@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.*
 import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
@@ -249,7 +250,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis avsenderId ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             mottakerId = "123";
             mottakerNavn = "321";
             avsenderNavn = "123";
@@ -269,7 +270,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis mottakerId ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             avsenderId = "123";
             mottakerNavn = "321";
             avsenderNavn = "123";
@@ -307,7 +308,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis avsenderNavn ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             mottakerNavn = "123";
             avsenderId = "123";
             mottakerId = "321";
@@ -327,7 +328,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis mottakerNavn ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             avsenderNavn = "123";
             avsenderId = "123";
             mottakerId = "321";
@@ -343,6 +344,49 @@ class SedMottakServiceTest {
             sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
         }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn"
     }
+
+    @Test
+    fun `behandleSed skal ikke sende til id og fordeling ved tredje landsborger`() {
+        every { euxService.hentSedMedRetry(any(), any()) } returns SED().apply {
+            nav = Nav().apply {
+                bruker = Bruker().apply {
+                    person = Person().apply {
+                        statsborgerskap = listOf<String>("").map {
+                            Statsborgerskap().apply { land = it }
+                        }
+                        foedselsdato = "1990-01-01"
+                    }
+                }
+            }
+            sedType = "A003"
+            medlemskap = MedlemskapA003().apply {
+                vedtak = VedtakA003(land = "NO")
+            }
+        }
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every {
+            opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any())
+        } returns "ignorer"
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
+        every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
+        val sedHendelse = sedHendelseUtenBruker()
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify(exactly = 1) { personIdentifisering.identifiserPerson(any(), any()) }
+        verify { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
+        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
+        verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
+        verify(exactly = 0) { bucIdentifisertService.lagreIdentifisertPerson(any(), any()) }
+        verify(exactly = 0) { bucIdentifiseringOppgRepository.findByOppgaveId(any()) }
+    }
+
 
     private fun opprettSED() = SED().apply {
         nav = Nav().apply {

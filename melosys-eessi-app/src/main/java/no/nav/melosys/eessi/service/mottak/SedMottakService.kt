@@ -15,6 +15,7 @@ import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.Person
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
@@ -23,8 +24,11 @@ import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostS
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import no.nav.melosys.eessi.service.sed.helpers.EøsLandkoder
+import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 private val log = KotlinLogging.logger {}
 
@@ -92,31 +96,31 @@ class SedMottakService(
         sedMetrikker.sedMottatt(sedMottattHendelse.sedHendelse.sedType)
     }
 
-    private fun sjekkSedMottakerOgAvsenderID(sedHendelse: SedHendelse){
-        if (sedHendelse.avsenderId.isNullOrEmpty() && sedHendelse.mottakerId.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderId og mottakerId")
+    private fun sjekkSedMottakerOgAvsenderID(sedHendelse: SedHendelse) {
+        check(sedHendelse.avsenderId.isNullOrEmpty() && sedHendelse.mottakerId.isNullOrEmpty()) {
+            "Mottatt SED ${sedHendelse.sedId} mangler avsenderId og mottakerId"
         }
 
-        if (sedHendelse.mottakerId.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler mottakerId")
+        check(sedHendelse.mottakerId.isNullOrEmpty()) {
+            "Mottatt SED ${sedHendelse.sedId} mangler mottakerId"
         }
 
-        if (sedHendelse.avsenderId.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderId")
+        check(sedHendelse.avsenderId.isNullOrEmpty()) {
+            "Mottatt SED ${sedHendelse.sedId} mangler avsenderId"
         }
     }
 
-    private fun sjekkSedMottakerOgAvsenderNavn(sedHendelse: SedHendelse){
-        if (sedHendelse.avsenderNavn.isNullOrEmpty() && sedHendelse.mottakerNavn.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn og mottakerNavn")
+    private fun sjekkSedMottakerOgAvsenderNavn(sedHendelse: SedHendelse) {
+        check(sedHendelse.avsenderNavn.isNullOrEmpty() && sedHendelse.mottakerNavn.isNullOrEmpty()) {
+            "Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn og mottakerNavn"
         }
 
-        if (sedHendelse.mottakerNavn.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn")
+        check(sedHendelse.mottakerNavn.isNullOrEmpty()) {
+            "Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn"
         }
 
-        if (sedHendelse.avsenderNavn.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn")
+        check(sedHendelse.avsenderNavn.isNullOrEmpty()) {
+            "Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn"
         }
     }
 
@@ -143,6 +147,10 @@ class SedMottakService(
             return
         }
 
+        // Det skal ikke blir rekvirert d-nummer på bakgrunn av mottatt A003, når den gjelder en tredjelandsborger og arbeidssted ikke er Norge
+        if (sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(sedMottatt, sed)) return
+
+
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
 
         val rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId
@@ -151,6 +159,28 @@ class SedMottakService(
             ?.let { log.info("Identifiseringsoppgave ${it.oppgaveId} finnes allerede for rinasak $rinaSaksnummer") }
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
+
+    private fun sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(sedMottatt: SedMottattHendelse, sed: SED): Boolean {
+        if (sed.sedType != SedType.A003.name) return false // Ikke A003
+        if ((sed.medlemskap as MedlemskapA003).vedtak?.land == "NO") return false // Norge er lovvalgsland
+
+        val person = sed.finnPerson().getOrNull() ?: return false // Personen finnes ikke hos NAV
+        if (harNorskPersonnummer(person)) {
+            // personen det gjelder har norsk fnr eller d-nr
+            return false
+        }
+
+        if (person.statsborgerskap.any { LandkodeMapper.erEøsLand(it?.land) }) return false // personen det gjelder er EØS-borger
+
+        if (sed.erNorgeNevntSomArbeidsSted()) return false// Sjekk: Norge er nevnt som arbeidssted
+
+        log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
+        return true
+    }
+
+    private fun SED.erNorgeNevntSomArbeidsSted(land: String = EøsLandkoder.NO.value.lowercase()): Boolean =
+        this.nav?.arbeidssted?.any { it.adresse?.land?.lowercase() == land } ?: false
+            || this.nav?.arbeidsland?.any { it.land == land } ?: false
 
     private fun oppgaveErÅpen(bucIdentifiseringOppg: BucIdentifiseringOppg): Boolean =
         oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
