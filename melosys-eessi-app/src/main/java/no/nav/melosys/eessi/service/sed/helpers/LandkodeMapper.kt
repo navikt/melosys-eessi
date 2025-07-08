@@ -17,7 +17,7 @@ object LandkodeMapper {
     const val KOSOVO_LANDKODE_ISO2 = "XK"
 
     private const val STATSLØS_LANDKODE_ISO3 = "XXX"
-    private const val STATSLØS_LANDKODE_ISO2 = "XS"
+    const val STATSLØS_LANDKODE_ISO2 = "XS"
 
     private val ISO3_TIL_ISO2_LANDKODER_MAP = Locale.getISOCountries()
         .associateBy { Locale.Builder().setRegion(it).build().isO3Country }.toMap() +
