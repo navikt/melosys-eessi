@@ -15,8 +15,13 @@ fun SED.erNorgeNevntSomArbeidsSted(land: String = EøsLandkoder.NO.value.lowerca
  * Det skal ikke blir rekvirert d-nummer på bakgrunn av mottatt A003, når den gjelder en tredjelandsborger og arbeidssted ikke er Norge
  */
 fun SED.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(hentAvsenderLand: () -> String): Boolean {
-    if (sedType != SedType.A003.name) return false // Ikke A003
-    if ((medlemskap as MedlemskapA003).vedtak?.land == "NO") return false // Norge er lovvalgsland
+    if (sedType != SedType.A003.name) {
+        return false
+    }
+    if ((medlemskap as MedlemskapA003).vedtak?.land == "NO") {
+        // Norge er lovvalgsland
+        return false
+    }
 
     val person = finnPerson().getOrNull() ?: return false // Personen finnes ikke hos NAV
     if (person.harNorskPersonnummer()) {
@@ -24,15 +29,16 @@ fun SED.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(hentAvsenderLand: ()
         return false
     }
 
-    if (person.statsborgerskap.any { LandkodeMapper.erEøsLand(it?.land) }) {
+    if (person.hentStatsborgerksapsliste().any { LandkodeMapper.erEøsLand(it) }) {
         // personen det gjelder er EØS-borger, så ikke en tredjelandsborger
         return false
     }
 
     if (erNorgeNevntSomArbeidsSted()) return false// Norge er nevnt som arbeidssted
 
-    if (UfmRegler.erTredjelandsborgerIkkeAvtaleland(hentAvsenderLand(), person.statsborgerskap.mapNotNull { it?.land }))
-        return false // Sjekk: Avsender er tredjelandsborger uten arbeidssted i Norge
+    if (SedA003UnntaksreglerForTredjelandsborgere.avsenderErFraGodkjentLandForUnntak(avsenderLandkode = hentAvsenderLand())) {
+        return false
+    }
 
     return true
 }
