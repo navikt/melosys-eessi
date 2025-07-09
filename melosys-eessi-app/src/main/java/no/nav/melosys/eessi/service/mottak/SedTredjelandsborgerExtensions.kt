@@ -10,6 +10,7 @@ import kotlin.jvm.optionals.getOrNull
 fun SED.erNorgeNevntSomArbeidsSted(land: String = EøsLandkoder.NO.name): Boolean =
     this.nav?.arbeidssted?.any { it.adresse?.land == land } ?: false
         || this.nav?.arbeidsland?.any { it.land == land } ?: false
+        || this.nav?.arbeidsland?.any { al -> al.arbeidssted.any { it.adresse?.land == land } } ?: false
 
 /**
  * Det skal ikke blir rekvirert d-nummer på bakgrunn av mottatt A003, når den gjelder en tredjelandsborger og arbeidssted ikke er Norge
