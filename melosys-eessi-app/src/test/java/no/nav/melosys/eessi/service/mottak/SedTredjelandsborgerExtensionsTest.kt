@@ -23,8 +23,9 @@ class SedTredjelandsborgerExtensionsTest {
             .avsenderLand("NO")
             .expectedResult(false),
 
+
         TestCaseBuilder()
-            .name("A003 med Norge som lovvalgsland")
+            .name("Norge er lovvalgsland")
             .sed {
                 sedType(SedType.A003)
                     .vedtakLand("NO")
@@ -33,7 +34,7 @@ class SedTredjelandsborgerExtensionsTest {
             .expectedResult(false),
 
         TestCaseBuilder()
-            .name("Person har norsk personnummer")
+            .name("Person har norsk fnr eller d-nr")
             .sed {
                 sedType(SedType.A003)
                     .vedtakLand("SE")
@@ -43,7 +44,7 @@ class SedTredjelandsborgerExtensionsTest {
             .expectedResult(false),
 
         TestCaseBuilder()
-            .name("Person er EØS-borger")
+            .name("Person er EØS-borger, så ikke en tredjelandsborger")
             .sed {
                 sedType(SedType.A003)
                     .vedtakLand("SE")
@@ -72,7 +73,8 @@ class SedTredjelandsborgerExtensionsTest {
                     .arbeidsland("NO")
             }
             .avsenderLand("NO")
-            .expectedResult(false),
+            .expectedResult(false)
+            .reason("Norge er nevnt som arbeidssted"),
 
         TestCaseBuilder()
             .name("Avsender er fra godkjent land for unntak")
@@ -110,11 +112,12 @@ class SedTredjelandsborgerExtensionsTest {
     fun `sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted skal returnere riktig resultat`(
         sed: SED,
         avsenderLand: String,
-        expectedResult: Boolean
+        expectedResult: Boolean,
+        expectedReason: String
     ) {
         // Act
-        val result = sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted({ avsenderLand }) { a ->
-            println(a)
+        val result = sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted({ avsenderLand }) { reason ->
+            reason shouldBe expectedReason
         }
 
         // Assert
@@ -188,8 +191,12 @@ class TestCaseBuilder {
     private var sedBuilder: SEDTestBuilder = SEDTestBuilder()
     private var avsenderLand: String = "NO"
     private var expectedResult: Boolean = false
+    private var reason: String = ""
 
-    fun name(name: String) = apply { this.name = name }
+    fun name(name: String) = apply {
+        this.name = name
+        this.reason = name
+    }
 
     fun sed(configure: SEDTestBuilder.() -> SEDTestBuilder) = apply {
         this.sedBuilder = configure(sedBuilder)
@@ -198,6 +205,7 @@ class TestCaseBuilder {
     fun avsenderLand(land: String) = apply { this.avsenderLand = land }
 
     fun expectedResult(result: Boolean) = apply { this.expectedResult = result }
+    fun reason(result: String) = apply { this.reason = result }
 
-    fun build(): Arguments.ArgumentSet = argumentSet(name, sedBuilder.build(), avsenderLand, expectedResult)
+    fun build(): Arguments.ArgumentSet = argumentSet(name, sedBuilder.build(), avsenderLand, expectedResult, reason)
 }

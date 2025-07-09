@@ -15,29 +15,38 @@ fun SED.erNorgeNevntSomArbeidsSted(land: String = EøsLandkoder.NO.name): Boolea
  * Det skal ikke blir rekvirert d-nummer på bakgrunn av mottatt A003, når den gjelder en tredjelandsborger og arbeidssted ikke er Norge
  * https://jira.adeo.no/browse/MELOSYS-7403
  */
-fun SED.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(hentAvsenderLand: () -> String): Boolean {
+fun SED.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(hentAvsenderLand: () -> String, reason: (a: String) -> Unit = {}): Boolean {
     if (sedType != SedType.A003.name) {
+        reason("Ikke A003 SED")
         return false
     }
     if ((medlemskap as MedlemskapA003).vedtak?.land == "NO") {
-        // Norge er lovvalgsland
+        reason("Norge er lovvalgsland")
         return false
     }
 
-    val person = finnPerson().getOrNull() ?: return false // Personen finnes ikke hos NAV
+    val person = finnPerson().getOrNull() ?: run {
+        reason("Ingen person funnet")
+        return false
+    }
+
     if (person.harNorskPersonnummer()) {
-        // personen det gjelder har norsk fnr eller d-nr
+        reason("Person har norsk fnr eller d-nr")
         return false
     }
 
     if (person.hentStatsborgerksapsliste().any { LandkodeMapper.erEøsLand(it) }) {
-        // personen det gjelder er EØS-borger, så ikke en tredjelandsborger
+        reason("Person er EØS-borger, så ikke en tredjelandsborger")
         return false
     }
 
-    if (erNorgeNevntSomArbeidsSted()) return false// Norge er nevnt som arbeidssted
+    if (erNorgeNevntSomArbeidsSted()) {
+        reason("Norge er nevnt som arbeidssted")
+        return false
+    }
 
     if (SedA003UnntaksreglerForTredjelandsborgere.avsenderErFraGodkjentLandForUnntak(avsenderLandkode = hentAvsenderLand())) {
+        reason("Avsender er fra godkjent land for unntak")
         return false
     }
 
