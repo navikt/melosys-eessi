@@ -15,97 +15,97 @@ import org.junit.jupiter.params.provider.MethodSource
 class SedTredjelandsborgerExtensionsTest {
 
     fun sedErA003OgTredjelandsborgerUtenNorgeSomArbeidsstedTestData() = listOf(
-        TestCaseBuilder()
-            .name("Ikke A003 SED")
-            .sed {
+        sedTestCase {
+            name("Ikke A003 SED")
+            sed {
                 sedType(SedType.A001)
             }
-            .avsenderLand("NO")
-            .expectedResult(false),
-
-
-        TestCaseBuilder()
-            .name("Norge er lovvalgsland")
-            .sed {
+            avsenderLand("NO")
+            expectedResult(false)
+        },
+        sedTestCase {
+            name("Norge er lovvalgsland")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("NO")
+                vedtakLand("NO")
             }
-            .avsenderLand("NO")
-            .expectedResult(false),
-
-        TestCaseBuilder()
-            .name("Person har norsk fnr eller d-nr")
-            .sed {
+            avsenderLand("NO")
+            expectedResult(false)
+        },
+        sedTestCase {
+            name("Person har norsk fnr eller d-nr")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .personMedNorskPin("12345678901")
+                vedtakLand("SE")
+                personMedNorskPin("12345678901")
             }
-            .avsenderLand("NO")
-            .expectedResult(false),
-
-        TestCaseBuilder()
-            .name("Person er EØS-borger, så ikke en tredjelandsborger")
-            .sed {
+            avsenderLand("NO")
+            expectedResult(false)
+        },
+        sedTestCase {
+            name("Person er EØS-borger, så ikke en tredjelandsborger")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .personMedStatsborgerskap("SE", "DK")
+                vedtakLand("SE")
+                personMedStatsborgerskap("SE", "DK")
             }
-            .avsenderLand("NO")
-            .expectedResult(false),
-
-        TestCaseBuilder()
-            .name("Norge er nevnt som arbeidssted")
-            .sed {
+            avsenderLand("NO")
+            expectedResult(false)
+        },
+        sedTestCase {
+            name("Norge er nevnt som arbeidssted")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .personMedStatsborgerskap("US")
-                    .arbeidssted("NO")
+                vedtakLand("SE")
+                personMedStatsborgerskap("US")
+                arbeidssted("NO")
             }
-            .avsenderLand("NO")
-            .expectedResult(false),
-
-        TestCaseBuilder()
-            .name("Norge er nevnt som arbeidsland")
-            .sed {
+            avsenderLand("NO")
+            expectedResult(false)
+        },
+        sedTestCase {
+            name("Norge er nevnt som arbeidsland")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .personMedStatsborgerskap("US")
-                    .arbeidsland("NO")
+                vedtakLand("SE")
+                personMedStatsborgerskap("US")
+                arbeidsland("NO")
             }
-            .avsenderLand("NO")
-            .expectedResult(false)
-            .reason("Norge er nevnt som arbeidssted"),
-
-        TestCaseBuilder()
-            .name("Avsender er fra godkjent land for unntak")
-            .sed {
+            avsenderLand("NO")
+            expectedResult(false)
+            reason("Norge er nevnt som arbeidssted")
+        },
+        sedTestCase {
+            name("Avsender er fra godkjent land for unntak")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .personMedStatsborgerskap("US")
+                vedtakLand("SE")
+                personMedStatsborgerskap("US")
             }
-            .avsenderLand("CH")
-            .expectedResult(false),
-
-        TestCaseBuilder()
-            .name("Tredjelandsborger uten Norge som arbeidssted")
-            .sed {
+            avsenderLand("CH")
+            expectedResult(false)
+        },
+        sedTestCase {
+            name("Tredjelandsborger uten Norge som arbeidssted")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .personMedStatsborgerskap("US")
+                vedtakLand("SE")
+                personMedStatsborgerskap("US")
             }
-            .avsenderLand("FR")
-            .expectedResult(true),
-
-        TestCaseBuilder()
-            .name("Ingen person funnet")
-            .sed {
+            avsenderLand("FR")
+            expectedResult(true)
+        },
+        sedTestCase {
+            name("Ingen person funnet")
+            sed {
                 sedType(SedType.A003)
-                    .vedtakLand("SE")
-                    .utenPerson()
+                vedtakLand("SE")
+                utenPerson()
             }
-            .avsenderLand("NO")
-            .expectedResult(false)
-    ).map { it.build() }
+            avsenderLand("NO")
+            expectedResult(false)
+        }
+    )
 
     @ParameterizedTest(name = "{index} - {argumentSetName} Lovvalg:{1} return:{2}")
     @MethodSource("sedErA003OgTredjelandsborgerUtenNorgeSomArbeidsstedTestData")
@@ -207,3 +207,6 @@ class TestCaseBuilder {
 
     fun build(): Arguments.ArgumentSet = argumentSet(name, sedBuilder.build(), avsenderLand, expectedResult, reason)
 }
+
+fun sedTestCase(configure: TestCaseBuilder.() -> Unit) =
+    TestCaseBuilder().apply(configure).build()
