@@ -87,7 +87,7 @@ class SedTredjelandsborgerExtensionsTest {
             .expectedResult(false),
 
         TestCaseBuilder()
-            .name("Tredjelandsborger uten Norge som arbeidssted - skal returnere true")
+            .name("Tredjelandsborger uten Norge som arbeidssted")
             .sed {
                 sedType(SedType.A003)
                     .vedtakLand("SE")
@@ -115,12 +115,10 @@ class SedTredjelandsborgerExtensionsTest {
         expectedResult: Boolean,
         expectedReason: String
     ) {
-        // Act
         val result = sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted({ avsenderLand }) { reason ->
             reason shouldBe expectedReason
         }
 
-        // Assert
         result shouldBe expectedResult
     }
 }

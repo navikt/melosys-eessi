@@ -51,5 +51,6 @@ fun SED.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(hentAvsenderLand: ()
         return false
     }
 
+    reason("Tredjelandsborger uten Norge som arbeidssted")
     return true
 }
