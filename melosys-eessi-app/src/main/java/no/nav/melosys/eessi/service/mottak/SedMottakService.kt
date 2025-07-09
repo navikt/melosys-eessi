@@ -148,11 +148,14 @@ class SedMottakService(
             return
         }
 
-        if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
-            fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
-            if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
+        fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
+        if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
+            // TODO: lagre SED i DB for å se de vi ikke oppretter oppgave for og sjekke mer nøye at de det stemmer
+            if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
                 log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
                 return
+            } else {
+                log.info("Toggle TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED er deaktivert, så oppretter fortsatt oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
             }
         }
 
