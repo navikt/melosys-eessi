@@ -12,17 +12,23 @@ object UfmRegler {
         EøsLandkoder.AT,
         EøsLandkoder.NL,
         EøsLandkoder.LU
+        // Dette er kopiert fra melosys-api
+        // Storbritannia og Sveits skal hånters på egen måte - ny oppdatering i https://jira.adeo.no/browse/MELOSYS-7403
     )
 
-    fun statsborgerskapErMedlemsland(statsborgerskapLandkoder: Collection<String>) =
+    fun statsborgerskapErMedlemsland(statsborgerskapLandkoder: List<String>) =
         EøsLandkoder.entries.any { it.name in statsborgerskapLandkoder }
 
-    fun avsenderErNordiskEllerAvtaleland(avsenderLandkode: EøsLandkoder?) =
-        avsenderLandkode in NORDISK_ELLER_AVTALELAND
+    fun avsenderErNordiskEllerAvtaleland(avsenderLandkode: String?): Boolean {
+        val eøsAvsenderLand = EøsLandkoder.entries.firstOrNull { it.name == avsenderLandkode }
+        return eøsAvsenderLand in NORDISK_ELLER_AVTALELAND
+    }
 
-    fun erStatsløs(statsborgerskapLandkoder: Collection<String>) =
-        statsborgerskapLandkoder.isNotEmpty() && LandkodeMapper.STATSLØS_LANDKODE_ISO2 in statsborgerskapLandkoder
+    fun erStatsløs(statsborgerskapLandkoder: List<String>) =
+        LandkodeMapper.STATSLØS_LANDKODE_ISO2 in statsborgerskapLandkoder
 
-    fun lovvalgslandErNorge(landkode: EøsLandkoder) =
-        landkode == EøsLandkoder.NO
+    fun erTredjelandsborgerIkkeAvtaleland(avsenderLandkode: String?, statsborgerskapLandkoder: List<String>): Boolean =
+        avsenderErNordiskEllerAvtaleland(avsenderLandkode)
+            || erStatsløs(statsborgerskapLandkoder)
+            || statsborgerskapErMedlemsland(statsborgerskapLandkoder)
 }
