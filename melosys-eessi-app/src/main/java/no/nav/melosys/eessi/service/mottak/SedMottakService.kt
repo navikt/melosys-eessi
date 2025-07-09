@@ -1,7 +1,9 @@
 package no.nav.melosys.eessi.service.mottak
 
+import io.getunleash.Unleash
 import jakarta.transaction.Transactional
 import mu.KotlinLogging
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName.TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
 import no.nav.melosys.eessi.identifisering.FnrUtils
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
@@ -41,6 +43,7 @@ class SedMottakService(
     private val personIdentifisering: PersonIdentifisering,
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
+    private val unleach: Unleash,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -145,10 +148,12 @@ class SedMottakService(
             return
         }
 
-        fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
-        if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
-            log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
-            return
+        if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
+            fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
+            if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
+                log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
+                return
+            }
         }
 
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")

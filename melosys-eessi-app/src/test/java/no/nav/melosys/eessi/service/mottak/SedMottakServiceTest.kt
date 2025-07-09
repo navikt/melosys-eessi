@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.mottak
 
+import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -81,7 +82,8 @@ class SedMottakServiceTest {
             personIdentifisering,
             bucIdentifisertService,
             saksrelasjonService,
-            "1"
+            FakeUnleash().apply { enableAll() },
+            "1",
         )
         val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)
         every { saksrelasjonService.finnVedRinaSaksnummer(any()) } returns Optional.of(rinasakKobling)
