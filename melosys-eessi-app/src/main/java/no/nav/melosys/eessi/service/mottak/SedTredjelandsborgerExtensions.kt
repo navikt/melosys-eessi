@@ -7,12 +7,13 @@ import no.nav.melosys.eessi.service.sed.helpers.EøsLandkoder
 import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
 import kotlin.jvm.optionals.getOrNull
 
-fun SED.erNorgeNevntSomArbeidsSted(land: String = EøsLandkoder.NO.value.lowercase()): Boolean =
-    this.nav?.arbeidssted?.any { it.adresse?.land?.lowercase() == land } ?: false
+fun SED.erNorgeNevntSomArbeidsSted(land: String = EøsLandkoder.NO.name): Boolean =
+    this.nav?.arbeidssted?.any { it.adresse?.land == land } ?: false
         || this.nav?.arbeidsland?.any { it.land == land } ?: false
 
 /**
  * Det skal ikke blir rekvirert d-nummer på bakgrunn av mottatt A003, når den gjelder en tredjelandsborger og arbeidssted ikke er Norge
+ * https://jira.adeo.no/browse/MELOSYS-7403
  */
 fun SED.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(hentAvsenderLand: () -> String): Boolean {
     if (sedType != SedType.A003.name) {
