@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.service.mottak.SedA003UnntaksreglerForTredjelandsborgere.erNorgeNevntSomArbeidsSted
 
 // Tester laget av Claude Sonnet 4
 class SEDErNorgeNevntSomArbeidsStedTest {

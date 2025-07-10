@@ -5,6 +5,7 @@ import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.service.mottak.SedA003UnntaksreglerForTredjelandsborgere.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

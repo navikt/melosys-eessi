@@ -23,6 +23,7 @@ import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
+import no.nav.melosys.eessi.service.mottak.SedA003UnntaksreglerForTredjelandsborgere.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
