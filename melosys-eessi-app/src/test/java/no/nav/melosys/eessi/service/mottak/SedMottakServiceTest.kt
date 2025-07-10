@@ -348,7 +348,7 @@ class SedMottakServiceTest {
     }
 
     @Test
-    fun `behandleSed skal ikke sende til id og fordeling ved tredje landsborger`() {
+    fun `behandleSed skal ikke sende til id og fordeling ved tredjelandsborger`() {
         every { euxService.hentSedMedRetry(any(), any()) } returns SED(
             nav = Nav(
                 bruker = Bruker(
