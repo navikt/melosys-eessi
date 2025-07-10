@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.sed
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test

@@ -1,8 +1,8 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.sed.mapper
 
 import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.controller.dto.Bestemmelse
-import no.nav.melosys.eessi.service.sed.helpers.A1GrunnlagMapper.mapFromBestemmelse
+import no.nav.melosys.eessi.service.sed.mapper.A1GrunnlagMapper.mapFromBestemmelse
 import org.junit.jupiter.api.Test
 
 class A1GrunnlagMapperTest {

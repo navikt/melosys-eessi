@@ -13,9 +13,9 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.models.sed.nav.Bruker
 import no.nav.melosys.eessi.models.sed.nav.Periode
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.finnLandkodeIso2
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.mapTilLandkodeIso2
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.LandkodeMapper.finnLandkodeIso2
+import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilLandkodeIso2
 import org.springframework.util.StringUtils
 import java.time.LocalDate
 

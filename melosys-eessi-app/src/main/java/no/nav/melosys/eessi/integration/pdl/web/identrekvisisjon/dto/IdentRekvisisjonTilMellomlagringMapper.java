@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.models.sed.nav.Kjønn;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap;
 
-import static no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon;
+import static no.nav.melosys.eessi.service.sed.LandkodeMapper.finnLandkodeIso3ForIdentRekvisisjon;
 
 public class IdentRekvisisjonTilMellomlagringMapper {
 

@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.sed.mapper
 
 import no.nav.melosys.eessi.controller.dto.Bestemmelse
 

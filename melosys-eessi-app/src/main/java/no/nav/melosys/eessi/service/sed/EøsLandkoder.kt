@@ -1,4 +1,4 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.sed
 
 enum class EøsLandkoder(val value: String) {
     BE("Belgia"),
@@ -38,4 +38,3 @@ enum class EøsLandkoder(val value: String) {
     AT("Østerrike"),
     AX("Åland")
 }
-

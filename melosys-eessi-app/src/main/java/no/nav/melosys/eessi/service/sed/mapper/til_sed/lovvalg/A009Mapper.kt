@@ -10,7 +10,7 @@ import no.nav.melosys.eessi.models.sed.nav.Fastperiode
 import no.nav.melosys.eessi.models.sed.nav.Periode
 import no.nav.melosys.eessi.models.sed.nav.Utsendingsland
 import no.nav.melosys.eessi.models.sed.nav.VedtakA009
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.mapTilLandkodeIso2
+import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilLandkodeIso2
 
 class A009Mapper : LovvalgSedMapper<MedlemskapA009> {
 

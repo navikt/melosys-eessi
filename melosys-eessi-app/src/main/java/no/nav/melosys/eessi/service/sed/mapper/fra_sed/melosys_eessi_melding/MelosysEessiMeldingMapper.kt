@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
 import no.nav.melosys.eessi.kafka.producers.model.*
 import no.nav.melosys.eessi.models.sed.SED
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
 
 interface MelosysEessiMeldingMapper {
     fun map(eessiMeldingParams: EessiMeldingParams) = MelosysEessiMelding(

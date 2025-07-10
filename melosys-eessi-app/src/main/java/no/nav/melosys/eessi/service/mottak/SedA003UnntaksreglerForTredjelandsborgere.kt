@@ -3,8 +3,8 @@ package no.nav.melosys.eessi.service.mottak
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
-import no.nav.melosys.eessi.service.sed.helpers.EøsLandkoder
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.EøsLandkoder
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import kotlin.jvm.optionals.getOrNull
 
 object SedA003UnntaksreglerForTredjelandsborgere {

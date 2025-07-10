@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.controller.dto
 
 import no.nav.melosys.eessi.models.sed.nav.Pin
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
 
 data class Ident(
     var ident: String? = null,

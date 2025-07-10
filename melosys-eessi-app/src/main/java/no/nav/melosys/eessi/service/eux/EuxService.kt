@@ -17,7 +17,7 @@ import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils

@@ -1,6 +1,7 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.sed
 
-import java.util.*
+import java.util.Locale
+import java.util.Optional
 
 /**
  * Mapper mellom landkoder i ISO2 og ISO3 format.
