@@ -3,7 +3,7 @@ package no.nav.melosys.eessi.service.sed.mapper.fra_sed
 import mu.KotlinLogging
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper.mapTilNavLandkode
+import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilNavLandkode
 
 private val log = KotlinLogging.logger {}
 

@@ -5,8 +5,8 @@ import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA001
 import no.nav.melosys.eessi.models.sed.nav.*
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
-import no.nav.melosys.eessi.service.sed.helpers.UnntakArtikkelMapper
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.mapper.UnntakArtikkelMapper
 
 class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
     override fun getSedType(): SedType = SedType.A001

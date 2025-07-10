@@ -2,7 +2,7 @@ package no.nav.melosys.eessi.controller.dto
 
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
 import no.nav.melosys.eessi.models.sed.nav.Identifikator
-import no.nav.melosys.eessi.service.sed.helpers.StreamUtils
+import java.util.stream.Stream
 
 data class Virksomhet(
     var navn: String? = null,
@@ -15,11 +15,13 @@ data class Virksomhet(
             return Virksomhet(
                 navn = arbeidsgiver.navn,
                 adresse = arbeidsgiver.adresse.let { Adresse.av(it) },
-                orgnr = StreamUtils.nullableStream(arbeidsgiver.identifikator)
+                orgnr = nullableStream(arbeidsgiver.identifikator)
                     .findFirst()
                     .map(Identifikator::id)
                     .orElse(null)
             )
         }
+
+        fun <T> nullableStream(collection: Collection<T>?): Stream<T> = collection?.stream() ?: Stream.empty()
     }
 }

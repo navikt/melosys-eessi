@@ -17,7 +17,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
-import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory
+import no.nav.melosys.eessi.service.sed.mapper.SedMapperFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*

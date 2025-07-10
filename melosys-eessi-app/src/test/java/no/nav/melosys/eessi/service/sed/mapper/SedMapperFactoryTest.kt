@@ -1,9 +1,9 @@
-package no.nav.melosys.eessi.service.sed.helpers
+package no.nav.melosys.eessi.service.sed.mapper
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.models.SedType
-import no.nav.melosys.eessi.service.sed.helpers.SedMapperFactory.sedMapper
+import no.nav.melosys.eessi.service.sed.mapper.SedMapperFactory.sedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A001Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A009Mapper
 import org.junit.jupiter.api.Test

@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.controller.dto
 
 import no.nav.melosys.eessi.models.sed.nav.Adresse as RinaAdresse
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import org.apache.commons.lang3.StringUtils
 
 data class Adresse(

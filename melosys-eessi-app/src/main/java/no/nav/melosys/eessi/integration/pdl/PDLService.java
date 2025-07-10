@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
-import no.nav.melosys.eessi.service.sed.helpers.LandkodeMapper;
+import no.nav.melosys.eessi.service.sed.LandkodeMapper;
 import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.integration.pdl.dto.HarMetadata.hentSisteOpplysning;
