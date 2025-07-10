@@ -5,7 +5,6 @@ import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
-import no.nav.melosys.eessi.identifisering.FnrUtils
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.PersonFasade
 import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvisisjonTilMellomlagringMapper
@@ -17,7 +16,6 @@ import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
-import no.nav.melosys.eessi.models.sed.nav.Person
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import no.nav.melosys.eessi.service.eux.EuxService
@@ -195,7 +193,7 @@ class SedMottakService(
         val personFraSed = sed.finnPerson().orElse(null)
 
         return when {
-            personFraSed != null && !harNorskPersonnummer(personFraSed) -> {
+            personFraSed != null && !personFraSed.harNorskPersonnummer() -> {
                 val identRekvisjonTilMellomlagring =
                     IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed)
 
@@ -218,11 +216,6 @@ class SedMottakService(
             }
         }
     }
-
-    private fun harNorskPersonnummer(personFraSed: Person): Boolean = personFraSed.finnNorskPin()
-        .map { it.identifikator }
-        .flatMap(FnrUtils::filtrerUtGyldigNorskIdent)
-        .isPresent
 
     private fun opprettJournalpost(sedMottattHendelse: SedMottattHendelse, navIdent: String? = null): String {
         log.info("Oppretter journalpost for SED ${sedMottattHendelse.sedHendelse.rinaDokumentId}")

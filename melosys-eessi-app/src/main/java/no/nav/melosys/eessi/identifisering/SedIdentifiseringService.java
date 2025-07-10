@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.nav.Person;
-import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +42,7 @@ class SedIdentifiseringService implements PersonIdentifisering {
 
     private Optional<String> vurderEllerSøkEtterPerson(Person sedPerson) {
         PersonsokKriterier søkeKriterier = PersonsokKriterier.builder().fornavn(sedPerson.getFornavn()).etternavn(sedPerson.getEtternavn()).foedselsdato(tilLocalDate(sedPerson.getFoedselsdato())).statsborgerskapISO2(sedPerson.hentStatsborgerksapsliste()).build();
-        Optional<String> norskIdent = sedPerson.finnNorskPin().map(Pin::getIdentifikator).flatMap(FnrUtils::filtrerUtGyldigNorskIdent);
+        Optional<String> norskIdent = Optional.ofNullable(sedPerson.hentNorskPersonnummer());
         if (norskIdent.isPresent()) {
             PersonSokResultat resultat = personSøk.vurderPerson(norskIdent.get(), søkeKriterier);
             if (resultat.personIdentifisert()) {
