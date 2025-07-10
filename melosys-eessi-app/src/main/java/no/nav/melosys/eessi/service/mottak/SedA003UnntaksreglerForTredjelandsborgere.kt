@@ -17,7 +17,7 @@ object SedA003UnntaksreglerForTredjelandsborgere {
         EøsLandkoder.CH,
     )
 
-    fun avsenderErFraGodkjentLandForUnntak(avsenderLandkode: String?): Boolean {
+    private fun avsenderErFraGodkjentLandForUnntak(avsenderLandkode: String?): Boolean {
         val eøsAvsenderLand = EøsLandkoder.entries.firstOrNull { it.name == avsenderLandkode }
         return eøsAvsenderLand in NORDISK_AVTALELAND_UNNTATT_TREDJELANDSBORGER_SJEKK
     }
