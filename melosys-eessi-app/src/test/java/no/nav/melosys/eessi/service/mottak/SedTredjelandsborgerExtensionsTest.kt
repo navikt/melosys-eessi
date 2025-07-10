@@ -53,23 +53,46 @@ class SedTredjelandsborgerExtensionsTest {
             expectedResult(false)
         },
         sedTestCase {
-            name("Norge er nevnt som arbeidssted")
+            name("Norge er nevnt i arbeidssted.address.land")
             sed {
                 sedType(SedType.A003)
                 vedtakLand("SE")
                 personMedStatsborgerskap("US")
-                arbeidssted("NO")
+                arbeidssted(
+                    Arbeidssted(
+                        adresse = Adresse(land = "NO")
+                    )
+                )
             }
             avsenderLand("NO")
             expectedResult(false)
+            reason("Norge er nevnt som arbeidssted")
         },
         sedTestCase {
-            name("Norge er nevnt som arbeidsland")
+            name("Norge er nevnt som i arbeidsland.land")
             sed {
                 sedType(SedType.A003)
                 vedtakLand("SE")
                 personMedStatsborgerskap("US")
-                arbeidsland("NO")
+                arbeidsland(
+                    Arbeidsland(land = "NO")
+                )
+            }
+            avsenderLand("NO")
+            expectedResult(false)
+            reason("Norge er nevnt som arbeidssted")
+        },
+        sedTestCase {
+            name("Norge er nevnt som land i arbeidsland.arbeidssted.address.land")
+            sed {
+                sedType(SedType.A003)
+                vedtakLand("SE")
+                personMedStatsborgerskap("US")
+                arbeidsland(
+                    Arbeidsland(
+                        arbeidssted = listOf(Arbeidssted(adresse = Adresse(land = "NO")))
+                    )
+                )
             }
             avsenderLand("NO")
             expectedResult(false)
@@ -147,18 +170,12 @@ class SEDTestBuilder {
         )
     }
 
-    fun arbeidssted(land: String) = apply {
-        this.arbeidssted = listOf(
-            Arbeidssted(
-                adresse = Adresse(land = land)
-            )
-        )
+    fun arbeidssted(arbeidssted: Arbeidssted) = apply {
+        this.arbeidssted = listOf(arbeidssted)
     }
 
-    fun arbeidsland(land: String) = apply {
-        this.arbeidsland = listOf(
-            Arbeidsland(land = land)
-        )
+    fun arbeidsland(arbeidsland: Arbeidsland) = apply {
+        this.arbeidsland = listOf(arbeidsland)
     }
 
     fun utenPerson() = apply { this.person = null }
