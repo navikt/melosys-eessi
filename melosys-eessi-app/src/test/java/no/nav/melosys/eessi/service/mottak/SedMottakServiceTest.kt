@@ -349,22 +349,22 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed skal ikke sende til id og fordeling ved tredje landsborger`() {
-        every { euxService.hentSedMedRetry(any(), any()) } returns SED().apply {
-            nav = Nav().apply {
-                bruker = Bruker().apply {
-                    person = Person().apply {
-                        statsborgerskap = listOf<String>("").map {
+        every { euxService.hentSedMedRetry(any(), any()) } returns SED(
+            nav = Nav(
+                bruker = Bruker(
+                    person = Person(
+                        statsborgerskap = listOf("FR").map {
                             Statsborgerskap().apply { land = it }
-                        }
+                        },
                         foedselsdato = "1990-01-01"
-                    }
-                }
-            }
-            sedType = "A003"
-            medlemskap = MedlemskapA003().apply {
+                    )
+                )
+            ),
+            sedType = "A003",
+            medlemskap = MedlemskapA003(
                 vedtak = VedtakA003(land = "NO")
-            }
-        }
+            )
+        )
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         every {
             opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any())
@@ -390,29 +390,27 @@ class SedMottakServiceTest {
     }
 
 
-    private fun opprettSED() = SED().apply {
-        nav = Nav().apply {
-            bruker = Bruker().apply {
-                person = Person().apply {
-                    statsborgerskap = listOf("NO", "SE").map {
-                        Statsborgerskap().apply { land = it }
-                    }
+    private fun opprettSED() = SED(
+        nav = Nav(
+            bruker = Bruker(
+                person = Person(
+                    statsborgerskap = listOf("NO", "SE").map { Statsborgerskap(land = it) },
                     foedselsdato = "1990-01-01"
-                }
-            }
-        }
-        sedType = "A009"
-        medlemskap = MedlemskapA009().apply {
-            vedtak = VedtakA009().apply {
-                gjelderperiode = Periode().apply {
-                    fastperiode = Fastperiode().apply {
-                        startdato = "2019-05-01"
+                )
+            )
+        ),
+        sedType = "A009",
+        medlemskap = MedlemskapA009(
+            vedtak = VedtakA009(
+                gjelderperiode = Periode(
+                    fastperiode = Fastperiode(
+                        startdato = "2019-05-01",
                         sluttdato = "2019-12-01"
-                    }
-                }
-            }
-        }
-    }
+                    )
+                )
+            )
+        )
+    )
 
     private fun sedHendelseMedBruker() = sedHendelseUtenBruker().apply {
         avsenderId = "SE:12345"
