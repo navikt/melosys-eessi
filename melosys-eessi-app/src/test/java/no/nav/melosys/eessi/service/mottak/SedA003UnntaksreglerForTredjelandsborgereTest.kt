@@ -38,7 +38,7 @@ class SedTredjelandsborgerExtensionsTest {
             sed {
                 sedType(SedType.A003)
                 vedtakLand("SE")
-                personMedNorskPin("12345678901")
+                personMedNorskPin("30056928150")
             }
             avsenderLand("NO")
             expectedResult(false)
