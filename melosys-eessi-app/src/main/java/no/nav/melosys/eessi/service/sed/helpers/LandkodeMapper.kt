@@ -26,7 +26,7 @@ object LandkodeMapper {
             UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2,
             KOSOVO_LANDKODE_ISO3 to KOSOVO_LANDKODE_ISO2,
         )
-    private val EØS_LANDKODER_ISO2 = EøsLandkoder.entries.map { it.name }
+    private val EØS_LANDKODER_ISO2 = EøsLandkoder.entries.map { it.name }.toSet()
 
     @JvmStatic
     fun mapTilLandkodeIso2(landkodeIso3: String?): String =
@@ -58,5 +58,5 @@ object LandkodeMapper {
             else -> landkode
         }
 
-    fun erEøsLand(landkodeIso2: String?): Boolean = EØS_LANDKODER_ISO2.contains(landkodeIso2)
+    fun erEøsLand(landkodeIso2: String?): Boolean = landkodeIso2 in EØS_LANDKODER_ISO2
 }
