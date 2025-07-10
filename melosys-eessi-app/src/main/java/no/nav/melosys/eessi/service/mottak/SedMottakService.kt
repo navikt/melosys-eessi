@@ -1,9 +1,10 @@
 package no.nav.melosys.eessi.service.mottak
 
+import io.getunleash.Unleash
 import jakarta.transaction.Transactional
 import mu.KotlinLogging
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName.TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
-import no.nav.melosys.eessi.identifisering.FnrUtils
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.PersonFasade
 import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvisisjonTilMellomlagringMapper
@@ -15,12 +16,12 @@ import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
-import no.nav.melosys.eessi.models.sed.nav.Person
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
+import no.nav.melosys.eessi.service.mottak.SedA003UnntaksreglerForTredjelandsborgere.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted
 import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
@@ -41,6 +42,7 @@ class SedMottakService(
     private val personIdentifisering: PersonIdentifisering,
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
+    private val unleach: Unleash,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -92,31 +94,33 @@ class SedMottakService(
         sedMetrikker.sedMottatt(sedMottattHendelse.sedHendelse.sedType)
     }
 
-    private fun sjekkSedMottakerOgAvsenderID(sedHendelse: SedHendelse){
-        if (sedHendelse.avsenderId.isNullOrEmpty() && sedHendelse.mottakerId.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderId og mottakerId")
-        }
+    private fun sjekkSedMottakerOgAvsenderID(sedHendelse: SedHendelse) {
+        sedHendelse.run {
+            when {
+                avsenderId.isNullOrEmpty() && mottakerId.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderId og mottakerId")
 
-        if (sedHendelse.mottakerId.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler mottakerId")
-        }
+                mottakerId.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler mottakerId")
 
-        if (sedHendelse.avsenderId.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderId")
+                avsenderId.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderId")
+            }
         }
     }
 
-    private fun sjekkSedMottakerOgAvsenderNavn(sedHendelse: SedHendelse){
-        if (sedHendelse.avsenderNavn.isNullOrEmpty() && sedHendelse.mottakerNavn.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn og mottakerNavn")
-        }
+    private fun sjekkSedMottakerOgAvsenderNavn(sedHendelse: SedHendelse) {
+        sedHendelse.run {
+            when {
+                avsenderNavn.isNullOrEmpty() && mottakerNavn.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderNavn og mottakerNavn")
 
-        if (sedHendelse.mottakerNavn.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn")
-        }
+                mottakerNavn.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler mottakerNavn")
 
-        if (sedHendelse.avsenderNavn.isNullOrEmpty()){
-            throw IllegalStateException("Mottatt SED ${sedHendelse.sedId} mangler avsenderNavn")
+                avsenderNavn.isNullOrEmpty() ->
+                    error("Mottatt SED $sedId mangler avsenderNavn")
+            }
         }
     }
 
@@ -141,6 +145,17 @@ class SedMottakService(
         if (!sedMottatt.sedHendelse.erASED()) {
             log.info("SED er ikke A-sed, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
             return
+        }
+
+        fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
+        if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
+            // TODO: lagre SED i DB for å se de vi ikke oppretter oppgave for og sjekke mer nøye at de det stemmer
+            if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
+                log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
+                return
+            } else {
+                log.info("Toggle TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED er deaktivert, så oppretter fortsatt oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
+            }
         }
 
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
@@ -178,7 +193,7 @@ class SedMottakService(
         val personFraSed = sed.finnPerson().orElse(null)
 
         return when {
-            personFraSed != null && !harNorskPersonnummer(personFraSed) -> {
+            personFraSed != null && !personFraSed.harNorskPersonnummer() -> {
                 val identRekvisjonTilMellomlagring =
                     IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed)
 
@@ -201,11 +216,6 @@ class SedMottakService(
             }
         }
     }
-
-    private fun harNorskPersonnummer(personFraSed: Person): Boolean = personFraSed.finnNorskPin()
-        .map { it.identifikator }
-        .flatMap(FnrUtils::filtrerUtGyldigNorskIdent)
-        .isPresent
 
     private fun opprettJournalpost(sedMottattHendelse: SedMottattHendelse, navIdent: String? = null): String {
         log.info("Oppretter journalpost for SED ${sedMottattHendelse.sedHendelse.rinaDokumentId}")

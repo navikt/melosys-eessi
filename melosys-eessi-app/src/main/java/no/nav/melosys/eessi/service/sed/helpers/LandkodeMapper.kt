@@ -17,7 +17,7 @@ object LandkodeMapper {
     const val KOSOVO_LANDKODE_ISO2 = "XK"
 
     private const val STATSLØS_LANDKODE_ISO3 = "XXX"
-    private const val STATSLØS_LANDKODE_ISO2 = "XS"
+    const val STATSLØS_LANDKODE_ISO2 = "XS"
 
     private val ISO3_TIL_ISO2_LANDKODER_MAP = Locale.getISOCountries()
         .associateBy { Locale.Builder().setRegion(it).build().isO3Country }.toMap() +
@@ -26,6 +26,7 @@ object LandkodeMapper {
             UKJENT_LANDKODE_ISO3 to UKJENT_LANDKODE_ISO2,
             KOSOVO_LANDKODE_ISO3 to KOSOVO_LANDKODE_ISO2,
         )
+    private val EØS_LANDKODER_ISO2 = EøsLandkoder.entries.map { it.name }.toSet()
 
     @JvmStatic
     fun mapTilLandkodeIso2(landkodeIso3: String?): String =
@@ -56,4 +57,6 @@ object LandkodeMapper {
             "EL" -> "GR"
             else -> landkode
         }
+
+    fun erEøsLand(landkodeIso2: String?): Boolean = landkodeIso2 in EØS_LANDKODER_ISO2
 }

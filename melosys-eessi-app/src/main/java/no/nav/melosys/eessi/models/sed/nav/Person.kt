@@ -1,7 +1,9 @@
 package no.nav.melosys.eessi.models.sed.nav
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import no.nav.melosys.eessi.identifisering.FnrUtils
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class Person(
@@ -15,11 +17,14 @@ data class Person(
     var pin: Collection<Pin> = setOf(),
     var statsborgerskap: Collection<Statsborgerskap?> = setOf()
 ) {
-    fun finnNorskPin(): Optional<Pin> = pin.firstOrNull { it.land == "NO" }?.let { Optional.of(it) } ?: Optional.empty()
-
     fun hentStatsborgerksapsliste(): Collection<String> = statsborgerskap.mapNotNull { it?.land }
 
     fun harStatsborgerskap(land: String): Boolean = hentStatsborgerksapsliste().contains(land)
 
     fun finnUtenlandskIdFraLand(land: String): Optional<Pin> = pin.firstOrNull { it.land == land }?.let { Optional.of(it) } ?: Optional.empty()
+
+    fun hentNorskPersonnummer(): String? =
+        pin.firstOrNull { it.land == "NO" }?.identifikator?.let { FnrUtils.filtrerUtGyldigNorskIdent(it).getOrNull() }
+
+    fun harNorskPersonnummer(): Boolean = hentNorskPersonnummer() != null
 }

@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.mottak
 
+import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -13,6 +14,7 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.*
 import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
@@ -80,7 +82,8 @@ class SedMottakServiceTest {
             personIdentifisering,
             bucIdentifisertService,
             saksrelasjonService,
-            "1"
+            FakeUnleash().apply { enableAll() },
+            "1",
         )
         val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)
         every { saksrelasjonService.finnVedRinaSaksnummer(any()) } returns Optional.of(rinasakKobling)
@@ -249,7 +252,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis avsenderId ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             mottakerId = "123";
             mottakerNavn = "321";
             avsenderNavn = "123";
@@ -269,7 +272,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis mottakerId ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             avsenderId = "123";
             mottakerNavn = "321";
             avsenderNavn = "123";
@@ -307,7 +310,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis avsenderNavn ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             mottakerNavn = "123";
             avsenderId = "123";
             mottakerId = "321";
@@ -327,7 +330,7 @@ class SedMottakServiceTest {
 
     @Test
     fun `behandleSed hvis mottakerNavn ikke er satt kasterException`() {
-        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply{
+        val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
             avsenderNavn = "123";
             avsenderId = "123";
             mottakerId = "321";
@@ -344,29 +347,70 @@ class SedMottakServiceTest {
         }.message shouldBe "Mottatt SED ${sedHendelse.sedId} mangler mottakerNavn"
     }
 
-    private fun opprettSED() = SED().apply {
-        nav = Nav().apply {
-            bruker = Bruker().apply {
-                person = Person().apply {
-                    statsborgerskap = listOf("NO", "SE").map {
-                        Statsborgerskap().apply { land = it }
-                    }
-                    foedselsdato = "1990-01-01"
-                }
-            }
-        }
-        sedType = "A009"
-        medlemskap = MedlemskapA009().apply {
-            vedtak = VedtakA009().apply {
-                gjelderperiode = Periode().apply {
-                    fastperiode = Fastperiode().apply {
-                        startdato = "2019-05-01"
-                        sluttdato = "2019-12-01"
-                    }
-                }
-            }
-        }
+    @Test
+    fun `behandleSed skal ikke sende til id og fordeling ved tredjelandsborger`() {
+        every { euxService.hentSedMedRetry(any(), any()) } returns SED(
+            nav = Nav(
+                bruker = Bruker(
+                    person = Person(
+                        statsborgerskap = listOf("FR").map {
+                            Statsborgerskap().apply { land = it }
+                        },
+                        foedselsdato = "1990-01-01"
+                    )
+                )
+            ),
+            sedType = "A003",
+            medlemskap = MedlemskapA003(
+                vedtak = VedtakA003(land = "NO")
+            )
+        )
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every {
+            opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any())
+        } returns "ignorer"
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
+        every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
+        val sedHendelse = sedHendelseUtenBruker()
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify(exactly = 1) { personIdentifisering.identifiserPerson(any(), any()) }
+        verify { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
+        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
+        verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
+        verify(exactly = 0) { bucIdentifisertService.lagreIdentifisertPerson(any(), any()) }
+        verify(exactly = 0) { bucIdentifiseringOppgRepository.findByOppgaveId(any()) }
     }
+
+
+    private fun opprettSED() = SED(
+        nav = Nav(
+            bruker = Bruker(
+                person = Person(
+                    statsborgerskap = listOf("NO", "SE").map { Statsborgerskap(land = it) },
+                    foedselsdato = "1990-01-01"
+                )
+            )
+        ),
+        sedType = "A009",
+        medlemskap = MedlemskapA009(
+            vedtak = VedtakA009(
+                gjelderperiode = Periode(
+                    fastperiode = Fastperiode(
+                        startdato = "2019-05-01",
+                        sluttdato = "2019-12-01"
+                    )
+                )
+            )
+        )
+    )
 
     private fun sedHendelseMedBruker() = sedHendelseUtenBruker().apply {
         avsenderId = "SE:12345"
