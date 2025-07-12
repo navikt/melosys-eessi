@@ -1,203 +1,207 @@
-package no.nav.melosys.eessi;
+package no.nav.melosys.eessi
 
-import java.time.Duration;
-import java.util.Collections;
-import java.util.Random;
-import java.util.UUID;
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
+import io.mockk.Called
+import io.mockk.every
+import io.mockk.verify
+import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
+import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent
+import no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe
+import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit
+import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson
+import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
+import no.nav.melosys.eessi.kafka.producers.model.Periode
+import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
+import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
+import org.awaitility.Awaitility.await
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import java.time.Duration
+import java.time.LocalDate
+import java.util.*
+import kotlin.collections.forEach
 
-import lombok.extern.slf4j.Slf4j;
-import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLIdent;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit;
-import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
-import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
-import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
-import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import static no.nav.melosys.eessi.integration.pdl.dto.PDLIdentGruppe.FOLKEREGISTERIDENT;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-
-@Slf4j
-class SedMottakTestIT extends ComponentTestBase {
+class SedMottakTestIT : ComponentTestBaseKotlin() {
 
     @Autowired
-    BucIdentifiseringOppgRepository bucIdentifiseringOppgRepository;
+    lateinit var bucIdentifiseringOppgRepository: BucIdentifiseringOppgRepository
+
     @Autowired
-    SedMottattHendelseRepository sedMottattHendelseRepository;
+    lateinit var sedMottattHendelseRepository: SedMottattHendelseRepository
 
-    final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
+    private val rinaSaksnummer = Random().nextInt(100000).toString()
 
     @Test
-    void sedMottattMedFnr_blirIdentifisert_publiseresKafka() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+    fun `sed mottatt med fnr blir identifisert og publiseres på Kafka`() {
+        val sedID = UUID.randomUUID().toString()
+        every { euxConsumer.hentSed(any(), any()) } returns mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR)
 
-        mockPerson();
+        mockPerson()
 
-        // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
-        kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
-        kafkaTestConsumer.doWait(5_000L);
+        kafkaTestConsumer.reset(2)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1)
     }
 
     @Test
-    void sedMottattMedFnr_sektorKodeH_ignorererMelding() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
+    fun `sed mottatt med sektorKode H ignoreres`() {
+        val sedID = UUID.randomUUID().toString()
 
-        kafkaTestConsumer.reset(1);
-        SedHendelse sedHendelse = mockData.sedHendelse(rinaSaksnummer, sedID, FNR);
-        sedHendelse.setSektorKode("H");
-        kafkaTemplate.send(lagSedMottattRecord(sedHendelse)).get();
-        kafkaTestConsumer.doWait(5_000L);
+        kafkaTestConsumer.reset(1)
+        val sedHendelse = mockData.sedHendelse(rinaSaksnummer, sedID, FNR).apply {
+            sektorKode = "H"
+        }
+        kafkaTemplate.send(lagSedMottattRecord(sedHendelse)).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        verifyNoInteractions(euxConsumer);
+        verify { euxConsumer wasNot Called }
     }
 
     @Test
-    void sedMottattUtenFnr_søkIdentifiserer_sendtPåTopic() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
+    fun `sed mottatt uten fnr søker identifisering og publiseres på Kafka`() {
+        val sedID = UUID.randomUUID().toString()
+        every { euxConsumer.hentSed(any(), any()) } returns mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null)
 
-        var pdlSøkPerson = new PDLSokPerson();
-        var søkHits = new PDLSokHit();
-        søkHits.setIdenter(Collections.singleton(new PDLIdent(FOLKEREGISTERIDENT, FNR)));
-        pdlSøkPerson.setHits(Collections.singleton(søkHits));
-        when(pdlConsumer.søkPerson(any())).thenReturn(pdlSøkPerson);
-        mockPerson();
+        val pdlSøkPerson = PDLSokPerson().apply {
+            hits = setOf(PDLSokHit().apply {
+                identer = setOf(PDLIdent(PDLIdentGruppe.FOLKEREGISTERIDENT, FNR))
+            })
+        }
+        every { pdlConsumer.søkPerson(any()) } returns pdlSøkPerson
+        mockPerson()
 
-        kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
-        kafkaTestConsumer.doWait(5_000L);
+        kafkaTestConsumer.reset(2)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1)
     }
 
     @Test
-    void toSedMottattUtenFnr_oppretterIdentifiseringsoppgave_reagererPåEndretOppgave() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        final var sedID2 = UUID.randomUUID().toString();
-        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
-        oppgaveDto.setStatus("OPPRETTET");
+    fun `to sed mottatt uten fnr oppretter identifiseringsoppgave og reagerer på endret oppgave`() {
+        val sedID1 = UUID.randomUUID().toString()
+        val sedID2 = UUID.randomUUID().toString()
+        val oppgaveID = Random().nextInt(100000).toString()
+        val oppgaveDto = HentOppgaveDto(oppgaveID, "AAPEN", 1).apply { status = "OPPRETTET" }
 
-        mockPerson();
+        mockPerson()
+        every { euxConsumer.hentSed(any(), any()) } returns mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null)
+        every { pdlConsumer.søkPerson(any()) } returns PDLSokPerson()
+        every { oppgaveConsumer.opprettOppgave(any()) } returns oppgaveDto
+        every { oppgaveConsumer.hentOppgave(oppgaveID) } returns oppgaveDto
 
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
-        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
-        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+        kafkaTestConsumer.reset(2)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID1, null))).get()
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get();
-        kafkaTestConsumer.doWait(5_000L);
+        await().atMost(Duration.ofSeconds(4)).pollInterval(Duration.ofSeconds(1))
+            .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2 }
 
-        await().atMost(Duration.ofSeconds(4))
-            .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+        await().atMost(Duration.ofSeconds(4)).untilAsserted {
+            verify { oppgaveConsumer.opprettOppgave(any()) }
+        }
+        hentMelosysEessiRecords().shouldBeEmpty()
+        bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID).shouldNotBeNull()
 
-        verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
-        assertThat(hentMelosysEessiRecords()).isEmpty();
-        assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
+        kafkaTestConsumer.reset(3)
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        kafkaTestConsumer.reset(3);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get();
-        kafkaTestConsumer.doWait(5_000L);
-
-        verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
-
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 2);
+        await().atMost(Duration.ofSeconds(4)).untilAsserted {
+            verify { oppgaveConsumer.oppdaterOppgave(eq(oppgaveID), any()) }
+        }
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 2)
     }
 
     @Test
-    void toSedMottattIdentifisert_publisererPåKafka() throws Exception {
-        final var sedID = UUID.randomUUID().toString();
-        final var sedID2 = UUID.randomUUID().toString();
-        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
-        oppgaveDto.setStatus("OPPRETTET");
+    fun `to sed mottatt med fnr publiseres på Kafka`() {
+        val sedID1 = UUID.randomUUID().toString()
+        val sedID2 = UUID.randomUUID().toString()
+        mockPerson()
 
-        mockPerson();
+        every { euxConsumer.hentSed(any(), any()) } returns mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR)
+        every { pdlConsumer.søkPerson(any()) } returns PDLSokPerson()
 
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
-        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
+        kafkaTestConsumer.reset(2)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID1, FNR))).get()
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, FNR))).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        kafkaTestConsumer.reset(2);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, FNR))).get();
-        kafkaTestConsumer.doWait(5_000L);
+        await().atMost(Duration.ofSeconds(4)).pollInterval(Duration.ofSeconds(1))
+            .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2 }
 
-        await().atMost(Duration.ofSeconds(4))
-            .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
-
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 2);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 2)
     }
 
     @Test
-    void sedMottattIkkeIdentifisert_oppgaveBlirIdentifisertOgMarkertSomFeilIdentifisert_førsteSedFlyttesTilIdOgFordeling() throws Exception {
-        final var sedID1 = UUID.randomUUID().toString();
-        final var sedID2 = UUID.randomUUID().toString();
-        final var oppgaveID = Integer.toString(new Random().nextInt(100000));
-        final var oppgaveDto = new HentOppgaveDto(oppgaveID, "AAPEN", 1);
-        oppgaveDto.setStatus("OPPRETTET");
+    fun `sed ikke identifisert oppgave identifiseres og markeres feil, første sed flyttes til ID og fordeling`() {
+        val sedID1 = UUID.randomUUID().toString()
+        val sedID2 = UUID.randomUUID().toString()
+        val oppgaveID = Random().nextInt(100000).toString()
+        val oppgaveDto = HentOppgaveDto(oppgaveID, "AAPEN", 1).apply { status = "OPPRETTET" }
 
-        mockPerson(FØDSELSDATO.minusYears(1), "DK");
+        mockPerson(FØDSELSDATO.minusYears(1), "DK")
+        every { euxConsumer.hentSed(any(), any()) } returns mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null)
+        every { pdlConsumer.søkPerson(any()) } returns PDLSokPerson()
+        every { oppgaveConsumer.opprettOppgave(any()) } returns oppgaveDto
+        every { oppgaveConsumer.hentOppgave(oppgaveID) } returns oppgaveDto
 
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, null));
-        when(pdlConsumer.søkPerson(any())).thenReturn(new PDLSokPerson());
-        when(oppgaveConsumer.opprettOppgave(any())).thenReturn(oppgaveDto);
-        when(oppgaveConsumer.hentOppgave(oppgaveID)).thenReturn(oppgaveDto);
+        kafkaTestConsumer.reset(1)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID1, null))).get()
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID1, null))).get();
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID2, null))).get();
-        kafkaTestConsumer.doWait(5_000L);
+        await().atMost(Duration.ofSeconds(4)).pollInterval(Duration.ofSeconds(1))
+            .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2 }
 
-        await().atMost(Duration.ofSeconds(4))
-            .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 2);
+        await().atMost(Duration.ofSeconds(6)).untilAsserted {
+            verify() { oppgaveConsumer.opprettOppgave(any()) }
+        }
 
-        verify(oppgaveConsumer, timeout(6000)).opprettOppgave(any());
-        assertThat(hentMelosysEessiRecords()).isEmpty();
-        assertThat(bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID)).isPresent();
+        hentMelosysEessiRecords().shouldBeEmpty()
+        bucIdentifiseringOppgRepository.findByOppgaveId(oppgaveID).shouldNotBeNull()
 
-        //Forventer kun én melding, som er oppgave-endret record
-        kafkaTestConsumer.reset(1);
-        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get();
-        kafkaTestConsumer.doWait(5_000L);
+        kafkaTestConsumer.reset(1)
+        kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID, "1", rinaSaksnummer)).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        verify(oppgaveConsumer, timeout(4000)).oppdaterOppgave(eq(oppgaveID), any());
-
-        assertThat(hentMelosysEessiRecords()).isEmpty();
+        await().atMost(Duration.ofSeconds(4)).untilAsserted {
+            verify() { oppgaveConsumer.oppdaterOppgave(eq(oppgaveID), any()) }
+        }
+        hentMelosysEessiRecords().shouldBeEmpty()
     }
 
     @Test
-    void sedMottak_identiskeMeldinger_kunFørsteMeldingBehandles() throws Exception{
-        final var sedID = UUID.randomUUID().toString();
-        when(euxConsumer.hentSed(anyString(), anyString())).thenReturn(mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR));
+    fun `identiske sed mottak meldinger behandles kun én gang`() {
+        val sedID = UUID.randomUUID().toString()
+        every { euxConsumer.hentSed(any(), any()) } returns mockData.sed(FØDSELSDATO, STATSBORGERSKAP, FNR)
+        mockPerson()
 
-        mockPerson();
+        kafkaTestConsumer.reset(3)
+        val hendelse = mockData.sedHendelse(rinaSaksnummer, sedID, FNR)
+        kafkaTemplate.send(lagSedMottattRecord(hendelse)).get()
+        kafkaTemplate.send(lagSedMottattRecord(hendelse)).get()
+        kafkaTestConsumer.doWait(5_000L)
 
-        // Venter på to Kafka-meldinger: den vi selv legger på topic som input, og den som kommer som output
-        kafkaTestConsumer.reset(3);
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
-        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, FNR))).get();
-        kafkaTestConsumer.doWait(5_000L);
+        await().atMost(Duration.ofSeconds(4)).pollInterval(Duration.ofSeconds(1))
+            .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1 }
 
-        await().atMost(Duration.ofSeconds(4))
-            .pollInterval(Duration.ofSeconds(1))
-            .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1)
+    }
 
-
-        assertMelosysEessiMelding(hentMelosysEessiRecords(), 1);
+     fun assertMelosysEessiMelding(records: Collection<MelosysEessiMelding>, expectedSize: Int) {
+        records.shouldHaveSize(expectedSize)
+        records.forEach {
+            it.periode shouldBe  Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01"))
+            listOf(null, "1").shouldContain(it.journalpostId)
+            it.aktoerId shouldBe AKTOER_ID
+        }
     }
 }

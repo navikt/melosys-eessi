@@ -26,7 +26,7 @@ public class MockData {
     public MockData() {
     }
 
-    SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident) {
+    public SedHendelse sedHendelse(String rinaSaksnummer, String sedID, String ident) {
         return SedHendelse.builder()
                 .avsenderId("US:avsenderId")
                 .avsenderNavn("avsender")
@@ -44,7 +44,7 @@ public class MockData {
                 .build();
     }
 
-    SED sed(LocalDate fødselsdato, String statsborgerskap, String ident) {
+    public SED sed(LocalDate fødselsdato, String statsborgerskap, String ident) {
         SED sed = new SED();
         sed.setSedType(A003.name());
 
