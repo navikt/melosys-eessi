@@ -2,7 +2,7 @@ no.nav.security.jwt.client.registration:
   eux-rina-api:
     token-endpoint-url: dummy
   eux-nav-rinasak:
-      token-endpoint-url: dummy
+    token-endpoint-url: dummy
   pdl-web:
     token-endpoint-url: dummy
   pdl:
@@ -16,14 +16,3 @@ no.nav.security.jwt.client.registration:
 
 unleash:
   token: "fake"
-
-spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=eessi
-    username: postgres
-    password: mysecretpassword
-  jpa:
-    properties:
-      hibernate:
-        default_schema: eessi
-

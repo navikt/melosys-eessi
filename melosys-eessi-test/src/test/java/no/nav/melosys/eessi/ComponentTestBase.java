@@ -25,7 +25,6 @@ import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
-import no.nav.melosys.utils.PostgresContainer;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -39,7 +38,6 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.junit.jupiter.Container;
 
 import static no.nav.melosys.eessi.ComponentTestBase.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -53,7 +51,7 @@ import static org.mockito.Mockito.when;
     topics = {EESSIBASIS_SEDMOTTATT_V_1, EESSIBASIS_SEDSENDT_V_1, OPPGAVE_ENDRET, TEAMMELOSYS_EESSI_V_1_LOCAL},
     brokerProperties = {"offsets.topic.replication.factor=1", "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"})
 @EnableMockOAuth2Server
-public abstract class ComponentTestBase {
+public abstract class ComponentTestBase extends PostgresTestContainerBase {
     public static final String EESSIBASIS_SEDMOTTATT_V_1 = "eessibasis-sedmottatt-v1";
     public static final String EESSIBASIS_SEDSENDT_V_1 = "eessibasis-sedsendt-v1";
     public static final String OPPGAVE_ENDRET = "oppgavehandtering.oppgavehendelse-v1";
@@ -104,9 +102,6 @@ public abstract class ComponentTestBase {
     protected ProducerRecord<String, Object> lagSedMottattRecord(SedHendelse sedHendelse) {
         return new ProducerRecord<>(EESSIBASIS_SEDMOTTATT_V_1, "key", sedHendelse);
     }
-
-    @Container
-    public static PostgresContainer DB = PostgresContainer.getInstance();
 
 
     @BeforeEach

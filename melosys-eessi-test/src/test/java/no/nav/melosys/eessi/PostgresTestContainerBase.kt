@@ -17,7 +17,6 @@ open class PostgresTestContainerBase {
                 registry.add("spring.datasource.url") { dbContainer.jdbcUrl }
                 registry.add("spring.datasource.password") { dbContainer.password }
                 registry.add("spring.datasource.username") { dbContainer.username }
-                registry.add("spring.jpa.properties.hibernate.default_schema") { "public" }
 
                 dbContainer.start()
             }
