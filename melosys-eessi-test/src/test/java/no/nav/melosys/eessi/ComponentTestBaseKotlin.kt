@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.ninjasquad.springmockk.MockkBean
 import io.getunleash.FakeUnleash
@@ -69,6 +68,9 @@ abstract class ComponentTestBaseKotlin {
 
     @Autowired
     lateinit var kafkaTemplate: KafkaTemplate<String, Any>
+
+    @Autowired(required = false)
+    lateinit var objectMapper: ObjectMapper
 
     @MockkBean(relaxed = true)
     lateinit var euxConsumer: EuxConsumer
@@ -162,9 +164,6 @@ abstract class ComponentTestBaseKotlin {
         const val FNR = "25068420779"
         const val AKTOER_ID = "1234567890123"
 
-        val objectMapper: ObjectMapper = ObjectMapper().apply {
-            registerModule(JavaTimeModule())
-        }
         @Container
         val DB: PostgresContainer = PostgresContainer.getInstance()
     }
