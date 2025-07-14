@@ -15,15 +15,19 @@ import no.nav.melosys.eessi.integration.pdl.dto.PDLSokHit
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
 import no.nav.melosys.eessi.kafka.producers.model.Periode
+import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
+import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
+import no.nav.melosys.eessi.repository.SedMottattStorageRepository
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.Duration
 import java.time.LocalDate
 import java.util.*
-import kotlin.collections.forEach
 
 class SedMottakTestIT : ComponentTestBaseKotlin() {
 
@@ -32,6 +36,9 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
 
     @Autowired
     lateinit var sedMottattHendelseRepository: SedMottattHendelseRepository
+
+    @Autowired
+    lateinit var sedMottattStorageRepository: SedMottattStorageRepository
 
     private val rinaSaksnummer = Random().nextInt(100000).toString()
 
@@ -141,6 +148,46 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
     }
 
     @Test
+    fun `to sed mottatt med treff på tredjelandsborger regel - skal lagre i sed`() {
+        val sedID1 = UUID.randomUUID().toString()
+
+        val sed = SED(
+            sedType = SedType.A003.name,
+            medlemskap = MedlemskapA003(
+                vedtak = VedtakA003(land = "SE")
+            ),
+            nav = Nav(
+                bruker = Bruker(
+                    person = Person(
+                        foedselsdato = "2019-06-01",
+                        fornavn = "Fornavn",
+                        etternavn = "Etternavn",
+                        statsborgerskap = listOf(Statsborgerskap(land = "US"))
+                    )
+                ),
+                arbeidssted = emptyList(),
+                arbeidsland = emptyList()
+            )
+        )
+        every { euxConsumer.hentSed(any(), any()) } returns sed
+
+        kafkaTestConsumer.reset(1)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID1, FNR))).get()
+        kafkaTestConsumer.doWait(5_000L)
+
+        await().atMost(Duration.ofSeconds(4)).pollInterval(Duration.ofSeconds(1))
+            .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1 }
+
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 0)
+
+        sedMottattStorageRepository.findAll()
+            .shouldHaveSize(1)
+            .single()
+            .sed shouldBe sed
+
+    }
+
+    @Test
     fun `sed ikke identifisert oppgave identifiseres og markeres feil, første sed flyttes til ID og fordeling`() {
         val sedID1 = UUID.randomUUID().toString()
         val sedID2 = UUID.randomUUID().toString()
@@ -196,10 +243,10 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 1)
     }
 
-     fun assertMelosysEessiMelding(records: Collection<MelosysEessiMelding>, expectedSize: Int) {
+    fun assertMelosysEessiMelding(records: Collection<MelosysEessiMelding>, expectedSize: Int) {
         records.shouldHaveSize(expectedSize)
         records.forEach {
-            it.periode shouldBe  Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01"))
+            it.periode shouldBe Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01"))
             listOf(null, "1").shouldContain(it.journalpostId)
             it.aktoerId shouldBe AKTOER_ID
         }
