@@ -12,8 +12,8 @@ import org.hibernate.type.SqlTypes
 import java.time.ZonedDateTime
 
 @Entity
-@Table(name = "sed_storage")
-class SedMottattStorage(
+@Table(name = "sed_mottatt_lager")
+class SedMottattLager(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,

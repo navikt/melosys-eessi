@@ -1,4 +1,4 @@
-CREATE TABLE sed_storage
+CREATE TABLE sed_mottatt_lager
 (
     id              SERIAL PRIMARY KEY,
     sed_id          VARCHAR(50) NOT NULL,

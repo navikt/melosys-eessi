@@ -18,7 +18,7 @@ import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattStorage
+import no.nav.melosys.eessi.repository.SedMottattLager
 import no.nav.melosys.eessi.repository.SedMottattStorageRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
@@ -174,7 +174,7 @@ class SedMottakService(
     private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
         try {
             sedMottatattStorageRepository.save(
-                SedMottattStorage(
+                SedMottattLager(
                     sedId = sedMottatt.sedHendelse.sedId,
                     sed = sed,
                     storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",

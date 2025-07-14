@@ -5,9 +5,9 @@ import org.springframework.stereotype.Repository
 import java.time.ZonedDateTime
 
 @Repository
-interface SedMottattStorageRepository : JpaRepository<SedMottattStorage, Long> {
+interface SedMottattStorageRepository : JpaRepository<SedMottattLager, Long> {
 
-    fun findBySedId(sedId: String): List<SedMottattStorage>
+    fun findBySedId(sedId: String): List<SedMottattLager>
 
-    fun findByCreatedAtBetween(start: ZonedDateTime, end: ZonedDateTime): List<SedMottattStorage>
+    fun findByCreatedAtBetween(start: ZonedDateTime, end: ZonedDateTime): List<SedMottattLager>
 }
