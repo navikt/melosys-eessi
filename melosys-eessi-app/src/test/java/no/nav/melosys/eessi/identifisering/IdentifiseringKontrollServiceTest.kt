@@ -62,8 +62,8 @@ internal class IdentifiseringKontrollServiceTest {
 
         sedPerson.foedselsdato = fødselsdato.toString()
         sedPerson.kjoenn = no.nav.melosys.eessi.models.sed.nav.Kjønn.K
-        sedPerson.pin = setOf(utenlandskPin)
-        sedPerson.statsborgerskap = setOf(statsborgerskap)
+        sedPerson.pin = listOf(utenlandskPin)
+        sedPerson.statsborgerskap = listOf(statsborgerskap)
 
         sed.nav = Nav(
             bruker = Bruker(

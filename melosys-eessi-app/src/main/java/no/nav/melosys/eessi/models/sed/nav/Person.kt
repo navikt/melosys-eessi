@@ -14,8 +14,8 @@ data class Person(
     var fornavn: String? = null,
     var fornavnvedfoedsel: String? = null,
     var kjoenn: Kjønn? = null,
-    var pin: Collection<Pin> = setOf(),
-    var statsborgerskap: Collection<Statsborgerskap?> = setOf()
+    var pin: List<Pin> = emptyList(),
+    var statsborgerskap: List<Statsborgerskap?> = emptyList()
 ) {
     fun hentStatsborgerksapsliste(): Collection<String> = statsborgerskap.mapNotNull { it?.land }
 

@@ -167,7 +167,7 @@ class SEDTestBuilder {
     fun personMedNorskPin(personnummer: String) = apply {
         this.person = Person(
             statsborgerskap = listOf(Statsborgerskap(land = "US")),
-            pin = setOf(Pin(land = "NO", identifikator = personnummer))
+            pin = listOf(Pin(land = "NO", identifikator = personnummer))
         )
     }
 
