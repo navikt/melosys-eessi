@@ -19,7 +19,6 @@ import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
 import no.nav.melosys.utils.ConsumerRecordPredicates
 import no.nav.melosys.utils.KafkaTestConfig
 import no.nav.melosys.utils.KafkaTestConsumer
-import no.nav.melosys.utils.PostgresContainer
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +29,6 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import org.testcontainers.junit.jupiter.Container
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDate
@@ -58,7 +56,7 @@ import java.time.LocalDate
     ]
 )
 @EnableMockOAuth2Server
-abstract class ComponentTestBaseKotlin {
+abstract class ComponentTestBaseKotlin : PostgresTestContainerBase() {
     protected val mockData = MockData()
     @Autowired
     lateinit var unleash: Unleash
@@ -163,8 +161,5 @@ abstract class ComponentTestBaseKotlin {
         const val STATSBORGERSKAP = "NO"
         const val FNR = "25068420779"
         const val AKTOER_ID = "1234567890123"
-
-        @Container
-        val DB: PostgresContainer = PostgresContainer.getInstance()
     }
 }

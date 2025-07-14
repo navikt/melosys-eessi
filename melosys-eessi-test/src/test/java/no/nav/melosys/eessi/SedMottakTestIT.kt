@@ -180,7 +180,7 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 0)
 
-        sedMottattStorageRepository.findAll()
+        sedMottattStorageRepository.findBySedId(sedID1)
             .shouldHaveSize(1)
             .single()
             .sed shouldBe sed
