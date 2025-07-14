@@ -172,14 +172,18 @@ class SedMottakService(
     }
 
     private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
-        sedMottatattStorageRepository.save(
-            SedMottattStorage(
-                sedId = sedMottatt.sedHendelse.sedId,
-                rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId,
-                sed = sed,
-                storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",
+        try {
+            sedMottatattStorageRepository.save(
+                SedMottattStorage(
+                    sedId = sedMottatt.sedHendelse.sedId,
+                    rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId,
+                    sed = sed,
+                    storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",
+                )
             )
-        )
+        } catch (e: Exception) {
+            log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed storage for tredjelandsborger uten arbeidssted i Norge", e)
+        }
     }
 
 
