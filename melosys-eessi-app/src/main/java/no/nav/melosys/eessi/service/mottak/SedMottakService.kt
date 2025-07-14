@@ -176,7 +176,6 @@ class SedMottakService(
             sedMottatattStorageRepository.save(
                 SedMottattStorage(
                     sedId = sedMottatt.sedHendelse.sedId,
-                    rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId,
                     sed = sed,
                     storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",
                 )

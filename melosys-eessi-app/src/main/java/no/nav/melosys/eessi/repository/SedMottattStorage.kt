@@ -21,9 +21,6 @@ class SedMottattStorage(
     @Column(name = "sed_id", nullable = false, length = 50)
     val sedId: String,
 
-    @Column(name = "rina_saksnummer", nullable = false, length = 20)
-    val rinaSaksnummer: String,
-
     @Column(name = "sed", nullable = false, columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
     val sed: SED,

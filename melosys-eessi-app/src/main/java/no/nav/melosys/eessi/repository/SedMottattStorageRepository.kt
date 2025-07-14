@@ -9,9 +9,5 @@ interface SedMottattStorageRepository : JpaRepository<SedMottattStorage, Long> {
 
     fun findBySedId(sedId: String): List<SedMottattStorage>
 
-    fun findByRinaSaksnummer(rinaSaksnummer: String): List<SedMottattStorage>
-
-    fun findByStorageReason(storageReason: String): List<SedMottattStorage>
-
     fun findByCreatedAtBetween(start: ZonedDateTime, end: ZonedDateTime): List<SedMottattStorage>
 }
