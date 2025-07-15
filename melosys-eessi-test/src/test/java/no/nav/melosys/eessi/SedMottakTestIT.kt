@@ -21,7 +21,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattStorageRepository
+import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,7 +38,7 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
     lateinit var sedMottattHendelseRepository: SedMottattHendelseRepository
 
     @Autowired
-    lateinit var sedMottattStorageRepository: SedMottattStorageRepository
+    lateinit var sedMottattStorageRepository: SedMottattLagerRepository
 
     private val rinaSaksnummer = Random().nextInt(100000).toString()
 

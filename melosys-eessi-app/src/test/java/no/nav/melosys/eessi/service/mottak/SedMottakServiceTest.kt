@@ -19,7 +19,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattStorageRepository
+import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
@@ -55,7 +55,7 @@ class SedMottakServiceTest {
     private lateinit var bucIdentifiseringOppgRepository: BucIdentifiseringOppgRepository
 
     @MockK(relaxed = true)
-    private lateinit var sedMottatattStorageRepository: SedMottattStorageRepository
+    private lateinit var sedMottatattStorageRepository: SedMottattLagerRepository
 
     @MockK(relaxed = true)
     private lateinit var bucIdentifisertService: BucIdentifisertService

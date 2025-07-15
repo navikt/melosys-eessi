@@ -19,7 +19,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import no.nav.melosys.eessi.repository.SedMottattLager
-import no.nav.melosys.eessi.repository.SedMottattStorageRepository
+import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
@@ -45,7 +45,7 @@ class SedMottakService(
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleach: Unleash,
-    private val sedMottatattStorageRepository: SedMottattStorageRepository,
+    private val sedMottatattStorageRepository: SedMottattLagerRepository,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 

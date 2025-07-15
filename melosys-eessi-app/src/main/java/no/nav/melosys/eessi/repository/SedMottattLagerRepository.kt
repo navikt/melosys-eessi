@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository
 import java.time.ZonedDateTime
 
 @Repository
-interface SedMottattStorageRepository : JpaRepository<SedMottattLager, Long> {
+interface SedMottattLagerRepository : JpaRepository<SedMottattLager, Long> {
 
     fun findBySedId(sedId: String): List<SedMottattLager>
 
