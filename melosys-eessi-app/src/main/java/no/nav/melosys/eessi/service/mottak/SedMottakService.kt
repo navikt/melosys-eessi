@@ -181,7 +181,7 @@ class SedMottakService(
                 )
             )
         } catch (e: Exception) {
-            log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed storage for tredjelandsborger uten arbeidssted i Norge", e)
+            log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
         }
     }
 
