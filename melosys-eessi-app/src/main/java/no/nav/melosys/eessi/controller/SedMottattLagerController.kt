@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.controller
 
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.SedMottattLager
 import no.nav.melosys.eessi.repository.SedMottattLagerRepository
@@ -18,9 +22,24 @@ class SedMottattLagerController(
 ) {
 
     @GetMapping
-    fun getAllSeds(pageable: Pageable): Page<SedMottattLager> {
-        return sedMottattLagerRepository.findAll(pageable)
-    }
+    @Parameter(
+        name = "sort",
+        description = "Sort criteria in the format: property(,asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+        example = "createdAt,desc",
+        `in` = ParameterIn.QUERY,
+        array = ArraySchema(
+            schema = Schema(
+                type = "string",
+                allowableValues = [
+                    "id", "id,asc", "id,desc",
+                    "sedId", "sedId,asc", "sedId,desc",
+                    "storageReason", "storageReason,asc", "storageReason,desc",
+                    "createdAt", "createdAt,asc", "createdAt,desc"
+                ]
+            )
+        )
+    )
+    fun getAllSeds(pageable: Pageable): Page<SedMottattLager> = sedMottattLagerRepository.findAll(pageable)
 
     @GetMapping("/{id}")
     fun getSedById(@PathVariable id: Long): ResponseEntity<SedMottattLager> =
