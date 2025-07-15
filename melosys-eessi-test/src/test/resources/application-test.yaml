@@ -32,8 +32,9 @@ KAFKA_BOOTSTRAP_SERVERS: ${spring.embedded.kafka.brokers}
 KAFKA_BROKERS: ${spring.embedded.kafka.brokers}
 
 spring.datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=eessi
     username: postgres
-    password: su
+    password: mysecretpassword
 
 spring.jpa:
     hibernate:
@@ -43,7 +44,6 @@ spring.jpa:
     show-sql: false
     properties:
         hibernate:
-            default_schema: PUBLIC
             format_sql: true
             jdbc.lob.non_contextual_creation: true
         jadira.usertype.autoRegisterUserTypes: true

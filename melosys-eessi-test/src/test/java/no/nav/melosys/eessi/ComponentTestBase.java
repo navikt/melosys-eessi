@@ -3,7 +3,6 @@ package no.nav.melosys.eessi;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,11 +22,9 @@ import no.nav.melosys.eessi.integration.saf.SafConsumer;
 import no.nav.melosys.eessi.integration.sak.SakConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
-import no.nav.melosys.eessi.kafka.producers.model.Periode;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
 import no.nav.melosys.utils.KafkaTestConfig;
 import no.nav.melosys.utils.KafkaTestConsumer;
-import no.nav.melosys.utils.PostgresContainer;
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -41,10 +38,8 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.junit.jupiter.Container;
 
 import static no.nav.melosys.eessi.ComponentTestBase.*;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -56,7 +51,7 @@ import static org.mockito.Mockito.when;
     topics = {EESSIBASIS_SEDMOTTATT_V_1, EESSIBASIS_SEDSENDT_V_1, OPPGAVE_ENDRET, TEAMMELOSYS_EESSI_V_1_LOCAL},
     brokerProperties = {"offsets.topic.replication.factor=1", "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"})
 @EnableMockOAuth2Server
-public abstract class ComponentTestBase {
+public abstract class ComponentTestBase extends PostgresTestContainerBase {
     public static final String EESSIBASIS_SEDMOTTATT_V_1 = "eessibasis-sedmottatt-v1";
     public static final String EESSIBASIS_SEDSENDT_V_1 = "eessibasis-sedsendt-v1";
     public static final String OPPGAVE_ENDRET = "oppgavehandtering.oppgavehendelse-v1";
@@ -108,9 +103,6 @@ public abstract class ComponentTestBase {
         return new ProducerRecord<>(EESSIBASIS_SEDMOTTATT_V_1, "key", sedHendelse);
     }
 
-    @Container
-    public static PostgresContainer DB = PostgresContainer.getInstance();
-
 
     @BeforeEach
     public void setup() {
@@ -154,16 +146,6 @@ public abstract class ComponentTestBase {
     @SneakyThrows
     MelosysEessiMelding tilMelosysEessiMelding(String value) {
         return objectMapper.readValue(value, MelosysEessiMelding.class);
-    }
-
-    void assertMelosysEessiMelding(Collection<MelosysEessiMelding> melosysEessiMelding, int forventetStørrelse) {
-        assertThat(melosysEessiMelding)
-            .hasSize(forventetStørrelse)
-            .allMatch(eessiMelding ->
-                eessiMelding.getPeriode().equals(new Periode(LocalDate.parse("2019-06-01"), LocalDate.parse("2019-12-01")))
-                    && (eessiMelding.getJournalpostId() == null || eessiMelding.getJournalpostId().equals("1"))
-                    && eessiMelding.getAktoerId().equals(AKTOER_ID)
-            );
     }
 
     protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String versjon, String rinaSaksnummer) {

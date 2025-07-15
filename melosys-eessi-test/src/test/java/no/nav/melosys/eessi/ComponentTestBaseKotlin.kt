@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.ninjasquad.springmockk.MockkBean
 import io.getunleash.FakeUnleash
@@ -20,7 +19,6 @@ import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding
 import no.nav.melosys.utils.ConsumerRecordPredicates
 import no.nav.melosys.utils.KafkaTestConfig
 import no.nav.melosys.utils.KafkaTestConsumer
-import no.nav.melosys.utils.PostgresContainer
 import no.nav.security.token.support.spring.test.EnableMockOAuth2Server
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +29,6 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.test.context.EmbeddedKafka
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
-import org.testcontainers.junit.jupiter.Container
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDate
@@ -59,7 +56,7 @@ import java.time.LocalDate
     ]
 )
 @EnableMockOAuth2Server
-abstract class ComponentTestBaseKotlin {
+abstract class ComponentTestBaseKotlin : PostgresTestContainerBase() {
     protected val mockData = MockData()
     @Autowired
     lateinit var unleash: Unleash
@@ -69,6 +66,9 @@ abstract class ComponentTestBaseKotlin {
 
     @Autowired
     lateinit var kafkaTemplate: KafkaTemplate<String, Any>
+
+    @Autowired(required = false)
+    lateinit var objectMapper: ObjectMapper
 
     @MockkBean(relaxed = true)
     lateinit var euxConsumer: EuxConsumer
@@ -161,11 +161,5 @@ abstract class ComponentTestBaseKotlin {
         const val STATSBORGERSKAP = "NO"
         const val FNR = "25068420779"
         const val AKTOER_ID = "1234567890123"
-
-        val objectMapper: ObjectMapper = ObjectMapper().apply {
-            registerModule(JavaTimeModule())
-        }
-        @Container
-        val DB: PostgresContainer = PostgresContainer.getInstance()
     }
 }

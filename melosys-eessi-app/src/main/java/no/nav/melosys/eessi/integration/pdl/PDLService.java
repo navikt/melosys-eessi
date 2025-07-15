@@ -100,7 +100,7 @@ public class PDLService implements PersonFasade {
             .map(this::hentFolkeregisterIdent)
             .filter(Objects::nonNull)
             .map(PersonSokResponse::new)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private String hentFolkeregisterIdent(Collection<PDLIdent> pdlIdenter) {

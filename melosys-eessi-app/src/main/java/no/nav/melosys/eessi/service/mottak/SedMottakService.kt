@@ -18,6 +18,8 @@ import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
+import no.nav.melosys.eessi.repository.SedMottattLager
+import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
@@ -43,6 +45,7 @@ class SedMottakService(
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleach: Unleash,
+    private val sedMottattLagerRepository: SedMottattLagerRepository,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -149,7 +152,8 @@ class SedMottakService(
 
         fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
         if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
-            // TODO: lagre SED i DB for å se de vi ikke oppretter oppgave for og sjekke mer nøye at de det stemmer
+            lagreSed(sedMottatt, sed)
+
             if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
                 log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
                 return
@@ -166,6 +170,21 @@ class SedMottakService(
             ?.let { log.info("Identifiseringsoppgave ${it.oppgaveId} finnes allerede for rinasak $rinaSaksnummer") }
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
+
+    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
+        try {
+            sedMottattLagerRepository.save(
+                SedMottattLager(
+                    sedId = sedMottatt.sedHendelse.sedId,
+                    sed = sed,
+                    storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",
+                )
+            )
+        } catch (e: Exception) {
+            log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
+        }
+    }
+
 
     private fun oppgaveErÅpen(bucIdentifiseringOppg: BucIdentifiseringOppg): Boolean =
         oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
