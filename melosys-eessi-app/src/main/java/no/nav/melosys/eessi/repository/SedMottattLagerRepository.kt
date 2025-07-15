@@ -9,5 +9,5 @@ interface SedMottattLagerRepository : JpaRepository<SedMottattLager, Long> {
 
     fun findBySedId(sedId: String): List<SedMottattLager>
 
-    fun findByCreatedAtBetween(start: ZonedDateTime, end: ZonedDateTime): List<SedMottattLager>
+    fun findByCreatedAtAfter(since: ZonedDateTime): List<SedMottattLager>
 }
