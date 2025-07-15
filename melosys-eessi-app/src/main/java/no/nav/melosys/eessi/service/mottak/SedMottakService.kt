@@ -45,7 +45,7 @@ class SedMottakService(
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleach: Unleash,
-    private val sedMottatattStorageRepository: SedMottattLagerRepository,
+    private val sedMottattLagerRepository: SedMottattLagerRepository,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -173,7 +173,7 @@ class SedMottakService(
 
     private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
         try {
-            sedMottatattStorageRepository.save(
+            sedMottattLagerRepository.save(
                 SedMottattLager(
                     sedId = sedMottatt.sedHendelse.sedId,
                     sed = sed,
