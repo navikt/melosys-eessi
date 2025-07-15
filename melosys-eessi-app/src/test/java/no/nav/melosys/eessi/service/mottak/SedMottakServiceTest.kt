@@ -203,7 +203,7 @@ class SedMottakServiceTest {
 
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
 
@@ -239,15 +239,15 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed hvis avsenderId og mottakerId ikke er satt kasterException`() {
         val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
-            mottakerNavn = "321";
-            avsenderNavn = "123";
+            mottakerNavn = "321"
+            avsenderNavn = "123"
         }
 
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         shouldThrow<IllegalStateException> {
@@ -258,16 +258,16 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed hvis avsenderId ikke er satt kasterException`() {
         val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
-            mottakerId = "123";
-            mottakerNavn = "321";
-            avsenderNavn = "123";
+            mottakerId = "123"
+            mottakerNavn = "321"
+            avsenderNavn = "123"
         }
 
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         shouldThrow<IllegalStateException> {
@@ -278,16 +278,16 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed hvis mottakerId ikke er satt kasterException`() {
         val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
-            avsenderId = "123";
-            mottakerNavn = "321";
-            avsenderNavn = "123";
+            avsenderId = "123"
+            mottakerNavn = "321"
+            avsenderNavn = "123"
         }
 
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         shouldThrow<IllegalStateException> {
@@ -298,14 +298,14 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed hvis avsenderNavn og mottakerNavn ikke er satt kasterException`() {
         val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
-            avsenderId = "123";
-            mottakerId = "321";
+            avsenderId = "123"
+            mottakerId = "321"
         }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         shouldThrow<IllegalStateException> {
@@ -316,16 +316,16 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed hvis avsenderNavn ikke er satt kasterException`() {
         val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
-            mottakerNavn = "123";
-            avsenderId = "123";
-            mottakerId = "321";
+            mottakerNavn = "123"
+            avsenderId = "123"
+            mottakerId = "321"
         }
 
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         shouldThrow<IllegalStateException> {
@@ -336,15 +336,15 @@ class SedMottakServiceTest {
     @Test
     fun `behandleSed hvis mottakerNavn ikke er satt kasterException`() {
         val sedHendelse = sedHendelseUtenAvsenderOgMottakerDetaljer().apply {
-            avsenderNavn = "123";
-            avsenderId = "123";
-            mottakerId = "321";
+            avsenderNavn = "123"
+            avsenderId = "123"
+            mottakerId = "321"
         }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true;
+        every { saksrelasjonService.finnVedRinaSaksnummer(any()).isPresent } returns true
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         shouldThrow<IllegalStateException> {
@@ -442,18 +442,18 @@ class SedMottakServiceTest {
     }
 
     private fun sedHendelseUtenAvsenderOgMottakerDetaljer() = SedHendelse().apply {
-        id = 0;
-        sedId = "10977943_389501f50fba4af7a4228fa41b8ee71d_1";
-        sektorKode = "LA";
-        bucType = "LA_BUC_02";
-        rinaSakId = "10977943";
-        avsenderId = null;
-        avsenderNavn = null;
-        mottakerId = null;
-        mottakerNavn = null;
-        rinaDokumentId = "389501f50fba4af7a4228fa41b8ee71d";
-        rinaDokumentVersjon = "1";
-        sedType = "X005";
+        id = 0
+        sedId = "10977943_389501f50fba4af7a4228fa41b8ee71d_1"
+        sektorKode = "LA"
+        bucType = "LA_BUC_02"
+        rinaSakId = "10977943"
+        avsenderId = null
+        avsenderNavn = null
+        mottakerId = null
+        mottakerNavn = null
+        rinaDokumentId = "389501f50fba4af7a4228fa41b8ee71d"
+        rinaDokumentVersjon = "1"
+        sedType = "X005"
     }
 
 
