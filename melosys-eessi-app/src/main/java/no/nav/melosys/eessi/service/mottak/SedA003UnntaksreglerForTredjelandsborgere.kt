@@ -1,11 +1,14 @@
 package no.nav.melosys.eessi.service.mottak
 
+import mu.KotlinLogging
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.service.sed.EøsLandkoder
 import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import kotlin.jvm.optionals.getOrNull
+
+private val log = KotlinLogging.logger { }
 
 object SedA003UnntaksreglerForTredjelandsborgere {
     // https://jira.adeo.no/browse/MELOSYS-7403
@@ -61,7 +64,11 @@ object SedA003UnntaksreglerForTredjelandsborgere {
             return false
         }
 
-        if (avsenderErFraGodkjentLandForUnntak(avsenderLandkode = hentAvsenderLand())) {
+        val avsenderLand = hentAvsenderLand()
+        if (avsenderErFraGodkjentLandForUnntak(avsenderLandkode = avsenderLand)) {
+            // https://jira.adeo.no/browse/MELOSYS-7403
+            // logger dette en en stund i prod, siden det ikker er mulig å teste i preprod
+            log.info { "Avsender er fra godkjent land: $avsenderLand for unntak  - sendes videre til ID og fordeling" }
             reason("Avsender er fra godkjent land for unntak")
             return false
         }
