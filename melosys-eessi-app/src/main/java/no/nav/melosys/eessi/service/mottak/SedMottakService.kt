@@ -177,7 +177,7 @@ class SedMottakService(
                 SedMottattLager(
                     sedId = sedMottatt.sedHendelse.sedId,
                     sed = sed,
-                    storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED toggle:$toggleAktivert",
+                    storageReason = "TREDJELANDSBORGER 7403 - toggle:$toggleAktivert",
                 )
             )
         } catch (e: Exception) {
