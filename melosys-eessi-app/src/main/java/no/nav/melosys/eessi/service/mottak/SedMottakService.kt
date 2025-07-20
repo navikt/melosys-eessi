@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.service.mottak
 
 import io.getunleash.Unleash
-import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
@@ -18,8 +17,6 @@ import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattLager
-import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
@@ -28,6 +25,7 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 private val log = KotlinLogging.logger {}
 
@@ -45,7 +43,7 @@ class SedMottakService(
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleach: Unleash,
-    private val sedMottattLagerRepository: SedMottattLagerRepository,
+    private val sedLagerService: SedLagerService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -171,20 +169,13 @@ class SedMottakService(
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
 
-    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean = false) {
+     fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean = false) {
         try {
-            sedMottattLagerRepository.save(
-                SedMottattLager(
-                    sedId = sedMottatt.sedHendelse.sedId,
-                    sed = sed,
-                    storageReason = "TREDJELANDSBORGER 7403 - toggle:$toggleAktivert",
-                )
-            )
+            sedLagerService.lagreSedSeparatTransaksjon(sedMottatt, sed, toggleAktivert)
         } catch (e: Exception) {
             log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
         }
     }
-
 
     private fun oppgaveErÅpen(bucIdentifiseringOppg: BucIdentifiseringOppg): Boolean =
         oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
