@@ -62,12 +62,17 @@ class SedMottattLagerController(
         return sedMottattLagerRepository.findBySedId(sedId)
     }
 
+
     @GetMapping("/recent")
+    @Parameter(description = "timer tilbake i tid", name = "hours", `in` = ParameterIn.QUERY, example = "24")
+    @Parameter(description = "filtering av storageReason", name = "filter", `in` = ParameterIn.QUERY, example = "TREDJELANDSBORGER")
     fun getRecentSeds(
-        @RequestParam(defaultValue = "24") hours: Long
+        @RequestParam(defaultValue = "24") hours: Long,
+        @RequestParam(defaultValue = "", required = false) filter: String,
     ): List<Map<String, Any?>> {
         val since = ZonedDateTime.now().minusHours(hours)
         val recentSeds = sedMottattLagerRepository.findByCreatedAtAfter(since)
+            .filter { it.storageReason.contains(filter) }
 
         return recentSeds.map { sedLager ->
             val hendelse = sedMottattHendelseRepository.findBySedID(sedLager.sedId)
