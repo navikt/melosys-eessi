@@ -152,9 +152,9 @@ class SedMottakService(
 
         fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
         if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
-            lagreSed(sedMottatt, sed)
-
-            if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
+            val toggleAktivert = unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)
+            lagreSed(sedMottatt, sed, toggleAktivert)
+            if (toggleAktivert) {
                 log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
                 return
             } else {
@@ -171,13 +171,13 @@ class SedMottakService(
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
 
-    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
+    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean = false) {
         try {
             sedMottattLagerRepository.save(
                 SedMottattLager(
                     sedId = sedMottatt.sedHendelse.sedId,
                     sed = sed,
-                    storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",
+                    storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED toggle:$toggleAktivert",
                 )
             )
         } catch (e: Exception) {
