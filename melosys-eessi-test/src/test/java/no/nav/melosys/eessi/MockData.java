@@ -65,6 +65,8 @@ public class MockData {
 
         Nav nav = new Nav();
         Person person = new Person();
+        person.setFornavn("Ola");
+        person.setEtternavn("Nordmann");
         person.setFoedselsdato(fødselsdato.toString());
         person.setKjoenn(Kjønn.M);
         Statsborgerskap statsborgerskap1 = new Statsborgerskap();
