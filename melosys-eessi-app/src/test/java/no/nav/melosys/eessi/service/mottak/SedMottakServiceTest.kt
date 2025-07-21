@@ -19,7 +19,6 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
@@ -55,9 +54,6 @@ class SedMottakServiceTest {
     private lateinit var bucIdentifiseringOppgRepository: BucIdentifiseringOppgRepository
 
     @MockK(relaxed = true)
-    private lateinit var sedMottatattStorageRepository: SedMottattLagerRepository
-
-    @MockK(relaxed = true)
     private lateinit var bucIdentifisertService: BucIdentifisertService
 
     @MockK
@@ -87,7 +83,7 @@ class SedMottakServiceTest {
             bucIdentifisertService,
             saksrelasjonService,
             FakeUnleash().apply { enableAll() },
-            sedMottatattStorageRepository,
+            mockk(relaxed = true),
             "1",
         )
         val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)

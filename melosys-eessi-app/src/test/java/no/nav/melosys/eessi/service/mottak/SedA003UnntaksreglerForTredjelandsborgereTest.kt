@@ -17,117 +17,107 @@ class SedTredjelandsborgerExtensionsTest {
 
     fun sedErA003OgTredjelandsborgerUtenNorgeSomArbeidsstedTestData() = listOf(
         sedTestCase {
-            name("Ikke A003 SED")
+            name = "Ikke A003 SED"
             sed {
-                sedType(SedType.A001)
+                type = SedType.A001
             }
-            avsenderLand("NO")
-            expectedResult(false)
+            avsenderLand = "NO"
+            expectedResult = false
         },
         sedTestCase {
-            name("Norge er lovvalgsland")
+            name = "Norge er lovvalgsland"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("NO")
+                type = SedType.A003
+                vedtakLand = "NO"
             }
-            avsenderLand("NO")
-            expectedResult(false)
+            avsenderLand = "NO"
+            expectedResult = false
         },
         sedTestCase {
-            name("Person har norsk fnr eller d-nr")
+            name = "Person har norsk fnr eller d-nr"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedNorskPin("30056928150")
+                type = SedType.A003
+                vedtakLand = "SE"
+                norskPin("30056928150")
             }
-            avsenderLand("NO")
-            expectedResult(false)
+            avsenderLand = "NO"
+            expectedResult = false
         },
         sedTestCase {
-            name("Person er EØS-borger, så ikke en tredjelandsborger")
+            name = "Person er EØS-borger, så ikke en tredjelandsborger"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedStatsborgerskap("SE", "DK")
+                type = SedType.A003
+                vedtakLand = "SE"
+                statsborgerskap("SE", "DK")
             }
-            avsenderLand("NO")
-            expectedResult(false)
+            avsenderLand = "NO"
+            expectedResult = false
         },
         sedTestCase {
-            name("Norge er nevnt i arbeidssted.address.land")
+            name = "Norge er nevnt i arbeidssted.address.land"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedStatsborgerskap("US")
-                arbeidssted(
-                    Arbeidssted(
-                        adresse = Adresse(land = "NO")
-                    )
-                )
+                type = SedType.A003
+                vedtakLand = "SE"
+                statsborgerskap("US")
+                arbeidssted("NO")
             }
-            avsenderLand("NO")
-            expectedResult(false)
-            reason("Norge er nevnt som arbeidssted")
+            avsenderLand = "NO"
+            expectedResult = false
+            reason = "Norge er nevnt som arbeidssted"
         },
         sedTestCase {
-            name("Norge er nevnt som i arbeidsland.land")
+            name = "Norge er nevnt som i arbeidsland.land"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedStatsborgerskap("US")
-                arbeidsland(
-                    Arbeidsland(land = "NO")
-                )
+                type = SedType.A003
+                vedtakLand = "SE"
+                statsborgerskap("US")
+                arbeidsland("NO")
             }
-            avsenderLand("NO")
-            expectedResult(false)
-            reason("Norge er nevnt som arbeidssted")
+            avsenderLand = "NO"
+            expectedResult = false
+            reason = "Norge er nevnt som arbeidssted"
         },
         sedTestCase {
-            name("Norge er nevnt som land i arbeidsland.arbeidssted.address.land")
+            name = "Norge er nevnt som land i arbeidsland.arbeidssted.address.land"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedStatsborgerskap("US")
-                arbeidsland(
-                    Arbeidsland(
-                        arbeidssted = listOf(Arbeidssted(adresse = Adresse(land = "NO")))
-                    )
-                )
+                type = SedType.A003
+                vedtakLand = "SE"
+                statsborgerskap("US")
+                arbeidsland(arbeidsstedLand = listOf("NO"))
             }
-            avsenderLand("NO")
-            expectedResult(false)
-            reason("Norge er nevnt som arbeidssted")
+            avsenderLand = "NO"
+            expectedResult = false
+            reason = "Norge er nevnt som arbeidssted"
         },
         sedTestCase {
-            name("Avsender er fra godkjent land for unntak")
+            name = "Avsender er fra godkjent land for unntak"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedStatsborgerskap("US")
+                type = SedType.A003
+                vedtakLand = "SE"
+                statsborgerskap("US")
             }
-            avsenderLand("CH")
-            expectedResult(false)
+            avsenderLand = "CH"
+            expectedResult = false
         },
         sedTestCase {
-            name("Tredjelandsborger uten Norge som arbeidssted")
+            name = "Tredjelandsborger uten Norge som arbeidssted"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
-                personMedStatsborgerskap("US")
+                type = SedType.A003
+                vedtakLand = "SE"
+                statsborgerskap("US")
             }
-            avsenderLand("FR")
-            expectedResult(true)
+            avsenderLand = "FR"
+            expectedResult = true
         },
         sedTestCase {
-            name("Ingen person funnet")
+            name = "Ingen person funnet"
             sed {
-                sedType(SedType.A003)
-                vedtakLand("SE")
+                type = SedType.A003
+                vedtakLand = "SE"
                 utenPerson()
             }
-            avsenderLand("NO")
-            expectedResult(false)
+            avsenderLand = "NO"
+            expectedResult = false
         }
     )
 
@@ -148,41 +138,47 @@ class SedTredjelandsborgerExtensionsTest {
 }
 
 class SEDTestBuilder {
-    private var sedType: SedType = SedType.A003
-    private var vedtakLand: String = "SE"
+    var type: SedType = SedType.A003
+    var vedtakLand: String = "SE"
     private var person: Person? = Person(statsborgerskap = listOf(Statsborgerskap(land = "US")))
     private var arbeidssted: List<Arbeidssted> = emptyList()
     private var arbeidsland: List<Arbeidsland> = emptyList()
 
-    fun sedType(sedType: SedType) = apply { this.sedType = sedType }
-
-    fun vedtakLand(land: String) = apply { this.vedtakLand = land }
-
-    fun personMedStatsborgerskap(vararg landkoder: String) = apply {
+    fun statsborgerskap(vararg landkoder: String) {
         this.person = Person(
             statsborgerskap = landkoder.map { Statsborgerskap(land = it) }
         )
     }
 
-    fun personMedNorskPin(personnummer: String) = apply {
+    fun norskPin(personnummer: String) {
         this.person = Person(
             statsborgerskap = listOf(Statsborgerskap(land = "US")),
             pin = listOf(Pin(land = "NO", identifikator = personnummer))
         )
     }
 
-    fun arbeidssted(arbeidssted: Arbeidssted) = apply {
-        this.arbeidssted = listOf(arbeidssted)
+    fun arbeidssted(vararg landkoder: String) {
+        this.arbeidssted = landkoder.map { Arbeidssted(adresse = Adresse(land = it)) }
     }
 
-    fun arbeidsland(arbeidsland: Arbeidsland) = apply {
-        this.arbeidsland = listOf(arbeidsland)
+    fun arbeidsland(vararg landkoder: String) {
+        this.arbeidsland = landkoder.map { Arbeidsland(land = it) }
     }
 
-    fun utenPerson() = apply { this.person = null }
+    fun arbeidsland(arbeidsstedLand: List<String>) {
+        this.arbeidsland = listOf(
+            Arbeidsland(
+                arbeidssted = arbeidsstedLand.map { Arbeidssted(adresse = Adresse(land = it)) }
+            )
+        )
+    }
+
+    fun utenPerson() {
+        this.person = null
+    }
 
     fun build(): SED {
-        val medlemskap = when (sedType) {
+        val medlemskap = when (type) {
             SedType.A003 -> MedlemskapA003(
                 vedtak = VedtakA003(land = vedtakLand)
             )
@@ -191,7 +187,7 @@ class SEDTestBuilder {
         }
 
         return SED(
-            sedType = sedType.name,
+            sedType = type.name,
             medlemskap = medlemskap,
             nav = Nav(
                 bruker = Bruker(person = person),
@@ -203,27 +199,18 @@ class SEDTestBuilder {
 }
 
 class TestCaseBuilder {
-    private var name: String = ""
-    private var sedBuilder: SEDTestBuilder = SEDTestBuilder()
-    private var avsenderLand: String = "NO"
-    private var expectedResult: Boolean = false
-    private var reason: String = ""
+    var name: String = ""
+    var sedBuilder: SEDTestBuilder = SEDTestBuilder()
+    var avsenderLand: String = "NO"
+    var expectedResult: Boolean = false
+    var reason: String = ""
 
-    fun name(name: String) = apply {
-        this.name = name
-        this.reason = name
+    fun sed(configure: SEDTestBuilder.() -> Unit) = apply {
+        sedBuilder.apply(configure)
     }
 
-    fun sed(configure: SEDTestBuilder.() -> SEDTestBuilder) = apply {
-        this.sedBuilder = configure(sedBuilder)
-    }
-
-    fun avsenderLand(land: String) = apply { this.avsenderLand = land }
-
-    fun expectedResult(result: Boolean) = apply { this.expectedResult = result }
-    fun reason(result: String) = apply { this.reason = result }
-
-    fun build(): Arguments.ArgumentSet = argumentSet(name, sedBuilder.build(), avsenderLand, expectedResult, reason)
+    fun build(): Arguments.ArgumentSet =
+        argumentSet(name, sedBuilder.build(), avsenderLand, expectedResult, reason.ifBlank { name })
 }
 
 fun sedTestCase(configure: TestCaseBuilder.() -> Unit) =

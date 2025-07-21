@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import no.nav.melosys.eessi.repository.SedMottattLager
 import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.security.token.support.core.api.Protected
@@ -13,12 +14,14 @@ import org.springframework.data.domain.Pageable
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.ZonedDateTime
+import kotlin.jvm.optionals.getOrNull
 
 @Protected
 @RestController
 @RequestMapping("/admin/sed-mottatt-lager")
 class SedMottattLagerController(
-    private val sedMottattLagerRepository: SedMottattLagerRepository
+    private val sedMottattLagerRepository: SedMottattLagerRepository,
+    private val sedMottattHendelseRepository: SedMottattHendelseRepository
 ) {
 
     @GetMapping
@@ -59,12 +62,25 @@ class SedMottattLagerController(
         return sedMottattLagerRepository.findBySedId(sedId)
     }
 
+
     @GetMapping("/recent")
+    @Parameter(description = "timer tilbake i tid", name = "hours", `in` = ParameterIn.QUERY, example = "24")
+    @Parameter(description = "filtering av storageReason", name = "filter", `in` = ParameterIn.QUERY, example = "TREDJELANDSBORGER")
     fun getRecentSeds(
-        @RequestParam(defaultValue = "24") hours: Long
-    ): List<SedMottattLager> {
+        @RequestParam(defaultValue = "24") hours: Long,
+        @RequestParam(defaultValue = "", required = false) filter: String,
+    ): List<Map<String, Any?>> {
         val since = ZonedDateTime.now().minusHours(hours)
-        return sedMottattLagerRepository.findByCreatedAtAfter(since)
+        val recentSeds = sedMottattLagerRepository.findByCreatedAtAfter(since)
+            .filter { it.storageReason.contains(filter) }
+
+        return recentSeds.map { sedLager ->
+            val hendelse = sedMottattHendelseRepository.findBySedID(sedLager.sedId)
+            mapOf(
+                "sedMottattLager" to sedLager,
+                "rinaSakId" to hendelse.getOrNull()?.sedHendelse?.rinaSakId
+            )
+        }
     }
 
     @GetMapping("/count")

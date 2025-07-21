@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.service.mottak
 
 import io.getunleash.Unleash
-import jakarta.transaction.Transactional
 import mu.KotlinLogging
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
@@ -18,8 +17,6 @@ import no.nav.melosys.eessi.models.buc.Participant
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattLager
-import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
@@ -28,6 +25,7 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 private val log = KotlinLogging.logger {}
 
@@ -45,7 +43,7 @@ class SedMottakService(
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
     private val unleach: Unleash,
-    private val sedMottattLagerRepository: SedMottattLagerRepository,
+    private val sedLagerService: SedLagerService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -152,9 +150,9 @@ class SedMottakService(
 
         fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
         if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
-            lagreSed(sedMottatt, sed)
-
-            if (unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)) {
+            val toggleAktivert = unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)
+            lagreSed(sedMottatt, sed, toggleAktivert)
+            if (toggleAktivert) {
                 log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
                 return
             } else {
@@ -171,20 +169,14 @@ class SedMottakService(
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
 
-    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
+    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean) {
         try {
-            sedMottattLagerRepository.save(
-                SedMottattLager(
-                    sedId = sedMottatt.sedHendelse.sedId,
-                    sed = sed,
-                    storageReason = "TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED",
-                )
-            )
+            // Dette må gjøres i en separat transaksjon for å unngå at eksisterende transaksjon blir rullet tilbake
+            sedLagerService.lagreSedSeparatTransaksjon(sedMottatt, sed, toggleAktivert)
         } catch (e: Exception) {
             log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
         }
     }
-
 
     private fun oppgaveErÅpen(bucIdentifiseringOppg: BucIdentifiseringOppg): Boolean =
         oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
