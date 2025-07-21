@@ -104,6 +104,8 @@ public class MockData {
         Person person = new Person();
         person.setFoedselsdato(fødselsdato.toString());
         person.setKjoenn(Kjønn.M);
+        person.setFornavn("Ola");
+        person.setEtternavn("Nordmann");
         Statsborgerskap statsborgerskap1 = new Statsborgerskap();
         statsborgerskap1.setLand(statsborgerskap);
         person.setStatsborgerskap(Collections.singletonList(statsborgerskap1));
