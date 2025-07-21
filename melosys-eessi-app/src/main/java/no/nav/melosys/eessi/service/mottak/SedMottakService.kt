@@ -169,7 +169,7 @@ class SedMottakService(
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
 
-     fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean = false) {
+    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean) {
         try {
             // Dette må gjøres i en separat transaksjon for å unngå at eksisterende transaksjon blir rullet tilbake
             sedLagerService.lagreSedSeparatTransaksjon(sedMottatt, sed, toggleAktivert)
