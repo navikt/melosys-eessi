@@ -1,159 +1,151 @@
-package no.nav.melosys.eessi.identifisering;
+package no.nav.melosys.eessi.identifisering
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
+import io.mockk.every
+import io.mockk.junit5.MockKExtension
+import io.mockk.mockk
+import no.nav.melosys.eessi.integration.pdl.PDLService
+import no.nav.melosys.eessi.models.exception.NotFoundException
+import no.nav.melosys.eessi.models.person.PersonModell
+import no.nav.melosys.eessi.service.personsok.PersonSokResponse
+import no.nav.melosys.eessi.service.personsok.PersonsokKriterier
+import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.time.LocalDate
+import kotlin.test.assertEquals
 
-import com.google.common.collect.Lists;
-import no.nav.melosys.eessi.integration.pdl.PDLService;
-import no.nav.melosys.eessi.models.exception.NotFoundException;
-import no.nav.melosys.eessi.models.person.PersonModell;
-import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
-import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockKExtension::class)
 class PersonSokTest {
 
-    private final String IDENT = "01058312345";
-    private final LocalDate defaultFødselsdato = LocalDate.of(2000, 1, 1);
-    private final Collection<String> defaultStatsborgerskap = Set.of("NO");
+    private val IDENT = "01058312345"
+    private val defaultFødselsdato = LocalDate.of(2000, 1, 1)
+    private val defaultStatsborgerskap = setOf("NO")
 
-    @Mock
-    private PDLService personFasade;
-
-    private PersonSok personSok;
+    private val personFasade: PDLService = mockk()
+    private lateinit var personSok: PersonSok
 
     @BeforeEach
-    public void setup() throws Exception {
-        personSok = new PersonSok(personFasade);
-    }
-
-    private PersonSokResponse lagPersonSøkResponse() {
-        PersonSokResponse response = new PersonSokResponse();
-        response.setIdent(IDENT);
-        return response;
+    fun setup() {
+        personSok = PersonSok(personFasade)
     }
 
     @Test
-    void søkEtterPerson_ettTreffKorrekteOpplysninger_forventIdentIdentifisert() {
-        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+    fun `søkEtterPerson - ett treff med korrekte opplysninger - forvent ident identifisert`() {
+        every { personFasade.hentPerson(IDENT) } returns lagPersonModell(false)
+        every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
+        val resultat = personSok.søkEtterPerson(personsoekKriterier())
 
-        assertThat(sokResultat.personIdentifisert()).isTrue();
-        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+        assertThat(resultat.personIdentifisert()).isTrue()
+        assertThat(resultat.ident).isEqualTo(IDENT)
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.IDENTIFISERT)
     }
 
     @Test
-    void søkEtterPerson_feilFødselsdato_forventIngenIdentFeilFødselsdato() {
-        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+    fun `søkEtterPerson - feil fødselsdato - forvent feil fødselsdato`() {
+        every { personFasade.hentPerson(IDENT) } returns lagPersonModell(false)
+        every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.of(2000, 1, 2)));
+        val resultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.of(2000, 1, 2)))
 
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getIdent()).isNull();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FEIL_FOEDSELSDATO);
+        assertThat(resultat.personIdentifisert()).isFalse()
+        assertThat(resultat.ident).isNull()
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FEIL_FOEDSELSDATO)
     }
 
     @Test
-    void søkEtterPerson_feilStatsborgerskap_forventIngenIdentFeilStatsborgerskap() {
-        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModell(false));
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+    fun `søkEtterPerson - feil statsborgerskap - forvent feil statsborgerskap`() {
+        every { personFasade.hentPerson(IDENT) } returns lagPersonModell(false)
+        every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier(Set.of()));
+        val resultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.now(), emptySet<String>()))
 
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getIdent()).isNull();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FEIL_STATSBORGERSKAP);
+        assertThat(resultat.personIdentifisert()).isFalse()
+        assertThat(resultat.ident).isNull()
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FEIL_STATSBORGERSKAP)
     }
 
     @Test
-    void søkEtterPerson_ingenTreff_forventIngenIdentIngenTreff() {
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.emptyList());
+    fun `søkEtterPerson - ingen treff - forvent ingen treff`() {
+        every { personFasade.soekEtterPerson(any()) } returns emptyList()
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
+        val resultat = personSok.søkEtterPerson(personsoekKriterier())
 
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.INGEN_TREFF);
+        assertThat(resultat.personIdentifisert()).isFalse()
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.INGEN_TREFF)
     }
 
     @Test
-    void søkEtterPerson_flereTreff_forventIngenIdentFlereTreff() {
-        when(personFasade.soekEtterPerson(any())).thenReturn(Lists.newArrayList(new PersonSokResponse(), new PersonSokResponse()));
+    fun `søkEtterPerson - flere treff - forvent flere treff`() {
+        every { personFasade.soekEtterPerson(any()) } returns listOf(PersonSokResponse(), PersonSokResponse())
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
+        val resultat = personSok.søkEtterPerson(personsoekKriterier())
 
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getIdent()).isNull();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FLERE_TREFF);
+        assertThat(resultat.personIdentifisert()).isFalse()
+        assertThat(resultat.ident).isNull()
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FLERE_TREFF)
     }
 
     @Test
-    void søkEtterPerson_finnerIkkeITPS_forventIngenIdentFnrIkkeFunnet() {
-        when(personFasade.hentPerson(anyString())).thenThrow(NotFoundException.class);
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+    fun `søkEtterPerson - person ikke funnet i ITPS - forvent fnr ikke funnet`() {
+        every { personFasade.hentPerson(any()) } throws NotFoundException("Fnr ikke funnet")
+        every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
+        val resultat = personSok.søkEtterPerson(personsoekKriterier())
 
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FNR_IKKE_FUNNET);
+        assertThat(resultat.personIdentifisert()).isFalse()
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FNR_IKKE_FUNNET)
     }
 
     @Test
-    void søkEtterPerson_personFunnetOpphørt_forventIngenIdentPersonOpphørt() {
-        when(personFasade.hentPerson(anyString())).thenReturn(lagPersonModell(true));
-        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+    fun `søkEtterPerson - person er opphørt - forvent person opphørt`() {
+        every { personFasade.hentPerson(any()) } returns lagPersonModell(true)
+        every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterier());
+        val resultat = personSok.søkEtterPerson(personsoekKriterier())
 
-        assertThat(sokResultat.personIdentifisert()).isFalse();
-        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT);
+        assertThat(resultat.personIdentifisert()).isFalse()
+        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT)
     }
 
+    @Test
+    fun `vurderPerson skal returnerne FEIL_NAVN når etternavn ikke matcher`() {
+        val ident = "12345678901"
+        val personFraPDL = lagPersonModell(false)
+        val søkekriterier = personsoekKriterier().apply { etternavn = "FeilEtternavn" }
 
-    private PersonsokKriterier personsoekKriterier() {
-        return personsoekKriterier(defaultFødselsdato, defaultStatsborgerskap);
+        every { personFasade.hentPerson(ident) } returns personFraPDL
+
+        val resultat = personSok.vurderPerson(ident, søkekriterier)
+
+        assertEquals(SoekBegrunnelse.FEIL_NAVN, resultat.begrunnelse)
     }
 
-    private PersonsokKriterier personsoekKriterier(LocalDate fødselsdato) {
-        return personsoekKriterier(fødselsdato, defaultStatsborgerskap);
+    private fun personsoekKriterier(
+        fødselsdato: LocalDate = defaultFødselsdato,
+        statsborgerskap: Collection<String> = defaultStatsborgerskap
+    ): PersonsokKriterier =
+        PersonsokKriterier.builder()
+            .fornavn("Fornavn")
+            .etternavn("Etternavn")
+            .foedselsdato(fødselsdato)
+            .statsborgerskapISO2(statsborgerskap)
+            .build()
+
+    private fun lagPersonSøkResponse(): PersonSokResponse {
+        val response = PersonSokResponse()
+        response.ident = IDENT
+        return response
     }
 
-    private PersonsokKriterier personsoekKriterier(Collection<String> statsborgerskap) {
-        return personsoekKriterier(defaultFødselsdato, statsborgerskap);
-    }
-
-    private PersonsokKriterier personsoekKriterier(LocalDate fødselsdato, Collection<String> statsborgerskap) {
-        return PersonsokKriterier.builder()
-                .fornavn("Fornavn")
-                .etternavn("Etternavn")
-                .foedselsdato(fødselsdato)
-                .statsborgerskapISO2(statsborgerskap)
-                .build();
-    }
-
-    private PersonModell lagPersonModell(boolean erOpphørt) {
-        return PersonModell.builder()
-                .ident(IDENT)
-                .fornavn("Fornavn")
-                .etternavn("Etternavn")
-                .fødselsdato(defaultFødselsdato)
-                .statsborgerskapLandkodeISO2(defaultStatsborgerskap)
-                .erOpphørt(erOpphørt)
-                .build();
-    }
+    private fun lagPersonModell(erOpphørt: Boolean): PersonModell =
+        PersonModell.PersonModellBuilder()
+            .ident(IDENT)
+            .fornavn("Fornavn")
+            .etternavn("Etternavn")
+            .fødselsdato(defaultFødselsdato)
+            .statsborgerskapLandkodeISO2(defaultStatsborgerskap)
+            .erOpphørt(erOpphørt)
+            .build()
 }
