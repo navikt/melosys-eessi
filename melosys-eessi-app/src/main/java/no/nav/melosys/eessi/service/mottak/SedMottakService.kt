@@ -171,6 +171,7 @@ class SedMottakService(
 
      fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean = false) {
         try {
+            // Dette må gjøres i en separat transaksjon for å unngå at eksisterende transaksjon blir rullet tilbake
             sedLagerService.lagreSedSeparatTransaksjon(sedMottatt, sed, toggleAktivert)
         } catch (e: Exception) {
             log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
