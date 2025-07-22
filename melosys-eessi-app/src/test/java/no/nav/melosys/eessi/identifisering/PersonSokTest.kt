@@ -1,5 +1,9 @@
 package no.nav.melosys.eessi.identifisering
 
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
@@ -8,12 +12,10 @@ import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.person.PersonModell
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDate
-import kotlin.test.assertEquals
 
 @ExtendWith(MockKExtension::class)
 class PersonSokTest {
@@ -35,11 +37,11 @@ class PersonSokTest {
         every { personFasade.hentPerson(IDENT) } returns lagPersonModell(false)
         every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier())
-
-        assertThat(resultat.personIdentifisert()).isTrue()
-        assertThat(resultat.ident).isEqualTo(IDENT)
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.IDENTIFISERT)
+        personSok.søkEtterPerson(personsoekKriterier()).run {
+            personIdentifisert().shouldBeTrue()
+            ident shouldBe IDENT
+            begrunnelse shouldBe SoekBegrunnelse.IDENTIFISERT
+        }
     }
 
     @Test
@@ -47,11 +49,11 @@ class PersonSokTest {
         every { personFasade.hentPerson(IDENT) } returns lagPersonModell(false)
         every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.of(2000, 1, 2)))
-
-        assertThat(resultat.personIdentifisert()).isFalse()
-        assertThat(resultat.ident).isNull()
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FEIL_FOEDSELSDATO)
+        personSok.søkEtterPerson(personsoekKriterier(LocalDate.of(2000, 1, 2))).run {
+            personIdentifisert().shouldBeFalse()
+            ident.shouldBeNull()
+            begrunnelse shouldBe SoekBegrunnelse.FEIL_FOEDSELSDATO
+        }
     }
 
     @Test
@@ -59,32 +61,32 @@ class PersonSokTest {
         every { personFasade.hentPerson(IDENT) } returns lagPersonModell(false)
         every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier(LocalDate.now(), emptySet<String>()))
-
-        assertThat(resultat.personIdentifisert()).isFalse()
-        assertThat(resultat.ident).isNull()
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FEIL_STATSBORGERSKAP)
+        personSok.søkEtterPerson(personsoekKriterier(LocalDate.now(), emptySet<String>())).run {
+            personIdentifisert().shouldBeFalse()
+            ident.shouldBeNull()
+            begrunnelse shouldBe SoekBegrunnelse.FEIL_STATSBORGERSKAP
+        }
     }
 
     @Test
     fun `søkEtterPerson - ingen treff - forvent ingen treff`() {
         every { personFasade.soekEtterPerson(any()) } returns emptyList()
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier())
-
-        assertThat(resultat.personIdentifisert()).isFalse()
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.INGEN_TREFF)
+        personSok.søkEtterPerson(personsoekKriterier()).run {
+            personIdentifisert().shouldBeFalse()
+            begrunnelse shouldBe SoekBegrunnelse.INGEN_TREFF
+        }
     }
 
     @Test
     fun `søkEtterPerson - flere treff - forvent flere treff`() {
         every { personFasade.soekEtterPerson(any()) } returns listOf(PersonSokResponse(), PersonSokResponse())
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier())
-
-        assertThat(resultat.personIdentifisert()).isFalse()
-        assertThat(resultat.ident).isNull()
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FLERE_TREFF)
+        personSok.søkEtterPerson(personsoekKriterier()).run {
+            personIdentifisert().shouldBeFalse()
+            ident.shouldBeNull()
+            begrunnelse shouldBe SoekBegrunnelse.FLERE_TREFF
+        }
     }
 
     @Test
@@ -92,10 +94,10 @@ class PersonSokTest {
         every { personFasade.hentPerson(any()) } throws NotFoundException("Fnr ikke funnet")
         every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier())
-
-        assertThat(resultat.personIdentifisert()).isFalse()
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.FNR_IKKE_FUNNET)
+        personSok.søkEtterPerson(personsoekKriterier()).run {
+            personIdentifisert().shouldBeFalse()
+            begrunnelse shouldBe SoekBegrunnelse.FNR_IKKE_FUNNET
+        }
     }
 
     @Test
@@ -103,10 +105,10 @@ class PersonSokTest {
         every { personFasade.hentPerson(any()) } returns lagPersonModell(true)
         every { personFasade.soekEtterPerson(any()) } returns listOf(lagPersonSøkResponse())
 
-        val resultat = personSok.søkEtterPerson(personsoekKriterier())
-
-        assertThat(resultat.personIdentifisert()).isFalse()
-        assertThat(resultat.begrunnelse).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT)
+        personSok.søkEtterPerson(personsoekKriterier()).run {
+            personIdentifisert().shouldBeFalse()
+            begrunnelse shouldBe SoekBegrunnelse.PERSON_OPPHORT
+        }
     }
 
     @Test
@@ -117,9 +119,9 @@ class PersonSokTest {
 
         every { personFasade.hentPerson(ident) } returns personFraPDL
 
-        val resultat = personSok.vurderPerson(ident, søkekriterier)
-
-        assertEquals(SoekBegrunnelse.FEIL_NAVN, resultat.begrunnelse)
+        personSok.vurderPerson(ident, søkekriterier).run {
+            begrunnelse shouldBe SoekBegrunnelse.FEIL_NAVN
+        }
     }
 
     private fun personsoekKriterier(
@@ -134,9 +136,7 @@ class PersonSokTest {
             .build()
 
     private fun lagPersonSøkResponse(): PersonSokResponse {
-        val response = PersonSokResponse()
-        response.ident = IDENT
-        return response
+        return PersonSokResponse().apply {ident = IDENT}
     }
 
     private fun lagPersonModell(erOpphørt: Boolean): PersonModell =
