@@ -5,6 +5,7 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
+import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import io.mockk.mockk
 import no.nav.melosys.eessi.integration.pdl.PDLService
@@ -24,7 +25,9 @@ class PersonSokTest {
     private val defaultFødselsdato = LocalDate.of(2000, 1, 1)
     private val defaultStatsborgerskap = setOf("NO")
 
-    private val personFasade: PDLService = mockk()
+    @MockK
+    private lateinit var personFasade: PDLService
+
     private lateinit var personSok: PersonSok
 
     @BeforeEach
