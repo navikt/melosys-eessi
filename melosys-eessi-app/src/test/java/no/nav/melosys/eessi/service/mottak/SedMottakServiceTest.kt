@@ -8,8 +8,8 @@ import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
+import no.nav.melosys.eessi.integration.PersonFasade
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
-import no.nav.melosys.eessi.integration.pdl.PDLService
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.*
@@ -42,7 +42,7 @@ class SedMottakServiceTest {
     private lateinit var personIdentifisering: PersonIdentifisering
 
     @MockK
-    private lateinit var pdlService: PDLService
+    private lateinit var personFasade: PersonFasade
 
     @MockK
     private lateinit var oppgaveService: OppgaveService
@@ -65,6 +65,9 @@ class SedMottakServiceTest {
     @MockK
     private lateinit var saksrelasjonService: SaksrelasjonService
 
+    @MockK(relaxed = true)
+    private lateinit var sedLagerService: SedLagerService
+
     private lateinit var sedMottakService: SedMottakService
 
 
@@ -72,7 +75,7 @@ class SedMottakServiceTest {
     fun setup() {
         sedMottakService = SedMottakService(
             euxService,
-            pdlService,
+            personFasade,
             opprettInngaaendeJournalpostService,
             oppgaveService,
             sedMottattHendelseRepository,
@@ -83,7 +86,7 @@ class SedMottakServiceTest {
             bucIdentifisertService,
             saksrelasjonService,
             FakeUnleash().apply { enableAll() },
-            mockk(relaxed = true),
+            sedLagerService,
             "1",
         )
         val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)
@@ -98,7 +101,7 @@ class SedMottakServiceTest {
             opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any())
         } returns "ignorer"
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
-        every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
         every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
         every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
         val sedHendelse = sedHendelseUtenBruker()
@@ -371,7 +374,7 @@ class SedMottakServiceTest {
             opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any())
         } returns "ignorer"
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
-        every { pdlService.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
         every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "ignorer"
         every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
         val sedHendelse = sedHendelseUtenBruker()
@@ -388,6 +391,151 @@ class SedMottakServiceTest {
         verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
         verify(exactly = 0) { bucIdentifisertService.lagreIdentifisertPerson(any(), any()) }
         verify(exactly = 0) { bucIdentifiseringOppgRepository.findByOppgaveId(any()) }
+    }
+
+    @Test
+    fun `behandleSed tredjelandsborger uten arbeidssted i Norge setter skalJournalfoeres til false`() {
+        every { euxService.hentSedMedRetry(any(), any()) } returns SED(
+            nav = Nav(
+                bruker = Bruker(
+                    person = Person(
+                        statsborgerskap = listOf("US").map {
+                            Statsborgerskap().apply { land = it }
+                        },
+                        foedselsdato = "1990-01-01"
+                    )
+                )
+            ),
+            sedType = "A003",
+            medlemskap = MedlemskapA003(
+                vedtak = VedtakA003(land = "DE")
+            )
+        )
+        
+        val savedSedMottattHendelse = slot<SedMottattHendelse>()
+        every { sedMottattHendelseRepository.save(capture(savedSedMottattHendelse)) } returnsArgument 0
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), any()) } just Runs
+        every { euxService.hentSedMedVedlegg(any(), any()) } returns mockk()
+        every { euxService.hentBuc(any()) } returns mockk(relaxed = true)
+        
+        val sedHendelse = sedHendelseUtenBruker().apply { sedType = "A003" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), true) }
+        verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
+        
+        savedSedMottattHendelse.captured.skalJournalfoeres shouldBe false
+    }
+
+    @Test
+    fun `erXSedBehandletUtenASed returnerer false når A-SED har skalJournalfoeres false`() {
+        val xSedHendelse = sedHendelseMedBruker().apply {
+            sedType = "X008"
+            rinaSakId = RINA_SAKSNUMMER
+        }
+        
+        val aSedMottattHendelse = SedMottattHendelse.builder()
+            .sedHendelse(sedHendelseUtenBruker())
+            .skalJournalfoeres(false)
+            .build()
+        
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        // Should not throw exception because A-SED has skalJournalfoeres = false
+        verify { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) }
+        verify(exactly = 0) { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) }
+    }
+
+    @Test
+    fun `erXSedBehandletUtenASed kaller nye repository metode`() {
+        val xSedHendelse = sedHendelseMedBruker().apply {
+            sedType = "X008"
+            rinaSakId = RINA_SAKSNUMMER
+        }
+        
+        val aSedMottattHendelse = SedMottattHendelse.builder()
+            .sedHendelse(sedHendelseUtenBruker())
+            .skalJournalfoeres(true)
+            .build()
+        
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) }
+        verify { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) }
+    }
+
+    @Test
+    fun `behandleSed tredjelandsborger med toggle deaktivert oppretter fortsatt oppgave`() {
+        every { euxService.hentSedMedRetry(any(), any()) } returns SED(
+            nav = Nav(
+                bruker = Bruker(
+                    person = Person(
+                        statsborgerskap = listOf("US").map {
+                            Statsborgerskap().apply { land = it }
+                        },
+                        foedselsdato = "1990-01-01"
+                    )
+                )
+            ),
+            sedType = "A003",
+            medlemskap = MedlemskapA003(
+                vedtak = VedtakA003(land = "DE")
+            )
+        )
+        
+        val serviceWithDisabledToggle = SedMottakService(
+            euxService,
+            personFasade,
+            opprettInngaaendeJournalpostService,
+            oppgaveService,
+            sedMottattHendelseRepository,
+            bucIdentifiseringOppgRepository,
+            journalpostSedKoblingService,
+            sedMetrikker,
+            personIdentifisering,
+            bucIdentifisertService,
+            saksrelasjonService,
+            FakeUnleash().apply { disable("TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED") },
+            sedLagerService,
+            "1",
+        )
+        
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), any()) } just Runs
+        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "journalpostId"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "oppgaveId"
+        every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
+        every { euxService.hentSedMedVedlegg(any(), any()) } returns mockk()
+        every { euxService.hentBuc(any()) } returns mockk(relaxed = true)
+        
+        val sedHendelse = sedHendelseUtenBruker().apply { sedType = "A003" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+        serviceWithDisabledToggle.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), false) }
+        verify { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
+        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
+        verify { bucIdentifiseringOppgRepository.save(any()) }
     }
 
 

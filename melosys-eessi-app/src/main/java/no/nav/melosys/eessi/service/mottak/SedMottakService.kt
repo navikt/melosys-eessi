@@ -139,6 +139,14 @@ class SedMottakService(
             if (sedTypeErX007OgNorgeErSakseier) return false
         }
 
+        val aSed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
+            sedHendelse.rinaSakId
+        ).singleOrNull()
+
+        if (aSed?.skalJournalfoeres == false) {
+            return false
+        }
+
         return !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId)
     }
 
@@ -151,6 +159,8 @@ class SedMottakService(
         fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
         if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
             val toggleAktivert = unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)
+            sedMottatt.skalJournalfoeres = false
+            sedMottattHendelseRepository.save(sedMottatt)
             lagreSed(sedMottatt, sed, toggleAktivert)
             if (toggleAktivert) {
                 log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")

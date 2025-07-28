@@ -21,6 +21,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
+import no.nav.melosys.eessi.repository.SedMottattLager
 import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Test
@@ -241,6 +242,50 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
             .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1 }
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 1)
+    }
+
+    @Test
+    fun `tredjelandsborger A003 uten Norge som arbeidssted setter skalJournalfoeres til false`() {
+        val sedID = UUID.randomUUID().toString()
+        
+        val sed = SED(
+            sedType = SedType.A003.name,
+            medlemskap = MedlemskapA003(
+                vedtak = VedtakA003(land = "DE") 
+            ),
+            nav = Nav(
+                bruker = Bruker(
+                    person = Person(
+                        foedselsdato = "1990-01-01",
+                        fornavn = "Test",
+                        etternavn = "Person",
+                        statsborgerskap = listOf(Statsborgerskap(land = "US")) 
+                    )
+                ),
+                arbeidssted = emptyList(),
+                arbeidsland = emptyList()
+            )
+        )
+        every { euxConsumer.hentSed(any(), any()) } returns sed
+
+        kafkaTestConsumer.reset(1)
+        kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get()
+        kafkaTestConsumer.doWait(5_000L)
+
+        await().atMost(Duration.ofSeconds(7)).pollInterval(Duration.ofSeconds(1))
+            .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1 }
+
+        assertMelosysEessiMelding(hentMelosysEessiRecords(), 0)
+
+        val storedLager = sedMottattStorageRepository.findBySedId(sedID)
+        storedLager.shouldHaveSize(1)
+        storedLager.first().sed shouldBe sed
+
+        val sedMottattHendelser = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
+        sedMottattHendelser.shouldHaveSize(1)
+        val sedMottattHendelse = sedMottattHendelser.first()
+        
+        sedMottattHendelse.skalJournalfoeres shouldBe false
     }
 
     fun assertMelosysEessiMelding(records: Collection<MelosysEessiMelding>, expectedSize: Int) {

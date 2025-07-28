@@ -27,6 +27,9 @@ class SedMottattHendelse(
     @Column(name = "publisert_kafka")
     var publisertKafka: Boolean = false,
 
+    @Column(name = "skal_journalfoeres")
+    var skalJournalfoeres: Boolean = true,
+
     @CreatedDate
     @Column(name = "mottatt_dato")
     var mottattDato: LocalDateTime? = null,
@@ -41,12 +44,14 @@ class SedMottattHendelse(
         private var sedHendelse: SedHendelse? = null
         private var journalpostId: String? = null
         private var publisertKafka: Boolean = false
+        private var skalJournalfoeres: Boolean = true
         private var mottattDato: LocalDateTime? = null
         private var sistEndretDato: LocalDateTime? = null
 
         fun sedHendelse(sedHendelse: SedHendelse?) = apply { this.sedHendelse = sedHendelse }
         fun journalpostId(journalpostId: String?) = apply { this.journalpostId = journalpostId }
         fun publisertKafka(publisertKafka: Boolean) = apply { this.publisertKafka = publisertKafka }
+        fun skalJournalfoeres(skalJournalfoeres: Boolean) = apply { this.skalJournalfoeres = skalJournalfoeres }
         fun mottattDato(mottattDato: LocalDateTime?) = apply { this.mottattDato = mottattDato }
         fun sistEndretDato(sistEndretDato: LocalDateTime?) = apply { this.sistEndretDato = sistEndretDato }
 
@@ -55,6 +60,7 @@ class SedMottattHendelse(
             sedHendelse ?: throw IllegalArgumentException("sedHendelse must be set"),
             journalpostId,
             publisertKafka,
+            skalJournalfoeres,
             mottattDato,
             sistEndretDato
         )
