@@ -11,6 +11,12 @@ interface SedMottattHendelseRepository : JpaRepository<SedMottattHendelse, Long>
     fun findAllByJournalpostIdIsNullOrderByMottattDato(): List<SedMottattHendelse>
 
     @Query(
+        value = "select * from sed_mottatt_hendelse where sed_hendelse ->> 'rinaSakId' = ?1 order by mottatt_dato desc",
+        nativeQuery = true
+    )
+    fun findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer: String): List<SedMottattHendelse>
+
+    @Query(
         value = "select * from sed_mottatt_hendelse where sed_hendelse ->> 'rinaSakId' = ?1 and publisert_kafka = ?2 order by mottatt_dato",
         nativeQuery = true
     )
