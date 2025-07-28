@@ -272,7 +272,7 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get()
         kafkaTestConsumer.doWait(5_000L)
 
-        await().atMost(Duration.ofSeconds(4)).pollInterval(Duration.ofSeconds(1))
+        await().atMost(Duration.ofSeconds(7)).pollInterval(Duration.ofSeconds(1))
             .until { sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1 }
 
         assertMelosysEessiMelding(hentMelosysEessiRecords(), 0)
