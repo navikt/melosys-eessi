@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import static no.nav.melosys.eessi.identifisering.PersonKontroller.harOverlappendeStatsborgerskap;
 import static no.nav.melosys.eessi.identifisering.PersonKontroller.harSammeFoedselsdato;
-import static no.nav.melosys.eessi.identifisering.PersonKontroller.harSammeNavn;
 
 @Component
 class PersonSok {
@@ -54,8 +53,6 @@ class PersonSok {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
         } else if (!harSammeFoedselsdato(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;
-        } else if (!harSammeNavn(person, personsokKriterier)) {
-            return SoekBegrunnelse.FEIL_NAVN;
         }
         return SoekBegrunnelse.IDENTIFISERT;
     }

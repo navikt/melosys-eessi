@@ -28,11 +28,6 @@ final class PersonKontroller {
         return harSammeFoedselsdato(personModell, personsokKriterier.getFoedselsdato());
     }
 
-    static boolean harSammeNavn(PersonModell person, PersonsokKriterier kriterier) {
-        return person.getFornavn().equalsIgnoreCase(kriterier.getFornavn())
-            && person.getEtternavn().equalsIgnoreCase(kriterier.getEtternavn());
-    }
-
     static boolean harSammeFoedselsdato(PersonModell personModell, LocalDate fødselsdato) {
         return personModell.getFødselsdato().equals(fødselsdato);
     }
