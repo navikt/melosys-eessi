@@ -5,7 +5,10 @@ import java.util.Optional;
 
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
-import no.nav.melosys.eessi.models.sed.nav.*;
+import no.nav.melosys.eessi.models.sed.nav.Bruker;
+import no.nav.melosys.eessi.models.sed.nav.Nav;
+import no.nav.melosys.eessi.models.sed.nav.Person;
+import no.nav.melosys.eessi.models.sed.nav.Pin;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
