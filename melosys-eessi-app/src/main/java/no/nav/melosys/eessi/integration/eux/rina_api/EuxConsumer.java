@@ -245,7 +245,7 @@ public class EuxConsumer implements RestConsumer {
         } catch (RestClientException e) {
             try {
                 String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
-                if (appEnvironment != null && appEnvironment.equals("devf")) {
+                if (appEnvironment != null && appEnvironment.equals("dev")) {
                     String value = objectMapper.writeValueAsString(entity.getBody());
                     log.info("Feil ved kall mot eux: {} sed:\n{}", e.getMessage(), value);
                 }
