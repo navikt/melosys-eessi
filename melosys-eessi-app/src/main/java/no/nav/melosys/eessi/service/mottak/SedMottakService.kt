@@ -64,7 +64,7 @@ class SedMottakService(
             return
         }
 
-        check(!erXSedBehandletUtenASed(sedMottattHendelse.sedHendelse)) {
+        check(!erXSedBehandletUtenASedEllerHSed(sedMottattHendelse.sedHendelse)) {
             "Mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av type ${
                 sedMottattHendelse.sedHendelse.sedType
             } har ikke tilhørende A sed behandlet"
@@ -125,7 +125,7 @@ class SedMottakService(
         }
     }
 
-    private fun erXSedBehandletUtenASed(sedHendelse: SedHendelse): Boolean {
+    private fun erXSedBehandletUtenASedEllerHSed(sedHendelse: SedHendelse): Boolean {
         if (!sedHendelse.erXSedSomTrengerKontroll()) return false
 
         if (sedHendelse.sedType == SedType.X007.name) {
@@ -139,15 +139,15 @@ class SedMottakService(
             if (sedTypeErX007OgNorgeErSakseier) return false
         }
 
-        val aSed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
+        val sed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
             sedHendelse.rinaSakId
         ).singleOrNull()
 
-        if (aSed?.skalJournalfoeres == false) {
+        if (sed?.skalJournalfoeres == false) {
             return false
         }
 
-        return !journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId)
+        return !(journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId) || journalpostSedKoblingService.erHSedAlleredeBehandlet(sedHendelse.rinaSakId))
     }
 
     private fun opprettOppgaveIdentifisering(sedMottatt: SedMottattHendelse, sed: SED) {
