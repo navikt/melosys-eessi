@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.mottak
 
 import io.getunleash.FakeUnleash
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -225,14 +226,47 @@ class SedMottakServiceTest {
     }
 
     @Test
-    fun `behandleSed xSedUtenTilhørendeASed kasterException`() {
+    fun `behandle SED - X-SED uten tilhørende A-SED eller H-SED kasterException`() {
         val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
 
         shouldThrow<IllegalStateException> {
             sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
         }.message shouldBe "Mottatt SED 555554444 av type X008 har ikke tilhørende A sed behandlet"
+    }
+
+    @Test
+    fun `behandle SED - X-SED med bare H-SED og ikke A-SED skal ikke kaste exception`() {
+        val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns true
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+
+        shouldNotThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }
+
+        verify { sedMottattHendelseRepository.save(sedMottattHendelse) }
+    }
+
+    @Test
+    fun `behandle SED - X-SED med bare A-SED og ikke H-SED skal ikke kaste exception`() {
+        val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
+        every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+
+        shouldNotThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }
+
+        verify { sedMottattHendelseRepository.save(sedMottattHendelse) }
     }
 
     @Test
@@ -411,14 +445,14 @@ class SedMottakServiceTest {
                 vedtak = VedtakA003(land = "DE")
             )
         )
-        
+
         val savedSedMottattHendelse = slot<SedMottattHendelse>()
         every { sedMottattHendelseRepository.save(capture(savedSedMottattHendelse)) } returnsArgument 0
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
         every { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), any()) } just Runs
         every { euxService.hentSedMedVedlegg(any(), any()) } returns mockk()
         every { euxService.hentBuc(any()) } returns mockk(relaxed = true)
-        
+
         val sedHendelse = sedHendelseUtenBruker().apply { sedType = "A003" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 
@@ -426,26 +460,26 @@ class SedMottakServiceTest {
 
         verify { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), true) }
         verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
-        
+
         savedSedMottattHendelse.captured.skalJournalfoeres shouldBe false
     }
 
     @Test
-    fun `erXSedBehandletUtenASed returnerer false når A-SED har skalJournalfoeres false`() {
+    fun `erXSedBehandletUtenASedEllerHSed returnerer false når A-SED har skalJournalfoeres false`() {
         val xSedHendelse = sedHendelseMedBruker().apply {
             sedType = "X008"
             rinaSakId = RINA_SAKSNUMMER
         }
-        
+
         val aSedMottattHendelse = SedMottattHendelse.builder()
             .sedHendelse(sedHendelseUtenBruker())
             .skalJournalfoeres(false)
             .build()
-        
+
         every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
-        
+
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
 
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
@@ -456,23 +490,23 @@ class SedMottakServiceTest {
     }
 
     @Test
-    fun `erXSedBehandletUtenASed kaller nye repository metode`() {
+    fun `erXSedBehandletUtenASedEllerHSed kaller nye repository metode`() {
         val xSedHendelse = sedHendelseMedBruker().apply {
             sedType = "X008"
             rinaSakId = RINA_SAKSNUMMER
         }
-        
+
         val aSedMottattHendelse = SedMottattHendelse.builder()
             .sedHendelse(sedHendelseUtenBruker())
             .skalJournalfoeres(true)
             .build()
-        
+
         every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
         every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
-        
+
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
 
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
@@ -499,7 +533,7 @@ class SedMottakServiceTest {
                 vedtak = VedtakA003(land = "DE")
             )
         )
-        
+
         val serviceWithDisabledToggle = SedMottakService(
             euxService,
             personFasade,
@@ -516,7 +550,7 @@ class SedMottakServiceTest {
             sedLagerService,
             "1",
         )
-        
+
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
         every { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), any()) } just Runs
@@ -526,7 +560,7 @@ class SedMottakServiceTest {
         every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
         every { euxService.hentSedMedVedlegg(any(), any()) } returns mockk()
         every { euxService.hentBuc(any()) } returns mockk(relaxed = true)
-        
+
         val sedHendelse = sedHendelseUtenBruker().apply { sedType = "A003" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
 

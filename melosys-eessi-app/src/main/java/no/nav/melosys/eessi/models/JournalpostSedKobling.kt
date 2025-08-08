@@ -28,4 +28,8 @@ class JournalpostSedKobling(
     fun erASed(): Boolean {
         return sedType.uppercase().startsWith("A")
     }
+
+    fun erHSed(): Boolean {
+        return sedType.uppercase().startsWith("H")
+    }
 }
