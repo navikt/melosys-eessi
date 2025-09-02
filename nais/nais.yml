@@ -53,6 +53,9 @@ spec:
         - application: {{APP_NAME_EUX_RINA_API}}
   webproxy: true
   observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
     logging:
       destinations:
         - id: elastic
