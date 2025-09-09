@@ -100,7 +100,7 @@ class KafkaDLQAdminTjeneste(
 
     @Operation(
         summary = "Resend SED",
-        description = "Resend en SED for en gitt rinasak og sedId/dokumentId. eux-rina-api sender inn i sedMottatt-køen sin igjen."
+        description = "Resend en SED for en gitt rinasak og setIdentifier. eux-rina-api sender inn i sedMottatt-køen sin igjen."
     )
     @PostMapping("/buc/resend/{rinaSaksnummer}/{setIdentifier}")
     fun resendSed(
