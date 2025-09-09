@@ -102,16 +102,16 @@ class KafkaDLQAdminTjeneste(
         summary = "Resend SED",
         description = "Resend en SED for en gitt rinasak og sedId/dokumentId. eux-rina-api sender inn i sedMottatt-køen sin igjen."
     )
-    @PostMapping("/buc/resend/{rinaSaksnummer}/{dokumentId}")
+    @PostMapping("/buc/resend/{rinaSaksnummer}/{setIdentifier}")
     fun resendSed(
         @PathVariable rinaSaksnummer: String,
-        @PathVariable dokumentId: String,
+        @PathVariable setIdentifier: String,
         @RequestHeader(API_KEY_HEADER) apiKey: String
     ): ResponseEntity<Void> {
         validerApikey(apiKey)
 
-        log.info { "Sender SED $dokumentId på nytt for sak $rinaSaksnummer" }
-        bucAdminService.resendSed(rinaSaksnummer, dokumentId)
+        log.info { "Sender SED $setIdentifier på nytt for sak $rinaSaksnummer" }
+        bucAdminService.resendSed(rinaSaksnummer, setIdentifier)
 
         return ResponseEntity.ok().build()
     }
