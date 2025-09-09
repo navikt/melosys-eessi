@@ -110,7 +110,7 @@ class KafkaDLQAdminTjeneste(
     ): ResponseEntity<Void> {
         validerApikey(apiKey)
 
-        log.info { "Sender SED $setIdentifier på nytt for sak $rinaSaksnummer" }
+        log.info { "Sender SED på nytt for sak $rinaSaksnummer med setID: $setIdentifier" }
         bucAdminService.resendSed(rinaSaksnummer, setIdentifier)
 
         return ResponseEntity.ok().build()
