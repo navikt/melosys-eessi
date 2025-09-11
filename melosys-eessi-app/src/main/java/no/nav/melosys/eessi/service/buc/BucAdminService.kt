@@ -32,8 +32,8 @@ class BucAdminService(
     private fun identifiserManglendeSeder(oversikt: RinaSakOversiktV3): List<ManglendeSed> {
         val rinaSaksnummer = oversikt.sakId ?: return emptyList()
         val lokaleSedIder = sedMottattHendelseRepository
-            .findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, true)
-            .mapNotNull { it.sedHendelse?.sedId }
+            .findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
+            .mapNotNull { it.sedHendelse.sedId }
             .toSet()
 
         log.info { "Fant ${oversikt.sedListe?.size ?: 0} SEDer i RINA og ${lokaleSedIder.size} lokalt for sak $rinaSaksnummer" }
@@ -44,7 +44,7 @@ class BucAdminService(
                 ManglendeSed(
                     sedType = sed.sedType ?: "UKJENT",
                     status = SedStatus.MANGLER_LOKALT,
-                    dokumentId = sed.sedId,
+                    sedId = sed.sedId,
                     beskrivelse = "SED finnes i RINA med status '${sed.status}', men ikke i lokal database."
                 )
             }
@@ -61,6 +61,17 @@ class BucAdminService(
             euxKotlinConsumer.resendSed(rinaSaksnummer, dokumentId)
         } catch (e: Exception) {
             log.error(e) { "Feil ved gjensending av SED $dokumentId for sak $rinaSaksnummer" }
+            throw e
+        }
+    }
+
+    fun resendSedListe(sedIds: List<String>) {
+        log.info { "Ber om gjensending av ${sedIds.size} SEDer" }
+        try {
+            euxKotlinConsumer.resendSedListe(sedIds)
+            log.info { "Gjensending av ${sedIds.size} SEDer fullført" }
+        } catch (e: Exception) {
+            log.error(e) { "Feil ved gjensending av SED-liste med ${sedIds.size} SEDer" }
             throw e
         }
     }
