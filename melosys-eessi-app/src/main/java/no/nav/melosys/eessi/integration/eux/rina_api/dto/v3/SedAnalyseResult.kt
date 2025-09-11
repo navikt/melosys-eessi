@@ -16,6 +16,6 @@ data class SedAnalyseResult(
 data class ManglendeSed(
     val sedType: String,
     val status: SedStatus,
-    val dokumentId: String? = null,
+    val sedId: String? = null,
     val beskrivelse: String? = null
 )

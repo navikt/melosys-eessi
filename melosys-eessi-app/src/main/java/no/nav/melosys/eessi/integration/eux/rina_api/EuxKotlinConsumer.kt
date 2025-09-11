@@ -74,4 +74,32 @@ class EuxKotlinConsumer(
             .bodyToMono(Void::class.java)
             .block()
     }
+
+
+    fun resendSedListe(sedIds: List<String>) {
+        val uri = "/cpi/resend/liste"
+        val body = sedIds.joinToString(" ")
+
+        euxRinaWebClient.post()
+            .uri(uri)
+            .bodyValue(body)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError) { response ->
+                response.bodyToMono(String::class.java)
+                    .flatMap { errorBody ->
+                        val errorMessage = parseErrorMessage(errorBody, response.statusCode())
+                        Mono.error(
+                            IntegrationException(
+                                "Feil ved gjensending av SED-liste fra EUX Rina API. " +
+                                "URI: $uri, " +
+                                "Antall SEDer: ${sedIds.size}, " +
+                                "Status: ${response.statusCode()}, " +
+                                "Feil: $errorMessage"
+                            )
+                        )
+                    }
+            }
+            .bodyToMono(Void::class.java)
+            .block()
+    }
 }
