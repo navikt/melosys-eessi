@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.controller
 import io.swagger.v3.oas.annotations.Operation
 import mu.KotlinLogging
 import no.nav.melosys.eessi.controller.dto.KafkaDLQDto
+import no.nav.melosys.eessi.controller.dto.ResendSedListeDto
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.RinaSakOversiktV3
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.SedAnalyseResult
 import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ
@@ -12,6 +13,7 @@ import no.nav.melosys.eessi.service.buc.BucAdminService
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService
 import no.nav.security.token.support.core.api.Protected
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -114,6 +116,27 @@ class KafkaDLQAdminTjeneste(
         bucAdminService.resendSed(rinaSaksnummer, setIdentifier)
 
         return ResponseEntity.ok().build()
+    }
+
+
+    @Operation(
+        summary = "Resend SED-liste",
+        description = "Resend en liste med SEDer. eux-rina-api sender inn i sedMottatt-køen sin igjen."
+    )
+    @PostMapping("/sed/resend-liste")
+    fun resendSedListe(
+        @RequestBody dto: ResendSedListeDto,
+        @RequestHeader(API_KEY_HEADER) apiKey: String
+    ): ResponseEntity<String?> {
+        validerApikey(apiKey)
+        log.info("Sender forespørsel om gjensending av {} SEDer", dto.sedIds.size)
+        try {
+            bucAdminService.resendSedListe(dto.sedIds)
+            return ResponseEntity.ok<String?>("Forespørsel om gjensending av " + dto.sedIds.size + " SEDer sendt")
+        } catch (e: java.lang.Exception) {
+            log.error("Feil ved gjensending av SED-liste", e)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body<String?>("Feil ved gjensending: " + e.message)
+        }
     }
 
     @GetMapping("/buc/analyse/alle")

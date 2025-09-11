@@ -78,7 +78,7 @@ class EuxKotlinConsumer(
 
     fun resendSedListe(sedIds: List<String>) {
         val uri = "/cpi/resend/liste"
-        val body = sedIds.joinToString(" ")
+        val body = sedIds.joinToString("\n")
 
         euxRinaWebClient.post()
             .uri(uri)

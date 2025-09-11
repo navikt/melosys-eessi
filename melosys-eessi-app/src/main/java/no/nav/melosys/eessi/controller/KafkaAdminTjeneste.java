@@ -6,10 +6,8 @@ import java.util.Optional;
 
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerAssignmentResponse;
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse;
-import no.nav.melosys.eessi.controller.dto.ResendSedListeDto;
 import no.nav.melosys.eessi.kafka.consumers.OppgaveHendelseConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
-import no.nav.melosys.eessi.service.buc.BucAdminService;
 import no.nav.security.token.support.core.api.Protected;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,13 +29,11 @@ public class KafkaAdminTjeneste {
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
     private final OppgaveHendelseConsumer oppgaveHendelseConsumer;
     private final SedMottattConsumer sedMottattConsumer;
-    private final BucAdminService bucAdminService;
     private final String apiKey;
 
-    public KafkaAdminTjeneste(OppgaveHendelseConsumer oppgaveHendelseConsumer, SedMottattConsumer sedMottattConsumer, BucAdminService bucAdminService, @Value("${melosys.admin.api-key}") String apiKey, KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
+    public KafkaAdminTjeneste(OppgaveHendelseConsumer oppgaveHendelseConsumer, SedMottattConsumer sedMottattConsumer, @Value("${melosys.admin.api-key}") String apiKey, KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
         this.oppgaveHendelseConsumer = oppgaveHendelseConsumer;
         this.sedMottattConsumer = sedMottattConsumer;
-        this.bucAdminService = bucAdminService;
         this.apiKey = apiKey;
         this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
     }
@@ -85,19 +81,6 @@ public class KafkaAdminTjeneste {
             default -> log.warn("Vi støtter ikke {}, gjør ingenting.", consumerId);
         }
         return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/sed/resend-liste")
-    public ResponseEntity<String> resendSedListe(@RequestBody ResendSedListeDto dto, @RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
-        log.info("[KafkaAdminTjeneste] Sender forespørsel om gjensending av {} SEDer", dto.getSedIds().size());
-        try {
-            bucAdminService.resendSedListe(dto.getSedIds());
-            return ResponseEntity.ok("Forespørsel om gjensending av " + dto.getSedIds().size() + " SEDer sendt");
-        } catch (Exception e) {
-            log.error("[KafkaAdminTjeneste] Feil ved gjensending av SED-liste", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Feil ved gjensending: " + e.getMessage());
-        }
     }
 
     private KafkaConsumerResponse lagKafkaConsumerResponse(MessageListenerContainer listenerContainer) {
