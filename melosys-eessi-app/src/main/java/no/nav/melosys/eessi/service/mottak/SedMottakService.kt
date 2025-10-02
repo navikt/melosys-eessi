@@ -64,7 +64,9 @@ class SedMottakService(
             return
         }
 
-        check(!erXSedBehandletUtenASedEllerHSed(sedMottattHendelse.sedHendelse)) {
+        val erXSedBehandletUtenASedEllerHSed = erXSedBehandletUtenASedEllerHSed(sedMottattHendelse.sedHendelse)
+
+        check(!erXSedBehandletUtenASedEllerHSed) {
             "Mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av type ${
                 sedMottattHendelse.sedHendelse.sedType
             } har ikke tilhørende A sed behandlet"
@@ -72,6 +74,20 @@ class SedMottakService(
 
         sjekkSedMottakerOgAvsenderID(sedMottattHendelse.sedHendelse)
         sjekkSedMottakerOgAvsenderNavn(sedMottattHendelse.sedHendelse)
+
+        if (SedType.valueOf(sedMottattHendelse.sedHendelse.sedType).erXSED()) {
+            val aSed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
+                sedMottattHendelse.sedHendelse.rinaSakId
+            ).lastOrNull {
+                it.sedHendelse.erASED()
+            }
+
+            if (aSed != null && !aSed.skalJournalfoeres) {
+                sedMottattHendelse.skalJournalfoeres = false
+                sedMottattHendelseRepository.save(sedMottattHendelse)
+                return
+            }
+        }
 
         val lagretHendelse = sedMottattHendelseRepository.save(sedMottattHendelse)
 
@@ -139,15 +155,16 @@ class SedMottakService(
             if (sedTypeErX007OgNorgeErSakseier) return false
         }
 
-        val sed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
+        // Check if an A-SED exists with skalJournalfoeres = false
+        val aSedWithSkalJournalfoeresFalse = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
             sedHendelse.rinaSakId
-        ).singleOrNull()
+        ).any { it.sedHendelse.erASED() && !it.skalJournalfoeres }
 
-        if (sed?.skalJournalfoeres == false) {
-            return false
-        }
+        if (aSedWithSkalJournalfoeresFalse) return false
 
-        return !(journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId) || journalpostSedKoblingService.erHSedAlleredeBehandlet(sedHendelse.rinaSakId))
+        return !(journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId) || journalpostSedKoblingService.erHSedAlleredeBehandlet(
+            sedHendelse.rinaSakId
+        ))
     }
 
     private fun opprettOppgaveIdentifisering(sedMottatt: SedMottattHendelse, sed: SED) {
