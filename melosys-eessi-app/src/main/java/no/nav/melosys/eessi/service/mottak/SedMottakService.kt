@@ -155,16 +155,7 @@ class SedMottakService(
             if (sedTypeErX007OgNorgeErSakseier) return false
         }
 
-        // Check if an A-SED exists with skalJournalfoeres = false
-        val aSedWithSkalJournalfoeresFalse = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
-            sedHendelse.rinaSakId
-        ).any { it.sedHendelse.erASED() && !it.skalJournalfoeres }
-
-        if (aSedWithSkalJournalfoeresFalse) return false
-
-        return !(journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId) || journalpostSedKoblingService.erHSedAlleredeBehandlet(
-            sedHendelse.rinaSakId
-        ))
+        return !(journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId) || journalpostSedKoblingService.erHSedAlleredeBehandlet(sedHendelse.rinaSakId))
     }
 
     private fun opprettOppgaveIdentifisering(sedMottatt: SedMottattHendelse, sed: SED) {

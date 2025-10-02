@@ -485,7 +485,7 @@ class SedMottakServiceTest {
             .build()
 
         every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
-        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
         every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
@@ -537,7 +537,7 @@ class SedMottakServiceTest {
             .build()
 
         every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
-        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
         every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
 
         val savedSedMottattHendelse = slot<SedMottattHendelse>()
