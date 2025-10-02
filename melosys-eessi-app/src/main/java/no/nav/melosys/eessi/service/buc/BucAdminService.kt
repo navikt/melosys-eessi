@@ -33,7 +33,7 @@ class BucAdminService(
         val rinaSaksnummer = oversikt.sakId ?: return emptyList()
         val lokaleSedIder = sedMottattHendelseRepository
             .findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
-            .mapNotNull { it.sedHendelse.sedId }
+            .mapNotNull { it.sedHendelse.rinaDokumentId }
             .toSet()
 
         log.info { "Fant ${oversikt.sedListe?.size ?: 0} SEDer i RINA og ${lokaleSedIder.size} lokalt for sak $rinaSaksnummer" }

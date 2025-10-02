@@ -243,6 +243,7 @@ class SedMottakServiceTest {
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
         every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns true
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(any()) } returns emptyList()
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
 
@@ -257,8 +258,15 @@ class SedMottakServiceTest {
     fun `behandle SED - X-SED med bare A-SED og ikke H-SED skal ikke kaste exception`() {
         val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+        val aSedMottattHendelse = SedMottattHendelse.builder()
+            .sedHendelse(sedHendelseUtenBruker())
+            .skalJournalfoeres(true)
+            .build()
+
         every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
         every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(any()) } returns listOf(aSedMottattHendelse)
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
 
@@ -477,7 +485,8 @@ class SedMottakServiceTest {
             .build()
 
         every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
-        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns false
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
+        every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
         every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
 
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
@@ -486,7 +495,7 @@ class SedMottakServiceTest {
 
         // Should not throw exception because A-SED has skalJournalfoeres = false
         verify { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) }
-        verify(exactly = 0) { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) }
+        verify(exactly = 1) { sedMottattHendelseRepository.save(any()) }
     }
 
     @Test
@@ -513,6 +522,61 @@ class SedMottakServiceTest {
 
         verify { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) }
         verify { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) }
+    }
+
+    @Test
+    fun `behandleSed X-SED setter skalJournalfoeres til false når A-SED har skalJournalfoeres false`() {
+        val xSedHendelse = sedHendelseMedBruker().apply {
+            sedType = "X008"
+            rinaSakId = RINA_SAKSNUMMER
+        }
+
+        val aSedMottattHendelse = SedMottattHendelse.builder()
+            .sedHendelse(sedHendelseUtenBruker())
+            .skalJournalfoeres(false)
+            .build()
+
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
+        every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
+
+        val savedSedMottattHendelse = slot<SedMottattHendelse>()
+        every { sedMottattHendelseRepository.save(capture(savedSedMottattHendelse)) } returnsArgument 0
+
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify(exactly = 1) { sedMottattHendelseRepository.save(any()) }
+        savedSedMottattHendelse.captured.skalJournalfoeres shouldBe false
+    }
+
+    @Test
+    fun `behandleSed X-SED fortsetter behandling når A-SED har skalJournalfoeres true`() {
+        val xSedHendelse = sedHendelseMedBruker().apply {
+            sedType = "X008"
+            rinaSakId = RINA_SAKSNUMMER
+        }
+
+        val aSedMottattHendelse = SedMottattHendelse.builder()
+            .sedHendelse(sedHendelseUtenBruker())
+            .skalJournalfoeres(true)
+            .build()
+
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSedMottattHendelse)
+        every { journalpostSedKoblingService.erASedAlleredeBehandlet(any()) } returns true
+        every { journalpostSedKoblingService.erHSedAlleredeBehandlet(any()) } returns false
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(xSedHendelse).build()
+
+        sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+
+        verify { euxService.hentSedMedRetry(any(), any()) }
+        verify { personIdentifisering.identifiserPerson(any(), any()) }
+        verify { sedMottattHendelseRepository.save(any()) }
     }
 
     @Test
