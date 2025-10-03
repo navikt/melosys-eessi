@@ -57,6 +57,8 @@ enum class SedType {
 
     fun erASED(): Boolean = name.startsWith("A")
 
+    fun erHSED(): Boolean = name.startsWith("H")
+
     fun kreverAdresse(): Boolean = this in KREVER_ADRESSE
 
     companion object {

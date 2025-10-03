@@ -45,6 +45,11 @@ public class SedHendelse {
     }
 
     @JsonIgnore
+    public boolean erHSED() {
+        return SedType.valueOf(sedType).erHSED();
+    }
+
+    @JsonIgnore
     public boolean erXSedSomTrengerKontroll() {
         return TRENGER_KONTROLL.contains(sedType.toUpperCase());
     }
