@@ -76,13 +76,13 @@ class SedMottakService(
         sjekkSedMottakerOgAvsenderNavn(sedMottattHendelse.sedHendelse)
 
         if (SedType.valueOf(sedMottattHendelse.sedHendelse.sedType).erXSED()) {
-            val aSed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
+            val initiellSed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
                 sedMottattHendelse.sedHendelse.rinaSakId
             ).lastOrNull {
-                it.sedHendelse.erASED()
+                it.sedHendelse.erASED() || it.sedHendelse.erHSED()
             }
 
-            if (aSed != null && !aSed.skalJournalfoeres) {
+            if (initiellSed != null && !initiellSed.skalJournalfoeres) {
                 sedMottattHendelse.skalJournalfoeres = false
                 sedMottattHendelseRepository.save(sedMottattHendelse)
                 return
@@ -155,7 +155,10 @@ class SedMottakService(
             if (sedTypeErX007OgNorgeErSakseier) return false
         }
 
-        return !(journalpostSedKoblingService.erASedAlleredeBehandlet(sedHendelse.rinaSakId) || journalpostSedKoblingService.erHSedAlleredeBehandlet(sedHendelse.rinaSakId))
+        val sedHendelser = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(sedHendelse.rinaSakId)
+        return !(sedHendelser.any {
+            it.sedHendelse.erASED() || it.sedHendelse.erHSED()
+        })
     }
 
     private fun opprettOppgaveIdentifisering(sedMottatt: SedMottattHendelse, sed: SED) {

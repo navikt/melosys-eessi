@@ -39,12 +39,6 @@ class JournalpostSedKoblingService(
         )
     }
 
-    fun erASedAlleredeBehandlet(rinaSaksnummer: String): Boolean =
-        journalpostSedKoblingRepository.findByRinaSaksnummer(rinaSaksnummer).any { it.erASed() }
-
-    fun erHSedAlleredeBehandlet(rinaSaksnummer: String): Boolean =
-        journalpostSedKoblingRepository.findByRinaSaksnummer(rinaSaksnummer).any { it.erHSed() }
-
     fun lagre(
         journalpostID: String,
         rinaSaksnummer: String,
