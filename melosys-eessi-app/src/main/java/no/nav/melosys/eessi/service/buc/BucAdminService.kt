@@ -18,7 +18,7 @@ class BucAdminService(
 ) {
 
     fun analyserManglendeSeder(rinaSaksnummer: String): SedAnalyseResult {
-        log.info { "Analyserer manglende SEDer for sak $rinaSaksnummer" }
+        log.info { "Analyserer manglende SED-er for sak $rinaSaksnummer" }
         val oversikt = euxKotlinConsumer.hentBucOversiktV3(rinaSaksnummer)
         val manglendeSeder = identifiserManglendeSeder(oversikt)
 
@@ -57,22 +57,12 @@ class BucAdminService(
 
     fun resendSed(rinaSaksnummer: String, dokumentId: String) {
         log.info { "Ber om gjensending av SED $dokumentId for sak $rinaSaksnummer" }
-        try {
-            euxKotlinConsumer.resendSed(rinaSaksnummer, dokumentId)
-        } catch (e: Exception) {
-            log.error(e) { "Feil ved gjensending av SED $dokumentId for sak $rinaSaksnummer" }
-            throw e
-        }
+        euxKotlinConsumer.resendSed(rinaSaksnummer, dokumentId)
     }
 
     fun resendSedListe(sedIds: List<String>) {
-        log.info { "Ber om gjensending av ${sedIds.size} SEDer" }
-        try {
-            euxKotlinConsumer.resendSedListe(sedIds)
-            log.info { "Gjensending av ${sedIds.size} SEDer fullført" }
-        } catch (e: Exception) {
-            log.error(e) { "Feil ved gjensending av SED-liste med ${sedIds.size} SEDer" }
-            throw e
-        }
+        log.info { "Ber om gjensending av ${sedIds.size} SED-er" }
+        euxKotlinConsumer.resendSedListe(sedIds)
+        log.info { "Gjensending av ${sedIds.size} SED-er fullført" }
     }
 }
