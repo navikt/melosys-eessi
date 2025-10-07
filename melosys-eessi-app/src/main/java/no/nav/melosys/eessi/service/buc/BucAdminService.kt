@@ -18,9 +18,9 @@ class BucAdminService(
 ) {
 
     fun analyserManglendeSeder(rinaSaksnummer: String): SedAnalyseResult {
-        log.info { "Analyserer manglende SED-er for sak $rinaSaksnummer" }
+        log.info { "Analyserer SED-status for sak $rinaSaksnummer" }
         val oversikt = euxKotlinConsumer.hentBucOversiktV3(rinaSaksnummer)
-        val manglendeSeder = identifiserManglendeSeder(oversikt)
+        val manglendeSeder = analyserSedStatus(oversikt)
 
         return SedAnalyseResult(
             rinaSaksnummer = rinaSaksnummer,
@@ -29,24 +29,42 @@ class BucAdminService(
         )
     }
 
-    private fun identifiserManglendeSeder(oversikt: RinaSakOversiktV3): List<ManglendeSed> {
+    private fun analyserSedStatus(oversikt: RinaSakOversiktV3): List<ManglendeSed> {
         val rinaSaksnummer = oversikt.sakId ?: return emptyList()
-        val lokaleSedIder = sedMottattHendelseRepository
-            .findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
-            .mapNotNull { it.sedHendelse.rinaDokumentId }
-            .toSet()
 
-        log.info { "Fant ${oversikt.sedListe?.size ?: 0} SED-er i RINA og ${lokaleSedIder.size} lokalt for sak $rinaSaksnummer" }
+        // Map SED ID -> publisert status (null = mangler lokalt)
+        val lokaleSedMap = sedMottattHendelseRepository
+            .findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
+            .mapNotNull { it.sedHendelse.rinaDokumentId?.let { id -> id to it.publisertKafka } }
+            .toMap()
+
+        log.info { "Fant ${oversikt.sedListe?.size ?: 0} SED-er i RINA og ${lokaleSedMap.size} lokalt for sak $rinaSaksnummer" }
 
         return oversikt.sedListe
-            ?.filterNot { sed -> lokaleSedIder.contains(sed.sedId) }
-            ?.map { sed ->
-                ManglendeSed(
-                    sedType = sed.sedType ?: "UKJENT",
-                    status = SedStatus.MANGLER_LOKALT,
-                    sedId = sed.sedId,
-                    beskrivelse = "SED finnes i RINA med status '${sed.status}', men ikke i lokal database."
-                )
+            ?.mapNotNull { sed ->
+                val sedId = sed.sedId ?: return@mapNotNull null
+                val publisertKafka = lokaleSedMap[sedId]
+
+                when {
+                    publisertKafka == null -> ManglendeSed(
+                        sedType = sed.sedType ?: "UKJENT",
+                        status = SedStatus.MANGLER_LOKALT,
+                        sedId = sedId,
+                        beskrivelse = "SED finnes i RINA med status '${sed.status}', men ikke i lokal database."
+                    )
+                    !publisertKafka -> ManglendeSed(
+                        sedType = sed.sedType ?: "UKJENT",
+                        status = SedStatus.IKKE_PUBLISERT,
+                        sedId = sedId,
+                        beskrivelse = "SED finnes lokalt, men er ikke publisert til Kafka."
+                    )
+                    else -> ManglendeSed(
+                        sedType = sed.sedType ?: "UKJENT",
+                        status = SedStatus.FINNES_LOKALT,
+                        sedId = sedId,
+                        beskrivelse = "SED finnes lokalt og er publisert til Kafka."
+                    )
+                }
             }
             ?: emptyList()
     }
