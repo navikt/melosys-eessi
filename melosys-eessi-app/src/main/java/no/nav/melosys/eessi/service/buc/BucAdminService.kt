@@ -32,11 +32,11 @@ class BucAdminService(
     private fun identifiserManglendeSeder(oversikt: RinaSakOversiktV3): List<ManglendeSed> {
         val rinaSaksnummer = oversikt.sakId ?: return emptyList()
         val lokaleSedIder = sedMottattHendelseRepository
-            .findAllByRinaSaksnummerAndPublisertKafkaSortedByMottattDato(rinaSaksnummer, false)
+            .findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
             .mapNotNull { it.sedHendelse.rinaDokumentId }
             .toSet()
 
-        log.info { "Fant ${oversikt.sedListe?.size ?: 0} SEDer i RINA og ${lokaleSedIder.size} lokalt for sak $rinaSaksnummer" }
+        log.info { "Fant ${oversikt.sedListe?.size ?: 0} SED-er i RINA og ${lokaleSedIder.size} lokalt for sak $rinaSaksnummer" }
 
         return oversikt.sedListe
             ?.filterNot { sed -> lokaleSedIder.contains(sed.sedId) }
