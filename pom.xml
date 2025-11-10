@@ -26,7 +26,7 @@
         <guava.version>32.0.0-jre</guava.version>
         <hypersistence-utils.version>3.11.0</hypersistence-utils.version>
         <java.version>17</java.version>
-        <kotlin.version>2.2.21</kotlin.version>
+        <kotlin.version>2.0.21</kotlin.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
         <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
         <kotest.version>5.6.0</kotest.version>
@@ -98,7 +98,7 @@
             </dependency>
             <dependency>
                 <groupId>io.mockk</groupId>
-                <artifactId>mockk</artifactId>
+                <artifactId>mockk-jvm</artifactId>
                 <version>${mockk.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -138,6 +138,11 @@
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${google-errorprone.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlbeans</groupId>
+                <artifactId>xmlbeans</artifactId>
+                <version>5.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

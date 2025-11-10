@@ -29,13 +29,16 @@ public class JournalpostapiConfiguration {
         RestTemplateBuilder restTemplateBuilder,
         RestSTSInterceptor systemContextClientRequestInterceptor,
         CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
+        
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setBufferRequestBody(false);
+        
         return restTemplateBuilder
-            .requestFactory(SimpleClientHttpRequestFactory::new)
+            .requestFactory(() -> requestFactory)
             .uriTemplateHandler(new DefaultUriBuilderFactory(url))
             .interceptors(systemContextClientRequestInterceptor, correlationIdOutgoingInterceptor)
-            .setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
-            .setReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
-            .setBufferRequestBody(false)
+            .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+            .readTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
             .build();
     }
 
