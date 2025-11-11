@@ -32,7 +32,7 @@
         <kotest.version>5.6.0</kotest.version>
         <mockk.version>1.12.5</mockk.version>
         <springmockk.version>3.1.1</springmockk.version>
-        <logstash-encoder.version>7.4</logstash-encoder.version>
+        <logstash-encoder.version>8.1</logstash-encoder.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <micrometer.version>1.12.3</micrometer.version>
