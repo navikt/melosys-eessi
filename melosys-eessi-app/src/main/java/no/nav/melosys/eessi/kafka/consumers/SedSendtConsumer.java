@@ -10,6 +10,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static no.nav.melosys.eessi.config.MDCOperations.*;
 
@@ -21,6 +22,7 @@ public class SedSendtConsumer {
     private final OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
     private final KafkaDLQService kafkaDLQService;
 
+    @Transactional
     @KafkaListener(clientIdPrefix = "melosys-eessi-sedSendt", topics = "${melosys.kafka.aiven.consumer.sendt.topic}", containerFactory = "sedSendtHendelseListenerContainerFactory", groupId = "${melosys.kafka.aiven.consumer.sendt.groupid}")
     public void sedSendt(ConsumerRecord<String, SedHendelse> consumerRecord) {
         SedHendelse sedSendtHendelse = consumerRecord.value();

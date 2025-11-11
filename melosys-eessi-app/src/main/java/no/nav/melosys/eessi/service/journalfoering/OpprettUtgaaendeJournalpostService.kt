@@ -16,6 +16,7 @@ import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 private val log = KotlinLogging.logger {}
 
@@ -30,6 +31,8 @@ class OpprettUtgaaendeJournalpostService(
     private val personIdentifisering: PersonIdentifisering,
     private val sedSendtHendelseRepository: SedSendtHendelseRepository
 ) {
+
+    @Transactional
     fun behandleSedSendtHendelse(sedSendt: SedHendelse) {
         if (sedSendt.erIkkeLaBuc() && !erHBucFraMelosys(sedSendt)) {
             return
@@ -42,7 +45,7 @@ class OpprettUtgaaendeJournalpostService(
                 journalfoerTidligereSedDersomEksisterer(sedSendt.rinaSakId)
             } else {
                 log.info("SED {} inneholder ikke personId, journalfører ikke.", sedSendt.rinaDokumentId)
-                sedSendtHendelseRepository.save(SedSendtHendelse(sedSendt.id, sedSendt, null))
+                sedSendtHendelseRepository.save(SedSendtHendelse(null, sedSendt, null))
             }
             sedMetrikker.sedSendt(sedSendt.sedType)
         } catch (e: SedAlleredeJournalførtException) {
