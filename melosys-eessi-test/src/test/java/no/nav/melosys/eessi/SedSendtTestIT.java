@@ -23,11 +23,12 @@ import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import no.nav.melosys.eessi.repository.KafkaDLQRepository;
 import no.nav.melosys.eessi.repository.SedSendtHendelseRepository;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -50,10 +51,10 @@ class SedSendtTestIT extends ComponentTestBase {
     @Autowired
     private KafkaDLQRepository kafkaDLQRepository;
 
-    @MockBean
+    @MockitoBean
     private PersonFasade personFasade;
 
-    @MockBean
+    @Autowired
     private BucIdentifisertRepository bucIdentifisertRepository;
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
@@ -225,10 +226,8 @@ class SedSendtTestIT extends ComponentTestBase {
     }
 
     private void mockIdentifisertPerson() {
-        BucIdentifisert bucIdentifisert = new BucIdentifisert(1L, rinaSaksnummer, FNR);
-        when(bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer)).thenReturn(Optional.of(bucIdentifisert));
-
-        when(bucIdentifisertRepository.findByRinaSaksnummer(anyString())).thenReturn(Optional.of(bucIdentifisert));
+        BucIdentifisert bucIdentifisert = new BucIdentifisert(0L, rinaSaksnummer, FNR);
+        bucIdentifisertRepository.save(bucIdentifisert);
     }
 
     protected ProducerRecord<String, Object> lagSedSendtRecord(SedHendelse sedHendelse) {
