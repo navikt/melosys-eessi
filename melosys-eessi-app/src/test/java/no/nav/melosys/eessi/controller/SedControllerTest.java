@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
@@ -30,15 +31,15 @@ class SedControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private SedService sedService;
 
-    @MockBean
+    @MockitoBean
     private OpprettUtgaaendeJournalpostService opprettUtgaaendeJournalpostService;
 
-    @MockBean
+    @MockitoBean
     private TokenValidationContextHolder tokenValidationContextHolder;
-    @MockBean
+    @MockitoBean
     private OAuth2HttpClient oAuth2HttpClient;
 
     @Test

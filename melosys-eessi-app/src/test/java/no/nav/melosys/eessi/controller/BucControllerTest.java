@@ -23,9 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
@@ -45,18 +45,18 @@ class BucControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private EuxService euxService;
-    @MockBean
+    @MockitoBean
     private SedService sedService;
-    @MockBean
+    @MockitoBean
     private LukkBucService lukkBucService;
 
-    @MockBean
+    @MockitoBean
     private TokenValidationContextHolder tokenValidationContextHolder;
-    @MockBean
+    @MockitoBean
     private OAuth2HttpClient oAuth2HttpClient;
-    @MockBean
+    @MockitoBean
     private EuxConsumer euxConsumer;
 
     @Test
