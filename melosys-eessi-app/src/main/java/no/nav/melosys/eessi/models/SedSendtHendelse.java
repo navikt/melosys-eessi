@@ -23,8 +23,6 @@ public class SedSendtHendelse {
     @java.lang.SuppressWarnings("all")
     public static class SedSendtHendelseBuilder {
         @java.lang.SuppressWarnings("all")
-        private Long id;
-        @java.lang.SuppressWarnings("all")
         private SedHendelse sedHendelse;
         @java.lang.SuppressWarnings("all")
         private String journalpostId;
@@ -38,7 +36,6 @@ public class SedSendtHendelse {
          */
         @java.lang.SuppressWarnings("all")
         public SedSendtHendelse.SedSendtHendelseBuilder id(final Long id) {
-            this.id = id;
             return this;
         }
 
@@ -62,13 +59,13 @@ public class SedSendtHendelse {
 
         @java.lang.SuppressWarnings("all")
         public SedSendtHendelse build() {
-            return new SedSendtHendelse(this.id, this.sedHendelse, this.journalpostId);
+            return new SedSendtHendelse(this.sedHendelse, this.journalpostId);
         }
 
         @java.lang.Override
         @java.lang.SuppressWarnings("all")
         public java.lang.String toString() {
-            return "SedSendtHendelse.SedSendtHendelseBuilder(id=" + this.id + ", sedHendelse=" + this.sedHendelse + ", journalpostId=" + this.journalpostId + ")";
+            return "SedSendtHendelse.SedSendtHendelseBuilder(sedHendelse=" + this.sedHendelse + ", journalpostId=" + this.journalpostId + ")";
         }
     }
 
@@ -158,8 +155,7 @@ public class SedSendtHendelse {
     }
 
     @java.lang.SuppressWarnings("all")
-    public SedSendtHendelse(final Long id, final SedHendelse sedHendelse, final String journalpostId) {
-        this.id = id;
+    public SedSendtHendelse(final SedHendelse sedHendelse, final String journalpostId) {
         this.sedHendelse = sedHendelse;
         this.journalpostId = journalpostId;
     }

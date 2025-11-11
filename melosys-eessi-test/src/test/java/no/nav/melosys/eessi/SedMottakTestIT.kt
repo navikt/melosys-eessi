@@ -21,7 +21,6 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
-import no.nav.melosys.eessi.repository.SedMottattLager
 import no.nav.melosys.eessi.repository.SedMottattLagerRepository
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Test
@@ -247,11 +246,11 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
     @Test
     fun `tredjelandsborger A003 uten Norge som arbeidssted setter skalJournalfoeres til false`() {
         val sedID = UUID.randomUUID().toString()
-        
+
         val sed = SED(
             sedType = SedType.A003.name,
             medlemskap = MedlemskapA003(
-                vedtak = VedtakA003(land = "DE") 
+                vedtak = VedtakA003(land = "DE")
             ),
             nav = Nav(
                 bruker = Bruker(
@@ -259,7 +258,7 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
                         foedselsdato = "1990-01-01",
                         fornavn = "Test",
                         etternavn = "Person",
-                        statsborgerskap = listOf(Statsborgerskap(land = "US")) 
+                        statsborgerskap = listOf(Statsborgerskap(land = "US"))
                     )
                 ),
                 arbeidssted = emptyList(),
@@ -284,7 +283,7 @@ class SedMottakTestIT : ComponentTestBaseKotlin() {
         val sedMottattHendelser = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
         sedMottattHendelser.shouldHaveSize(1)
         val sedMottattHendelse = sedMottattHendelser.first()
-        
+
         sedMottattHendelse.skalJournalfoeres shouldBe false
     }
 

@@ -33,9 +33,8 @@ public class JournalpostapiConfiguration {
             .requestFactory(SimpleClientHttpRequestFactory::new)
             .uriTemplateHandler(new DefaultUriBuilderFactory(url))
             .interceptors(systemContextClientRequestInterceptor, correlationIdOutgoingInterceptor)
-            .setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
-            .setReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
-            .setBufferRequestBody(false)
+            .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
+            .readTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
             .build();
     }
 

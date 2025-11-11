@@ -32,7 +32,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.ActiveProfiles;
@@ -46,7 +46,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "/kafka-test.properties")
+@TestPropertySource(locations = "/kafka-test.properties", properties = {
+    "spring.main.allow-bean-definition-overriding=true",
+    "spring.test.bean-override.enabled=true"
+})
 @EmbeddedKafka(controlledShutdown = true, partitions = 1,
     topics = {EESSIBASIS_SEDMOTTATT_V_1, EESSIBASIS_SEDSENDT_V_1, OPPGAVE_ENDRET, TEAMMELOSYS_EESSI_V_1_LOCAL},
     brokerProperties = {"offsets.topic.replication.factor=1", "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"})
@@ -72,25 +75,25 @@ public abstract class ComponentTestBase extends PostgresTestContainerBase {
     @Autowired
     KafkaTestConsumer kafkaTestConsumer;
 
-    @MockBean
+    @MockitoBean
     EuxConsumer euxConsumer;
 
-    @MockBean
+    @MockitoBean
     SakConsumer sakConsumer;
 
-    @MockBean
+    @MockitoBean
     JournalpostapiConsumer journalpostapiConsumer;
 
-    @MockBean
+    @MockitoBean
     OppgaveConsumer oppgaveConsumer;
 
-    @MockBean
+    @MockitoBean
     SafConsumer safConsumer;
 
-    @MockBean
+    @MockitoBean
     PDLConsumer pdlConsumer;
 
-    @MockBean
+    @MockitoBean
     PdlWebConsumer pdlWebConsumer;
 
     @Autowired
