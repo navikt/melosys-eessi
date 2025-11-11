@@ -53,6 +53,8 @@
         <google-errorprone.version>2.44.0</google-errorprone.version>
         <org.apache.pdfbox.version>3.0.6</org.apache.pdfbox.version>
         <nimbus-jose-jwt.version>9.37.4</nimbus-jose-jwt.version>
+        <poi-ooxml-full.version>5.2.3</poi-ooxml-full.version>
+        <xmlbeans.version>5.1.1</xmlbeans.version>
     </properties>
 
     <dependencyManagement>
@@ -98,7 +100,7 @@
             </dependency>
             <dependency>
                 <groupId>io.mockk</groupId>
-                <artifactId>mockk</artifactId>
+                <artifactId>mockk-jvm</artifactId>
                 <version>${mockk.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -138,6 +140,16 @@
                 <groupId>com.google.errorprone</groupId>
                 <artifactId>error_prone_annotations</artifactId>
                 <version>${google-errorprone.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml-full</artifactId>
+                <version>${poi-ooxml-full.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlbeans</groupId>
+                <artifactId>xmlbeans</artifactId>
+                <version>${xmlbeans.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
