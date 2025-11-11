@@ -45,7 +45,7 @@ class OpprettUtgaaendeJournalpostService(
                 journalfoerTidligereSedDersomEksisterer(sedSendt.rinaSakId)
             } else {
                 log.info("SED {} inneholder ikke personId, journalfører ikke.", sedSendt.rinaDokumentId)
-                sedSendtHendelseRepository.save(SedSendtHendelse(null, sedSendt, null))
+                sedSendtHendelseRepository.save(SedSendtHendelse(sedSendt, null))
             }
             sedMetrikker.sedSendt(sedSendt.sedType)
         } catch (e: SedAlleredeJournalførtException) {
