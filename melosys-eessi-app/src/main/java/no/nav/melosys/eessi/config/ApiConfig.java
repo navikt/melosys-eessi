@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.config;
 
 import no.nav.melosys.eessi.controller.interceptor.CorrelationIdInterceptor;
-import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -9,7 +8,6 @@ import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableOAuth2Client(cacheEnabled = true)
 public class ApiConfig implements WebMvcConfigurer {
 
     private static final String API_PREFIX = "/api";

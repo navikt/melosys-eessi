@@ -4,8 +4,8 @@ import java.util.Optional;
 import jakarta.annotation.Nonnull;
 
 import no.nav.security.token.support.client.core.ClientProperties;
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;

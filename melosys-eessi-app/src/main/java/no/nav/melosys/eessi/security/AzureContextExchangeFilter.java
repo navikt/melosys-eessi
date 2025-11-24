@@ -3,8 +3,8 @@ package no.nav.melosys.eessi.security;
 
 import no.nav.security.token.support.client.core.ClientProperties;
 import no.nav.security.token.support.client.core.OAuth2GrantType;
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 
 public class AzureContextExchangeFilter extends GenericContextExchangeFilter {
 
