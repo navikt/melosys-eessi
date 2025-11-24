@@ -75,6 +75,18 @@ public final class LocalUnleash implements Unleash {
     }
 
     @Override
+    @Deprecated
+    public Variant deprecatedGetVariant(String toggleName, UnleashContext context, Variant defaultValue) {
+        return getVariant(toggleName, defaultValue);
+    }
+
+    @Override
+    @Deprecated
+    public Variant deprecatedGetVariant(String toggleName, UnleashContext context) {
+        return getVariant(toggleName, Variant.DISABLED_VARIANT);
+    }
+
+    @Override
     public List<String> getFeatureToggleNames() {
         return more().getFeatureToggleNames();
     }
