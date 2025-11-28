@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.SedVedlegg
 import no.nav.melosys.eessi.models.buc.BUC
 import no.nav.melosys.eessi.models.buc.SedVersjonSjekker.verifiserSedVersjonErBucVersjon
 import no.nav.melosys.eessi.models.exception.IntegrationException
+import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
@@ -123,7 +124,17 @@ class SedService(
     }
 
     private fun slettBucOgSaksrelasjon(rinaSaksnummer: String) {
-        euxService.slettBUC(rinaSaksnummer)
+        try {
+            euxService.slettBUC(rinaSaksnummer)
+        } catch (e: NotFoundException) {
+            log.warn("BUC {} finnes ikke, ignorerer feil ved sletting", rinaSaksnummer)
+        } catch (e: IntegrationException) {
+            if (e.message?.contains("PRECONDITION_FAILED") == true) {
+                log.warn("BUC {} kunne ikke slettes (PRECONDITION_FAILED), ignorerer", rinaSaksnummer)
+            } else {
+                throw e
+            }
+        }
         saksrelasjonService.slettVedRinaId(rinaSaksnummer)
     }
 
