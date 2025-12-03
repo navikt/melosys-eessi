@@ -24,6 +24,7 @@ import no.nav.melosys.eessi.models.buc.BUC
 import no.nav.melosys.eessi.models.buc.Document
 import no.nav.melosys.eessi.models.exception.IntegrationException
 import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
@@ -117,6 +118,42 @@ class SedServiceTest {
         shouldThrow<IntegrationException> {
             sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
         }
+
+        verify { euxService.slettBUC(RINA_ID) }
+        verify { saksrelasjonService.slettVedRinaId(RINA_ID) }
+    }
+
+    @Test
+    fun `opprettBucOgSed - slettBUC feiler med NotFoundException, forvent at saksrelasjon fortsatt slettes`() {
+        val sedData = SedDataStub.getStub()
+
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.sendSed(any(), any(), any()) } throws IntegrationException("Sending failed")
+        every { euxService.slettBUC(RINA_ID) } throws NotFoundException("BUC not found")
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
+        every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
+
+        shouldThrow<IntegrationException> {
+            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+        }.message shouldBe "Sending failed"
+
+        verify { euxService.slettBUC(RINA_ID) }
+        verify { saksrelasjonService.slettVedRinaId(RINA_ID) }
+    }
+
+    @Test
+    fun `opprettBucOgSed - slettBUC feiler med PRECONDITION_FAILED, forvent at saksrelasjon fortsatt slettes`() {
+        val sedData = SedDataStub.getStub()
+
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.sendSed(any(), any(), any()) } throws IntegrationException("Sending failed")
+        every { euxService.slettBUC(RINA_ID) } throws IntegrationException("412 PRECONDITION_FAILED")
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
+        every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
+
+        shouldThrow<IntegrationException> {
+            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+        }.message shouldBe "Sending failed"
 
         verify { euxService.slettBUC(RINA_ID) }
         verify { saksrelasjonService.slettVedRinaId(RINA_ID) }
