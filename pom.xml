@@ -23,7 +23,7 @@
     <properties>
         <bekk-nocommons.version>0.16.0</bekk-nocommons.version>
         <commons-io.version>2.21.0</commons-io.version>
-        <guava.version>32.0.0-jre</guava.version>
+        <guava.version>33.5.0-jre</guava.version>
         <hypersistence-utils.version>3.12.0</hypersistence-utils.version>
         <java.version>17</java.version>
         <kotlin.version>2.2.21</kotlin.version>
