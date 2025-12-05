@@ -6,6 +6,7 @@ import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxMelosysSedOppdateringDto;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.PreconditionFailedException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -38,6 +39,11 @@ public class EuxRinasakerConsumer implements RestConsumer {
             return euxRestTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
         } catch (HttpClientErrorException.NotFound e) {
             throw new NotFoundException("404 fra eux rinasaker: " + hentFeilmeldingForEux(e), e);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 412) {
+                throw new PreconditionFailedException("412 fra eux rinasaker: " + hentFeilmeldingForEux(e), e);
+            }
+            throw new IntegrationException("Feil i integrasjon mot eux rinasaker: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
             throw new IntegrationException("Feil i integrasjon mot eux rinasaker: " + hentFeilmeldingForEux(e), e);
         }

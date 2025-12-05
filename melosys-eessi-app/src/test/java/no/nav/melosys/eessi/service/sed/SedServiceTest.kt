@@ -25,6 +25,7 @@ import no.nav.melosys.eessi.models.buc.Document
 import no.nav.melosys.eessi.models.exception.IntegrationException
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.exception.NotFoundException
+import no.nav.melosys.eessi.models.exception.PreconditionFailedException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
@@ -147,7 +148,7 @@ class SedServiceTest {
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
         every { euxService.sendSed(any(), any(), any()) } throws IntegrationException("Sending failed")
-        every { euxService.slettBUC(RINA_ID) } throws IntegrationException("412 PRECONDITION_FAILED")
+        every { euxService.slettBUC(RINA_ID) } throws PreconditionFailedException("412 fra eux: PRECONDITION_FAILED")
         every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
         every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
 

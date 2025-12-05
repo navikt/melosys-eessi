@@ -15,6 +15,7 @@ import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.PreconditionFailedException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.vedlegg.SedMedVedlegg;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -242,6 +243,11 @@ public class EuxConsumer implements RestConsumer {
             return euxRestTemplate.exchange(uri, method, entity, responseType, variabler).getBody();
         } catch (HttpClientErrorException.NotFound e) {
             throw new NotFoundException("404 fra eux: " + hentFeilmeldingForEux(e), e);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode().value() == 412) {
+                throw new PreconditionFailedException("412 fra eux: " + hentFeilmeldingForEux(e), e);
+            }
+            throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
             try {
                 String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
