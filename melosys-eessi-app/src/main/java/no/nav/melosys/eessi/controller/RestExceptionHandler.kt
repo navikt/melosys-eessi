@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import no.nav.melosys.eessi.models.exception.IntegrationException
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.exception.NotFoundException
+import no.nav.melosys.eessi.models.exception.PreconditionFailedException
 import no.nav.melosys.eessi.models.exception.ValidationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -26,6 +27,9 @@ class RestExceptionHandler {
 
     @ExceptionHandler(IntegrationException::class)
     fun handle(e: IntegrationException): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
+
+    @ExceptionHandler(PreconditionFailedException::class)
+    fun handle(e: PreconditionFailedException): ResponseEntity<*> = handle(e, HttpStatus.PRECONDITION_FAILED)
 
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
