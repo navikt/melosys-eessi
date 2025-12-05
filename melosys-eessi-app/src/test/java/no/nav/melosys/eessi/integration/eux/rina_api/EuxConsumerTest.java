@@ -17,6 +17,7 @@ import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.*;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.exception.PreconditionFailedException;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
@@ -154,6 +155,18 @@ class EuxConsumerTest {
 
         assertThatExceptionOfType(NotFoundException.class)
             .isThrownBy(() -> euxConsumer.settMottakere(rinaSaksnummer, mottakere));
+    }
+
+    @Test
+    void slettBUC_respons412_kasterPreconditionFailedException() {
+        String rinaSaksnummer = "1234";
+
+        server.expect(requestTo("/buc/" + rinaSaksnummer))
+            .andExpect(method(HttpMethod.DELETE))
+            .andRespond(withStatus(HttpStatus.PRECONDITION_FAILED));
+
+        assertThatExceptionOfType(PreconditionFailedException.class)
+            .isThrownBy(() -> euxConsumer.slettBUC(rinaSaksnummer));
     }
 
     @Test
