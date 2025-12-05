@@ -77,7 +77,7 @@ spec:
     - secret: {{APP_NAME}}-unleash-api-token
   ingresses:
     - {{INGRESS}}
+    - {{INGRESS_DEPRECATED}}
     - {{GCP_REACHABLE_INGRESS}}
   kafka:
     pool: {{ KAFKA_POOL }}
-
