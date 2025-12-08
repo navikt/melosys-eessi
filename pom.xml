@@ -39,7 +39,7 @@
         <micrometer-jvm-extras.version>0.2.2</micrometer-jvm-extras.version>
         <okhttp3.version>4.12.0</okhttp3.version>
         <random-benas.version>3.9.0</random-benas.version>
-        <shedlock-version>4.34.0</shedlock-version>
+        <shedlock-version>7.2.1</shedlock-version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <token-support.version>3.2.0</token-support.version>
         <unleash.version>9.3.2</unleash.version>
