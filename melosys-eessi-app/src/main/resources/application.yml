@@ -32,8 +32,8 @@ cron:
 
   servlet:
     multipart:
-      max-file-size: 10485760 # 10MB
-      max-request-size: 10485760 # 10MB
+      max-file-size: 104857600 # 100MB
+      max-request-size: 104857600 # 100MB
 
 melosys:
   admin:
