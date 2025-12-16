@@ -2,6 +2,7 @@
     "APP_NAME": "melosys-eessi",
     "VAULT_CLUSTER": "prod",
     "INGRESS": "https://melosys-eessi.intern.nav.no",
+    "INGRESS_DEPRECATED": "https://melosys-eessi.intern.nav.no",
     "GCP_REACHABLE_INGRESS": "https://melosys-eessi.prod-fss-pub.nais.io",
     "KAFKA_POOL": "nav-prod",
     "APP_NAME_MELOSYS_API": "melosys",
