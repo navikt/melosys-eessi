@@ -7,8 +7,11 @@ import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.common.graphql.request.GraphQLRequest;
 import no.nav.melosys.eessi.integration.common.graphql.response.GraphQLResponse;
 import no.nav.melosys.eessi.integration.saf.dto.SafResponse;
+import no.nav.melosys.eessi.integration.saf.dto.Variantformat;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -33,5 +36,19 @@ public class SafConsumer implements RestConsumer {
             throw new IntegrationException("Feil ved integrasjon mot saf. Feilmeldinger: " + response.lagErrorString());
         }
         return response.getData().getQuery().hentRinaSakId();
+    }
+
+    public byte[] hentDokument(String journalpostId, String dokumentId) {
+        return webClient.get()
+            .uri(
+                "/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}",
+                journalpostId,
+                dokumentId,
+                Variantformat.ARKIV
+            )
+            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_PDF_VALUE)
+            .retrieve()
+            .bodyToMono(byte[].class)
+            .block();
     }
 }
