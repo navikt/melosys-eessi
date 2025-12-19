@@ -67,7 +67,7 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - forvent Rina case id`() {
         val sedData = SedDataStub.getStub()
-        val vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray()))
+        val vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray()))
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
         every { euxService.hentRinaUrl(any()) } returns "URL"
@@ -86,7 +86,7 @@ class SedServiceTest {
         val vedleggReferanse = VedleggReferanse(
             journalpostId = "12345",
             dokumentId = "67890",
-            tittel = "tittei"
+            tittel = "tittel"
         )
         val pdfBytes = "pdf".toByteArray()
 
@@ -99,7 +99,7 @@ class SedServiceTest {
         val opprettBucOgSedDtoV2 = OpprettBucOgSedDtoV2(
             bucType = BucType.LA_BUC_01,
             sedDataDto = sedData,
-            vedlegg = setOf(vedleggReferanse),
+            vedlegg = listOf(vedleggReferanse),
             sendAutomatisk = true,
             oppdaterEksisterende = false
         )
@@ -132,7 +132,7 @@ class SedServiceTest {
 
         sendSedService.opprettBucOgSed(
             sedDataDto = sedDataDto("mock/sedA009-Kosovo.json"),
-            vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray())),
+            vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray())),
             bucType = BucType.LA_BUC_01,
             sendAutomatisk = true,
             forsøkOppdaterEksisterende = false

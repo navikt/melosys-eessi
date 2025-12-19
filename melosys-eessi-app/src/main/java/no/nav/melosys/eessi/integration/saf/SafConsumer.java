@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.integration.saf.dto.Variantformat;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -48,6 +49,8 @@ public class SafConsumer implements RestConsumer {
             )
             .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_PDF_VALUE)
             .retrieve()
+            .onStatus(HttpStatusCode::isError, response ->
+                Mono.error(new IntegrationException("Feil ved henting av dokument fra SAF: " + response.statusCode())))
             .bodyToMono(byte[].class)
             .block();
     }
