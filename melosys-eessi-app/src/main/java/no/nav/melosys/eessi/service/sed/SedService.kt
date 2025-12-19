@@ -34,7 +34,7 @@ class SedService(
     private val euxService: EuxService,
     private val saksrelasjonService: SaksrelasjonService,
     @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long,
-    private val JsonFieldMasker: JsonFieldMasker,
+    private val jsonFieldMasker: JsonFieldMasker,
     private val safConsumer: SafConsumer
 ) {
 
@@ -234,8 +234,8 @@ class SedService(
         } catch (e: Exception) {
             log.error {
                 "$description: ${e.message}\n" +
-                    "SedDataDto:\n${JsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
-                    "SED:\n${JsonFieldMasker.toMaskedJson(sed)}"
+                    "SedDataDto:\n${jsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
+                    "SED:\n${jsonFieldMasker.toMaskedJson(sed)}"
             }
             throw e
         }
