@@ -40,7 +40,7 @@ public class SafConsumer implements RestConsumer {
     }
 
     public byte[] hentDokument(String journalpostId, String dokumentId) {
-        return webClient.get()
+        byte[] response = webClient.get()
             .uri(
                 "/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}",
                 journalpostId,
@@ -49,9 +49,15 @@ public class SafConsumer implements RestConsumer {
             )
             .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_PDF_VALUE)
             .retrieve()
-            .onStatus(HttpStatusCode::isError, response ->
-                Mono.error(new IntegrationException("Feil ved henting av dokument fra SAF: " + response.statusCode())))
+            .onStatus(HttpStatusCode::isError, resp ->
+                Mono.error(new IntegrationException("Feil ved henting av dokument fra SAF: " + resp.statusCode())))
             .bodyToMono(byte[].class)
             .block();
+
+        if (response == null) {
+            throw new IntegrationException("Mottatt null-response fra SAF ved henting av dokument");
+        }
+
+        return response;
     }
 }
