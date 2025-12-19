@@ -32,11 +32,11 @@ class RestExceptionHandler {
     @ExceptionHandler(PreconditionFailedException::class)
     fun handle(e: PreconditionFailedException): ResponseEntity<*> = handle(e, HttpStatus.PRECONDITION_FAILED)
 
-//    @ExceptionHandler(HttpMessageConversionException::class)
-//    fun handle(e: HttpMessageConversionException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageConversionException::class)
+    fun handle(e: HttpMessageConversionException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
 
-//    @ExceptionHandler(Exception::class)
-//    fun handle(e: Exception): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception::class)
+    fun handle(e: Exception): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
 
     private fun handle(e: Exception, httpStatus: HttpStatus): ResponseEntity<Map<String, String?>> {
         val message = e.message ?: e.javaClass.simpleName
