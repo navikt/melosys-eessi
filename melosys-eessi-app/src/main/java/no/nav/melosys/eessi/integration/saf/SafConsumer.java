@@ -7,8 +7,12 @@ import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.common.graphql.request.GraphQLRequest;
 import no.nav.melosys.eessi.integration.common.graphql.response.GraphQLResponse;
 import no.nav.melosys.eessi.integration.saf.dto.SafResponse;
+import no.nav.melosys.eessi.integration.saf.dto.Variantformat;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -33,5 +37,27 @@ public class SafConsumer implements RestConsumer {
             throw new IntegrationException("Feil ved integrasjon mot saf. Feilmeldinger: " + response.lagErrorString());
         }
         return response.getData().getQuery().hentRinaSakId();
+    }
+
+    public byte[] hentDokument(String journalpostId, String dokumentId) {
+        byte[] response = webClient.get()
+            .uri(
+                "/rest/hentdokument/{journalpostId}/{dokumentInfoId}/{variantFormat}",
+                journalpostId,
+                dokumentId,
+                Variantformat.ARKIV
+            )
+            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_PDF_VALUE)
+            .retrieve()
+            .onStatus(HttpStatusCode::isError, resp ->
+                Mono.error(new IntegrationException("Feil ved henting av dokument fra SAF: " + resp.statusCode())))
+            .bodyToMono(byte[].class)
+            .block();
+
+        if (response == null) {
+            throw new IntegrationException("Mottatt null-response fra SAF ved henting av dokument");
+        }
+
+        return response;
     }
 }

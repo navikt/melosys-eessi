@@ -26,6 +26,7 @@ class SafConsumerTest {
     private SafConsumer safConsumer;
 
     private final static String JOURNALPOST_ID = "143432657";
+    private final static String DOKUMENT_ID = "67890";
 
     private static MockWebServer mockServer;
     private static String rootUri;
@@ -66,6 +67,19 @@ class SafConsumerTest {
         assertThatExceptionOfType(IntegrationException.class)
                 .isThrownBy(() -> safConsumer.hentRinasakForJournalpost("1231"))
                 .withMessageContaining("feil1\nfeil2");
+    }
+
+    @Test
+    void hentDokument_dokumentFinnes_returnererPDF() {
+        mockServer.enqueue(
+            new MockResponse()
+                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                .setBody("pdf")
+        );
+
+        byte[] pdf = safConsumer.hentDokument(JOURNALPOST_ID, DOKUMENT_ID);
+
+        assertThat(pdf).isEqualTo(new byte[]{'p', 'd', 'f'});
     }
 
     private String hentErrorRespons() throws Exception {

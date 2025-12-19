@@ -14,7 +14,9 @@ import io.mockk.junit5.MockKExtension
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDtoV2
 import no.nav.melosys.eessi.controller.dto.SedDataDto
+import no.nav.melosys.eessi.controller.dto.VedleggReferanse
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.FagsakRinasakKobling
 import no.nav.melosys.eessi.models.SedType
@@ -46,6 +48,9 @@ class SedServiceTest {
     @MockK
     lateinit var saksrelasjonService: SaksrelasjonService
 
+    @MockK
+    lateinit var safConsumer: no.nav.melosys.eessi.integration.saf.SafConsumer
+
     lateinit var sendSedService: SedService
 
     private val RINA_ID = "aabbcc"
@@ -55,14 +60,14 @@ class SedServiceTest {
         sendSedService = SedService(
             euxService, saksrelasjonService, 0L, JsonFieldMasker(
                 jacksonObjectMapper().registerModule(JavaTimeModule())
-            )
+            ), safConsumer
         )
     }
 
     @Test
     fun `opprettBucOgSed - forvent Rina case id`() {
         val sedData = SedDataStub.getStub()
-        val vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray()))
+        val vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray()))
 
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
         every { euxService.hentRinaUrl(any()) } returns "URL"
@@ -72,6 +77,41 @@ class SedServiceTest {
         val sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true, false)
 
         verify { euxService.opprettBucOgSed(BucType.LA_BUC_01, sedData.mottakerIder!!, any(), vedlegg) }
+        sedDto.rinaSaksnummer shouldBe RINA_ID
+    }
+
+    @Test
+    fun `opprettBucOgSedV2 - forvent Rina case id`() {
+        val sedData = SedDataStub.getStub()
+        val vedleggReferanse = VedleggReferanse(
+            journalpostId = "12345",
+            dokumentId = "67890",
+            tittel = "tittel"
+        )
+        val pdfBytes = "pdf".toByteArray()
+
+        every { safConsumer.hentDokument(vedleggReferanse.journalpostId, vedleggReferanse.dokumentId) } returns pdfBytes
+        every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
+        every { euxService.hentRinaUrl(any()) } returns "URL"
+        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
+        every { euxService.sendSed(any(), any(), any()) } returns Unit
+
+        val opprettBucOgSedDtoV2 = OpprettBucOgSedDtoV2(
+            bucType = BucType.LA_BUC_01,
+            sedDataDto = sedData,
+            vedlegg = listOf(vedleggReferanse),
+            sendAutomatisk = true,
+            oppdaterEksisterende = false
+        )
+
+        val sedDto = sendSedService.opprettBucOgSed(opprettBucOgSedDtoV2)
+
+        verify { euxService.opprettBucOgSed(
+            opprettBucOgSedDtoV2.bucType,
+            opprettBucOgSedDtoV2.sedDataDto.mottakerIder!!,
+            any(),
+            listOf(SedVedlegg(tittel = vedleggReferanse.tittel, innhold = pdfBytes))
+        ) }
         sedDto.rinaSaksnummer shouldBe RINA_ID
     }
 
@@ -92,7 +132,7 @@ class SedServiceTest {
 
         sendSedService.opprettBucOgSed(
             sedDataDto = sedDataDto("mock/sedA009-Kosovo.json"),
-            vedlegg = setOf(SedVedlegg("tittei", "pdf".toByteArray())),
+            vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray())),
             bucType = BucType.LA_BUC_01,
             sendAutomatisk = true,
             forsøkOppdaterEksisterende = false

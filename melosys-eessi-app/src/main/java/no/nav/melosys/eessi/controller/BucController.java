@@ -42,7 +42,12 @@ public class BucController {
 
     @ApiResponse(description = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true. " + "Sender på eksisterende BUC hvis BUCen meddeler et lovvalg med utenlandsk myndighet, og BUCen er åpen.")
     @PostMapping(value = "/{bucType}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public BucOgSedOpprettetDto opprettBucOgSed(@RequestBody OpprettBucOgSedDto opprettBucOgSedDto, @PathVariable("bucType") BucType bucType, @RequestParam("sendAutomatisk") boolean sendAutomatisk, @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende) throws ValidationException {
+    public BucOgSedOpprettetDto opprettBucOgSed(
+        @RequestBody OpprettBucOgSedDto opprettBucOgSedDto,
+        @PathVariable("bucType") BucType bucType,
+        @RequestParam("sendAutomatisk") boolean sendAutomatisk,
+        @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende
+    ) throws ValidationException {
         if (bucType.hentFørsteLovligeSed().kreverAdresse() && opprettBucOgSedDto.getSedDataDto().manglerAdresser()) {
             throw new ValidationException("Personen mangler adresse");
         }
