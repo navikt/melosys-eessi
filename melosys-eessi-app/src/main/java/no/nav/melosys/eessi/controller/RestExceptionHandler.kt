@@ -9,6 +9,7 @@ import no.nav.melosys.eessi.models.exception.PreconditionFailedException
 import no.nav.melosys.eessi.models.exception.ValidationException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageConversionException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
@@ -30,6 +31,9 @@ class RestExceptionHandler {
 
     @ExceptionHandler(PreconditionFailedException::class)
     fun handle(e: PreconditionFailedException): ResponseEntity<*> = handle(e, HttpStatus.PRECONDITION_FAILED)
+
+    @ExceptionHandler(HttpMessageConversionException::class)
+    fun handle(e: HttpMessageConversionException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
 
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)

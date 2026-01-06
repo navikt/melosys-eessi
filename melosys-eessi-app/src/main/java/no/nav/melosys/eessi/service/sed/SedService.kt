@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.TimeUnit
+import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDtoV2
+import no.nav.melosys.eessi.integration.saf.SafConsumer
 
 private val log = KotlinLogging.logger {}
 
@@ -32,8 +34,31 @@ class SedService(
     private val euxService: EuxService,
     private val saksrelasjonService: SaksrelasjonService,
     @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long,
-    private val JsonFieldMasker: JsonFieldMasker
+    private val jsonFieldMasker: JsonFieldMasker,
+    private val safConsumer: SafConsumer
 ) {
+
+    fun opprettBucOgSed(
+        opprettBucOgSedDtoV2: OpprettBucOgSedDtoV2
+    ): BucOgSedOpprettetDto {
+        val vedlegg = opprettBucOgSedDtoV2.vedlegg.map {
+            SedVedlegg(
+                tittel = it.tittel,
+                innhold = safConsumer.hentDokument(
+                    it.journalpostId,
+                    it.dokumentId,
+                ),
+            )
+        }
+
+        return opprettBucOgSed(
+            sedDataDto = opprettBucOgSedDtoV2.sedDataDto,
+            vedlegg = vedlegg,
+            bucType = opprettBucOgSedDtoV2.bucType,
+            sendAutomatisk = opprettBucOgSedDtoV2.sendAutomatisk,
+            forsøkOppdaterEksisterende = opprettBucOgSedDtoV2.oppdaterEksisterende
+        )
+    }
 
     fun opprettBucOgSed(
         sedDataDto: SedDataDto,
@@ -209,8 +234,8 @@ class SedService(
         } catch (e: Exception) {
             log.error {
                 "$description: ${e.message}\n" +
-                    "SedDataDto:\n${JsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
-                    "SED:\n${JsonFieldMasker.toMaskedJson(sed)}"
+                    "SedDataDto:\n${jsonFieldMasker.toMaskedJson(sedDataDto)}\n" +
+                    "SED:\n${jsonFieldMasker.toMaskedJson(sed)}"
             }
             throw e
         }
