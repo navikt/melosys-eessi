@@ -91,7 +91,7 @@ class EuxServiceTest {
     fun `opprettBucOgSed forventRinaSaksnummer`() {
         every { euxConsumer.opprettBUC(any()) } returns OPPRETTET_BUC_ID
         every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
-        every { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) } returns "123"
+        every { euxConsumer.leggTilVedleggMultipart(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) } returns "123"
         every { euxConsumer.settMottakere(any(), any()) } returns Unit
         every { bucMetrikker.bucOpprettet(any()) } returns Unit
         val bucType = BucType.LA_BUC_01
@@ -103,7 +103,7 @@ class EuxServiceTest {
 
         verify { euxConsumer.opprettBUC(bucType.name) }
         verify { euxConsumer.opprettSed(OPPRETTET_BUC_ID, sed) }
-        verify { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) }
+        verify { euxConsumer.leggTilVedleggMultipart(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) }
         opprettBucOgSedResponse.rinaSaksnummer shouldBe OPPRETTET_BUC_ID
     }
 

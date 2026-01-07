@@ -147,6 +147,33 @@ public class EuxConsumer implements RestConsumer {
         }, rinaSaksnummer, dokumentId);
     }
 
+    public String leggTilVedleggMultipart(String rinaSaksnummer, String dokumentId, String filtype, SedVedlegg vedlegg) {
+        log.info("Legger til vedlegg (multipart) på sak {} og dokument {}", rinaSaksnummer, dokumentId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        ByteArrayResource fileResource = new ByteArrayResource(vedlegg.getInnhold()) {
+            @Override
+            public String getFilename() {
+                return vedlegg.getTittel();
+            }
+        };
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileResource);
+
+        String url =  "/cpi/buc/{rinaSaksnummer}/sed/{dokumentId}/vedlegg?Filnavn={filnavn}&Filtype={filtype}&synkron={synkron}";
+
+        return exchange(
+            url,
+            HttpMethod.POST,
+            new HttpEntity<>(body, headers),
+            new ParameterizedTypeReference<>() {},
+            rinaSaksnummer, dokumentId, vedlegg.getTittel(), filtype, true
+        );
+    }
+
     private byte[] konverterToPDF(byte[] content, String filtype) {
         try (PDDocument document = new PDDocument()) {
             log.info("KonverterTilPDF: Prøver å converte filtype: {}", filtype);

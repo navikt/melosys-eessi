@@ -130,7 +130,7 @@ class EuxService(
     }
 
     private fun leggTilVedlegg(rinaSaksnummer: String, dokumentID: String, vedlegg: SedVedlegg) {
-        val vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg)
+        val vedleggID = euxConsumer.leggTilVedleggMultipart(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg)
         log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer)
     }
 
