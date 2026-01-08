@@ -43,7 +43,11 @@ class PersonSok {
             return PersonSokResultat.ikkeIdentifisert(SoekBegrunnelse.FNR_IKKE_FUNNET);
         }
         SoekBegrunnelse begrunnelse = vurderPerson(person, personsokKriterier);
-        return begrunnelse == SoekBegrunnelse.IDENTIFISERT ? PersonSokResultat.identifisert(ident) : PersonSokResultat.ikkeIdentifisert(begrunnelse);
+        if (begrunnelse == SoekBegrunnelse.IDENTIFISERT) {
+            boolean harNavnemismatch = !PersonKontroller.navnMatcher(person, personsokKriterier);
+            return PersonSokResultat.identifisert(ident, harNavnemismatch);
+        }
+        return PersonSokResultat.ikkeIdentifisert(begrunnelse);
     }
 
     private SoekBegrunnelse vurderPerson(PersonModell person, PersonsokKriterier personsokKriterier) {
@@ -53,6 +57,8 @@ class PersonSok {
             return SoekBegrunnelse.FEIL_STATSBORGERSKAP;
         } else if (!harSammeFoedselsdato(person, personsokKriterier)) {
             return SoekBegrunnelse.FEIL_FOEDSELSDATO;
+        } else if (!PersonKontroller.harUkjentEllerSammeKjønn(person, personsokKriterier)) {
+            return SoekBegrunnelse.FEIL_KJONN;
         }
         return SoekBegrunnelse.IDENTIFISERT;
     }
