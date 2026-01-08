@@ -154,10 +154,12 @@ public class EuxConsumer implements RestConsumer {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
+        String tittelUtenNorskeBokstaver = utenNorskeBokstaver(vedlegg.getTittel());
+
         ByteArrayResource fileResource = new ByteArrayResource(vedlegg.getInnhold()) {
             @Override
             public String getFilename() {
-                return vedlegg.getTittel();
+                return tittelUtenNorskeBokstaver;
             }
         };
 
@@ -169,7 +171,7 @@ public class EuxConsumer implements RestConsumer {
             HttpMethod.POST,
             new HttpEntity<>(body, headers),
             new ParameterizedTypeReference<>() {},
-            rinaSaksnummer, dokumentId, vedlegg.getTittel(), filtype, true
+            rinaSaksnummer, dokumentId, tittelUtenNorskeBokstaver, filtype, true
         );
     }
 
@@ -262,6 +264,16 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter handlinger for BUC {}", rinaSaksnummer);
         return exchange(BUC_HANDLINGER + "?format={format}", HttpMethod.GET, new HttpEntity<>(defaultHeaders()), new ParameterizedTypeReference<>() {
         }, rinaSaksnummer, "enkelt");
+    }
+
+    private String utenNorskeBokstaver(String input) {
+        return input
+            .replace("æ", "ae")
+            .replace("Æ", "Ae")
+            .replace("ø", "oe")
+            .replace("Ø", "Oe")
+            .replace("å", "aa")
+            .replace("Å", "Aa");
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, ParameterizedTypeReference<T> responseType, Object... variabler) {
