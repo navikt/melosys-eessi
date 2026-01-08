@@ -50,6 +50,7 @@ public class EuxConsumer implements RestConsumer {
     private static final String SED_PATH_PDF = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/pdf";
     private static final String SED_MED_VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/filer";
     private static final String VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/vedleggJson";
+    private static final String VEDLEGG_MULTIPART_PATH = "/buc/{rinaSaksnummer}/sed/{dokumentId}/vedlegg?Filnavn={filnavn}&Filtype={filtype}&synkron={synkron}";
     private static final String SED_HANDLINGER = "/buc/{rinaSaksnummer}/sed/{sedId}/handlinger";
     private static final String BUC_HANDLINGER = "/buc/{rinaSaksnummer}/muligeaksjoner";
     private static final String RINA_LENKE_PATH = "/url/buc/{rinaSaksnummer}";
@@ -163,10 +164,8 @@ public class EuxConsumer implements RestConsumer {
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("file", fileResource);
 
-        String url =  "/cpi/buc/{rinaSaksnummer}/sed/{dokumentId}/vedlegg?Filnavn={filnavn}&Filtype={filtype}&synkron={synkron}";
-
         return exchange(
-            url,
+            VEDLEGG_MULTIPART_PATH,
             HttpMethod.POST,
             new HttpEntity<>(body, headers),
             new ParameterizedTypeReference<>() {},
