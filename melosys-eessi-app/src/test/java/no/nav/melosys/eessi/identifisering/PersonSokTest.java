@@ -8,6 +8,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import no.nav.melosys.eessi.integration.pdl.PDLService;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
+import no.nav.melosys.eessi.models.person.Kjønn;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.service.personsok.PersonSokResponse;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
@@ -124,6 +125,54 @@ class PersonSokTest {
         assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.PERSON_OPPHORT);
     }
 
+    @Test
+    void søkEtterPerson_feilKjønn_forventIngenIdentFeilKjønn() {
+        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModellMedKjønn(Kjønn.MANN));
+        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterierMedKjønn(Kjønn.KVINNE));
+
+        assertThat(sokResultat.personIdentifisert()).isFalse();
+        assertThat(sokResultat.getIdent()).isNull();
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.FEIL_KJONN);
+    }
+
+    @Test
+    void søkEtterPerson_sammeKjønn_forventIdentIdentifisert() {
+        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModellMedKjønn(Kjønn.MANN));
+        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterierMedKjønn(Kjønn.MANN));
+
+        assertThat(sokResultat.personIdentifisert()).isTrue();
+        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+    }
+
+    @Test
+    void søkEtterPerson_ukjentKjønnISed_forventIdentIdentifisert() {
+        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModellMedKjønn(Kjønn.MANN));
+        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterierMedKjønn(Kjønn.UKJENT));
+
+        assertThat(sokResultat.personIdentifisert()).isTrue();
+        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+    }
+
+    @Test
+    void søkEtterPerson_nullKjønnISed_forventIdentIdentifisert() {
+        when(personFasade.hentPerson(IDENT)).thenReturn(lagPersonModellMedKjønn(Kjønn.MANN));
+        when(personFasade.soekEtterPerson(any())).thenReturn(Collections.singletonList(lagPersonSøkResponse()));
+
+        PersonSokResultat sokResultat = personSok.søkEtterPerson(personsoekKriterierMedKjønn(null));
+
+        assertThat(sokResultat.personIdentifisert()).isTrue();
+        assertThat(sokResultat.getIdent()).isEqualTo(IDENT);
+        assertThat(sokResultat.getBegrunnelse()).isEqualTo(SoekBegrunnelse.IDENTIFISERT);
+    }
+
 
     private PersonsokKriterier personsoekKriterier() {
         return personsoekKriterier(defaultFødselsdato, defaultStatsborgerskap);
@@ -146,6 +195,16 @@ class PersonSokTest {
                 .build();
     }
 
+    private PersonsokKriterier personsoekKriterierMedKjønn(Kjønn kjønn) {
+        return PersonsokKriterier.builder()
+                .fornavn("Fornavn")
+                .etternavn("Etternavn")
+                .foedselsdato(defaultFødselsdato)
+                .statsborgerskapISO2(defaultStatsborgerskap)
+                .kjoenn(kjønn)
+                .build();
+    }
+
     private PersonModell lagPersonModell(boolean erOpphørt) {
         return PersonModell.builder()
                 .ident(IDENT)
@@ -154,6 +213,18 @@ class PersonSokTest {
                 .fødselsdato(defaultFødselsdato)
                 .statsborgerskapLandkodeISO2(defaultStatsborgerskap)
                 .erOpphørt(erOpphørt)
+                .build();
+    }
+
+    private PersonModell lagPersonModellMedKjønn(Kjønn kjønn) {
+        return PersonModell.builder()
+                .ident(IDENT)
+                .fornavn("Fornavn")
+                .etternavn("Etternavn")
+                .fødselsdato(defaultFødselsdato)
+                .statsborgerskapLandkodeISO2(defaultStatsborgerskap)
+                .erOpphørt(false)
+                .kjønn(kjønn)
                 .build();
     }
 }

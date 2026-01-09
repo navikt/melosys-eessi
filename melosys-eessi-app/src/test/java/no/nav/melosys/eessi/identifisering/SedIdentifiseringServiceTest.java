@@ -54,14 +54,14 @@ class SedIdentifiseringServiceTest {
         SED sed = lagSED();
         sed.getNav().getBruker().getPerson().setPin(List.of(new Pin(norskIdent, "NO", null)));
 
-        when(personSok.vurderPerson(eq(norskIdent), any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        when(personSok.vurderPerson(eq(norskIdent), any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent, false));
         Optional<String> res = sedIdentifiseringService.identifiserPerson("123", sed);
         assertThat(res).contains(norskIdent);
     }
 
     @Test
     void identifiserPerson_ingenSakSedIngenNorskIdent_finnerIkkePersonFraSedFinnerFraSøk() {
-        when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent));
+        when(personSok.søkEtterPerson(any(PersonsokKriterier.class))).thenReturn(PersonSokResultat.identifisert(norskIdent, false));
         Optional<String> res = sedIdentifiseringService.identifiserPerson("123", lagSED());
         assertThat(res).contains(norskIdent);
     }

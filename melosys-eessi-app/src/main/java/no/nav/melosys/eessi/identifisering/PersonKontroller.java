@@ -4,9 +4,9 @@ package no.nav.melosys.eessi.identifisering;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import no.nav.melosys.eessi.models.person.Kjønn;
 import no.nav.melosys.eessi.models.person.PersonModell;
 import no.nav.melosys.eessi.models.person.UtenlandskId;
-import no.nav.melosys.eessi.models.sed.nav.Kjønn;
 import no.nav.melosys.eessi.models.sed.nav.Person;
 import no.nav.melosys.eessi.service.personsok.PersonsokKriterier;
 
@@ -36,8 +36,84 @@ final class PersonKontroller {
         return personModell.getUtenlandskId().stream().anyMatch(utenlandskId::equals);
     }
 
+    static boolean harUkjentEllerSammeKjønn(PersonModell person, PersonsokKriterier personsokKriterier) {
+        Kjønn søkeKjønn = personsokKriterier.getKjoenn();
+        if (søkeKjønn == null || søkeKjønn == Kjønn.UKJENT) {
+            return true;
+        }
+        return person.getKjønn() == søkeKjønn;
+    }
+
     public static boolean harUkjentEllerSammeKjønn(PersonModell identifisertPerson, Person sedPerson) {
-        return sedPerson.getKjoenn() == Kjønn.U || identifisertPerson.getKjønn() == sedPerson.getKjoenn().tilDomene();
+        return sedPerson.getKjoenn() == no.nav.melosys.eessi.models.sed.nav.Kjønn.U || identifisertPerson.getKjønn() == sedPerson.getKjoenn().tilDomene();
+    }
+
+    /**
+     * Sjekker om navn matcher ved å bruke subsequence-matching.
+     * Fjerner spesialtegn fra begge navn og sjekker om den korteste strippede
+     * versjonen er en subsequence av den andre.
+     * F.eks. "Jän" matcher "Jan" fordi "Jn" ⊆ "Jan"
+     * F.eks. "Łukasz" matcher "Lukasz" fordi "ukasz" ⊆ "Lukasz"
+     */
+    static boolean navnMatcher(PersonModell person, PersonsokKriterier personsokKriterier) {
+        String sedFornavn = personsokKriterier.getFornavn();
+        String sedEtternavn = personsokKriterier.getEtternavn();
+        String pdlFornavn = person.getFornavn();
+        String pdlEtternavn = person.getEtternavn();
+
+        if (sedFornavn == null || sedEtternavn == null || pdlFornavn == null || pdlEtternavn == null) {
+            return true;
+        }
+
+        return navnMatcherMedSubsequence(sedFornavn, pdlFornavn)
+            && navnMatcherMedSubsequence(sedEtternavn, pdlEtternavn);
+    }
+
+    /**
+     * Sjekker om to navn matcher ved subsequence-logikk.
+     * Hvis ingen av navnene har spesialtegn, brukes eksakt match.
+     * Hvis minst ett navn har spesialtegn, sjekkes om korteste strippede er subsequence av lengste.
+     */
+    static boolean navnMatcherMedSubsequence(String navn1, String navn2) {
+        String stripped1 = fjernSpesialtegn(navn1);
+        String stripped2 = fjernSpesialtegn(navn2);
+
+        boolean navn1HarSpesialtegn = stripped1.length() < navn1.length();
+        boolean navn2HarSpesialtegn = stripped2.length() < navn2.length();
+
+        if (!navn1HarSpesialtegn && !navn2HarSpesialtegn) {
+            return stripped1.equalsIgnoreCase(stripped2);
+        }
+
+        if (stripped1.length() <= stripped2.length()) {
+            return erSubsequence(stripped1, navn2);
+        } else {
+            return erSubsequence(stripped2, navn1);
+        }
+    }
+
+    /**
+     * Fjerner alle tegn som ikke er a-z eller A-Z.
+     */
+    static String fjernSpesialtegn(String tekst) {
+        if (tekst == null) {
+            return "";
+        }
+        return tekst.replaceAll("[^a-zA-Z]", "");
+    }
+
+    /**
+     * Sjekker om 'shorter' er en subsequence av 'longer' (case-insensitive).
+     * En subsequence betyr at alle tegn i 'shorter' finnes i 'longer' i samme rekkefølge.
+     */
+    static boolean erSubsequence(String shorter, String longer) {
+        int j = 0;
+        for (int i = 0; i < longer.length() && j < shorter.length(); i++) {
+            if (Character.toLowerCase(shorter.charAt(j)) == Character.toLowerCase(longer.charAt(i))) {
+                j++;
+            }
+        }
+        return j == shorter.length();
     }
 
     @java.lang.SuppressWarnings("all")
