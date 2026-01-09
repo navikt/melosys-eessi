@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ClientCodecConfigurer;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
@@ -18,11 +20,18 @@ public class SafConsumerProducer {
                                    @Value("${melosys.integrations.saf-url}") String safUrl,
                                    GenericAuthFilterFactory genericAuthFilterFactory
     ) {
+        // Setter buffer til 100MB for å håndtere store dokumenter
+        ExchangeStrategies strategies = ExchangeStrategies.builder()
+            .codecs((ClientCodecConfigurer configurer) ->
+                configurer.defaultCodecs().maxInMemorySize(100 * 1024 * 1024))
+            .build();
+
         return new SafConsumer(
             webclientBuilder
                 .baseUrl(safUrl)
                 .defaultHeaders(this::defaultHeaders)
                 .filter(genericAuthFilterFactory.getAzureFilter("saf"))
+                .exchangeStrategies(strategies)
                 .build()
         );
     }

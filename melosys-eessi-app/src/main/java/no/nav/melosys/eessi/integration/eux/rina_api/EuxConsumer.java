@@ -50,6 +50,7 @@ public class EuxConsumer implements RestConsumer {
     private static final String SED_PATH_PDF = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/pdf";
     private static final String SED_MED_VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/filer";
     private static final String VEDLEGG_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/vedleggJson";
+    private static final String VEDLEGG_MULTIPART_PATH = "/buc/{rinaSaksnummer}/sed/{dokumentId}/vedlegg?Filnavn={filnavn}&Filtype={filtype}&synkron={synkron}";
     private static final String SED_HANDLINGER = "/buc/{rinaSaksnummer}/sed/{sedId}/handlinger";
     private static final String BUC_HANDLINGER = "/buc/{rinaSaksnummer}/muligeaksjoner";
     private static final String RINA_LENKE_PATH = "/url/buc/{rinaSaksnummer}";
@@ -147,6 +148,33 @@ public class EuxConsumer implements RestConsumer {
         }, rinaSaksnummer, dokumentId);
     }
 
+    public String leggTilVedleggMultipart(String rinaSaksnummer, String dokumentId, String filtype, SedVedlegg vedlegg) {
+        log.info("Legger til vedlegg (multipart) på sak {} og dokument {}", rinaSaksnummer, dokumentId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        String tittelUtenNorskeBokstaver = utenNorskeBokstaver(vedlegg.getTittel());
+
+        ByteArrayResource fileResource = new ByteArrayResource(vedlegg.getInnhold()) {
+            @Override
+            public String getFilename() {
+                return tittelUtenNorskeBokstaver;
+            }
+        };
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", fileResource);
+
+        return exchange(
+            VEDLEGG_MULTIPART_PATH,
+            HttpMethod.POST,
+            new HttpEntity<>(body, headers),
+            new ParameterizedTypeReference<>() {},
+            rinaSaksnummer, dokumentId, tittelUtenNorskeBokstaver, filtype, true
+        );
+    }
+
     private byte[] konverterToPDF(byte[] content, String filtype) {
         try (PDDocument document = new PDDocument()) {
             log.info("KonverterTilPDF: Prøver å converte filtype: {}", filtype);
@@ -236,6 +264,16 @@ public class EuxConsumer implements RestConsumer {
         log.info("Henter handlinger for BUC {}", rinaSaksnummer);
         return exchange(BUC_HANDLINGER + "?format={format}", HttpMethod.GET, new HttpEntity<>(defaultHeaders()), new ParameterizedTypeReference<>() {
         }, rinaSaksnummer, "enkelt");
+    }
+
+    private String utenNorskeBokstaver(String input) {
+        return input
+            .replace("æ", "ae")
+            .replace("Æ", "Ae")
+            .replace("ø", "oe")
+            .replace("Ø", "Oe")
+            .replace("å", "aa")
+            .replace("Å", "Aa");
     }
 
     private <T> T exchange(String uri, HttpMethod method, HttpEntity<?> entity, ParameterizedTypeReference<T> responseType, Object... variabler) {

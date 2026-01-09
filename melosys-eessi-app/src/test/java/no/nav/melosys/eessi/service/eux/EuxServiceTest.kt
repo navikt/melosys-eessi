@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.service.eux
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
@@ -27,6 +28,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName.EUX_RINA_BRUK_MULTIPART
 
 class EuxServiceTest {
 
@@ -36,9 +38,17 @@ class EuxServiceTest {
     private val objectMapper = jacksonObjectMapper().registerModule(JavaTimeModule())
     private lateinit var euxService: EuxService
 
+    private val fakeUnleash = FakeUnleash()
+
     @BeforeEach
     fun setup() {
-        euxService = EuxService(euxConsumer, bucMetrikker, euxRinasakerConsumer)
+        fakeUnleash.reset()
+        euxService = EuxService(
+            euxConsumer,
+            bucMetrikker,
+            euxRinasakerConsumer,
+            fakeUnleash
+        )
     }
 
     @Test
@@ -89,11 +99,34 @@ class EuxServiceTest {
 
     @Test
     fun `opprettBucOgSed forventRinaSaksnummer`() {
+        fakeUnleash.enable( EUX_RINA_BRUK_MULTIPART)
+        every { euxConsumer.opprettBUC(any()) } returns OPPRETTET_BUC_ID
+        every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
+        every { euxConsumer.leggTilVedleggMultipart(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) } returns "123"
+        every { euxConsumer.settMottakere(any(), any()) } returns Unit
+        every { bucMetrikker.bucOpprettet(any()) } returns Unit
+        val bucType = BucType.LA_BUC_01
+        val mottakere = listOf("SE:123")
+        val sed = SED()
+        val vedlegg = setOf(SedVedlegg("filen min", "pdf".toByteArray()))
+
+        val opprettBucOgSedResponse = euxService.opprettBucOgSed(bucType, mottakere, sed, vedlegg)
+
+        verify { euxConsumer.opprettBUC(bucType.name) }
+        verify { euxConsumer.opprettSed(OPPRETTET_BUC_ID, sed) }
+        verify { euxConsumer.leggTilVedleggMultipart(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) }
+        opprettBucOgSedResponse.rinaSaksnummer shouldBe OPPRETTET_BUC_ID
+    }
+
+    @Test
+    fun `opprettBucOgSed forventRinaSaksnummer (feature disabled)`() {
+        fakeUnleash.disable( EUX_RINA_BRUK_MULTIPART)
         every { euxConsumer.opprettBUC(any()) } returns OPPRETTET_BUC_ID
         every { euxConsumer.opprettSed(OPPRETTET_BUC_ID, any()) } returns OPPRETTET_SED_ID
         every { euxConsumer.leggTilVedlegg(OPPRETTET_BUC_ID, OPPRETTET_SED_ID, "pdf", any()) } returns "123"
         every { euxConsumer.settMottakere(any(), any()) } returns Unit
         every { bucMetrikker.bucOpprettet(any()) } returns Unit
+
         val bucType = BucType.LA_BUC_01
         val mottakere = listOf("SE:123")
         val sed = SED()

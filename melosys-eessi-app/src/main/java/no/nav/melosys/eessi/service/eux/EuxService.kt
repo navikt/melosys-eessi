@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.eux
 
+import io.getunleash.Unleash
 import mu.KotlinLogging
 import no.nav.melosys.eessi.integration.eux.rina_api.Aksjoner
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer
@@ -22,6 +23,7 @@ import org.springframework.retry.annotation.Retryable
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
 import java.util.*
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName.EUX_RINA_BRUK_MULTIPART
 
 private val log = KotlinLogging.logger {}
 
@@ -29,7 +31,8 @@ private val log = KotlinLogging.logger {}
 class EuxService(
     private val euxConsumer: EuxConsumer,
     private val bucMetrikker: BucMetrikker,
-    private val euxRinasakerConsumer: EuxRinasakerConsumer
+    private val euxRinasakerConsumer: EuxRinasakerConsumer,
+    private val unleash: Unleash
 ) {
 
     fun slettBUC(rinaSaksnummer: String) {
@@ -130,7 +133,11 @@ class EuxService(
     }
 
     private fun leggTilVedlegg(rinaSaksnummer: String, dokumentID: String, vedlegg: SedVedlegg) {
-        val vedleggID = euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg)
+        val vedleggID = if (unleash.isEnabled( EUX_RINA_BRUK_MULTIPART)) {
+            euxConsumer.leggTilVedleggMultipart(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg)
+        } else {
+            euxConsumer.leggTilVedlegg(rinaSaksnummer, dokumentID, FILTYPE_PDF, vedlegg)
+        }
         log.info("Lagt til vedlegg med ID {} i rinasak {}", vedleggID, rinaSaksnummer)
     }
 
