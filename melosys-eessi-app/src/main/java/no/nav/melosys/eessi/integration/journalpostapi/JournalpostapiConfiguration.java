@@ -2,11 +2,11 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 
 import java.time.Duration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.RestSTSInterceptor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -41,9 +41,9 @@ public class JournalpostapiConfiguration {
     @Bean
     public JournalpostapiConsumer journalpostapiConsumer(
         RestTemplate journalpostapiRestTemplate,
-        ObjectMapper objectMapper) {
+        JsonMapper jsonMapper) {
 
-        return new JournalpostapiConsumer(journalpostapiRestTemplate, objectMapper);
+        return new JournalpostapiConsumer(journalpostapiRestTemplate, jsonMapper);
     }
 
 }

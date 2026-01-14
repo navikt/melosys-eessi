@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.models.SedType;
@@ -22,8 +22,9 @@ import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*;
 import no.nav.melosys.eessi.models.sed.nav.Nav;
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
+import no.nav.security.token.support.client.core.ClientAuthenticationProperties;
 import no.nav.security.token.support.client.core.ClientProperties;
-import no.nav.security.token.support.client.core.OAuth2GrantType;
+import static com.nimbusds.oauth2.sdk.GrantType.JWT_BEARER;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -33,7 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,6 +42,7 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import tools.jackson.databind.json.JsonMapper;
 
 import static no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerProducer.configureJacksonMapper;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,26 +63,26 @@ class EuxConsumerTest {
 
     private MockRestServiceServer server;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     @BeforeEach
     void setup() {
-        var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api", ClientProperties.builder()
-            .wellKnownUrl(URI.create("test"))
-            .tokenEndpointUrl(URI.create("token_endpoint"))
-            .grantType(OAuth2GrantType.JWT_BEARER)
-            .scope(List.of("scope1", "scope2"))
-            .resourceUrl(URI.create("resource_url"))
-            .build()));
+        var authentication = ClientAuthenticationProperties.builder("test-client-id", ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+            .clientSecret("test-secret")
+            .build();
+        var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api",
+            ClientProperties.builder(JWT_BEARER, authentication)
+                .tokenEndpointUrl(URI.create("http://token-endpoint"))
+                .build()));
 
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
 
         RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
 
 
-        euxConsumer = new EuxConsumer(restTemplate, objectMapper, null);
+        euxConsumer = new EuxConsumer(restTemplate, jsonMapper, null);
         server = MockRestServiceServer.createServer(restTemplate);
-        when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken("accesstoken").build());
+        when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(new OAuth2AccessTokenResponse("accesstoken", 3600, 3600, Map.of()));
     }
 
     @Test
@@ -214,7 +216,7 @@ class EuxConsumerTest {
         forventetResultat.put("attachmentId", "ffrewf24");
 
         server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
-            .andRespond(withSuccess(objectMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(jsonMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map<String, String> resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
         assertThat(resultat).isEqualTo(forventetResultat);

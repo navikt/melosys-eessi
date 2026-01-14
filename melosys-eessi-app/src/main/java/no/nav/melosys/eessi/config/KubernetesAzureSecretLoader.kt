@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.config
 
 import org.springframework.boot.SpringApplication
-import org.springframework.boot.env.EnvironmentPostProcessor
 import org.springframework.core.env.ConfigurableEnvironment
 import org.springframework.core.env.MapPropertySource
 import java.io.BufferedReader
@@ -10,6 +9,7 @@ import java.io.InputStreamReader
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.text.contains
+import org.springframework.boot.EnvironmentPostProcessor
 
 /**
  * Laster Azure client secret fra Kubernetes når applikasjonen kjører med local-q1 eller local-q2 profil.

@@ -1,12 +1,12 @@
 package no.nav.melosys.eessi.integration.eux.rina_api
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.RinaSakOversiktV3
 import no.nav.melosys.eessi.models.exception.IntegrationException
 import org.springframework.http.HttpStatusCode
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import tools.jackson.databind.json.JsonMapper
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class EuxApiErrorResponse(
@@ -17,12 +17,12 @@ data class EuxApiErrorResponse(
 
 class EuxKotlinConsumer(
     private val euxRinaWebClient: WebClient,
+    private val jsonMapper: JsonMapper = JsonMapper.builder().build(),
 ) {
-    private val objectMapper = ObjectMapper()
 
     private fun parseErrorMessage(errorBody: String, statusCode: HttpStatusCode): String {
         return try {
-            val errorResponse = objectMapper.readValue(errorBody, EuxApiErrorResponse::class.java)
+            val errorResponse = jsonMapper.readValue(errorBody, EuxApiErrorResponse::class.java)
             errorResponse.messages ?: "Ukjent feil fra EUX Rina API"
         } catch (e: Exception) {
             // Fall tilbake til opprinnelig feilmelding hvis JSON-parsing feiler

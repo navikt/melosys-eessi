@@ -1,1 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=no.nav.melosys.eessi.config.KubernetesAzureSecretLoader

@@ -1,58 +1,59 @@
 package no.nav.melosys.eessi.service.sed
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.LongNode
-import com.fasterxml.jackson.databind.node.ObjectNode
-import com.fasterxml.jackson.databind.node.TextNode
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.sed.SED
 import org.springframework.stereotype.Component
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.node.ArrayNode
+import tools.jackson.databind.node.ObjectNode
 
 @Component
-class JsonFieldMasker(private val mapper: ObjectMapper) {
+class JsonFieldMasker(private val mapper: JsonMapper) {
 
     fun sanitizeJson(json: String, whitelist: Set<String>): String {
 
         @Suppress("kotlin:S6518")
         fun sanitizeNode(node: JsonNode, keep: Set<String>): JsonNode {
             fun maskPrimitive(node: JsonNode): JsonNode {
-                return if (node.isNumber) {
+                return if (node.isNumber()) {
                     // Mask numbers as their size-based numeric value
                     val size = node.asText().length
                     val maskedNumber = (1..size).joinToString("") { it.toString() }.toInt()
-                    LongNode(maskedNumber.toLong()) // Ensure it's treated as a number
+                    mapper.nodeFactory.numberNode(maskedNumber.toLong())
                 } else {
                     // Mask text values as 'xxxx...'
-                    TextNode("x".repeat(node.asText().length))
+                    mapper.nodeFactory.textNode("x".repeat(node.asText().length))
                 }
             }
-            fun sanitizeArrayNode(node: JsonNode, keep: Set<String>): ArrayNode {
-                val sanitizedArray = node.deepCopy<ArrayNode>()
-                node.forEachIndexed { index, element ->
+            fun sanitizeArrayNode(node: JsonNode, keep: Set<String>): JsonNode {
+                val sanitizedArray = mapper.nodeFactory.arrayNode()
+                for (element in node) {
                     val sanitizedElement: JsonNode = when {
-                        element.isTextual -> maskPrimitive(element)
-                        element.isInt || element.isLong -> maskPrimitive(element)
+                        element.isTextual() -> maskPrimitive(element)
+                        element.isInt() || element.isLong() -> maskPrimitive(element)
                         else -> sanitizeNode(element, keep) // Recursively sanitize
                     }
-                    sanitizedArray.set(index, sanitizedElement) // Ensure sanitizedElement is JsonNode
+                    sanitizedArray.add(sanitizedElement)
                 }
                 return sanitizedArray
             }
 
-            fun sanitizeObjectNode(node: JsonNode, keep: Set<String>): ObjectNode {
-                val sanitizedObject = node.deepCopy<ObjectNode>()
-                node.fieldNames().forEachRemaining { field ->
-                    val fieldValue = node[field]
+            fun sanitizeObjectNode(node: JsonNode, keep: Set<String>): JsonNode {
+                val sanitizedObject = mapper.nodeFactory.objectNode()
+                val fields = node.properties().iterator()
+                while (fields.hasNext()) {
+                    val entry = fields.next()
+                    val field = entry.key
+                    val fieldValue = entry.value
                     if (keep.contains(field)) {
-                        sanitizedObject.set<JsonNode>(field, fieldValue) // Preserve whitelisted fields
+                        sanitizedObject.set(field, fieldValue) // Preserve whitelisted fields
                     } else {
                         // Mask text and numbers, sanitize nested objects and arrays
-                        sanitizedObject.set<JsonNode>(
+                        sanitizedObject.set(
                             field, when {
-                                fieldValue.isTextual -> maskPrimitive(fieldValue)
-                                fieldValue.isInt || fieldValue.isLong -> maskPrimitive(fieldValue)
+                                fieldValue.isTextual() -> maskPrimitive(fieldValue)
+                                fieldValue.isInt() || fieldValue.isLong() -> maskPrimitive(fieldValue)
                                 else -> sanitizeNode(fieldValue, keep)
                             }
                         )
@@ -62,10 +63,10 @@ class JsonFieldMasker(private val mapper: ObjectMapper) {
             }
 
             return when {
-                node.isObject -> sanitizeObjectNode(node, keep)
-                node.isArray -> sanitizeArrayNode(node, keep)
-                node.isBoolean -> node // Preserve boolean values
-                node.isInt || node.isLong -> TextNode("n".repeat(node.asText().length)) // Mask integer/long values
+                node.isObject() -> sanitizeObjectNode(node, keep)
+                node.isArray() -> sanitizeArrayNode(node, keep)
+                node.isBoolean() -> node // Preserve boolean values
+                node.isInt() || node.isLong() -> mapper.nodeFactory.textNode("n".repeat(node.asText().length)) // Mask integer/long values
                 else -> node // Return other types (e.g., null, floats) as-is
             }
         }

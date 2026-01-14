@@ -1,35 +1,30 @@
 package no.nav.melosys.eessi.integration.journalpostapi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.benas.randombeans.api.EnhancedRandom;
 import no.nav.melosys.eessi.EnhancedRandomCreator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RestClientTest()
-@AutoConfigureWebClient(registerRestTemplate = true)
+@ExtendWith(MockitoExtension.class)
 class JournalpostapiConsumerTest {
 
     private static final String JOURNALPOST_RESPONSE = "{\"journalpostId\":\"498371665\",\"journalstatus\":\"J\",\"melding\":null,\"journalpostferdigstilt\":false,\"dokumenter\":[{\"dokumentInfoId\":\"520426094\"}]}";
 
-    @Autowired
     private MockRestServiceServer server;
-    @Autowired
     private RestTemplate restTemplate;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
     private JournalpostapiConsumer journalpostapiConsumer;
 
     private final EnhancedRandom random = EnhancedRandomCreator.defaultEnhancedRandom();
@@ -37,7 +32,10 @@ class JournalpostapiConsumerTest {
 
     @BeforeEach
     public void setUp() {
-        journalpostapiConsumer = new JournalpostapiConsumer(restTemplate, objectMapper);
+        restTemplate = new RestTemplate();
+        jsonMapper = JsonMapper.builder().build();
+        server = MockRestServiceServer.createServer(restTemplate);
+        journalpostapiConsumer = new JournalpostapiConsumer(restTemplate, jsonMapper);
         request = random.nextObject(OpprettJournalpostRequest.class);
     }
 

@@ -5,10 +5,7 @@ import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class OppgaveDto {
     private String aktoerId;
@@ -16,11 +13,9 @@ public class OppgaveDto {
     private String tema;
     private String oppgavetype;
     private String journalpostId;
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate aktivDato;
-    @JsonSerialize(using = ToStringSerializer.class)
-    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate fristFerdigstillelse;
     private String prioritet;
     private String saksreferanse;
@@ -120,7 +115,6 @@ public class OppgaveDto {
         /**
          * @return {@code this}.
          */
-        @JsonDeserialize(using = LocalDateDeserializer.class)
         @java.lang.SuppressWarnings("all")
         public OppgaveDto.OppgaveDtoBuilder aktivDato(final LocalDate aktivDato) {
             this.aktivDato = aktivDato;
@@ -130,7 +124,6 @@ public class OppgaveDto {
         /**
          * @return {@code this}.
          */
-        @JsonDeserialize(using = LocalDateDeserializer.class)
         @java.lang.SuppressWarnings("all")
         public OppgaveDto.OppgaveDtoBuilder fristFerdigstillelse(final LocalDate fristFerdigstillelse) {
             this.fristFerdigstillelse = fristFerdigstillelse;
@@ -340,13 +333,11 @@ public class OppgaveDto {
         this.journalpostId = journalpostId;
     }
 
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     @java.lang.SuppressWarnings("all")
     public void setAktivDato(final LocalDate aktivDato) {
         this.aktivDato = aktivDato;
     }
 
-    @JsonDeserialize(using = LocalDateDeserializer.class)
     @java.lang.SuppressWarnings("all")
     public void setFristFerdigstillelse(final LocalDate fristFerdigstillelse) {
         this.fristFerdigstillelse = fristFerdigstillelse;

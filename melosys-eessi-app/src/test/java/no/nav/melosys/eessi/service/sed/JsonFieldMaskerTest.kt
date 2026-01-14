@@ -1,17 +1,14 @@
 package no.nav.melosys.eessi.service.sed
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.json.shouldEqualJson
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
 import java.nio.file.Files
 import java.nio.file.Paths
 
 class JsonFieldMaskerTest {
 
-    private val jsonFieldMasker = JsonFieldMasker(jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-    })
+    private val jsonFieldMasker = JsonFieldMasker(JsonMapper.builder().build())
 
     @Test
     fun `alt som ikke er i whitelist eller er boolean, float eller null skal maskeres`() {

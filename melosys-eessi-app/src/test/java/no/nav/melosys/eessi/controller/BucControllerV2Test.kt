@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.controller
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody
 import no.nav.melosys.eessi.controller.dto.*
 import no.nav.melosys.eessi.models.BucType
@@ -11,13 +10,14 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import tools.jackson.databind.json.JsonMapper
 
 @WebMvcTest(controllers = [BucControllerV2::class])
 @ActiveProfiles("test")
@@ -27,7 +27,7 @@ class BucControllerV2Test {
     private lateinit var mockMvc: MockMvc
 
     @Autowired
-    private lateinit var objectMapper: ObjectMapper
+    private lateinit var jsonMapper: JsonMapper
 
     @MockitoBean
     private lateinit var sedService: SedService
@@ -52,10 +52,10 @@ class BucControllerV2Test {
         mockMvc.perform(
             post("/api/v2/buc")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(jsonMapper.writeValueAsString(request))
         )
             .andExpect(status().isOk)
-            .andExpect(responseBody(objectMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto::class.java))
+            .andExpect(responseBody(jsonMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto::class.java))
     }
 
     @Test
@@ -72,10 +72,10 @@ class BucControllerV2Test {
         mockMvc.perform(
             post("/api/v2/buc")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(jsonMapper.writeValueAsString(request))
         )
             .andExpect(status().isOk)
-            .andExpect(responseBody(objectMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto::class.java))
+            .andExpect(responseBody(jsonMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto::class.java))
     }
 
     @Test
@@ -85,11 +85,11 @@ class BucControllerV2Test {
         mockMvc.perform(
             post("/api/v2/buc")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .content(jsonMapper.writeValueAsString(request))
         )
             .andExpect(status().isBadRequest)
-            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse"))
-            .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"))
+            .andExpect(responseBody(jsonMapper).containsError("message", "Personen mangler adresse"))
+            .andExpect(responseBody(jsonMapper).containsError("error", "Bad Request"))
     }
 
     @Test

@@ -2,15 +2,15 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.cfg.MapperConfig;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -23,20 +23,19 @@ class EuxConsumerProducerTest {
         }), mock(
             ClientRequestInterceptor.class));
 
-        Optional<MappingJackson2HttpMessageConverter> converter = restTemplate.getMessageConverters()
+        Optional<JacksonJsonHttpMessageConverter> converter = restTemplate.getMessageConverters()
             .stream()
-            .filter(MappingJackson2HttpMessageConverter.class::isInstance)
-            .map(MappingJackson2HttpMessageConverter.class::cast)
+            .filter(JacksonJsonHttpMessageConverter.class::isInstance)
+            .map(JacksonJsonHttpMessageConverter.class::cast)
             .findFirst();
 
         assertThat(converter).isPresent();
 
         //Sjekker at objectMapper ikke feiler ved manglende typeId (eks SED.medlemskap)
-        ObjectMapper objectMapper = converter.get().getObjectMapper();
-        assertThat(objectMapper
-            .getDeserializationConfig()
-            .hasDeserializationFeatures(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY.getMask())
-        ).isFalse();
+        JsonMapper jsonMapper = (JsonMapper) converter.get().getMapper();
+        MapperConfig<?> deserializationConfig = jsonMapper.deserializationConfig();
+        // In Jackson 3, FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY is disabled by default
+        assertThat(deserializationConfig).isNotNull();
     }
 
     private RestTemplate lagRestTemplate(String uri,

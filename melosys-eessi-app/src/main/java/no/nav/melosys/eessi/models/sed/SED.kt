@@ -1,15 +1,15 @@
 package no.nav.melosys.eessi.models.sed
 
 import com.fasterxml.jackson.annotation.*
-import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.medlemskap.Medlemskap
 import no.nav.melosys.eessi.models.sed.nav.*
+import tools.jackson.databind.annotation.JsonTypeIdResolver
 import java.util.*
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class SED @JsonCreator constructor(
+data class SED(
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "sed")
     @JsonTypeIdResolver(MedlemskapTypeResolver::class)
     @JsonProperty("medlemskap") var medlemskap: Medlemskap? = null,

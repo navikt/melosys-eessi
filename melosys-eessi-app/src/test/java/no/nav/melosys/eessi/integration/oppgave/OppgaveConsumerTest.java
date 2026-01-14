@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -18,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import tools.jackson.databind.json.JsonMapper;
 
 import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -61,7 +60,7 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    void oppdaterOppgave_utenBeskrivelse_beksrivelseMappesIkkeTilRequest() throws InterruptedException, JsonProcessingException {
+    void oppdaterOppgave_utenBeskrivelse_beksrivelseMappesIkkeTilRequest() throws InterruptedException {
         final var forventetJsonBodyRequestUtenBeskrivelseFelt = """
             {
                 \"id\": 1,
@@ -76,8 +75,8 @@ class OppgaveConsumerTest {
         var requestBody = request.getBody().readUtf8();
         assertThat(request).extracting(RecordedRequest::getPath, RecordedRequest::getMethod).containsExactly("/oppgaver/" + OPPGAVE_ID, "PATCH");
         assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
-        var objectMapper = new ObjectMapper();
-        assertThat(objectMapper.readTree(requestBody)).isEqualTo(objectMapper.readTree(forventetJsonBodyRequestUtenBeskrivelseFelt));
+        var jsonMapper = JsonMapper.builder().build();
+        assertThat(jsonMapper.readTree(requestBody)).isEqualTo(jsonMapper.readTree(forventetJsonBodyRequestUtenBeskrivelseFelt));
     }
 
     private void assertOppgaveFelter(HentOppgaveDto oppgaveDto) {

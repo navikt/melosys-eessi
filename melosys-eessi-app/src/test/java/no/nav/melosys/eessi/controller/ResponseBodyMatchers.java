@@ -4,18 +4,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.ResultMatcher;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ResponseBodyMatchers {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
-    private ResponseBodyMatchers(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    private ResponseBodyMatchers(JsonMapper jsonMapper) {
+        this.jsonMapper = jsonMapper;
     }
 
     public <T> ResultMatcher containsObjectAsJson(
@@ -23,7 +23,7 @@ public class ResponseBodyMatchers {
         Class<T> targetClass) {
         return mvcResult -> {
             String json = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
-            T actualObject = objectMapper.readValue(json, targetClass);
+            T actualObject = jsonMapper.readValue(json, targetClass);
             assertThat(actualObject).usingRecursiveComparison().isEqualTo(expectedObject);
         };
     }
@@ -33,7 +33,7 @@ public class ResponseBodyMatchers {
         String expectedMessage) {
         return mvcResult -> {
             String json = mvcResult.getResponse().getContentAsString(StandardCharsets.UTF_8);
-            Map<String, String> errorMap = objectMapper.readValue(json, new TypeReference<HashMap<String, String>>() {
+            Map<String, String> errorMap = jsonMapper.readValue(json, new TypeReference<HashMap<String, String>>() {
             });
             assertThat(errorMap.get(expectedFieldName))
                 .isNotNull()
@@ -41,8 +41,8 @@ public class ResponseBodyMatchers {
         };
     }
 
-    static ResponseBodyMatchers responseBody(ObjectMapper objectMapper) {
-        return new ResponseBodyMatchers(objectMapper);
+    static ResponseBodyMatchers responseBody(JsonMapper jsonMapper) {
+        return new ResponseBodyMatchers(jsonMapper);
     }
 
 }

@@ -2,10 +2,6 @@ package no.nav.melosys.eessi.service.kontroll;
 
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
@@ -17,6 +13,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import tools.jackson.databind.cfg.DateTimeFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,13 +40,13 @@ class SedMottakAdminTjenesteTest {
     }
 
     @Test
-    void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() throws JsonProcessingException {
+    void hentFeiledeSeder_enFeiledSedMottat_viserFeilmeldingSisteHendelse() {
         when(sedMottattHendelseRepository.findAllByJournalpostIdIsNullOrderByMottattDato())
             .thenReturn(singletonList(sedMottattHendelse));
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        JsonMapper mapper = JsonMapper.builder()
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .build();
 
         var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);

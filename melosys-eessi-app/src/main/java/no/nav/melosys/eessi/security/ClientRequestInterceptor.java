@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.Optional;
 
 import no.nav.security.token.support.client.core.ClientProperties;
-import no.nav.security.token.support.client.core.OAuth2GrantType;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -14,6 +13,8 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+
+import static com.nimbusds.oauth2.sdk.GrantType.CLIENT_CREDENTIALS;
 
 /**
  * Interceptor som legger til Authorization-header med Bearer-token for en RestTemplate.
@@ -47,8 +48,13 @@ public class ClientRequestInterceptor implements ClientHttpRequestInterceptor {
     }
 
     private String hentAccessTokenForSystem() {
-        var clientPropertiesForSystem = ClientProperties.builder().tokenEndpointUrl(clientProperties.getTokenEndpointUrl()).scope(clientProperties.getScope()).authentication(clientProperties.getAuthentication()).grantType(OAuth2GrantType.CLIENT_CREDENTIALS).build();
+        var clientPropertiesForSystem = ClientProperties.builder(CLIENT_CREDENTIALS, clientProperties.getAuthentication())
+            .tokenEndpointUrl(clientProperties.getTokenEndpointUrl())
+            .scope(clientProperties.getScope())
+            .build();
+
         OAuth2AccessTokenResponse response = oAuth2AccessTokenService.getAccessToken(clientPropertiesForSystem);
+
         return response.getAccessToken();
     }
 }

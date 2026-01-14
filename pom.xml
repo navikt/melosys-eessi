@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>4.0.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.nav</groupId>
@@ -40,12 +40,12 @@
         <okhttp3.version>4.12.0</okhttp3.version>
         <random-benas.version>3.9.0</random-benas.version>
         <shedlock-version>7.5.0</shedlock-version>
+        <spring-retry.version>2.0.12</spring-retry.version>
         <testcontainers.version>1.21.4</testcontainers.version>
-        <token-support.version>3.2.0</token-support.version>
+        <token-support.version>6.0.1</token-support.version>
         <unleash.version>9.3.2</unleash.version>
         <vault-jdbc.version>1.3.10</vault-jdbc.version>
         <springdoc-openapi.version>2.8.14</springdoc-openapi.version>
-        <junit-jupiter.version>5.11.3</junit-jupiter.version>
 
         <!-- Transitive avhengigheter -->
         <checker-qual.version>3.52.1</checker-qual.version>
