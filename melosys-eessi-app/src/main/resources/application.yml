@@ -28,14 +28,14 @@ spring:
       sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${melosys.systemuser.username}" password="${melosys.systemuser.password}";
       reconnect.backoff.ms: 1000
 
-cron:
-  job:
-    lukk-buc: ${CRON_JOB_LUKK_BUC:0 0 0 * * *} # hver dag kl 00:00
-
   servlet:
     multipart:
       max-file-size: 104857600 # 100MB
       max-request-size: 104857600 # 100MB
+
+cron:
+  job:
+    lukk-buc: ${CRON_JOB_LUKK_BUC:0 0 0 * * *} # hver dag kl 00:00
 
 melosys:
   admin:
