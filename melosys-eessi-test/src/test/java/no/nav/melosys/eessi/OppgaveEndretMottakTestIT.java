@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi;
 
 import java.time.Duration;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -8,8 +9,10 @@ import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto;
 import no.nav.melosys.eessi.integration.pdl.dto.PDLSokPerson;
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.test.utils.ContainerTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -25,6 +28,17 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
     SedMottattHendelseRepository sedMottattHendelseRepository;
 
     final String rinaSaksnummer = Integer.toString(new Random().nextInt(100000));
+
+    @BeforeEach
+    void waitForKafkaConsumers() {
+        // Wait for consumers to be assigned partitions before sending messages
+        Optional.ofNullable(listenerRegistry.getListenerContainer("oppgaveHendelse")).ifPresent(
+            listener -> ContainerTestUtils.waitForAssignment(listener, 1)
+        );
+        Optional.ofNullable(listenerRegistry.getListenerContainer("sedMottattHendelse")).ifPresent(
+            listener -> ContainerTestUtils.waitForAssignment(listener, 1)
+        );
+    }
 
     @Test
     void oppgaveEndret_utenKorrektVersjonsnumerFraKafka_ikkeFerdigstill() throws Exception {
@@ -44,7 +58,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        await().atMost(Duration.ofSeconds(4))
+        await().atMost(Duration.ofSeconds(10))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
 
@@ -79,7 +93,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        await().atMost(Duration.ofSeconds(4))
+        await().atMost(Duration.ofSeconds(10))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
 
