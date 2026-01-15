@@ -47,7 +47,6 @@ class BasicAuthClientRequestInterceptorTest {
 
         HttpHeaders headers = httpRequest.getHeaders();
 
-        assertThat((Map<String, List<String>>) headers).isNotEmpty();
         List<String> authValues = headers.get(HttpHeaders.AUTHORIZATION);
         assertThat(authValues).contains(expectedToken);
     }

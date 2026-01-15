@@ -1,6 +1,8 @@
 package no.nav.melosys.eessi.models.sed.nav
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
 import no.nav.melosys.eessi.identifisering.FnrUtils
 import java.util.*
 import kotlin.jvm.optionals.getOrNull
@@ -14,17 +16,19 @@ data class Person(
     var fornavn: String? = null,
     var fornavnvedfoedsel: String? = null,
     var kjoenn: Kjønn? = null,
-    var pin: List<Pin>? = null,
-    var statsborgerskap: List<Statsborgerskap?>? = null
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var pin: List<Pin> = emptyList(),
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    var statsborgerskap: List<Statsborgerskap?> = emptyList()
 ) {
-    fun hentStatsborgerksapsliste(): Collection<String> = statsborgerskap?.mapNotNull { it?.land } ?: emptyList()
+    fun hentStatsborgerksapsliste(): Collection<String> = statsborgerskap.mapNotNull { it?.land }
 
     fun harStatsborgerskap(land: String): Boolean = hentStatsborgerksapsliste().contains(land)
 
-    fun finnUtenlandskIdFraLand(land: String): Optional<Pin> = pin?.firstOrNull { it.land == land }?.let { Optional.of(it) } ?: Optional.empty()
+    fun finnUtenlandskIdFraLand(land: String): Optional<Pin> = pin.firstOrNull { it.land == land }?.let { Optional.of(it) } ?: Optional.empty()
 
     fun hentNorskPersonnummer(): String? =
-        pin?.firstOrNull { it.land == "NO" }?.identifikator?.let { FnrUtils.filtrerUtGyldigNorskIdent(it).getOrNull() }
+        pin.firstOrNull { it.land == "NO" }?.identifikator?.let { FnrUtils.filtrerUtGyldigNorskIdent(it).getOrNull() }
 
     fun harNorskPersonnummer(): Boolean = hentNorskPersonnummer() != null
 }

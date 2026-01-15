@@ -9,6 +9,8 @@ spring:
   jpa:
     properties:
       hibernate:
+        type:
+          json_format_mapper: no.nav.melosys.eessi.config.HibernateJackson3FormatMapper
         jdbc:
           lob:
             non_contextual_creation: true #fix for jdbc bug i postgres-driver som krasjer app
