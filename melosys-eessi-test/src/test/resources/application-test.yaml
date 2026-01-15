@@ -52,10 +52,6 @@ spring:
     application:
         name: melosys-eessi
     kafka:
-        producer:
-            key-serializer: org.apache.kafka.common.serialization.StringSerializer
-            value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
-
         properties:
             schema.registry.url: dummy
             reconnect.backoff.ms: 1000
