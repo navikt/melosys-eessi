@@ -4,18 +4,22 @@ package no.nav.melosys.eessi.service.personsok;
 import java.time.LocalDate;
 import java.util.Collection;
 
+import no.nav.melosys.eessi.models.person.Kjønn;
+
 public class PersonsokKriterier {
     private String fornavn;
     private String etternavn;
     private LocalDate foedselsdato;
     private Collection<String> statsborgerskapISO2;
+    private Kjønn kjoenn;
 
     @java.lang.SuppressWarnings("all")
-    PersonsokKriterier(final String fornavn, final String etternavn, final LocalDate foedselsdato, final Collection<String> statsborgerskapISO2) {
+    PersonsokKriterier(final String fornavn, final String etternavn, final LocalDate foedselsdato, final Collection<String> statsborgerskapISO2, final Kjønn kjoenn) {
         this.fornavn = fornavn;
         this.etternavn = etternavn;
         this.foedselsdato = foedselsdato;
         this.statsborgerskapISO2 = statsborgerskapISO2;
+        this.kjoenn = kjoenn;
     }
 
 
@@ -29,6 +33,8 @@ public class PersonsokKriterier {
         private LocalDate foedselsdato;
         @java.lang.SuppressWarnings("all")
         private Collection<String> statsborgerskapISO2;
+        @java.lang.SuppressWarnings("all")
+        private Kjønn kjoenn;
 
         @java.lang.SuppressWarnings("all")
         PersonsokKriterierBuilder() {
@@ -70,15 +76,24 @@ public class PersonsokKriterier {
             return this;
         }
 
+        /**
+         * @return {@code this}.
+         */
+        @java.lang.SuppressWarnings("all")
+        public PersonsokKriterier.PersonsokKriterierBuilder kjoenn(final Kjønn kjoenn) {
+            this.kjoenn = kjoenn;
+            return this;
+        }
+
         @java.lang.SuppressWarnings("all")
         public PersonsokKriterier build() {
-            return new PersonsokKriterier(this.fornavn, this.etternavn, this.foedselsdato, this.statsborgerskapISO2);
+            return new PersonsokKriterier(this.fornavn, this.etternavn, this.foedselsdato, this.statsborgerskapISO2, this.kjoenn);
         }
 
         @java.lang.Override
         @java.lang.SuppressWarnings("all")
         public java.lang.String toString() {
-            return "PersonsokKriterier.PersonsokKriterierBuilder(fornavn=" + this.fornavn + ", etternavn=" + this.etternavn + ", foedselsdato=" + this.foedselsdato + ", statsborgerskapISO2=" + this.statsborgerskapISO2 + ")";
+            return "PersonsokKriterier.PersonsokKriterierBuilder(fornavn=" + this.fornavn + ", etternavn=" + this.etternavn + ", foedselsdato=" + this.foedselsdato + ", statsborgerskapISO2=" + this.statsborgerskapISO2 + ", kjoenn=" + this.kjoenn + ")";
         }
     }
 
@@ -108,6 +123,11 @@ public class PersonsokKriterier {
     }
 
     @java.lang.SuppressWarnings("all")
+    public Kjønn getKjoenn() {
+        return this.kjoenn;
+    }
+
+    @java.lang.SuppressWarnings("all")
     public void setFornavn(final String fornavn) {
         this.fornavn = fornavn;
     }
@@ -125,6 +145,11 @@ public class PersonsokKriterier {
     @java.lang.SuppressWarnings("all")
     public void setStatsborgerskapISO2(final Collection<String> statsborgerskapISO2) {
         this.statsborgerskapISO2 = statsborgerskapISO2;
+    }
+
+    @java.lang.SuppressWarnings("all")
+    public void setKjoenn(final Kjønn kjoenn) {
+        this.kjoenn = kjoenn;
     }
 
     @java.lang.Override
@@ -148,6 +173,10 @@ public class PersonsokKriterier {
         final java.lang.Object other$statsborgerskapISO2 = other.getStatsborgerskapISO2();
         if (this$statsborgerskapISO2 == null ? other$statsborgerskapISO2 != null : !this$statsborgerskapISO2.equals(other$statsborgerskapISO2))
             return false;
+        final java.lang.Object this$kjoenn = this.getKjoenn();
+        final java.lang.Object other$kjoenn = other.getKjoenn();
+        if (this$kjoenn == null ? other$kjoenn != null : !this$kjoenn.equals(other$kjoenn))
+            return false;
         return true;
     }
 
@@ -169,12 +198,14 @@ public class PersonsokKriterier {
         result = result * PRIME + ($foedselsdato == null ? 43 : $foedselsdato.hashCode());
         final java.lang.Object $statsborgerskapISO2 = this.getStatsborgerskapISO2();
         result = result * PRIME + ($statsborgerskapISO2 == null ? 43 : $statsborgerskapISO2.hashCode());
+        final java.lang.Object $kjoenn = this.getKjoenn();
+        result = result * PRIME + ($kjoenn == null ? 43 : $kjoenn.hashCode());
         return result;
     }
 
     @java.lang.Override
     @java.lang.SuppressWarnings("all")
     public java.lang.String toString() {
-        return "PersonsokKriterier(fornavn=" + this.getFornavn() + ", etternavn=" + this.getEtternavn() + ", foedselsdato=" + this.getFoedselsdato() + ", statsborgerskapISO2=" + this.getStatsborgerskapISO2() + ")";
+        return "PersonsokKriterier(fornavn=" + this.getFornavn() + ", etternavn=" + this.getEtternavn() + ", foedselsdato=" + this.getFoedselsdato() + ", statsborgerskapISO2=" + this.getStatsborgerskapISO2() + ", kjoenn=" + this.getKjoenn() + ")";
     }
 }

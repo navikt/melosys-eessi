@@ -37,22 +37,44 @@ class SedIdentifiseringService implements PersonIdentifisering {
             personSokMetrikker.counter(SoekBegrunnelse.INGEN_PERSON_I_SED);
             return Optional.empty();
         }
-        return vurderEllerSøkEtterPerson(personFraSed.get());
+        return vurderEllerSøkEtterPerson(rinaSaksnummer, personFraSed.get());
     }
 
-    private Optional<String> vurderEllerSøkEtterPerson(Person sedPerson) {
-        PersonsokKriterier søkeKriterier = PersonsokKriterier.builder().fornavn(sedPerson.getFornavn()).etternavn(sedPerson.getEtternavn()).foedselsdato(tilLocalDate(sedPerson.getFoedselsdato())).statsborgerskapISO2(sedPerson.hentStatsborgerksapsliste()).build();
+    private Optional<String> vurderEllerSøkEtterPerson(String rinaSaksnummer, Person sedPerson) {
+        PersonsokKriterier søkeKriterier = PersonsokKriterier.builder()
+            .fornavn(sedPerson.getFornavn())
+            .etternavn(sedPerson.getEtternavn())
+            .foedselsdato(tilLocalDate(sedPerson.getFoedselsdato()))
+            .statsborgerskapISO2(sedPerson.hentStatsborgerksapsliste())
+            .kjoenn(sedPerson.getKjoenn() != null ? sedPerson.getKjoenn().tilDomene() : null)
+            .build();
         Optional<String> norskIdent = Optional.ofNullable(sedPerson.hentNorskPersonnummer());
         if (norskIdent.isPresent()) {
             PersonSokResultat resultat = personSøk.vurderPerson(norskIdent.get(), søkeKriterier);
             if (resultat.personIdentifisert()) {
                 personSokMetrikker.counter(resultat.getBegrunnelse());
+                loggHvisNavnemismatch(rinaSaksnummer, resultat);
                 return norskIdent;
             }
         }
         PersonSokResultat resultat = personSøk.søkEtterPerson(søkeKriterier);
         personSokMetrikker.counter(resultat.getBegrunnelse());
-        log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
+        loggResultat(rinaSaksnummer, resultat);
         return Optional.ofNullable(resultat.getIdent());
+    }
+
+    private void loggResultat(String rinaSaksnummer, PersonSokResultat resultat) {
+        if (resultat.getBegrunnelse() == SoekBegrunnelse.FEIL_KJONN) {
+            log.info("Identifisering feilet på kjønn. rinaSaksnummer={}", rinaSaksnummer);
+        } else if (resultat.personIdentifisert()) {
+            loggHvisNavnemismatch(rinaSaksnummer, resultat);
+        }
+        log.info("Resultat fra forsøk på identifisering av person: {}", resultat.getBegrunnelse());
+    }
+
+    private void loggHvisNavnemismatch(String rinaSaksnummer, PersonSokResultat resultat) {
+        if (resultat.harNavnemismatch()) {
+            log.warn("Navnemismatch ved identifisering (ville feilet med navnesjekk). rinaSaksnummer={}", rinaSaksnummer);
+        }
     }
 }

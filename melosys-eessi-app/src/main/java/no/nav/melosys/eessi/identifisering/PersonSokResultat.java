@@ -6,25 +6,27 @@ import jakarta.validation.constraints.NotNull;
 final class PersonSokResultat {
     private final String ident;
     private final SoekBegrunnelse begrunnelse;
+    private final boolean harNavnemismatch;
 
-    private PersonSokResultat(String ident, SoekBegrunnelse begrunnelse) {
+    private PersonSokResultat(String ident, SoekBegrunnelse begrunnelse, boolean harNavnemismatch) {
         this.ident = ident;
         this.begrunnelse = begrunnelse;
+        this.harNavnemismatch = harNavnemismatch;
     }
 
     boolean personIdentifisert() {
         return begrunnelse == SoekBegrunnelse.IDENTIFISERT;
     }
 
-    static PersonSokResultat identifisert(@NotNull String ident) {
-        return new PersonSokResultat(ident, SoekBegrunnelse.IDENTIFISERT);
+    static PersonSokResultat identifisert(@NotNull String ident, boolean harNavnemismatch) {
+        return new PersonSokResultat(ident, SoekBegrunnelse.IDENTIFISERT, harNavnemismatch);
     }
 
     static PersonSokResultat ikkeIdentifisert(SoekBegrunnelse begrunnelse) {
         if (begrunnelse == SoekBegrunnelse.IDENTIFISERT) {
             throw new IllegalArgumentException("Begrunnelse " + begrunnelse + " gjelder ikke når person ikke er identifsert!");
         }
-        return new PersonSokResultat(null, begrunnelse);
+        return new PersonSokResultat(null, begrunnelse, false);
     }
 
     @java.lang.SuppressWarnings("all")
@@ -35,5 +37,10 @@ final class PersonSokResultat {
     @java.lang.SuppressWarnings("all")
     public SoekBegrunnelse getBegrunnelse() {
         return this.begrunnelse;
+    }
+
+    @java.lang.SuppressWarnings("all")
+    public boolean harNavnemismatch() {
+        return this.harNavnemismatch;
     }
 }
