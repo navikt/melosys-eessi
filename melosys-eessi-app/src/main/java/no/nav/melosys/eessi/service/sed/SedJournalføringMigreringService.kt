@@ -19,6 +19,7 @@ private val log = KotlinLogging.logger {}
 class SedJournalføringMigreringService(
     private val sedMottattHendelseRepository: SedMottattHendelseRepository,
     private val euxConsumer: EuxConsumer,
+    private val jsonMapper: JsonMapper,
 ) {
     private val lock = Any()
 
@@ -86,9 +87,8 @@ class SedJournalføringMigreringService(
             val fileName = if (naisClusterName == "prod-fss") fileNameProd else fileNameDev
             val fileUri = requireNotNull(javaClass.classLoader.getResource(fileName)).toURI()
             val content = Files.readString(Paths.get(fileUri))
-            // TODO: kan forenkle dette når vi får inn jackson-module-kotlin
             val sedSendtJournalføringListe =
-                JsonMapper.builder().build().readValue(content, object : TypeReference<MutableList<SedSendtJournalføringMigrering?>?>() {
+                jsonMapper.readValue(content, object : TypeReference<MutableList<SedSendtJournalføringMigrering?>?>() {
                 })
 
             antallSedSendtHendelser = sedSendtJournalføringListe!!.size

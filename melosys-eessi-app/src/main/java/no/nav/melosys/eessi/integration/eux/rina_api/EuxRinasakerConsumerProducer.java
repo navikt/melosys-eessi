@@ -29,25 +29,27 @@ public class EuxRinasakerConsumerProducer {
     @Primary
     public EuxRinasakerConsumer euxRinasakerConsumer(RestTemplateBuilder builder, ClientConfigurationProperties
         clientConfigurationProperties,
-                                                     OAuth2AccessTokenService oAuth2AccessTokenService) {
+                                                     OAuth2AccessTokenService oAuth2AccessTokenService,
+                                                     JsonMapper jsonMapper) {
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-nav-rinasak");
-        return new EuxRinasakerConsumer(lagRestTemplate(builder, interceptor));
+        return new EuxRinasakerConsumer(lagRestTemplate(builder, interceptor, jsonMapper));
     }
 
     private RestTemplate lagRestTemplate(RestTemplateBuilder restTemplateBuilder,
-                                         ClientHttpRequestInterceptor interceptor) {
+                                         ClientHttpRequestInterceptor interceptor,
+                                         JsonMapper jsonMapper) {
         RestTemplate restTemplate = restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
             .build();
 
-        return configureJacksonMapper(restTemplate);
+        return configureJacksonMapper(restTemplate, jsonMapper);
     }
 
-    private static RestTemplate configureJacksonMapper(RestTemplate restTemplate) {
+    private static RestTemplate configureJacksonMapper(RestTemplate restTemplate, JsonMapper baseMapper) {
         //For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
-        JsonMapper customMapper = JsonMapper.builder()
+        JsonMapper customMapper = baseMapper.rebuild()
             .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
             .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .build();

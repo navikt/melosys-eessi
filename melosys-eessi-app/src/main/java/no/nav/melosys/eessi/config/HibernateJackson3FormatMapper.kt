@@ -4,7 +4,8 @@ import org.hibernate.type.descriptor.WrapperOptions
 import org.hibernate.type.descriptor.java.JavaType
 import org.hibernate.type.format.FormatMapper
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.module.kotlin.kotlinModule
+import tools.jackson.module.kotlin.KotlinFeature
+import tools.jackson.module.kotlin.KotlinModule
 import java.lang.reflect.Type
 
 /**
@@ -17,7 +18,11 @@ import java.lang.reflect.Type
 class HibernateJackson3FormatMapper : FormatMapper {
 
     private val jsonMapper: JsonMapper = JsonMapper.builder()
-        .addModule(kotlinModule())
+        .addModule(
+            KotlinModule.Builder()
+                .enable(KotlinFeature.NullIsSameAsDefault)
+                .build()
+        )
         .build()
 
     override fun <T : Any?> fromString(

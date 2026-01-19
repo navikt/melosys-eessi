@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.client.WebClient
+import tools.jackson.databind.json.JsonMapper
 
 @Configuration
 class EuxKotlinConsumerProducer(
@@ -18,7 +19,8 @@ class EuxKotlinConsumerProducer(
 
     @Bean
     fun euxKotlinConsumer(
-        @Value("\${melosys.integrations.eux-rina-api-url}") euxRinaApiUrl: String
+        @Value("\${melosys.integrations.eux-rina-api-url}") euxRinaApiUrl: String,
+        jsonMapper: JsonMapper
     ): EuxKotlinConsumer {
         val webClient = webClientBuilder
             .baseUrl(euxRinaApiUrl)
@@ -26,6 +28,6 @@ class EuxKotlinConsumerProducer(
             .filter(genericAuthFilterFactory.getAzureFilter("eux-rina-api"))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build()
-        return EuxKotlinConsumer(webClient)
+        return EuxKotlinConsumer(webClient, jsonMapper)
     }
 } 
