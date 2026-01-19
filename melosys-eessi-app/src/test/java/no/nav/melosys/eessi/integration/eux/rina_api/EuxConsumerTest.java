@@ -44,7 +44,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import tools.jackson.databind.json.JsonMapper;
 
-import static no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerProducer.configureJacksonMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -538,10 +537,10 @@ class EuxConsumerTest {
                                          RestTemplateBuilder restTemplateBuilder,
                                          ClientHttpRequestInterceptor interceptor) {
 
-        return configureJacksonMapper(restTemplateBuilder
+        return EuxConsumerProducer.configureJacksonMapper(restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-            .build());
+            .build(), jsonMapper);
     }
 }

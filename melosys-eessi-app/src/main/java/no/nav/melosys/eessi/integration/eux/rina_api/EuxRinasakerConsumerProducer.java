@@ -47,13 +47,13 @@ public class EuxRinasakerConsumerProducer {
         return configureJacksonMapper(restTemplate, jsonMapper);
     }
 
-    private static RestTemplate configureJacksonMapper(RestTemplate restTemplate, JsonMapper baseMapper) {
+    protected static RestTemplate configureJacksonMapper(RestTemplate restTemplate, JsonMapper baseMapper) {
         //For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
         JsonMapper customMapper = baseMapper.rebuild()
             .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
             .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .build();
-        
+
         // Replace the default JacksonJsonHttpMessageConverter with a custom configured one
         restTemplate.getMessageConverters().removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
         restTemplate.getMessageConverters().add(new JacksonJsonHttpMessageConverter(customMapper));

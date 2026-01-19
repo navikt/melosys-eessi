@@ -46,6 +46,17 @@ public class EuxConsumerProducer {
             .build();
     }
 
+    /**
+     * Konfigurerer RestTemplate med EUX-spesifikk JsonMapper.
+     * Brukes av tester som trenger å sette opp RestTemplate manuelt.
+     */
+    public static RestTemplate configureJacksonMapper(RestTemplate restTemplate, JsonMapper baseMapper) {
+        JsonMapper euxMapper = createEuxMapper(baseMapper);
+        restTemplate.getMessageConverters().removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
+        restTemplate.getMessageConverters().add(new JacksonJsonHttpMessageConverter(euxMapper));
+        return restTemplate;
+    }
+
     private RestTemplate lagRestTemplate(RestTemplateBuilder restTemplateBuilder,
                                          ClientHttpRequestInterceptor interceptor,
                                          JsonMapper jsonMapper) {
