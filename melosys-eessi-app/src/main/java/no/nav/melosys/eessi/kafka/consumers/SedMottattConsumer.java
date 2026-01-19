@@ -15,7 +15,10 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.listener.AbstractConsumerSeekAware;
 import org.springframework.stereotype.Component;
 
-import static no.nav.melosys.eessi.config.MDCOperations.*;
+import static no.nav.melosys.eessi.config.MDCOperations.CORRELATION_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.SED_ID;
+import static no.nav.melosys.eessi.config.MDCOperations.putToMDC;
+import static no.nav.melosys.eessi.config.MDCOperations.remove;
 
 @Component
 @Profile("!local-q2")
@@ -50,7 +53,8 @@ public class SedMottattConsumer extends AbstractConsumerSeekAware {
     }
 
     public void settSpesifiktOffsetPåConsumer(long offset) {
-        getSeekCallbacks().forEach((tp, callback) -> callback.seek(tp.topic(), tp.partition(), offset));
+        getTopicsAndCallbacks().forEach((tp, callbacks) ->
+            callbacks.forEach(callback -> callback.seek(tp.topic(), tp.partition(), offset)));
     }
 
     @java.lang.SuppressWarnings("all")

@@ -2,8 +2,8 @@ package no.nav.melosys.eessi.models.sed.nav
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import no.nav.melosys.eessi.models.sed.ArbeidsgiverDeserializer
+import tools.jackson.databind.annotation.JsonDeserialize
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)

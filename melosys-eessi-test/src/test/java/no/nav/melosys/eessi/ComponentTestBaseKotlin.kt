@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.readValue
 import com.ninjasquad.springmockk.MockkBean
 import io.getunleash.FakeUnleash
 import io.getunleash.Unleash
@@ -68,7 +68,7 @@ abstract class ComponentTestBaseKotlin : PostgresTestContainerBase() {
     lateinit var kafkaTemplate: KafkaTemplate<String, Any>
 
     @Autowired(required = false)
-    lateinit var objectMapper: ObjectMapper
+    lateinit var jsonMapper: JsonMapper
 
     @MockkBean(relaxed = true)
     lateinit var euxConsumer: EuxConsumer
@@ -117,7 +117,7 @@ abstract class ComponentTestBaseKotlin : PostgresTestContainerBase() {
             .replace("\$fnr", FNR)
             .replace("\$versjonsnummer", versjon)
             .replace("\$rinasaksnummer", rinaSaksnummer)
-        return objectMapper.readValue(json)
+        return jsonMapper.readValue(json)
     }
 
     @BeforeEach
@@ -149,7 +149,7 @@ abstract class ComponentTestBaseKotlin : PostgresTestContainerBase() {
     fun hentMelosysEessiRecords(): List<MelosysEessiMelding> =
         kafkaTestConsumer.records.orEmpty()
             .filter { ConsumerRecordPredicates.topic(TEAMMELOSYS_EESSI_V_1_LOCAL).test(it) }
-            .map { objectMapper.readValue(it.value(), MelosysEessiMelding::class.java) }
+            .map { jsonMapper.readValue(it.value(), MelosysEessiMelding::class.java) }
 
     companion object {
         const val EESSIBASIS_SEDMOTTATT_V_1 = "eessibasis-sedmottatt-v1"

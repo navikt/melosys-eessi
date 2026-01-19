@@ -5,8 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.EuxVedlegg;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
@@ -34,6 +32,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import tools.jackson.databind.json.JsonMapper;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,7 +43,7 @@ public class EuxConsumer implements RestConsumer {
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(EuxConsumer.class);
     private final RestTemplate euxRestTemplate;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private static final String BUC_PATH = "/buc/{rinaSaksnummer}";
     private static final String SED_PATH = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}";
     private static final String SED_PATH_PDF = "/buc/{rinaSaksnummer}/sed/{rinaDokumentID}/pdf";
@@ -56,9 +55,9 @@ public class EuxConsumer implements RestConsumer {
     private static final String RINA_LENKE_PATH = "/url/buc/{rinaSaksnummer}";
     private final Environment environment;
 
-    public EuxConsumer(RestTemplate restTemplate, ObjectMapper objectMapper, Environment environment) {
+    public EuxConsumer(RestTemplate restTemplate, JsonMapper jsonMapper, Environment environment) {
         this.euxRestTemplate = restTemplate;
-        this.objectMapper = objectMapper;
+        this.jsonMapper = jsonMapper;
         this.environment = environment;
     }
 
@@ -204,12 +203,7 @@ public class EuxConsumer implements RestConsumer {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        byte[] documentBytes;
-        try {
-            documentBytes = objectMapper.writeValueAsBytes(sed);
-        } catch (JsonProcessingException jpe) {
-            throw new IntegrationException("Feil ved opprettelse av SED mot EUX", jpe);
-        }
+        byte[] documentBytes = jsonMapper.writeValueAsBytes(sed);
         ByteArrayResource document = new ByteArrayResource(documentBytes) {
             @Override
             public String getFilename() {
@@ -287,14 +281,10 @@ public class EuxConsumer implements RestConsumer {
             }
             throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
-            try {
-                String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
-                if (appEnvironment != null && appEnvironment.equals("dev")) {
-                    String value = objectMapper.writeValueAsString(entity.getBody());
-                    log.info("Feil ved kall mot eux: {} sed:\n{}", e.getMessage(), value);
-                }
-            } catch (JsonProcessingException jsonProcessingException) {
-                log.error("Unable to serialize entity to JSON", jsonProcessingException);
+            String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
+            if (appEnvironment != null && appEnvironment.equals("dev")) {
+                String value = jsonMapper.writeValueAsString(entity.getBody());
+                log.info("Feil ved kall mot eux: {} sed:\n{}", e.getMessage(), value);
             }
             throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         }

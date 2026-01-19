@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.melosys.eessi.controller.dto.*;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.models.BucType;
@@ -22,11 +21,12 @@ import no.nav.security.token.support.core.context.TokenValidationContextHolder;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
 import static no.nav.melosys.eessi.controller.ResponseBodyMatchers.responseBody;
 import static org.mockito.Mockito.verify;
@@ -43,7 +43,7 @@ class BucControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private ObjectMapper objectMapper;
+    private JsonMapper jsonMapper;
 
     @MockitoBean
     private EuxService euxService;
@@ -79,9 +79,9 @@ class BucControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("sendAutomatisk", "true")
                 .param("oppdaterEksisterende", "false")
-                .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
+                .content(jsonMapper.writeValueAsString(opprettBucOgSedDto)))
             .andExpect(status().isOk())
-            .andExpect(responseBody(objectMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
+            .andExpect(responseBody(jsonMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
     }
 
     @Test
@@ -104,9 +104,9 @@ class BucControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("sendAutomatisk", "true")
                 .param("oppdaterEksisterende", "false")
-                .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
+                .content(jsonMapper.writeValueAsString(opprettBucOgSedDto)))
             .andExpect(status().isOk())
-            .andExpect(responseBody(objectMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
+            .andExpect(responseBody(jsonMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
     }
 
     @Test
@@ -117,10 +117,10 @@ class BucControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("sendAutomatisk", "true")
                 .param("oppdaterEksisterende", "false")
-                .content(objectMapper.writeValueAsString(opprettBucOgSedDto)))
+                .content(jsonMapper.writeValueAsString(opprettBucOgSedDto)))
             .andExpect(status().isBadRequest())
-            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse"))
-            .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
+            .andExpect(responseBody(jsonMapper).containsError("message", "Personen mangler adresse"))
+            .andExpect(responseBody(jsonMapper).containsError("error", "Bad Request"));
 
     }
 
@@ -133,10 +133,10 @@ class BucControllerTest {
 
         mockMvc.perform(post("/api/buc/{rinaSaksnummer}/sed/{sedType}", 1, SedType.A002)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(sedDataDto)))
+                .content(jsonMapper.writeValueAsString(sedDataDto)))
             .andExpect(status().isBadRequest())
-            .andExpect(responseBody(objectMapper).containsError("message", "Personen mangler adresse"))
-            .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
+            .andExpect(responseBody(jsonMapper).containsError("message", "Personen mangler adresse"))
+            .andExpect(responseBody(jsonMapper).containsError("error", "Bad Request"));
     }
 
     @Test
@@ -148,7 +148,7 @@ class BucControllerTest {
 
         mockMvc.perform(post("/api/buc/{rinaSaksnummer}/sed/{sedType}", 1, SedType.A005)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(sedDataDto)))
+                .content(jsonMapper.writeValueAsString(sedDataDto)))
             .andExpect(status().isOk());
 
 
@@ -167,7 +167,7 @@ class BucControllerTest {
 
         mockMvc.perform(post("/api/buc/{rinaSaksnummer}/sed/{sedType}", 1, SedType.A003)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(sedDataDto)))
+                .content(jsonMapper.writeValueAsString(sedDataDto)))
             .andExpect(status().isOk());
 
 
@@ -183,8 +183,8 @@ class BucControllerTest {
         mockMvc.perform(get("/api/buc/{rinsSaksnummer}/sed/{rinaDokumentId}/grunnlag", 23, 44)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest())
-            .andExpect(responseBody(objectMapper).containsError("message", "Sed-type A009 støttes ikke"))
-            .andExpect(responseBody(objectMapper).containsError("error", "Bad Request"));
+            .andExpect(responseBody(jsonMapper).containsError("message", "Sed-type A009 støttes ikke"))
+            .andExpect(responseBody(jsonMapper).containsError("error", "Bad Request"));
     }
 
     @Test
@@ -194,7 +194,7 @@ class BucControllerTest {
         mockMvc.perform(get("/api/buc/{rinaSaksnummer}/aksjoner", 33)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(responseBody(objectMapper).containsObjectAsJson(List.of("CLOSE", "CREATE", "REOPEN"), Collection.class));
+            .andExpect(responseBody(jsonMapper).containsObjectAsJson(List.of("CLOSE", "CREATE", "REOPEN"), Collection.class));
     }
 
     @NotNull

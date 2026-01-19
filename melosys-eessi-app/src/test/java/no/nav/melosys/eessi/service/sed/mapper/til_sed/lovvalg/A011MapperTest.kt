@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -10,19 +8,20 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA011
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
 import java.io.IOException
-import java.net.URL
 
 class A011MapperTest {
 
     private val a011Mapper = A011Mapper()
     private lateinit var a001: SED
+    private val jsonMapper = JsonMapper.builder().build()
 
     @BeforeEach
     fun setup() {
-        val jsonUrl: URL = this::class.java.classLoader.getResource("mock/sedA001.json")
+        val inputStream = this::class.java.classLoader.getResourceAsStream("mock/sedA001.json")
             ?: throw IOException("File not found: mock/sedA001.json")
-        a001 = jacksonObjectMapper().readValue<SED>(jsonUrl)
+        a001 = jsonMapper.readValue(inputStream, SED::class.java)
     }
 
     @Test

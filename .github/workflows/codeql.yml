@@ -31,15 +31,9 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-java@v5
         with:
-          distribution: 'zulu'
-          java-version: '17'
-      - name: Setup Maven
-        uses: actions/cache@preview
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
       - name: Build
         run: mvn clean package -B -e -U
 

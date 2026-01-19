@@ -44,7 +44,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        await().atMost(Duration.ofSeconds(4))
+        await().atMost(Duration.ofSeconds(10))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
 
@@ -79,7 +79,7 @@ public class OppgaveEndretMottakTestIT extends ComponentTestBase {
         kafkaTemplate.send(lagSedMottattRecord(mockData.sedHendelse(rinaSaksnummer, sedID, null))).get();
         kafkaTestConsumer.doWait(5_000L);
 
-        await().atMost(Duration.ofSeconds(4))
+        await().atMost(Duration.ofSeconds(10))
             .pollInterval(Duration.ofSeconds(1))
             .until(() -> sedMottattHendelseRepository.countAllByRinaSaksnummer(rinaSaksnummer) == 1);
 

@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
 import no.nav.security.mock.oauth2.MockOAuth2Server
@@ -9,7 +7,7 @@ import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
@@ -17,6 +15,9 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import kotlin.random.Random
+import org.springframework.kafka.test.utils.ContainerTestUtils
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.core.type.TypeReference
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 @AutoConfigureMockMvc
@@ -34,7 +35,7 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
     private lateinit var mockOAuth2Server: MockOAuth2Server
 
     @Autowired
-    private lateinit var objectMapper: ObjectMapper
+    private lateinit var jsonMapper: JsonMapper
 
     private fun hentBearerToken(): String {
         return mockOAuth2Server.issueToken(
@@ -61,7 +62,7 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
             .andReturn()
 
         val jsonResponse = result.response.contentAsString
-        val kafkaConsumerResponses: List<KafkaConsumerResponse> = objectMapper.readValue(
+        val kafkaConsumerResponses: List<KafkaConsumerResponse> = jsonMapper.readValue(
             jsonResponse, object : TypeReference<List<KafkaConsumerResponse>>() {}
         )
 
@@ -81,7 +82,7 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
             .andReturn()
 
         val stopJsonResponse = stopResult.response.contentAsString
-        val kafkaConsumerResponseStop: KafkaConsumerResponse = objectMapper.readValue(
+        val kafkaConsumerResponseStop: KafkaConsumerResponse = jsonMapper.readValue(
             stopJsonResponse, KafkaConsumerResponse::class.java
         )
 
@@ -99,7 +100,7 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
             .andReturn()
 
         val startJsonResponse = startResult.response.contentAsString
-        val kafkaConsumerResponseStart: KafkaConsumerResponse = objectMapper.readValue(
+        val kafkaConsumerResponseStart: KafkaConsumerResponse = jsonMapper.readValue(
             startJsonResponse, KafkaConsumerResponse::class.java
         )
 
@@ -109,6 +110,11 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
     @Test
     fun `settOffset sender inn offset2 consumer leser på nytt fra offset2`() {
+        // Wait for consumer to be assigned partitions before sending messages
+        listenerRegistry.getListenerContainer("oppgaveHendelse")?.let {
+            ContainerTestUtils.waitForAssignment(it, 1)
+        }
+
         val rinaSaksnummer = Random.nextInt(100000).toString()
         val oppgaveID = Random.nextInt(100000).toString()
         val oppgaveID1 = Random.nextInt(100000).toString()
@@ -131,7 +137,7 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID2, versjon, rinaSaksnummer)).get()
         kafkaTemplate.send(lagOppgaveIdentifisertRecord(oppgaveID3, versjon, rinaSaksnummer)).get()
 
-        verify(oppgaveConsumer, timeout(1000).times(4)).hentOppgave(anyString())
+        verify(oppgaveConsumer, timeout(5000).times(4)).hentOppgave(anyString())
 
         mockMvc.perform(
             MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/seek/2")

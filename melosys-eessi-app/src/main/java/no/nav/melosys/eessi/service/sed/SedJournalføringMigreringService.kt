@@ -1,13 +1,13 @@
 package no.nav.melosys.eessi.service.sed
 
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer
 import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.json.JsonMapper
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.LocalDateTime
@@ -88,7 +88,7 @@ class SedJournalføringMigreringService(
             val content = Files.readString(Paths.get(fileUri))
             // TODO: kan forenkle dette når vi får inn jackson-module-kotlin
             val sedSendtJournalføringListe =
-                ObjectMapper().readValue(content, object : TypeReference<MutableList<SedSendtJournalføringMigrering?>?>() {
+                JsonMapper.builder().build().readValue(content, object : TypeReference<MutableList<SedSendtJournalføringMigrering?>?>() {
                 })
 
             antallSedSendtHendelser = sedSendtJournalføringListe!!.size

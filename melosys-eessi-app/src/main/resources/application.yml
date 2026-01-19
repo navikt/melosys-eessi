@@ -9,13 +9,15 @@ spring:
   jpa:
     properties:
       hibernate:
+        type:
+          json_format_mapper: no.nav.melosys.eessi.config.HibernateJackson3FormatMapper
         jdbc:
           lob:
             non_contextual_creation: true #fix for jdbc bug i postgres-driver som krasjer app
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
       properties:
         enable.idempotence: true
 
@@ -26,14 +28,14 @@ spring:
       sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${melosys.systemuser.username}" password="${melosys.systemuser.password}";
       reconnect.backoff.ms: 1000
 
-cron:
-  job:
-    lukk-buc: ${CRON_JOB_LUKK_BUC:0 0 0 * * *} # hver dag kl 00:00
-
   servlet:
     multipart:
       max-file-size: 104857600 # 100MB
       max-request-size: 104857600 # 100MB
+
+cron:
+  job:
+    lukk-buc: ${CRON_JOB_LUKK_BUC:0 0 0 * * *} # hver dag kl 00:00
 
 melosys:
   admin:

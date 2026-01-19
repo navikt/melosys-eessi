@@ -28,3 +28,4 @@ target/
 
 ### Env Files ###
 /.env
+/.tool-versions

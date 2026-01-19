@@ -1,30 +1,24 @@
 package no.nav.melosys.eessi.models.sed
 
-import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.DeserializationContext
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
+import tools.jackson.core.JsonParser
+import tools.jackson.databind.DeserializationContext
+import tools.jackson.databind.deser.std.StdDeserializer
+import tools.jackson.databind.node.ArrayNode
 
-class ArbeidsgiverDeserializer(vc: Class<*>?) : StdDeserializer<List<Arbeidsgiver>>(vc) {
-
-    @Suppress("unused")
-    constructor() : this(null)
+class ArbeidsgiverDeserializer : StdDeserializer<List<Arbeidsgiver>>(List::class.java) {
 
     override fun deserialize(jsonParser: JsonParser, deserializationContext: DeserializationContext): List<Arbeidsgiver> {
-        val objectmapper = jsonParser.codec as ObjectMapper
-        val jsonNode = objectmapper.readTree<JsonNode>(jsonParser)
+        val jsonNode = deserializationContext.readTree(jsonParser)
 
-        return if (jsonNode.isArray) {
-            objectmapper.readerFor(LIST_TYPE_REFERENCE).readValue(jsonNode)
+        return if (jsonNode.isArray()) {
+            val result = mutableListOf<Arbeidsgiver>()
+            for (element in jsonNode as ArrayNode) {
+                result.add(deserializationContext.readTreeAsValue(element, Arbeidsgiver::class.java))
+            }
+            result
         } else {
-            listOf(objectmapper.treeToValue(jsonNode, Arbeidsgiver::class.java))
+            listOf(deserializationContext.readTreeAsValue(jsonNode, Arbeidsgiver::class.java))
         }
-    }
-
-    companion object {
-        private val LIST_TYPE_REFERENCE = object : TypeReference<List<Arbeidsgiver>>() {}
     }
 }

@@ -127,15 +127,15 @@ class KafkaDLQAdminTjeneste(
     fun resendSedListe(
         @RequestBody dto: ResendSedListeDto,
         @RequestHeader(API_KEY_HEADER) apiKey: String
-    ): ResponseEntity<String?> {
+    ): ResponseEntity<String> {
         validerApikey(apiKey)
         log.info("Sender forespørsel om gjensending av {} SEDer", dto.sedIds.size)
         try {
             bucAdminService.resendSedListe(dto.sedIds)
-            return ResponseEntity.ok<String?>("Forespørsel om gjensending av " + dto.sedIds.size + " SEDer sendt")
+            return ResponseEntity.ok("Forespørsel om gjensending av " + dto.sedIds.size + " SEDer sendt")
         } catch (e: java.lang.Exception) {
             log.error("Feil ved gjensending av SED-liste", e)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body<String?>("Feil ved gjensending: " + e.message)
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Feil ved gjensending: " + e.message)
         }
     }
 

@@ -1,11 +1,12 @@
 package no.nav.melosys.eessi.security;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
+import no.nav.security.token.support.client.core.ClientAuthenticationProperties;
 import no.nav.security.token.support.client.core.ClientProperties;
-import no.nav.security.token.support.client.core.OAuth2GrantType;
+import static com.nimbusds.oauth2.sdk.GrantType.JWT_BEARER;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -39,16 +40,16 @@ class AzureRequestInterceptorTest {
 
     @BeforeEach
     public void setup() {
-        var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api", ClientProperties.builder()
-            .wellKnownUrl(URI.create("test"))
-            .tokenEndpointUrl(URI.create("token_endpoint"))
-            .grantType(OAuth2GrantType.JWT_BEARER)
-            .scope(List.of("scope1", "scope2"))
-            .resourceUrl(URI.create("resource_url"))
-            .build()));
+        var authentication = ClientAuthenticationProperties.builder("test-client-id", ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+            .clientSecret("test-secret")
+            .build();
+        var clientConfigurationProperties = new ClientConfigurationProperties(Map.of("eux-rina-api",
+            ClientProperties.builder(JWT_BEARER, authentication)
+                .tokenEndpointUrl(URI.create("http://token-endpoint"))
+                .build()));
 
         clientRequestInterceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
-        when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(OAuth2AccessTokenResponse.builder().accessToken(oidcKey).build());
+        when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(new OAuth2AccessTokenResponse(oidcKey, 3600, 3600, Map.of()));
     }
 
     @Test
@@ -58,7 +59,8 @@ class AzureRequestInterceptorTest {
 
         verify(httpRequestExecution).execute(any(HttpRequest.class), any(byte[].class));
 
-        assertThat(httpRequest.getHeaders()).containsKey(HttpHeaders.AUTHORIZATION);
-        assertThat(httpRequest.getHeaders().get(HttpHeaders.AUTHORIZATION)).contains("Bearer " + oidcKey);
+        HttpHeaders headers = httpRequest.getHeaders();
+        assertThat(headers.containsHeader(HttpHeaders.AUTHORIZATION)).isTrue();
+        assertThat(headers.get(HttpHeaders.AUTHORIZATION)).contains("Bearer " + oidcKey);
     }
 }

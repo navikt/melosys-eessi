@@ -3,6 +3,7 @@ package no.nav.melosys.eessi.security;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 
 import no.nav.melosys.eessi.config.AppCredentials;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,7 +47,6 @@ class BasicAuthClientRequestInterceptorTest {
 
         HttpHeaders headers = httpRequest.getHeaders();
 
-        assertThat(headers).isNotEmpty();
         List<String> authValues = headers.get(HttpHeaders.AUTHORIZATION);
         assertThat(authValues).contains(expectedToken);
     }

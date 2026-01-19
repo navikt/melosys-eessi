@@ -1,6 +1,3 @@
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -20,6 +17,7 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import tools.jackson.databind.json.JsonMapper
 import java.util.*
 import kotlin.NoSuchElementException
 
@@ -28,9 +26,7 @@ class KopierBucServiceTest {
 
     private val euxService: EuxService = mockk()
     private val saksrelasjonService: SaksrelasjonService = mockk()
-    private val objectMapper = jacksonObjectMapper().apply {
-        registerModule(JavaTimeModule())
-    }
+    private val jsonMapper = JsonMapper.builder().build()
     private lateinit var kopierBucService: KopierBucService
     private lateinit var buc: BUC
     private lateinit var sedA001: SED
@@ -76,6 +72,6 @@ class KopierBucServiceTest {
     }
 
     private inline fun <reified T> lesObjekt(fil: String): T {
-        return objectMapper.readValue(javaClass.classLoader.getResource(fil), T::class.java)
+        return jsonMapper.readValue(javaClass.classLoader.getResourceAsStream(fil), T::class.java)
     }
 }

@@ -8,12 +8,12 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
+import org.springframework.boot.restclient.RestTemplateBuilder
+import org.springframework.boot.restclient.autoconfigure.RestTemplateAutoConfiguration
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.web.client.RestTemplateBuilder
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.context.annotation.Bean
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.RestTemplate
@@ -81,7 +81,7 @@ class EuxConsumerSpringTest(
                     "actions": null,
                     "documents": null,
                     "participants": null
-            }""""
+            }"""
                 )
                 .addHeader("Content-Type", "application/json")
         )

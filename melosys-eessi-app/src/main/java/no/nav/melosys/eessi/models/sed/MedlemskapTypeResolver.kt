@@ -1,11 +1,11 @@
 package no.nav.melosys.eessi.models.sed
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import com.fasterxml.jackson.databind.DatabindContext
-import com.fasterxml.jackson.databind.JavaType
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*
+import tools.jackson.databind.DatabindContext
+import tools.jackson.databind.JavaType
+import tools.jackson.databind.jsontype.TypeIdResolver
 
 class MedlemskapTypeResolver : TypeIdResolver {
    private lateinit var sedType: JavaType
@@ -14,11 +14,11 @@ class MedlemskapTypeResolver : TypeIdResolver {
         this.sedType = javaType
     }
 
-    override fun idFromValue(value: Any): String? = null
+    override fun idFromValue(ctxt: DatabindContext, value: Any): String? = null
 
-    override fun idFromValueAndType(value: Any, suggestedType: Class<*>): String? = null
+    override fun idFromValueAndType(ctxt: DatabindContext, value: Any, suggestedType: Class<*>): String? = null
 
-    override fun idFromBaseType(): String? = null
+    override fun idFromBaseType(ctxt: DatabindContext): String? = null
 
     override fun typeFromId(context: DatabindContext, id: String): JavaType {
         val type = mapping[SedType.valueOf(id)] ?: DEFAULT_CLASS

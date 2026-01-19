@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -8,6 +7,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.controller.dto.Adressetype
 import no.nav.melosys.eessi.models.sed.SED
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
 
 class SedGrunnlagMapperA001Test {
 
@@ -75,8 +75,8 @@ class SedGrunnlagMapperA001Test {
 
     companion object {
         private fun hentSed(): SED {
-            val jsonUrl = SedGrunnlagMapperA001Test::class.java.classLoader.getResource("mock/sedA001.json")
-            return ObjectMapper().readValue(jsonUrl, SED::class.java)
+            val inputStream = SedGrunnlagMapperA001Test::class.java.classLoader.getResourceAsStream("mock/sedA001.json")
+            return JsonMapper.builder().build().readValue(inputStream, SED::class.java)
         }
     }
 }

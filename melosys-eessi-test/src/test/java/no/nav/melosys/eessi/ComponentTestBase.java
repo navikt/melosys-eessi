@@ -7,8 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import tools.jackson.databind.json.JsonMapper;
 import lombok.SneakyThrows;
 import io.getunleash.FakeUnleash;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
@@ -30,6 +29,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -43,16 +43,17 @@ import static no.nav.melosys.eessi.ComponentTestBase.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 @ActiveProfiles(profiles = "test")
 @SpringBootTest(classes = {ComponentTestConfig.class, KafkaTestConfig.class}, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "/kafka-test.properties", properties = {
     "spring.main.allow-bean-definition-overriding=true",
     "spring.test.bean-override.enabled=true"
 })
-@EmbeddedKafka(controlledShutdown = true, partitions = 1,
+@EmbeddedKafka(partitions = 1,
     topics = {EESSIBASIS_SEDMOTTATT_V_1, EESSIBASIS_SEDSENDT_V_1, OPPGAVE_ENDRET, TEAMMELOSYS_EESSI_V_1_LOCAL},
-    brokerProperties = {"offsets.topic.replication.factor=1", "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"})
+    brokerProperties = {"offsets.topic.replication.factor=1", "transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"}
+)
 @EnableMockOAuth2Server
 public abstract class ComponentTestBase extends PostgresTestContainerBase {
     public static final String EESSIBASIS_SEDMOTTATT_V_1 = "eessibasis-sedmottatt-v1";
@@ -64,16 +65,15 @@ public abstract class ComponentTestBase extends PostgresTestContainerBase {
     static final String STATSBORGERSKAP = "NO";
     static final String FNR = "25068420779";
     static final String AKTOER_ID = "1234567890123";
-    static final ObjectMapper objectMapper = new ObjectMapper();
-
-    static {
-        objectMapper.registerModule(new JavaTimeModule());
-    }
+    static final JsonMapper jsonMapper = JsonMapper.builder().build();
 
     protected final MockData mockData = new MockData();
 
     @Autowired
     KafkaTestConsumer kafkaTestConsumer;
+
+    @Autowired
+    org.springframework.kafka.config.KafkaListenerEndpointRegistry listenerRegistry;
 
     @MockitoBean
     EuxConsumer euxConsumer;
@@ -148,7 +148,7 @@ public abstract class ComponentTestBase extends PostgresTestContainerBase {
 
     @SneakyThrows
     MelosysEessiMelding tilMelosysEessiMelding(String value) {
-        return objectMapper.readValue(value, MelosysEessiMelding.class);
+        return jsonMapper.readValue(value, MelosysEessiMelding.class);
     }
 
     protected ProducerRecord<String, Object> lagOppgaveIdentifisertRecord(String oppgaveID, String versjon, String rinaSaksnummer) {
@@ -159,14 +159,13 @@ public abstract class ComponentTestBase extends PostgresTestContainerBase {
     private OppgaveKafkaAivenRecord oppgaveEksempel(String oppgaveID, String versjonsNummer, String rinaSaksnummer) {
         var path = Paths.get(Objects.requireNonNull(this.getClass().getClassLoader().getResource("oppgave_endret.json")).toURI());
         var oppgaveJsonString = Files.readString(path);
-        var treeNode = new ObjectMapper().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
+        var treeNode = JsonMapper.builder().build().readTree(oppgaveJsonString.replaceAll("\\$id", oppgaveID)
             .replaceAll("\\$fnr", FNR)
             .replaceAll("\\$versjonsnummer", versjonsNummer)
             .replaceAll("\\$rinasaksnummer", rinaSaksnummer)); //TODO: WHAT TO DO?
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
+        JsonMapper jsonMapper = JsonMapper.builder().build();
 
-        return objectMapper.treeToValue(treeNode, OppgaveKafkaAivenRecord.class);
+        return jsonMapper.treeToValue(treeNode, OppgaveKafkaAivenRecord.class);
     }
 }

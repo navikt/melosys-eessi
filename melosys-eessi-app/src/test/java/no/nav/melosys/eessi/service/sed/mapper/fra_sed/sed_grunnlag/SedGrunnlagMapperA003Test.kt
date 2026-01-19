@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.withClue
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
@@ -13,6 +12,7 @@ import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.nav.Arbeidsgiver
 import no.nav.melosys.eessi.models.sed.nav.VedtakA003
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
 
 internal class SedGrunnlagMapperA003Test {
     private val sedGrunnlagMapper = SedGrunnlagMapperA003()
@@ -173,7 +173,7 @@ internal class SedGrunnlagMapperA003Test {
     @Test
     fun map_kunNorskIdent_forventTomListeAvUtenlandskeIdenter() {
         val sed = hentSed()
-        val pin = sed.nav!!.bruker!!.person!!.pin.iterator().next()
+        val pin = sed.nav!!.bruker!!.person!!.pin!!.iterator().next()
         pin.land = "NO"
         sed.nav!!.bruker!!.person!!.pin = listOf(pin)
 
@@ -258,8 +258,8 @@ internal class SedGrunnlagMapperA003Test {
         }
 
         private fun hentSed(): SED =
-            ObjectMapper().readValue(
-                SedGrunnlagMapperA003Test::class.java.classLoader.getResource("mock/sedA003.json"),
+            JsonMapper.builder().build().readValue(
+                SedGrunnlagMapperA003Test::class.java.classLoader.getResourceAsStream("mock/sedA003.json"),
                 SED::class.java
             )
     }

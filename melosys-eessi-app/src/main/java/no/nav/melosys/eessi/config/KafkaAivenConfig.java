@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.service.oppgave.OppgaveEndretService;
@@ -18,7 +18,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -36,8 +36,8 @@ import org.springframework.kafka.listener.KafkaListenerErrorHandler;
 import org.springframework.kafka.listener.ListenerExecutionFailedException;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import org.springframework.messaging.Message;
 
 import static no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord.Hendelse.Hendelsestype.OPPGAVE_ENDRET;
@@ -84,15 +84,15 @@ public class KafkaAivenConfig {
 
     @Bean
     @Qualifier("aivenTemplate")
-    public KafkaTemplate<String, Object> aivenKafkaTemplate(ObjectMapper objectMapper) {
+    public KafkaTemplate<String, Object> aivenKafkaTemplate(JsonMapper jsonMapper) {
         Map<String, Object> props = producerProps();
-        ProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(props, new StringSerializer(), new JsonSerializer<>(objectMapper));
+        ProducerFactory<String, Object> producerFactory = new DefaultKafkaProducerFactory<>(props, new StringSerializer(), new JacksonJsonSerializer<>(jsonMapper));
         return new KafkaTemplate<>(producerFactory);
     }
 
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedSendtHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
         props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -103,7 +103,7 @@ public class KafkaAivenConfig {
 
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, SedHendelse>> sedMottattHendelseListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
         props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, SedHendelse> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer(SedHendelse.class));
         ConcurrentKafkaListenerContainerFactory<String, SedHendelse> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -118,7 +118,7 @@ public class KafkaAivenConfig {
     }
 
     private ConcurrentKafkaListenerContainerFactory<String, OppgaveKafkaAivenRecord> oppgaveListenerContainerFactory(KafkaProperties kafkaProperties) {
-        Map<String, Object> props = kafkaProperties.buildConsumerProperties(null);
+        Map<String, Object> props = kafkaProperties.buildConsumerProperties();
         props.putAll(consumerConfig());
         DefaultKafkaConsumerFactory<String, OppgaveKafkaAivenRecord> defaultKafkaConsumerFactory = new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), valueDeserializer(OppgaveKafkaAivenRecord.class));
         ConcurrentKafkaListenerContainerFactory<String, OppgaveKafkaAivenRecord> factory = new ConcurrentKafkaListenerContainerFactory<>();
@@ -146,7 +146,7 @@ public class KafkaAivenConfig {
         props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 15000);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
         props.put(ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 1);
         if (isNotLocal()) {
             props.putAll(securityConfig());
@@ -168,7 +168,7 @@ public class KafkaAivenConfig {
     }
 
     private <T> ErrorHandlingDeserializer<T> valueDeserializer(Class<T> targetType) {
-        return new ErrorHandlingDeserializer<>(new JsonDeserializer<>(targetType, false));
+        return new ErrorHandlingDeserializer<>(new JacksonJsonDeserializer<>(targetType, false));
     }
 
     private boolean isNotLocal() {

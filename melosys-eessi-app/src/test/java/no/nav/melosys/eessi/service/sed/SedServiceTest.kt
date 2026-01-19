@@ -1,8 +1,5 @@
 package no.nav.melosys.eessi.service.sed
 
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -35,6 +32,7 @@ import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import tools.jackson.databind.json.JsonMapper
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
@@ -59,7 +57,7 @@ class SedServiceTest {
     fun setup() {
         sendSedService = SedService(
             euxService, saksrelasjonService, 0L, JsonFieldMasker(
-                jacksonObjectMapper().registerModule(JavaTimeModule())
+                JsonMapper.builder().build()
             ), safConsumer
         )
     }
@@ -142,7 +140,7 @@ class SedServiceTest {
             .shouldNotBeNull()
             .bruker.shouldNotBeNull()
             .person.shouldNotBeNull()
-            .statsborgerskap.shouldHaveSize(1).single().shouldNotBeNull()
+            .statsborgerskap.shouldNotBeNull().shouldHaveSize(1).single().shouldNotBeNull()
             .land shouldBe LandkodeMapper.UKJENT_LANDKODE_ISO2
     }
 
@@ -326,13 +324,12 @@ class SedServiceTest {
     }
 
     private fun sedDataDto(jsonFile: String): SedDataDto =
-        jacksonObjectMapper().apply {
-            registerModule(JavaTimeModule())
-        }.readValue<SedDataDto>(
+        JsonMapper.builder().build().readValue(
             Files.readString(
                 Paths.get(
                     requireNotNull(SedDataStub::class.java.classLoader.getResource(jsonFile)).toURI()
                 )
-            )
+            ),
+            SedDataDto::class.java
         )
 }
