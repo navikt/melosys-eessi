@@ -323,6 +323,7 @@
                 <configuration>
                     <args>
                         <arg>-Xjsr305=strict</arg>
+                        <arg>-Xannotation-default-target</arg>
                     </args>
                     <compilerPlugins>
                         <plugin>spring</plugin>
