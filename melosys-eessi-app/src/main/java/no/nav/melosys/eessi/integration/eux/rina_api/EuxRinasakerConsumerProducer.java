@@ -4,6 +4,7 @@ import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterce
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +29,7 @@ public class EuxRinasakerConsumerProducer {
     public EuxRinasakerConsumer euxRinasakerConsumer(RestTemplateBuilder builder, ClientConfigurationProperties
         clientConfigurationProperties,
                                                      OAuth2AccessTokenService oAuth2AccessTokenService,
-                                                     JsonMapper euxJsonMapper) {
+                                                     @Qualifier("euxJsonMapper") JsonMapper euxJsonMapper) {
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-nav-rinasak");
         return new EuxRinasakerConsumer(lagRestTemplate(builder, interceptor, euxJsonMapper));
     }

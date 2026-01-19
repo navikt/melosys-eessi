@@ -228,7 +228,7 @@ class EuxConsumerTest {
         forventetResultat.put("attachmentId", "ffrewf24");
 
         server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
-            .andRespond(withSuccess(jsonMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(euxJsonMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map<String, String> resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
         assertThat(resultat).isEqualTo(forventetResultat);
@@ -554,6 +554,6 @@ class EuxConsumerTest {
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-            .build(), jsonMapper);
+            .build(), euxJsonMapper);
     }
 }
