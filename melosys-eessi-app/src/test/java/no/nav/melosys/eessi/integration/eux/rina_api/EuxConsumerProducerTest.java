@@ -9,6 +9,8 @@ import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.cfg.MapperConfig;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.module.kotlin.KotlinFeature;
@@ -23,6 +25,11 @@ class EuxConsumerProducerTest {
         .addModule(new KotlinModule.Builder()
             .enable(KotlinFeature.NullIsSameAsDefault)
             .build())
+        .build();
+
+    private final JsonMapper euxJsonMapper = baseMapper.rebuild()
+        .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
+        .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
         .build();
 
     @Test
@@ -54,7 +61,7 @@ class EuxConsumerProducerTest {
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-            .build(), baseMapper);
+            .build(), euxJsonMapper);
     }
 
 }

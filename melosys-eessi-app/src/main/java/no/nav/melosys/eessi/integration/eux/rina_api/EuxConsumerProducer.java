@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
-import tools.jackson.databind.DeserializationFeature;
-import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
@@ -31,29 +29,20 @@ public class EuxConsumerProducer {
     @Bean
     @Primary
     public EuxConsumer euxConsumer(RestTemplateBuilder builder, ClientConfigurationProperties clientConfigurationProperties,
-                                   OAuth2AccessTokenService oAuth2AccessTokenService, JsonMapper jsonMapper, Environment environment) {
+                                   OAuth2AccessTokenService oAuth2AccessTokenService,
+                                   JsonMapper euxJsonMapper,
+                                   Environment environment) {
         ClientRequestInterceptor interceptor = new ClientRequestInterceptor(clientConfigurationProperties, oAuth2AccessTokenService, "eux-rina-api");
-        JsonMapper euxMapper = createEuxMapper(jsonMapper);
-        return new EuxConsumer(lagRestTemplate(builder, interceptor, euxMapper), euxMapper, environment);
-    }
-
-    private static JsonMapper createEuxMapper(JsonMapper baseMapper) {
-        // Bygg ny mapper basert på global konfig, men med EUX-spesifikke innstillinger
-        // For å kunne ta i mot SED'er som ikke har et 'medlemskap' objekt, eks X001
-        return baseMapper.rebuild()
-            .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
-            .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .build();
+        return new EuxConsumer(lagRestTemplate(builder, interceptor, euxJsonMapper), euxJsonMapper, environment);
     }
 
     /**
      * Konfigurerer RestTemplate med EUX-spesifikk JsonMapper.
      * Brukes av tester som trenger å sette opp RestTemplate manuelt.
      */
-    public static RestTemplate configureJacksonMapper(RestTemplate restTemplate, JsonMapper baseMapper) {
-        JsonMapper euxMapper = createEuxMapper(baseMapper);
+    public static RestTemplate configureJacksonMapper(RestTemplate restTemplate, JsonMapper euxJsonMapper) {
         restTemplate.getMessageConverters().removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
-        restTemplate.getMessageConverters().add(new JacksonJsonHttpMessageConverter(euxMapper));
+        restTemplate.getMessageConverters().add(new JacksonJsonHttpMessageConverter(euxJsonMapper));
         return restTemplate;
     }
 
@@ -68,9 +57,6 @@ public class EuxConsumerProducer {
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
             .build();
 
-        restTemplate.getMessageConverters().removeIf(JacksonJsonHttpMessageConverter.class::isInstance);
-        restTemplate.getMessageConverters().add(new JacksonJsonHttpMessageConverter(jsonMapper));
-
-        return restTemplate;
+        return configureJacksonMapper(restTemplate, jsonMapper);
     }
 }

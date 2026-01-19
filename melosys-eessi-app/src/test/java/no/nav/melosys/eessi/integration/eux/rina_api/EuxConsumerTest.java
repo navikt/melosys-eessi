@@ -42,7 +42,11 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.module.kotlin.KotlinFeature;
+import tools.jackson.module.kotlin.KotlinModule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -62,7 +66,16 @@ class EuxConsumerTest {
 
     private MockRestServiceServer server;
 
-    private final JsonMapper jsonMapper = JsonMapper.builder().build();
+    private final JsonMapper baseMapper = JsonMapper.builder()
+        .addModule(new KotlinModule.Builder()
+            .enable(KotlinFeature.NullIsSameAsDefault)
+            .build())
+        .build();
+
+    private final JsonMapper euxJsonMapper = baseMapper.rebuild()
+        .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
+        .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
 
     @BeforeEach
     void setup() {
@@ -79,7 +92,7 @@ class EuxConsumerTest {
         RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
 
 
-        euxConsumer = new EuxConsumer(restTemplate, jsonMapper, null);
+        euxConsumer = new EuxConsumer(restTemplate, euxJsonMapper, null);
         server = MockRestServiceServer.createServer(restTemplate);
         when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(new OAuth2AccessTokenResponse("accesstoken", 3600, 3600, Map.of()));
     }
