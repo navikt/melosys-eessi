@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.identifisering;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -73,7 +74,7 @@ class BehandleBucIdentifisertServiceTest {
             .thenReturn(List.of(sedAlleredeJournalført, sed2, sed3));
         when(melosysEessiMeldingMapperFactory.getMapper(any())).thenReturn(new DefaultMapper());
         when(personFasade.hentAktoerId(FNR)).thenReturn(AKTOER_ID);
-        when(euxService.hentSedMedVedlegg(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(new SedMedVedlegg(null, null));
+        when(euxService.hentSedMedVedlegg(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(new SedMedVedlegg(null, Collections.emptyList()));
         when(euxService.hentSed(RINA_SAKSNUMMER, RINA_DOKUMENT_ID)).thenReturn(lagSED());
         when(euxService.sedErEndring(RINA_DOKUMENT_ID, RINA_SAKSNUMMER)).thenReturn(false);
         when(saksrelasjonService.finnVedRinaSaksnummer(RINA_SAKSNUMMER)).thenReturn(Optional.empty());
