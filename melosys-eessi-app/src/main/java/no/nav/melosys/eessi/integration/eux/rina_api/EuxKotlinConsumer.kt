@@ -17,12 +17,12 @@ data class EuxApiErrorResponse(
 
 class EuxKotlinConsumer(
     private val euxRinaWebClient: WebClient,
-    private val euxJsonMapper: JsonMapper,
+    private val jsonMapper: JsonMapper,
 ) {
 
     private fun parseErrorMessage(errorBody: String, statusCode: HttpStatusCode): String {
         return try {
-            val errorResponse = euxJsonMapper.readValue(errorBody, EuxApiErrorResponse::class.java)
+            val errorResponse = jsonMapper.readValue(errorBody, EuxApiErrorResponse::class.java)
             errorResponse.messages ?: "Ukjent feil fra EUX Rina API"
         } catch (e: Exception) {
             // Fall tilbake til opprinnelig feilmelding hvis JSON-parsing feiler
