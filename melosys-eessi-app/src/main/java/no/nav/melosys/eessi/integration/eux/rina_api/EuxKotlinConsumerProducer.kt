@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.integration.eux.rina_api
 
 import no.nav.melosys.eessi.integration.interceptor.CorrelationIdExchangeFilter
 import no.nav.melosys.eessi.security.GenericAuthFilterFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,7 +21,7 @@ class EuxKotlinConsumerProducer(
     @Bean
     fun euxKotlinConsumer(
         @Value("\${melosys.integrations.eux-rina-api-url}") euxRinaApiUrl: String,
-        jsonMapper: JsonMapper
+        @Qualifier("euxJsonMapper") euxJsonMapper: JsonMapper
     ): EuxKotlinConsumer {
         val webClient = webClientBuilder
             .baseUrl(euxRinaApiUrl)
@@ -28,6 +29,6 @@ class EuxKotlinConsumerProducer(
             .filter(genericAuthFilterFactory.getAzureFilter("eux-rina-api"))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .build()
-        return EuxKotlinConsumer(webClient, jsonMapper)
+        return EuxKotlinConsumer(webClient, euxJsonMapper)
     }
 }
