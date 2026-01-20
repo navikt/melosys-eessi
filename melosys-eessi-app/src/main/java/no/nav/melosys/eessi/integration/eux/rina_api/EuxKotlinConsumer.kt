@@ -17,7 +17,7 @@ data class EuxApiErrorResponse(
 
 class EuxKotlinConsumer(
     private val euxRinaWebClient: WebClient,
-    private val jsonMapper: JsonMapper = JsonMapper.builder().build(),
+    private val jsonMapper: JsonMapper,
 ) {
 
     private fun parseErrorMessage(errorBody: String, statusCode: HttpStatusCode): String {

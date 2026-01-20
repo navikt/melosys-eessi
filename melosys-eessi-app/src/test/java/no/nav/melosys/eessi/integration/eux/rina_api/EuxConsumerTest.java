@@ -42,9 +42,12 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.module.kotlin.KotlinFeature;
+import tools.jackson.module.kotlin.KotlinModule;
 
-import static no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumerProducer.configureJacksonMapper;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,7 +66,16 @@ class EuxConsumerTest {
 
     private MockRestServiceServer server;
 
-    private final JsonMapper jsonMapper = JsonMapper.builder().build();
+    private final JsonMapper baseMapper = JsonMapper.builder()
+        .addModule(new KotlinModule.Builder()
+            .enable(KotlinFeature.NullIsSameAsDefault)
+            .build())
+        .build();
+
+    private final JsonMapper euxJsonMapper = baseMapper.rebuild()
+        .disable(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY)
+        .enable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .build();
 
     @BeforeEach
     void setup() {
@@ -80,7 +92,7 @@ class EuxConsumerTest {
         RestTemplate restTemplate = lagRestTemplate("", new RestTemplateBuilder(), interceptor);
 
 
-        euxConsumer = new EuxConsumer(restTemplate, jsonMapper, null);
+        euxConsumer = new EuxConsumer(restTemplate, euxJsonMapper, null);
         server = MockRestServiceServer.createServer(restTemplate);
         when(oAuth2AccessTokenService.getAccessToken(any())).thenReturn(new OAuth2AccessTokenResponse("accesstoken", 3600, 3600, Map.of()));
     }
@@ -216,7 +228,7 @@ class EuxConsumerTest {
         forventetResultat.put("attachmentId", "ffrewf24");
 
         server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
-            .andRespond(withSuccess(jsonMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(euxJsonMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map<String, String> resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
         assertThat(resultat).isEqualTo(forventetResultat);
@@ -538,10 +550,10 @@ class EuxConsumerTest {
                                          RestTemplateBuilder restTemplateBuilder,
                                          ClientHttpRequestInterceptor interceptor) {
 
-        return configureJacksonMapper(restTemplateBuilder
+        return EuxConsumerProducer.configureJacksonMapper(restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
             .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
-            .build());
+            .build(), euxJsonMapper);
     }
 }

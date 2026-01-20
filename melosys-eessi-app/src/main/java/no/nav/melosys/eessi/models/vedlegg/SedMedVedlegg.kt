@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 data class SedMedVedlegg(
     val sed: BinaerFil? = null,
-    val vedlegg: List<BinaerFil>? = emptyList()
+    val vedlegg: List<BinaerFil> = emptyList()
 ) {
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     data class BinaerFil(
