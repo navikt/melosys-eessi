@@ -46,4 +46,35 @@ class A008MapperTest {
             }
         }
     }
+
+    @Test
+    fun `map formaal endringsmelding til SED`() {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(testData = "mock/sedDataDtoStub.json") {
+            a008Formaal = "endringsmelding"
+        }
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            formaal shouldBe "endringsmelding"
+        }
+    }
+
+    @Test
+    fun `map formaal arbeid_flere_land til SED`() {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(testData = "mock/sedDataDtoStub.json") {
+            a008Formaal = "arbeid_flere_land"
+        }
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            formaal shouldBe "arbeid_flere_land"
+        }
+    }
+
+    @Test
+    fun `formaal er null naar ikke satt`() {
+        val sed = SedDataStub.mapTilSed<A008Mapper>(testData = "mock/sedDataDtoStub.json") {}
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            formaal.shouldBeNull()
+        }
+    }
 }

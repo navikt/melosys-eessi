@@ -10,7 +10,8 @@ class A008Mapper : LovvalgSedMapper<MedlemskapA008> {
     override fun getSedType() = SedType.A008
 
     override fun getMedlemskap(sedData: SedDataDto) = MedlemskapA008(
-        bruker = hentA008Bruker(sedData)
+        bruker = hentA008Bruker(sedData),
+        formaal = sedData.a008Formaal
     )
 
     override fun prefillNav(sedData: SedDataDto): Nav =
