@@ -30,7 +30,7 @@ class JacksonConfig {
 
     /**
      * JsonMapper konfigurert for EUX/RINA API-integrasjoner.
-     * Brukes av EuxConsumer og EuxRinasakerConsumer.
+     * Brukes av EuxConsumer, EuxRinasakerConsumer og EuxKotlinConsumer.
      * - FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY disabled: For SED'er uten 'medlemskap' objekt (f.eks. X001)
      * - WRITE_DATES_AS_TIMESTAMPS enabled: For riktig datoformat mot EUX API
      * 
