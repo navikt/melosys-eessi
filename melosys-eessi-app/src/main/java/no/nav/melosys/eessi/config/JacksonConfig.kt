@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.config
 
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -13,17 +12,6 @@ import tools.jackson.module.kotlin.KotlinModule
 
 @Configuration
 class JacksonConfig {
-
-    @Bean
-    fun kotlinModuleCustomizer(): JsonMapperBuilderCustomizer {
-        return JsonMapperBuilderCustomizer { builder ->
-            builder.addModule(
-                KotlinModule.Builder()
-                    .enable(KotlinFeature.NullIsSameAsDefault)
-                    .build()
-            )
-        }
-    }
 
     /**
      * Hoved JsonMapper med KotlinModule og NullIsSameAsDefault.

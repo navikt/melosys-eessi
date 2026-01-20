@@ -30,4 +30,4 @@ class EuxKotlinConsumerProducer(
             .build()
         return EuxKotlinConsumer(webClient, jsonMapper)
     }
-} 
+}
