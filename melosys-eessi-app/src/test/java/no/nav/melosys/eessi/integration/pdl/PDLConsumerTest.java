@@ -38,7 +38,7 @@ class PDLConsumerTest {
     }
 
     @Test
-    void hentPerson_medIdent_mottarPersonResponseUtenFeil() {
+    void hentPerson_medIdent_mottarPersonResponseUtenFeil() throws InterruptedException {
         mockServer.enqueue(new MockResponse().setBody(hentFil("mock/pdl_hent_person.json")).addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
         var res = pdlConsumer.hentPerson("123123123");
         assertThat(res.getNavn()).flatExtracting(PDLNavn::getFornavn, PDLNavn::getEtternavn).containsExactly("RASK", "MASKIN");
@@ -47,21 +47,27 @@ class PDLConsumerTest {
         assertThat(res.getFolkeregisterpersonstatus()).flatExtracting(PDLFolkeregisterPersonstatus::getStatus).containsExactly("bosatt");
         assertThat(res.getUtenlandskIdentifikasjonsnummer()).flatExtracting(PDLUtenlandskIdentifikator::getIdentifikasjonsnummer, PDLUtenlandskIdentifikator::getUtstederland).containsExactly("212121-9944332", "SWE");
         assertThat(res.getKjoenn()).flatExtracting(PDLKjoenn::getKjoenn).contains(PDLKjoennType.KVINNE);
+        var request = mockServer.takeRequest();
+        assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     @Test
-    void søkPerson_medRequest_mottarOgMapperResponseUtenFeil() {
+    void søkPerson_medRequest_mottarOgMapperResponseUtenFeil() throws InterruptedException {
         mockServer.enqueue(new MockResponse().setBody(hentFil("mock/pdl_sok_person.json")).addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
         var request = new PDLSokRequestVars(new PDLPaging(1, 1), Set.of(PDLSokCriterion.etternavn().erLik("Mannen")));
         var response = pdlConsumer.søkPerson(request);
         assertThat(response.getTotalHits()).isOne();
         assertThat(response.getHits()).hasSize(1).flatExtracting(PDLSokHit::getIdenter).hasSize(2).containsExactly(new PDLIdent(FOLKEREGISTERIDENT, "28026522600"), new PDLIdent(AKTORID, "2834873315250"));
+        var recordedRequest = mockServer.takeRequest();
+        assertThat(recordedRequest.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     @Test
-    void hentIdentliste_medIdent_mottarOgMapperResponseUtenFeil() {
+    void hentIdentliste_medIdent_mottarOgMapperResponseUtenFeil() throws InterruptedException {
         mockServer.enqueue(new MockResponse().setBody(hentFil("mock/pdl_hent_identliste.json")).addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
         assertThat(pdlConsumer.hentIdenter("123").getIdenter()).hasSize(2).flatExtracting(PDLIdent::getIdent, PDLIdent::getGruppe).containsExactlyInAnyOrder("28026522600", FOLKEREGISTERIDENT, "2834873315250", AKTORID);
+        var request = mockServer.takeRequest();
+        assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     private String hentFil(String filnavn) {

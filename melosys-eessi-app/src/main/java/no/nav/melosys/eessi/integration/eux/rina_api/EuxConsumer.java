@@ -114,7 +114,7 @@ public class EuxConsumer implements RestConsumer {
 
     public byte[] genererPdfFraSed(SED sed) {
         log.info("Henter pdf for forhåndsvisning av sed med type {}", sed.getSedType());
-        var headers = new HttpHeaders();
+        var headers = defaultHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_PDF));
         return exchange("/sed/pdf", HttpMethod.POST, new HttpEntity<>(sed, headers), new ParameterizedTypeReference<>() {
         });
