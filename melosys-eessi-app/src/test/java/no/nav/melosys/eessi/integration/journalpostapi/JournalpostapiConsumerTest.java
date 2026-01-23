@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -13,6 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import tools.jackson.databind.json.JsonMapper;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -42,6 +44,8 @@ class JournalpostapiConsumerTest {
     @Test
     void opprettJournalpost_skalJournalforeEndelig() {
         server.expect(requestTo("?forsoekFerdigstill=true"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(JOURNALPOST_RESPONSE, MediaType.APPLICATION_JSON));
 
         journalpostapiConsumer.opprettJournalpost(request, true);
@@ -50,15 +54,17 @@ class JournalpostapiConsumerTest {
     @Test
     void opprettJournalpost_skalIkkeJournalforeEndelig() {
         server.expect(requestTo("?forsoekFerdigstill=false"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(JOURNALPOST_RESPONSE, MediaType.APPLICATION_JSON));
         journalpostapiConsumer.opprettJournalpost(request, false);
     }
 
     @Test
     void opprettJournalpost_eksternReferanseIdFinnesAlleredeHttp409_kasterException() {
-        server.expect(requestTo("?forsoekFerdigstill=false")).andRespond(
-            withStatus(HttpStatus.CONFLICT).body(JOURNALPOST_RESPONSE)
-        );
+        server.expect(requestTo("?forsoekFerdigstill=false"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andRespond(withStatus(HttpStatus.CONFLICT).body(JOURNALPOST_RESPONSE));
 
         assertThatExceptionOfType(SedAlleredeJournalførtException.class)
             .isThrownBy(() -> journalpostapiConsumer.opprettJournalpost(request, false))
@@ -67,9 +73,9 @@ class JournalpostapiConsumerTest {
 
     @Test
     void henterJournalpostResponseFra409Exception_ok() {
-        server.expect(requestTo("?forsoekFerdigstill=false")).andRespond(
-            withStatus(HttpStatus.CONFLICT).body(JOURNALPOST_RESPONSE)
-        );
+        server.expect(requestTo("?forsoekFerdigstill=false"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andRespond(withStatus(HttpStatus.CONFLICT).body(JOURNALPOST_RESPONSE));
 
         try {
             journalpostapiConsumer.opprettJournalpost(request, false);

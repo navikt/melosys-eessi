@@ -54,6 +54,8 @@ class SafConsumerTest {
 
         Optional<String> optionalRinasaksnummer = safConsumer.hentRinasakForJournalpost(JOURNALPOST_ID);
         assertThat(optionalRinasaksnummer).contains(rinaSaksnummer);
+        var request = mockServer.takeRequest();
+        assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     @Test

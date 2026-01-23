@@ -35,6 +35,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,6 +53,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -107,6 +110,8 @@ class EuxConsumerTest {
         String id = "1234";
 
         server.expect(requestTo("/buc/" + id))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(buc, MediaType.APPLICATION_JSON));
 
         BUC response = euxConsumer.hentBUC(id);
@@ -129,6 +134,8 @@ class EuxConsumerTest {
         String id = "1234";
         String buc = "LA_BUC_04";
         server.expect(requestTo("/buc?BuCType=" + buc))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         String response = euxConsumer.opprettBUC(buc);
@@ -140,6 +147,8 @@ class EuxConsumerTest {
         String id = "1234";
         server.expect(requestTo("/buc/" + id))
             .andExpect(method(HttpMethod.DELETE))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess());
 
         euxConsumer.slettBUC(id);
@@ -152,6 +161,8 @@ class EuxConsumerTest {
         String danmark = "DK:4321";
 
         server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "," + danmark))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess("1234", MediaType.APPLICATION_JSON));
 
         euxConsumer.settMottakere(rinaSaksnummer, List.of(sverige, danmark));
@@ -165,6 +176,7 @@ class EuxConsumerTest {
         var mottakere = List.of(sverige, danmark);
 
         server.expect(requestTo("/buc/" + rinaSaksnummer + "/mottakere?mottakere=" + sverige + "," + danmark))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withStatus(HttpStatus.NOT_FOUND));
 
         assertThatExceptionOfType(NotFoundException.class)
@@ -177,6 +189,7 @@ class EuxConsumerTest {
 
         server.expect(requestTo("/buc/" + rinaSaksnummer))
             .andExpect(method(HttpMethod.DELETE))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withStatus(HttpStatus.PRECONDITION_FAILED));
 
         assertThatExceptionOfType(PreconditionFailedException.class)
@@ -189,6 +202,8 @@ class EuxConsumerTest {
         String domene = "https://rina-ss1-q.adeo.no/portal/#/caseManagement/";
 
         server.expect(requestTo("/url/buc/" + rinaSaksnummer))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(domene + rinaSaksnummer, MediaType.TEXT_PLAIN));
 
         String response = euxConsumer.hentRinaUrl(rinaSaksnummer);
@@ -206,6 +221,8 @@ class EuxConsumerTest {
         String landkode = "NO";
 
         server.expect(requestTo("/institusjoner?BuCType=" + buctype + "&LandKode=" + landkode))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(institusjonerString, MediaType.APPLICATION_JSON));
 
         List<Institusjon> resultat = euxConsumer.hentInstitusjoner(buctype, landkode);
@@ -228,6 +245,7 @@ class EuxConsumerTest {
         forventetResultat.put("attachmentId", "ffrewf24");
 
         server.expect(requestTo("/buc/sed/vedlegg?BuCType=" + buc + "&MottakerID=" + mottaker + "&FilType=" + filtype))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(euxJsonMapper.writeValueAsString(forventetResultat), MediaType.APPLICATION_JSON));
 
         Map<String, String> resultat = euxConsumer.opprettBucOgSedMedVedlegg(buc, mottaker, filtype, sed, vedlegg.getBytes());
@@ -248,6 +266,8 @@ class EuxConsumerTest {
             .fromUriString("/rinasaker?buctype=" + bucType + "&status=" + status).toUriString();
 
         server.expect(requestTo(uri))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         List<BucInfo> resultat = euxConsumer
@@ -267,6 +287,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -286,6 +308,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -310,6 +334,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -333,6 +359,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -356,6 +384,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -376,6 +406,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -396,6 +428,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -415,6 +449,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -435,6 +471,8 @@ class EuxConsumerTest {
         String sed = IOUtils.toString(new InputStreamReader(new FileInputStream(jsonUrl.getFile())));
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(sed, MediaType.APPLICATION_JSON));
 
         SED resultat = euxConsumer.hentSed(id, dokumentId);
@@ -451,6 +489,7 @@ class EuxConsumerTest {
         byte[] forventetRetur = "teststring".getBytes();
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/pdf"))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_OCTET_STREAM_VALUE))
             .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_OCTET_STREAM));
 
         byte[] resultat = euxConsumer.hentSedPdf(id, dokumentId);
@@ -460,9 +499,16 @@ class EuxConsumerTest {
     @Test
     void genererPdfFraSed_forventPdf() {
         SED sed = new SED();
+        sed.setSedType("A001");
+        sed.setSedVer("4");
+        sed.setSedGVer("4");
         byte[] forventetRetur = "teststring".getBytes();
 
         server.expect(requestTo("/sed/pdf"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_PDF_VALUE))
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json("{\"sed\":\"A001\",\"sedVer\":\"4\",\"sedGVer\":\"4\"}"))
             .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_PDF));
 
         byte[] resultat = euxConsumer.genererPdfFraSed(sed);
@@ -477,6 +523,8 @@ class EuxConsumerTest {
         String forventetRetur = "123321";
 
         server.expect(requestTo("/buc/" + id + "/sed"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.opprettSed(id, sed);
@@ -490,6 +538,8 @@ class EuxConsumerTest {
         SED sed = new SED();
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess());
 
         euxConsumer.oppdaterSed(id, dokumentId, sed);
@@ -501,6 +551,8 @@ class EuxConsumerTest {
         String dokumentId = "22";
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/send"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess());
 
         euxConsumer.sendSed(id, dokumentId);
@@ -516,6 +568,7 @@ class EuxConsumerTest {
         final String forventetRetur = "546327ghrjek";
 
         server.expect(requestTo("/buc/" + id + "/sed/" + dokumentId + "/vedleggJson"))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(forventetRetur, MediaType.APPLICATION_JSON));
 
         String resultat = euxConsumer.leggTilVedlegg(id, dokumentId, filtype, new SedVedlegg(filNavn, "vedlegg".getBytes()));
@@ -527,6 +580,8 @@ class EuxConsumerTest {
 
         String id = "123";
         server.expect(requestTo("/buc/" + id + "/sensitivsak"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess());
 
         euxConsumer.setSakSensitiv(id);
@@ -538,6 +593,8 @@ class EuxConsumerTest {
         String handlinger = "[ \"Close\", \"Create\"]";
 
         server.expect(requestTo("/buc/" + rinaSaksnummer + "/muligeaksjoner?format=enkelt"))
+            .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
             .andRespond(withSuccess(handlinger, MediaType.APPLICATION_JSON));
 
         Collection<String> resultat = euxConsumer.hentBucHandlinger(rinaSaksnummer);

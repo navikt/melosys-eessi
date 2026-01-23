@@ -57,6 +57,7 @@ class OppgaveConsumerTest {
         var request = mockWebServer.takeRequest();
         assertThat(request).extracting(RecordedRequest::getPath, RecordedRequest::getMethod).containsExactly("/oppgaver", "POST");
         assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
+        assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
     @Test
@@ -75,6 +76,7 @@ class OppgaveConsumerTest {
         var requestBody = request.getBody().readUtf8();
         assertThat(request).extracting(RecordedRequest::getPath, RecordedRequest::getMethod).containsExactly("/oppgaver/" + OPPGAVE_ID, "PATCH");
         assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
+        assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
         var jsonMapper = JsonMapper.builder().build();
         assertThat(jsonMapper.readTree(requestBody)).isEqualTo(jsonMapper.readTree(forventetJsonBodyRequestUtenBeskrivelseFelt));
     }
