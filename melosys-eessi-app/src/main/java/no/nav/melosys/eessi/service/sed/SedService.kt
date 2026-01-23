@@ -35,7 +35,8 @@ class SedService(
     private val saksrelasjonService: SaksrelasjonService,
     @Value("\${rina.pause-foer-sending-av-sed:10}") private val pauseFørSendingAvSed: Long,
     private val jsonFieldMasker: JsonFieldMasker,
-    private val safConsumer: SafConsumer
+    private val safConsumer: SafConsumer,
+    private val sedMapperFactory: SedMapperFactory
 ) {
 
     fun opprettBucOgSed(
@@ -71,7 +72,7 @@ class SedService(
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer)
         val mottakere = sedDataDto.mottakerIder
         val sedType = bucType!!.hentFørsteLovligeSed()
-        val sedMapper = SedMapperFactory.sedMapper(sedType)
+        val sedMapper = sedMapperFactory.sedMapper(sedType)
         val sed = sedMapper.mapTilSed(sedDataDto)
         validerMottakerInstitusjoner(bucType, mottakere!!)
         val response = executeWithSedLogging(
@@ -161,7 +162,7 @@ class SedService(
     }
 
     fun genererPdfFraSed(sedDataDto: SedDataDto, sedType: SedType): ByteArray? {
-        val sedMapper = SedMapperFactory.sedMapper(sedType)
+        val sedMapper = sedMapperFactory.sedMapper(sedType)
         val sed = sedMapper.mapTilSed(sedDataDto)
         return executeWithSedLogging("Feil ved genererPdfFraSed", sedDataDto, sed) {
             euxService.genererPdfFraSed(sed)
@@ -170,7 +171,7 @@ class SedService(
 
     fun sendPåEksisterendeBuc(sedDataDto: SedDataDto, rinaSaksnummer: String, sedType: SedType) {
         val buc = euxService.hentBuc(rinaSaksnummer)
-        val sed = SedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto)
+        val sed = sedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto)
         verifiserSedVersjonErBucVersjon(buc, sed)
 
         return executeWithSedLogging("Feil ved sendPåEksisterendeBuc", sedDataDto, sed) {
