@@ -6,5 +6,5 @@ public final class ToggleName {
 
     public static final String TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED = "melosys.eessi.tredjelandsborger.uten.norge.som.arbeidssted";
     public static final String EUX_RINA_BRUK_MULTIPART = "melosys-eessi.eux_rina_bruk_multipart";
-    public static final String A008_CDM_4_4 = "melosys.a008-cdm-4-4";
+    public static final String CDM_4_4 = "melosys.cdm-4-4";
 }
