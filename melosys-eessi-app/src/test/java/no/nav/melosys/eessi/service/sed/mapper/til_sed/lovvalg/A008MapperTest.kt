@@ -94,25 +94,9 @@ class A008MapperTest {
     }
 
     @Test
-    fun `map formaal endringsmelding til SED naar toggle er paa`() {
+    fun `formaal er alltid arbeid_flere_land naar toggle er paa`() {
         fakeUnleash.enable(A008_CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            a008Formaal = "endringsmelding"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            formaal shouldBe "endringsmelding"
-        }
-    }
-
-    @Test
-    fun `map formaal arbeid_flere_land til SED naar toggle er paa`() {
-        fakeUnleash.enable(A008_CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            a008Formaal = "arbeid_flere_land"
-        }
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
 
         val sed = a008Mapper.mapTilSed(sedData)
 
@@ -122,22 +106,8 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal er null naar toggle er av selv om a008Formaal er satt`() {
+    fun `formaal er null naar toggle er av`() {
         fakeUnleash.disable(A008_CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            a008Formaal = "endringsmelding"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            formaal.shouldBeNull()
-        }
-    }
-
-    @Test
-    fun `formaal er null naar ikke satt og toggle er paa`() {
-        fakeUnleash.enable(A008_CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
 
         val sed = a008Mapper.mapTilSed(sedData)
