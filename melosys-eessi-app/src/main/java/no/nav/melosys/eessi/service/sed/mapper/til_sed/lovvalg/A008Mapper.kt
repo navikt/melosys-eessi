@@ -23,7 +23,7 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
 
     override fun getMedlemskap(sedData: SedDataDto) = MedlemskapA008(
         bruker = hentA008Bruker(sedData),
-        formaal = if (unleash.isEnabled(CDM_4_4)) "arbeid_flere_land" else null
+        formaal = sedData.a008Formaal
     )
 
     override fun prefillNav(sedData: SedDataDto): Nav =
