@@ -94,9 +94,10 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal er alltid arbeid_flere_land naar toggle er paa`() {
-        fakeUnleash.enable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
+    fun `formaal fra sedData mappes til SED`() {
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            a008Formaal = "arbeid_flere_land"
+        }
 
         val sed = a008Mapper.mapTilSed(sedData)
 
@@ -106,8 +107,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal er null naar toggle er av`() {
-        fakeUnleash.disable(CDM_4_4)
+    fun `formaal er null naar sedData ikke har formaal`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
 
         val sed = a008Mapper.mapTilSed(sedData)

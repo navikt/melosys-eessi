@@ -145,5 +145,6 @@
         "unntaksBegrunnelse" : null,
         "unntakFraBestemmelse" : null
     } ],
-    "gjeldenderegler" : null
+    "gjeldenderegler" : null,
+    "a008Formaal" : null
 }
