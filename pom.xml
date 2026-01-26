@@ -29,13 +29,13 @@
         <kotlin.version>2.3.0</kotlin.version>
         <kotlin-logging.version>3.0.5</kotlin-logging.version>
         <kotlin.compiler.jvmTarget>${java.version}</kotlin.compiler.jvmTarget>
-        <kotest.version>6.0.7</kotest.version>
+        <kotest.version>6.1.0</kotest.version>
         <mockk.version>1.14.7</mockk.version>
         <springmockk.version>4.0.2</springmockk.version>
         <logstash-encoder.version>8.1</logstash-encoder.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
-        <micrometer.version>1.16.1</micrometer.version>
+        <micrometer.version>1.16.2</micrometer.version>
         <micrometer-jvm-extras.version>0.2.2</micrometer-jvm-extras.version>
         <okhttp3.version>4.12.0</okhttp3.version>
         <random-benas.version>3.9.0</random-benas.version>
@@ -48,11 +48,11 @@
         <springdoc-openapi.version>2.8.14</springdoc-openapi.version>
 
         <!-- Transitive avhengigheter -->
-        <checker-qual.version>3.52.1</checker-qual.version>
+        <checker-qual.version>3.53.0</checker-qual.version>
         <opensagres.version>2.1.0</opensagres.version>
-        <google-errorprone.version>2.45.0</google-errorprone.version>
+        <google-errorprone.version>2.46.0</google-errorprone.version>
         <org.apache.pdfbox.version>3.0.6</org.apache.pdfbox.version>
-        <nimbus-jose-jwt.version>10.6</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.7</nimbus-jose-jwt.version>
         <poi-ooxml-full.version>5.5.1</poi-ooxml-full.version>
         <xmlbeans.version>5.3.0</xmlbeans.version>
     </properties>
