@@ -42,7 +42,7 @@ data class SedDataDto(
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     var lovvalgsperioder: List<Lovvalgsperiode> = emptyList(),
     var gjeldenderegler: String? = null,
-    var a008Formaal: String? = null // CDM 4.4: "endringsmelding" | "arbeid_flere_land"
+    var a008Formaal: A008Formaal? = null
 ) {
     fun finnLovvalgslandDefaultNO(): String = lovvalgsperioder.firstOrNull { it.lovvalgsland != null }?.lovvalgsland ?: "NO"
 

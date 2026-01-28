@@ -6,6 +6,7 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
+import no.nav.melosys.eessi.controller.dto.A008Formaal
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import org.junit.jupiter.api.BeforeEach
@@ -94,9 +95,10 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal fra sedData mappes til SED`() {
+    fun `formaal fra sedData mappes til SED naar toggle er paa`() {
+        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            a008Formaal = "arbeid_flere_land"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
         }
 
         val sed = a008Mapper.mapTilSed(sedData)
@@ -107,8 +109,37 @@ class A008MapperTest {
     }
 
     @Test
+    fun `formaal endringsmelding mappes korrekt`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            a008Formaal = A008Formaal.ENDRINGSMELDING
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            formaal shouldBe "endringsmelding"
+        }
+    }
+
+    @Test
     fun `formaal er null naar sedData ikke har formaal`() {
+        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            formaal.shouldBeNull()
+        }
+    }
+
+    @Test
+    fun `formaal er null naar toggle er av selv om sedData har formaal`() {
+        fakeUnleash.disable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
 
         val sed = a008Mapper.mapTilSed(sedData)
 

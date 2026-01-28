@@ -28,7 +28,6 @@ public class SedController {
 
     @PostMapping("/sed/{sedType}/pdf")
     public byte[] genererPdfFraSed(@RequestBody SedDataDto sedDataDto, @PathVariable SedType sedType) throws ValidationException {
-        log.info("Genererer pdf for getA008Formaal: {}", sedDataDto.getA008Formaal());
         if (sedType.kreverAdresse() && sedDataDto.manglerAdresser()) {
             throw new ValidationException("Personen mangler adresse ved PDF generering");
         }
