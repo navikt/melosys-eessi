@@ -72,6 +72,8 @@ spec:
       value: {{APP_NAME}}
     - name: JDK_JAVA_OPTIONS
       value: "$(JAVA_PROXY_OPTIONS)"
+    - name: UNLEASH_URL
+      value: https://melosys-unleash-api.nav.cloud.nais.io/api
   envFrom:
     - secret: {{APP_NAME}}
     - secret: {{APP_NAME}}-unleash-api-token
