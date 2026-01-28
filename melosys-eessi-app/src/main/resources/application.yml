@@ -173,4 +173,5 @@ no.nav.security.jwt.client.registration:
       client-auth-method: client_secret_basic
 
 unleash:
+  url: ${UNLEASH_URL}
   token: ${UNLEASH_SERVER_API_TOKEN}

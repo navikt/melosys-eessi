@@ -66,3 +66,6 @@ no.nav.security.jwt.issuer:
     aad:
         discoveryurl: http://localhost:${mock-oauth2-server.port}/issuer1/.well-known/openid-configuration
         acceptedaudience: dumbdumb
+
+UNLEASH_URL: placeholder
+UNLEASH_SERVER_API_TOKEN: placeholder
