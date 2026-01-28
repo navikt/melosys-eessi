@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile;
 public class ComponentTestConfig {
 
     @Bean
-    @Profile("test")
+    @Primary
     public Unleash fakeUnleash() {
         return new FakeUnleash();
     }
