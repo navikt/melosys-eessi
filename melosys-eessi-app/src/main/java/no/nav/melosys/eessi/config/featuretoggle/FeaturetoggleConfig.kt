@@ -48,7 +48,7 @@ class FeaturetoggleConfig {
     }
 
     @Bean
-    @Profile("local", "local-q2", "test")
+    @Profile("local", "local-q2")
     fun fakeUnleash(): Unleash {
         log.info { "Creating FakeUnleash with all toggles enabled" }
         return FakeUnleash().apply { enableAll() }
