@@ -4,6 +4,7 @@ import io.getunleash.Unleash
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
+import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
@@ -40,6 +41,7 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
         }
 
         return formaal?.rinaVerdi
+            ?: throw MappingException("a008Formaal er påkrevd for A008 SED når CDM 4.4 er aktivert")
     }
 
     override fun prefillNav(sedData: SedDataDto): Nav =

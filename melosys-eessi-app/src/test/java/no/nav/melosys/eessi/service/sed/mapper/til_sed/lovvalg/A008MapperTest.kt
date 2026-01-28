@@ -1,12 +1,15 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.getunleash.FakeUnleash
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.A008Formaal
+import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import org.junit.jupiter.api.BeforeEach
@@ -71,6 +74,7 @@ class A008MapperTest {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
         }
 
         val sed = a008Mapper.mapTilSed(sedData)
@@ -123,15 +127,15 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal er null naar sedData ikke har formaal`() {
+    fun `kaster exception naar toggle er paa men formaal mangler`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
 
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            formaal.shouldBeNull()
+        val exception = shouldThrow<MappingException> {
+            a008Mapper.mapTilSed(sedData)
         }
+
+        exception.message shouldContain "a008Formaal er påkrevd"
     }
 
     @Test
