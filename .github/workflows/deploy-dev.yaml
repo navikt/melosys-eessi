@@ -71,14 +71,6 @@ jobs:
           IMAGE: ${{ needs.build.outputs.image }}
           VARS: nais/vars-q2.json
           TELEMETRY: ${{ needs.build.outputs.telemetry }}
-      - name: Deploy til dev (Q1)
-        uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: dev-fss
-          RESOURCE: nais/nais.yml
-          IMAGE: ${{ needs.build.outputs.image }}
-          VARS: nais/vars-q1.json
-          TELEMETRY: ${{ needs.build.outputs.telemetry }}
       - name: Get commit message
         run: echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Slack Notification
@@ -87,7 +79,7 @@ jobs:
           SLACK_COLOR: "${{ job.status == 'success' && 'good' || 'danger' }}"
           SLACK_USERNAME: Github Actions
           SLACK_ICON: https://github.com/github.png?size=48
-          SLACK_TITLE: "melosys-eessi ${{ job.status == 'success' && 'ble deployet' || 'kunne ikke deployes' }} til q1 og q2"
+          SLACK_TITLE: "melosys-eessi ${{ job.status == 'success' && 'ble deployet' || 'kunne ikke deployes' }} til q2"
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_MESSAGE: ${{ env.COMMIT_MSG }}
       - name: post-deploy
