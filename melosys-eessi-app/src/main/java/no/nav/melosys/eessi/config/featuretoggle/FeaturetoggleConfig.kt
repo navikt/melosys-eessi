@@ -13,11 +13,9 @@ import org.springframework.context.annotation.Profile
 private val log = KotlinLogging.logger {}
 
 @Configuration
-class FeaturetoggleConfig {
+class FeatureToggleConfig {
 
-    companion object {
-        private const val APP_NAME = "Melosys-eessi"
-    }
+    private val APP_NAME = "Melosys-eessi"
 
     @Bean
     @Profile("nais", "local-mock")
