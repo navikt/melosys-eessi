@@ -10,6 +10,7 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.A008Formaal
 import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import org.junit.jupiter.api.BeforeEach
@@ -127,15 +128,15 @@ class A008MapperTest {
     }
 
     @Test
-    fun `kaster exception naar toggle er paa men formaal mangler`() {
+    fun `set til arbeid_flere_land naar toggle er paa men formaal mangler`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
 
-        val exception = shouldThrow<MappingException> {
-            a008Mapper.mapTilSed(sedData)
-        }
+        val sed: SED = a008Mapper.mapTilSed(sedData)
 
-        exception.message shouldContain "a008Formaal er påkrevd"
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>()
+            .formaal.shouldNotBeNull()
+            .shouldBe("arbeid_flere_land")
     }
 
     @Test

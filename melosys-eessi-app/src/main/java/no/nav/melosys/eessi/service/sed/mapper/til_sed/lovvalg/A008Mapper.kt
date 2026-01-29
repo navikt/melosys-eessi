@@ -2,9 +2,9 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.getunleash.Unleash
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
+import no.nav.melosys.eessi.controller.dto.A008Formaal
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
-import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
@@ -33,15 +33,19 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
     private fun hentFormaal(sedData: SedDataDto): String? {
         val formaal = sedData.a008Formaal
 
+        log.info("CDM_4_4: {}", unleash.isEnabled(CDM_4_4))
+
         if (!unleash.isEnabled(CDM_4_4)) {
             if (formaal != null) {
                 log.warn("a008Formaal mottatt fra melosys-web men CDM 4.4 toggle er deaktivert. Ignorerer formaal: {}", formaal.rinaVerdi)
             }
             return null
         }
-
-        return formaal?.rinaVerdi
-            ?: throw MappingException("a008Formaal er påkrevd for A008 SED når CDM 4.4 er aktivert")
+        if(formaal?.rinaVerdi == null) {
+            log.warn("a008Formaal er ikke satt i melosys-web for A008 SED når CDM 4.4 er aktivert")
+            return A008Formaal.ARBEID_FLERE_LAND.rinaVerdi
+        }
+        return formaal.rinaVerdi
     }
 
     override fun prefillNav(sedData: SedDataDto): Nav =
