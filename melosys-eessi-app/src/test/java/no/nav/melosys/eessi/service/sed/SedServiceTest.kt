@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.sed
 
+import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -29,6 +30,7 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.eux.EuxService
 import no.nav.melosys.eessi.service.eux.OpprettBucOgSedResponse
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
+import no.nav.melosys.eessi.service.sed.mapper.SedMapperFactory
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -49,6 +51,9 @@ class SedServiceTest {
     @MockK
     lateinit var safConsumer: no.nav.melosys.eessi.integration.saf.SafConsumer
 
+    private val fakeUnleash = FakeUnleash()
+    private val sedMapperFactory = SedMapperFactory(fakeUnleash)
+
     lateinit var sendSedService: SedService
 
     private val RINA_ID = "aabbcc"
@@ -58,7 +63,7 @@ class SedServiceTest {
         sendSedService = SedService(
             euxService, saksrelasjonService, 0L, JsonFieldMasker(
                 JsonMapper.builder().build()
-            ), safConsumer
+            ), safConsumer, sedMapperFactory
         )
     }
 

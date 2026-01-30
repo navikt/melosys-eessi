@@ -1,21 +1,24 @@
 package no.nav.melosys.eessi.service.sed.mapper
 
+import io.getunleash.Unleash
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X008Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.horisontal.HorisontalSedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.*
+import org.springframework.stereotype.Component
 
-object SedMapperFactory {
+@Component
+class SedMapperFactory(unleash: Unleash) {
 
-    private val SED_MAPPERS: Map<SedType, SedMapper> = mapOf(
+    private val sedMappers: Map<SedType, SedMapper> = mapOf(
         SedType.A001 to A001Mapper(),
         SedType.A002 to A002Mapper(),
         SedType.A003 to A003Mapper(),
         SedType.A004 to A004Mapper(),
         SedType.A005 to A005Mapper(),
-        SedType.A008 to A008Mapper(),
+        SedType.A008 to A008Mapper(unleash),
         SedType.A009 to A009Mapper(),
         SedType.A010 to A010Mapper(),
         SedType.A011 to A011Mapper(),
@@ -39,9 +42,8 @@ object SedMapperFactory {
         SedType.H130 to HorisontalSedMapper(SedType.H130)
     )
 
-    @JvmStatic
     fun sedMapper(sedType: SedType): SedMapper {
-        return SED_MAPPERS[sedType]
+        return sedMappers[sedType]
             ?: throw MappingException("Sed-type ${sedType.name} støttes ikke")
     }
 }
