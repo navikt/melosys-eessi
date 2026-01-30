@@ -33,15 +33,13 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
     private fun hentFormaal(sedData: SedDataDto): String? {
         val formaal = sedData.a008Formaal
 
-        log.info("CDM_4_4: {}", unleash.isEnabled(CDM_4_4))
-
         if (!unleash.isEnabled(CDM_4_4)) {
             if (formaal != null) {
                 log.warn("a008Formaal mottatt fra melosys-web men CDM 4.4 toggle er deaktivert. Ignorerer formaal: {}", formaal.rinaVerdi)
             }
             return null
         }
-        if(formaal?.rinaVerdi == null) {
+        if (formaal == null) {
             log.warn("a008Formaal er ikke satt i melosys-web for A008 SED når CDM 4.4 er aktivert")
             return A008Formaal.ARBEID_FLERE_LAND.rinaVerdi
         }
