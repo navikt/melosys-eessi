@@ -172,7 +172,7 @@ public class KafkaAivenConfig {
     }
 
     private boolean isNotLocal() {
-        return Arrays.stream(env.getActiveProfiles()).noneMatch(profile -> (profile.equalsIgnoreCase("local") || profile.equalsIgnoreCase("test") || profile.equalsIgnoreCase("local-mock")));
+        return Arrays.stream(env.getActiveProfiles()).noneMatch(profile -> (profile.equalsIgnoreCase("local") || profile.equalsIgnoreCase("test") || profile.equalsIgnoreCase("local-mock") || profile.equalsIgnoreCase("local-rina")));
     }
 
     private RecordFilterStrategy<String, OppgaveKafkaAivenRecord> recordFilterStrategyOppgaveHendelserListener() {
