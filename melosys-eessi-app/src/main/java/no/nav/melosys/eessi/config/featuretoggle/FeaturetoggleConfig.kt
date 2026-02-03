@@ -18,7 +18,7 @@ class FeatureToggleConfig {
     private val APP_NAME = "Melosys-eessi"
 
     @Bean
-    @Profile("nais", "local-mock")
+    @Profile("nais", "local-mock", "local-rina")
     fun unleashConfig(
         @Value("\${unleash.url}") url: String,
         @Value("\${unleash.token}") token: String
@@ -39,7 +39,7 @@ class FeatureToggleConfig {
     }
 
     @Bean
-    @Profile("local-mock")
+    @Profile("local-mock", "local-rina")
     fun localUnleash(config: UnleashConfig): Unleash {
         log.info { "Creating DefaultEnabledUnleash for local-mock profile" }
         return DefaultEnabledUnleash(DefaultUnleash(config))
