@@ -1,24 +1,27 @@
 package no.nav.melosys.eessi.service.sed.mapper
 
+import io.getunleash.FakeUnleash
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.models.SedType
-import no.nav.melosys.eessi.service.sed.mapper.SedMapperFactory.sedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A001Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A009Mapper
 import org.junit.jupiter.api.Test
 
 class SedMapperFactoryTest {
 
+    private val fakeUnleash = FakeUnleash()
+    private val sedMapperFactory = SedMapperFactory(fakeUnleash)
+
     @Test
     fun oppslagavSedA001GirKorrektMapper() {
-        val sedMapper = sedMapper(SedType.A001)
+        val sedMapper = sedMapperFactory.sedMapper(SedType.A001)
         sedMapper.shouldBeInstanceOf<A001Mapper>()
     }
 
     @Test
     fun oppslagavSedA009GirKorrektMapper() {
-        val sedMapper = sedMapper(SedType.A009)
+        val sedMapper = sedMapperFactory.sedMapper(SedType.A009)
         sedMapper.shouldBeInstanceOf<A009Mapper>()
     }
 
@@ -55,7 +58,7 @@ class SedMapperFactoryTest {
         )
 
         for (sedType in sedTyperMedMapper) {
-            val sedMapper = sedMapper(sedType)
+            val sedMapper = sedMapperFactory.sedMapper(sedType)
             sedMapper.getSedType() shouldBe sedType
         }
     }

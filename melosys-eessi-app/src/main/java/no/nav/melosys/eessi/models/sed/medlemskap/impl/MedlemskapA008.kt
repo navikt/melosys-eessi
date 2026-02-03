@@ -8,5 +8,6 @@ import no.nav.melosys.eessi.models.sed.nav.MedlemskapA008Bruker
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class MedlemskapA008(
     var endring: EndringA008? = null,
-    var bruker: MedlemskapA008Bruker? = null
+    var bruker: MedlemskapA008Bruker? = null,
+    var formaal: String? = null
 ) : Medlemskap
