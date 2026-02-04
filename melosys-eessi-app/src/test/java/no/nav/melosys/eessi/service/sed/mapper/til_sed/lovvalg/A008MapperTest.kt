@@ -9,9 +9,9 @@ import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.A008Formaal
-import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
+import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -53,12 +53,13 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull().run {
-                    yrkesaktivitet.shouldNotBeNull()
-                        .startdato shouldBe "2020-01-01"
-                    bosted.shouldNotBeNull()
-                        .land shouldBe "SE"
-                }
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<ArbeidIFlereLand>().run {
+                        yrkesaktivitet.shouldNotBeNull()
+                            .startdato shouldBe "2020-01-01"
+                        bosted.shouldNotBeNull()
+                            .land shouldBe "SE"
+                    }
             }
 
             sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
@@ -82,11 +83,17 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull().run {
-                    yrkesaktivitet.shouldNotBeNull()
-                        .startdato shouldBe "2020-01-01"
-                    bosted.shouldNotBeNull()
-                        .land shouldBe "SE"
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<List<*>>()
+                @Suppress("UNCHECKED_CAST")
+                (arbeidiflereland as List<ArbeidIFlereLand>).run {
+                    size shouldBe 1
+                    first().run {
+                        yrkesaktivitet.shouldNotBeNull()
+                            .startdato shouldBe "2020-01-01"
+                        bosted.shouldNotBeNull()
+                            .land shouldBe "SE"
+                    }
                 }
             }
 
@@ -150,6 +157,40 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             formaal.shouldBeNull()
+        }
+    }
+
+    @Test
+    fun `arbeidiflereland er objekt naar CDM 4_4 toggle er av`() {
+        fakeUnleash.disable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().run {
+                arbeidiflereland.shouldBeInstanceOf<ArbeidIFlereLand>()
+            }
+        }
+    }
+
+    @Test
+    fun `arbeidiflereland er liste naar CDM 4_4 toggle er paa`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().run {
+                arbeidiflereland.shouldBeInstanceOf<List<*>>()
+                (arbeidiflereland as List<*>).size shouldBe 1
+            }
         }
     }
 }

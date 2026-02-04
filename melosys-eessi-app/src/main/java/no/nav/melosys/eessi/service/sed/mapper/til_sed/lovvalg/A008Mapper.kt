@@ -53,12 +53,20 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
             }
         }
 
-    private fun hentA008Bruker(sedData: SedDataDto) =
-        MedlemskapA008Bruker(
-            arbeidiflereland = ArbeidIFlereLand(
-                bosted = Bosted(sedData.avklartBostedsland),
-                yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
-                    Yrkesaktivitet(startdato = søknadsperiodeFom.formaterEllerNull())
-                }
-            ))
+    private fun hentA008Bruker(sedData: SedDataDto): MedlemskapA008Bruker {
+        val arbeidIFlereLand = ArbeidIFlereLand(
+            bosted = Bosted(sedData.avklartBostedsland),
+            yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
+                Yrkesaktivitet(startdato = søknadsperiodeFom.formaterEllerNull())
+            }
+        )
+
+        return MedlemskapA008Bruker(
+            arbeidiflereland = if (unleash.isEnabled(CDM_4_4)) {
+                listOf(arbeidIFlereLand)  // CDM 4.4: array
+            } else {
+                arbeidIFlereLand  // CDM 4.3: enkelt objekt
+            }
+        )
+    }
 }

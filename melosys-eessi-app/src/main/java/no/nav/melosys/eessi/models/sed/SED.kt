@@ -9,6 +9,7 @@ import java.util.*
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonPropertyOrder("nav", "medlemskap", "sed", "sedVer", "sedGVer")
 data class SED(
     @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "sed")
     @JsonTypeIdResolver(MedlemskapTypeResolver::class)
