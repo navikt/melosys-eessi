@@ -101,7 +101,7 @@ class SaksrelasjonServiceTest {
     }
 
     @Test
-    void oppdaterKobling_koblingFinnes_oppdatererGsakSaksnummer() {
+    void oppdaterKobling_koblingFinnes_oppdatererGsakSaksnummerOgReturnererGammelVerdi() {
         final var gammelGsakSaksnummer = 123L;
         final var nyGsakSaksnummer = 456L;
         final var fagsakRinasakKobling = new FagsakRinasakKobling();
@@ -110,8 +110,9 @@ class SaksrelasjonServiceTest {
         fagsakRinasakKobling.setBucType(BucType.LA_BUC_04);
         when(fagsakRinasakKoblingRepository.findByRinaSaksnummer(RINA_ID)).thenReturn(Optional.of(fagsakRinasakKobling));
 
-        saksrelasjonService.oppdaterKobling(RINA_ID, nyGsakSaksnummer);
+        Long returnertGammelVerdi = saksrelasjonService.oppdaterKobling(RINA_ID, nyGsakSaksnummer);
 
+        assertThat(returnertGammelVerdi).isEqualTo(gammelGsakSaksnummer);
         assertThat(fagsakRinasakKobling.getGsakSaksnummer()).isEqualTo(nyGsakSaksnummer);
         verify(fagsakRinasakKoblingRepository).save(fagsakRinasakKobling);
     }

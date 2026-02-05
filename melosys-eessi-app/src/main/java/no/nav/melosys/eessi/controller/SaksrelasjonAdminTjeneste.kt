@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.controller
 
-import no.nav.melosys.eessi.controller.dto.SaksrelasjonDto
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.LoggerFactory
@@ -17,22 +18,38 @@ class SaksrelasjonAdminTjeneste(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @PutMapping("/kobling/{rinaSaksnummer}")
+    @Operation(
+        summary = "Flytt Rinasak-kobling til annen fagsak",
+        description = """
+            Flytter en eksisterende kobling mellom en Rinasak og en fagsak til en ny fagsak.
+            Brukes når en Rinasak er feilaktig koblet til feil fagsak.
+
+            NB: Den gamle fagsaken mister koblingen til Rinasakien - det finnes kun én kobling per Rinasak.
+        """
+    )
+    @PutMapping("/kobling/{rinaSaksnummer}/{gsakSaksnummer}")
     fun oppdaterKobling(
         @RequestHeader(API_KEY_HEADER) apiKeyHeader: String,
-        @PathVariable rinaSaksnummer: String,
-        @RequestBody dto: SaksrelasjonDto
-    ): ResponseEntity<Void> {
+        @Parameter(description = "Rinasak-nummeret som skal flyttes") @PathVariable rinaSaksnummer: String,
+        @Parameter(description = "Ny fagsak (gsakSaksnummer) som Rinasakien skal kobles til") @PathVariable gsakSaksnummer: Long
+    ): ResponseEntity<OppdaterKoblingResponse> {
         validerApikey(apiKeyHeader)
-        requireNotNull(dto.gsakSaksnummer) { "gsakSaksnummer kan ikke være null" }
-        require(dto.gsakSaksnummer!! > 0) { "gsakSaksnummer må være større enn 0" }
+        require(gsakSaksnummer > 0) { "gsakSaksnummer må være større enn 0" }
 
         log.info(
             "Admin: Oppdaterer kobling for rinaSaksnummer {} til gsakSaksnummer {}",
-            rinaSaksnummer, dto.gsakSaksnummer
+            rinaSaksnummer, gsakSaksnummer
         )
-        saksrelasjonService.oppdaterKobling(rinaSaksnummer, dto.gsakSaksnummer!!)
-        return ResponseEntity.ok().build()
+        val gammelGsakSaksnummer = saksrelasjonService.oppdaterKobling(rinaSaksnummer, gsakSaksnummer)
+
+        return ResponseEntity.ok(
+            OppdaterKoblingResponse(
+                melding = "Flyttet rinaSaksnummer $rinaSaksnummer fra gsakSaksnummer $gammelGsakSaksnummer til $gsakSaksnummer",
+                rinaSaksnummer = rinaSaksnummer,
+                gammelGsakSaksnummer = gammelGsakSaksnummer,
+                nyGsakSaksnummer = gsakSaksnummer
+            )
+        )
     }
 
     private fun validerApikey(value: String) {
@@ -40,6 +57,13 @@ class SaksrelasjonAdminTjeneste(
             throw SecurityException("Trenger gyldig apikey")
         }
     }
+
+    data class OppdaterKoblingResponse(
+        val melding: String,
+        val rinaSaksnummer: String,
+        val gammelGsakSaksnummer: Long,
+        val nyGsakSaksnummer: Long
+    )
 
     companion object {
         private const val API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY"

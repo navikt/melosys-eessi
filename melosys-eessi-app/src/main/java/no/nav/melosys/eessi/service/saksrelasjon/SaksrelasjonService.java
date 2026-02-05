@@ -34,17 +34,23 @@ public class SaksrelasjonService {
         fagsakRinasakKoblingRepository.deleteByRinaSaksnummer(rinaSaksnummer);
     }
 
+    /**
+     * Oppdaterer kobling mellom rinaSaksnummer og gsakSaksnummer.
+     * @return gammel gsakSaksnummer som koblingen pekte til før oppdatering
+     */
     @Transactional
-    public void oppdaterKobling(String rinaSaksnummer, Long nyGsakSaksnummer) {
+    public Long oppdaterKobling(String rinaSaksnummer, Long nyGsakSaksnummer) {
         FagsakRinasakKobling kobling = fagsakRinasakKoblingRepository
             .findByRinaSaksnummer(rinaSaksnummer)
             .orElseThrow(() -> new NotFoundException("Fant ikke kobling for rinaSaksnummer: " + rinaSaksnummer));
 
+        Long gammelGsakSaksnummer = kobling.getGsakSaksnummer();
         log.info("Flytter rinaSaksnummer {} fra gsakSaksnummer {} til {}",
-            rinaSaksnummer, kobling.getGsakSaksnummer(), nyGsakSaksnummer);
+            rinaSaksnummer, gammelGsakSaksnummer, nyGsakSaksnummer);
 
         kobling.setGsakSaksnummer(nyGsakSaksnummer);
         fagsakRinasakKoblingRepository.save(kobling);
+        return gammelGsakSaksnummer;
     }
 
     public List<FagsakRinasakKobling> finnVedGsakSaksnummer(Long gsakSaksnummer) {
