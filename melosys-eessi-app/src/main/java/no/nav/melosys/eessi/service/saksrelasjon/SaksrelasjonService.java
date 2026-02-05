@@ -7,6 +7,7 @@ import java.util.Optional;
 import no.nav.melosys.eessi.integration.sak.Sak;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.FagsakRinasakKobling;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.repository.FagsakRinasakKoblingRepository;
 import no.nav.melosys.eessi.service.sak.ArkivsakService;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,19 @@ public class SaksrelasjonService {
     @Transactional
     public void slettVedRinaId(String rinaSaksnummer) {
         fagsakRinasakKoblingRepository.deleteByRinaSaksnummer(rinaSaksnummer);
+    }
+
+    @Transactional
+    public void oppdaterKobling(String rinaSaksnummer, Long nyGsakSaksnummer) {
+        FagsakRinasakKobling kobling = fagsakRinasakKoblingRepository
+            .findByRinaSaksnummer(rinaSaksnummer)
+            .orElseThrow(() -> new NotFoundException("Fant ikke kobling for rinaSaksnummer: " + rinaSaksnummer));
+
+        log.info("Flytter rinaSaksnummer {} fra gsakSaksnummer {} til {}",
+            rinaSaksnummer, kobling.getGsakSaksnummer(), nyGsakSaksnummer);
+
+        kobling.setGsakSaksnummer(nyGsakSaksnummer);
+        fagsakRinasakKoblingRepository.save(kobling);
     }
 
     public List<FagsakRinasakKobling> finnVedGsakSaksnummer(Long gsakSaksnummer) {

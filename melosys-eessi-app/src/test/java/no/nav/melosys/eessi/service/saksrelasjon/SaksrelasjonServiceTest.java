@@ -14,9 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 class SaksrelasjonServiceTest {
@@ -95,5 +98,30 @@ class SaksrelasjonServiceTest {
 
 
         assertThat(saksrelasjonService.finnAktørIDTilhørendeRinasak("123")).contains(aktørID);
+    }
+
+    @Test
+    void oppdaterKobling_koblingFinnes_oppdatererGsakSaksnummer() {
+        final var gammelGsakSaksnummer = 123L;
+        final var nyGsakSaksnummer = 456L;
+        final var fagsakRinasakKobling = new FagsakRinasakKobling();
+        fagsakRinasakKobling.setRinaSaksnummer(RINA_ID);
+        fagsakRinasakKobling.setGsakSaksnummer(gammelGsakSaksnummer);
+        fagsakRinasakKobling.setBucType(BucType.LA_BUC_04);
+        when(fagsakRinasakKoblingRepository.findByRinaSaksnummer(RINA_ID)).thenReturn(Optional.of(fagsakRinasakKobling));
+
+        saksrelasjonService.oppdaterKobling(RINA_ID, nyGsakSaksnummer);
+
+        assertThat(fagsakRinasakKobling.getGsakSaksnummer()).isEqualTo(nyGsakSaksnummer);
+        verify(fagsakRinasakKoblingRepository).save(fagsakRinasakKobling);
+    }
+
+    @Test
+    void oppdaterKobling_koblingFinnesIkke_kasterNotFoundException() {
+        when(fagsakRinasakKoblingRepository.findByRinaSaksnummer(RINA_ID)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> saksrelasjonService.oppdaterKobling(RINA_ID, 456L))
+            .isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(RINA_ID);
     }
 }
