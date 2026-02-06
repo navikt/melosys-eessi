@@ -269,6 +269,58 @@ class A008MapperTest {
     }
 
     @Test
+    fun `CDM 4_4 rund-tur serialisering-deserialisering bevarer array-struktur`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
+
+        val original = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(original)
+        val deserialized = jsonMapper.readValue(json, SED::class.java)
+
+        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().run {
+                // Etter deserialisering fra array blir dette List<LinkedHashMap> (Any?-type)
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<List<*>>()
+                @Suppress("UNCHECKED_CAST")
+                val items = arbeidiflereland as List<Map<String, Any?>>
+                items.size shouldBe 1
+                @Suppress("UNCHECKED_CAST")
+                val bosted = items.first()["bosted"] as Map<String, Any?>
+                bosted["land"] shouldBe "SE"
+            }
+        }
+    }
+
+    @Test
+    fun `CDM 4_3 rund-tur serialisering-deserialisering bevarer objekt-struktur`() {
+        fakeUnleash.disable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+
+        val original = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(original)
+        val deserialized = jsonMapper.readValue(json, SED::class.java)
+
+        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().run {
+                // Etter deserialisering fra objekt blir dette LinkedHashMap (Any?-type)
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<Map<*, *>>()
+                @Suppress("UNCHECKED_CAST")
+                val map = arbeidiflereland as Map<String, Any?>
+                @Suppress("UNCHECKED_CAST")
+                val bosted = map["bosted"] as Map<String, Any?>
+                bosted["land"] shouldBe "SE"
+            }
+        }
+    }
+
+    @Test
     fun `CDM 4_3 serialiserer arbeidiflereland som objekt i JSON`() {
         fakeUnleash.disable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
