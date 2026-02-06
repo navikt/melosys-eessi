@@ -80,7 +80,6 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
     }
 
     private fun hentA008Bruker(sedData: SedDataDto): MedlemskapA008Bruker {
-        val isCdm44 = unleash.isEnabled(CDM_4_4)
         val arbeidIFlereLand = ArbeidIFlereLand(
             bosted = Bosted(sedData.avklartBostedsland),
             yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
@@ -89,8 +88,7 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
         )
 
         return MedlemskapA008Bruker(
-            arbeidiflereland = arbeidIFlereLand,
-            cdm44 = isCdm44
+            arbeidiflereland = if (unleash.isEnabled(CDM_4_4)) listOf(arbeidIFlereLand) else arbeidIFlereLand
         )
     }
 }

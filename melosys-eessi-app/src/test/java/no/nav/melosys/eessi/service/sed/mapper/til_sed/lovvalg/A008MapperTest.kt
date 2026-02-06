@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.getunleash.FakeUnleash
-import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -60,13 +59,13 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull().run {
-                    yrkesaktivitet.shouldNotBeNull()
-                        .startdato shouldBe "2020-01-01"
-                    bosted.shouldNotBeNull()
-                        .land shouldBe "SE"
-                }
-                cdm44.shouldBeFalse()
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<ArbeidIFlereLand>().run {
+                        yrkesaktivitet.shouldNotBeNull()
+                            .startdato shouldBe "2020-01-01"
+                        bosted.shouldNotBeNull()
+                            .land shouldBe "SE"
+                    }
             }
 
             sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().run {
@@ -93,13 +92,18 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull().run {
-                    yrkesaktivitet.shouldNotBeNull()
-                        .startdato shouldBe "2020-01-01"
-                    bosted.shouldNotBeNull()
-                        .land shouldBe "SE"
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<List<*>>()
+                @Suppress("UNCHECKED_CAST")
+                (arbeidiflereland as List<ArbeidIFlereLand>).run {
+                    size shouldBe 1
+                    first().run {
+                        yrkesaktivitet.shouldNotBeNull()
+                            .startdato shouldBe "2020-01-01"
+                        bosted.shouldNotBeNull()
+                            .land shouldBe "SE"
+                    }
                 }
-                cdm44.shouldBeTrue()
             }
 
             sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
@@ -162,23 +166,6 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             formaal.shouldBeNull()
-        }
-    }
-
-    @Test
-    fun `cdm44 flag er false naar toggle er av`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldBeInstanceOf<ArbeidIFlereLand>()
-                cdm44.shouldBeFalse()
-            }
         }
     }
 
@@ -264,24 +251,6 @@ class A008MapperTest {
     }
 
     @Test
-    fun `cdm44 flag er true naar toggle er paa`() {
-        fakeUnleash.enable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull()
-                cdm44.shouldBeTrue()
-            }
-        }
-    }
-
-    @Test
     fun `CDM 4_4 serialiserer arbeidiflereland som array i JSON`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
@@ -313,59 +282,5 @@ class A008MapperTest {
         val arbeidiflereland = jsonTree.path("medlemskap").path("bruker").path("arbeidiflereland")
         arbeidiflereland.isObject.shouldBeTrue()
         arbeidiflereland.path("bosted").path("land").asText() shouldBe "SE"
-    }
-
-    @Test
-    fun `cdm44 flag lekker ikke til JSON`() {
-        fakeUnleash.enable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-        val json = jsonMapper.writeValueAsString(sed)
-        val jsonTree = jsonMapper.readTree(json)
-
-        jsonTree.path("medlemskap").path("bruker").path("cdm44").isMissingNode.shouldBeTrue()
-    }
-
-    @Test
-    fun `roundtrip CDM 4_4 - serialiser og deserialiser SED bevarer data`() {
-        fakeUnleash.enable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-        val json = jsonMapper.writeValueAsString(sed)
-        val deserialized = jsonMapper.readValue(json, SED::class.java)
-
-        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().arbeidiflereland.shouldNotBeNull().run {
-                bosted.shouldNotBeNull().land shouldBe "SE"
-                yrkesaktivitet.shouldNotBeNull().startdato shouldBe "2020-01-01"
-            }
-        }
-    }
-
-    @Test
-    fun `roundtrip CDM 4_3 - serialiser og deserialiser SED bevarer data`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-        val json = jsonMapper.writeValueAsString(sed)
-        val deserialized = jsonMapper.readValue(json, SED::class.java)
-
-        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().arbeidiflereland.shouldNotBeNull().run {
-                bosted.shouldNotBeNull().land shouldBe "SE"
-                yrkesaktivitet.shouldNotBeNull().startdato shouldBe "2020-01-01"
-            }
-        }
     }
 }
