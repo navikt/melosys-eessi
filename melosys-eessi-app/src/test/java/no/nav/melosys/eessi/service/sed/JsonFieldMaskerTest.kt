@@ -8,7 +8,7 @@ import java.nio.file.Paths
 
 class JsonFieldMaskerTest {
 
-    private val jsonFieldMasker = JsonFieldMasker(JsonMapper.builder().build())
+    private val jsonFieldMasker = JsonFieldMasker(JsonMapper.builder().build(), "prod-fss")
 
     @Test
     fun `alt som ikke er i whitelist eller er boolean, float eller null skal maskeres`() {
