@@ -15,11 +15,18 @@ import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinFeature
+import tools.jackson.module.kotlin.KotlinModule
 
 class A008MapperTest {
 
     private lateinit var fakeUnleash: FakeUnleash
     private lateinit var a008Mapper: A008Mapper
+
+    private val jsonMapper: JsonMapper = JsonMapper.builder()
+        .addModule(KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault).build())
+        .build()
 
     @BeforeEach
     fun setup() {
@@ -270,6 +277,94 @@ class A008MapperTest {
             bruker.shouldNotBeNull().run {
                 arbeidiflereland.shouldNotBeNull()
                 cdm44.shouldBeTrue()
+            }
+        }
+    }
+
+    @Test
+    fun `CDM 4_4 serialiserer arbeidiflereland som array i JSON`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(sed)
+        val jsonTree = jsonMapper.readTree(json)
+
+        val arbeidiflereland = jsonTree.path("medlemskap").path("bruker").path("arbeidiflereland")
+        arbeidiflereland.isArray.shouldBeTrue()
+        arbeidiflereland.size() shouldBe 1
+        arbeidiflereland[0].path("bosted").path("land").asText() shouldBe "SE"
+    }
+
+    @Test
+    fun `CDM 4_3 serialiserer arbeidiflereland som objekt i JSON`() {
+        fakeUnleash.disable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(sed)
+        val jsonTree = jsonMapper.readTree(json)
+
+        val arbeidiflereland = jsonTree.path("medlemskap").path("bruker").path("arbeidiflereland")
+        arbeidiflereland.isObject.shouldBeTrue()
+        arbeidiflereland.path("bosted").path("land").asText() shouldBe "SE"
+    }
+
+    @Test
+    fun `cdm44 flag lekker ikke til JSON`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(sed)
+        val jsonTree = jsonMapper.readTree(json)
+
+        jsonTree.path("medlemskap").path("bruker").path("cdm44").isMissingNode.shouldBeTrue()
+    }
+
+    @Test
+    fun `roundtrip CDM 4_4 - serialiser og deserialiser SED bevarer data`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(sed)
+        val deserialized = jsonMapper.readValue(json, SED::class.java)
+
+        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().arbeidiflereland.shouldNotBeNull().run {
+                bosted.shouldNotBeNull().land shouldBe "SE"
+                yrkesaktivitet.shouldNotBeNull().startdato shouldBe "2020-01-01"
+            }
+        }
+    }
+
+    @Test
+    fun `roundtrip CDM 4_3 - serialiser og deserialiser SED bevarer data`() {
+        fakeUnleash.disable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+        val json = jsonMapper.writeValueAsString(sed)
+        val deserialized = jsonMapper.readValue(json, SED::class.java)
+
+        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            bruker.shouldNotBeNull().arbeidiflereland.shouldNotBeNull().run {
+                bosted.shouldNotBeNull().land shouldBe "SE"
+                yrkesaktivitet.shouldNotBeNull().startdato shouldBe "2020-01-01"
             }
         }
     }

@@ -70,10 +70,9 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
             ?: return null
 
         val adresse = sedData.bostedsadresse?.let {
-            val by = it.poststed.tilEESSIShortString()
             Adresse(
-                by = by,
-                land = mapTilLandkodeIso2(it.land) ?: bostedsland
+                by = it.poststed.tilEESSIShortString(),
+                land = mapTilLandkodeIso2(it.land)
             )
         } ?: Adresse(land = bostedsland)
 
