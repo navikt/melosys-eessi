@@ -62,7 +62,10 @@ class A008MapperTest {
                 cdm44.shouldBeFalse()
             }
 
-            sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
+            sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().run {
+                size shouldBe 1
+                first().bosted.shouldBeNull()
+            }
 
             sed.run {
                 sedVer shouldBe "3"
@@ -174,6 +177,7 @@ class A008MapperTest {
 
     @Test
     fun `bosted-adresse ligger paa arbeidsland index 0 uansett land-match`() {
+        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
             bostedsadresse = Adresse(poststed = "Stockholm", land = "SE", adressetype = Adressetype.BOSTEDSADRESSE)
@@ -210,6 +214,7 @@ class A008MapperTest {
 
     @Test
     fun `bosted er null naar avklartBostedsland mangler`() {
+        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = null
         }

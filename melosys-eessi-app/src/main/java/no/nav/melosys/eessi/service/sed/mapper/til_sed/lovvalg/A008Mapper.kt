@@ -56,9 +56,9 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
 
     override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> =
         super.hentArbeidsland(sedData).also { arbeidslandListe ->
-            arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
-
             if (unleash.isEnabled(CDM_4_4)) {
+                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+
                 arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
                     arbeidssted.adresse?.navn = arbeidssted.navn
                 }
@@ -70,9 +70,10 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
             ?: return null
 
         val adresse = sedData.bostedsadresse?.let {
+            val by = it.poststed.tilEESSIShortString()
             Adresse(
-                by = it.poststed.tilEESSIShortString(),
-                land = mapTilLandkodeIso2(it.land)
+                by = by,
+                land = mapTilLandkodeIso2(it.land) ?: bostedsland
             )
         } ?: Adresse(land = bostedsland)
 
