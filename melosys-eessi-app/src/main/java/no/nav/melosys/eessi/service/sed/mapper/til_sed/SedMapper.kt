@@ -86,26 +86,24 @@ interface SedMapper {
         )
 
     fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> =
-        sedData.arbeidsland.map { arbeidsland ->
+        sedData.arbeidsland.mapIndexed { index, arbeidsland ->
             no.nav.melosys.eessi.models.sed.nav.Arbeidsland(
                 land = arbeidsland.land,
                 arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted),
-                bosted = lagArbeidslandBosted(sedData, arbeidsland.land)
+                bosted = if (index == 0) lagArbeidslandBosted(sedData) else null
             )
         }
 
-    private fun lagArbeidslandBosted(sedData: SedDataDto, arbeidslandLand: String?): ArbeidslandBosted? {
-        if (arbeidslandLand == null) return null
-        if (sedData.avklartBostedsland != arbeidslandLand) return null
+    private fun lagArbeidslandBosted(sedData: SedDataDto): ArbeidslandBosted? {
+        val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
+            ?: return null
 
         val adresse = sedData.bostedsadresse?.let {
             no.nav.melosys.eessi.models.sed.nav.Adresse(
                 by = it.poststed.tilEESSIShortString(),
                 land = mapTilLandkodeIso2(it.land)
             )
-        } ?: no.nav.melosys.eessi.models.sed.nav.Adresse(
-            land = mapTilLandkodeIso2(sedData.avklartBostedsland)
-        )
+        } ?: no.nav.melosys.eessi.models.sed.nav.Adresse(land = bostedsland)
 
         return ArbeidslandBosted(adresse = adresse)
     }

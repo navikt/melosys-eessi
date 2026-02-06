@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
-import no.nav.melosys.eessi.controller.dto.A008Formaal
+import no.nav.melosys.eessi.controller.dto.*
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
 import no.nav.melosys.eessi.models.sed.nav.ArbeidIFlereLand
@@ -177,38 +177,56 @@ class A008MapperTest {
     }
 
     @Test
-    fun `A008 CDM 4_4 skal ha bosted-adresse paa arbeidsland naar arbeidsland matcher bostedsland`() {
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "NO"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
-            land shouldBe "NO"
-            bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
-                by shouldBe "Noi"
-                land shouldBe "NO"
-            }
-        }
-    }
-
-    @Test
-    fun `bosted er null naar arbeidsland ikke matcher bostedsland`() {
+    fun `bosted-adresse ligger paa arbeidsland index 0 uansett land-match`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
+            bostedsadresse = Adresse(poststed = "Stockholm", land = "SE", adressetype = Adressetype.BOSTEDSADRESSE)
+            arbeidsland = listOf(
+                no.nav.melosys.eessi.controller.dto.Arbeidsland(
+                    land = "NO",
+                    arbeidssted = listOf(Arbeidssted(adresse = Adresse(poststed = "Oslo", land = "NO"), fysisk = true, navn = "Jobb1"))
+                ),
+                no.nav.melosys.eessi.controller.dto.Arbeidsland(
+                    land = "SE",
+                    arbeidssted = listOf(Arbeidssted(adresse = Adresse(poststed = "Stockholm", land = "SE"), fysisk = true, navn = "Jobb2"))
+                )
+            )
         }
 
         val sed = a008Mapper.mapTilSed(sedData)
 
-        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+        val arbeidslandListe = sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull()
+        arbeidslandListe.size shouldBe 2
+
+        arbeidslandListe[0].run {
             land shouldBe "NO"
+            bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                by shouldBe "Stockholm"
+                land shouldBe "SE"
+            }
+        }
+
+        arbeidslandListe[1].run {
+            land shouldBe "SE"
             bosted.shouldBeNull()
         }
     }
 
     @Test
-    fun `A008 skal ha companyNameVesselName paa arbeidssted adresse`() {
+    fun `bosted er null naar avklartBostedsland mangler`() {
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = null
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+            bosted.shouldBeNull()
+        }
+    }
+
+    @Test
+    fun `companyNameVesselName settes paa arbeidssted adresse og arbeidssted navn`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
 
         val sed = a008Mapper.mapTilSed(sedData)
