@@ -89,9 +89,26 @@ interface SedMapper {
         sedData.arbeidsland.map { arbeidsland ->
             no.nav.melosys.eessi.models.sed.nav.Arbeidsland(
                 land = arbeidsland.land,
-                arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted)
+                arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted),
+                bosted = lagArbeidslandBosted(sedData, arbeidsland.land)
             )
         }
+
+    private fun lagArbeidslandBosted(sedData: SedDataDto, arbeidslandLand: String?): ArbeidslandBosted? {
+        if (arbeidslandLand == null) return null
+        if (sedData.avklartBostedsland != arbeidslandLand) return null
+
+        val adresse = sedData.bostedsadresse?.let {
+            no.nav.melosys.eessi.models.sed.nav.Adresse(
+                by = it.poststed.tilEESSIShortString(),
+                land = mapTilLandkodeIso2(it.land)
+            )
+        } ?: no.nav.melosys.eessi.models.sed.nav.Adresse(
+            land = mapTilLandkodeIso2(sedData.avklartBostedsland)
+        )
+
+        return ArbeidslandBosted(adresse = adresse)
+    }
 
     fun hentArbeidsgivereILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> =
         hentArbeidsgiver(virksomheter) { it.adresse.land == landkode }
@@ -192,7 +209,7 @@ interface SedMapper {
         arbeidssteder.map {
             no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
                 navn = it.navn,
-                adresse = mapAdresseForBedrift(it.adresse),
+                adresse = mapAdresseForBedrift(it.adresse).apply { navn = it.navn },
                 hjemmebase = landkodeIso2EllerNull(it.hjemmebase),
                 erikkefastadresse = when {
                     it.fysisk -> "nei"

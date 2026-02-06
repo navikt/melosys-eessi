@@ -177,6 +177,51 @@ class A008MapperTest {
     }
 
     @Test
+    fun `A008 CDM 4_4 skal ha bosted-adresse paa arbeidsland naar arbeidsland matcher bostedsland`() {
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "NO"
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+            land shouldBe "NO"
+            bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                by shouldBe "Noi"
+                land shouldBe "NO"
+            }
+        }
+    }
+
+    @Test
+    fun `bosted er null naar arbeidsland ikke matcher bostedsland`() {
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "SE"
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+            land shouldBe "NO"
+            bosted.shouldBeNull()
+        }
+    }
+
+    @Test
+    fun `A008 skal ha companyNameVesselName paa arbeidssted adresse`() {
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+            arbeidssted.first().run {
+                navn shouldBe "MinJobb"
+                adresse.shouldNotBeNull().navn shouldBe "MinJobb"
+            }
+        }
+    }
+
+    @Test
     fun `arbeidiflereland er liste naar CDM 4_4 toggle er paa`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
