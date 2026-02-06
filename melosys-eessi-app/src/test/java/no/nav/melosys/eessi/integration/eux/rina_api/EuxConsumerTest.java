@@ -371,12 +371,7 @@ class EuxConsumerTest {
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA008.class);
 
         MedlemskapA008 medlemskapA008 = (MedlemskapA008) resultat.getMedlemskap();
-        // arbeidiflereland er Any? og deserialiseres som Map ved mottak av JSON
-        @SuppressWarnings("unchecked")
-        Map<String, Object> arbeidIFlereLand = (Map<String, Object>) medlemskapA008.getBruker().getArbeidiflereland();
-        @SuppressWarnings("unchecked")
-        Map<String, Object> bosted = (Map<String, Object>) arbeidIFlereLand.get("bosted");
-        assertThat(bosted.get("land")).isEqualTo("SE");
+        assertThat(medlemskapA008.getBruker().getArbeidiflereland().getBosted().getLand()).isEqualTo("SE");
     }
 
     @Test

@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
 import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilLandkodeIso2
 import org.slf4j.LoggerFactory
 
 class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008> {
@@ -53,7 +54,33 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
             }
         }
 
+    override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> =
+        super.hentArbeidsland(sedData).also { arbeidslandListe ->
+            arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+
+            if (unleash.isEnabled(CDM_4_4)) {
+                arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
+                    arbeidssted.adresse?.navn = arbeidssted.navn
+                }
+            }
+        }
+
+    private fun lagArbeidslandBosted(sedData: SedDataDto): ArbeidslandBosted? {
+        val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
+            ?: return null
+
+        val adresse = sedData.bostedsadresse?.let {
+            Adresse(
+                by = it.poststed.tilEESSIShortString(),
+                land = mapTilLandkodeIso2(it.land)
+            )
+        } ?: Adresse(land = bostedsland)
+
+        return ArbeidslandBosted(adresse = adresse)
+    }
+
     private fun hentA008Bruker(sedData: SedDataDto): MedlemskapA008Bruker {
+        val isCdm44 = unleash.isEnabled(CDM_4_4)
         val arbeidIFlereLand = ArbeidIFlereLand(
             bosted = Bosted(sedData.avklartBostedsland),
             yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
@@ -62,11 +89,8 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
         )
 
         return MedlemskapA008Bruker(
-            arbeidiflereland = if (unleash.isEnabled(CDM_4_4)) {
-                listOf(arbeidIFlereLand)  // CDM 4.4: array
-            } else {
-                arbeidIFlereLand  // CDM 4.3: enkelt objekt
-            }
+            arbeidiflereland = arbeidIFlereLand,
+            cdm44 = isCdm44
         )
     }
 }

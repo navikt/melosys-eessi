@@ -1,11 +1,11 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.getunleash.FakeUnleash
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.booleans.shouldBeFalse
+import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.*
@@ -53,13 +53,13 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull()
-                    .shouldBeInstanceOf<ArbeidIFlereLand>().run {
-                        yrkesaktivitet.shouldNotBeNull()
-                            .startdato shouldBe "2020-01-01"
-                        bosted.shouldNotBeNull()
-                            .land shouldBe "SE"
-                    }
+                arbeidiflereland.shouldNotBeNull().run {
+                    yrkesaktivitet.shouldNotBeNull()
+                        .startdato shouldBe "2020-01-01"
+                    bosted.shouldNotBeNull()
+                        .land shouldBe "SE"
+                }
+                cdm44.shouldBeFalse()
             }
 
             sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
@@ -83,18 +83,13 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull()
-                    .shouldBeInstanceOf<List<*>>()
-                @Suppress("UNCHECKED_CAST")
-                (arbeidiflereland as List<ArbeidIFlereLand>).run {
-                    size shouldBe 1
-                    first().run {
-                        yrkesaktivitet.shouldNotBeNull()
-                            .startdato shouldBe "2020-01-01"
-                        bosted.shouldNotBeNull()
-                            .land shouldBe "SE"
-                    }
+                arbeidiflereland.shouldNotBeNull().run {
+                    yrkesaktivitet.shouldNotBeNull()
+                        .startdato shouldBe "2020-01-01"
+                    bosted.shouldNotBeNull()
+                        .land shouldBe "SE"
                 }
+                cdm44.shouldBeTrue()
             }
 
             sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
@@ -161,7 +156,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `arbeidiflereland er objekt naar CDM 4_4 toggle er av`() {
+    fun `cdm44 flag er false naar toggle er av`() {
         fakeUnleash.disable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
@@ -172,6 +167,7 @@ class A008MapperTest {
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
                 arbeidiflereland.shouldBeInstanceOf<ArbeidIFlereLand>()
+                cdm44.shouldBeFalse()
             }
         }
     }
@@ -226,7 +222,8 @@ class A008MapperTest {
     }
 
     @Test
-    fun `companyNameVesselName settes paa arbeidssted adresse og arbeidssted navn`() {
+    fun `companyNameVesselName settes paa arbeidssted adresse naar CDM 4_4`() {
+        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
 
         val sed = a008Mapper.mapTilSed(sedData)
@@ -240,7 +237,22 @@ class A008MapperTest {
     }
 
     @Test
-    fun `arbeidiflereland er liste naar CDM 4_4 toggle er paa`() {
+    fun `companyNameVesselName settes ikke paa arbeidssted adresse naar CDM 4_3`() {
+        fakeUnleash.disable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+            arbeidssted.first().run {
+                navn shouldBe "MinJobb"
+                adresse.shouldNotBeNull().navn.shouldBeNull()
+            }
+        }
+    }
+
+    @Test
+    fun `cdm44 flag er true naar toggle er paa`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
@@ -251,8 +263,8 @@ class A008MapperTest {
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
             bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldBeInstanceOf<List<*>>()
-                (arbeidiflereland as List<*>).size shouldBe 1
+                arbeidiflereland.shouldNotBeNull()
+                cdm44.shouldBeTrue()
             }
         }
     }

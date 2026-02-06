@@ -86,27 +86,12 @@ interface SedMapper {
         )
 
     fun hentArbeidsland(sedData: SedDataDto): List<no.nav.melosys.eessi.models.sed.nav.Arbeidsland> =
-        sedData.arbeidsland.mapIndexed { index, arbeidsland ->
+        sedData.arbeidsland.map { arbeidsland ->
             no.nav.melosys.eessi.models.sed.nav.Arbeidsland(
                 land = arbeidsland.land,
-                arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted),
-                bosted = if (index == 0) lagArbeidslandBosted(sedData) else null
+                arbeidssted = hentArbeidssted4_3(arbeidsland.arbeidssted)
             )
         }
-
-    private fun lagArbeidslandBosted(sedData: SedDataDto): ArbeidslandBosted? {
-        val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
-            ?: return null
-
-        val adresse = sedData.bostedsadresse?.let {
-            no.nav.melosys.eessi.models.sed.nav.Adresse(
-                by = it.poststed.tilEESSIShortString(),
-                land = mapTilLandkodeIso2(it.land)
-            )
-        } ?: no.nav.melosys.eessi.models.sed.nav.Adresse(land = bostedsland)
-
-        return ArbeidslandBosted(adresse = adresse)
-    }
 
     fun hentArbeidsgivereILand(virksomheter: List<Virksomhet>, landkode: String?): List<Arbeidsgiver> =
         hentArbeidsgiver(virksomheter) { it.adresse.land == landkode }
@@ -207,7 +192,7 @@ interface SedMapper {
         arbeidssteder.map {
             no.nav.melosys.eessi.models.sed.nav.Arbeidssted(
                 navn = it.navn,
-                adresse = mapAdresseForBedrift(it.adresse).apply { navn = it.navn },
+                adresse = mapAdresseForBedrift(it.adresse),
                 hjemmebase = landkodeIso2EllerNull(it.hjemmebase),
                 erikkefastadresse = when {
                     it.fysisk -> "nei"

@@ -1,14 +1,17 @@
 package no.nav.melosys.eessi.models.sed.nav
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import no.nav.melosys.eessi.models.sed.ArbeidIFlereLandDeserializer
+import no.nav.melosys.eessi.models.sed.MedlemskapA008BrukerSerializer
+import tools.jackson.databind.annotation.JsonDeserialize
+import tools.jackson.databind.annotation.JsonSerialize
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class MedlemskapA008Bruker (
-    /**
-     * CDM 4.3: ArbeidIFlereLand (enkelt objekt)
-     * CDM 4.4: List<ArbeidIFlereLand> (array)
-     *
-     * Type bestemmes av CDM_4_4 toggle ved mapping i A008Mapper.
-     */
-    var arbeidiflereland: Any? = null
+@JsonSerialize(using = MedlemskapA008BrukerSerializer::class)
+data class MedlemskapA008Bruker(
+    @JsonDeserialize(using = ArbeidIFlereLandDeserializer::class)
+    var arbeidiflereland: ArbeidIFlereLand? = null,
+    @JsonIgnore
+    var cdm44: Boolean = false
 )
