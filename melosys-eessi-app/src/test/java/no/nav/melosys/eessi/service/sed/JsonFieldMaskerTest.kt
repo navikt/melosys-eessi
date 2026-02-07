@@ -1,14 +1,18 @@
 package no.nav.melosys.eessi.service.sed
 
 import io.kotest.assertions.json.shouldEqualJson
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import org.junit.jupiter.api.Test
+import org.springframework.mock.env.MockEnvironment
 import tools.jackson.databind.json.JsonMapper
 import java.nio.file.Files
 import java.nio.file.Paths
 
 class JsonFieldMaskerTest {
 
-    private val jsonFieldMasker = JsonFieldMasker(JsonMapper.builder().build())
+    private val mapper = JsonMapper.builder().build()
+    private val jsonFieldMasker = JsonFieldMasker(mapper, MockEnvironment())
 
     @Test
     fun `alt som ikke er i whitelist eller er boolean, float eller null skal maskeres`() {
@@ -64,6 +68,39 @@ class JsonFieldMaskerTest {
         val maskedJson = jsonFieldMasker.toMaskedJson(sedDataDto)
 
         maskedJson shouldEqualJson expectedJson
+    }
+
+    @Test
+    fun `prod-gcp maskerer persondata`() {
+        val masker = JsonFieldMasker(mapper, MockEnvironment(), naisClusterName = "prod-gcp")
+        val sedDataDto = SedDataStub.getStub("mock/sedDataDtoStub.json")
+
+        masker.toMaskedJson(sedDataDto) shouldNotContain "MrFornavn"
+    }
+
+    @Test
+    fun `dev-gcp viser full JSON uten maskering`() {
+        val masker = JsonFieldMasker(mapper, MockEnvironment(), naisClusterName = "dev-gcp")
+        val sedDataDto = SedDataStub.getStub("mock/sedDataDtoStub.json")
+
+        masker.toMaskedJson(sedDataDto) shouldContain "MrFornavn"
+    }
+
+    @Test
+    fun `local-mock profil viser full JSON uten maskering`() {
+        val env = MockEnvironment().apply { setActiveProfiles("local-mock") }
+        val masker = JsonFieldMasker(mapper, env)
+        val sedDataDto = SedDataStub.getStub("mock/sedDataDtoStub.json")
+
+        masker.toMaskedJson(sedDataDto) shouldContain "MrFornavn"
+    }
+
+    @Test
+    fun `ukjent miljo maskerer persondata`() {
+        val masker = JsonFieldMasker(mapper, MockEnvironment(), naisClusterName = "ukjent")
+        val sedDataDto = SedDataStub.getStub("mock/sedDataDtoStub.json")
+
+        masker.toMaskedJson(sedDataDto) shouldNotContain "MrFornavn"
     }
 
     private fun readFile(fileName: String): String {

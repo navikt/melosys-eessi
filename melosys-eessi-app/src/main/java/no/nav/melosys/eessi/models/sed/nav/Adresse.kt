@@ -8,6 +8,7 @@ data class Adresse(
     var bygning: String? = null,
     var gate: String? = null,
     var land: String? = null,
+    var navn: String? = null,
     var postnummer: String? = null,
     var region: String? = null,
     var type: String? = null

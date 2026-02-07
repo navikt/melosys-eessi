@@ -62,7 +62,7 @@ class SedServiceTest {
     fun setup() {
         sendSedService = SedService(
             euxService, saksrelasjonService, 0L, JsonFieldMasker(
-                JsonMapper.builder().build()
+                JsonMapper.builder().build(), org.springframework.mock.env.MockEnvironment()
             ), safConsumer, sedMapperFactory
         )
     }
