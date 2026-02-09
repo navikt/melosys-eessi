@@ -29,7 +29,7 @@ interface MelosysEessiMeldingMapper {
                 arbeidssteder = arbeidsstedList.map(::Arbeidssted)
             }
             nav.arbeidsland?.let { arbeidslandList ->
-                arbeidsland = arbeidslandList.map(::Arbeidsland)
+                arbeidsland = arbeidslandList.filter { it.land != null }.map(::Arbeidsland)
             }
         }
     }
