@@ -81,7 +81,7 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
 
     private fun hentA008Bruker(sedData: SedDataDto): MedlemskapA008Bruker {
         val arbeidIFlereLand = ArbeidIFlereLand(
-            bosted = Bosted(sedData.avklartBostedsland),
+            bosted = Bosted(sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }),
             yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
                 Yrkesaktivitet(startdato = søknadsperiodeFom.formaterEllerNull())
             }
