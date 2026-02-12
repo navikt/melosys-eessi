@@ -13,7 +13,6 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.models.sed.nav.Bruker
 import no.nav.melosys.eessi.models.sed.nav.Periode
-import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.LandkodeMapper.finnLandkodeIso2
 import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilLandkodeIso2
 import org.springframework.util.StringUtils
@@ -61,12 +60,7 @@ interface SedMapper {
         sedDataDto.bruker.statsborgerskap
             .filter { finnLandkodeIso2(it).isPresent }
             .map { lagStatsborgerskap(it) }
-            .onEach { statsborgerskap ->
-                if (statsborgerskap.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2) {
-                    statsborgerskap.land = LandkodeMapper.UKJENT_LANDKODE_ISO2
-                    log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: ${sedDataDto.gsakSaksnummer}")
-                }
-            }.apply {
+            .apply {
                 if (isEmpty()) {
                     throw MappingException(
                         "Statsborgerskap mangler eller er ugyldig. Statsborgerskap fra sedData: ${

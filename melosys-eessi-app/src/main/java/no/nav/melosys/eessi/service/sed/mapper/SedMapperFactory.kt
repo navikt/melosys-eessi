@@ -1,16 +1,23 @@
 package no.nav.melosys.eessi.service.sed.mapper
 
 import io.getunleash.Unleash
+import mu.KotlinLogging
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
+import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.SED
+import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X008Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.horisontal.HorisontalSedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.*
 import org.springframework.stereotype.Component
 
+private val log = KotlinLogging.logger { }
+
 @Component
-class SedMapperFactory(unleash: Unleash) {
+class SedMapperFactory(private val unleash: Unleash) {
 
     private val sedMappers: Map<SedType, SedMapper> = mapOf(
         SedType.A001 to A001Mapper(),
@@ -45,5 +52,24 @@ class SedMapperFactory(unleash: Unleash) {
     fun sedMapper(sedType: SedType): SedMapper {
         return sedMappers[sedType]
             ?: throw MappingException("Sed-type ${sedType.name} støttes ikke")
+    }
+
+    fun mapTilSed(sedType: SedType, sedDataDto: SedDataDto): SED {
+        val sed = sedMapper(sedType).mapTilSed(sedDataDto)
+        if (!unleash.isEnabled(CDM_4_4)) {
+            konverterKosovoTilUkjent(sed, sedDataDto.gsakSaksnummer)
+        }
+        return sed
+    }
+
+    private fun konverterKosovoTilUkjent(sed: SED, gsakSaksnummer: Long?) {
+        sed.finnPerson().ifPresent { person ->
+            person.statsborgerskap.filterNotNull().forEach { statsborgerskap ->
+                if (statsborgerskap.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2) {
+                    statsborgerskap.land = LandkodeMapper.UKJENT_LANDKODE_ISO2
+                    log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: $gsakSaksnummer")
+                }
+            }
+        }
     }
 }
