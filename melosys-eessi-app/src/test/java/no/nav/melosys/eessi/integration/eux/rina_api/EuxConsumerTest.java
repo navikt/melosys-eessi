@@ -371,7 +371,13 @@ class EuxConsumerTest {
         assertThat(resultat.getMedlemskap().getClass()).isEqualTo(MedlemskapA008.class);
 
         MedlemskapA008 medlemskapA008 = (MedlemskapA008) resultat.getMedlemskap();
-        assertThat(medlemskapA008.getBruker().getArbeidiflereland().getBosted().getLand()).isEqualTo("SE");
+        // TODO: Map-casts pga Any? i MedlemskapA008Bruker. Rydd opp når feltet får typet modell.
+        assertThat(medlemskapA008.getBruker().getArbeidiflereland()).isNotNull();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> arbeidiflereland = (Map<String, Object>) medlemskapA008.getBruker().getArbeidiflereland();
+        @SuppressWarnings("unchecked")
+        Map<String, Object> bosted = (Map<String, Object>) arbeidiflereland.get("bosted");
+        assertThat(bosted.get("land")).isEqualTo("SE");
     }
 
     @Test

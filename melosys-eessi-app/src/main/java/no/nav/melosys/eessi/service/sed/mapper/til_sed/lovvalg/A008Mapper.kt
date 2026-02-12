@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
 import no.nav.melosys.eessi.models.sed.nav.*
+import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilLandkodeIso2
 import org.slf4j.LoggerFactory
 
 class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008> {
@@ -53,12 +54,41 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
             }
         }
 
-    private fun hentA008Bruker(sedData: SedDataDto) =
-        MedlemskapA008Bruker(
-            arbeidiflereland = ArbeidIFlereLand(
-                bosted = Bosted(sedData.avklartBostedsland),
-                yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
-                    Yrkesaktivitet(startdato = søknadsperiodeFom.formaterEllerNull())
+    override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> =
+        super.hentArbeidsland(sedData).also { arbeidslandListe ->
+            if (unleash.isEnabled(CDM_4_4)) {
+                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+
+                arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
+                    arbeidssted.adresse?.navn = arbeidssted.navn
                 }
-            ))
+            }
+        }
+
+    private fun lagArbeidslandBosted(sedData: SedDataDto): ArbeidslandBosted? {
+        val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
+            ?: return null
+
+        val adresse = sedData.bostedsadresse?.let {
+            Adresse(
+                by = it.poststed.tilEESSIShortString(),
+                land = mapTilLandkodeIso2(it.land)
+            )
+        } ?: Adresse(land = bostedsland)
+
+        return ArbeidslandBosted(adresse = adresse)
+    }
+
+    private fun hentA008Bruker(sedData: SedDataDto): MedlemskapA008Bruker {
+        val arbeidIFlereLand = ArbeidIFlereLand(
+            bosted = Bosted(sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }),
+            yrkesaktivitet = sedData.søknadsperiode?.fom?.let { søknadsperiodeFom ->
+                Yrkesaktivitet(startdato = søknadsperiodeFom.formaterEllerNull())
+            }
+        )
+
+        return MedlemskapA008Bruker(
+            arbeidiflereland = if (unleash.isEnabled(CDM_4_4)) listOf(arbeidIFlereLand) else arbeidIFlereLand
+        )
+    }
 }

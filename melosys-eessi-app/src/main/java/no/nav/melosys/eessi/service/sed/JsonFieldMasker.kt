@@ -2,14 +2,21 @@ package no.nav.melosys.eessi.service.sed
 
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.sed.SED
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.databind.node.ArrayNode
-import tools.jackson.databind.node.ObjectNode
 
 @Component
-class JsonFieldMasker(private val mapper: JsonMapper) {
+class JsonFieldMasker(
+    private val mapper: JsonMapper,
+    private val environment: Environment,
+    @Value("\${NAIS_CLUSTER_NAME:}") private val naisClusterName: String = ""
+) {
+
+    private val skipMasking: Boolean get() =
+        environment.activeProfiles.any { it.contains("local") } || naisClusterName.startsWith("dev")
 
     fun sanitizeJson(json: String, whitelist: Set<String>): String {
 
@@ -96,7 +103,8 @@ class JsonFieldMasker(private val mapper: JsonMapper) {
 
     private fun <T> toMaskedJson(data: T, keepFields: Set<String>): String =
         try {
-            sanitizeJson(mapper.writeValueAsString(data), keepFields)
+            val json = mapper.writeValueAsString(data)
+            if (skipMasking) mapper.readTree(json).toPrettyString() else sanitizeJson(json, keepFields)
         } catch (e: Exception) {
             "Failed to mask JSON: ${e.message}"
         }
