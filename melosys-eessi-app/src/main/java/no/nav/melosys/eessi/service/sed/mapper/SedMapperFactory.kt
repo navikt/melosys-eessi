@@ -57,19 +57,20 @@ class SedMapperFactory(private val unleash: Unleash) {
     fun mapTilSed(sedType: SedType, sedDataDto: SedDataDto): SED {
         val sed = sedMapper(sedType).mapTilSed(sedDataDto)
         if (!unleash.isEnabled(CDM_4_4)) {
-            konverterKosovoTilUkjent(sed, sedDataDto.gsakSaksnummer)
+            return konverterKosovoTilUkjent(sed, sedDataDto.gsakSaksnummer)
         }
         return sed
     }
 
-    private fun konverterKosovoTilUkjent(sed: SED, gsakSaksnummer: Long?) {
-        sed.finnPerson().ifPresent { person ->
-            person.statsborgerskap.filterNotNull().forEach { statsborgerskap ->
-                if (statsborgerskap.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2) {
-                    statsborgerskap.land = LandkodeMapper.UKJENT_LANDKODE_ISO2
-                    log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: $gsakSaksnummer")
-                }
-            }
+    private fun konverterKosovoTilUkjent(sed: SED, gsakSaksnummer: Long?): SED {
+        val person = sed.finnPerson().orElse(null) ?: return sed
+
+        person.statsborgerskap = person.statsborgerskap.map {
+            if (it?.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2) {
+                log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: $gsakSaksnummer")
+                it.copy(land = LandkodeMapper.UKJENT_LANDKODE_ISO2)
+            } else it
         }
+        return sed
     }
 }
