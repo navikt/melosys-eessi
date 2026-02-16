@@ -61,6 +61,7 @@ class SedServiceTest {
 
     @BeforeEach
     fun setup() {
+        fakeUnleash.resetAll()
         sendSedService = SedService(
             euxService, saksrelasjonService, 0L, JsonFieldMasker(
                 JsonMapper.builder().build(), org.springframework.mock.env.MockEnvironment()
@@ -181,8 +182,6 @@ class SedServiceTest {
             .person.shouldNotBeNull()
             .statsborgerskap.shouldNotBeNull().shouldHaveSize(1).single().shouldNotBeNull()
             .land shouldBe LandkodeMapper.KOSOVO_LANDKODE_ISO2
-
-        fakeUnleash.disable(CDM_4_4)
     }
 
     @Test

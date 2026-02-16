@@ -11,12 +11,18 @@ import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A001Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A009Mapper
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SedMapperFactoryTest {
 
     private val fakeUnleash = FakeUnleash()
     private val sedMapperFactory = SedMapperFactory(fakeUnleash)
+
+    @BeforeEach
+    fun setup() {
+        fakeUnleash.resetAll()
+    }
 
     @Test
     fun oppslagavSedA001GirKorrektMapper() {
@@ -90,7 +96,5 @@ class SedMapperFactoryTest {
         sed.finnPerson().get()
             .statsborgerskap.shouldNotBeNull().shouldHaveSize(1).single().shouldNotBeNull()
             .land shouldBe LandkodeMapper.KOSOVO_LANDKODE_ISO2
-
-        fakeUnleash.disable(CDM_4_4)
     }
 }
