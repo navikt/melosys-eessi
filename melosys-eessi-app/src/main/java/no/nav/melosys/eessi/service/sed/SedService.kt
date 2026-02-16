@@ -72,8 +72,7 @@ class SedService(
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer)
         val mottakere = sedDataDto.mottakerIder
         val sedType = bucType!!.hentFørsteLovligeSed()
-        val sedMapper = sedMapperFactory.sedMapper(sedType)
-        val sed = sedMapper.mapTilSed(sedDataDto)
+        val sed = sedMapperFactory.mapTilSed(sedType, sedDataDto)
         validerMottakerInstitusjoner(bucType, mottakere!!)
         val response = executeWithSedLogging(
             "opprettEllerOppdaterBucOgSed feilet", sedDataDto, sed
@@ -162,8 +161,7 @@ class SedService(
     }
 
     fun genererPdfFraSed(sedDataDto: SedDataDto, sedType: SedType): ByteArray? {
-        val sedMapper = sedMapperFactory.sedMapper(sedType)
-        val sed = sedMapper.mapTilSed(sedDataDto)
+        val sed = sedMapperFactory.mapTilSed(sedType, sedDataDto)
         return executeWithSedLogging("Feil ved genererPdfFraSed", sedDataDto, sed) {
             euxService.genererPdfFraSed(sed)
         }
@@ -171,7 +169,7 @@ class SedService(
 
     fun sendPåEksisterendeBuc(sedDataDto: SedDataDto, rinaSaksnummer: String, sedType: SedType) {
         val buc = euxService.hentBuc(rinaSaksnummer)
-        val sed = sedMapperFactory.sedMapper(sedType).mapTilSed(sedDataDto)
+        val sed = sedMapperFactory.mapTilSed(sedType, sedDataDto)
         verifiserSedVersjonErBucVersjon(buc, sed)
 
         return executeWithSedLogging("Feil ved sendPåEksisterendeBuc", sedDataDto, sed) {
