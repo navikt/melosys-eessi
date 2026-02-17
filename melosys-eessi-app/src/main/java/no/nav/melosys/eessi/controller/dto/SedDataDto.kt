@@ -42,7 +42,8 @@ data class SedDataDto(
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     var lovvalgsperioder: List<Lovvalgsperiode> = emptyList(),
     var gjeldenderegler: String? = null,
-    var a008Formaal: A008Formaal? = null
+    var a008Formaal: A008Formaal? = null,
+    var erFjernarbeidTWFA: Boolean? = null
 ) {
     fun finnLovvalgslandDefaultNO(): String = lovvalgsperioder.firstOrNull { it.lovvalgsland != null }?.lovvalgsland ?: "NO"
 

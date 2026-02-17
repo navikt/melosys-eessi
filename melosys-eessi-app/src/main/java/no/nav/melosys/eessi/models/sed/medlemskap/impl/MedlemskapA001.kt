@@ -13,5 +13,6 @@ data class MedlemskapA001(
     var naavaerendemedlemskap: MutableList<Land?>? = null,
     var forespurtmedlemskap: MutableList<Land?>? = null,
     var anmodning: Anmodning? = null,
-    var forrigesoeknad: MutableList<ForrigeSoeknad?>? = null
+    var forrigesoeknad: MutableList<ForrigeSoeknad?>? = null,
+    var forordning8832004: Forordning8832004? = null
 ) : Medlemskap
