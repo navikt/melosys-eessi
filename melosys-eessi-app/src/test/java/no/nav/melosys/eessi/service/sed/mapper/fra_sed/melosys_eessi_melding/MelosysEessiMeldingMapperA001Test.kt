@@ -65,7 +65,7 @@ class MelosysEessiMeldingMapperA001Test {
     @Test
     fun `mapA001 CDM 4_4 med TWFA markering`() {
         val medlemskap = hentMedlemskapCdm44().apply {
-            forordning8832004?.artikkel10 = Artikkel10(enighet = Enighet(eessiYesNoType = "1"))
+            rammeavtale = Rammeavtale(fjernarbeid = Fjernarbeid(eessiYesNoType = "ja"))
         }
 
         val melosysEessiMelding = mapMedlemskap(medlemskap)

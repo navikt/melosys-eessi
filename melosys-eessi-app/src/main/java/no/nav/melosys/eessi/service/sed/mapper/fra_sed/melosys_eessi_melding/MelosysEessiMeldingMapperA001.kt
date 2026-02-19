@@ -21,7 +21,7 @@ internal class MelosysEessiMeldingMapperA001 : NyttLovvalgEessiMeldingMapper<Med
         anmodningUnntak.unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap)
         anmodningUnntak.unntakFraLovvalgsbestemmelse = hentUnntakFraLovvalgsbestemmelse(medlemskap)
         anmodningUnntak.erFjernarbeidTWFA =
-            medlemskap.forordning8832004?.artikkel10?.enighet?.eessiYesNoType == "1"
+            medlemskap.rammeavtale?.fjernarbeid?.eessiYesNoType.equals("ja", ignoreCase = true)
         return anmodningUnntak
     }
 

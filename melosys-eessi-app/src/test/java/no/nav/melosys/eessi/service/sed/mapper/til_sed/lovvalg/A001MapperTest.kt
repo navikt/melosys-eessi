@@ -133,40 +133,61 @@ class A001MapperTest {
     }
 
     @Test
-    fun `TWFA markering settes naar erFjernarbeidTWFA er true`() {
+    fun `TWFA settes til ja naar erFjernarbeidTWFA er true og artikkel er 13_1_a`() {
+        fakeUnleash.enable(CDM_4_4)
+
+        val sed = mapTilA001 {
+            erFjernarbeidTWFA = true
+            lovvalgsperioder.first().unntakFraBestemmelse = Bestemmelse.ART_13_1_a
+        }
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
+            rammeavtale.shouldNotBeNull()
+                .fjernarbeid.shouldNotBeNull()
+                .eessiYesNoType shouldBe "ja"
+        }
+    }
+
+    @Test
+    fun `TWFA settes til nei naar erFjernarbeidTWFA er false og artikkel er 13_1_a`() {
+        fakeUnleash.enable(CDM_4_4)
+
+        val sed = mapTilA001 {
+            erFjernarbeidTWFA = false
+            lovvalgsperioder.first().unntakFraBestemmelse = Bestemmelse.ART_13_1_a
+        }
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
+            rammeavtale.shouldNotBeNull()
+                .fjernarbeid.shouldNotBeNull()
+                .eessiYesNoType shouldBe "nei"
+        }
+    }
+
+    @Test
+    fun `TWFA settes til nei naar erFjernarbeidTWFA er null og artikkel er 13_1_a`() {
+        fakeUnleash.enable(CDM_4_4)
+
+        val sed = mapTilA001 {
+            erFjernarbeidTWFA = null
+            lovvalgsperioder.first().unntakFraBestemmelse = Bestemmelse.ART_13_1_a
+        }
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
+            rammeavtale.shouldNotBeNull()
+                .fjernarbeid.shouldNotBeNull()
+                .eessiYesNoType shouldBe "nei"
+        }
+    }
+
+    @Test
+    fun `rammeavtale er null naar artikkel ikke er 13_1_a selv med CDM 4_4`() {
         fakeUnleash.enable(CDM_4_4)
 
         val sed = mapTilA001 { erFjernarbeidTWFA = true }
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
-            forordning8832004.shouldNotBeNull()
-                .artikkel10.shouldNotBeNull()
-                .enighet.shouldNotBeNull()
-                .eessiYesNoType shouldBe "1"
-        }
-    }
-
-    @Test
-    fun `TWFA markering settes ikke naar erFjernarbeidTWFA er false`() {
-        fakeUnleash.enable(CDM_4_4)
-
-        val sed = mapTilA001 { erFjernarbeidTWFA = false }
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
-            forordning8832004.shouldNotBeNull()
-                .artikkel10.shouldBeNull()
-        }
-    }
-
-    @Test
-    fun `TWFA markering settes ikke naar erFjernarbeidTWFA er null`() {
-        fakeUnleash.enable(CDM_4_4)
-
-        val sed = mapTilA001 { erFjernarbeidTWFA = null }
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
-            forordning8832004.shouldNotBeNull()
-                .artikkel10.shouldBeNull()
+            rammeavtale.shouldBeNull()
         }
     }
 
@@ -174,10 +195,14 @@ class A001MapperTest {
     fun `TWFA ignoreres naar CDM 4_3 selv om erFjernarbeidTWFA er true`() {
         fakeUnleash.disable(CDM_4_4)
 
-        val sed = mapTilA001 { erFjernarbeidTWFA = true }
+        val sed = mapTilA001 {
+            erFjernarbeidTWFA = true
+            lovvalgsperioder.first().unntakFraBestemmelse = Bestemmelse.ART_13_1_a
+        }
 
         sed.medlemskap.shouldBeInstanceOf<MedlemskapA001>().run {
             forordning8832004.shouldBeNull()
+            rammeavtale.shouldBeNull()
         }
     }
 }

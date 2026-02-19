@@ -2,6 +2,7 @@ package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.getunleash.Unleash
 import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
+import no.nav.melosys.eessi.controller.dto.Bestemmelse
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
@@ -34,7 +35,8 @@ class A001Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA001
             tidligereperiode = sedData.tidligereLovvalgsperioder.mapNotNull { mapTilPeriodeDto(it) }.toMutableList(),
             vertsland = getVertsland(sedData),
             anmodning = getAnmodning(),
-            forordning8832004 = if (unleash.isEnabled(CDM_4_4)) lovvalgsperiode?.let { getForordning8832004(it, sedData) } else null
+            forordning8832004 = if (unleash.isEnabled(CDM_4_4)) lovvalgsperiode?.let { getForordning8832004(it) } else null,
+            rammeavtale = lovvalgsperiode?.let { getRammeavtale(it, sedData) }
         )
     }
 
@@ -54,15 +56,21 @@ class A001Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA001
         )
     }
 
-    private fun getForordning8832004(lovvalgsperiode: Lovvalgsperiode, sedData: SedDataDto) = Forordning8832004(
+    private fun getForordning8832004(lovvalgsperiode: Lovvalgsperiode) = Forordning8832004(
         unntak = UnntakForordning(
             grunnlag = Grunnlag(
                 artikkel = UnntakArtikkelMapper.mapFromBestemmelse(lovvalgsperiode.unntakFraBestemmelse),
                 annet = if (UnntakArtikkelMapper.BESTEMMELSE_OTHER == lovvalgsperiode.unntakFraBestemmelse.toString()) "" else null
             )
-        ),
-        artikkel10 = if (sedData.erFjernarbeidTWFA == true) Artikkel10(enighet = Enighet(eessiYesNoType = "1")) else null
+        )
     )
+
+    private fun getRammeavtale(lovvalgsperiode: Lovvalgsperiode, sedData: SedDataDto): Rammeavtale? {
+        if (!unleash.isEnabled(CDM_4_4)) return null
+        if (lovvalgsperiode.unntakFraBestemmelse != Bestemmelse.ART_13_1_a) return null
+
+        return Rammeavtale(Fjernarbeid(if (sedData.erFjernarbeidTWFA == true) "ja" else "nei"))
+    }
 
     private fun getVertsland(sedData: SedDataDto) = Vertsland(
         arbeidsgiver = hentArbeidsgivereIkkeILand(
