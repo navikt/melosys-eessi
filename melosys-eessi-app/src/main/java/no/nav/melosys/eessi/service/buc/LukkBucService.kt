@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.service.buc
 
+import io.getunleash.Unleash
 import mu.KotlinLogging
 import no.nav.melosys.eessi.metrikker.BucMetrikker
 import no.nav.melosys.eessi.models.BucType
@@ -20,8 +21,9 @@ private val log = KotlinLogging.logger {}
 class LukkBucService(
     private val euxService: EuxService,
     private val bucMetrikker: BucMetrikker,
+    unleash: Unleash,
 ) {
-    private val x001Mapper = X001Mapper()
+    private val x001Mapper = X001Mapper(unleash)
 
     fun lukkBucerAvType(bucType: BucType) {
         try {
