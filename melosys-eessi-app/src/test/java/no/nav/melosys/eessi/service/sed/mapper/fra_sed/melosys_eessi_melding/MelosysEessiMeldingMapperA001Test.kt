@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.fra_sed.melosys_eessi_melding
 
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -19,20 +18,22 @@ class MelosysEessiMeldingMapperA001Test {
     private val melosysEessiMeldingMapperFactory = MelosysEessiMeldingMapperFactory("dummy")
 
     private fun mapMedlemskap(medlemskap: MedlemskapA001) =
-        melosysEessiMeldingMapperFactory.getMapper(SedType.A001).map(
-            EessiMeldingParams(
-                aktoerId = "123",
-                sed = createSed(medlemskap),
-                rinaDokumentID = createSedHendelse().rinaDokumentId,
-                rinaSaksnummer = createSedHendelse().rinaSakId,
-                sedType = createSedHendelse().sedType,
-                bucType = createSedHendelse().bucType,
-                avsenderID = createSedHendelse().avsenderId,
-                landkode = "landkode",
-                sedErEndring = false,
-                sedVersjon = "1"
+        createSedHendelse().let { hendelse ->
+            melosysEessiMeldingMapperFactory.getMapper(SedType.A001).map(
+                EessiMeldingParams(
+                    aktoerId = "123",
+                    sed = createSed(medlemskap),
+                    rinaDokumentID = hendelse.rinaDokumentId,
+                    rinaSaksnummer = hendelse.rinaSakId,
+                    sedType = hendelse.sedType,
+                    bucType = hendelse.bucType,
+                    avsenderID = hendelse.avsenderId,
+                    landkode = "landkode",
+                    sedErEndring = false,
+                    sedVersjon = "1"
+                )
             )
-        )
+        }
 
     @Test
     fun mapA001_forventRettFelt() {
