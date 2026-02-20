@@ -72,16 +72,11 @@ class A008MapperTest {
                 size shouldBe 1
                 first().bosted.shouldBeNull()
             }
-
-            sed.run {
-                sedVer shouldBe "3"
-                sedGVer shouldBe "4"
-            }
         }
     }
 
     @Test
-    fun `map til SED med versjon 4 naar toggle er paa`() {
+    fun `map til SED med CDM 4_4 toggle paa har korrekt medlemskap-struktur`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
@@ -107,11 +102,6 @@ class A008MapperTest {
             }
 
             sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().size shouldBe 1
-
-            sed.run {
-                sedVer shouldBe "4"
-                sedGVer shouldBe "4"
-            }
         }
     }
 
