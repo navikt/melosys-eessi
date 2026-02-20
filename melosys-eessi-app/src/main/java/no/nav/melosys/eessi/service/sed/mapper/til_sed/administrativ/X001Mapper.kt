@@ -1,20 +1,24 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ
 
+import io.getunleash.Unleash
+import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.Konstanter
+import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
+import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
 import java.time.LocalDate
 
-class X001Mapper : AdministrativSedMapper {
+class X001Mapper(private val unleash: Unleash) : AdministrativSedMapper {
 
     override fun getSedType(): SedType = SedType.X001
 
     fun mapFraSed(sed: SED, aarsak: String) = SED(
         sedType = SedType.X001.toString(),
         sedGVer = Konstanter.DEFAULT_SED_G_VER,
-        sedVer = Konstanter.SED_VER_CDM_4_3,
+        sedVer = if (unleash.isEnabled(CDM_4_4)) SED_VER_CDM_4_4 else SED_VER_CDM_4_3,
         nav = mapNav(sed, aarsak)
     )
 

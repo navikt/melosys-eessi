@@ -6,6 +6,8 @@ import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
+import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
+import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
@@ -56,10 +58,12 @@ class SedMapperFactory(private val unleash: Unleash) {
 
     fun mapTilSed(sedType: SedType, sedDataDto: SedDataDto): SED {
         val sed = sedMapper(sedType).mapTilSed(sedDataDto)
-        if (!unleash.isEnabled(CDM_4_4)) {
-            return konverterKosovoTilUkjent(sed, sedDataDto.gsakSaksnummer)
+        if (unleash.isEnabled(CDM_4_4)) {
+            sed.sedGVer = DEFAULT_SED_G_VER
+            sed.sedVer = SED_VER_CDM_4_4
+            return sed
         }
-        return sed
+        return konverterKosovoTilUkjent(sed, sedDataDto.gsakSaksnummer)
     }
 
     private fun konverterKosovoTilUkjent(sed: SED, gsakSaksnummer: Long?): SED {
