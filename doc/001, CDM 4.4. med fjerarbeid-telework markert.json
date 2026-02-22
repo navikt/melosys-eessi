@@ -1,0 +1,91 @@
+{
+    "A001": {
+        "Person": {
+            "PersonIdentification": {
+                "familyName": "Pedal",
+                "forename": "Varm",
+                "dateBirth": "1984-08-13",
+                "sex": {
+                    "value": [
+                        "02"
+                    ]
+                },
+                "PINPersonInEachInstitution": {
+                    "PersonalIdentificationNumber": [
+                        {
+                            "country": {
+                                "value": [
+                                    "NO"
+                                ]
+                            },
+                            "personalIdentificationNumber": "13488441692"
+                        }
+                    ]
+                }
+            },
+            "AdditionalInformationPerson": {
+                "nationality": {
+                    "value": [
+                        "AF",
+                        "XK"
+                    ]
+                }
+            }
+        },
+        "Addresses": {
+            "Address": [
+                {
+                    "type": {
+                        "value": [
+                            "01"
+                        ]
+                    },
+                    "Address": {
+                        "town": "Oslo",
+                        "country": {
+                            "value": [
+                                "NO"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "RequestedPeriod": {
+            "startDate": "2026-12-01",
+            "endDate": "2026-12-02"
+        },
+        "RequestedForSituationsCoveredByArti8832004": {
+            "regulationArticlesSituationAgreementExceptionProposed": {
+                "value": [
+                    "10"
+                ]
+            },
+            "FillInIfArticle10": {
+                "teleworkFrameworkAgreement": {
+                    "value": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        "ApplicableLegislation": {
+            "applicableLegislationCurrentSituation": {
+                "value": [
+                    "SE"
+                ]
+            },
+            "applicableLegislationRequestedSituation": {
+                "value": [
+                    "NO"
+                ]
+            }
+        },
+        "AdditionalInformation": {
+            "additionalInformation": "Test"
+        },
+        "sedGVer": "4",
+        "sedVer": "4",
+        "sedPackage": "Sector Components/Legislation Applicable/A001"
+    }
+}

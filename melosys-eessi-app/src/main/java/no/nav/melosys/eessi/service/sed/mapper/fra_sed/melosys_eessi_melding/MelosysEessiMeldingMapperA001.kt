@@ -20,12 +20,16 @@ internal class MelosysEessiMeldingMapperA001 : NyttLovvalgEessiMeldingMapper<Med
         val anmodningUnntak = AnmodningUnntak()
         anmodningUnntak.unntakFraLovvalgsland = hentUnntakFraLovvalgsland(medlemskap)
         anmodningUnntak.unntakFraLovvalgsbestemmelse = hentUnntakFraLovvalgsbestemmelse(medlemskap)
+        anmodningUnntak.erFjernarbeidTWFA =
+            medlemskap.rammeavtale?.fjernarbeid?.eessiYesNoType.equals("ja", ignoreCase = true)
         return anmodningUnntak
     }
 
-    fun hentUnntakFraLovvalgsland(medlemskap: MedlemskapA001): String? = medlemskap.naavaerendemedlemskap!!.iterator().next()!!.landkode
+    fun hentUnntakFraLovvalgsland(medlemskap: MedlemskapA001): String? = medlemskap.naavaerendemedlemskap?.firstOrNull()?.landkode
 
-    fun hentUnntakFraLovvalgsbestemmelse(medlemskap: MedlemskapA001): String? = medlemskap.unntak!!.grunnlag!!.artikkel
+    fun hentUnntakFraLovvalgsbestemmelse(medlemskap: MedlemskapA001): String? =
+        medlemskap.forordning8832004?.unntak?.grunnlag?.artikkel  // CDM 4.4
+            ?: medlemskap.unntak?.grunnlag?.artikkel              // CDM 4.3 fallback
 
     override fun sedErEndring(medlemskap: MedlemskapA001): Boolean {
         if (medlemskap.anmodning == null) {

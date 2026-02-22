@@ -22,7 +22,7 @@ private val log = KotlinLogging.logger { }
 class SedMapperFactory(private val unleash: Unleash) {
 
     private val sedMappers: Map<SedType, SedMapper> = mapOf(
-        SedType.A001 to A001Mapper(),
+        SedType.A001 to A001Mapper(unleash),
         SedType.A002 to A002Mapper(),
         SedType.A003 to A003Mapper(),
         SedType.A004 to A004Mapper(),
