@@ -65,7 +65,7 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
                 by = it.poststed.tilEESSIShortString(),
                 land = mapTilLandkodeIso2(it.land)
             )
-        } ?: Adresse(land = bostedsland)
+        } ?: Adresse(land = bostedsland, by = "N/A")
 
         return ArbeidslandBosted(adresse = adresse)
     }

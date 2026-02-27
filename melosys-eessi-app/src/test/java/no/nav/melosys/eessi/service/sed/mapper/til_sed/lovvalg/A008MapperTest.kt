@@ -211,6 +211,24 @@ class A008MapperTest {
     }
 
     @Test
+    fun `bosted-adresse settes med NA naar bostedsadresse mangler`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            avklartBostedsland = "PT"
+            bostedsadresse = null
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
+            bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                land shouldBe "PT"
+                by shouldBe "N/A"
+            }
+        }
+    }
+
+    @Test
     fun `companyNameVesselName settes paa arbeidssted adresse naar CDM 4_4`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
