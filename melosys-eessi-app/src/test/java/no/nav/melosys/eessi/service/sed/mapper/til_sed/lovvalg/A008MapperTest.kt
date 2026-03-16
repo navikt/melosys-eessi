@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
 import io.getunleash.FakeUnleash
+import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -326,6 +327,50 @@ class A008MapperTest {
                 bosted["land"] shouldBe "SE"
             }
         }
+    }
+
+    @Test
+    fun `CDM 4_4 arbeid i flere land ukjent hvilke gir gyldig SED uten tomme arrays`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            harFastArbeidssted = false
+            arbeidsland = listOf()
+            arbeidsgivendeVirksomheter = listOf()
+            selvstendigeVirksomheter = listOf()
+            avklartBostedsland = "IS"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().run {
+            arbeidsland.shouldBeNull()
+            harfastarbeidssted.shouldBeNull()
+            arbeidsgiver.shouldBeNull()
+            selvstendig.shouldBeNull()
+        }
+
+        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
+            formaal shouldBe "arbeid_flere_land"
+            bruker.shouldNotBeNull().run {
+                arbeidiflereland.shouldNotBeNull()
+                    .shouldBeInstanceOf<List<*>>()
+                @Suppress("UNCHECKED_CAST")
+                (arbeidiflereland as List<ArbeidIFlereLand>).run {
+                    size shouldBe 1
+                    first().bosted.shouldNotBeNull().land shouldBe "IS"
+                }
+            }
+        }
+
+        val json = jsonMapper.writeValueAsString(sed)
+        val jsonTree = jsonMapper.readTree(json)
+
+        val nav = jsonTree.path("nav")
+        nav.has("arbeidsgiver").shouldBeFalse()
+        nav.has("arbeidsland").shouldBeFalse()
+        nav.has("harfastarbeidssted").shouldBeFalse()
+        nav.has("selvstendig").shouldBeFalse()
     }
 
     @Test
