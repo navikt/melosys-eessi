@@ -371,6 +371,9 @@ class A008MapperTest {
         nav.has("arbeidsland").shouldBeFalse()
         nav.has("harfastarbeidssted").shouldBeFalse()
         nav.has("selvstendig").shouldBeFalse()
+
+        val medlemskap = jsonTree.path("medlemskap")
+        medlemskap.has("endring").shouldBeFalse()
     }
 
     @Test
