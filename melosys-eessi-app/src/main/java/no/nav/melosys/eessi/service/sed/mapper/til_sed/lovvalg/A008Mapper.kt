@@ -40,21 +40,29 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
 
     override fun prefillNav(sedData: SedDataDto): Nav =
         super.prefillNav(sedData).apply {
-            if (arbeidsland == null) {
+            if (sedData.arbeidsland.isEmpty()) {
                 harfastarbeidssted = null
             }
         }
 
-    override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> =
-        super.hentArbeidsland(sedData).also { arbeidslandListe ->
-            if (unleash.isEnabled(CDM_4_4)) {
-                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+    override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> {
+        val arbeidslandListe = super.hentArbeidsland(sedData).toMutableList()
 
-                arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
-                    arbeidssted.adresse?.navn = arbeidssted.navn
-                }
+        if (unleash.isEnabled(CDM_4_4)) {
+            if (arbeidslandListe.isEmpty()) {
+                // TODO: Hardkodet FI/Helsinki for testing - fjern før merge
+                arbeidslandListe.add(Arbeidsland(bosted = ArbeidslandBosted(adresse = Adresse(land = "FI", by = "Helsinki"))))
+            } else {
+                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+            }
+
+            arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
+                arbeidssted.adresse?.navn = arbeidssted.navn
             }
         }
+
+        return arbeidslandListe
+    }
 
     private fun lagArbeidslandBosted(sedData: SedDataDto): ArbeidslandBosted? {
         val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
