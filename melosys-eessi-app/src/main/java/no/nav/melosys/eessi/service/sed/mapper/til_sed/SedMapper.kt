@@ -48,7 +48,7 @@ interface SedMapper {
             arbeidsgiver = hentArbeidsgivereILand(
                 sedData.arbeidsgivendeVirksomheter,
                 sedData.finnLovvalgslandDefaultNO()
-            ),
+            ).takeIf { it.isNotEmpty() },
             ytterligereinformasjon = sedData.ytterligereInformasjon,
             selvstendig = sedData.selvstendigeVirksomheter
                 .takeIf { it.isNotEmpty() }

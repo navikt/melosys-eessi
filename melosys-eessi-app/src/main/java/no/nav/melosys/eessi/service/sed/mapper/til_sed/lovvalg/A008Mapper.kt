@@ -40,30 +40,46 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
 
     override fun prefillNav(sedData: SedDataDto): Nav =
         super.prefillNav(sedData).apply {
-            if (arbeidsland == null) {
+            if (sedData.arbeidsland.isEmpty()) {
                 harfastarbeidssted = null
             }
         }
 
-    override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> =
-        super.hentArbeidsland(sedData).also { arbeidslandListe ->
-            if (unleash.isEnabled(CDM_4_4)) {
-                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+    override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> {
+        val arbeidslandListe = super.hentArbeidsland(sedData).toMutableList()
 
-                arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
-                    arbeidssted.adresse?.navn = arbeidssted.navn
+        if (unleash.isEnabled(CDM_4_4)) {
+            if (arbeidslandListe.isEmpty()) {
+                lagArbeidslandBosted(sedData)?.let { bosted ->
+                    arbeidslandListe.add(Arbeidsland(bosted = bosted))
                 }
+            } else {
+                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+            }
+
+            arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
+                arbeidssted.adresse?.navn = arbeidssted.navn
             }
         }
+
+        return arbeidslandListe
+    }
 
     private fun lagArbeidslandBosted(sedData: SedDataDto): ArbeidslandBosted? {
         val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
             ?: return null
 
-        val adresse = sedData.bostedsadresse?.let {
+        val adresseKilde = sedData.bostedsadresse ?: sedData.kontaktadresse ?: sedData.oppholdsadresse
+
+        val adresse = adresseKilde?.let {
+            val landkode = mapTilLandkodeIso2(it.land)
             Adresse(
-                by = it.poststed.tilEESSIShortString(),
-                land = mapTilLandkodeIso2(it.land)
+                by = it.poststed.tilEESSIShortString() ?: "N/A",
+                gate = it.gateadresse.tilEESSIMediumString(),
+                postnummer = it.postnr.tilEESSITinyString(),
+                region = it.region.tilEESSIShortString(),
+                bygning = it.tilleggsnavn.tilEESSIMediumString(),
+                land = if (landkode.isBlank() || landkode == "XU") bostedsland else landkode
             )
         } ?: Adresse(land = bostedsland, by = "N/A")
 
