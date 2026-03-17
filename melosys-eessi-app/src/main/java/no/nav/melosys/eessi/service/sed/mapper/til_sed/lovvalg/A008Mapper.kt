@@ -72,13 +72,14 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
         val adresseKilde = sedData.bostedsadresse ?: sedData.kontaktadresse ?: sedData.oppholdsadresse
 
         val adresse = adresseKilde?.let {
+            val landkode = mapTilLandkodeIso2(it.land)
             Adresse(
                 by = it.poststed.tilEESSIShortString() ?: "N/A",
                 gate = it.gateadresse.tilEESSIMediumString(),
                 postnummer = it.postnr.tilEESSITinyString(),
                 region = it.region.tilEESSIShortString(),
                 bygning = it.tilleggsnavn.tilEESSIMediumString(),
-                land = mapTilLandkodeIso2(it.land)
+                land = if (landkode.isBlank() || landkode == "XU") bostedsland else landkode
             )
         } ?: Adresse(land = bostedsland, by = "N/A")
 
