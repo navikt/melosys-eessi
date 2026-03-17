@@ -50,8 +50,9 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
 
         if (unleash.isEnabled(CDM_4_4)) {
             if (arbeidslandListe.isEmpty()) {
-                // TODO: Hardkodet FI/Helsinki for testing - fjern før merge
-                arbeidslandListe.add(Arbeidsland(bosted = ArbeidslandBosted(adresse = Adresse(land = "FI", by = "Helsinki"))))
+                lagArbeidslandBosted(sedData)?.let { bosted ->
+                    arbeidslandListe.add(Arbeidsland(bosted = bosted))
+                }
             } else {
                 arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
             }
@@ -68,9 +69,15 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
         val bostedsland = sedData.avklartBostedsland?.let { mapTilLandkodeIso2(it) }
             ?: return null
 
-        val adresse = sedData.bostedsadresse?.let {
+        val adresseKilde = sedData.bostedsadresse ?: sedData.kontaktadresse ?: sedData.oppholdsadresse
+
+        val adresse = adresseKilde?.let {
             Adresse(
-                by = it.poststed.tilEESSIShortString(),
+                by = it.poststed.tilEESSIShortString() ?: "N/A",
+                gate = it.gateadresse.tilEESSIMediumString(),
+                postnummer = it.postnr.tilEESSITinyString(),
+                region = it.region.tilEESSIShortString(),
+                bygning = it.tilleggsnavn.tilEESSIMediumString(),
                 land = mapTilLandkodeIso2(it.land)
             )
         } ?: Adresse(land = bostedsland, by = "N/A")

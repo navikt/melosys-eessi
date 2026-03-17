@@ -212,11 +212,13 @@ class A008MapperTest {
     }
 
     @Test
-    fun `bosted-adresse settes med NA naar bostedsadresse mangler`() {
+    fun `bosted-adresse settes med NA naar alle adresser mangler`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "PT"
             bostedsadresse = null
+            kontaktadresse = null
+            oppholdsadresse = null
         }
 
         val sed = a008Mapper.mapTilSed(sedData)
@@ -330,7 +332,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `CDM 4_4 arbeid i flere land ukjent hvilke gir gyldig SED uten tomme arrays`() {
+    fun `CDM 4_4 tom arbeidsland med bostedsadresse oppretter arbeidsland-entry med adressefelter`() {
         fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             harFastArbeidssted = false
@@ -339,41 +341,108 @@ class A008MapperTest {
             selvstendigeVirksomheter = listOf()
             avklartBostedsland = "IS"
             a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+            bostedsadresse = Adresse(
+                poststed = "BÅSTAD", postnr = "1866", land = "NOR",
+                gateadresse = "Sentvetveien 17", adressetype = Adressetype.BOSTEDSADRESSE
+            )
+            kontaktadresse = null
+            oppholdsadresse = null
         }
 
         val sed = a008Mapper.mapTilSed(sedData)
 
         sed.nav.shouldNotBeNull().run {
-            arbeidsland.shouldBeNull()
             harfastarbeidssted.shouldBeNull()
             arbeidsgiver.shouldBeNull()
             selvstendig.shouldBeNull()
-        }
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            formaal shouldBe "arbeid_flere_land"
-            bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull()
-                    .shouldBeInstanceOf<List<*>>()
-                @Suppress("UNCHECKED_CAST")
-                (arbeidiflereland as List<ArbeidIFlereLand>).run {
-                    size shouldBe 1
-                    first().bosted.shouldNotBeNull().land shouldBe "IS"
+            arbeidsland.shouldNotBeNull().run {
+                size shouldBe 1
+                first().bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                    land shouldBe "NO"
+                    by shouldBe "BÅSTAD"
+                    gate shouldBe "Sentvetveien 17"
+                    postnummer shouldBe "1866"
                 }
             }
         }
+    }
 
-        val json = jsonMapper.writeValueAsString(sed)
-        val jsonTree = jsonMapper.readTree(json)
+    @Test
+    fun `CDM 4_4 tom arbeidsland uten bostedsadresse bruker kontaktadresse`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            harFastArbeidssted = false
+            arbeidsland = listOf()
+            avklartBostedsland = "IS"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+            bostedsadresse = null
+            kontaktadresse = Adresse(
+                poststed = "Oslo", postnr = "0001", land = "NOR",
+                gateadresse = "Kontaktgata 1", adressetype = Adressetype.KONTAKTADRESSE
+            )
+            oppholdsadresse = null
+        }
 
-        val nav = jsonTree.path("nav")
-        nav.has("arbeidsgiver").shouldBeFalse()
-        nav.has("arbeidsland").shouldBeFalse()
-        nav.has("harfastarbeidssted").shouldBeFalse()
-        nav.has("selvstendig").shouldBeFalse()
+        val sed = a008Mapper.mapTilSed(sedData)
 
-        val medlemskap = jsonTree.path("medlemskap")
-        medlemskap.has("endring").shouldBeFalse()
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first()
+            .bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                land shouldBe "NO"
+                by shouldBe "Oslo"
+                gate shouldBe "Kontaktgata 1"
+                postnummer shouldBe "0001"
+            }
+    }
+
+    @Test
+    fun `CDM 4_4 tom arbeidsland uten bostedsadresse og kontaktadresse bruker oppholdsadresse`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            harFastArbeidssted = false
+            arbeidsland = listOf()
+            avklartBostedsland = "IS"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+            bostedsadresse = null
+            kontaktadresse = null
+            oppholdsadresse = Adresse(
+                poststed = "Far away", postnr = "XJY", land = "NZL",
+                gateadresse = "Eksotisk gate 5", adressetype = Adressetype.POSTADRESSE
+            )
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first()
+            .bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                land shouldBe "NZ"
+                by shouldBe "Far away"
+                gate shouldBe "Eksotisk gate 5"
+                postnummer shouldBe "XJY"
+            }
+    }
+
+    @Test
+    fun `CDM 4_4 tom arbeidsland uten noen adresser bruker avklartBostedsland med NA`() {
+        fakeUnleash.enable(CDM_4_4)
+        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
+            harFastArbeidssted = false
+            arbeidsland = listOf()
+            avklartBostedsland = "IS"
+            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
+            bostedsadresse = null
+            kontaktadresse = null
+            oppholdsadresse = null
+        }
+
+        val sed = a008Mapper.mapTilSed(sedData)
+
+        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first()
+            .bosted.shouldNotBeNull().adresse.shouldNotBeNull().run {
+                land shouldBe "IS"
+                by shouldBe "N/A"
+                gate.shouldBeNull()
+                postnummer.shouldBeNull()
+            }
     }
 
     @Test
