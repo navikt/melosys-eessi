@@ -26,7 +26,7 @@ public record OppgaveKafkaAivenRecord(Hendelse hendelse, UtfortAv utfortAv, Oppg
     public record Kategorisering(String tema, String oppgavetype, @Nullable String behandlingstema,
                                  @Nullable String behandlingstype,
                                  Prioritet prioritet) {
-        public enum Prioritet {HOY, NORMAL, LAV}
+        public enum Prioritet {HOY, NORMAL, LAV, KRITISK}
     }
 
     public record Behandlingsperiode(LocalDate aktiv, @Nullable LocalDate frist) {
