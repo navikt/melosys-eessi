@@ -237,6 +237,38 @@ class SedMottakServiceTest {
     }
 
     @Test
+    fun `behandle SED - X001 uten A-SED i sed_mottatt_hendelse men med A-SED i journalpost_sed_kobling kaster ikke exception`() {
+        val sedHendelse = sedHendelseMedBruker().apply { sedType = "X001" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(any()) } returns emptyList()
+        every { journalpostSedKoblingService.harASedEllerHSedForRinaSak(RINA_SAKSNUMMER) } returns true
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.of(IDENT)
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+
+        shouldNotThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }
+
+        verify { journalpostSedKoblingService.harASedEllerHSedForRinaSak(RINA_SAKSNUMMER) }
+        verify { euxService.hentSedMedRetry(any(), any()) }
+    }
+
+    @Test
+    fun `behandle SED - X001 uten A-SED i begge tabeller kaster exception`() {
+        val sedHendelse = sedHendelseMedBruker().apply { sedType = "X001" }
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
+
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(any()) } returns emptyList()
+        every { journalpostSedKoblingService.harASedEllerHSedForRinaSak(RINA_SAKSNUMMER) } returns false
+
+        shouldThrow<IllegalStateException> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }.message shouldBe "Mottatt SED 555554444 av type X001 har ikke tilhørende A sed behandlet"
+    }
+
+    @Test
     fun `behandle SED - X-SED med bare H-SED og ikke A-SED skal ikke kaste exception`() {
         val sedHendelse = sedHendelseMedBruker().apply { sedType = "X008" }
         val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()

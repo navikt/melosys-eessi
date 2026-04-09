@@ -156,9 +156,22 @@ class SedMottakService(
         }
 
         val sedHendelser = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(sedHendelse.rinaSakId)
-        return !(sedHendelser.any {
+        val harASedEllerHSedIMottattHendelse = sedHendelser.any {
             it.sedHendelse.erASED() || it.sedHendelse.erHSED()
-        })
+        }
+
+        if (harASedEllerHSedIMottattHendelse) return false
+
+        // Fallback for X001: sjekk journalpost_sed_kobling for historiske data (før DB-bytte)
+        if (sedHendelse.sedType == SedType.X001.name) {
+            val harASedEllerHSedIJournalpostKobling = journalpostSedKoblingService.harASedEllerHSedForRinaSak(sedHendelse.rinaSakId)
+            if (harASedEllerHSedIJournalpostKobling) {
+                log.info("Fant tilhørende A-SED/H-SED i journalpost_sed_kobling (fallback) for rinaSakId ${sedHendelse.rinaSakId}")
+                return false
+            }
+        }
+
+        return true
     }
 
     private fun opprettOppgaveIdentifisering(sedMottatt: SedMottattHendelse, sed: SED) {
