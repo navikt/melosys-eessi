@@ -49,31 +49,32 @@ class SedMottakService(
 
     @Transactional
     fun behandleSedMottakHendelse(sedMottattHendelse: SedMottattHendelse) {
-        if (sedMottattHendelse.sedHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedMottattHendelse)) {
-            log.debug("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} BUC type ikke tilknyttet melosys")
+        val sedHendelse = sedMottattHendelse.sedHendelse
+        log.info("Behandler mottatt SED ${sedHendelse.sedId} av type ${sedHendelse.sedType} i rinaSak ${sedHendelse.rinaSakId}")
+
+        if (sedHendelse.erIkkeLaBuc() && !erHBucFraMelosys(sedMottattHendelse)) {
+            log.debug("Ignorerer mottatt SED ${sedHendelse.sedId} BUC type ikke tilknyttet melosys")
             return
         }
 
-        if (sedMottattHendelse.sedHendelse.erX100()) {
-            log.info("Ignorerer mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av typen X100")
+        if (sedHendelse.erX100()) {
+            log.info("Ignorerer mottatt SED ${sedHendelse.sedId} av typen X100")
             return
         }
 
-        if (sedMottattHendelseRepository.findBySedID(sedMottattHendelse.sedHendelse.sedId).isPresent) {
-            log.info("Mottatt SED ${sedMottattHendelse.sedHendelse.sedId} er allerede behandlet")
+        if (sedMottattHendelseRepository.findBySedID(sedHendelse.sedId).isPresent) {
+            log.info("Mottatt SED ${sedHendelse.sedId} er allerede behandlet")
             return
         }
 
-        val erXSedBehandletUtenASedEllerHSed = erXSedBehandletUtenASedEllerHSed(sedMottattHendelse.sedHendelse)
+        val erXSedBehandletUtenASedEllerHSed = erXSedBehandletUtenASedEllerHSed(sedHendelse)
 
         check(!erXSedBehandletUtenASedEllerHSed) {
-            "Mottatt SED ${sedMottattHendelse.sedHendelse.sedId} av type ${
-                sedMottattHendelse.sedHendelse.sedType
-            } har ikke tilhørende A sed behandlet"
+            "Mottatt SED ${sedHendelse.sedId} av type ${sedHendelse.sedType} har ikke tilhørende A sed behandlet"
         }
 
-        sjekkSedMottakerOgAvsenderID(sedMottattHendelse.sedHendelse)
-        sjekkSedMottakerOgAvsenderNavn(sedMottattHendelse.sedHendelse)
+        sjekkSedMottakerOgAvsenderID(sedHendelse)
+        sjekkSedMottakerOgAvsenderNavn(sedHendelse)
 
         if (SedType.valueOf(sedMottattHendelse.sedHendelse.sedType).erXSED()) {
             val initiellSed = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(
@@ -144,6 +145,8 @@ class SedMottakService(
     private fun erXSedBehandletUtenASedEllerHSed(sedHendelse: SedHendelse): Boolean {
         if (!sedHendelse.erXSedSomTrengerKontroll()) return false
 
+        log.info("X-SED ${sedHendelse.sedId} av type ${sedHendelse.sedType} trenger kontroll, sjekker om tilhørende A-SED/H-SED finnes for rinaSakId ${sedHendelse.rinaSakId}")
+
         if (sedHendelse.sedType == SedType.X007.name) {
             val buc = euxService.hentBuc(sedHendelse.rinaSakId)
 
@@ -152,7 +155,10 @@ class SedMottakService(
                     && p.organisation!!.id == rinaInstitusjonsId
             }
 
-            if (sedTypeErX007OgNorgeErSakseier) return false
+            if (sedTypeErX007OgNorgeErSakseier) {
+                log.info("X007 ${sedHendelse.sedId}: Norge er sakseier, hopper over A-SED/H-SED-sjekk")
+                return false
+            }
         }
 
         val sedHendelser = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(sedHendelse.rinaSakId)
@@ -160,17 +166,25 @@ class SedMottakService(
             it.sedHendelse.erASED() || it.sedHendelse.erHSED()
         }
 
-        if (harASedEllerHSedIMottattHendelse) return false
+        if (harASedEllerHSedIMottattHendelse) {
+            log.info("Fant tilhørende A-SED/H-SED i sed_mottatt_hendelse for rinaSakId ${sedHendelse.rinaSakId}")
+            return false
+        }
+
+        log.info("Fant ingen tilhørende A-SED/H-SED i sed_mottatt_hendelse for rinaSakId ${sedHendelse.rinaSakId} (${sedHendelser.size} hendelser funnet)")
 
         // Fallback for X001: sjekk journalpost_sed_kobling for historiske data (før DB-bytte)
         if (sedHendelse.sedType == SedType.X001.name) {
+            log.info("X001 ${sedHendelse.sedId}: sjekker fallback mot journalpost_sed_kobling for rinaSakId ${sedHendelse.rinaSakId}")
             val harASedEllerHSedIJournalpostKobling = journalpostSedKoblingService.harASedEllerHSedForRinaSak(sedHendelse.rinaSakId)
             if (harASedEllerHSedIJournalpostKobling) {
-                log.info("Fant tilhørende A-SED/H-SED i journalpost_sed_kobling (fallback) for rinaSakId ${sedHendelse.rinaSakId}")
+                log.info("X001 ${sedHendelse.sedId}: fant tilhørende A-SED/H-SED i journalpost_sed_kobling (fallback) for rinaSakId ${sedHendelse.rinaSakId}")
                 return false
             }
+            log.info("X001 ${sedHendelse.sedId}: fant ingen tilhørende A-SED/H-SED i journalpost_sed_kobling for rinaSakId ${sedHendelse.rinaSakId}")
         }
 
+        log.warn("X-SED ${sedHendelse.sedId} av type ${sedHendelse.sedType}: ingen tilhørende A-SED/H-SED funnet for rinaSakId ${sedHendelse.rinaSakId}")
         return true
     }
 
