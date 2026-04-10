@@ -29,6 +29,10 @@ class JournalpostSedKoblingService(
     fun finnVedJournalpostID(journalpostID: String): Optional<JournalpostSedKobling> =
         journalpostSedKoblingRepository.findByJournalpostID(journalpostID)
 
+    fun harASedEllerHSedForRinaSak(rinaSaksnummer: String): Boolean =
+        journalpostSedKoblingRepository.findByRinaSaksnummer(rinaSaksnummer)
+            .any { it.erASed() || it.erHSed() }
+
     fun finnVedJournalpostIDOpprettMelosysEessiMelding(journalpostID: String): Optional<MelosysEessiMelding> {
         val journalpostSedKobling = journalpostSedKoblingRepository.findByJournalpostID(journalpostID).getOrNull()
         return Optional.ofNullable(

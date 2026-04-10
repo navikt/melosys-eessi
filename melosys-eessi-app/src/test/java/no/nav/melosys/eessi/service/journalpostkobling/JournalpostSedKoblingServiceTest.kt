@@ -84,4 +84,38 @@ class JournalpostSedKoblingServiceTest {
                 .avsenderID shouldBe "mnb"
         }
     }
+
+    @Test
+    fun `harASedEllerHSedForRinaSak returnerer true når A-SED finnes`() {
+        every { journalpostSedKoblingRepository.findByRinaSaksnummer("123") } returns mutableListOf(
+            JournalpostSedKobling("jp1", "123", "sedId1", "1", "LA_BUC_02", "A009")
+        )
+
+        journalpostSedKoblingService.harASedEllerHSedForRinaSak("123") shouldBe true
+    }
+
+    @Test
+    fun `harASedEllerHSedForRinaSak returnerer true når H-SED finnes`() {
+        every { journalpostSedKoblingRepository.findByRinaSaksnummer("123") } returns mutableListOf(
+            JournalpostSedKobling("jp1", "123", "sedId1", "1", "H_BUC_01", "H001")
+        )
+
+        journalpostSedKoblingService.harASedEllerHSedForRinaSak("123") shouldBe true
+    }
+
+    @Test
+    fun `harASedEllerHSedForRinaSak returnerer false når kun X-SED finnes`() {
+        every { journalpostSedKoblingRepository.findByRinaSaksnummer("123") } returns mutableListOf(
+            JournalpostSedKobling("jp1", "123", "sedId1", "1", "LA_BUC_02", "X001")
+        )
+
+        journalpostSedKoblingService.harASedEllerHSedForRinaSak("123") shouldBe false
+    }
+
+    @Test
+    fun `harASedEllerHSedForRinaSak returnerer false når ingen koblinger finnes`() {
+        every { journalpostSedKoblingRepository.findByRinaSaksnummer("123") } returns mutableListOf()
+
+        journalpostSedKoblingService.harASedEllerHSedForRinaSak("123") shouldBe false
+    }
 }
