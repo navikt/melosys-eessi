@@ -171,21 +171,25 @@ class SedMottakService(
             return false
         }
 
-        log.info("Fant ingen tilhørende A-SED/H-SED i sed_mottatt_hendelse for rinaSakId ${sedHendelse.rinaSakId} (${sedHendelser.size} hendelser funnet)")
+        log.info("Fant ingen tilhørende A-SED/H-SED i sed_mottatt_hendelse for rinaSakId ${sedHendelse.rinaSakId}. Sjekker journalpost_sed_kobling.")
 
-        // Fallback for X001: sjekk journalpost_sed_kobling for historiske data (før DB-bytte)
-        if (sedHendelse.sedType == SedType.X001.name) {
-            log.info("X001 ${sedHendelse.sedId}: sjekker fallback mot journalpost_sed_kobling for rinaSakId ${sedHendelse.rinaSakId}")
-            val harASedEllerHSedIJournalpostKobling = journalpostSedKoblingService.harASedEllerHSedForRinaSak(sedHendelse.rinaSakId)
-            if (harASedEllerHSedIJournalpostKobling) {
-                log.info("X001 ${sedHendelse.sedId}: fant tilhørende A-SED/H-SED i journalpost_sed_kobling (fallback) for rinaSakId ${sedHendelse.rinaSakId}")
-                return false
-            }
-            log.info("X001 ${sedHendelse.sedId}: fant ingen tilhørende A-SED/H-SED i journalpost_sed_kobling for rinaSakId ${sedHendelse.rinaSakId}")
-        }
+        if (harASedEllerHSedIJournalpostKobling(sedHendelse)) return false
 
         log.warn("X-SED ${sedHendelse.sedId} av type ${sedHendelse.sedType}: ingen tilhørende A-SED/H-SED funnet for rinaSakId ${sedHendelse.rinaSakId}")
         return true
+    }
+
+    private fun harASedEllerHSedIJournalpostKobling(sedHendelse: SedHendelse): Boolean {
+        if (sedHendelse.sedType != SedType.X001.name) return false
+
+        log.info("X001 ${sedHendelse.sedId}: sjekker fallback mot journalpost_sed_kobling for rinaSakId ${sedHendelse.rinaSakId}")
+        val funnet = journalpostSedKoblingService.harASedEllerHSedForRinaSak(sedHendelse.rinaSakId)
+        if (funnet) {
+            log.info("X001 ${sedHendelse.sedId}: fant tilhørende A-SED/H-SED i journalpost_sed_kobling (fallback) for rinaSakId ${sedHendelse.rinaSakId}")
+        } else {
+            log.info("X001 ${sedHendelse.sedId}: fant ingen tilhørende A-SED/H-SED i journalpost_sed_kobling for rinaSakId ${sedHendelse.rinaSakId}")
+        }
+        return funnet
     }
 
     private fun opprettOppgaveIdentifisering(sedMottatt: SedMottattHendelse, sed: SED) {
