@@ -48,7 +48,7 @@
         <springdoc-openapi.version>3.0.3</springdoc-openapi.version>
 
         <!-- Transitive avhengigheter -->
-        <checker-qual.version>3.55.1</checker-qual.version>
+        <checker-qual.version>4.0.0</checker-qual.version>
         <opensagres.version>2.2.0</opensagres.version>
         <google-errorprone.version>2.49.0</google-errorprone.version>
         <org.apache.pdfbox.version>3.0.7</org.apache.pdfbox.version>
