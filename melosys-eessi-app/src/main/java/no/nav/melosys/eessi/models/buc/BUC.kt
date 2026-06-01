@@ -47,6 +47,9 @@ data class BUC (
     fun finnDokumentVedSedType(sedType: String): Document? =
         finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) ?: SedStatus.TOM })
 
+    fun finnUtgåendeDokumentVedSedType(sedType: String): Document? =
+        documents.firstOrNull { it.type == sedType && !it.erInngående() && it.erOpprettet() }
+
     fun sedKanOppdateres(id: String): Boolean = actions.filter { id == it.documentId }
         .any { "Update".equals(it.operation, ignoreCase = true) }
 

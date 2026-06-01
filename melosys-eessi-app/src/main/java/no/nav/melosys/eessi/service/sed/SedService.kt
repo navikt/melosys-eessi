@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.melosys.eessi.controller.dto.BucOgSedOpprettetDto
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.SedJournalstatus
+import no.nav.melosys.eessi.controller.dto.SedStatus
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.FagsakRinasakKobling
 import no.nav.melosys.eessi.models.SedType
@@ -172,8 +173,49 @@ class SedService(
         val sed = sedMapperFactory.mapTilSed(sedType, sedDataDto)
         verifiserSedVersjonErBucVersjon(buc, sed)
 
+        if (håndterEksisterendeSed(buc, rinaSaksnummer, sedType, sedDataDto, sed)) return
+
         return executeWithSedLogging("Feil ved sendPåEksisterendeBuc", sedDataDto, sed) {
             euxService.opprettOgSendSed(sed, rinaSaksnummer)
+        }
+    }
+
+    /**
+     * Sjekker om det allerede finnes en utgående SED av riktig type i BUCen.
+     * Returnerer true hvis situasjonen er håndtert (SED allerede sendt, eller utkast sendt),
+     * false hvis vi skal fortsette med å opprette ny SED.
+     */
+    private fun håndterEksisterendeSed(
+        buc: BUC, rinaSaksnummer: String, sedType: SedType, sedDataDto: SedDataDto, sed: SED
+    ): Boolean {
+        val eksisterendeSed = buc.finnUtgåendeDokumentVedSedType(sedType.name) ?: return false
+        val status = SedStatus.fraEngelskStatus(eksisterendeSed.status)
+
+        when (status) {
+            SedStatus.SENDT -> {
+                log.info(
+                    "SED {} av type {} er allerede sendt i rinasak {}. Hopper over opprettelse og sending.",
+                    eksisterendeSed.id, sedType, rinaSaksnummer
+                )
+                return true
+            }
+            SedStatus.UTKAST -> {
+                log.info(
+                    "SED {} av type {} finnes som utkast i rinasak {}. Sender eksisterende utkast.",
+                    eksisterendeSed.id, sedType, rinaSaksnummer
+                )
+                executeWithSedLogging("Feil ved sending av eksisterende utkast", sedDataDto, sed) {
+                    euxService.sendSed(rinaSaksnummer, eksisterendeSed.id, sedType.name)
+                }
+                return true
+            }
+            else -> {
+                log.info(
+                    "SED {} av type {} finnes med status {} i rinasak {}. Oppretter og sender ny.",
+                    eksisterendeSed.id, sedType, status, rinaSaksnummer
+                )
+                return false
+            }
         }
     }
 
