@@ -1,6 +1,7 @@
 package no.nav.melosys.eessi.service.kafkadlq
 
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.string.shouldContain
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -42,6 +43,7 @@ internal class KafkaDLQServiceTest {
 
         kafkaDLQService.slettKafkaMelding(uuid)
 
+        verify(exactly = 1) { kafkaDLQRepository.findById(uuid) }
         verify(exactly = 1) { kafkaDLQRepository.delete(melding) }
     }
 
@@ -50,9 +52,10 @@ internal class KafkaDLQServiceTest {
         val uuid = UUID.randomUUID()
         every { kafkaDLQRepository.findById(uuid) } returns Optional.empty()
 
-        shouldThrow<NotFoundException> {
+        val exception = shouldThrow<NotFoundException> {
             kafkaDLQService.slettKafkaMelding(uuid)
         }
+        exception.message shouldContain uuid.toString()
 
         verify(exactly = 0) { kafkaDLQRepository.delete(any()) }
     }

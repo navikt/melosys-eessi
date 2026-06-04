@@ -10,6 +10,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.util.UUID
 
 /**
  * Tester for admin-kontroller autentisering som krever både API-nøkkel og bearer token.
@@ -135,5 +136,35 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
                 .accept(MediaType.APPLICATION_JSON)
         )
             .andExpect(MockMvcResultMatchers.status().isOk)
+    }
+
+    @Test
+    fun `skal kreve autentisering for DELETE på dlq endepunkt og gi 404 for ukjent melding`() {
+        val uuid = UUID.randomUUID()
+
+        // Uten autentisering
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/$uuid")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isInternalServerError)
+
+        // Feil API-nøkkel
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/$uuid")
+                .header(API_KEY_HEADER, "feil-api-nokkel")
+                .header("Authorization", "Bearer ${hentBearerToken()}")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isInternalServerError)
+
+        // Korrekt autentisering, men meldingen finnes ikke -> 404
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/$uuid")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header("Authorization", "Bearer ${hentBearerToken()}")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
 }
