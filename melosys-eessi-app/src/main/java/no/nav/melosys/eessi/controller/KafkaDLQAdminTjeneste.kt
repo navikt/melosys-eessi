@@ -48,6 +48,19 @@ class KafkaDLQAdminTjeneste(
         }
     }
 
+    @Operation(
+        summary = "Slett feilet Kafka-melding",
+        description = "Sletter en feilet melding fra DLQ uten å prosessere den. Brukes for meldinger som aldri skal prosesseres, f.eks. SED med ugyldig kombinasjon av BUC og SED."
+    )
+    @DeleteMapping("/{uuid}")
+    fun slettKafkaMelding(@PathVariable uuid: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
+        validerApikey(apiKey)
+        return ThreadLocalAccessInfo.utførSomAdminForespørsel {
+            kafkaDLQService.slettKafkaMelding(UUID.fromString(uuid))
+            ResponseEntity.noContent().build()
+        }
+    }
+
     @PostMapping("/restart/alle")
     fun rekjørAlleKafkaMeldinger(@RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Map<String, Any>> {
         validerApikey(apiKey)

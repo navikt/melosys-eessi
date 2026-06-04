@@ -80,6 +80,13 @@ public class KafkaDLQService {
         }
     }
 
+    @Transactional
+    public void slettKafkaMelding(UUID uuid) {
+        KafkaDLQ kafkaDLQMelding = kafkaDLQRepository.findById(uuid).orElseThrow(() -> new NotFoundException("Kunne ikke finne KafkaDLQ-melding basert, uuid=" + uuid));
+        log.info("Sletter KafkaDLQ-melding fra DLQ uten prosessering, uuid={}, queueType={}", uuid, kafkaDLQMelding.getQueueType());
+        kafkaDLQRepository.delete(kafkaDLQMelding);
+    }
+
     private void rekjorSedMottattHendelse(SedMottattHendelseKafkaDLQ sedMottattHendelseKafkaDLQ) {
         SedHendelse sedHendelse = sedMottattHendelseKafkaDLQ.getSedMottattHendelse();
         putToMDC(SED_ID, sedHendelse.getSedId());
