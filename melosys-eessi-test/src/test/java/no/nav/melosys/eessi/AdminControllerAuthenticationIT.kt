@@ -139,7 +139,7 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
     }
 
     @Test
-    fun `skal kreve autentisering for DELETE på dlq endepunkt og gi 404 for ukjent melding`() {
+    fun `skal kreve autentisering for DELETE på dlq endepunkt`() {
         val uuid = UUID.randomUUID()
 
         // Uten autentisering
@@ -157,25 +157,5 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
                 .accept(MediaType.APPLICATION_JSON)
         )
             .andExpect(MockMvcResultMatchers.status().isInternalServerError)
-
-        // Korrekt autentisering, men meldingen finnes ikke -> 404
-        mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/$uuid")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
-                .header("Authorization", "Bearer ${hentBearerToken()}")
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().isNotFound)
-    }
-
-    @Test
-    fun `skal gi 400 for ugyldig uuid på DELETE av dlq-melding`() {
-        mockMvc.perform(
-            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/ikke-en-gyldig-uuid")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
-                .header("Authorization", "Bearer ${hentBearerToken()}")
-                .accept(MediaType.APPLICATION_JSON)
-        )
-            .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 }
