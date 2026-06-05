@@ -2,7 +2,10 @@ package no.nav.melosys.eessi
 
 import no.nav.melosys.eessi.controller.dto.KafkaConsumerResponse
 import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
+import no.nav.melosys.eessi.models.kafkadlq.SedSendtHendelseKafkaDLQ
+import no.nav.melosys.eessi.repository.KafkaDLQRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import org.assertj.core.api.Assertions
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
@@ -14,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import java.util.UUID
 import kotlin.random.Random
 import org.springframework.kafka.test.utils.ContainerTestUtils
 import tools.jackson.databind.json.JsonMapper
@@ -36,6 +40,9 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
     @Autowired
     private lateinit var jsonMapper: JsonMapper
+
+    @Autowired
+    private lateinit var kafkaDLQRepository: KafkaDLQRepository
 
     private fun hentBearerToken(): String {
         return mockOAuth2Server.issueToken(
@@ -149,6 +156,48 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
         // Vi sender 4 meldinger, resetter til offset 2, melding med offset 2 og 3 leses på nytt, totalt hentes oppgave 6 ganger.
         verify(oppgaveConsumer, timeout(6_000).times(6)).hentOppgave(anyString())
+    }
+
+    @Test
+    fun `slettKafkaMelding sletter eksisterende melding og returnerer 204`() {
+        val id = UUID.randomUUID()
+        val melding = SedSendtHendelseKafkaDLQ().apply {
+            this.id = id
+            sedSendtHendelse = mockData.sedHendelse("rinasak", UUID.randomUUID().toString(), FNR)
+        }
+        kafkaDLQRepository.save(melding)
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/$id")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isNoContent)
+
+        Assertions.assertThat(kafkaDLQRepository.findById(id)).isEmpty()
+    }
+
+    @Test
+    fun `slettKafkaMelding returnerer 404 når melding ikke finnes`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/${UUID.randomUUID()}")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isNotFound)
+    }
+
+    @Test
+    fun `slettKafkaMelding returnerer 400 ved ugyldig uuid`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/ikke-en-gyldig-uuid")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
     }
 
 }

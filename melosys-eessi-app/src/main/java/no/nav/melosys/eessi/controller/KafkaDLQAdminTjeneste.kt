@@ -1,11 +1,14 @@
 package no.nav.melosys.eessi.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponses
 import mu.KotlinLogging
 import no.nav.melosys.eessi.controller.dto.KafkaDLQDto
 import no.nav.melosys.eessi.controller.dto.ResendSedListeDto
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.RinaSakOversiktV3
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.v3.SedAnalyseResult
+import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.kafkadlq.KafkaDLQ
 import no.nav.melosys.eessi.models.kafkadlq.SedMottattHendelseKafkaDLQ
 import no.nav.melosys.eessi.security.ThreadLocalAccessInfo
@@ -43,8 +46,28 @@ class KafkaDLQAdminTjeneste(
     fun rekjørKafkaMelding(@PathVariable uuid: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
         validerApikey(apiKey)
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
-            kafkaDLQService.rekjørKafkaMelding(UUID.fromString(uuid))
+            kafkaDLQService.rekjørKafkaMelding(parseUuid(uuid))
             ResponseEntity.ok().build()
+        }
+    }
+
+    @Operation(
+        summary = "Slett feilet Kafka-melding",
+        description = "Sletter en feilet melding fra DLQ uten å prosessere den. Brukes for meldinger som aldri skal prosesseres, f.eks. SED med ugyldig kombinasjon av BUC og SED."
+    )
+    @ApiResponses(
+        value = [
+            ApiResponse(responseCode = "204", description = "Meldingen ble slettet"),
+            ApiResponse(responseCode = "404", description = "Fant ingen KafkaDLQ-melding med angitt uuid"),
+            ApiResponse(responseCode = "400", description = "Ugyldig uuid")
+        ]
+    )
+    @DeleteMapping("/{uuid}")
+    fun slettKafkaMelding(@PathVariable uuid: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
+        validerApikey(apiKey)
+        return ThreadLocalAccessInfo.utførSomAdminForespørsel {
+            kafkaDLQService.slettKafkaMelding(parseUuid(uuid))
+            ResponseEntity.noContent().build()
         }
     }
 
@@ -188,6 +211,13 @@ class KafkaDLQAdminTjeneste(
             throw SecurityException("Ugyldig API-nøkkel")
         }
     }
+
+    private fun parseUuid(uuid: String): UUID =
+        try {
+            UUID.fromString(uuid)
+        } catch (e: IllegalArgumentException) {
+            throw ValidationException("Ugyldig uuid: $uuid")
+        }
 
 
     companion object {
