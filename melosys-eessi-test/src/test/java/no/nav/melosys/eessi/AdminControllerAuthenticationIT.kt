@@ -167,4 +167,15 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
         )
             .andExpect(MockMvcResultMatchers.status().isNotFound)
     }
+
+    @Test
+    fun `skal gi 400 for ugyldig uuid på DELETE av dlq-melding`() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/ikke-en-gyldig-uuid")
+                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
+                .header("Authorization", "Bearer ${hentBearerToken()}")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(MockMvcResultMatchers.status().isBadRequest)
+    }
 }
