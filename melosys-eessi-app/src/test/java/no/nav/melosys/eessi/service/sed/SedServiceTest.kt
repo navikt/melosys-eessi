@@ -351,6 +351,72 @@ class SedServiceTest {
     }
 
     @Test
+    fun `sendPåEksisterendeBuc - SED allerede sendt, hopper over opprettelse`() {
+        val buc = BUC(
+            bucVersjon = "v4.1",
+            documents = listOf(
+                Document(id = "sed-123", type = SedType.A012.name, status = "sent", direction = "OUT")
+            ),
+            actions = listOf(
+                Action("A012", "A012", "222", "Create")
+            )
+        )
+
+        every { euxService.hentBuc(any()) } returns buc
+
+        val sedDataDto = SedDataStub.getStub()
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A012)
+
+        verify { euxService.hentBuc(any()) }
+        verify(exactly = 0) { euxService.opprettOgSendSed(any(), any()) }
+        verify(exactly = 0) { euxService.sendSed(any(), any(), any()) }
+    }
+
+    @Test
+    fun `sendPåEksisterendeBuc - SED finnes som utkast, sender eksisterende`() {
+        val buc = BUC(
+            bucVersjon = "v4.1",
+            documents = listOf(
+                Document(id = "sed-456", type = SedType.A011.name, status = "new", direction = "OUT")
+            ),
+            actions = listOf(
+                Action("A011", "A011", "222", "Create")
+            )
+        )
+
+        every { euxService.hentBuc(any()) } returns buc
+        every { euxService.sendSed(any(), any(), any()) } returns Unit
+
+        val sedDataDto = SedDataStub.getStub()
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A011)
+
+        verify { euxService.hentBuc(any()) }
+        verify(exactly = 0) { euxService.opprettOgSendSed(any(), any()) }
+        verify { euxService.sendSed("123", "sed-456", SedType.A011.name) }
+    }
+
+    @Test
+    fun `sendPåEksisterendeBuc - innkommende SED av samme type ignoreres, oppretter ny`() {
+        val buc = BUC(
+            bucVersjon = "v4.1",
+            documents = listOf(
+                Document(id = "sed-789", type = SedType.A012.name, status = "received", direction = "IN")
+            ),
+            actions = listOf(
+                Action("A012", "A012", "222", "Create")
+            )
+        )
+
+        every { euxService.hentBuc(any()) } returns buc
+        every { euxService.opprettOgSendSed(any(), any()) } returns Unit
+
+        val sedDataDto = SedDataStub.getStub()
+        sendSedService.sendPåEksisterendeBuc(sedDataDto, "123", SedType.A012)
+
+        verify { euxService.opprettOgSendSed(any(), any()) }
+    }
+
+    @Test
     fun `genererPdfFraSed, forvent kall`() {
         val sedDataDto = SedDataStub.getStub()
         val mockPdf = "vi later som om dette er en pdf".toByteArray()
