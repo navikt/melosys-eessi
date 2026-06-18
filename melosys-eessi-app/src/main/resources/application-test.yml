@@ -11,6 +11,7 @@ no.nav.security.jwt.client.registration:
     token-endpoint-url: dummy
   saf:
     token-endpoint-url: dummy
-
+  sak:
+    token-endpoint-url: dummy
 
 

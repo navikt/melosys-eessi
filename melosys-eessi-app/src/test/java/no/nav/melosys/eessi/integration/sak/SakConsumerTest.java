@@ -1,50 +1,54 @@
 package no.nav.melosys.eessi.integration.sak;
 
+import java.io.IOException;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.header;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@ExtendWith(MockitoExtension.class)
 class SakConsumerTest {
 
     private SakConsumer sakConsumer;
+    private static MockWebServer mockWebServer;
 
-    @Spy
-    private RestTemplate restTemplate;
-
-    private MockRestServiceServer server;
+    @BeforeAll
+    static void setupAll() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+    }
 
     @BeforeEach
-    public void setup() {
-        sakConsumer = new SakConsumer(restTemplate);
-        server = MockRestServiceServer.createServer(restTemplate);
+    void setUp() {
+        String rootUri = String.format("http://localhost:%s", mockWebServer.getPort());
+        sakConsumer = new SakConsumer(WebClient.builder().baseUrl(rootUri).build());
     }
 
     @Test
-    void getSak_expectSak() {
+    void getSak_expectSak() throws InterruptedException {
         String responseJson = "{\"id\":\"11\",\"tema\":\"MED\",\"applikasjon\":\"melsoys\","
                 + "\"aktoerId\":\"123\",\"orgnr\":\"12312312\",\"fagsakNr\":\"fag123\","
                 + "\"opprettetAv\":\"srvmelosys\",\"opprettetTidspunkt\":\"2019-02-11T08:33:38.964Z\"}";
-        String sakId = "11";
-        server.expect(requestTo("/" + sakId))
-                .andExpect(header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE))
-                .andRespond(withSuccess(responseJson, MediaType.APPLICATION_JSON));
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(responseJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-        Sak response = sakConsumer.getSak(sakId);
+        Sak response = sakConsumer.getSak("11");
+
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo(sakId);
+        assertThat(response.getId()).isEqualTo("11");
 
+        RecordedRequest request = mockWebServer.takeRequest();
+        assertThat(request.getPath()).isEqualTo("/11");
+        assertThat(request.getMethod()).isEqualTo("GET");
+        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
     }
 }

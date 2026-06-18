@@ -1,13 +1,14 @@
 package no.nav.melosys.eessi.integration.sak;
 
-import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
-import no.nav.melosys.eessi.security.BasicAuthClientRequestInterceptor;
+import java.util.Collections;
+
+import no.nav.melosys.eessi.security.GenericAuthFilterFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class SakConsumerProducer {
@@ -19,12 +20,19 @@ public class SakConsumerProducer {
     }
 
     @Bean
-    public SakConsumer sakRestClient(BasicAuthClientRequestInterceptor basicAuthClientRequestInterceptor,
-                                     CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
-        RestTemplate restTemplate = new RestTemplateBuilder()
-            .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-            .interceptors(basicAuthClientRequestInterceptor, correlationIdOutgoingInterceptor)
-            .build();
-        return new SakConsumer(restTemplate);
+    public SakConsumer sakRestClient(WebClient.Builder webClientBuilder,
+                                     GenericAuthFilterFactory genericAuthFilterFactory) {
+        return new SakConsumer(
+            webClientBuilder
+                .baseUrl(url)
+                .defaultHeaders(this::defaultHeaders)
+                .filter(genericAuthFilterFactory.getAzureFilter("sak"))
+                .build()
+        );
+    }
+
+    private void defaultHeaders(HttpHeaders httpHeaders) {
+        httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
     }
 }
