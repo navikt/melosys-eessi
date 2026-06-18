@@ -1,7 +1,7 @@
 package no.nav.melosys.eessi.service.sak;
 
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.integration.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.sak.SakClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,14 +16,14 @@ import static org.mockito.Mockito.when;
 class ArkivsakServiceTest {
 
     @Mock
-    private SakConsumer sakConsumer;
+    private SakClient sakClient;
 
     private ArkivsakService arkivsakService;
 
     @BeforeEach
     public void setup() throws Exception {
-        arkivsakService = new ArkivsakService(sakConsumer);
-        when(sakConsumer.getSak(anyString())).thenReturn(new Sak());
+        arkivsakService = new ArkivsakService(sakClient);
+        when(sakClient.getSak(anyString())).thenReturn(new Sak());
     }
 
     @Test

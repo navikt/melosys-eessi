@@ -15,9 +15,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class SakConsumerTest {
+class SakClientTest {
 
-    private SakConsumer sakConsumer;
+    private SakClient sakClient;
     private static MockWebServer mockWebServer;
 
     @BeforeAll
@@ -29,7 +29,7 @@ class SakConsumerTest {
     @BeforeEach
     void setUp() {
         String rootUri = String.format("http://localhost:%s", mockWebServer.getPort());
-        sakConsumer = new SakConsumer(WebClient.builder().baseUrl(rootUri).build());
+        sakClient = new SakClient(WebClient.builder().baseUrl(rootUri).build());
     }
 
     @Test
@@ -41,7 +41,7 @@ class SakConsumerTest {
             .setBody(responseJson)
             .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-        Sak response = sakConsumer.getSak("11");
+        Sak response = sakClient.getSak("11");
 
         assertThat(response).isNotNull();
         assertThat(response.getId()).isEqualTo("11");

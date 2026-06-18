@@ -218,12 +218,8 @@ class SedSendtTestIT extends ComponentTestBase {
 
     private void mockArkivsak() {
         String arkivsakIdString = Long.toString(arkivsakID);
-        when(sakConsumer.getSak(arkivsakIdString)).thenReturn(
-            Sak.builder()
-                .id(arkivsakIdString)
-                .tema("MED")
-                .aktoerId(AKTOER_ID)
-                .build()
+        when(sakClient.getSak(arkivsakIdString)).thenReturn(
+            new Sak(arkivsakIdString, "MED", null, AKTOER_ID, null, null, null, null)
         );
     }
 
