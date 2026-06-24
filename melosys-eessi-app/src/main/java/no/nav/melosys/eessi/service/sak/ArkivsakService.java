@@ -2,7 +2,7 @@
 package no.nav.melosys.eessi.service.sak;
 
 import no.nav.melosys.eessi.integration.sak.Sak;
-import no.nav.melosys.eessi.integration.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.sak.SakClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,14 +10,14 @@ import org.springframework.stereotype.Service;
 public class ArkivsakService {
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ArkivsakService.class);
-    private final SakConsumer sakConsumer;
+    private final SakClient sakClient;
 
     @Autowired
-    public ArkivsakService(SakConsumer sakConsumer) {
-        this.sakConsumer = sakConsumer;
+    public ArkivsakService(SakClient sakClient) {
+        this.sakClient = sakClient;
     }
 
     public Sak hentsak(Long id) {
-        return sakConsumer.getSak(Long.toString(id));
+        return sakClient.getSak(Long.toString(id));
     }
 }

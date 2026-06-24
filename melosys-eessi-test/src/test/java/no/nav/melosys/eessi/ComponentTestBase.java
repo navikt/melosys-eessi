@@ -18,7 +18,7 @@ import no.nav.melosys.eessi.integration.oppgave.OppgaveConsumer;
 import no.nav.melosys.eessi.integration.pdl.PDLConsumer;
 import no.nav.melosys.eessi.integration.pdl.PdlWebConsumer;
 import no.nav.melosys.eessi.integration.saf.SafConsumer;
-import no.nav.melosys.eessi.integration.sak.SakConsumer;
+import no.nav.melosys.eessi.integration.sak.SakClient;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.kafka.producers.model.MelosysEessiMelding;
 import no.nav.melosys.utils.ConsumerRecordPredicates;
@@ -79,7 +79,7 @@ public abstract class ComponentTestBase extends PostgresTestContainerBase {
     EuxConsumer euxConsumer;
 
     @MockitoBean
-    SakConsumer sakConsumer;
+    SakClient sakClient;
 
     @MockitoBean
     JournalpostapiConsumer journalpostapiConsumer;
