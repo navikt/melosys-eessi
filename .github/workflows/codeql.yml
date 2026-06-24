@@ -43,7 +43,7 @@ jobs:
           category: "/language:${{matrix.language}}"
       - name: Notify on Slack
         if: failure()
-        uses: rtCamp/action-slack-notify@v2
+        uses: rtCamp/action-slack-notify@v2.3.3
         env:
           SLACK_CHANNEL: melosys-alarmer-codeql
           SLACK_MESSAGE: "CodeQL analyse feilet for branch ${{ github.ref }} i repository ${{ github.repository }}."
