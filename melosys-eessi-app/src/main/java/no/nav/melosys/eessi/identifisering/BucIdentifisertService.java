@@ -9,8 +9,8 @@ import no.nav.melosys.eessi.models.BucIdentifisert;
 import no.nav.melosys.eessi.repository.BucIdentifisertRepository;
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BucIdentifisertService {
@@ -39,14 +39,13 @@ public class BucIdentifisertService {
         return bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer).map(BucIdentifisert::getFolkeregisterident);
     }
 
-    @Transactional
     public void lagreIdentifisertPerson(String rinaSaksnummer, String ident) {
-        // Atomisk insert som ikke gjør noe om rina-saken allerede er identifisert. Dette forhindrer
-        // race condition (duplikat unik nøkkel) når flere pods/tråder identifiserer samme rina-sak samtidig.
-        int antallLagret = bucIdentifisertRepository.lagreHvisIkkeEksisterer(rinaSaksnummer, ident);
-        if (antallLagret == 0) {
-            log.info("Rinasak {} allerede identifisert", rinaSaksnummer);
+        try {
+            bucIdentifisertRepository.findByRinaSaksnummer(rinaSaksnummer).ifPresentOrElse(i -> log.info("Rinasak {} allerede identifisert", rinaSaksnummer), () -> bucIdentifisertRepository.save(new BucIdentifisert(0, rinaSaksnummer, ident)));
+            applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
+        } catch (IncorrectResultSizeDataAccessException e) {
+            log.error("Duplikat resultat ved oppslag av ident for rinaSak {}", rinaSaksnummer, e);
+            throw e;
         }
-        applicationEventPublisher.publishEvent(new BucIdentifisertEvent(rinaSaksnummer, ident));
     }
 }
