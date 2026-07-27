@@ -1,4 +1,3 @@
-#FROM gcr.io/distroless/java21-debian12:nonroot
 FROM europe-north1-docker.pkg.dev/cgr-nav/pull-through/nav.no/jdk:openjdk-21
 LABEL maintainer="Team Melosys"
 WORKDIR /app
