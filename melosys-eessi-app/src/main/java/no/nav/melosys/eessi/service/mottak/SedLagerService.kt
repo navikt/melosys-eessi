@@ -13,12 +13,12 @@ class SedLagerService(
     private val sedMottattLagerRepository: SedMottattLagerRepository
 ) {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun lagreSedSeparatTransaksjon(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean = false) {
+    fun lagreSedSeparatTransaksjon(sedMottatt: SedMottattHendelse, sed: SED) {
         sedMottattLagerRepository.save(
             SedMottattLager(
                 sedId = sedMottatt.sedHendelse.sedId,
                 sed = sed,
-                storageReason = "TREDJELANDSBORGER 7403 - toggle:$toggleAktivert",
+                storageReason = "TREDJELANDSBORGER 7403",
             )
         )
     }

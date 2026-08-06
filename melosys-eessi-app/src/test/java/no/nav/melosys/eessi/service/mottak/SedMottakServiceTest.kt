@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.mottak
 
-import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -86,7 +85,6 @@ class SedMottakServiceTest {
             personIdentifisering,
             bucIdentifisertService,
             saksrelasjonService,
-            FakeUnleash().apply { enableAll() },
             sedLagerService,
             "1",
         )
@@ -490,7 +488,7 @@ class SedMottakServiceTest {
         val savedSedMottattHendelse = slot<SedMottattHendelse>()
         every { sedMottattHendelseRepository.save(capture(savedSedMottattHendelse)) } returnsArgument 0
         every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
-        every { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), any()) } just Runs
+        every { sedLagerService.lagreSedSeparatTransaksjon(any(), any()) } just Runs
         every { euxService.hentSedMedVedlegg(any(), any()) } returns mockk()
         every { euxService.hentBuc(any()) } returns mockk(relaxed = true)
 
@@ -499,7 +497,7 @@ class SedMottakServiceTest {
 
         sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
 
-        verify { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), true) }
+        verify { sedLagerService.lagreSedSeparatTransaksjon(any(), any()) }
         verify(exactly = 2) { sedMottattHendelseRepository.save(any()) }
 
         savedSedMottattHendelse.captured.skalJournalfoeres shouldBe false
@@ -602,63 +600,6 @@ class SedMottakServiceTest {
         verify { euxService.hentSedMedRetry(any(), any()) }
         verify { personIdentifisering.identifiserPerson(any(), any()) }
         verify { sedMottattHendelseRepository.save(any()) }
-    }
-
-    @Test
-    fun `behandleSed tredjelandsborger med toggle deaktivert oppretter fortsatt oppgave`() {
-        every { euxService.hentSedMedRetry(any(), any()) } returns SED(
-            nav = Nav(
-                bruker = Bruker(
-                    person = Person(
-                        statsborgerskap = listOf("US").map {
-                            Statsborgerskap().apply { land = it }
-                        },
-                        foedselsdato = "1990-01-01"
-                    )
-                )
-            ),
-            sedType = "A003",
-            medlemskap = MedlemskapA003(
-                vedtak = VedtakA003(land = "DE")
-            )
-        )
-
-        val serviceWithDisabledToggle = SedMottakService(
-            euxService,
-            personFasade,
-            opprettInngaaendeJournalpostService,
-            oppgaveService,
-            sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository,
-            journalpostSedKoblingService,
-            sedMetrikker,
-            personIdentifisering,
-            bucIdentifisertService,
-            saksrelasjonService,
-            FakeUnleash().apply { disable("TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED") },
-            sedLagerService,
-            "1",
-        )
-
-        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
-        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
-        every { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), any()) } just Runs
-        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "journalpostId"
-        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
-        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "oppgaveId"
-        every { bucIdentifiseringOppgRepository.save(any()) } returns mockk()
-        every { euxService.hentSedMedVedlegg(any(), any()) } returns mockk()
-        every { euxService.hentBuc(any()) } returns mockk(relaxed = true)
-
-        val sedHendelse = sedHendelseUtenBruker().apply { sedType = "A003" }
-        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelse).build()
-
-        serviceWithDisabledToggle.behandleSedMottakHendelse(sedMottattHendelse)
-
-        verify { sedLagerService.lagreSedSeparatTransaksjon(any(), any(), false) }
-        verify { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
-        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
-        verify { bucIdentifiseringOppgRepository.save(any()) }
     }
 
 
