@@ -1,8 +1,6 @@
 package no.nav.melosys.eessi.service.mottak
 
-import io.getunleash.Unleash
 import mu.KotlinLogging
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName.TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
 import no.nav.melosys.eessi.integration.PersonFasade
@@ -42,7 +40,6 @@ class SedMottakService(
     private val personIdentifisering: PersonIdentifisering,
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
-    private val unleach: Unleash,
     private val sedLagerService: SedLagerService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
@@ -200,16 +197,11 @@ class SedMottakService(
 
         fun hentAvsenderLand(): String = euxService.hentBuc(sedMottatt.sedHendelse.rinaSakId).hentAvsenderLand()
         if (sed.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted(::hentAvsenderLand)) {
-            val toggleAktivert = unleach.isEnabled(TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED)
             sedMottatt.skalJournalfoeres = false
             sedMottattHendelseRepository.save(sedMottatt)
-            lagreSed(sedMottatt, sed, toggleAktivert)
-            if (toggleAktivert) {
-                log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
-                return
-            } else {
-                log.info("Toggle TREDJELANDSBORGER_UTEN_NORGE_SOM_ARBEIDSSTED er deaktivert, så oppretter fortsatt oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
-            }
+            lagreSed(sedMottatt, sed)
+            log.info("SED er A003 og tredjelandsborger uten arbeidssted i Norge, oppretter ikke oppgave til ID og fordeling, SED: ${sedMottatt.sedHendelse.sedId}")
+            return
         }
 
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
@@ -221,10 +213,10 @@ class SedMottakService(
             ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
     }
 
-    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED, toggleAktivert: Boolean) {
+    private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
         try {
             // Dette må gjøres i en separat transaksjon for å unngå at eksisterende transaksjon blir rullet tilbake
-            sedLagerService.lagreSedSeparatTransaksjon(sedMottatt, sed, toggleAktivert)
+            sedLagerService.lagreSedSeparatTransaksjon(sedMottatt, sed)
         } catch (e: Exception) {
             log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
         }
