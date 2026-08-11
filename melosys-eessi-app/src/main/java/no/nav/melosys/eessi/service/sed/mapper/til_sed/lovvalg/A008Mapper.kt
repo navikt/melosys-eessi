@@ -1,7 +1,5 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import io.getunleash.Unleash
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.A008Formaal
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
@@ -11,7 +9,7 @@ import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.service.sed.LandkodeMapper.mapTilLandkodeIso2
 import org.slf4j.LoggerFactory
 
-class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008> {
+class A008Mapper : LovvalgSedMapper<MedlemskapA008> {
 
     private val log = LoggerFactory.getLogger(A008Mapper::class.java)
 
@@ -25,14 +23,8 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
     private fun hentFormaal(sedData: SedDataDto): String? {
         val formaal = sedData.a008Formaal
 
-        if (!unleash.isEnabled(CDM_4_4)) {
-            if (formaal != null) {
-                log.warn("a008Formaal mottatt fra melosys-web men CDM 4.4 toggle er deaktivert. Ignorerer formaal: {}", formaal.rinaVerdi)
-            }
-            return null
-        }
         if (formaal == null) {
-            log.warn("a008Formaal er ikke satt i melosys-web for A008 SED når CDM 4.4 er aktivert")
+            log.warn("a008Formaal er ikke satt i melosys-web for A008 SED")
             return A008Formaal.ARBEID_FLERE_LAND.rinaVerdi
         }
         return formaal.rinaVerdi
@@ -48,18 +40,16 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
     override fun hentArbeidsland(sedData: SedDataDto): List<Arbeidsland> {
         val arbeidslandListe = super.hentArbeidsland(sedData).toMutableList()
 
-        if (unleash.isEnabled(CDM_4_4)) {
-            if (arbeidslandListe.isEmpty()) {
-                lagArbeidslandBosted(sedData)?.let { bosted ->
-                    arbeidslandListe.add(Arbeidsland(bosted = bosted))
-                }
-            } else {
-                arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+        if (arbeidslandListe.isEmpty()) {
+            lagArbeidslandBosted(sedData)?.let { bosted ->
+                arbeidslandListe.add(Arbeidsland(bosted = bosted))
             }
+        } else {
+            arbeidslandListe.firstOrNull()?.bosted = lagArbeidslandBosted(sedData)
+        }
 
-            arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
-                arbeidssted.adresse?.navn = arbeidssted.navn
-            }
+        arbeidslandListe.flatMap { it.arbeidssted }.forEach { arbeidssted ->
+            arbeidssted.adresse?.navn = arbeidssted.navn
         }
 
         return arbeidslandListe
@@ -95,7 +85,7 @@ class A008Mapper(private val unleash: Unleash) : LovvalgSedMapper<MedlemskapA008
         )
 
         return MedlemskapA008Bruker(
-            arbeidiflereland = if (unleash.isEnabled(CDM_4_4)) listOf(arbeidIFlereLand) else arbeidIFlereLand
+            arbeidiflereland = listOf(arbeidIFlereLand)
         )
     }
 }

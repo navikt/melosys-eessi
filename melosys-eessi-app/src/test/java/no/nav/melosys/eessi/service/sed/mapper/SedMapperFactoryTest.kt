@@ -1,30 +1,20 @@
 package no.nav.melosys.eessi.service.sed.mapper
 
-import io.getunleash.FakeUnleash
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.models.SedType
-import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A001Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.A009Mapper
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SedMapperFactoryTest {
 
-    private val fakeUnleash = FakeUnleash()
-    private val sedMapperFactory = SedMapperFactory(fakeUnleash)
-
-    @BeforeEach
-    fun setup() {
-        fakeUnleash.resetAll()
-    }
+    private val sedMapperFactory = SedMapperFactory()
 
     @Test
     fun oppslagavSedA001GirKorrektMapper() {
@@ -77,20 +67,7 @@ class SedMapperFactoryTest {
     }
 
     @Test
-    fun `mapTilSed - CDM 4_4 av, Kosovo konverteres til Ukjent`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedDataDto = SedDataStub.getStub("mock/sedA009-Kosovo.json")
-
-        val sed = sedMapperFactory.mapTilSed(SedType.A009, sedDataDto)
-
-        sed.finnPerson().get()
-            .statsborgerskap.shouldNotBeNull().shouldHaveSize(1).single().shouldNotBeNull()
-            .land shouldBe LandkodeMapper.UKJENT_LANDKODE_ISO2
-    }
-
-    @Test
-    fun `mapTilSed - CDM 4_4 pa, Kosovo beholdes`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `mapTilSed - Kosovo beholdes`() {
         val sedDataDto = SedDataStub.getStub("mock/sedA009-Kosovo.json")
 
         val sed = sedMapperFactory.mapTilSed(SedType.A009, sedDataDto)
@@ -101,19 +78,7 @@ class SedMapperFactoryTest {
     }
 
     @Test
-    fun `mapTilSed - CDM 4_4 av, sedVer er CDM 4_3`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedDataDto = SedDataStub.getStub()
-
-        val sed = sedMapperFactory.mapTilSed(SedType.A009, sedDataDto)
-
-        sed.sedVer shouldBe SED_VER_CDM_4_3
-        sed.sedGVer shouldBe "4"
-    }
-
-    @Test
-    fun `mapTilSed - CDM 4_4 pa, sedVer er CDM 4_4`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `mapTilSed - sedVer er CDM 4_4`() {
         val sedDataDto = SedDataStub.getStub()
 
         val sed = sedMapperFactory.mapTilSed(SedType.A009, sedDataDto)
@@ -123,8 +88,7 @@ class SedMapperFactoryTest {
     }
 
     @Test
-    fun `mapTilSed - CDM 4_4 pa, alle SED-typer far versjon 4_4`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `mapTilSed - alle SED-typer far versjon 4_4`() {
         val sedDataDto = SedDataStub.getStub()
 
         // Tester SED-typer som kan mappes med standard test-stub.

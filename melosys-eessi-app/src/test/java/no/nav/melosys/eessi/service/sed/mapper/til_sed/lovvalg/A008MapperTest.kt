@@ -1,12 +1,10 @@
 package no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg
 
-import io.getunleash.FakeUnleash
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.*
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA008
@@ -20,7 +18,6 @@ import tools.jackson.module.kotlin.KotlinModule
 
 class A008MapperTest {
 
-    private lateinit var fakeUnleash: FakeUnleash
     private lateinit var a008Mapper: A008Mapper
 
     private val jsonMapper: JsonMapper = JsonMapper.builder()
@@ -29,8 +26,7 @@ class A008MapperTest {
 
     @BeforeEach
     fun setup() {
-        fakeUnleash = FakeUnleash()
-        a008Mapper = A008Mapper(fakeUnleash)
+        a008Mapper = A008Mapper()
     }
 
     @Test
@@ -49,35 +45,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `map til SED med versjon 3 naar toggle er av`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().run {
-                arbeidiflereland.shouldNotBeNull()
-                    .shouldBeInstanceOf<ArbeidIFlereLand>().run {
-                        yrkesaktivitet.shouldNotBeNull()
-                            .startdato shouldBe "2020-01-01"
-                        bosted.shouldNotBeNull()
-                            .land shouldBe "SE"
-                    }
-            }
-
-            sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().run {
-                size shouldBe 1
-                first().bosted.shouldBeNull()
-            }
-        }
-    }
-
-    @Test
-    fun `map til SED med CDM 4_4 toggle paa har korrekt medlemskap-struktur`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `map til SED har korrekt medlemskap-struktur`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
             a008Formaal = A008Formaal.ARBEID_FLERE_LAND
@@ -106,8 +74,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal fra sedData mappes til SED naar toggle er paa`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `formaal fra sedData mappes til SED`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             a008Formaal = A008Formaal.ARBEID_FLERE_LAND
         }
@@ -121,7 +88,6 @@ class A008MapperTest {
 
     @Test
     fun `formaal endringsmelding mappes korrekt`() {
-        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             a008Formaal = A008Formaal.ENDRINGSMELDING
         }
@@ -134,8 +100,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `set til arbeid_flere_land naar toggle er paa men formaal mangler`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `set til arbeid_flere_land naar formaal mangler`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {}
 
         val sed: SED = a008Mapper.mapTilSed(sedData)
@@ -146,22 +111,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `formaal er null naar toggle er av selv om sedData har formaal`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            a008Formaal = A008Formaal.ARBEID_FLERE_LAND
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            formaal.shouldBeNull()
-        }
-    }
-
-    @Test
     fun `bosted-adresse ligger paa arbeidsland index 0 uansett land-match`() {
-        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
             bostedsadresse = Adresse(poststed = "Stockholm", land = "SE", adressetype = Adressetype.BOSTEDSADRESSE)
@@ -198,7 +148,6 @@ class A008MapperTest {
 
     @Test
     fun `bosted er null naar avklartBostedsland mangler`() {
-        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = null
         }
@@ -212,7 +161,6 @@ class A008MapperTest {
 
     @Test
     fun `bosted-adresse settes med NA naar alle adresser mangler`() {
-        fakeUnleash.enable(CDM_4_4)
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "PT"
             bostedsadresse = null
@@ -231,8 +179,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `companyNameVesselName settes paa arbeidssted adresse naar CDM 4_4`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `companyNameVesselName settes paa arbeidssted adresse`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
 
         val sed = a008Mapper.mapTilSed(sedData)
@@ -246,23 +193,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `companyNameVesselName settes ikke paa arbeidssted adresse naar CDM 4_3`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json")
-
-        val sed = a008Mapper.mapTilSed(sedData)
-
-        sed.nav.shouldNotBeNull().arbeidsland.shouldNotBeNull().first().run {
-            arbeidssted.first().run {
-                navn shouldBe "MinJobb"
-                adresse.shouldNotBeNull().navn.shouldBeNull()
-            }
-        }
-    }
-
-    @Test
-    fun `CDM 4_4 serialiserer arbeidiflereland som array i JSON`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `serialiserer arbeidiflereland som array i JSON`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
             a008Formaal = A008Formaal.ARBEID_FLERE_LAND
@@ -279,8 +210,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `CDM 4_4 rund-tur serialisering-deserialisering bevarer array-struktur`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `rund-tur serialisering-deserialisering bevarer array-struktur`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             avklartBostedsland = "SE"
             a008Formaal = A008Formaal.ARBEID_FLERE_LAND
@@ -306,33 +236,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `CDM 4_3 rund-tur serialisering-deserialisering bevarer objekt-struktur`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-        }
-
-        val original = a008Mapper.mapTilSed(sedData)
-        val json = jsonMapper.writeValueAsString(original)
-        val deserialized = jsonMapper.readValue(json, SED::class.java)
-
-        deserialized.medlemskap.shouldBeInstanceOf<MedlemskapA008>().run {
-            bruker.shouldNotBeNull().run {
-                // Etter deserialisering fra objekt blir dette LinkedHashMap (Any?-type)
-                arbeidiflereland.shouldNotBeNull()
-                    .shouldBeInstanceOf<Map<*, *>>()
-                @Suppress("UNCHECKED_CAST")
-                val map = arbeidiflereland as Map<String, Any?>
-                @Suppress("UNCHECKED_CAST")
-                val bosted = map["bosted"] as Map<String, Any?>
-                bosted["land"] shouldBe "SE"
-            }
-        }
-    }
-
-    @Test
-    fun `CDM 4_4 tom arbeidsland med bostedsadresse oppretter arbeidsland-entry med adressefelter`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `tom arbeidsland med bostedsadresse oppretter arbeidsland-entry med adressefelter`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             harFastArbeidssted = false
             arbeidsland = listOf()
@@ -367,8 +271,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `CDM 4_4 tom arbeidsland uten bostedsadresse bruker kontaktadresse`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `tom arbeidsland uten bostedsadresse bruker kontaktadresse`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             harFastArbeidssted = false
             arbeidsland = listOf()
@@ -394,8 +297,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `CDM 4_4 tom arbeidsland uten bostedsadresse og kontaktadresse bruker oppholdsadresse`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `tom arbeidsland uten bostedsadresse og kontaktadresse bruker oppholdsadresse`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             harFastArbeidssted = false
             arbeidsland = listOf()
@@ -421,8 +323,7 @@ class A008MapperTest {
     }
 
     @Test
-    fun `CDM 4_4 tom arbeidsland uten noen adresser bruker avklartBostedsland med NA`() {
-        fakeUnleash.enable(CDM_4_4)
+    fun `tom arbeidsland uten noen adresser bruker avklartBostedsland med NA`() {
         val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
             harFastArbeidssted = false
             arbeidsland = listOf()
@@ -442,21 +343,5 @@ class A008MapperTest {
                 gate.shouldBeNull()
                 postnummer.shouldBeNull()
             }
-    }
-
-    @Test
-    fun `CDM 4_3 serialiserer arbeidiflereland som objekt i JSON`() {
-        fakeUnleash.disable(CDM_4_4)
-        val sedData = SedDataStub.getStub("mock/sedDataDtoStub.json") {
-            avklartBostedsland = "SE"
-        }
-
-        val sed = a008Mapper.mapTilSed(sedData)
-        val json = jsonMapper.writeValueAsString(sed)
-        val jsonTree = jsonMapper.readTree(json)
-
-        val arbeidiflereland = jsonTree.path("medlemskap").path("bruker").path("arbeidiflereland")
-        arbeidiflereland.isObject.shouldBeTrue()
-        arbeidiflereland.path("bosted").path("land").asText() shouldBe "SE"
     }
 }

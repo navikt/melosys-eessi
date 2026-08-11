@@ -1,33 +1,27 @@
 package no.nav.melosys.eessi.service.sed.mapper
 
-import io.getunleash.Unleash
-import mu.KotlinLogging
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
 import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.models.sed.SED
-import no.nav.melosys.eessi.service.sed.LandkodeMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.SedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.administrativ.X008Mapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.horisontal.HorisontalSedMapper
 import no.nav.melosys.eessi.service.sed.mapper.til_sed.lovvalg.*
 import org.springframework.stereotype.Component
 
-private val log = KotlinLogging.logger { }
-
 @Component
-class SedMapperFactory(private val unleash: Unleash) {
+class SedMapperFactory {
 
     private val sedMappers: Map<SedType, SedMapper> = mapOf(
-        SedType.A001 to A001Mapper(unleash),
+        SedType.A001 to A001Mapper(),
         SedType.A002 to A002Mapper(),
         SedType.A003 to A003Mapper(),
         SedType.A004 to A004Mapper(),
         SedType.A005 to A005Mapper(),
-        SedType.A008 to A008Mapper(unleash),
+        SedType.A008 to A008Mapper(),
         SedType.A009 to A009Mapper(),
         SedType.A010 to A010Mapper(),
         SedType.A011 to A011Mapper(),
@@ -58,23 +52,8 @@ class SedMapperFactory(private val unleash: Unleash) {
 
     fun mapTilSed(sedType: SedType, sedDataDto: SedDataDto): SED {
         val sed = sedMapper(sedType).mapTilSed(sedDataDto)
-        if (unleash.isEnabled(CDM_4_4)) {
-            sed.sedGVer = DEFAULT_SED_G_VER
-            sed.sedVer = SED_VER_CDM_4_4
-            return sed
-        }
-        return konverterKosovoTilUkjent(sed, sedDataDto.gsakSaksnummer)
-    }
-
-    private fun konverterKosovoTilUkjent(sed: SED, gsakSaksnummer: Long?): SED {
-        val person = sed.finnPerson().orElse(null) ?: return sed
-
-        person.statsborgerskap = person.statsborgerskap.map {
-            if (it?.land == LandkodeMapper.KOSOVO_LANDKODE_ISO2) {
-                log.info("Endrer statsborgerskap fra Kosovo til Ukjent. gsakSaksnummer: $gsakSaksnummer")
-                it.copy(land = LandkodeMapper.UKJENT_LANDKODE_ISO2)
-            } else it
-        }
+        sed.sedGVer = DEFAULT_SED_G_VER
+        sed.sedVer = SED_VER_CDM_4_4
         return sed
     }
 }

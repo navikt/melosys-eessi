@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.service.sed
 
-import io.getunleash.FakeUnleash
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -15,7 +14,6 @@ import io.mockk.verify
 import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDtoV2
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.controller.dto.VedleggReferanse
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName.CDM_4_4
 import no.nav.melosys.eessi.models.BucType
 import no.nav.melosys.eessi.models.FagsakRinasakKobling
 import no.nav.melosys.eessi.models.SedType
@@ -52,8 +50,7 @@ class SedServiceTest {
     @MockK
     lateinit var safConsumer: no.nav.melosys.eessi.integration.saf.SafConsumer
 
-    private val fakeUnleash = FakeUnleash()
-    private val sedMapperFactory = SedMapperFactory(fakeUnleash)
+    private val sedMapperFactory = SedMapperFactory()
 
     lateinit var sendSedService: SedService
 
@@ -61,7 +58,6 @@ class SedServiceTest {
 
     @BeforeEach
     fun setup() {
-        fakeUnleash.resetAll()
         sendSedService = SedService(
             euxService, saksrelasjonService, 0L, JsonFieldMasker(
                 JsonMapper.builder().build(), org.springframework.mock.env.MockEnvironment()
@@ -121,40 +117,7 @@ class SedServiceTest {
     }
 
     @Test
-    fun `opprettBucOgSed - Kosovo statsborgerskap skal mappes til ukjent`() {
-        val sedCapturingSlot = CapturingSlot<SED>()
-        every {
-            euxService.opprettBucOgSed(
-                any(),
-                any(),
-                capture(sedCapturingSlot),
-                any()
-            )
-        } returns OpprettBucOgSedResponse(RINA_ID, "123")
-        every { euxService.hentRinaUrl(any()) } returns "URL"
-        every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
-        every { euxService.sendSed(any(), any(), any()) } returns Unit
-
-        sendSedService.opprettBucOgSed(
-            sedDataDto = sedDataDto("mock/sedA009-Kosovo.json"),
-            vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray())),
-            bucType = BucType.LA_BUC_01,
-            sendAutomatisk = true,
-            forsøkOppdaterEksisterende = false
-        )
-
-        sedCapturingSlot.captured.nav
-            .shouldNotBeNull()
-            .bruker.shouldNotBeNull()
-            .person.shouldNotBeNull()
-            .statsborgerskap.shouldNotBeNull().shouldHaveSize(1).single().shouldNotBeNull()
-            .land shouldBe LandkodeMapper.UKJENT_LANDKODE_ISO2
-    }
-
-    @Test
-    fun `opprettBucOgSed - CDM 4_4 aktivert, Kosovo statsborgerskap beholdes som XK`() {
-        fakeUnleash.enable(CDM_4_4)
-
+    fun `opprettBucOgSed - Kosovo statsborgerskap beholdes som XK`() {
         val sedCapturingSlot = CapturingSlot<SED>()
         every {
             euxService.opprettBucOgSed(
