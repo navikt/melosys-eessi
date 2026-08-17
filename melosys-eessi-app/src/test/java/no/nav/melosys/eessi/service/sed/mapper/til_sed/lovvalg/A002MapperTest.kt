@@ -18,7 +18,7 @@ import java.time.LocalDate
 class A002MapperTest {
 
     @Test
-    fun `map til SED med version 3`() {
+    fun `map til SED med version 4`() {
         val sed = SedDataStub.mapTilSed<A002Mapper>(testData = "mock/sedDataDtoStub.json") {
             svarAnmodningUnntak = SvarAnmodningUnntakDto(
                 SvarAnmodningUnntakBeslutning.AVSLAG,
@@ -33,7 +33,7 @@ class A002MapperTest {
                 arbeidsland.shouldBeNull()
                 harfastarbeidssted.shouldBeNull()
             }
-            sedVer shouldBe "3"
+            sedVer shouldBe "4"
             sedGVer shouldBe "4"
         }
     }

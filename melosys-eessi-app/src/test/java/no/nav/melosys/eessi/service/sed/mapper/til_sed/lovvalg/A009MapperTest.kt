@@ -35,7 +35,7 @@ class A009MapperTest {
         }
 
     @Test
-    fun `map til SED version 3`() {
+    fun `map til SED version 4`() {
         val sed = mapTilA009 {
             avklartBostedsland = "SE"
         }
@@ -47,7 +47,7 @@ class A009MapperTest {
                 .arbeidsland.shouldNotBeNull().shouldHaveSize(1).single()
                 .land shouldBe lovvalgsland
 
-            sedVer shouldBe "3"
+            sedVer shouldBe "4"
             sedGVer shouldBe "4"
         }
     }
