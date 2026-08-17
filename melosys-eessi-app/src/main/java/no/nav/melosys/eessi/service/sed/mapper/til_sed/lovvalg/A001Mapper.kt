@@ -4,9 +4,6 @@ import no.nav.melosys.eessi.controller.dto.Bestemmelse
 import no.nav.melosys.eessi.controller.dto.Lovvalgsperiode
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
-import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
-import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
-import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.*
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.service.sed.LandkodeMapper
@@ -15,17 +12,11 @@ import no.nav.melosys.eessi.service.sed.mapper.UnntakArtikkelMapper
 class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
     override fun getSedType(): SedType = SedType.A001
 
-    override fun mapTilSed(sedData: SedDataDto): SED =
-        super.mapTilSed(sedData).apply {
-            sedVer = SED_VER_CDM_4_4
-            sedGVer = DEFAULT_SED_G_VER
-        }
-
     override fun getMedlemskap(sedData: SedDataDto): MedlemskapA001 {
         val lovvalgsperiode = sedData.finnLovvalgsperiode()
 
         return MedlemskapA001(
-            unntak = lovvalgsperiode?.let { getUnntak(it) },
+            unntak = lovvalgsperiode?.let { Unntak(begrunnelse = it.unntaksBegrunnelse) },
             naavaerendemedlemskap = lovvalgsperiode?.let { getUnntakFraLovvalgsland(it) }.orEmpty().toMutableList(),
             forespurtmedlemskap = lovvalgsperiode?.let { getLovvalgsland(it) }.orEmpty().toMutableList(),
             soeknadsperiode = lovvalgsperiode?.let { getSoeknadsperiode(it) },
@@ -36,11 +27,6 @@ class A001Mapper : LovvalgSedMapper<MedlemskapA001> {
             rammeavtale = lovvalgsperiode?.let { getRammeavtale(it, sedData) }
         )
     }
-
-    private fun getUnntak(lovvalgsperiode: Lovvalgsperiode): Unntak =
-        Unntak(
-            begrunnelse = lovvalgsperiode.unntaksBegrunnelse
-        )
 
     private fun getForordning8832004(lovvalgsperiode: Lovvalgsperiode) = Forordning8832004(
         unntak = UnntakForordning(

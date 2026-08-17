@@ -8,7 +8,7 @@ import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.sed.Konstanter
 import no.nav.melosys.eessi.models.sed.Konstanter.DEFAULT_SED_G_VER
-import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_3
+import no.nav.melosys.eessi.models.sed.Konstanter.SED_VER_CDM_4_4
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.*
 import no.nav.melosys.eessi.models.sed.nav.Bruker
@@ -32,7 +32,7 @@ interface SedMapper {
         nav = prefillNav(sedData),
         sedType = getSedType().name,
         sedGVer = DEFAULT_SED_G_VER,
-        sedVer = SED_VER_CDM_4_3
+        sedVer = SED_VER_CDM_4_4
     )
 
     fun prefillNav(sedData: SedDataDto): Nav {
