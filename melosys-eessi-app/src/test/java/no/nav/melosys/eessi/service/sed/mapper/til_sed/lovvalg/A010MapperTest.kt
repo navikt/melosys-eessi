@@ -32,7 +32,7 @@ class A010MapperTest {
 
 
     @Test
-    fun `map til SED version 3`() {
+    fun `map til SED version 4`() {
         val sed = mapTilA010 {
             lovvalgsperioder.first().apply {
                 bestemmelse = Bestemmelse.ART_11_3_b
@@ -46,7 +46,7 @@ class A010MapperTest {
             nav.shouldNotBeNull()
                 .arbeidsland.shouldNotBeNull().shouldHaveSize(1).single()
                 .land shouldBe "NO"
-            sedVer shouldBe "3"
+            sedVer shouldBe "4"
             sedGVer shouldBe "4"
         }
     }

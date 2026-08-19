@@ -16,7 +16,7 @@ class A005MapperTest {
         sed.shouldNotBeNull().run {
             medlemskap.shouldBeInstanceOf<MedlemskapA005>()
             nav.shouldNotBeNull().arbeidsland shouldBe null
-            sedVer shouldBe "3"
+            sedVer shouldBe "4"
             sedGVer shouldBe "4"
         }
     }

@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test
 
 class A004MapperTest {
     @Test
-    fun `map til SED version 3`() {
+    fun `map til SED version 4`() {
         val sed = SedDataStub.mapTilSed<A004Mapper>(testData = "mock/sedDataDtoStub.json") {
             utpekingAvvis = UtpekingAvvisDto(
                 nyttLovvalgsland = "DK",
@@ -27,7 +27,7 @@ class A004MapperTest {
         sed.shouldNotBeNull().run {
             medlemskap.shouldBeInstanceOf<MedlemskapA004>()
             nav.shouldNotBeNull().arbeidsland shouldBe null
-            sedVer shouldBe "3"
+            sedVer shouldBe "4"
             sedGVer shouldBe "4"
         }
     }

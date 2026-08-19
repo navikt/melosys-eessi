@@ -22,7 +22,7 @@ class A003MapperTest {
         }
 
     @Test
-    fun `map til SED version 3`() {
+    fun `map til SED version 4`() {
         val sed = mapTilA003()
 
         sed.shouldNotBeNull().run {
@@ -34,7 +34,7 @@ class A003MapperTest {
                 arbeidsgiver.shouldNotBeNull().single().adresse.shouldNotBeNull().land shouldBe "NO"
                 arbeidsland.shouldNotBeNull().size shouldBe 1
             }
-            sedVer shouldBe "3"
+            sedVer shouldBe "4"
             sedGVer shouldBe "4"
         }
     }

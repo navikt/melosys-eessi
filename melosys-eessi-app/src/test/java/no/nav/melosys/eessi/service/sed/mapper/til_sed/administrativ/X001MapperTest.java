@@ -4,8 +4,6 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 
-import io.getunleash.FakeUnleash;
-import no.nav.melosys.eessi.config.featuretoggle.ToggleName;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.sed.SED;
 import org.apache.commons.io.IOUtils;
@@ -16,28 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class X001MapperTest {
 
-    private final FakeUnleash fakeUnleash = new FakeUnleash();
-
     @Test
-    void mapFraSed_cdm43() throws Exception {
-        fakeUnleash.disable(ToggleName.CDM_4_4);
-
+    void mapFraSed() throws Exception {
         SED fraSed = lesSed();
-        X001Mapper mapper = new X001Mapper(fakeUnleash);
-        SED x001 = mapper.mapFraSed(fraSed, "aarsaken");
-
-        assertThat(x001).extracting(SED::getSedType, SED::getMedlemskap, SED::getSedGVer, SED::getSedVer)
-            .containsExactly(SedType.X001.name(), null, "4", "3");
-
-        verifiserPåkrevdeFelter(x001);
-    }
-
-    @Test
-    void mapFraSed_cdm44() throws Exception {
-        fakeUnleash.enable(ToggleName.CDM_4_4);
-
-        SED fraSed = lesSed();
-        X001Mapper mapper = new X001Mapper(fakeUnleash);
+        X001Mapper mapper = new X001Mapper();
         SED x001 = mapper.mapFraSed(fraSed, "aarsaken");
 
         assertThat(x001).extracting(SED::getSedType, SED::getMedlemskap, SED::getSedGVer, SED::getSedVer)
