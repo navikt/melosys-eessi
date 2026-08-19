@@ -46,7 +46,6 @@ spring.jpa:
     properties:
         hibernate:
             format_sql: true
-            jdbc.lob.non_contextual_creation: true
         jadira.usertype.autoRegisterUserTypes: true
 
 spring:

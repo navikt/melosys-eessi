@@ -16,9 +16,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.Database;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Profile("nais")
@@ -50,16 +47,10 @@ public class DatabaseConfig {
         return config -> config.initSql(String.format("SET ROLE \"%s-admin\"", databaseName)).dataSource(adminDataSource);
     }
 
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-        entityManagerFactoryBean.setDataSource(userDataSource());
-        entityManagerFactoryBean.setPackagesToScan("no.nav.melosys.eessi");
-        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setDatabase(Database.POSTGRESQL);
-        entityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
-        return entityManagerFactoryBean;
-    }
+    // NB: Ingen egen LocalContainerEntityManagerFactoryBean her. Definerer vi den, slår Spring Boot
+    // sin JPA-autokonfigurasjon seg av (@ConditionalOnMissingBean), og hele spring.jpa.properties
+    // fra application.yml blir forkastet - inkludert hibernate.type.json_format_mapper.
+    // Se JsonFormatMapperIT.
 
     @Bean(name = "transactionManager")
     public PlatformTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) {

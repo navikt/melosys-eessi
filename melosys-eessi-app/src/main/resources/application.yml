@@ -7,13 +7,12 @@ spring:
   datasource:
     url: jdbc:postgresql://${PG_HOST}:5432/${DATABASE_NAME}
   jpa:
+    # Pinnes eksplisitt. Uten denne utleder Hibernate dialekten fra JDBC-metadata ved oppstart.
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
         type:
           json_format_mapper: no.nav.melosys.eessi.config.HibernateJackson3FormatMapper
-        jdbc:
-          lob:
-            non_contextual_creation: true #fix for jdbc bug i postgres-driver som krasjer app
   kafka:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
