@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
  * DatabaseConfig gjorde i nais-profilen), forkastes hele spring.jpa.properties-kartet i stillhet,
  * og Hibernate faller tilbake på Jackson 2.
  *
- * Denne testen fanger nettopp det.
+ * Denne testen verifiserer at `hibernate.type.json_format_mapper` faktisk er aktiv i testkonteksten (altså at vi ikke har overstyrt Spring Boot sin JPA-autokonfigurasjon for profilen testen kjører med).
  */
 class JsonFormatMapperIT : ComponentTestBaseKotlin() {
 
