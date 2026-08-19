@@ -7,6 +7,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
+import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer;
@@ -58,6 +59,12 @@ public class DatabaseConfig {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         vendorAdapter.setDatabase(Database.POSTGRESQL);
         entityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
+        // Denne bønnen slår av Spring Boot sin JPA-autokonfigurasjon, så spring.jpa.properties fra
+        // application.yml blir ikke plukket opp her. Format mapperen må derfor settes eksplisitt,
+        // ellers faller Hibernate tilbake på sin innebygde Jackson 2-mapper og klarer ikke å
+        // deserialisere polymorfe SED-er (Medlemskap er annotert for Jackson 3). Se DatabaseConfigTest.
+        entityManagerFactoryBean.getJpaPropertyMap()
+            .put(AvailableSettings.JSON_FORMAT_MAPPER, new HibernateJackson3FormatMapper());
         return entityManagerFactoryBean;
     }
 
