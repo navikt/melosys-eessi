@@ -7,7 +7,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import no.nav.vault.jdbc.hikaricp.HikariCPVaultUtil;
-import org.hibernate.cfg.AvailableSettings;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.flyway.autoconfigure.FlywayConfigurationCustomizer;
@@ -17,9 +16,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.Database;
-import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Profile("nais")
@@ -51,22 +47,10 @@ public class DatabaseConfig {
         return config -> config.initSql(String.format("SET ROLE \"%s-admin\"", databaseName)).dataSource(adminDataSource);
     }
 
-    @Bean
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
-        LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
-        entityManagerFactoryBean.setDataSource(userDataSource());
-        entityManagerFactoryBean.setPackagesToScan("no.nav.melosys.eessi");
-        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
-        vendorAdapter.setDatabase(Database.POSTGRESQL);
-        entityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
-        // Denne bønnen slår av Spring Boot sin JPA-autokonfigurasjon, så spring.jpa.properties fra
-        // application.yml blir ikke plukket opp her. Format mapperen må derfor settes eksplisitt,
-        // ellers faller Hibernate tilbake på sin innebygde Jackson 2-mapper og klarer ikke å
-        // deserialisere polymorfe SED-er (Medlemskap er annotert for Jackson 3). Se DatabaseConfigTest.
-        entityManagerFactoryBean.getJpaPropertyMap()
-            .put(AvailableSettings.JSON_FORMAT_MAPPER, new HibernateJackson3FormatMapper());
-        return entityManagerFactoryBean;
-    }
+    // NB: Ingen egen LocalContainerEntityManagerFactoryBean her. Definerer vi den, slår Spring Boot
+    // sin JPA-autokonfigurasjon seg av (@ConditionalOnMissingBean), og hele spring.jpa.properties
+    // fra application.yml blir forkastet - inkludert hibernate.type.json_format_mapper.
+    // Se JsonFormatMapperIT.
 
     @Bean(name = "transactionManager")
     public PlatformTransactionManager jpaTransactionManager(EntityManagerFactory entityManagerFactory) {
