@@ -43,6 +43,8 @@ class SedService(
     fun opprettBucOgSed(
         opprettBucOgSedDtoV2: OpprettBucOgSedDtoV2
     ): BucOgSedOpprettetDto {
+        val gsakSaksnummer = opprettBucOgSedDtoV2.sedDataDto.gsakSaksnummer
+            ?: throw MappingException("GsakId er påkrevd!")
         val vedlegg = opprettBucOgSedDtoV2.vedlegg.map {
             SedVedlegg(
                 tittel = it.tittel,
@@ -52,10 +54,9 @@ class SedService(
                 ),
             )
         }
-        val gsakSaksnummer = opprettBucOgSedDtoV2.sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer)
         val mottakere = opprettBucOgSedDtoV2.sedDataDto.mottakerIder
-        val sedType = opprettBucOgSedDtoV2.bucType!!.hentFørsteLovligeSed()
+        val sedType = opprettBucOgSedDtoV2.bucType.hentFørsteLovligeSed()
         val sed = sedMapperFactory.mapTilSed(sedType, opprettBucOgSedDtoV2.sedDataDto)
         validerMottakerInstitusjoner(opprettBucOgSedDtoV2.bucType, mottakere!!)
         val response = executeWithSedLogging(

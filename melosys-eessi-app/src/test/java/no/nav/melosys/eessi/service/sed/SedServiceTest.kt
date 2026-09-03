@@ -332,18 +332,20 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - ingen Gsak Saksnummer, forvent MappingException`() {
         val sedData = SedDataStub.getStub().apply { gsakSaksnummer = null }
+        val vedleggReferanse = VedleggReferanse("journalpostId", "dokumentId", "tittel")
 
         shouldThrow<MappingException> {
             sendSedService.opprettBucOgSed(
                 OpprettBucOgSedDtoV2(
                     bucType = BucType.LA_BUC_04,
                     sedDataDto = sedData,
-                    vedlegg = emptyList(),
+                    vedlegg = listOf(vedleggReferanse),
                     sendAutomatisk = true,
                     oppdaterEksisterende = false
                 )
             )
         }.message shouldContain "GsakId er påkrevd"
+        verify(exactly = 0) { safConsumer.hentDokument(any(), any()) }
     }
 
     @Test
