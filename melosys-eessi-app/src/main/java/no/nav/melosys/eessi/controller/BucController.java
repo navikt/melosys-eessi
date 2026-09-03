@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import no.nav.melosys.eessi.controller.dto.*;
+import no.nav.melosys.eessi.controller.dto.InstitusjonDto;
+import no.nav.melosys.eessi.controller.dto.SedDataDto;
+import no.nav.melosys.eessi.controller.dto.SedGrunnlagDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
@@ -16,11 +18,7 @@ import no.nav.melosys.eessi.service.eux.EuxService;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.melosys.eessi.service.sed.mapper.fra_sed.sed_grunnlag.SedGrunnlagMapperFactory;
 import no.nav.security.token.support.core.api.Protected;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-
-import static java.util.Collections.emptySet;
-import static java.util.Optional.ofNullable;
 
 @Protected
 @RestController
@@ -38,20 +36,6 @@ public class BucController {
         this.sedService = sedService;
         this.lukkBucService = lukkBucService;
         this.euxConsumer = euxConsumer;
-    }
-
-    @ApiResponse(description = "Oppretter første SED for den spesifikke buc-typen, og sender denne hvis sendAutomatisk=true. " + "Sender på eksisterende BUC hvis BUCen meddeler et lovvalg med utenlandsk myndighet, og BUCen er åpen.")
-    @PostMapping(value = "/{bucType}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public BucOgSedOpprettetDto opprettBucOgSed(
-        @RequestBody OpprettBucOgSedDto opprettBucOgSedDto,
-        @PathVariable("bucType") BucType bucType,
-        @RequestParam("sendAutomatisk") boolean sendAutomatisk,
-        @RequestParam(value = "oppdaterEksisterende", required = false) boolean oppdaterEksisterende
-    ) throws ValidationException {
-        if (bucType.hentFørsteLovligeSed().kreverAdresse() && opprettBucOgSedDto.getSedDataDto().manglerAdresser()) {
-            throw new ValidationException("Personen mangler adresse");
-        }
-        return sedService.opprettBucOgSed(opprettBucOgSedDto.getSedDataDto(), ofNullable(opprettBucOgSedDto.getVedlegg()).orElse(emptySet()), bucType, sendAutomatisk, oppdaterEksisterende);
     }
 
     @ApiResponse(description = "Oppretter og sender en sed på en eksisterende buc")

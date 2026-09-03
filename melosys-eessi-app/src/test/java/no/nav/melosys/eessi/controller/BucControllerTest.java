@@ -6,9 +6,11 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-import no.nav.melosys.eessi.controller.dto.*;
+import no.nav.melosys.eessi.controller.dto.Adresse;
+import no.nav.melosys.eessi.controller.dto.InvalideringSedDto;
+import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDto;
+import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
-import no.nav.melosys.eessi.models.BucType;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.sed.SED;
@@ -58,71 +60,6 @@ class BucControllerTest {
     private OAuth2HttpClient oAuth2HttpClient;
     @MockitoBean
     private EuxConsumer euxConsumer;
-
-    @Test
-    void opprettBucOgSed_ok() throws Exception {
-        OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(true);
-
-        BucOgSedOpprettetDto bucOgSedOpprettetDto = BucOgSedOpprettetDto.builder()
-            .rinaSaksnummer("123654")
-            .rinaUrl("/rina/123654")
-            .build();
-
-        when(sedService.opprettBucOgSed(
-            opprettBucOgSedDto.getSedDataDto(),
-            opprettBucOgSedDto.getVedlegg(),
-            BucType.LA_BUC_01,
-            true,
-            false)).thenReturn(bucOgSedOpprettetDto);
-
-        mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_01)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("sendAutomatisk", "true")
-                .param("oppdaterEksisterende", "false")
-                .content(jsonMapper.writeValueAsString(opprettBucOgSedDto)))
-            .andExpect(status().isOk())
-            .andExpect(responseBody(jsonMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
-    }
-
-    @Test
-    void opprettBucOgSed_manglerAdresseOgSedKreverIkkeAdresse_ok() throws Exception {
-        OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(false);
-
-        BucOgSedOpprettetDto bucOgSedOpprettetDto = BucOgSedOpprettetDto.builder()
-            .rinaSaksnummer("123654")
-            .rinaUrl("/rina/123654")
-            .build();
-
-        when(sedService.opprettBucOgSed(
-            opprettBucOgSedDto.getSedDataDto(),
-            opprettBucOgSedDto.getVedlegg(),
-            BucType.LA_BUC_03,
-            true,
-            false)).thenReturn(bucOgSedOpprettetDto);
-
-        mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_03)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("sendAutomatisk", "true")
-                .param("oppdaterEksisterende", "false")
-                .content(jsonMapper.writeValueAsString(opprettBucOgSedDto)))
-            .andExpect(status().isOk())
-            .andExpect(responseBody(jsonMapper).containsObjectAsJson(bucOgSedOpprettetDto, BucOgSedOpprettetDto.class));
-    }
-
-    @Test
-    void opprettBucOgSed_manglerAdresse_ValidationException() throws Exception {
-        OpprettBucOgSedDto opprettBucOgSedDto = lagOpprettBucOgSedDto(false);
-
-        mockMvc.perform(post("/api/buc/{bucType}", BucType.LA_BUC_01)
-                .contentType(MediaType.APPLICATION_JSON)
-                .param("sendAutomatisk", "true")
-                .param("oppdaterEksisterende", "false")
-                .content(jsonMapper.writeValueAsString(opprettBucOgSedDto)))
-            .andExpect(status().isBadRequest())
-            .andExpect(responseBody(jsonMapper).containsError("message", "Personen mangler adresse"))
-            .andExpect(responseBody(jsonMapper).containsError("error", "Bad Request"));
-
-    }
 
     @Test
     void sendPåEksisterendeBuc_manglerAdresse_ValidationException() throws Exception {
