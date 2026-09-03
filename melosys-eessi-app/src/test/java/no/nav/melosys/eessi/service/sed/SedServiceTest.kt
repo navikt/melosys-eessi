@@ -68,16 +68,33 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - forvent Rina case id`() {
         val sedData = SedDataStub.getStub()
-        val vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray()))
+        val vedleggReferanse = VedleggReferanse("journalpostId", "dokumentId", "tittel")
+        val pdfBytes = "pdf".toByteArray()
 
+        every { safConsumer.hentDokument(vedleggReferanse.journalpostId, vedleggReferanse.dokumentId) } returns pdfBytes
         every { euxService.opprettBucOgSed(any(), any(), any(), any()) } returns OpprettBucOgSedResponse(RINA_ID, "123")
         every { euxService.hentRinaUrl(any()) } returns "URL"
         every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
         every { euxService.sendSed(any(), any(), any()) } returns Unit
 
-        val sedDto = sendSedService.opprettBucOgSed(sedData, vedlegg, BucType.LA_BUC_01, true, false)
+        val sedDto = sendSedService.opprettBucOgSed(
+            OpprettBucOgSedDtoV2(
+                bucType = BucType.LA_BUC_01,
+                sedDataDto = sedData,
+                vedlegg = listOf(vedleggReferanse),
+                sendAutomatisk = true,
+                oppdaterEksisterende = false
+            )
+        )
 
-        verify { euxService.opprettBucOgSed(BucType.LA_BUC_01, sedData.mottakerIder!!, any(), vedlegg) }
+        verify {
+            euxService.opprettBucOgSed(
+                BucType.LA_BUC_01,
+                sedData.mottakerIder!!,
+                any(),
+                listOf(SedVedlegg("tittel", pdfBytes))
+            )
+        }
         sedDto.rinaSaksnummer shouldBe RINA_ID
     }
 
@@ -119,6 +136,10 @@ class SedServiceTest {
     @Test
     fun `opprettBucOgSed - Kosovo statsborgerskap beholdes som XK`() {
         val sedCapturingSlot = CapturingSlot<SED>()
+        val vedleggReferanse = VedleggReferanse("journalpostId", "dokumentId", "tittel")
+        val pdfBytes = "pdf".toByteArray()
+
+        every { safConsumer.hentDokument(vedleggReferanse.journalpostId, vedleggReferanse.dokumentId) } returns pdfBytes
         every {
             euxService.opprettBucOgSed(
                 any(),
@@ -132,11 +153,13 @@ class SedServiceTest {
         every { euxService.sendSed(any(), any(), any()) } returns Unit
 
         sendSedService.opprettBucOgSed(
-            sedDataDto = sedDataDto("mock/sedA009-Kosovo.json"),
-            vedlegg = setOf(SedVedlegg("tittel", "pdf".toByteArray())),
-            bucType = BucType.LA_BUC_01,
-            sendAutomatisk = true,
-            forsøkOppdaterEksisterende = false
+            OpprettBucOgSedDtoV2(
+                sedDataDto = sedDataDto("mock/sedA009-Kosovo.json"),
+                bucType = BucType.LA_BUC_01,
+                vedlegg = listOf(vedleggReferanse),
+                sendAutomatisk = true,
+                oppdaterEksisterende = false
+            )
         )
 
         sedCapturingSlot.captured.nav
@@ -158,7 +181,15 @@ class SedServiceTest {
         every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
 
         shouldThrow<IntegrationException> {
-            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+            sendSedService.opprettBucOgSed(
+                OpprettBucOgSedDtoV2(
+                    bucType = BucType.LA_BUC_02,
+                    sedDataDto = sedData,
+                    vedlegg = emptyList(),
+                    sendAutomatisk = true,
+                    oppdaterEksisterende = false
+                )
+            )
         }
 
         verify { euxService.slettBUC(RINA_ID) }
@@ -176,7 +207,15 @@ class SedServiceTest {
         every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
 
         shouldThrow<IntegrationException> {
-            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+            sendSedService.opprettBucOgSed(
+                OpprettBucOgSedDtoV2(
+                    bucType = BucType.LA_BUC_02,
+                    sedDataDto = sedData,
+                    vedlegg = emptyList(),
+                    sendAutomatisk = true,
+                    oppdaterEksisterende = false
+                )
+            )
         }.message shouldBe "Sending failed"
 
         verify { euxService.slettBUC(RINA_ID) }
@@ -194,7 +233,15 @@ class SedServiceTest {
         every { saksrelasjonService.slettVedRinaId(RINA_ID) } returns Unit
 
         shouldThrow<IntegrationException> {
-            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+            sendSedService.opprettBucOgSed(
+                OpprettBucOgSedDtoV2(
+                    bucType = BucType.LA_BUC_02,
+                    sedDataDto = sedData,
+                    vedlegg = emptyList(),
+                    sendAutomatisk = true,
+                    oppdaterEksisterende = false
+                )
+            )
         }.message shouldBe "Sending failed"
 
         verify { euxService.slettBUC(RINA_ID) }
@@ -219,7 +266,15 @@ class SedServiceTest {
         every { euxService.settSakSensitiv(RINA_ID) } returns Unit
         every { euxService.sendSed(RINA_ID, "123", SedType.A003.name) } returns Unit
 
-        val sedDto = sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_02, true, false)
+        val sedDto = sendSedService.opprettBucOgSed(
+            OpprettBucOgSedDtoV2(
+                bucType = BucType.LA_BUC_02,
+                sedDataDto = sedData,
+                vedlegg = emptyList(),
+                sendAutomatisk = true,
+                oppdaterEksisterende = false
+            )
+        )
 
         sedDto.rinaSaksnummer shouldBe RINA_ID
         verify { euxService.settSakSensitiv(RINA_ID) }
@@ -259,7 +314,15 @@ class SedServiceTest {
         every { euxService.sendSed(RINA_ID, "docid321", SedType.A003.name) } returns Unit
         every { euxService.hentRinaUrl(RINA_ID) } returns "URL"
 
-        sendSedService.opprettBucOgSed(sedDataDto, emptyList(), BucType.LA_BUC_02, true, true)
+        sendSedService.opprettBucOgSed(
+            OpprettBucOgSedDtoV2(
+                bucType = BucType.LA_BUC_02,
+                sedDataDto = sedDataDto,
+                vedlegg = emptyList(),
+                sendAutomatisk = true,
+                oppdaterEksisterende = true
+            )
+        )
 
         verify { euxService.oppdaterSed(eq(RINA_ID), eq("docid321"), any()) }
         verify(exactly = 0) { euxService.opprettBucOgSed(any(), any(), any(), any()) }
@@ -271,7 +334,15 @@ class SedServiceTest {
         val sedData = SedDataStub.getStub().apply { gsakSaksnummer = null }
 
         shouldThrow<MappingException> {
-            sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_04, true, false)
+            sendSedService.opprettBucOgSed(
+                OpprettBucOgSedDtoV2(
+                    bucType = BucType.LA_BUC_04,
+                    sedDataDto = sedData,
+                    vedlegg = emptyList(),
+                    sendAutomatisk = true,
+                    oppdaterEksisterende = false
+                )
+            )
         }.message shouldContain "GsakId er påkrevd"
     }
 
@@ -283,7 +354,15 @@ class SedServiceTest {
         every { euxService.hentRinaUrl(any()) } returns "URL"
         every { saksrelasjonService.lagreKobling(any(), any(), any()) } returns mockk<FagsakRinasakKobling>()
 
-        val response = sendSedService.opprettBucOgSed(sedData, emptyList(), BucType.LA_BUC_01, false, false)
+        val response = sendSedService.opprettBucOgSed(
+            OpprettBucOgSedDtoV2(
+                bucType = BucType.LA_BUC_01,
+                sedDataDto = sedData,
+                vedlegg = emptyList(),
+                sendAutomatisk = false,
+                oppdaterEksisterende = false
+            )
+        )
 
         verify { euxService.opprettBucOgSed(any(), any(), any(), any()) }
         verify { euxService.hentRinaUrl(RINA_ID) }
