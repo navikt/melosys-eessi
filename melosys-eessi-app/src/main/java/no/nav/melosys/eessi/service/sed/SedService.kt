@@ -43,6 +43,8 @@ class SedService(
     fun opprettBucOgSed(
         opprettBucOgSedDtoV2: OpprettBucOgSedDtoV2
     ): BucOgSedOpprettetDto {
+        val gsakSaksnummer = opprettBucOgSedDtoV2.sedDataDto.gsakSaksnummer
+            ?: throw MappingException("GsakId er påkrevd!")
         val vedlegg = opprettBucOgSedDtoV2.vedlegg.map {
             SedVedlegg(
                 tittel = it.tittel,
@@ -52,42 +54,24 @@ class SedService(
                 ),
             )
         }
-
-        return opprettBucOgSed(
-            sedDataDto = opprettBucOgSedDtoV2.sedDataDto,
-            vedlegg = vedlegg,
-            bucType = opprettBucOgSedDtoV2.bucType,
-            sendAutomatisk = opprettBucOgSedDtoV2.sendAutomatisk,
-            forsøkOppdaterEksisterende = opprettBucOgSedDtoV2.oppdaterEksisterende
-        )
-    }
-
-    fun opprettBucOgSed(
-        sedDataDto: SedDataDto,
-        vedlegg: Collection<SedVedlegg>,
-        bucType: BucType?,
-        sendAutomatisk: Boolean,
-        forsøkOppdaterEksisterende: Boolean
-    ): BucOgSedOpprettetDto {
-        val gsakSaksnummer = sedDataDto.gsakSaksnummer ?: throw MappingException("GsakId er påkrevd!")
         log.info("Oppretter buc og sed, gsakSaksnummer: {}", gsakSaksnummer)
-        val mottakere = sedDataDto.mottakerIder
-        val sedType = bucType!!.hentFørsteLovligeSed()
-        val sed = sedMapperFactory.mapTilSed(sedType, sedDataDto)
-        validerMottakerInstitusjoner(bucType, mottakere!!)
+        val mottakere = opprettBucOgSedDtoV2.sedDataDto.mottakerIder
+        val sedType = opprettBucOgSedDtoV2.bucType.hentFørsteLovligeSed()
+        val sed = sedMapperFactory.mapTilSed(sedType, opprettBucOgSedDtoV2.sedDataDto)
+        validerMottakerInstitusjoner(opprettBucOgSedDtoV2.bucType, mottakere!!)
         val response = executeWithSedLogging(
-            "opprettEllerOppdaterBucOgSed feilet", sedDataDto, sed
+            "opprettEllerOppdaterBucOgSed feilet", opprettBucOgSedDtoV2.sedDataDto, sed
         ) {
             opprettEllerOppdaterBucOgSed(
                 sed,
                 vedlegg,
-                bucType,
+                opprettBucOgSedDtoV2.bucType,
                 gsakSaksnummer,
-                sedDataDto.mottakerIder!!,
-                forsøkOppdaterEksisterende
+                opprettBucOgSedDtoV2.sedDataDto.mottakerIder!!,
+                opprettBucOgSedDtoV2.oppdaterEksisterende
             )
         }
-        if (sedDataDto.bruker.harSensitiveOpplysninger) {
+        if (opprettBucOgSedDtoV2.sedDataDto.bruker.harSensitiveOpplysninger) {
             euxService.settSakSensitiv(response.rinaSaksnummer!!)
         }
         if (sedType.name.startsWith("H")) {
@@ -98,8 +82,8 @@ class SedService(
                 SedJournalstatus.MELOSYS_JOURNALFOERER
             )
         }
-        if (sendAutomatisk) {
-            executeWithSedLogging("Feil ved sendSed", sedDataDto, sed) {
+        if (opprettBucOgSedDtoV2.sendAutomatisk) {
+            executeWithSedLogging("Feil ved sendSed", opprettBucOgSedDtoV2.sedDataDto, sed) {
                 sendSed(response.rinaSaksnummer!!, response.dokumentId!!, sed.sedType!!)
             }
         }
