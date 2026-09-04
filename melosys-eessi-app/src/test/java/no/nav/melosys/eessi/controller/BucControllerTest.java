@@ -1,18 +1,14 @@
 package no.nav.melosys.eessi.controller;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
 import no.nav.melosys.eessi.controller.dto.Adresse;
 import no.nav.melosys.eessi.controller.dto.InvalideringSedDto;
-import no.nav.melosys.eessi.controller.dto.OpprettBucOgSedDto;
 import no.nav.melosys.eessi.controller.dto.SedDataDto;
 import no.nav.melosys.eessi.integration.eux.rina_api.EuxConsumer;
 import no.nav.melosys.eessi.models.SedType;
-import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.sed.SED;
 import no.nav.melosys.eessi.service.buc.LukkBucService;
 import no.nav.melosys.eessi.service.eux.EuxService;
@@ -20,7 +16,6 @@ import no.nav.melosys.eessi.service.sed.SedDataStub;
 import no.nav.melosys.eessi.service.sed.SedService;
 import no.nav.security.token.support.client.core.http.OAuth2HttpClient;
 import no.nav.security.token.support.core.context.TokenValidationContextHolder;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -132,20 +127,5 @@ class BucControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(responseBody(jsonMapper).containsObjectAsJson(List.of("CLOSE", "CREATE", "REOPEN"), Collection.class));
-    }
-
-    @NotNull
-    private OpprettBucOgSedDto lagOpprettBucOgSedDto(boolean medAdresser) throws IOException, URISyntaxException {
-        OpprettBucOgSedDto opprettBucOgSedDto = new OpprettBucOgSedDto();
-        SedDataDto sedDataDto = SedDataStub.getStub();
-        if (!medAdresser) {
-            sedDataDto.setBostedsadresse(null);
-            sedDataDto.setKontaktadresse(null);
-            sedDataDto.setOppholdsadresse(null);
-        }
-        opprettBucOgSedDto.setSedDataDto(sedDataDto);
-        SedVedlegg sedVedlegg = new SedVedlegg("Søknad om medlemskap", "ny søknad om vedlegg".getBytes());
-        opprettBucOgSedDto.setVedlegg(List.of(sedVedlegg));
-        return opprettBucOgSedDto;
     }
 }
