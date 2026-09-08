@@ -209,7 +209,7 @@ class SedMottakService(
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
 
         val rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId
-        val åpenOppgave = finnÅpenIdentifiseringsoppgave(rinaSaksnummer)
+        val åpenOppgave = kartleggTidligereOppgaver(rinaSaksnummer).firstOrNull { it.erÅpen }
         if (åpenOppgave != null) {
             log.info("Identifiseringsoppgave ${åpenOppgave.oppgaveId} finnes allerede for rinasak $rinaSaksnummer")
             return
@@ -222,9 +222,12 @@ class SedMottakService(
      * men som ikke er publisert videre på Kafka. Brukes av admin når den ordinære mottaksflyten ikke fikk
      * opprettet identifiseringsoppgaven.
      *
-     * @return oppgaveId på den nye oppgaven
-     * @throws NotFoundException hvis det ikke finnes en upublisert A-SED på rinasaken
-     * @throws ValidationException hvis det allerede finnes en åpen identifiseringsoppgave på rinasaken
+     * Tidligere oppgaver på rinasaken returneres alltid, slik at den som kaller ser hva som fantes fra før.
+     * En oppgave som er ferdigstilt, feilregistrert eller slettet i Oppgave regnes ikke som åpen, og hindrer
+     * derfor ikke at en ny opprettes.
+     *
+     * @throws NotFoundException hvis det ikke finnes en A-SED på rinasaken
+     * @throws ValidationException hvis A-SEDen er publisert, eller det finnes en åpen identifiseringsoppgave
      */
     @Transactional
     fun opprettIdentifiseringsoppgaveForUpublisertASed(rinaSaksnummer: String): IdentifiseringsoppgaveResultat {
@@ -239,20 +242,25 @@ class SedMottakService(
 
         if (aSed.publisertKafka) {
             throw ValidationException(
-                "A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer er allerede publisert på Kafka. " +
-                    "Oppretter ikke identifiseringsoppgave."
+                "A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer er allerede publisert på Kafka, " +
+                    "altså identifisert og sendt videre til Melosys. Oppretter ikke identifiseringsoppgave."
             )
         }
 
-        finnÅpenIdentifiseringsoppgave(rinaSaksnummer)?.let {
+        val tidligereOppgaver = kartleggTidligereOppgaver(rinaSaksnummer)
+        tidligereOppgaver.firstOrNull { it.erÅpen }?.let {
             throw ValidationException(
-                "Det finnes allerede en åpen identifiseringsoppgave ${it.oppgaveId} for rinasak $rinaSaksnummer"
+                "Det finnes allerede en åpen identifiseringsoppgave ${it.oppgaveId} (status ${it.status}) " +
+                    "for rinasak $rinaSaksnummer. Oppretter ikke ny."
             )
         }
 
         val sed = euxService.hentSedMedRetry(aSed.sedHendelse.rinaSakId, aSed.sedHendelse.rinaDokumentId)
 
-        log.info { "Admin: oppretter oppgave til ID og fordeling for A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer" }
+        log.info {
+            "Admin: oppretter oppgave til ID og fordeling for A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer. " +
+                "Tidligere oppgaver på saken: ${tidligereOppgaver.ifEmpty { "ingen" }}"
+        }
         val oppgaveId = opprettOgLagreIdentifiseringsoppgave(aSed, sed)
 
         return IdentifiseringsoppgaveResultat(
@@ -260,7 +268,8 @@ class SedMottakService(
             sedId = aSed.sedHendelse.sedId,
             sedType = aSed.sedHendelse.sedType,
             journalpostId = aSed.journalpostId,
-            oppgaveId = oppgaveId
+            oppgaveId = oppgaveId,
+            tidligereOppgaver = tidligereOppgaver
         )
     }
 
@@ -269,12 +278,34 @@ class SedMottakService(
         val sedId: String,
         val sedType: String,
         val journalpostId: String?,
-        val oppgaveId: String
+        val oppgaveId: String,
+        val tidligereOppgaver: List<TidligereOppgave>
     )
 
-    private fun finnÅpenIdentifiseringsoppgave(rinaSaksnummer: String): BucIdentifiseringOppg? =
-        bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
-            .firstOrNull { this.oppgaveErÅpen(it) }
+    data class TidligereOppgave(
+        val oppgaveId: String,
+        val status: String,
+        val erÅpen: Boolean
+    )
+
+    /**
+     * Henter status for alle identifiseringsoppgaver registrert på rinasaken. En oppgave som Oppgave svarer
+     * 404 på, rapporteres som [STATUS_FINNES_IKKE] og regnes som ikke åpen, slik at en død oppgave-id ikke
+     * blokkerer ny oppgave eller velter SED-mottak.
+     */
+    private fun kartleggTidligereOppgaver(rinaSaksnummer: String): List<TidligereOppgave> =
+        bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer).map { kobling ->
+            try {
+                val oppgave = oppgaveService.hentOppgave(kobling.oppgaveId)
+                TidligereOppgave(kobling.oppgaveId, oppgave.status ?: STATUS_UKJENT, oppgave.erÅpen())
+            } catch (e: NotFoundException) {
+                log.warn(e) {
+                    "Oppgave ${kobling.oppgaveId} registrert på rinasak $rinaSaksnummer finnes ikke i Oppgave. " +
+                        "Behandler den som ikke åpen."
+                }
+                TidligereOppgave(kobling.oppgaveId, STATUS_FINNES_IKKE, false)
+            }
+        }
 
     private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
         try {
@@ -284,9 +315,6 @@ class SedMottakService(
             log.error("Kunne ikke lagre SED ${sedMottatt.sedHendelse.sedId} i sed mottatt lager for tredjelandsborger uten arbeidssted i Norge", e)
         }
     }
-
-    private fun oppgaveErÅpen(bucIdentifiseringOppg: BucIdentifiseringOppg): Boolean =
-        oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
 
     private fun opprettOgLagreIdentifiseringsoppgave(sedMottattHendelse: SedMottattHendelse, sed: SED): String {
         val journalpostID = sedMottattHendelse.journalpostId
@@ -360,4 +388,9 @@ class SedMottakService(
 
     private fun harEksisterendeSaksRelasjon(rinaSakId: String): Boolean =
         saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
+
+    companion object {
+        const val STATUS_FINNES_IKKE = "FINNES_IKKE"
+        const val STATUS_UKJENT = "UKJENT"
+    }
 }

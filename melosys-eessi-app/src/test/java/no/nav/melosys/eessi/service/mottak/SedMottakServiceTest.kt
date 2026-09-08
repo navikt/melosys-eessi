@@ -755,6 +755,70 @@ class SedMottakServiceTest {
         }
     }
 
+    @Test
+    fun `opprettIdentifiseringsoppgaveForUpublisertASed ferdigstilt oppgave blokkerer ikke ny oppgave`() {
+        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = false }
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
+            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "5555", 1))
+        every { oppgaveService.hentOppgave("5555") } returns HentOppgaveDto().apply { status = "FERDIGSTILT" }
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-NY"
+        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
+
+        val resultat = sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
+
+        resultat.oppgaveId shouldBe "OPPG-NY"
+        resultat.tidligereOppgaver.single().oppgaveId shouldBe "5555"
+        resultat.tidligereOppgaver.single().status shouldBe "FERDIGSTILT"
+        resultat.tidligereOppgaver.single().erÅpen shouldBe false
+    }
+
+    @Test
+    fun `opprettIdentifiseringsoppgaveForUpublisertASed oppgave som ikke finnes i Oppgave blokkerer ikke ny oppgave`() {
+        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = false }
+        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
+            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "9999", 1))
+        every { oppgaveService.hentOppgave("9999") } throws NotFoundException("Fant ikke oppgave med id 9999 i Oppgave.")
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-NY"
+        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
+
+        val resultat = sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
+
+        resultat.oppgaveId shouldBe "OPPG-NY"
+        resultat.tidligereOppgaver.single().status shouldBe SedMottakService.STATUS_FINNES_IKKE
+        resultat.tidligereOppgaver.single().erÅpen shouldBe false
+    }
+
+    @Test
+    fun `behandleSed oppgave som ikke finnes i Oppgave velter ikke mottak men oppretter ny oppgave`() {
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
+            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "9999", 1))
+        every { oppgaveService.hentOppgave("9999") } throws NotFoundException("Fant ikke oppgave med id 9999 i Oppgave.")
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-NY"
+        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build()
+
+        shouldNotThrow<Exception> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }
+
+        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
+    }
+
 
     companion object {
         private const val IDENT = "1122334455"

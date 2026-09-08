@@ -4,6 +4,7 @@ package no.nav.melosys.eessi.integration.oppgave;
 import no.nav.melosys.eessi.integration.RestConsumer;
 import no.nav.melosys.eessi.integration.RestUtils;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -21,10 +22,14 @@ public class OppgaveConsumer implements RestConsumer {
         this.webClient = webClient;
     }
 
+    /**
+     * @throws NotFoundException dersom oppgaven ikke finnes (404). Skilles fra øvrige feil slik at kallere
+     * kan behandle "oppgaven finnes ikke" som en normal tilstand, og ikke som en integrasjonsfeil.
+     */
     public HentOppgaveDto hentOppgave(String oppgaveID) {
         var correlationID = getCorrelationId();
         log.debug("hentOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
-        return webClient.get().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
+        return webClient.get().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).retrieve().onStatus(status -> status.value() == 404, clientResponse -> håndterIkkeFunnet(clientResponse, oppgaveID)).onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
     }
 
     public HentOppgaveDto opprettOppgave(OppgaveDto oppgaveDto) {
@@ -37,6 +42,10 @@ public class OppgaveConsumer implements RestConsumer {
         var correlationID = getCorrelationId();
         log.info("oppdaterOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
         return webClient.patch().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).bodyValue(oppgaveOppdateringDto).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
+    }
+
+    private Mono<? extends Throwable> håndterIkkeFunnet(ClientResponse clientResponse, String oppgaveID) {
+        return clientResponse.bodyToMono(String.class).defaultIfEmpty("").map(body -> new NotFoundException("Fant ikke oppgave med id " + oppgaveID + " i Oppgave. " + RestUtils.hentFeilmeldingForOppgave(body)));
     }
 
     private Mono<? extends Throwable> håndterFeil(ClientResponse clientResponse) {
