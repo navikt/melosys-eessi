@@ -8,6 +8,8 @@ import mu.KotlinLogging
 import no.nav.melosys.eessi.security.ThreadLocalAccessInfo
 import no.nav.melosys.eessi.service.mottak.SedMottakService
 import no.nav.security.token.support.core.api.Protected
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
@@ -64,7 +66,7 @@ class IdentifiseringsoppgaveAdminTjeneste(
     }
 
     private fun validerApikey(value: String) {
-        if (apiKey != value) {
+        if (!MessageDigest.isEqual(apiKey.toByteArray(StandardCharsets.UTF_8), value.toByteArray(StandardCharsets.UTF_8))) {
             throw SecurityException("Trenger gyldig apikey")
         }
     }

@@ -35,6 +35,9 @@ class RestExceptionHandler {
     @ExceptionHandler(HttpMessageConversionException::class)
     fun handle(e: HttpMessageConversionException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
 
+    @ExceptionHandler(SecurityException::class)
+    fun handle(e: SecurityException): ResponseEntity<*> = handle(e, HttpStatus.FORBIDDEN)
+
     @ExceptionHandler(Exception::class)
     fun handle(e: Exception): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
 
