@@ -53,8 +53,9 @@ class IdentifiseringsoppgaveAdminTjeneste(
         @Parameter(description = "Rinasaksnummeret A-SEDen tilhører") @PathVariable rinaSaksnummer: String
     ): ResponseEntity<SedMottakService.IdentifiseringsoppgaveResultat> {
         validerApikey(apiKeyHeader)
-        require(rinaSaksnummer.isNotBlank()) { "rinaSaksnummer kan ikke være tomt" }
-
+        if (rinaSaksnummer.isBlank()) {
+            throw no.nav.melosys.eessi.models.exception.ValidationException("rinaSaksnummer kan ikke være tomt")
+        }
         log.info { "Admin: oppretter oppgave til ID og fordeling for rinasak $rinaSaksnummer" }
 
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
