@@ -12,6 +12,8 @@ import no.nav.melosys.eessi.models.BucType.Companion.erHBucsomSkalKonsumeres
 import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
+import no.nav.melosys.eessi.models.exception.NotFoundException
+import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
@@ -207,11 +209,72 @@ class SedMottakService(
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
 
         val rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId
+        val åpenOppgave = finnÅpenIdentifiseringsoppgave(rinaSaksnummer)
+        if (åpenOppgave != null) {
+            log.info("Identifiseringsoppgave ${åpenOppgave.oppgaveId} finnes allerede for rinasak $rinaSaksnummer")
+            return
+        }
+        opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
+    }
+
+    /**
+     * Oppretter journalpost og oppgave til ID og fordeling for en A-SED som ligger i sed_mottatt_hendelse,
+     * men som ikke er publisert videre på Kafka. Brukes av admin når den ordinære mottaksflyten ikke fikk
+     * opprettet identifiseringsoppgaven.
+     *
+     * @return oppgaveId på den nye oppgaven
+     * @throws NotFoundException hvis det ikke finnes en upublisert A-SED på rinasaken
+     * @throws ValidationException hvis det allerede finnes en åpen identifiseringsoppgave på rinasaken
+     */
+    @Transactional
+    fun opprettIdentifiseringsoppgaveForUpublisertASed(rinaSaksnummer: String): IdentifiseringsoppgaveResultat {
+        val hendelserPåSak = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
+
+        if (hendelserPåSak.isEmpty()) {
+            throw NotFoundException("Fant ingen mottatte SED-hendelser for rinasak $rinaSaksnummer")
+        }
+
+        val aSed = hendelserPåSak.firstOrNull { it.sedHendelse.erASED() }
+            ?: throw NotFoundException("Fant ingen A-SED for rinasak $rinaSaksnummer")
+
+        if (aSed.publisertKafka) {
+            throw ValidationException(
+                "A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer er allerede publisert på Kafka. " +
+                    "Oppretter ikke identifiseringsoppgave."
+            )
+        }
+
+        finnÅpenIdentifiseringsoppgave(rinaSaksnummer)?.let {
+            throw ValidationException(
+                "Det finnes allerede en åpen identifiseringsoppgave ${it.oppgaveId} for rinasak $rinaSaksnummer"
+            )
+        }
+
+        val sed = euxService.hentSedMedRetry(aSed.sedHendelse.rinaSakId, aSed.sedHendelse.rinaDokumentId)
+
+        log.info { "Admin: oppretter oppgave til ID og fordeling for A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer" }
+        val oppgaveId = opprettOgLagreIdentifiseringsoppgave(aSed, sed)
+
+        return IdentifiseringsoppgaveResultat(
+            rinaSaksnummer = rinaSaksnummer,
+            sedId = aSed.sedHendelse.sedId,
+            sedType = aSed.sedHendelse.sedType,
+            journalpostId = aSed.journalpostId,
+            oppgaveId = oppgaveId
+        )
+    }
+
+    data class IdentifiseringsoppgaveResultat(
+        val rinaSaksnummer: String,
+        val sedId: String,
+        val sedType: String,
+        val journalpostId: String?,
+        val oppgaveId: String
+    )
+
+    private fun finnÅpenIdentifiseringsoppgave(rinaSaksnummer: String): BucIdentifiseringOppg? =
         bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer)
             .firstOrNull { this.oppgaveErÅpen(it) }
-            ?.let { log.info("Identifiseringsoppgave ${it.oppgaveId} finnes allerede for rinasak $rinaSaksnummer") }
-            ?: opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
-    }
 
     private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
         try {
@@ -225,8 +288,10 @@ class SedMottakService(
     private fun oppgaveErÅpen(bucIdentifiseringOppg: BucIdentifiseringOppg): Boolean =
         oppgaveService.hentOppgave(bucIdentifiseringOppg.oppgaveId).erÅpen()
 
-    private fun opprettOgLagreIdentifiseringsoppgave(sedMottattHendelse: SedMottattHendelse, sed: SED) {
-        val journalpostID = opprettJournalpost(sedMottattHendelse)
+    private fun opprettOgLagreIdentifiseringsoppgave(sedMottattHendelse: SedMottattHendelse, sed: SED): String {
+        val journalpostID = sedMottattHendelse.journalpostId
+            ?.also { log.info("Gjenbruker eksisterende journalpost $it for SED ${sedMottattHendelse.sedHendelse.sedId}") }
+            ?: opprettJournalpost(sedMottattHendelse)
         val oppgaveID = opprettOgLagreIndentifiseringsoppgave(sedMottattHendelse, sed, journalpostID)
 
         bucIdentifiseringOppgRepository.save(
@@ -238,6 +303,7 @@ class SedMottakService(
         )
 
         log.info("Opprettet oppgave med id $oppgaveID")
+        return oppgaveID
     }
 
     private fun opprettOgLagreIndentifiseringsoppgave(
