@@ -3,25 +3,17 @@ package no.nav.melosys.eessi.service.mottak
 import mu.KotlinLogging
 import no.nav.melosys.eessi.identifisering.BucIdentifisertService
 import no.nav.melosys.eessi.identifisering.PersonIdentifisering
-import no.nav.melosys.eessi.integration.PersonFasade
-import no.nav.melosys.eessi.integration.pdl.web.identrekvisisjon.dto.IdentRekvisisjonTilMellomlagringMapper
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
-import no.nav.melosys.eessi.models.BucIdentifiseringOppg
 import no.nav.melosys.eessi.models.BucType.Companion.erHBucsomSkalKonsumeres
 import no.nav.melosys.eessi.models.SedMottattHendelse
 import no.nav.melosys.eessi.models.SedType
 import no.nav.melosys.eessi.models.buc.Participant
-import no.nav.melosys.eessi.models.exception.NotFoundException
-import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
-import no.nav.melosys.eessi.repository.BucIdentifiseringOppgRepository
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository
 import no.nav.melosys.eessi.service.eux.EuxService
-import no.nav.melosys.eessi.service.journalfoering.OpprettInngaaendeJournalpostService
 import no.nav.melosys.eessi.service.journalpostkobling.JournalpostSedKoblingService
 import no.nav.melosys.eessi.service.mottak.SedA003UnntaksreglerForTredjelandsborgere.sedErA003OgTredjelandsborgerUtenNorgeSomArbeidssted
-import no.nav.melosys.eessi.service.oppgave.OppgaveService
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -32,17 +24,14 @@ private val log = KotlinLogging.logger {}
 @Service
 class SedMottakService(
     private val euxService: EuxService,
-    private val personFasade: PersonFasade,
-    private val opprettInngaaendeJournalpostService: OpprettInngaaendeJournalpostService,
-    private val oppgaveService: OppgaveService,
     private val sedMottattHendelseRepository: SedMottattHendelseRepository,
-    private val bucIdentifiseringOppgRepository: BucIdentifiseringOppgRepository,
     private val journalpostSedKoblingService: JournalpostSedKoblingService,
     private val sedMetrikker: SedMetrikker,
     private val personIdentifisering: PersonIdentifisering,
     private val bucIdentifisertService: BucIdentifisertService,
     private val saksrelasjonService: SaksrelasjonService,
     private val sedLagerService: SedLagerService,
+    private val identifiseringsoppgaveService: IdentifiseringsoppgaveService,
     @Value("\${rina.institusjon-id}") private val rinaInstitusjonsId: String
 ) {
 
@@ -209,103 +198,13 @@ class SedMottakService(
         log.info("Oppretter oppgave til ID og fordeling for SED ${sedMottatt.sedHendelse.sedId}")
 
         val rinaSaksnummer = sedMottatt.sedHendelse.rinaSakId
-        val åpenOppgave = kartleggTidligereOppgaver(rinaSaksnummer).firstOrNull { it.erÅpen }
+        val åpenOppgave = identifiseringsoppgaveService.finnÅpenOppgave(rinaSaksnummer)
         if (åpenOppgave != null) {
             log.info("Identifiseringsoppgave ${åpenOppgave.oppgaveId} finnes allerede for rinasak $rinaSaksnummer")
             return
         }
-        opprettOgLagreIdentifiseringsoppgave(sedMottatt, sed)
+        identifiseringsoppgaveService.opprettOgLagreOppgave(sedMottatt, sed)
     }
-
-    /**
-     * Oppretter journalpost og oppgave til ID og fordeling for en A-SED som ligger i sed_mottatt_hendelse,
-     * men som ikke er publisert videre på Kafka. Brukes av admin når den ordinære mottaksflyten ikke fikk
-     * opprettet identifiseringsoppgaven.
-     *
-     * Tidligere oppgaver på rinasaken returneres alltid, slik at den som kaller ser hva som fantes fra før.
-     * En oppgave som er ferdigstilt, feilregistrert eller slettet i Oppgave regnes ikke som åpen, og hindrer
-     * derfor ikke at en ny opprettes.
-     *
-     * @throws NotFoundException hvis det ikke finnes en A-SED på rinasaken
-     * @throws ValidationException hvis A-SEDen er publisert, eller det finnes en åpen identifiseringsoppgave
-     */
-    @Transactional
-    fun opprettIdentifiseringsoppgaveForUpublisertASed(rinaSaksnummer: String): IdentifiseringsoppgaveResultat {
-        val hendelserPåSak = sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(rinaSaksnummer)
-
-        if (hendelserPåSak.isEmpty()) {
-            throw NotFoundException("Fant ingen mottatte SED-hendelser for rinasak $rinaSaksnummer")
-        }
-
-        val aSed = hendelserPåSak.firstOrNull { it.sedHendelse.erASED() }
-            ?: throw NotFoundException("Fant ingen A-SED for rinasak $rinaSaksnummer")
-
-        if (aSed.publisertKafka) {
-            throw ValidationException(
-                "A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer er allerede publisert på Kafka, " +
-                    "altså identifisert og sendt videre til Melosys. Oppretter ikke identifiseringsoppgave."
-            )
-        }
-
-        val tidligereOppgaver = kartleggTidligereOppgaver(rinaSaksnummer)
-        tidligereOppgaver.firstOrNull { it.erÅpen }?.let {
-            throw ValidationException(
-                "Det finnes allerede en åpen identifiseringsoppgave ${it.oppgaveId} (status ${it.status}) " +
-                    "for rinasak $rinaSaksnummer. Oppretter ikke ny."
-            )
-        }
-
-        val sed = euxService.hentSedMedRetry(aSed.sedHendelse.rinaSakId, aSed.sedHendelse.rinaDokumentId)
-
-        log.info {
-            "Admin: oppretter oppgave til ID og fordeling for A-SED ${aSed.sedHendelse.sedId} i rinasak $rinaSaksnummer. " +
-                "Tidligere oppgaver på saken: ${tidligereOppgaver.ifEmpty { "ingen" }}"
-        }
-        val oppgaveId = opprettOgLagreIdentifiseringsoppgave(aSed, sed)
-
-        return IdentifiseringsoppgaveResultat(
-            rinaSaksnummer = rinaSaksnummer,
-            sedId = aSed.sedHendelse.sedId,
-            sedType = aSed.sedHendelse.sedType,
-            journalpostId = aSed.journalpostId,
-            oppgaveId = oppgaveId,
-            tidligereOppgaver = tidligereOppgaver
-        )
-    }
-
-    data class IdentifiseringsoppgaveResultat(
-        val rinaSaksnummer: String,
-        val sedId: String,
-        val sedType: String,
-        val journalpostId: String?,
-        val oppgaveId: String,
-        val tidligereOppgaver: List<TidligereOppgave>
-    )
-
-    data class TidligereOppgave(
-        val oppgaveId: String,
-        val status: String,
-        val erÅpen: Boolean
-    )
-
-    /**
-     * Henter status for alle identifiseringsoppgaver registrert på rinasaken. En oppgave som Oppgave svarer
-     * 404 på, rapporteres som [STATUS_FINNES_IKKE] og regnes som ikke åpen, slik at en død oppgave-id ikke
-     * blokkerer ny oppgave eller velter SED-mottak.
-     */
-    private fun kartleggTidligereOppgaver(rinaSaksnummer: String): List<TidligereOppgave> =
-        bucIdentifiseringOppgRepository.findByRinaSaksnummer(rinaSaksnummer).map { kobling ->
-            try {
-                val oppgave = oppgaveService.hentOppgave(kobling.oppgaveId)
-                TidligereOppgave(kobling.oppgaveId, oppgave.status ?: STATUS_UKJENT, oppgave.erÅpen())
-            } catch (e: NotFoundException) {
-                log.warn(e) {
-                    "Oppgave ${kobling.oppgaveId} registrert på rinasak $rinaSaksnummer finnes ikke i Oppgave. " +
-                        "Behandler den som ikke åpen."
-                }
-                TidligereOppgave(kobling.oppgaveId, STATUS_FINNES_IKKE, false)
-            }
-        }
 
     private fun lagreSed(sedMottatt: SedMottattHendelse, sed: SED) {
         try {
@@ -316,71 +215,6 @@ class SedMottakService(
         }
     }
 
-    private fun opprettOgLagreIdentifiseringsoppgave(sedMottattHendelse: SedMottattHendelse, sed: SED): String {
-        val journalpostID = sedMottattHendelse.journalpostId
-            ?.also { log.info("Gjenbruker eksisterende journalpost $it for SED ${sedMottattHendelse.sedHendelse.sedId}") }
-            ?: opprettJournalpost(sedMottattHendelse)
-        val oppgaveID = opprettOgLagreIndentifiseringsoppgave(sedMottattHendelse, sed, journalpostID)
-
-        bucIdentifiseringOppgRepository.save(
-            BucIdentifiseringOppg.builder()
-                .rinaSaksnummer(sedMottattHendelse.sedHendelse.rinaSakId)
-                .oppgaveId(oppgaveID)
-                .versjon(1)
-                .build()
-        )
-
-        log.info("Opprettet oppgave med id $oppgaveID")
-        return oppgaveID
-    }
-
-    private fun opprettOgLagreIndentifiseringsoppgave(
-        sedMottattHendelse: SedMottattHendelse,
-        sed: SED,
-        journalpostID: String
-    ): String {
-        val personFraSed = sed.finnPerson().orElse(null)
-
-        return when {
-            personFraSed != null && !personFraSed.harNorskPersonnummer() -> {
-                val identRekvisjonTilMellomlagring =
-                    IdentRekvisisjonTilMellomlagringMapper.byggIdentRekvisisjonTilMellomlagring(sedMottattHendelse, sed)
-
-                val lenkeForRekvirering = personFasade.opprettLenkeForRekvirering(identRekvisjonTilMellomlagring)
-
-                oppgaveService.opprettOppgaveTilIdOgFordeling(
-                    journalpostID,
-                    sedMottattHendelse.sedHendelse.sedType,
-                    sedMottattHendelse.sedHendelse.rinaSakId,
-                    lenkeForRekvirering
-                )
-            }
-
-            else -> {
-                oppgaveService.opprettOppgaveTilIdOgFordeling(
-                    journalpostID,
-                    sedMottattHendelse.sedHendelse.sedType,
-                    sedMottattHendelse.sedHendelse.rinaSakId
-                )
-            }
-        }
-    }
-
-    private fun opprettJournalpost(sedMottattHendelse: SedMottattHendelse, navIdent: String? = null): String {
-        log.info("Oppretter journalpost for SED ${sedMottattHendelse.sedHendelse.rinaDokumentId}")
-        val sedMedVedlegg = euxService.hentSedMedVedlegg(
-            sedMottattHendelse.sedHendelse.rinaSakId, sedMottattHendelse.sedHendelse.rinaDokumentId
-        )
-
-        val journalpostID = opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(
-            sedMottattHendelse.sedHendelse, sedMedVedlegg, navIdent
-        )
-
-        sedMottattHendelse.journalpostId = journalpostID
-        sedMottattHendelseRepository.save(sedMottattHendelse)
-        return journalpostID
-    }
-
     private fun erHBucFraMelosys(sedMottattHendelse: SedMottattHendelse): Boolean =
         erHBucsomSkalKonsumeres(sedMottattHendelse.sedHendelse.bucType)
             && harEksisterendeSaksRelasjon(sedMottattHendelse.sedHendelse.rinaSakId)
@@ -388,9 +222,4 @@ class SedMottakService(
 
     private fun harEksisterendeSaksRelasjon(rinaSakId: String): Boolean =
         saksrelasjonService.finnVedRinaSaksnummer(rinaSakId).isPresent()
-
-    companion object {
-        const val STATUS_FINNES_IKKE = "FINNES_IKKE"
-        const val STATUS_UKJENT = "UKJENT"
-    }
 }

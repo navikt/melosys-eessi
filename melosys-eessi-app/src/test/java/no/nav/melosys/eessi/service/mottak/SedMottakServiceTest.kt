@@ -14,7 +14,6 @@ import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.*
 import no.nav.melosys.eessi.models.exception.NotFoundException
-import no.nav.melosys.eessi.models.exception.ValidationException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
@@ -77,17 +76,21 @@ class SedMottakServiceTest {
     fun setup() {
         sedMottakService = SedMottakService(
             euxService,
-            personFasade,
-            opprettInngaaendeJournalpostService,
-            oppgaveService,
             sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository,
             journalpostSedKoblingService,
             sedMetrikker,
             personIdentifisering,
             bucIdentifisertService,
             saksrelasjonService,
             sedLagerService,
+            IdentifiseringsoppgaveService(
+                euxService,
+                personFasade,
+                opprettInngaaendeJournalpostService,
+                oppgaveService,
+                sedMottattHendelseRepository,
+                bucIdentifiseringOppgRepository
+            ),
             "1",
         )
         val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)
@@ -664,138 +667,6 @@ class SedMottakServiceTest {
         rinaDokumentId = "389501f50fba4af7a4228fa41b8ee71d"
         rinaDokumentVersjon = "1"
         sedType = "X005"
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed upublisert A-SED uten aapen oppgave oppretter journalpost og oppgave`() {
-        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = false }
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns mutableSetOf()
-        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
-        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
-        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
-        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-1"
-        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
-
-        val resultat = sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-
-        resultat.oppgaveId shouldBe "OPPG-1"
-        resultat.journalpostId shouldBe "JP-1"
-        resultat.rinaSaksnummer shouldBe RINA_SAKSNUMMER
-        verify { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
-        verify { bucIdentifiseringOppgRepository.save(any()) }
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed gjenbruker eksisterende journalpost`() {
-        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply {
-            publisertKafka = false
-            journalpostId = "JP-EKSISTERENDE"
-        }
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns mutableSetOf()
-        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
-        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-2"
-        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
-
-        val resultat = sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-
-        resultat.journalpostId shouldBe "JP-EKSISTERENDE"
-        verify(exactly = 0) { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) }
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed publisert A-SED kaster ValidationException`() {
-        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = true }
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
-
-        shouldThrow<ValidationException> {
-            sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-        }
-
-        verify { oppgaveService wasNot Called }
-        verify { opprettInngaaendeJournalpostService wasNot Called }
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed aapen oppgave finnes kaster ValidationException`() {
-        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = false }
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
-            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "5555", 1))
-        every { oppgaveService.hentOppgave("5555") } returns HentOppgaveDto().apply { status = "OPPRETTET" }
-
-        shouldThrow<ValidationException> {
-            sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-        }
-
-        verify { opprettInngaaendeJournalpostService wasNot Called }
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed ingen A-SED kaster NotFoundException`() {
-        val xSed = SedMottattHendelse.builder()
-            .sedHendelse(sedHendelseUtenBruker().apply { sedType = "X001" })
-            .build()
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(xSed)
-
-        shouldThrow<NotFoundException> {
-            sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-        }
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed ingen hendelser kaster NotFoundException`() {
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns emptyList()
-
-        shouldThrow<NotFoundException> {
-            sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-        }
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed ferdigstilt oppgave blokkerer ikke ny oppgave`() {
-        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = false }
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
-            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "5555", 1))
-        every { oppgaveService.hentOppgave("5555") } returns HentOppgaveDto().apply { status = "FERDIGSTILT" }
-        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
-        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
-        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
-        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-NY"
-        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
-
-        val resultat = sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-
-        resultat.oppgaveId shouldBe "OPPG-NY"
-        resultat.tidligereOppgaver.single().oppgaveId shouldBe "5555"
-        resultat.tidligereOppgaver.single().status shouldBe "FERDIGSTILT"
-        resultat.tidligereOppgaver.single().erÅpen shouldBe false
-    }
-
-    @Test
-    fun `opprettIdentifiseringsoppgaveForUpublisertASed oppgave som ikke finnes i Oppgave blokkerer ikke ny oppgave`() {
-        val aSed = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build().apply { publisertKafka = false }
-        every { sedMottattHendelseRepository.findAllByRinaSaksnummerSortedByMottattDatoDesc(RINA_SAKSNUMMER) } returns listOf(aSed)
-        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
-            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "9999", 1))
-        every { oppgaveService.hentOppgave("9999") } throws NotFoundException("Fant ikke oppgave med id 9999 i Oppgave.")
-        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
-        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
-        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
-        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
-        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-NY"
-        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
-
-        val resultat = sedMottakService.opprettIdentifiseringsoppgaveForUpublisertASed(RINA_SAKSNUMMER)
-
-        resultat.oppgaveId shouldBe "OPPG-NY"
-        resultat.tidligereOppgaver.single().status shouldBe SedMottakService.STATUS_FINNES_IKKE
-        resultat.tidligereOppgaver.single().erÅpen shouldBe false
     }
 
     @Test

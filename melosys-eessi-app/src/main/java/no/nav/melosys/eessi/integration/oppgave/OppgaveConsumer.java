@@ -23,8 +23,7 @@ public class OppgaveConsumer implements RestConsumer {
     }
 
     /**
-     * @throws NotFoundException dersom oppgaven ikke finnes (404). Skilles fra øvrige feil slik at kallere
-     * kan behandle "oppgaven finnes ikke" som en normal tilstand, og ikke som en integrasjonsfeil.
+     * @throws NotFoundException ved 404, slik at kallere kan skille "finnes ikke" fra integrasjonsfeil.
      */
     public HentOppgaveDto hentOppgave(String oppgaveID) {
         var correlationID = getCorrelationId();
