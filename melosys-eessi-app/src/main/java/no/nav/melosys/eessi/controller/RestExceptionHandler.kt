@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.controller
 
 import mu.KotlinLogging
+import no.nav.melosys.eessi.models.exception.IkkeRetrybarIntegrationException
 import no.nav.melosys.eessi.models.exception.IntegrationException
 import no.nav.melosys.eessi.models.exception.MappingException
 import no.nav.melosys.eessi.models.exception.NotFoundException
@@ -25,6 +26,9 @@ class RestExceptionHandler {
 
     @ExceptionHandler(ValidationException::class)
     fun handle(e: ValidationException): ResponseEntity<*> = handle(e, HttpStatus.BAD_REQUEST)
+
+    @ExceptionHandler(IkkeRetrybarIntegrationException::class)
+    fun handle(e: IkkeRetrybarIntegrationException): ResponseEntity<*> = handle(e, HttpStatus.UNPROCESSABLE_ENTITY)
 
     @ExceptionHandler(IntegrationException::class)
     fun handle(e: IntegrationException): ResponseEntity<*> = handle(e, HttpStatus.INTERNAL_SERVER_ERROR)
