@@ -11,6 +11,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
+import no.nav.melosys.eessi.models.exception.IkkeRetrybarIntegrationException;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.PreconditionFailedException;
@@ -32,6 +33,7 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import tools.jackson.databind.json.JsonMapper;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -279,6 +281,12 @@ public class EuxConsumer implements RestConsumer {
             if (e.getStatusCode().value() == 412) {
                 throw new PreconditionFailedException("412 fra eux: " + hentFeilmeldingForEux(e), e);
             }
+            int status = e.getStatusCode().value();
+            if (status == 401 || status == 403 || status == 408) {
+                throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
+            }
+            throw new IkkeRetrybarIntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
+        } catch (HttpServerErrorException e) {
             throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
             String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
