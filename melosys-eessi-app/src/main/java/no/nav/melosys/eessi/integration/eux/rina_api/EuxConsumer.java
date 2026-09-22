@@ -281,17 +281,14 @@ public class EuxConsumer implements RestConsumer {
             if (e.getStatusCode().value() == 412) {
                 throw new PreconditionFailedException("412 fra eux: " + hentFeilmeldingForEux(e), e);
             }
-            // Klientfeil (4xx): eux-rina-api har avvist forespørselen som ugyldig. Et nytt
-            // forsøk med samme data vil aldri lykkes, og bør derfor ikke retry'es.
+            int status = e.getStatusCode().value();
+            if (status == 401 || status == 403 || status == 408) {
+                throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
+            }
             throw new IkkeRetrybarIntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (HttpServerErrorException e) {
-            // eux-rina-api har mottatt og behandlet forespørselen, men avvist den (f.eks. en
-            // valideringsfeil i SED-et rapportert som 500 fra RINA). Siden vi fikk et konkret
-            // svar fra RINA, vil et nytt forsøk med samme data gi samme resultat og bør ikke retry'es.
-            throw new IkkeRetrybarIntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
+            throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {
-            // Ingen respons mottatt fra eux-rina-api (f.eks. timeout/nettverksfeil). Dette kan
-            // være forbigående, og er derfor fortsatt en (potensielt retrybar) IntegrationException.
             String appEnvironment = environment.getProperty("APP_ENVIRONMENT");
             if (appEnvironment != null && appEnvironment.equals("dev")) {
                 String value = jsonMapper.writeValueAsString(entity.getBody());
