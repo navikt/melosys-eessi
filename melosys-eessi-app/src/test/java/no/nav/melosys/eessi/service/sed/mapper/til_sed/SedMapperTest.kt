@@ -39,6 +39,16 @@ class SedMapperTest {
     }
 
     @Test
+    fun `prefillNav mapper harFastArbeidssted eksplisitt til ja, nei og null`() {
+        sedMapper.prefillNav(SedDataStub.getStub { harFastArbeidssted = true })
+            .harfastarbeidssted shouldBe "ja"
+        sedMapper.prefillNav(SedDataStub.getStub { harFastArbeidssted = false })
+            .harfastarbeidssted shouldBe "nei"
+        sedMapper.prefillNav(SedDataStub.getStub { harFastArbeidssted = null })
+            .harfastarbeidssted shouldBe null
+    }
+
+    @Test
     fun hentStatsborgerskap() {
         val statsborgerskap = sedMapper.hentStatsborgerskap(sedData)
 
