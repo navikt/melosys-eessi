@@ -117,6 +117,6 @@ jobs:
               "repository": "melosys-eessi",
               "image_tag": "${{ github.sha }}",
               "commit_sha": "${{ github.sha }}",
-              "commit_message": "${{ env.COMMIT_MSG }}",
+              "commit_message": ${{ toJSON(env.COMMIT_MSG) }},
               "actor": "${{ github.actor }}"
             }
