@@ -43,7 +43,11 @@ interface SedMapper {
         return Nav(
             arbeidssted = null,
             arbeidsland = if (erSedMatch) hentArbeidsland(sedData).takeIf { it.isNotEmpty() } else null,
-            harfastarbeidssted = if (!erSedMatch) null else if (sedData.harFastArbeidssted == true) "ja" else "nei",
+            harfastarbeidssted = if (!erSedMatch) null else when (sedData.harFastArbeidssted) {
+                true -> "ja"
+                false -> "nei"
+                null -> null
+            },
             bruker = hentBruker(sedData),
             arbeidsgiver = hentArbeidsgivereILand(
                 sedData.arbeidsgivendeVirksomheter,

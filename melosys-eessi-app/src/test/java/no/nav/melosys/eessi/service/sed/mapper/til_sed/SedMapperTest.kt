@@ -4,6 +4,8 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
+import io.kotest.matchers.string.shouldNotContain
 import no.nav.melosys.eessi.controller.dto.Adressetype
 import no.nav.melosys.eessi.controller.dto.SedDataDto
 import no.nav.melosys.eessi.models.SedType
@@ -11,6 +13,9 @@ import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.nav.Statsborgerskap
 import no.nav.melosys.eessi.service.sed.SedDataStub
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.module.kotlin.KotlinFeature
+import tools.jackson.module.kotlin.KotlinModule
 
 class SedMapperTest {
     private val sedMapper: SedMapper = object : SedMapper {
@@ -18,6 +23,10 @@ class SedMapperTest {
     }
 
     private val sedData: SedDataDto = SedDataStub.getStub()
+
+    private val jsonMapper: JsonMapper = JsonMapper.builder()
+        .addModule(KotlinModule.Builder().enable(KotlinFeature.NullIsSameAsDefault).build())
+        .build()
 
     @Test
     fun hentAdresser() {
@@ -36,6 +45,25 @@ class SedMapperTest {
 
         arbeidsland.shouldHaveSize(1)
             .single().arbeidssted.shouldHaveSize(1)
+    }
+
+    @Test
+    fun `prefillNav mapper harFastArbeidssted eksplisitt til ja, nei og null`() {
+        sedMapper.prefillNav(SedDataStub.getStub { harFastArbeidssted = true })
+            .harfastarbeidssted shouldBe "ja"
+        sedMapper.prefillNav(SedDataStub.getStub { harFastArbeidssted = false })
+            .harfastarbeidssted shouldBe "nei"
+        sedMapper.prefillNav(SedDataStub.getStub { harFastArbeidssted = null })
+            .harfastarbeidssted shouldBe null
+    }
+
+    @Test
+    fun `harFastArbeidssted null blir utelatt fra serialisert SED, false blir med som nei`() {
+        val sedMedUkjentArbeidssted = sedMapper.mapTilSed(SedDataStub.getStub { harFastArbeidssted = null })
+        val sedMedKjentArbeidssted = sedMapper.mapTilSed(SedDataStub.getStub { harFastArbeidssted = false })
+
+        jsonMapper.writeValueAsString(sedMedUkjentArbeidssted) shouldNotContain "harfastarbeidssted"
+        jsonMapper.writeValueAsString(sedMedKjentArbeidssted) shouldContain "\"harfastarbeidssted\":\"nei\""
     }
 
     @Test
