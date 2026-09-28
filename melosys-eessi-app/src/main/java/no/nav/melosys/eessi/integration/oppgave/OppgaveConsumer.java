@@ -2,6 +2,7 @@
 package no.nav.melosys.eessi.integration.oppgave;
 
 import no.nav.melosys.eessi.integration.RestUtils;
+import no.nav.melosys.eessi.models.exception.IkkeRetrybarOppgaveException;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.retry.annotation.Backoff;
@@ -52,12 +53,6 @@ public class OppgaveConsumer {
             .map(feilmelding -> clientResponse.statusCode().is5xxServerError()
                 ? new IntegrationException(feilmelding)
                 : new IkkeRetrybarOppgaveException(feilmelding));
-    }
-
-    private static class IkkeRetrybarOppgaveException extends IntegrationException {
-        IkkeRetrybarOppgaveException(String message) {
-            super(message);
-        }
     }
 
     private Mono<? extends Throwable> håndterFeil(ClientResponse clientResponse) {
