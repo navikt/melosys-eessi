@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import no.nav.melosys.eessi.models.exception.IkkeRetrybarEuxRinaException;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -121,15 +120,15 @@ class OppgaveConsumerTest {
     }
 
     @Test
-    void oppdaterOppgave_4xx_girIngenRetryOgFortsattIntegrationException() throws InterruptedException {
+    void oppdaterOppgave_4xx_girIngenRetry() throws InterruptedException {
         int antallKallFør = mockWebServer.getRequestCount();
         mockWebServer.enqueue(new MockResponse().setResponseCode(409).setBody("Versjonskonflikt"));
 
         var oppdatering = OppgaveOppdateringDto.builder().id(123).versjon(2).build();
         assertThatThrownBy(() -> oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppdatering))
-            .isInstanceOf(IntegrationException.class)
-            .isNotInstanceOf(IkkeRetrybarEuxRinaException.class);
+            .isInstanceOf(IntegrationException.class);
 
+        // 4xx skal ikke trigge @Retryable sitt noRetryFor, i motsetning til 5xx-testen over
         assertThat(mockWebServer.getRequestCount() - antallKallFør).isEqualTo(1);
         mockWebServer.takeRequest();
     }
