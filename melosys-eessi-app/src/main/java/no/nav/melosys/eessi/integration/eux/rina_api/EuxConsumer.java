@@ -11,7 +11,7 @@ import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.BUC;
 import no.nav.melosys.eessi.models.bucinfo.BucInfo;
-import no.nav.melosys.eessi.models.exception.IkkeRetrybarIntegrationException;
+import no.nav.melosys.eessi.models.exception.IkkeRetrybarEuxRinaException;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import no.nav.melosys.eessi.models.exception.NotFoundException;
 import no.nav.melosys.eessi.models.exception.PreconditionFailedException;
@@ -285,7 +285,7 @@ public class EuxConsumer implements RestConsumer {
             if (status == 401 || status == 403 || status == 408) {
                 throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
             }
-            throw new IkkeRetrybarIntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
+            throw new IkkeRetrybarEuxRinaException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (HttpServerErrorException e) {
             throw new IntegrationException("Feil i integrasjon mot eux: " + hentFeilmeldingForEux(e), e);
         } catch (RestClientException e) {

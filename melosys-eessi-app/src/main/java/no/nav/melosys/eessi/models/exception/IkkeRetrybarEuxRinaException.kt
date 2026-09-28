@@ -9,7 +9,7 @@ package no.nav.melosys.eessi.models.exception
  * kan la være å retry'e denne feilen, i motsetning til forbigående feil der vi ikke fikk noe
  * svar fra eux-rina-api i det hele tatt (f.eks. timeout/nettverksfeil).
  */
-class IkkeRetrybarIntegrationException : IntegrationException {
+class IkkeRetrybarEuxRinaException : IntegrationException {
     constructor(message: String?) : super(message)
 
     constructor(message: String?, e: Throwable?) : super(message, e)
