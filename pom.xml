@@ -52,9 +52,9 @@
         <opensagres.version>2.2.0</opensagres.version>
         <google-errorprone.version>2.50.0</google-errorprone.version>
         <org.apache.pdfbox.version>3.0.8</org.apache.pdfbox.version>
-        <nimbus-jose-jwt.version>10.9.1</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>10.10</nimbus-jose-jwt.version>
         <poi-ooxml-full.version>5.5.1</poi-ooxml-full.version>
-        <xmlbeans.version>5.4.0</xmlbeans.version>
+        <xmlbeans.version>5.4.1</xmlbeans.version>
 
         <!-- Transitive dependency override -->
         <okhttp.version>5.5.0</okhttp.version>
