@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import no.nav.melosys.eessi.models.exception.IkkeRetrybarIntegrationException;
+import no.nav.melosys.eessi.models.exception.IkkeRetrybarEuxRinaException;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -128,7 +128,7 @@ class OppgaveConsumerTest {
         var oppdatering = OppgaveOppdateringDto.builder().id(123).versjon(2).build();
         assertThatThrownBy(() -> oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppdatering))
             .isInstanceOf(IntegrationException.class)
-            .isNotInstanceOf(IkkeRetrybarIntegrationException.class);
+            .isNotInstanceOf(IkkeRetrybarEuxRinaException.class);
 
         assertThat(mockWebServer.getRequestCount() - antallKallFør).isEqualTo(1);
         mockWebServer.takeRequest();
