@@ -7,25 +7,38 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import no.nav.melosys.eessi.models.exception.IkkeRetrybarIntegrationException;
+import no.nav.melosys.eessi.models.exception.IntegrationException;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.json.JsonMapper;
 
 import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class OppgaveConsumerTest {
     private OppgaveConsumer oppgaveConsumer;
     private final String OPPGAVE_ID = "123";
     private static MockWebServer mockWebServer;
     private static String rootUri;
+    private AnnotationConfigApplicationContext context;
+
+    @Configuration
+    @EnableRetry
+    static class RetryConfig {
+    }
 
     @BeforeAll
     static void setupAll() throws IOException {
@@ -36,7 +49,16 @@ class OppgaveConsumerTest {
 
     @BeforeEach
     public void setUp() {
-        oppgaveConsumer = new OppgaveConsumer(WebClient.builder().baseUrl(rootUri).build());
+        context = new AnnotationConfigApplicationContext();
+        context.register(RetryConfig.class);
+        context.registerBean(OppgaveConsumer.class, () -> new OppgaveConsumer(WebClient.builder().baseUrl(rootUri).build()));
+        context.refresh();
+        oppgaveConsumer = context.getBean(OppgaveConsumer.class);
+    }
+
+    @AfterEach
+    void tearDown() {
+        context.close();
     }
 
     @Test
@@ -79,6 +101,37 @@ class OppgaveConsumerTest {
         assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
         var jsonMapper = JsonMapper.builder().build();
         assertThat(jsonMapper.readTree(requestBody)).isEqualTo(jsonMapper.readTree(forventetJsonBodyRequestUtenBeskrivelseFelt));
+    }
+
+    @Test
+    void oppdaterOppgave_5xx_girFeilEtterTreForsok() throws InterruptedException {
+        int antallKallFør = mockWebServer.getRequestCount();
+        for (int i = 0; i < 3; i++) {
+            mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+        }
+
+        var oppdatering = OppgaveOppdateringDto.builder().id(123).versjon(2).build();
+        assertThatThrownBy(() -> oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppdatering))
+            .isInstanceOf(IntegrationException.class);
+
+        assertThat(mockWebServer.getRequestCount() - antallKallFør).isEqualTo(3);
+        for (int i = 0; i < 3; i++) {
+            mockWebServer.takeRequest();
+        }
+    }
+
+    @Test
+    void oppdaterOppgave_4xx_girIngenRetryOgFortsattIntegrationException() throws InterruptedException {
+        int antallKallFør = mockWebServer.getRequestCount();
+        mockWebServer.enqueue(new MockResponse().setResponseCode(409).setBody("Versjonskonflikt"));
+
+        var oppdatering = OppgaveOppdateringDto.builder().id(123).versjon(2).build();
+        assertThatThrownBy(() -> oppgaveConsumer.oppdaterOppgave(OPPGAVE_ID, oppdatering))
+            .isInstanceOf(IntegrationException.class)
+            .isNotInstanceOf(IkkeRetrybarIntegrationException.class);
+
+        assertThat(mockWebServer.getRequestCount() - antallKallFør).isEqualTo(1);
+        mockWebServer.takeRequest();
     }
 
     private void assertOppgaveFelter(HentOppgaveDto oppgaveDto) {
