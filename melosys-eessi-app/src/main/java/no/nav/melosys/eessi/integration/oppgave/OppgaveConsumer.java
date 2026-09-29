@@ -4,6 +4,7 @@ package no.nav.melosys.eessi.integration.oppgave;
 import no.nav.melosys.eessi.integration.RestUtils;
 import no.nav.melosys.eessi.models.exception.IkkeRetrybarOppgaveException;
 import no.nav.melosys.eessi.models.exception.IntegrationException;
+import no.nav.melosys.eessi.models.exception.NotFoundException;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -23,10 +24,13 @@ public class OppgaveConsumer {
         this.webClient = webClient;
     }
 
+    /**
+     * @throws NotFoundException ved 404, slik at kallere kan skille "finnes ikke" fra integrasjonsfeil.
+     */
     public HentOppgaveDto hentOppgave(String oppgaveID) {
         var correlationID = getCorrelationId();
         log.debug("hentOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
-        return webClient.get().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
+        return webClient.get().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).retrieve().onStatus(status -> status.value() == 404, clientResponse -> håndterIkkeFunnet(clientResponse, oppgaveID)).onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
     }
 
     public HentOppgaveDto opprettOppgave(OppgaveDto oppgaveDto) {
@@ -53,6 +57,10 @@ public class OppgaveConsumer {
             .map(feilmelding -> clientResponse.statusCode().is5xxServerError()
                 ? new IntegrationException(feilmelding)
                 : new IkkeRetrybarOppgaveException(feilmelding));
+    }
+
+    private Mono<? extends Throwable> håndterIkkeFunnet(ClientResponse clientResponse, String oppgaveID) {
+        return clientResponse.bodyToMono(String.class).defaultIfEmpty("").map(body -> new NotFoundException("Fant ikke oppgave med id " + oppgaveID + " i Oppgave. " + RestUtils.hentFeilmeldingForOppgave(body)));
     }
 
     private Mono<? extends Throwable> håndterFeil(ClientResponse clientResponse) {

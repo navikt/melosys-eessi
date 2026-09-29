@@ -13,6 +13,7 @@ import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse
 import no.nav.melosys.eessi.metrikker.SedMetrikker
 import no.nav.melosys.eessi.models.*
+import no.nav.melosys.eessi.models.exception.NotFoundException
 import no.nav.melosys.eessi.models.sed.SED
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA003
 import no.nav.melosys.eessi.models.sed.medlemskap.impl.MedlemskapA009
@@ -75,17 +76,21 @@ class SedMottakServiceTest {
     fun setup() {
         sedMottakService = SedMottakService(
             euxService,
-            personFasade,
-            opprettInngaaendeJournalpostService,
-            oppgaveService,
             sedMottattHendelseRepository,
-            bucIdentifiseringOppgRepository,
             journalpostSedKoblingService,
             sedMetrikker,
             personIdentifisering,
             bucIdentifisertService,
             saksrelasjonService,
             sedLagerService,
+            IdentifiseringsoppgaveService(
+                euxService,
+                personFasade,
+                opprettInngaaendeJournalpostService,
+                oppgaveService,
+                sedMottattHendelseRepository,
+                bucIdentifiseringOppgRepository
+            ),
             "1",
         )
         val rinasakKobling = FagsakRinasakKobling(rinaSaksnummer = "test", gsakSaksnummer = 111111111, bucType = BucType.LA_BUC_02)
@@ -662,6 +667,27 @@ class SedMottakServiceTest {
         rinaDokumentId = "389501f50fba4af7a4228fa41b8ee71d"
         rinaDokumentVersjon = "1"
         sedType = "X005"
+    }
+
+    @Test
+    fun `behandleSed oppgave som ikke finnes i Oppgave velter ikke mottak men oppretter ny oppgave`() {
+        every { bucIdentifiseringOppgRepository.findByRinaSaksnummer(RINA_SAKSNUMMER) } returns
+            mutableSetOf(BucIdentifiseringOppg(1L, RINA_SAKSNUMMER, "9999", 1))
+        every { oppgaveService.hentOppgave("9999") } throws NotFoundException("Fant ikke oppgave med id 9999 i Oppgave.")
+        every { euxService.hentSedMedRetry(any(), any()) } returns opprettSED()
+        every { sedMottattHendelseRepository.save(any<SedMottattHendelse>()) } returnsArgument 0
+        every { personIdentifisering.identifiserPerson(any(), any()) } returns Optional.empty()
+        every { opprettInngaaendeJournalpostService.arkiverInngaaendeSedUtenBruker(any(), any(), any()) } returns "JP-1"
+        every { personFasade.opprettLenkeForRekvirering(any()) } returns "http://lenke.no"
+        every { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) } returns "OPPG-NY"
+        every { bucIdentifiseringOppgRepository.save(any()) } returnsArgument 0
+        val sedMottattHendelse = SedMottattHendelse.builder().sedHendelse(sedHendelseUtenBruker()).build()
+
+        shouldNotThrow<Exception> {
+            sedMottakService.behandleSedMottakHendelse(sedMottattHendelse)
+        }
+
+        verify { oppgaveService.opprettOppgaveTilIdOgFordeling(any(), any(), any(), any()) }
     }
 
 
