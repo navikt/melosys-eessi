@@ -1,5 +1,6 @@
 package no.nav.melosys.eessi.config;
 
+import no.nav.melosys.eessi.controller.interceptor.AdminTilgangInterceptor;
 import no.nav.melosys.eessi.controller.interceptor.CorrelationIdInterceptor;
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,12 @@ public class ApiConfig implements WebMvcConfigurer {
 
     private static final String API_PREFIX = "/api";
 
+    private final AdminTilgangInterceptor adminTilgangInterceptor;
+
+    public ApiConfig(AdminTilgangInterceptor adminTilgangInterceptor) {
+        this.adminTilgangInterceptor = adminTilgangInterceptor;
+    }
+
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
         configurer.addPathPrefix(API_PREFIX, ApiConfig::erApiTjeneste);
@@ -22,6 +29,11 @@ public class ApiConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new CorrelationIdInterceptor());
+        // SedMottakAdminTjeneste ligger utenfor controller-pakken og får ikke /api-prefiks.
+        // sed-mottatt-lager har aldri krevd adminnøkkel.
+        registry.addInterceptor(adminTilgangInterceptor)
+            .addPathPatterns("/admin/**", API_PREFIX + "/admin/**")
+            .excludePathPatterns(API_PREFIX + "/admin/sed-mottatt-lager/**");
     }
 
     private static boolean erApiTjeneste(Class clazz) {
