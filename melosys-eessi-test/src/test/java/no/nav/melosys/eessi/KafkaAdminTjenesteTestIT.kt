@@ -10,6 +10,7 @@ import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -44,6 +45,9 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
     @Autowired
     private lateinit var kafkaDLQRepository: KafkaDLQRepository
 
+    @Value("\${melosys.admin.driftsgruppe}")
+    private lateinit var driftsgruppeId: String
+
     private fun hentBearerToken(): String {
         return mockOAuth2Server.issueToken(
             issuerId = "issuer1",
@@ -52,7 +56,8 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
             claims = mapOf(
                 "oid" to "test-oid",
                 "azp" to "test-azp",
-                "NAVident" to "test123"
+                "NAVident" to "test123",
+                "groups" to listOf(driftsgruppeId)
             )
         ).serialize()
     }

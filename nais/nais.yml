@@ -71,6 +71,8 @@ spec:
       value: nais
     - name: APP_NAME
       value: {{APP_NAME}}
+    - name: GROUP_MELOSYS_INNLOGGING_VAKT
+      value: {{GROUP_MELOSYS_INNLOGGING_VAKT}}
     - name: JDK_JAVA_OPTIONS
       value: "$(JAVA_PROXY_OPTIONS)"
   envFrom:

@@ -65,6 +65,7 @@ spring:
 melosys:
     admin:
         api-key: dummy
+        driftsgruppe: 00000000-0000-0000-0000-000000000001
 
 no.nav.security.jwt.issuer:
     aad:
