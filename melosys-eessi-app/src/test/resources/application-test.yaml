@@ -56,10 +56,9 @@ spring:
                 protocol: PLAINTEXT
             security.protocol: PLAINTEXT
 
-# Apikey til SedMottakAdminTjeneste
 melosys:
     admin:
-        api-key: dummy
+        console-klient-id: test-console-klient-id
         driftsgruppe: 00000000-0000-0000-0000-000000000001
 
 no.nav.security.jwt.issuer:

@@ -28,14 +28,13 @@ class SedMottakAdminTjenesteTest {
     @Mock
     private SedMottakService sedMottakService;
 
-    private final String apiKey = "dummy";
     private SedMottakAdminTjeneste sedMottakAdminTjeneste;
     private SedMottattHendelse sedMottattHendelse;
 
 
     @BeforeEach
     void setUp() {
-        sedMottakAdminTjeneste = new SedMottakAdminTjeneste(sedMottakService, sedMottattHendelseRepository, apiKey);
+        sedMottakAdminTjeneste = new SedMottakAdminTjeneste(sedMottakService, sedMottattHendelseRepository);
         sedMottattHendelse = lagFeiledSedMottakHendelse();
     }
 
@@ -48,7 +47,7 @@ class SedMottakAdminTjenesteTest {
             .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
             .build();
 
-        var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId(apiKey);
+        var response = sedMottakAdminTjeneste.hentSEDerMottattUtenJournalpostId();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
 
         var body = response.getBody();
@@ -72,7 +71,7 @@ class SedMottakAdminTjenesteTest {
             .thenReturn(singletonList(sedMottattHendelse));
         doNothing().when(sedMottakService).behandleSedMottakHendelse(valueCapture.capture());
 
-        sedMottakAdminTjeneste.restartAlleSEDerUtenJournalpostId(apiKey);
+        sedMottakAdminTjeneste.restartAlleSEDerUtenJournalpostId();
 
         assertThat(valueCapture.getValue()).isEqualTo(sedMottattHendelse);
         verify(sedMottakService, times(1)).behandleSedMottakHendelse(any(SedMottattHendelse.class));

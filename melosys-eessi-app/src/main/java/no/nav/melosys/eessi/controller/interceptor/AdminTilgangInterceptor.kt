@@ -12,25 +12,44 @@ import org.springframework.web.servlet.HandlerInterceptor
 
 private val log = KotlinLogging.logger { }
 
+/**
+ * Tilgang til adminrutene: gyldig Azure-token fra Console, og driftsgruppe for personkall.
+ * Kjører før token-supports @Protected-sjekk (se ApiConfig), slik at STS-token og manglende token gir 401 her.
+ */
 @Component
 class AdminTilgangInterceptor(
     private val tokenValidationContextHolder: TokenValidationContextHolder,
     @Value("\${melosys.admin.driftsgruppe}") private val driftsgruppeId: String,
+    @Value("\${melosys.admin.console-klient-id}") private val consoleKlientId: String,
 ) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val claims = claimsFraGyldigAzureToken() ?: return true
+        // @Protected godtar også STS-token, så adminrutene må kreve Azure-token selv
+        val claims = claimsFraGyldigAzureToken()
+        if (claims == null) {
+            log.warn { "Admin-kall avvist: mangler Azure-token (${request.method})" }
+            return avvis(response, 401, MANGLER_AZURE_TOKEN)
+        }
 
-        // Uten Azure-token: @Protected og nøkkelsjekken avgjør, som før
+        val azp = claims.getStringClaim("azp")
+        if (azp != consoleKlientId) {
+            log.warn { "Admin-kall avvist: ukjent klient (azp=$azp, ${request.method})" }
+            return avvis(response, 403, UKJENT_KLIENT)
+        }
+
         if (erMaskinkall(claims)) return true
         if (erMedlemAvDriftsgruppe(claims)) return true
 
         log.warn { "Admin-kall avvist: personkall uten driftsgruppe (${request.method})" }
-        // Skrives direkte: RestExceptionHandler gjør ellers alle unntak om til 500
-        response.status = 403
+        return avvis(response, 403, MANGLER_DRIFTSGRUPPE)
+    }
+
+    // Skrives direkte: RestExceptionHandler gjør ellers alle unntak om til 500
+    private fun avvis(response: HttpServletResponse, status: Int, melding: String): Boolean {
+        response.status = status
         response.contentType = MediaType.TEXT_PLAIN_VALUE
         response.characterEncoding = Charsets.UTF_8.name()
-        response.writer.write(MANGLER_DRIFTSGRUPPE)
+        response.writer.write(melding)
         return false
     }
 
@@ -44,6 +63,8 @@ class AdminTilgangInterceptor(
     private fun erMedlemAvDriftsgruppe(claims: JwtTokenClaims) = driftsgruppeId in claims.getAsList("groups").orEmpty()
 
     companion object {
+        const val MANGLER_AZURE_TOKEN = "Mangler gyldig token"
+        const val UKJENT_KLIENT = "Kallet kommer ikke fra en godkjent klient"
         const val MANGLER_DRIFTSGRUPPE = "Mangler tilgang til admin-endepunkter"
         private const val ISSUER = "aad"
         private const val IDTYP_MASKIN = "app"
