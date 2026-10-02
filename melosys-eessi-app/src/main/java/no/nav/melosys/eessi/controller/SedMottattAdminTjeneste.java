@@ -9,7 +9,6 @@ import no.nav.melosys.eessi.metrikker.SedMetrikker;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.security.token.support.core.api.Protected;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,18 +22,14 @@ public class SedMottattAdminTjeneste {
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SedMottattAdminTjeneste.class);
     private final SedMottakService sedMottakService;
     private final SedMetrikker sedMetrikker;
-    private static final String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
-    private final String apiKey;
 
-    public SedMottattAdminTjeneste(SedMottakService sedMottakService, SedMetrikker sedMetrikker, @Value("${melosys.admin.api-key}") String apiKey) {
+    public SedMottattAdminTjeneste(SedMottakService sedMottakService, SedMetrikker sedMetrikker) {
         this.sedMottakService = sedMottakService;
         this.sedMetrikker = sedMetrikker;
-        this.apiKey = apiKey;
     }
 
     @PostMapping("")
-    public ResponseEntity<String> leggTilSedHendelse(@RequestHeader(API_KEY_HEADER) String apiKey, @RequestBody SedHendelse sedHendelse) {
-        validerApikey(apiKey);
+    public ResponseEntity<String> leggTilSedHendelse(@RequestBody SedHendelse sedHendelse) {
         sedMottatt(sedHendelse);
         return ResponseEntity.status(200).build();
     }
@@ -56,12 +51,6 @@ public class SedMottattAdminTjeneste {
         } finally {
             remove(SED_ID);
             remove(CORRELATION_ID);
-        }
-    }
-
-    private void validerApikey(String value) {
-        if (!apiKey.equals(value)) {
-            throw new SecurityException("Trenger gyldig apikey");
         }
     }
 }

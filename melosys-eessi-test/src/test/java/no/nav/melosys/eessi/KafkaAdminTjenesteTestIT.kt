@@ -5,6 +5,7 @@ import no.nav.melosys.eessi.integration.oppgave.HentOppgaveDto
 import no.nav.melosys.eessi.models.kafkadlq.SedSendtHendelseKafkaDLQ
 import no.nav.melosys.eessi.repository.KafkaDLQRepository
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.Test
@@ -28,11 +29,6 @@ import tools.jackson.core.type.TypeReference
 @AutoConfigureMockMvc
 class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
-    companion object {
-        private const val API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY"
-        private const val GYLDIG_API_NOKKEL = "dummy"
-    }
-
     @Autowired
     private lateinit var mockMvc: MockMvc
 
@@ -48,16 +44,24 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
     @Value("\${melosys.admin.driftsgruppe}")
     private lateinit var driftsgruppeId: String
 
+    @Value("\${melosys.admin.console-klient-id}")
+    private lateinit var consoleKlientId: String
+
+    // Klient-ID-en sendes også som azp, fordi mock-oauth2-server kan overskrive claimet med den.
     private fun hentBearerToken(): String {
         return mockOAuth2Server.issueToken(
-            issuerId = "issuer1",
-            subject = "testbruker",
-            audience = "dumbdumb",
-            claims = mapOf(
-                "oid" to "test-oid",
-                "azp" to "test-azp",
-                "NAVident" to "test123",
-                "groups" to listOf(driftsgruppeId)
+            "issuer1",
+            consoleKlientId,
+            DefaultOAuth2TokenCallback(
+                issuerId = "issuer1",
+                subject = "testbruker",
+                audience = listOf("dumbdumb"),
+                claims = mapOf(
+                    "oid" to "test-oid",
+                    "azp" to consoleKlientId,
+                    "NAVident" to "test123",
+                    "groups" to listOf(driftsgruppeId)
+                )
             )
         ).serialize()
     }
@@ -66,7 +70,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
     fun `hentKafkaConsumers returner informasjon om alle consumere`() {
         val result = mockMvc.perform(
             MockMvcRequestBuilders.get("/api/admin/kafka/consumers")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -86,7 +89,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
         // Test stop
         val stopResult = mockMvc.perform(
             MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/stop")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -104,7 +106,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
         // Test start
         val startResult = mockMvc.perform(
             MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/start")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -153,7 +154,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
         mockMvc.perform(
             MockMvcRequestBuilders.post("/api/admin/kafka/consumers/oppgaveHendelse/seek/2")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -174,7 +174,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
 
         mockMvc.perform(
             MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/$id")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -187,7 +186,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
     fun `slettKafkaMelding returnerer 404 når melding ikke finnes`() {
         mockMvc.perform(
             MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/${UUID.randomUUID()}")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
@@ -198,7 +196,6 @@ class KafkaAdminTjenesteTestIT : ComponentTestBase() {
     fun `slettKafkaMelding returnerer 400 ved ugyldig uuid`() {
         mockMvc.perform(
             MockMvcRequestBuilders.delete("/api/admin/kafka/dlq/ikke-en-gyldig-uuid")
-                .header(API_KEY_HEADER, GYLDIG_API_NOKKEL)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer ${hentBearerToken()}")
                 .contentType(MediaType.APPLICATION_JSON)
         )
