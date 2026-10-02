@@ -92,8 +92,8 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
 
     private fun hent(sti: String, token: String?, nøkkel: String? = null) = kall(get(sti), token, nøkkel)
 
-    private fun ResultActions.avvistMed(status: Int, melding: String) =
-        andExpect(status().`is`(status)).andExpect(content().string(melding))
+    private fun ResultActions.avvistMed(forventetStatus: Int, melding: String) =
+        andExpect(status().`is`(forventetStatus)).andExpect(content().string(melding))
 
     // Uten gyldig Azure-token
 

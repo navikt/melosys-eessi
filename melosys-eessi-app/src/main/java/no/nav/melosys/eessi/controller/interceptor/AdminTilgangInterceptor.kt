@@ -12,10 +12,6 @@ import org.springframework.web.servlet.HandlerInterceptor
 
 private val log = KotlinLogging.logger { }
 
-/**
- * Tilgang til adminrutene: gyldig Azure-token fra Console, og driftsgruppe for personkall.
- * Kjører før token-supports @Protected-sjekk (se ApiConfig), slik at STS-token og manglende token gir 401 her.
- */
 @Component
 class AdminTilgangInterceptor(
     private val tokenValidationContextHolder: TokenValidationContextHolder,

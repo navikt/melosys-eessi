@@ -31,7 +31,7 @@ public class ApiConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new CorrelationIdInterceptor());
         // SedMottakAdminTjeneste ligger utenfor controller-pakken og får ikke /api-prefiks.
-        // sed-mottatt-lager har aldri krevd adminnøkkel.
+        // sed-mottatt-lager har aldri hatt adminsjekk og holdes utenfor.
         // Kjører før token-supports interceptor (order 0), så kall uten Azure-token får 401 herfra, ikke 500.
         registry.addInterceptor(adminTilgangInterceptor)
             .addPathPatterns("/admin/**", API_PREFIX + "/admin/**")
