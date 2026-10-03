@@ -8,7 +8,8 @@ name: E2E på PR
 # Ikke bruk «Re-run jobs»: den gjenbruker den gamle merge-commiten, og en gammel
 # kjøring i samme concurrency-gruppe avbryter den som går.
 # Gaten: navikt/melosys-e2e-tests/.github/workflows/e2e-gate.yml
-# Samme oppsett som e2e-pr.yml i melosys-api, melosys-web og melosys-skjema-api.
+# Samme oppsett som e2e-pr.yml i melosys-api, melosys-web, melosys-skjema-api og
+# melosys-skjema-web.
 
 on:
   pull_request:
