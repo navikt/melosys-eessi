@@ -97,10 +97,12 @@ jobs:
           draft: true
           prerelease: false
 
+  # Venter ikke på deploy: e2e henter imaget fra GAR etter tag. Feiler dev-deployen,
+  # skal e2e likevel teste dette imaget, ellers får neste repo skylden for feilene.
   trigger-e2e-tests:
     name: Trigger E2E tests
     runs-on: ubuntu-latest
-    needs: [ build, deploy ]
+    needs: build
     steps:
       - name: Checkout latest code
         uses: actions/checkout@v7
