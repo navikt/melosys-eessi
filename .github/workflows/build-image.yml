@@ -1,0 +1,76 @@
+name: Build and Push Image
+run-name: ${{ inputs.correlation_id && format('Build and Push Image · {0}', inputs.correlation_id) || '' }}
+
+# Builds the selected branch and pushes the image to GAR as <image_tag> and the
+# commit sha, never latest. Tests are not run; they run in the pull request workflow.
+# Same setup as build-image.yml in melosys-api and melosys-web.
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Custom image tag (for example, e2e-test-123 or feature-x; latest, mq-* and e2e-ok-* are reserved)"
+        required: true
+        type: string
+      correlation_id:
+        description: "Optional. Set by e2e-brancher.yml in melosys-e2e-tests to find this run by its title."
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build:
+    name: Build and Push Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate image tag
+        env:
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          if [[ ! "$IMAGE_TAG" =~ ^[A-Za-z0-9_][A-Za-z0-9_.-]{0,127}$ ]]; then
+            echo "::error::Use a valid Docker tag: 1-128 letters, digits, underscores, periods or hyphens, starting with a letter, digit or underscore."
+            exit 1
+          fi
+          # latest is the master build, mq-* the merge queue image and e2e-ok-* the e2e
+          # marker. A manual e2e-ok-<tree> would make e2e skip that code.
+          case "$IMAGE_TAG" in
+            latest | mq-* | e2e-ok-*)
+              echo "::error::The tag $IMAGE_TAG is reserved (latest, mq-* and e2e-ok-*). Use another tag."
+              exit 1
+              ;;
+          esac
+
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6.0.1
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Build
+        run: mvn clean package -B -e -U -DskipTests
+
+      - name: Build and push Docker image
+        id: docker-push
+        uses: nais/docker-build-push@v0
+        with:
+          team: teammelosys
+          tag: |
+            type=raw,value=${{ inputs.image_tag }},priority=9001
+            type=raw,value=${{ github.sha }},priority=9000
+          platforms: linux/amd64,linux/arm64
+          salsa: false
+
+      - name: Output image info
+        env:
+          IMAGE: ${{ steps.docker-push.outputs.image }}
+          IMAGE_TAG: ${{ inputs.image_tag }}
+        run: |
+          echo "Image: $IMAGE"
+          echo "Custom tag: europe-north1-docker.pkg.dev/nais-management-233d/teammelosys/melosys-eessi:$IMAGE_TAG"
+          echo "SHA tag: $GITHUB_SHA"
