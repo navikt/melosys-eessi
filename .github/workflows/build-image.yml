@@ -1,5 +1,5 @@
 name: Build and Push Image
-run-name: ${{ inputs.correlation_id && format('Build and Push Image · {0}', inputs.correlation_id) || '' }}
+run-name: Build and Push Image · ${{ inputs.image_tag }}
 
 # Builds the selected branch and pushes the image to GAR as <image_tag> and the
 # commit sha, never latest. Tests are not run; they run in the pull request workflow.
@@ -13,11 +13,6 @@ on:
         description: "Custom image tag (for example, e2e-test-123 or feature-x; latest, mq-* and e2e-ok-* are reserved)"
         required: true
         type: string
-      correlation_id:
-        description: "Optional. Set by e2e-brancher.yml in melosys-e2e-tests to find this run by its title."
-        required: false
-        type: string
-        default: ""
 
 permissions:
   contents: read
