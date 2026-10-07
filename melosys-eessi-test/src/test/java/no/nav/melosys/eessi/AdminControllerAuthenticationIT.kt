@@ -1,15 +1,22 @@
 package no.nav.melosys.eessi
 
 import com.nimbusds.oauth2.sdk.TokenRequest
+import io.kotest.assertions.assertSoftly
+import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.shouldBe
 import no.nav.melosys.eessi.controller.interceptor.AdminTilgangInterceptor
 import no.nav.security.mock.oauth2.MockOAuth2Server
 import no.nav.security.mock.oauth2.token.DefaultOAuth2TokenCallback
 import no.nav.security.mock.oauth2.token.OAuth2TokenCallback
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
+import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.ResultActions
@@ -17,8 +24,11 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.request
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.web.bind.annotation.RequestMethod
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.util.UUID
 
 /**
@@ -33,10 +43,16 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
         private const val API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY"
         private const val ANNEN_GRUPPE = "00000000-0000-0000-0000-000000000002"
         private const val ANNEN_KLIENT = "annen-klient-id"
+        // Unntatt fra adminsjekken i ApiConfig
+        private const val SED_MOTTATT_LAGER = "/api/admin/sed-mottatt-lager"
     }
 
     @Autowired
     private lateinit var mockMvc: MockMvc
+
+    @Autowired
+    @Qualifier("requestMappingHandlerMapping")
+    private lateinit var handlerMapping: RequestMappingHandlerMapping
 
     @Autowired
     private lateinit var mockOAuth2Server: MockOAuth2Server
@@ -222,4 +238,88 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
         kall(delete("/api/admin/kafka/dlq/${UUID.randomUUID()}"), token = null)
             .avvistMed(401, AdminTilgangInterceptor.MANGLER_AZURE_TOKEN)
     }
+
+    // Alle registrerte adminruter
+    //
+    // Rutene hentes fra Spring, så nye adminkontrollere dekkes uten at testene må oppdateres.
+    // assertSoftly viser alle ruter som feiler, ikke bare den første.
+
+    @Test
+    fun `kall uten token avvises på alle registrerte adminruter`() {
+        val endepunkter = registrerteAdminEndepunkter()
+
+        assertSoftly {
+            endepunkter.forEach { endepunkt ->
+                withClue(endepunkt) {
+                    val respons = kall(endepunkt, token = null)
+                    respons.status shouldBe 401
+                    respons.contentAsString shouldBe AdminTilgangInterceptor.MANGLER_AZURE_TOKEN
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `kall fra annen klient avvises på alle registrerte adminruter`() {
+        val endepunkter = registrerteAdminEndepunkter()
+        val token = personToken(azp = ANNEN_KLIENT)
+
+        assertSoftly {
+            endepunkter.forEach { endepunkt ->
+                withClue(endepunkt) {
+                    val respons = kall(endepunkt, token)
+                    respons.status shouldBe 403
+                    respons.contentAsString shouldBe AdminTilgangInterceptor.UKJENT_KLIENT
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `personkall uten driftsgruppe avvises på alle registrerte adminruter`() {
+        val endepunkter = registrerteAdminEndepunkter()
+        val token = personToken(grupper = listOf(ANNEN_GRUPPE))
+
+        assertSoftly {
+            endepunkter.forEach { endepunkt ->
+                withClue(endepunkt) {
+                    val respons = kall(endepunkt, token)
+                    respons.status shouldBe 403
+                    respons.contentAsString shouldBe AdminTilgangInterceptor.MANGLER_DRIFTSGRUPPE
+                }
+            }
+        }
+    }
+
+    private data class Endepunkt(val metode: HttpMethod, val mønster: String) {
+        // Interceptoren avviser før argumentene leses, så stivariablene trenger bare å matche mønsteret
+        val sti = mønster.replace(Regex("\\{[^}]+}"), "1")
+
+        override fun toString() = "$metode $mønster"
+    }
+
+    private fun registrerteAdminEndepunkter(): List<Endepunkt> {
+        val endepunkter = handlerMapping.handlerMethods.keys.flatMap { info ->
+            val metoder = info.methodsCondition.methods.ifEmpty { setOf(RequestMethod.GET) }
+            info.patternValues
+                .filter { erAdminrute(it) && !it.startsWith(SED_MOTTATT_LAGER) }
+                .flatMap { mønster -> metoder.map { Endepunkt(it.asHttpMethod(), mønster) } }
+        }
+
+        // Vakt mot falsk grønn: finner oppslaget ingen ruter, kjører forEach ingen assertions, og testene
+        // passerer uten å ha sjekket noe. Den ene ruten har /api-prefiks, den andre ligger utenfor
+        // controller-pakken og har det ikke, så vakten viser at begge variantene blir funnet.
+        endepunkter.map { it.toString() }.shouldContainAll(
+            "GET /api/admin/kafka/dlq",
+            "GET /admin/sedmottak/feilede",
+        )
+        return endepunkter
+    }
+
+    // Samme ruter som AdminTilgangInterceptor er registrert for i ApiConfig
+    private fun erAdminrute(mønster: String) = mønster.startsWith("/admin/") || mønster.startsWith("/api/admin/")
+
+    private fun kall(endepunkt: Endepunkt, token: String?): MockHttpServletResponse =
+        kall(request(endepunkt.metode, endepunkt.sti).contentType(MediaType.APPLICATION_JSON), token)
+            .andReturn().response
 }
