@@ -242,6 +242,6 @@ class AdminControllerAuthenticationIT : ComponentTestBase() {
                 .header("Authorization", "Bearer ${hentBearerToken()}")
                 .accept(MediaType.APPLICATION_JSON)
         )
-            .andExpect(MockMvcResultMatchers.status().isInternalServerError)
+            .andExpect(MockMvcResultMatchers.status().isForbidden)
     }
 }
