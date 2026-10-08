@@ -10,7 +10,6 @@ import no.nav.melosys.eessi.kafka.consumers.OppgaveHendelseConsumer;
 import no.nav.melosys.eessi.kafka.consumers.SedMottattConsumer;
 import no.nav.security.token.support.core.api.Protected;
 import org.apache.kafka.common.TopicPartition;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,28 +24,23 @@ import org.springframework.web.bind.annotation.*;
 public class KafkaAdminTjeneste {
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(KafkaAdminTjeneste.class);
-    private static final String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
     private final KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry;
     private final OppgaveHendelseConsumer oppgaveHendelseConsumer;
     private final SedMottattConsumer sedMottattConsumer;
-    private final String apiKey;
 
-    public KafkaAdminTjeneste(OppgaveHendelseConsumer oppgaveHendelseConsumer, SedMottattConsumer sedMottattConsumer, @Value("${melosys.admin.api-key}") String apiKey, KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
+    public KafkaAdminTjeneste(OppgaveHendelseConsumer oppgaveHendelseConsumer, SedMottattConsumer sedMottattConsumer, KafkaListenerEndpointRegistry kafkaListenerEndpointRegistry) {
         this.oppgaveHendelseConsumer = oppgaveHendelseConsumer;
         this.sedMottattConsumer = sedMottattConsumer;
-        this.apiKey = apiKey;
         this.kafkaListenerEndpointRegistry = kafkaListenerEndpointRegistry;
     }
 
     @GetMapping
-    public ResponseEntity<List<KafkaConsumerResponse>> hentConsumerIds(@RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
+    public ResponseEntity<List<KafkaConsumerResponse>> hentConsumerIds() {
         return ResponseEntity.ok(kafkaListenerEndpointRegistry.getListenerContainerIds().stream().map(this::lagKafkaConsumerResponseVedId).toList());
     }
 
     @PostMapping("/{consumerId}/stop")
-    public ResponseEntity<KafkaConsumerResponse> stoppKafkaConsumer(@PathVariable String consumerId, @RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
+    public ResponseEntity<KafkaConsumerResponse> stoppKafkaConsumer(@PathVariable String consumerId) {
         MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
         if (listenerContainer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -57,8 +51,7 @@ public class KafkaAdminTjeneste {
     }
 
     @PostMapping("/{consumerId}/start")
-    public ResponseEntity<KafkaConsumerResponse> startKafkaConsumer(@PathVariable String consumerId, @RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
+    public ResponseEntity<KafkaConsumerResponse> startKafkaConsumer(@PathVariable String consumerId) {
         MessageListenerContainer listenerContainer = kafkaListenerEndpointRegistry.getListenerContainer(consumerId);
         if (listenerContainer == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -69,8 +62,7 @@ public class KafkaAdminTjeneste {
     }
 
     @PostMapping("/{consumerId}/seek/{offset}")
-    public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset, @RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
+    public ResponseEntity<String> settOffset(@PathVariable String consumerId, @PathVariable long offset) {
         if (!List.of("oppgaveEndret", "sedMottatt", "oppgaveHendelse").contains(consumerId)) {
             return ResponseEntity.badRequest().body("ConsumerId is not supported: " + consumerId);
         }
@@ -94,11 +86,5 @@ public class KafkaAdminTjeneste {
 
     private KafkaConsumerAssignmentResponse lagKafkaConsumerAssignmentResponse(TopicPartition topicPartition) {
         return KafkaConsumerAssignmentResponse.builder().topic(topicPartition.topic()).partition(topicPartition.partition()).build();
-    }
-
-    private void validerApikey(String value) {
-        if (!apiKey.equals(value)) {
-            throw new SecurityException("Trenger gyldig apikey");
-        }
     }
 }

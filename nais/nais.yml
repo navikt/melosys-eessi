@@ -73,6 +73,8 @@ spec:
       value: {{APP_NAME}}
     - name: GROUP_MELOSYS_INNLOGGING_VAKT
       value: {{GROUP_MELOSYS_INNLOGGING_VAKT}}
+    - name: MELOSYS_CONSOLE_CLIENT_ID
+      value: {{MELOSYS_CONSOLE_CLIENT_ID}}
     - name: JDK_JAVA_OPTIONS
       value: "$(JAVA_PROXY_OPTIONS)"
   envFrom:

@@ -15,7 +15,6 @@ import no.nav.melosys.eessi.security.ThreadLocalAccessInfo
 import no.nav.melosys.eessi.service.buc.BucAdminService
 import no.nav.melosys.eessi.service.kafkadlq.KafkaDLQService
 import no.nav.security.token.support.core.api.Protected
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -31,20 +30,15 @@ class KafkaDLQAdminTjeneste(
     private val bucAdminService: BucAdminService
 ) {
 
-    @Value("\${melosys.admin.api-key}")
-    private lateinit var apiKey: String
-
     @GetMapping
-    fun hentFeiledeMeldinger(@RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<List<KafkaDLQDto>> {
-        validerApikey(apiKey)
+    fun hentFeiledeMeldinger(): ResponseEntity<List<KafkaDLQDto>> {
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
             ResponseEntity.ok(kafkaDLQService.hentFeiledeKafkaMeldinger().map(::mapEntitetTilDto))
         }
     }
 
     @PostMapping("/{uuid}/restart")
-    fun rekjørKafkaMelding(@PathVariable uuid: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
-        validerApikey(apiKey)
+    fun rekjørKafkaMelding(@PathVariable uuid: String): ResponseEntity<Void> {
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
             kafkaDLQService.rekjørKafkaMelding(parseUuid(uuid))
             ResponseEntity.ok().build()
@@ -63,8 +57,7 @@ class KafkaDLQAdminTjeneste(
         ]
     )
     @DeleteMapping("/{uuid}")
-    fun slettKafkaMelding(@PathVariable uuid: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Void> {
-        validerApikey(apiKey)
+    fun slettKafkaMelding(@PathVariable uuid: String): ResponseEntity<Void> {
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
             kafkaDLQService.slettKafkaMelding(parseUuid(uuid))
             ResponseEntity.noContent().build()
@@ -72,9 +65,7 @@ class KafkaDLQAdminTjeneste(
     }
 
     @PostMapping("/restart/alle")
-    fun rekjørAlleKafkaMeldinger(@RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<Map<String, Any>> {
-        validerApikey(apiKey)
-
+    fun rekjørAlleKafkaMeldinger(): ResponseEntity<Map<String, Any>> {
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
             val vellykket = mutableListOf<UUID>()
             val feilet = mutableListOf<String>()
@@ -106,8 +97,7 @@ class KafkaDLQAdminTjeneste(
     }
 
     @GetMapping("/buc/analyse/{rinaSaksnummer}")
-    fun analyserSeder(@PathVariable rinaSaksnummer: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<SedAnalyseResult> {
-        validerApikey(apiKey)
+    fun analyserSeder(@PathVariable rinaSaksnummer: String): ResponseEntity<SedAnalyseResult> {
         log.info { "Analyserer SEDer for sak $rinaSaksnummer" }
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
             ResponseEntity.ok(bucAdminService.analyserManglendeSeder(rinaSaksnummer))
@@ -115,8 +105,7 @@ class KafkaDLQAdminTjeneste(
     }
 
     @GetMapping("/buc/oversikt/{rinaSaksnummer}")
-    fun hentRinaOversikt(@PathVariable rinaSaksnummer: String, @RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<RinaSakOversiktV3> {
-        validerApikey(apiKey)
+    fun hentRinaOversikt(@PathVariable rinaSaksnummer: String): ResponseEntity<RinaSakOversiktV3> {
         log.info { "Henter RINA oversikt for sak $rinaSaksnummer" }
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
             ResponseEntity.ok(bucAdminService.hentRinaOversikt(rinaSaksnummer))
@@ -130,11 +119,8 @@ class KafkaDLQAdminTjeneste(
     @PostMapping("/buc/resend/{rinaSaksnummer}/{setIdentifier}")
     fun resendSed(
         @PathVariable rinaSaksnummer: String,
-        @PathVariable setIdentifier: String,
-        @RequestHeader(API_KEY_HEADER) apiKey: String
+        @PathVariable setIdentifier: String
     ): ResponseEntity<Void> {
-        validerApikey(apiKey)
-
         log.info { "Sender SED på nytt for sak $rinaSaksnummer med setID: $setIdentifier" }
         bucAdminService.resendSed(rinaSaksnummer, setIdentifier)
 
@@ -148,10 +134,8 @@ class KafkaDLQAdminTjeneste(
     )
     @PostMapping("/sed/resend-liste")
     fun resendSedListe(
-        @RequestBody dto: ResendSedListeDto,
-        @RequestHeader(API_KEY_HEADER) apiKey: String
+        @RequestBody dto: ResendSedListeDto
     ): ResponseEntity<String> {
-        validerApikey(apiKey)
         log.info("Sender forespørsel om gjensending av {} SEDer", dto.sedIds.size)
         try {
             bucAdminService.resendSedListe(dto.sedIds)
@@ -163,8 +147,7 @@ class KafkaDLQAdminTjeneste(
     }
 
     @GetMapping("/buc/analyse/alle")
-    fun analyserAlleFeiledeSaker(@RequestHeader(API_KEY_HEADER) apiKey: String): ResponseEntity<List<SedAnalyseResult>> {
-        validerApikey(apiKey)
+    fun analyserAlleFeiledeSaker(): ResponseEntity<List<SedAnalyseResult>> {
         log.info { "Starter analyse av alle saker med feilede meldinger i DLQ" }
 
         return ThreadLocalAccessInfo.utførSomAdminForespørsel {
@@ -206,21 +189,10 @@ class KafkaDLQAdminTjeneste(
             .skip(entitet.skip)
             .build()
 
-    private fun validerApikey(value: String) {
-        if (apiKey != value) {
-            throw SecurityException("Ugyldig API-nøkkel")
-        }
-    }
-
     private fun parseUuid(uuid: String): UUID =
         try {
             UUID.fromString(uuid)
         } catch (e: IllegalArgumentException) {
             throw ValidationException("Ugyldig uuid: $uuid")
         }
-
-
-    companion object {
-        private const val API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY"
-    }
 }

@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.Parameter
 import no.nav.melosys.eessi.service.saksrelasjon.SaksrelasjonService
 import no.nav.security.token.support.core.api.Protected
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -13,8 +12,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/admin/saksrelasjon")
 class SaksrelasjonAdminTjeneste(
-    private val saksrelasjonService: SaksrelasjonService,
-    @Value("\${melosys.admin.api-key}") private val apiKey: String
+    private val saksrelasjonService: SaksrelasjonService
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -29,11 +27,9 @@ class SaksrelasjonAdminTjeneste(
     )
     @PutMapping("/kobling/{rinaSaksnummer}/{gsakSaksnummer}")
     fun oppdaterKobling(
-        @RequestHeader(API_KEY_HEADER) apiKeyHeader: String,
         @Parameter(description = "Rinasak-nummeret som skal flyttes") @PathVariable rinaSaksnummer: String,
         @Parameter(description = "Ny fagsak (gsakSaksnummer) som Rinasakien skal kobles til") @PathVariable gsakSaksnummer: Long
     ): ResponseEntity<OppdaterKoblingResponse> {
-        validerApikey(apiKeyHeader)
         require(gsakSaksnummer > 0) { "gsakSaksnummer må være større enn 0" }
 
         log.info(
@@ -52,20 +48,10 @@ class SaksrelasjonAdminTjeneste(
         )
     }
 
-    private fun validerApikey(value: String) {
-        if (apiKey != value) {
-            throw SecurityException("Trenger gyldig apikey")
-        }
-    }
-
     data class OppdaterKoblingResponse(
         val melding: String,
         val rinaSaksnummer: String,
         val gammelGsakSaksnummer: Long,
         val nyGsakSaksnummer: Long
     )
-
-    companion object {
-        private const val API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY"
-    }
 }

@@ -11,6 +11,7 @@
     "GROUP_MELOSYS_INNLOGGING_VAKT": "fb706914-eede-490a-b9cd-2458983e24c1",
     "APP_NAME_EUX_RINA_API": "eux-rina-api-q2",
     "APP_NAME_MELOSYS_CONSOLE": "melosys-console-q2",
+    "MELOSYS_CONSOLE_CLIENT_ID": "7e5dc28f-00a6-4d3f-b8e6-c42a78b60ffc",
     "NAIS_CLUSTER_NAME_GCP": "dev-gcp",
     "UNLEASH_ENVIRONMENT": "development"
 }

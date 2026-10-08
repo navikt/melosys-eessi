@@ -11,7 +11,6 @@ import no.nav.melosys.eessi.models.SedMottattHendelseDto;
 import no.nav.melosys.eessi.repository.SedMottattHendelseRepository;
 import no.nav.melosys.eessi.service.mottak.SedMottakService;
 import no.nav.security.token.support.core.api.Protected;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,26 +20,21 @@ import org.springframework.web.bind.annotation.*;
 public class SedMottakAdminTjeneste {
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SedMottakAdminTjeneste.class);
-    private static final String API_KEY_HEADER = "X-MELOSYS-ADMIN-APIKEY";
     private final SedMottakService sedMottakService;
     private final SedMottattHendelseRepository sedMottattHendelseRepository;
-    private final String apiKey;
 
-    public SedMottakAdminTjeneste(SedMottakService sedMottakService, SedMottattHendelseRepository sedMottattHendelseRepository, @Value("${melosys.admin.api-key}") String apiKey) {
+    public SedMottakAdminTjeneste(SedMottakService sedMottakService, SedMottattHendelseRepository sedMottattHendelseRepository) {
         this.sedMottakService = sedMottakService;
         this.sedMottattHendelseRepository = sedMottattHendelseRepository;
-        this.apiKey = apiKey;
     }
 
     @GetMapping("/feilede")
-    public ResponseEntity<Collection<SedMottattHendelseDto>> hentSEDerMottattUtenJournalpostId(@RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
+    public ResponseEntity<Collection<SedMottattHendelseDto>> hentSEDerMottattUtenJournalpostId() {
         return ResponseEntity.ok(lagSedMottattHendelseDtoer(hentAlleSEDerUtenJournalpostID()));
     }
 
     @PostMapping("/feilede/restart")
-    public ResponseEntity<Collection<SedMottattHendelseDto>> restartAlleSEDerUtenJournalpostId(@RequestHeader(API_KEY_HEADER) String apiKey) {
-        validerApikey(apiKey);
+    public ResponseEntity<Collection<SedMottattHendelseDto>> restartAlleSEDerUtenJournalpostId() {
         Collection<SedMottattHendelse> sedUtenJournalpost = hentAlleSEDerUtenJournalpostID();
         log.info("Forsøker å restarte feilede SEDer ");
         restartAlleFeiledeSEDer(sedUtenJournalpost);
@@ -61,15 +55,5 @@ public class SedMottakAdminTjeneste {
 
     private void restartAlleFeiledeSEDer(Collection<SedMottattHendelse> sedmottattHendelser) {
         sedmottattHendelser.forEach(sedMottakService::behandleSedMottakHendelse);
-    }
-
-    private void validerApikey(String value) {
-        if (!getApiKey().equals(value)) {
-            throw new SecurityException("Trenger gyldig apikey");
-        }
-    }
-
-    private String getApiKey() {
-        return apiKey;
     }
 }
