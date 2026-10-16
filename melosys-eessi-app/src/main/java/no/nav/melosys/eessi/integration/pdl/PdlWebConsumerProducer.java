@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.integration.pdl;
 
 import java.util.Collections;
 
-import no.nav.melosys.eessi.config.MDCOperations;
 import no.nav.melosys.eessi.integration.WebClientConfig;
 import no.nav.melosys.eessi.security.GenericAuthFilterFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,9 +35,5 @@ public class PdlWebConsumerProducer implements WebClientConfig {
         httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set(BEHANDLINGSNUMMER, MELOSYS_EESSI_BEHANDLINGSNUMMER);
-
-        if (MDCOperations.getCorrelationId() != null) {
-            httpHeaders.add(MDCOperations.X_CORRELATION_ID, MDCOperations.getCorrelationId());
-        }
     }
 }

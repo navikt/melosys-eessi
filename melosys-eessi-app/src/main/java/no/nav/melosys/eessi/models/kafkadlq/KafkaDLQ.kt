@@ -30,7 +30,11 @@ abstract class KafkaDLQ(
     var antallRekjoringer: Int = 0,
 
     @Column(name = "skip")
-    var skip: Boolean = false
+    var skip: Boolean = false,
+
+    /** W3C trace-kontekst fra da meldingen feilet, aktiveres ved rekjøring. */
+    @Column(name = "traceparent")
+    var traceparent: String? = null
 ) {
 
     fun økAntallRekjøringerMed1() {

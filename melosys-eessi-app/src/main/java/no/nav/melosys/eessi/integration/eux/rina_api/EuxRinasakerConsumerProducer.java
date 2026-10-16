@@ -1,6 +1,5 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
-import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -40,7 +39,7 @@ public class EuxRinasakerConsumerProducer {
         RestTemplate restTemplate = restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
-            .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
+            .interceptors(interceptor)
             .build();
 
         restTemplate.getMessageConverters().removeIf(JacksonJsonHttpMessageConverter.class::isInstance);

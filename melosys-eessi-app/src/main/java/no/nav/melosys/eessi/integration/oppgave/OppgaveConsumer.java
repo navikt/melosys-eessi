@@ -11,9 +11,6 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
-
 public class OppgaveConsumer {
     @java.lang.SuppressWarnings("all")
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(OppgaveConsumer.class);
@@ -24,23 +21,20 @@ public class OppgaveConsumer {
     }
 
     public HentOppgaveDto hentOppgave(String oppgaveID) {
-        var correlationID = getCorrelationId();
-        log.debug("hentOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
-        return webClient.get().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
+        log.debug("hentOppgave, id: {}", oppgaveID);
+        return webClient.get().uri("/oppgaver/{oppgaveID}", oppgaveID).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
     }
 
     public HentOppgaveDto opprettOppgave(OppgaveDto oppgaveDto) {
-        var correlationID = getCorrelationId();
-        log.info("opprettOppgave, correlationID: {}", correlationID);
-        return webClient.post().uri("/oppgaver").header(X_CORRELATION_ID, correlationID).bodyValue(oppgaveDto).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
+        log.info("opprettOppgave");
+        return webClient.post().uri("/oppgaver").bodyValue(oppgaveDto).retrieve().onStatus(HttpStatusCode::isError, this::håndterFeil).bodyToMono(HentOppgaveDto.class).block();
     }
 
     @Retryable(retryFor = IntegrationException.class, noRetryFor = IkkeRetrybarOppgaveException.class,
         maxAttempts = 3, backoff = @Backoff(delay = 200, maxDelay = 2000, multiplier = 2, random = true))
     public HentOppgaveDto oppdaterOppgave(String oppgaveID, OppgaveOppdateringDto oppgaveOppdateringDto) {
-        var correlationID = getCorrelationId();
-        log.info("oppdaterOppgave, id: {}, correlationID: {}", oppgaveID, correlationID);
-        return webClient.patch().uri("/oppgaver/{oppgaveID}", oppgaveID).header(X_CORRELATION_ID, correlationID).bodyValue(oppgaveOppdateringDto)
+        log.info("oppdaterOppgave, id: {}", oppgaveID);
+        return webClient.patch().uri("/oppgaver/{oppgaveID}", oppgaveID).bodyValue(oppgaveOppdateringDto)
             .retrieve()
             .onStatus(HttpStatusCode::isError, this::håndterOppdateringsfeil)
             .bodyToMono(HentOppgaveDto.class).block();
