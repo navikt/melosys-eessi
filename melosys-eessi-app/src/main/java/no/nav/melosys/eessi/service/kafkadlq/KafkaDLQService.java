@@ -95,7 +95,6 @@ public class KafkaDLQService {
     private void rekjorSedMottattHendelse(SedMottattHendelseKafkaDLQ sedMottattHendelseKafkaDLQ) {
         SedHendelse sedHendelse = sedMottattHendelseKafkaDLQ.getSedMottattHendelse();
         putToMDC(SED_ID, sedHendelse.getSedId());
-        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
         log.info("Mottatt melding om sed mottatt: {}, uuid: {}", sedHendelse, sedMottattHendelseKafkaDLQ.getId());
         try {
             sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
@@ -108,7 +107,6 @@ public class KafkaDLQService {
             throw e;
         } finally {
             remove(SED_ID);
-            remove(CORRELATION_ID);
         }
     }
 
@@ -131,7 +129,6 @@ public class KafkaDLQService {
     }
 
     private void rekjorOppgaveHendelse(OppgaveHendelseAivenKafkaDLQ oppgaveHendelseAivenKafkaDLQ) {
-        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
         log.info("Rekjører melding om oppgave endret: {}, uuid: {}", oppgaveHendelseAivenKafkaDLQ.getOppgaveEndretHendelse(), oppgaveHendelseAivenKafkaDLQ.getId());
         try {
             oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveHendelseAivenKafkaDLQ.getOppgaveEndretHendelse());
@@ -142,8 +139,6 @@ public class KafkaDLQService {
             oppgaveHendelseAivenKafkaDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(oppgaveHendelseAivenKafkaDLQ);
             throw e;
-        } finally {
-            remove(CORRELATION_ID);
         }
     }
 
