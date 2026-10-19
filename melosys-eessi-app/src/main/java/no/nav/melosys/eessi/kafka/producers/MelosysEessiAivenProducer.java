@@ -12,9 +12,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import static no.nav.melosys.eessi.config.MDCOperations.CORRELATION_ID;
-import static no.nav.melosys.eessi.config.MDCOperations.getCorrelationId;
-
 @Service
 @Profile("!local-q2")
 public class MelosysEessiAivenProducer {
@@ -31,7 +28,6 @@ public class MelosysEessiAivenProducer {
     public void publiserMelding(MelosysEessiMelding melding) {
         try {
             ProducerRecord<String, Object> melosysEessiRecord = new ProducerRecord<>(topicName, melding);
-            melosysEessiRecord.headers().add(CORRELATION_ID, getCorrelationId().getBytes());
             kafkaTemplate.send(melosysEessiRecord).get();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

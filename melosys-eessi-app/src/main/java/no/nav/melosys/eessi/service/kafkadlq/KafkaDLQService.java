@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import io.opentelemetry.context.Scope;
+import no.nav.melosys.eessi.config.observability.Traceparent;
 import no.nav.melosys.eessi.identifisering.OppgaveKafkaAivenRecord;
 import no.nav.melosys.eessi.kafka.consumers.SedHendelse;
 import no.nav.melosys.eessi.models.SedMottattHendelse;
@@ -39,6 +41,7 @@ public class KafkaDLQService {
         sedMottattHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         sedMottattHendelseDLQ.setSisteFeilmelding(feilmelding);
         sedMottattHendelseDLQ.setId(UUID.randomUUID());
+        sedMottattHendelseDLQ.setTraceparent(Traceparent.nåværende());
         kafkaDLQRepository.save(sedMottattHendelseDLQ);
     }
 
@@ -52,6 +55,7 @@ public class KafkaDLQService {
         sedSendtHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         sedSendtHendelseDLQ.setSisteFeilmelding(feilmelding);
         sedSendtHendelseDLQ.setId(randomUuid);
+        sedSendtHendelseDLQ.setTraceparent(Traceparent.nåværende());
         kafkaDLQRepository.save(sedSendtHendelseDLQ);
     }
 
@@ -65,18 +69,22 @@ public class KafkaDLQService {
         oppgaveHendelseDLQ.setTidRegistrert(LocalDateTime.now());
         oppgaveHendelseDLQ.setSisteFeilmelding(feilmelding);
         oppgaveHendelseDLQ.setId(randomUuid);
+        oppgaveHendelseDLQ.setTraceparent(Traceparent.nåværende());
         kafkaDLQRepository.save(oppgaveHendelseDLQ);
     }
 
     @Transactional
     public void rekjørKafkaMelding(UUID uuid) {
         KafkaDLQ kafkaDLQMelding = hentMeldingEllerKast(uuid);
-        if (kafkaDLQMelding instanceof SedMottattHendelseKafkaDLQ sedMottattHendelse) {
-            rekjorSedMottattHendelse(sedMottattHendelse);
-        } else if (kafkaDLQMelding instanceof SedSendtHendelseKafkaDLQ sedSendtHendelse) {
-            rekjorSedSendtHendelse(sedSendtHendelse);
-        } else if (kafkaDLQMelding instanceof OppgaveHendelseAivenKafkaDLQ oppgaveHendelse) {
-            rekjorOppgaveHendelse(oppgaveHendelse);
+        // Rekjøringen havner i samme trace som da meldingen feilet
+        try (Scope ignored = Traceparent.aktiver(kafkaDLQMelding.getTraceparent())) {
+            if (kafkaDLQMelding instanceof SedMottattHendelseKafkaDLQ sedMottattHendelse) {
+                rekjorSedMottattHendelse(sedMottattHendelse);
+            } else if (kafkaDLQMelding instanceof SedSendtHendelseKafkaDLQ sedSendtHendelse) {
+                rekjorSedSendtHendelse(sedSendtHendelse);
+            } else if (kafkaDLQMelding instanceof OppgaveHendelseAivenKafkaDLQ oppgaveHendelse) {
+                rekjorOppgaveHendelse(oppgaveHendelse);
+            }
         }
     }
 
@@ -95,7 +103,6 @@ public class KafkaDLQService {
     private void rekjorSedMottattHendelse(SedMottattHendelseKafkaDLQ sedMottattHendelseKafkaDLQ) {
         SedHendelse sedHendelse = sedMottattHendelseKafkaDLQ.getSedMottattHendelse();
         putToMDC(SED_ID, sedHendelse.getSedId());
-        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
         log.info("Mottatt melding om sed mottatt: {}, uuid: {}", sedHendelse, sedMottattHendelseKafkaDLQ.getId());
         try {
             sedMottakService.behandleSedMottakHendelse(SedMottattHendelse.builder().sedHendelse(sedHendelse).build());
@@ -108,7 +115,6 @@ public class KafkaDLQService {
             throw e;
         } finally {
             remove(SED_ID);
-            remove(CORRELATION_ID);
         }
     }
 
@@ -131,7 +137,6 @@ public class KafkaDLQService {
     }
 
     private void rekjorOppgaveHendelse(OppgaveHendelseAivenKafkaDLQ oppgaveHendelseAivenKafkaDLQ) {
-        putToMDC(CORRELATION_ID, UUID.randomUUID().toString());
         log.info("Rekjører melding om oppgave endret: {}, uuid: {}", oppgaveHendelseAivenKafkaDLQ.getOppgaveEndretHendelse(), oppgaveHendelseAivenKafkaDLQ.getId());
         try {
             oppgaveEndretService.behandleOppgaveEndretHendelse(oppgaveHendelseAivenKafkaDLQ.getOppgaveEndretHendelse());
@@ -142,8 +147,6 @@ public class KafkaDLQService {
             oppgaveHendelseAivenKafkaDLQ.økAntallRekjøringerMed1();
             kafkaDLQRepository.save(oppgaveHendelseAivenKafkaDLQ);
             throw e;
-        } finally {
-            remove(CORRELATION_ID);
         }
     }
 

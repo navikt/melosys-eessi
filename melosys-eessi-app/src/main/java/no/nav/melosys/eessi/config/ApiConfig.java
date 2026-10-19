@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.config;
 
 import no.nav.melosys.eessi.controller.interceptor.AdminTilgangInterceptor;
-import no.nav.melosys.eessi.controller.interceptor.CorrelationIdInterceptor;
 import no.nav.security.token.support.client.spring.oauth2.EnableOAuth2Client;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -29,7 +28,6 @@ public class ApiConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new CorrelationIdInterceptor());
         // SedMottakAdminTjeneste ligger utenfor controller-pakken og får ikke /api-prefiks.
         // sed-mottatt-lager har aldri hatt adminsjekk og holdes utenfor.
         // Kjører før token-supports interceptor (order 0), så kall uten Azure-token får 401 herfra, ikke 500.

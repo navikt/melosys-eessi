@@ -3,7 +3,6 @@ package no.nav.melosys.eessi.integration.journalpostapi;
 import java.time.Duration;
 
 import tools.jackson.databind.json.JsonMapper;
-import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.RestSTSInterceptor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.restclient.RestTemplateBuilder;
@@ -27,12 +26,11 @@ public class JournalpostapiConfiguration {
     @Bean
     public RestTemplate journalpostapiRestTemplate(
         RestTemplateBuilder restTemplateBuilder,
-        RestSTSInterceptor systemContextClientRequestInterceptor,
-        CorrelationIdOutgoingInterceptor correlationIdOutgoingInterceptor) {
+        RestSTSInterceptor systemContextClientRequestInterceptor) {
         return restTemplateBuilder
             .requestFactory(SimpleClientHttpRequestFactory::new)
             .uriTemplateHandler(new DefaultUriBuilderFactory(url))
-            .interceptors(systemContextClientRequestInterceptor, correlationIdOutgoingInterceptor)
+            .interceptors(systemContextClientRequestInterceptor)
             .connectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS))
             .readTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS))
             .build();

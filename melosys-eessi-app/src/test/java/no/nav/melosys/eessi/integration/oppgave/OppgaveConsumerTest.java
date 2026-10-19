@@ -23,7 +23,6 @@ import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.reactive.function.client.WebClient;
 import tools.jackson.databind.json.JsonMapper;
 
-import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -67,7 +66,6 @@ class OppgaveConsumerTest {
         assertOppgaveFelter(oppgave);
         var request = mockWebServer.takeRequest();
         assertThat(request).extracting(RecordedRequest::getPath, RecordedRequest::getMethod).containsExactly("/oppgaver/" + OPPGAVE_ID, "GET");
-        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
     }
 
     @Test
@@ -77,7 +75,6 @@ class OppgaveConsumerTest {
         assertOppgaveFelter(oppgave);
         var request = mockWebServer.takeRequest();
         assertThat(request).extracting(RecordedRequest::getPath, RecordedRequest::getMethod).containsExactly("/oppgaver", "POST");
-        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
         assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
     }
 
@@ -96,7 +93,6 @@ class OppgaveConsumerTest {
         var request = mockWebServer.takeRequest();
         var requestBody = request.getBody().readUtf8();
         assertThat(request).extracting(RecordedRequest::getPath, RecordedRequest::getMethod).containsExactly("/oppgaver/" + OPPGAVE_ID, "PATCH");
-        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
         assertThat(request.getHeader(HttpHeaders.CONTENT_TYPE)).contains(MediaType.APPLICATION_JSON_VALUE);
         var jsonMapper = JsonMapper.builder().build();
         assertThat(jsonMapper.readTree(requestBody)).isEqualTo(jsonMapper.readTree(forventetJsonBodyRequestUtenBeskrivelseFelt));

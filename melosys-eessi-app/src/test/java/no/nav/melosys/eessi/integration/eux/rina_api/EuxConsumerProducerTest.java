@@ -2,7 +2,6 @@ package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import java.util.Optional;
 
-import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.restclient.RestTemplateBuilder;
@@ -60,7 +59,7 @@ class EuxConsumerProducerTest {
         return EuxConsumerProducer.configureJacksonMapper(restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
-            .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
+            .interceptors(interceptor)
             .build(), euxJsonMapper);
     }
 

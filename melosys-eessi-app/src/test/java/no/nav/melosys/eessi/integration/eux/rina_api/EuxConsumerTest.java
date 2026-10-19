@@ -11,7 +11,6 @@ import java.util.Map;
 import com.google.common.collect.Maps;
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod;
 import no.nav.melosys.eessi.integration.eux.rina_api.dto.Institusjon;
-import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.models.SedType;
 import no.nav.melosys.eessi.models.SedVedlegg;
 import no.nav.melosys.eessi.models.buc.*;
@@ -630,7 +629,7 @@ class EuxConsumerTest {
         return EuxConsumerProducer.configureJacksonMapper(restTemplateBuilder
             .defaultMessageConverters()
             .rootUri(uri)
-            .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
+            .interceptors(interceptor)
             .build(), euxJsonMapper);
     }
 }

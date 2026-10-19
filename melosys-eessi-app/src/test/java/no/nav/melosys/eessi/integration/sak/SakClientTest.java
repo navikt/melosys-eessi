@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import static no.nav.melosys.eessi.config.MDCOperations.X_CORRELATION_ID;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class SakClientTest {
@@ -55,6 +54,5 @@ class SakClientTest {
         RecordedRequest request = mockWebServer.takeRequest();
         assertThat(request.getPath()).isEqualTo("/11");
         assertThat(request.getMethod()).isEqualTo("GET");
-        assertThat(request.getHeaders().names()).contains(X_CORRELATION_ID);
     }
 }

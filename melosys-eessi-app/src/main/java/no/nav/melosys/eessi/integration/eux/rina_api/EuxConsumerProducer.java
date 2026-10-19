@@ -1,7 +1,6 @@
 package no.nav.melosys.eessi.integration.eux.rina_api;
 
 import tools.jackson.databind.json.JsonMapper;
-import no.nav.melosys.eessi.integration.interceptor.CorrelationIdOutgoingInterceptor;
 import no.nav.melosys.eessi.security.ClientRequestInterceptor;
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenService;
 import no.nav.security.token.support.client.spring.ClientConfigurationProperties;
@@ -55,7 +54,7 @@ public class EuxConsumerProducer {
             .rootUri(uri)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
-            .interceptors(interceptor, new CorrelationIdOutgoingInterceptor())
+            .interceptors(interceptor)
             .build();
 
         return configureJacksonMapper(restTemplate, jsonMapper);
