@@ -1,5 +1,5 @@
 name: Build and Push Image
-run-name: Build and Push Image · ${{ inputs.image_tag }}
+run-name: Build and Push Image · ${{ inputs.requested_by || github.actor }} · ${{ inputs.image_tag }}
 
 # Builds the selected branch and pushes the image to GAR as <image_tag> and the
 # commit sha, never latest. Tests are not run; they run in the pull request workflow.
@@ -13,6 +13,11 @@ on:
         description: "Custom image tag (for example, e2e-test-123 or feature-x; latest, mq-* and e2e-ok-* are reserved)"
         required: true
         type: string
+      requested_by:
+        description: "Who ordered the build; set by e2e-brancher.yml in melosys-e2e-tests, which runs as the Melosys CI app. Empty means the actor."
+        required: false
+        type: string
+        default: ''
 
 permissions:
   contents: read
