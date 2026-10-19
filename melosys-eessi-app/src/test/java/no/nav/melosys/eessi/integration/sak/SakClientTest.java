@@ -54,5 +54,7 @@ class SakClientTest {
         RecordedRequest request = mockWebServer.takeRequest();
         assertThat(request.getPath()).isEqualTo("/11");
         assertThat(request.getMethod()).isEqualTo("GET");
+        assertThat(request.getHeader(SakClient.CORRELATION_ID_HEADER))
+            .matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 }
