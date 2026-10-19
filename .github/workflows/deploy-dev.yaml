@@ -147,7 +147,7 @@ jobs:
         run: echo "COMMIT_MSG=$(git log --format=%s -n 1)" >> $GITHUB_ENV
       - name: Get Melosys CI token
         id: app-token
-        uses: actions/create-github-app-token@v3.2.0
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ vars.MELOSYS_CI_CLIENT_ID }}
           private-key: ${{ secrets.MELOSYS_CI_PRIVATE_KEY }}
