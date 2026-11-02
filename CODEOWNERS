@@ -1,1 +1,6 @@
 * @navikt/teammelosys
+
+# Filene og mappene under oppdateres av Dependabot og er med vilje satt uten eier,
+# slik at Dependabot-PR-er ikke ber teamet om review automatisk.
+pom.xml
+/.github/workflows/
