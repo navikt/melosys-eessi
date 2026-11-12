@@ -11,7 +11,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class BUC (
+data class BUC(
     val id: String? = null,
     val startDate: ZonedDateTime? = null,
     val lastUpdate: ZonedDateTime? = null,
@@ -45,7 +45,9 @@ data class BUC (
     fun erÅpen(): Boolean = !"closed".equals(status, ignoreCase = true)
 
     fun finnDokumentVedSedType(sedType: String): Document? =
-        finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document -> SedStatus.fraEngelskStatus(document.status) ?: SedStatus.TOM })
+        finnDokumenterVedSedType(sedType).minWithOrNull(Comparator.comparing { document: Document ->
+            SedStatus.fraEngelskStatus(document.status) ?: SedStatus.TOM
+        })
 
     fun finnUtgåendeDokumentVedSedType(sedType: String): Document? =
         documents.filter { it.type == sedType && !it.erInngående() && it.erOpprettet() }
@@ -72,6 +74,22 @@ data class BUC (
             val harSentA008 = harSendtSedTypeAntallDagerSiden(SedType.A008, 30)
 
             harMotattX012 && harSentX013 && harSentA008 && kanOppretteEllerOppdatereSed(SedType.X001)
+        }
+
+        BucType.LA_BUC_02 -> {
+            val mottatteSedSomTillaterLukking = setOf(SedType.A012, SedType.X007, SedType.X009)
+
+            val sendtA003 = finnDokumentVedTypeOgStatus(SedType.A003, SedStatus.SENDT)
+            if (sendtA003 == null || !sendtA003.erAntallDagerSidenOppdatering(60)) return false
+
+            val mottatteEtterA003 = documents
+                .filter { it.erInngående() && it.erOpprettet() && it.erIkkeX100() }
+                .filter { it.lastUpdate!!.isAfter(sendtA003.lastUpdate) }
+
+            val bareTillatteMottatt = mottatteEtterA003.all { dok -> mottatteSedSomTillaterLukking.any { it.name == dok.type } }
+            val sisteMottatteErA012 = mottatteEtterA003.maxByOrNull { it.lastUpdate!! }?.type == SedType.A012.name
+
+            return (bareTillatteMottatt || sisteMottatteErA012) && kanOppretteEllerOppdatereSed(SedType.X001)
         }
 
         else -> kanOppretteEllerOppdatereSed(SedType.X001)

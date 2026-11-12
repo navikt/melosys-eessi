@@ -295,6 +295,118 @@ class BUCTest {
         buc.hentMottakere() shouldContain "ORG1"
     }
 
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_A003SendtForEnDagSiden() {
+        laBuc02(sendtA003(1)).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_A003Sendt61DagerSidenIngenMottatt() {
+        laBuc02(sendtA003(61)).kanLukkesAutomatisk() shouldBe true
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_A003Sendt61DagerSidenUtenX001Action() {
+        laBuc02(sendtA003(61), kanOppretteX001 = false).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_IngenSendtA003() {
+        laBuc02(mottatt(SedType.A012, 10)).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_A003MedStatusTom() {
+        val a003Tom = createDocument(SedType.A003, SedStatus.TOM, 61, "OUT")
+
+        laBuc02(a003Tom).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_BareTillatteMottatt_SisteErIkkeA012() {
+        laBuc02(
+            sendtA003(61),
+            mottatt(SedType.X009, 30),
+            mottatt(SedType.A012, 20),
+            mottatt(SedType.X007, 10)
+        ).kanLukkesAutomatisk() shouldBe true
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_MottattA004() {
+        laBuc02(sendtA003(61), mottatt(SedType.A004, 10)).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_MottattA004_SisteErA012() {
+        laBuc02(
+            sendtA003(61),
+            mottatt(SedType.A004, 20),
+            mottatt(SedType.A012, 10)
+        ).kanLukkesAutomatisk() shouldBe true
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_MottattA004_A012_SisteErX009() {
+        laBuc02(
+            sendtA003(61),
+            mottatt(SedType.A004, 30),
+            mottatt(SedType.A012, 20),
+            mottatt(SedType.X009, 10)
+        ).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_MottattA012_SisteErA004() {
+        laBuc02(
+            sendtA003(61),
+            mottatt(SedType.A012, 20),
+            mottatt(SedType.A004, 10)
+        ).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_UkjentSed_SisteErA012() {
+        laBuc02(
+            sendtA003(61),
+            mottatt(SedType.X010, 20),
+            mottatt(SedType.A012, 10)
+        ).kanLukkesAutomatisk() shouldBe true
+    }
+
+    @Test
+    fun kanIkkeLukkesAutomatisk_LABUC02_A003Sendt30DagerSiden_MottattA012() {
+        laBuc02(sendtA003(30), mottatt(SedType.A012, 1)).kanLukkesAutomatisk() shouldBe false
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_A003Sendt61DagerSiden_A012MottattIGår() {
+        laBuc02(sendtA003(61), mottatt(SedType.A012, 1)).kanLukkesAutomatisk() shouldBe true
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_MottattX100Ignoreres() {
+        laBuc02(sendtA003(61), mottatt(SedType.X100, 10)).kanLukkesAutomatisk() shouldBe true
+    }
+
+    @Test
+    fun kanLukkesAutomatisk_LABUC02_MottattSedMedStatusTomIgnoreres() {
+        laBuc02(
+            sendtA003(61),
+            createDocument(SedType.A004, SedStatus.TOM, 10, "IN")
+        ).kanLukkesAutomatisk() shouldBe true
+    }
+
+    private fun laBuc02(vararg documents: Document, kanOppretteX001: Boolean = true) = BUC(
+        bucType = BucType.LA_BUC_02.name,
+        actions = if (kanOppretteX001) listOf(Action("name", SedType.X001.name, "1", "CREATE")) else listOf(),
+        documents = documents.toList()
+    )
+
+    private fun sendtA003(dagerSiden: Long) = createDocument(SedType.A003, SedStatus.SENDT, dagerSiden, "OUT")
+
+    private fun mottatt(sedType: SedType, dagerSiden: Long) = createDocument(sedType, SedStatus.MOTTATT, dagerSiden, "IN")
+
     private fun createDocument(sedType: SedType, sedStatus: SedStatus, days: Long, direction: String) = Document(
         type = sedType.name,
         status = sedStatus.engelskStatus,
