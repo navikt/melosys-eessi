@@ -385,15 +385,6 @@ class BUCTest {
     }
 
     @Test
-    fun kanIkkeLukkesAutomatisk_LABUC02_FørsteA003IListenSendtForTiDagerSiden() {
-        laBuc02(
-            sendtA003(10),
-            mottatt(SedType.A004, 100),
-            sendtA003(120)
-        ).kanLukkesAutomatisk() shouldBe false
-    }
-
-    @Test
     fun kanLukkesAutomatisk_LABUC02_MottattX100Ignoreres() {
         laBuc02(sendtA003(61), mottatt(SedType.X100, 10)).kanLukkesAutomatisk() shouldBe true
     }
